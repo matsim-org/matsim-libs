@@ -135,7 +135,7 @@ public class TripsCSVWriter {
             record.add(Time.writeTime(departureTime));
             record.add(Time.writeTime(travelTime));
             record.add(Time.writeTime(totalWaitingTime));
-            record.add(Time.writeTime(distance));
+            record.add(Double.toString(distance));
             record.add(currentModeWithLongestShare);
             record.add(modes.stream().collect(Collectors.joining("-")));
             record.add(lastActivityType);
