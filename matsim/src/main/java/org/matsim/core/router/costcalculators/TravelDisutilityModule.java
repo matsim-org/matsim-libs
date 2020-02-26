@@ -24,7 +24,6 @@ package org.matsim.core.router.costcalculators;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 
 public class TravelDisutilityModule extends AbstractModule {
 
