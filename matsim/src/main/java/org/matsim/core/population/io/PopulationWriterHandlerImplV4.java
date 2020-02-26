@@ -202,7 +202,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
-		if (!act.isMaximumDurationUndefined()) {
+		if (!act.getOptionalMaximumDuration().isUndefined()) {
 			out.write(" dur=\"");
 			out.write(Time.writeTime(act.getMaximumDuration()));
 			out.write("\"");

@@ -31,11 +31,6 @@ import org.matsim.facilities.ActivityFacility;
  */
 public interface Activity extends PlanElement {
 
-	default boolean isMaximumDurationUndefined() {
-		return getOptionalMaximumDuration().isUndefined();
-	}
-
-
 	public OptionalTime getEndTime();
 
 	public void setEndTime(final double seconds);

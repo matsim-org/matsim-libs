@@ -432,7 +432,7 @@ public final class PopulationUtils {
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
 					return act.getEndTime().seconds();
-				} else if (!act.isMaximumDurationUndefined()) {
+				} else if (!act.getOptionalMaximumDuration().isUndefined()) {
 					return now + act.getMaximumDuration();
 				} else {
 					return Time.getUndefinedTime();
@@ -856,7 +856,7 @@ public final class PopulationUtils {
 				act.getStartTime().seconds());
 		newAct.setEndTime(!act.getEndTime().isDefined() ? Time.getUndefinedTime() :
 				act.getEndTime().seconds());
-		newAct.setMaximumDuration(act.isMaximumDurationUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());
+		newAct.setMaximumDuration(act.getOptionalMaximumDuration().isUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 
 		AttributesUtils.copyAttributesFromTo(act, newAct);

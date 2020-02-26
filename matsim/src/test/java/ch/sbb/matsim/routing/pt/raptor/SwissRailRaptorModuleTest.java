@@ -217,10 +217,10 @@ public class SwissRailRaptorModuleTest {
         // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
         // fixing it here. kai, feb'20
 
-        Assert.assertTrue((((Activity) planElements.get( 2)).isMaximumDurationUndefined())) ;
-        Assert.assertTrue((((Activity) planElements.get( 4)).isMaximumDurationUndefined())) ;
-        Assert.assertTrue((((Activity) planElements.get( 6)).isMaximumDurationUndefined())) ;
-        Assert.assertTrue((((Activity) planElements.get( 8)).isMaximumDurationUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(2)).getOptionalMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(4)).getOptionalMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(6)).getOptionalMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(8)).getOptionalMaximumDuration().isUndefined())) ;
 
     }
     

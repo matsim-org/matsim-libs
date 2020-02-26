@@ -154,7 +154,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(endTime)
 				+ "]"
 				+ "[duration="
-				+ Time.writeTime(isMaximumDurationUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
+				+ Time.writeTime(getOptionalMaximumDuration().isUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
 				+ "]"
 				+ "[facilityId="
 				+ this.facilityId + "]" ;
