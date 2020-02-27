@@ -26,6 +26,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -66,6 +67,8 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
     @Inject
     TripsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension;
+    @Inject
+    TripsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
 
 	@Override
     public void notifyIterationEnds(IterationEndsEvent event) {
@@ -75,7 +78,9 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
         final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
-            new TripsCSVWriter(scenario, customTripsWriterExtension).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv));
+            new TripsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension).write(experiencedPlansService.getExperiencedPlans()
+                    , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
+                    , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.legscsv));
         }
     }
 
@@ -96,13 +101,24 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         List<String> attributes = new ArrayList<>(scenario.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getAttributes().getAsMap().keySet().stream()).collect(Collectors.toSet()));
         attributes.remove("vehicles");
         List<String> header = new ArrayList<>();
-        header.add("PersonId");
+        header.add("person");
+        header.add("first_act_x");
+        header.add("first_act_y");
         header.addAll(attributes);
         try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputDirectoryHierarchy.getOutputFilename(Controler.DefaultFiles.personscsv)),
                 CSVFormat.DEFAULT.withDelimiter(config.global().getDefaultDelimiter().charAt(0)).withHeader(header.stream().toArray(String[]::new)))) {
             for (Person p : scenario.getPopulation().getPersons().values()) {
                 List<String> line = new ArrayList<>();
                 line.add(p.getId().toString());
+                Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
+                String x = "";
+                String y = "";
+                if (firstAct.getCoord() != null) {
+                    x = Double.toString(firstAct.getCoord().getX());
+                    y = Double.toString(firstAct.getCoord().getY());
+                }
+                line.add(x);
+                line.add(y);
                 for (String attribute : attributes) {
                     Object value = p.getAttributes().getAttribute(attribute);
                     String result = value != null ? String.valueOf(value) : "";

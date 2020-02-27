@@ -29,16 +29,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,30 +51,45 @@ import java.util.stream.Collectors;
  * @author jbischoff / SBB
  */
 public class TripsCSVWriter {
-    public static String[] HEADER = {"person", "tripNumber", "tripId",
-            "departureTime", "travelTime", "totalWaitingTime", "traveledDistance", "euclideanDistance",
-            "modeWithLongestShare", "modes", "originActivityType",
-            "destinationActivityType", "originFacilityId", "originLinkId",
-            "fromX", "fromY", "destinationFacilityId",
-            "destinationLinkId", "toX", "toY"};
+    public static String[] TRIPSHEADER = {"person", "trip_number", "trip_id",
+            "dep_time", "trav_time", "wait_time", "traveled_distance", "euclidean_distance",
+            "longest_distance_mode", "modes", "start_activity_type",
+            "end_activity_type", "start_facility_id", "start_link",
+            "start_x", "start_y", "end_facility_id",
+            "end_link", "end_x", "end_y", "first_pt_boarding_stop", "last_pt_egress_stop"};
+
+    public static String[] LEGSHEADER = {"person", "trip_id",
+            "dep_time", "trav_time", "wait_time", "distance", "mode", "start_link",
+            "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route"};
+
     private final String separator;
-    private final CustomTripsWriterExtension extension;
+    private final CustomTripsWriterExtension tripsWriterExtension;
     private final Scenario scenario;
+    private final CustomLegsWriterExtension legsWriterExtension;
 
 
-    public TripsCSVWriter(Scenario scenario, CustomTripsWriterExtension extension) {
+    public TripsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
         this.scenario = scenario;
         this.separator = scenario.getConfig().global().getDefaultDelimiter();
-        HEADER = ArrayUtils.addAll(HEADER, extension.getAdditionalHeader());
-        this.extension = extension;
+        TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER, tripsWriterExtension.getAdditionalTripHeader());
+        LEGSHEADER = ArrayUtils.addAll(LEGSHEADER, legWriterExtension.getAdditionalLegHeader());
+        this.tripsWriterExtension = tripsWriterExtension;
+        this.legsWriterExtension = legWriterExtension;
 
     }
 
-    public void write(IdMap<Person, Plan> experiencedPlans, String filename) {
-        try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(filename),
-                CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(HEADER))) {
+    public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
+        try (CSVPrinter tripsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(tripsFilename),
+                CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(TRIPSHEADER));
+             CSVPrinter legsCSVprinter = new CSVPrinter(IOUtils.getBufferedWriter(legsFilename),
+                     CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(LEGSHEADER))
+
+        ) {
+
             for (Map.Entry<Id<Person>, Plan> entry : experiencedPlans.entrySet()) {
-                csvPrinter.printRecords(getCSVRecord(entry.getValue(), entry.getKey()));
+                Tuple<Iterable<?>, Iterable<?>> tripsAndLegRecords = getPlanCSVRecords(entry.getValue(), entry.getKey());
+                tripsCSVprinter.printRecords(tripsAndLegRecords.getFirst());
+                legsCSVprinter.printRecords(tripsAndLegRecords.getSecond());
             }
         } catch (IOException e) {
 
@@ -83,19 +97,21 @@ public class TripsCSVWriter {
         }
     }
 
-    private Iterable<?> getCSVRecord(Plan experiencedPlan, Id<Person> personId) {
-        List<List<String>> records = new ArrayList<>();
+    private Tuple<Iterable<?>, Iterable<?>> getPlanCSVRecords(Plan experiencedPlan, Id<Person> personId) {
+        List<List<String>> tripRecords = new ArrayList<>();
+        List<List<String>> legRecords = new ArrayList<>();
+        Tuple<Iterable<?>, Iterable<?>> record = new Tuple<>(tripRecords, legRecords);
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(experiencedPlan);
 
         for (int i = 0; i < trips.size(); i++) {
             TripStructureUtils.Trip trip = trips.get(i);
-            List<String> record = new ArrayList<>();
-            records.add(record);
-            record.add(personId.toString());
+            List<String> tripRecord = new ArrayList<>();
+            tripRecords.add(tripRecord);
+            tripRecord.add(personId.toString());
             final String tripNo = Integer.toString(i + 1);
-            record.add(tripNo); // trip number, numbered starting with 0
+            tripRecord.add(tripNo); // trip number, numbered starting with 0
             String tripId = personId.toString() + "_" + tripNo;
-            record.add(tripId);
+            tripRecord.add(tripId);
             double distance = 0.0;
             double departureTime = trip.getOriginActivity().getEndTime();
             double travelTime = trip.getDestinationActivity().getStartTime() - departureTime;
@@ -114,6 +130,9 @@ public class TripsCSVWriter {
             Coord fromCoord = getCoordFromActivity(trip.getOriginActivity());
             Coord toCoord = getCoordFromActivity(trip.getDestinationActivity());
             int euclideanDistance = (int) CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+            String firstPtBoardingStop = null;
+            String lastPtEgressStop = null;
+
 
             for (Leg leg : trip.getLegsOnly()) {
                 modes.add(leg.getMode());
@@ -129,35 +148,102 @@ public class TripsCSVWriter {
                     currentModeWithLongestShare = leg.getMode();
 
                 }
+                if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+                    ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+                    firstPtBoardingStop = firstPtBoardingStop != null ? firstPtBoardingStop : route.getAccessStopId().toString();
+                    lastPtEgressStop = route.getEgressStopId().toString();
+                }
 
             }
 
-            record.add(Time.writeTime(departureTime));
-            record.add(Time.writeTime(travelTime));
-            record.add(Time.writeTime(totalWaitingTime));
-            record.add(Integer.toString((int) Math.round(distance)));
-            record.add(Integer.toString(euclideanDistance));
-            record.add(currentModeWithLongestShare);
-            record.add(modes.stream().collect(Collectors.joining("-")));
-            record.add(lastActivityType);
-            record.add(nextActivityType);
-            record.add(String.valueOf(fromFacilityId));
-            record.add(String.valueOf(fromLinkId));
-            record.add(Double.toString(fromCoord.getX()));
-            record.add(Double.toString(fromCoord.getY()));
+            tripRecord.add(Time.writeTime(departureTime));
+            tripRecord.add(Time.writeTime(travelTime));
+            tripRecord.add(Time.writeTime(totalWaitingTime));
+            tripRecord.add(Integer.toString((int) Math.round(distance)));
+            tripRecord.add(Integer.toString(euclideanDistance));
+            tripRecord.add(currentModeWithLongestShare);
+            tripRecord.add(modes.stream().collect(Collectors.joining("-")));
+            tripRecord.add(lastActivityType);
+            tripRecord.add(nextActivityType);
+            tripRecord.add(String.valueOf(fromFacilityId));
+            tripRecord.add(String.valueOf(fromLinkId));
+            tripRecord.add(Double.toString(fromCoord.getX()));
+            tripRecord.add(Double.toString(fromCoord.getY()));
 
-            record.add(String.valueOf(toFacilityId));
-            record.add(String.valueOf(toLinkId));
-            record.add(Double.toString(toCoord.getX()));
-            record.add(Double.toString(toCoord.getY()));
+            tripRecord.add(String.valueOf(toFacilityId));
+            tripRecord.add(String.valueOf(toLinkId));
+            tripRecord.add(Double.toString(toCoord.getX()));
+            tripRecord.add(Double.toString(toCoord.getY()));
+            tripRecord.add(firstPtBoardingStop != null ? firstPtBoardingStop : "");
+            tripRecord.add(lastPtEgressStop != null ? lastPtEgressStop : "");
+            tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(trip));
+            if (TRIPSHEADER.length != tripRecord.size()) {
+                throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional columns. Must be " + TRIPSHEADER.length + " , but is " + tripRecord.size());
+            }
+            Activity prevAct = null;
+            Leg prevLeg = null;
+            List<PlanElement> allElements = new ArrayList<>();
+            allElements.add(trip.getOriginActivity());
+            allElements.addAll(trip.getTripElements());
+            allElements.add(trip.getDestinationActivity());
+            for (PlanElement pe : allElements) {
+                if (pe instanceof Activity) {
+                    Activity currentAct = (Activity) pe;
+                    if (prevLeg != null) {
+                        List<String> legRecord = getLegRecord(prevLeg, personId.toString(), tripId, prevAct, currentAct);
+                        legRecords.add(legRecord);
+                    }
+                    prevAct = currentAct;
 
-            record.addAll(extension.getAdditionalColumns(trip));
-            if (HEADER.length != record.size()) {
-                    throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional columns. Must be " + HEADER.length + " , but is " + record.size());
+                } else if (pe instanceof Leg) {
+                    prevLeg = (Leg) pe;
+                }
             }
         }
 
-        return records;
+        return record;
+    }
+
+    private List<String> getLegRecord(Leg leg, String personId, String tripId, Activity previousAct, Activity nextAct) {
+        List<String> record = new ArrayList<>();
+        record.add(personId);
+        record.add(tripId);
+        record.add(Time.writeTime(leg.getDepartureTime()));
+        record.add(Time.writeTime(leg.getTravelTime()));
+        Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
+        double waitingTime = 0.;
+        if (boardingTime != null) {
+            waitingTime = boardingTime - leg.getDepartureTime();
+        }
+        record.add(Time.writeTime(waitingTime));
+        record.add(Integer.toString((int) leg.getRoute().getDistance()));
+        record.add(leg.getMode());
+        record.add(leg.getRoute().getStartLinkId().toString());
+        Coord startCoord = getCoordFromActivity(previousAct);
+        Coord endCoord = getCoordFromActivity(nextAct);
+        record.add(Double.toString(startCoord.getX()));
+        record.add(Double.toString(startCoord.getY()));
+        record.add(leg.getRoute().getEndLinkId().toString());
+        record.add(Double.toString(endCoord.getX()));
+        record.add(Double.toString(endCoord.getY()));
+        String transitLine = "";
+        String transitRoute = "";
+        String ptAccessStop = "";
+        String ptEgressStop = "";
+        if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+            ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+            transitLine = route.getLineId().toString();
+            transitRoute = route.getRouteId().toString();
+            ptAccessStop = route.getAccessStopId().toString();
+            ptEgressStop = route.getEgressStopId().toString();
+        }
+        record.add(ptAccessStop);
+        record.add(ptEgressStop);
+        record.add(transitLine);
+        record.add(transitRoute);
+
+
+        return record;
     }
 
     private Coord getCoordFromActivity(Activity activity) {
@@ -176,18 +262,37 @@ public class TripsCSVWriter {
 
 
     public interface CustomTripsWriterExtension {
-        String[] getAdditionalHeader();
-        List<String> getAdditionalColumns(TripStructureUtils.Trip trip);
+        String[] getAdditionalTripHeader();
+
+        List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip);
     }
 
-    static class NoExtension implements CustomTripsWriterExtension {
+    public interface CustomLegsWriterExtension {
+        String[] getAdditionalLegHeader();
+
+        List<String> getAdditionalLegColumns(TripStructureUtils.Trip experiencedTrip, Leg experiencedLeg);
+    }
+
+    static class NoTripWriterExtension implements CustomTripsWriterExtension {
         @Override
-        public String[] getAdditionalHeader() {
+        public String[] getAdditionalTripHeader() {
             return new String[0];
         }
 
         @Override
-        public List<String> getAdditionalColumns(TripStructureUtils.Trip trip) {
+        public List<String> getAdditionalTripColumns(TripStructureUtils.Trip trip) {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    static class NoLegsWriterExtension implements CustomLegsWriterExtension {
+        @Override
+        public String[] getAdditionalLegHeader() {
+            return new String[0];
+        }
+
+        @Override
+        public List<String> getAdditionalLegColumns(TripStructureUtils.Trip experiencedTrip, Leg experiencedLeg) {
             return Collections.EMPTY_LIST;
         }
     }
