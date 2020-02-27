@@ -46,7 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author lkroeger, ikaddoura
  *
  */
-final class NoiseContext {
+public final class NoiseContext {
 	
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
 

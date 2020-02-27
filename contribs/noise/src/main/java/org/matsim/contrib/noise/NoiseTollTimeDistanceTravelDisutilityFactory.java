@@ -51,8 +51,7 @@ final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisuti
 		
 		return new NoiseTollTimeDistanceTravelDisutility(
 				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
-				this.noiseContext,
-				this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 				this.sigma
 			);
 	}
