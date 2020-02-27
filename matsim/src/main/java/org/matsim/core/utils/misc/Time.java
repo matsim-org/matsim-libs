@@ -174,7 +174,7 @@ public class Time {
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
 	public static final double parseTime(final String time) {
-		return parseTime(time, ':');
+		return parseTime(time, ':').orElseUndefined();
 	}
 
 	/**
@@ -189,9 +189,9 @@ public class Time {
 	 *
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
-	public static final double parseTime(final String time, final char separator) {
+	public static final OptionalTime parseTime(final String time, final char separator) {
 		if (time == null || time.length() == 0 || time.equals("undefined")) {
-			return Time.getUndefinedTime();
+			return OptionalTime.undefined();
 		}
 		boolean isNegative = (time.charAt(0) == '-');
 		String[] strings = (isNegative
@@ -229,7 +229,7 @@ public class Time {
 		if (isNegative) {
 			seconds = -seconds;
 		}
-		return seconds;
+		return OptionalTime.defined(seconds);
 	}
 
 	/**
