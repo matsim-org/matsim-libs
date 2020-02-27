@@ -40,7 +40,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
-	public enum EventsFileFormat {xml}
+	public enum EventsFileFormat {xml, pb}
 
 	public enum CompressionType {
 		none(""),
@@ -108,7 +108,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
 				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
-		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: xml."+IOUtils.NATIVE_NEWLINE+ "\t\t" +
+		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: xml, pb."+IOUtils.NATIVE_NEWLINE+ "\t\t" +
 				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");

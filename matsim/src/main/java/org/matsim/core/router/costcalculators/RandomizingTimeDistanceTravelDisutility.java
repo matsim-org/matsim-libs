@@ -67,7 +67,7 @@ final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility 
 		if ( sigma != 0. ) {
 			if ( person==null ) {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
-						+ "sigma to zero.") ;
+						+ " sigma to zero. If you are loading a scenario from a config, set the routingRandomness in the plansCalcRoute config group to zero.") ;
 			}
 			if ( person != prevPerson ) {
 				prevPerson = person ;
