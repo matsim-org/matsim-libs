@@ -71,6 +71,9 @@ class TravelTimeDataArray extends TravelTimeData {
 	@Override
 	public double getTravelTime(final int timeSlot, final double now) {
 		double ttime = this.travelTimes[timeSlot];
+		if(this.link.getId().toString().equals("102")) {
+			System.out.println(timeSlot + " | " + ttime);
+		}
 		if (ttime >= 0.0) return ttime; // negative values are invalid.
 
 		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 9, so just use freespeed

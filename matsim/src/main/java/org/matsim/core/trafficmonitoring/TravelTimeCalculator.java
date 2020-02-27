@@ -252,7 +252,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 			/*
 			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
-			 * by a MapBasedDataContainerProvider.
+			 * by a MapBased.
 			 * When ArrayRoutingNetworks are used (as the FastRouter implementations do), the
 			 * getArrayIndex() methods from the RoutingLinks can be used to lookup the link
 			 * data objects in an array. This approach is implemented by the ArrayBasedDataContainerProvider.
