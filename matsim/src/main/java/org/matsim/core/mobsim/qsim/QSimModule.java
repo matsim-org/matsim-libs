@@ -100,8 +100,8 @@ public class QSimModule extends AbstractModule {
 		}
 
 		bind(QSim.class).in(IterationScoped.class);
-		bind(Netsim.class).to(QSim.class);
-		bind(Mobsim.class).toProvider(QSimProvider.class);
+		bind(Netsim.class).to(QSim.class).in(IterationScoped.class);
+		bind(Mobsim.class).toProvider(QSimProvider.class).in(IterationScoped.class);
 	}
 
 	static public Collection<AbstractQSimModule> getDefaultQSimModules() {

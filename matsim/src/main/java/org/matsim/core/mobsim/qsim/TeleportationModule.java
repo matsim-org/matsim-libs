@@ -21,12 +21,14 @@
 
  package org.matsim.core.mobsim.qsim;
 
+import org.matsim.core.controler.IterationScoped;
+
 public class TeleportationModule extends AbstractQSimModule {
 	public final static String COMPONENT_NAME = "TeleportationEngine";
 
 	@Override
 	protected void configureQSim() {
-		bind(DefaultTeleportationEngine.class).asEagerSingleton();
+		bind(DefaultTeleportationEngine.class).in(IterationScoped.class);
 		addNamedComponent(DefaultTeleportationEngine.class, COMPONENT_NAME);
 	}
 }

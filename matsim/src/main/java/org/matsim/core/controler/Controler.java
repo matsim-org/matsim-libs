@@ -262,7 +262,7 @@ public final class Controler implements ControlerI, MatsimServices {
 
 	@Override
 	public final TravelTime getLinkTravelTimes() {
-		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
+		return this.injector.getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
 				.get(TransportMode.car);
 	}
 

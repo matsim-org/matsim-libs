@@ -121,7 +121,8 @@ class NewControler extends AbstractController implements ControlerI {
 
 	@Override
 	protected final void runMobSim() {
-		this.mobsimProvider.get().run();
+		Mobsim mobsim = this.mobsimProvider.get();
+		mobsim.run();
 	}
 
 	@Override

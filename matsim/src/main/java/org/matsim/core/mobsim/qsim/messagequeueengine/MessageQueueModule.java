@@ -21,6 +21,7 @@
 
  package org.matsim.core.mobsim.qsim.messagequeueengine;
 
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.jdeqsimengine.SteppableScheduler;
@@ -30,9 +31,9 @@ public class MessageQueueModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(MessageQueue.class).asEagerSingleton();
-		bind(SteppableScheduler.class).asEagerSingleton();
-		bind(MessageQueueEngine.class).asEagerSingleton();
+		bind(MessageQueue.class).in(IterationScoped.class);
+		bind(SteppableScheduler.class).in(IterationScoped.class);
+		bind(MessageQueueEngine.class).in(IterationScoped.class);
 		
 //		addNamedComponent(MessageQueueEngine.class, COMPONENT_NAME);
 		this.addQSimComponentBinding( COMPONENT_NAME ).to( MessageQueueEngine.class ) ;

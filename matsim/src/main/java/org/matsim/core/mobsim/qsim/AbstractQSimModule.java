@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.google.inject.multibindings.Multibinder;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.AbstractMobsimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
@@ -61,7 +62,7 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 	// Use methods above
 	@Deprecated
 	protected <T extends QSimComponent> void addNamedComponent(Class<T> componentClass, String name) {
-		addQSimComponentBinding(name).to(componentClass);
+		addQSimComponentBinding(name).to(componentClass).in(IterationScoped.class);
 	}
 
 	protected abstract void configureQSim();

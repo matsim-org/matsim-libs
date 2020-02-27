@@ -21,12 +21,14 @@
 
  package org.matsim.core.mobsim.qsim;
 
+import org.matsim.core.controler.IterationScoped;
+
 public class ActivityEngineModule extends AbstractQSimModule {
 	public static final String COMPONENT_NAME = "ActivityEngine";
 
 	@Override
 	protected void configureQSim() {
-		bind( ActivityEngineDefaultImpl.class ).asEagerSingleton();
+		bind( ActivityEngineDefaultImpl.class ).in(IterationScoped.class);
 		addNamedComponent( ActivityEngineDefaultImpl.class, COMPONENT_NAME );
 	}
 }

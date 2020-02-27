@@ -21,6 +21,7 @@
 
  package org.matsim.core.mobsim.qsim.changeeventsengine;
 
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 public class NetworkChangeEventsModule extends AbstractQSimModule {
@@ -28,7 +29,7 @@ public class NetworkChangeEventsModule extends AbstractQSimModule {
 	
 	@Override
 	protected void configureQSim() {
-		bind(NetworkChangeEventsEngine.class).asEagerSingleton();
+		bind(NetworkChangeEventsEngine.class).in(IterationScoped.class);
 		addNamedComponent(NetworkChangeEventsEngine.class, NETWORK_CHANGE_EVENTS_ENGINE_NAME);
 	}
 }
