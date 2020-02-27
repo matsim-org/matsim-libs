@@ -166,7 +166,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_25_changedLinkVectorLogic";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_27";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 

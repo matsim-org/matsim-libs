@@ -76,8 +76,8 @@ import org.xml.sax.Attributes;
 
 public class RunNilsOSMSignalReader{
     public static void main(String[] args){
-        String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
-        String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
+        String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
+        String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/nils2020_02_20";
         CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
                 TransformationFactory.WGS84_UTM33N);
 
@@ -103,7 +103,7 @@ public class RunNilsOSMSignalReader{
                 true, // allow U-turn at left lane only
                 true, // make pedestrian signals
                 false,
-                null); // accept 4+ crossings
+                "StVO_free"); // accept 4+ crossings
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
     // (south,west,north,east)
 		reader.parse(inputOSM);

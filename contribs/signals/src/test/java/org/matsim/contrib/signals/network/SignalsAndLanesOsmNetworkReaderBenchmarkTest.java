@@ -205,7 +205,6 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         Assert.assertEquals("Number of Links with Lanes",noLinksWithLanesBenchmark, noLinksWithLanes);
         Assert.assertEquals("Number of Signalied Osm Nodes", NoSignalizedOsmNodesBenchmark,NoSignalizedOsmNodes);
 
-
         System.out.println("Number of Links: original: " + noLinks + " SignalReader: " + noLinksBenchmark);
         System.out.println("Number of Nodes: original: " + noNodes + " SignalReader: " + noNodesBenchmark);
 
