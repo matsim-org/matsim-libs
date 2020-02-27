@@ -30,12 +30,15 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.StayTaskEndTimeUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
+import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeUpdater;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
@@ -89,8 +92,9 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				ScheduleUpdater scheduleUpdater =  getModalInstance(ScheduleUpdater.class);
 				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						eTaxiScheduler, chargingInfrastructure).get();
+						eTaxiScheduler, scheduleUpdater, chargingInfrastructure).get();
 			}
 		});
 
@@ -112,6 +116,15 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 					}
 				}).asEagerSingleton();
+
+		{ //i do not really think that we need to bind this per mode, do we?
+			bindModal(StayTaskEndTimeUpdater.class).toProvider(() -> new ETaxiStayTaskEndTimeUpdater(taxiCfg)).asEagerSingleton();
+			bindModal(ScheduleUpdater.class).toProvider(modalProvider(
+					getter -> new ScheduleUpdater(getter.get(MobsimTimer.class),
+							getter.getModal(StayTaskEndTimeUpdater.class))
+					)
+			).asEagerSingleton();
+		}
 
 		bindModal(DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<ETaxiActionCreator>(taxiCfg.getMode()) {
