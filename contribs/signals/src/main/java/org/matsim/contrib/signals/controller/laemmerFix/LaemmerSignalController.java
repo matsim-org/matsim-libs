@@ -98,6 +98,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 		laemmerSignals.clear();
 		activeRequest = null;
 		regulationQueue.clear();
+		systemOutflowCapacity = 0;
 
 		this.initializeSensoring();
 		for (SignalGroup group : this.system.getSignalGroups().values()) {

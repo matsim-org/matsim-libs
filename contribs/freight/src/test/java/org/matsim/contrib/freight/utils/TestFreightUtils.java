@@ -18,25 +18,33 @@
   
 package org.matsim.contrib.freight.utils;
 
+import java.net.URL;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -47,17 +55,23 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
+import org.apache.log4j.Logger;
+
+import javax.management.InvalidAttributeValueException;
 
 public class TestFreightUtils {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
-	
-	private static Carriers carriersWithServicesAndShpiments;
+
 	private static Carrier carrierWServices;
 	private static Carrier carrierWShipments;
-	
-	private static Carriers carriersWithShipmentsOnly;
+
 	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
 	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
@@ -72,7 +86,7 @@ public class TestFreightUtils {
 	public static void setUp() {
 		
 		//Create carrier with services and shipments
-		carriersWithServicesAndShpiments = new Carriers() ;
+		Carriers carriersWithServicesAndShpiments = new Carriers();
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarrierUtils.addService(carrierWServices, service1);
@@ -88,12 +102,12 @@ public class TestFreightUtils {
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
-		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );;
+		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		final EngineInformation engineInfo = carrierVehType.getEngineInformation() ;
 		engineInfo.setFuelType( FuelType.diesel );
 		engineInfo.setFuelConsumption( 0.015 );
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
-		vehicleCapacity.setOther( 3 ); ;
+		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
 		costInfo.setCostsPerMeter( 0.0001 ) ;
 		costInfo.setCostsPerSecond( 0.001 ) ;
@@ -146,7 +160,7 @@ public class TestFreightUtils {
 		 */
 
 		//Convert to jsprit VRP
-		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 
@@ -209,7 +223,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes().size());
 		for ( VehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3., (double) carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
+			Assert.assertEquals(3., carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0 );
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
@@ -221,7 +235,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes().size());
 		for ( VehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3.,(double) carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
+			Assert.assertEquals(3., carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0 );
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
@@ -404,6 +418,87 @@ public class TestFreightUtils {
 		FreightUtils.addSkill(service, "testSkillTwo");
 		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(service, "testSkillOne"));
 		Assert.assertTrue("Should have skill 'testSkillTwo'.", FreightUtils.hasSkill(service, "testSkillTwo"));
+	}
+
+	@Test
+	public void testRunJsprit_allInformationGiven(){
+		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
+		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
+		ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		Controler controler = new Controler(scenario);
+
+		setJspritIterationsForCarriers(controler);
+
+		try {
+			FreightUtils.runJsprit(controler);
+		} catch (Exception e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+	}
+
+	/**
+	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
+	 */
+	@Test(expected = javax.management.InvalidAttributeValueException.class)
+	public void testRunJsprit_NoOfJsprtiIterationsMissing() throws InvalidAttributeValueException {
+		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		Controler controler = new Controler(scenario);
+
+		FreightUtils.runJsprit(controler);
+	}
+
+	/**
+	 * Don't crash even if there is no algortihm file specified.
+	 */
+	@Test
+	public void testRunJsprit_NoAlgortihmFileGiven(){
+		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		Controler controler = new Controler(scenario);
+
+		setJspritIterationsForCarriers(controler);
+
+		try {
+			FreightUtils.runJsprit(controler);
+		} catch (Exception e) {
+			Assert.fail();
+		}
+		Assert.assertEquals(null, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+	}
+
+	private Config prepareConfig(){
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
+		config.controler().setLastIteration(0);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
+		//freight configstuff
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).toString() );
+		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );
+		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
+		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
+		return config;
+	}
+
+	private void setJspritIterationsForCarriers(Controler controler) {
+		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			CarrierUtils.setJspritIterations(carrier, 1);
+		}
 	}
 
 }

@@ -40,6 +40,11 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     public static final String CARRIERSVEHICLETYPED = "carriersVehicleTypeFile";
     private static final String CARRIERSVEHICLETYPEDESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
 
+    private String vehicleRoutingAlgortihmFile;
+    public static final String VEHICLEROUTINGALGORITHM = "vehicleRoutingAlgortihmFile";
+    private static final String VEHICLEROUTINGALGORITHMDESC = "(Optional) Vehicle Routing Algorithm File, according to jsprit library. "
+           + "Empty value \"\" means an default algorithm is used.";
+
     @Positive
     private int travelTimeSliceWidth = 1800;
     public static final String TRAVELTIMESLICEWIDTH = "travelTimeSliceWidth";
@@ -56,6 +61,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         super(GROUPNAME);
     }
 
+    //### CarriersFile ###
     /**
      * @return -- {@value #CARRIERSFILEDESC}
      */
@@ -76,6 +82,8 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         this.carriersFile = carriersFile;
     }
 
+    
+    //### CarriersVehicleTypeFile ###
     /**
      * @return -- {@value #CARRIERSVEHICLETYPEDESC}
      */
@@ -87,8 +95,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     URL getCarriersVehicleTypesFileUrl(URL context) {
         return ConfigGroup.getInputFileURL(context, this.carriersVehicleTypesFile);
     }
-
-
+    
     /**
      * @param -- {@value #CARRIERSVEHICLETYPEDESC}
      */
@@ -97,7 +104,29 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         this.carriersVehicleTypesFile = carriersVehicleTypesFile;
     }
 
+    //### VehicleRoutingAlgorithmFile ###
+    /**
+     * @return -- {@value #VEHICLEROUTINGALGORITHMDESC}
+     */
+//    @StringGetter(VEHICLEROUTINGALGORITHM)
+    public String getVehicleRoutingAlgortihmFile() {
+        return vehicleRoutingAlgortihmFile;
+    }
 
+    URL getVehicleAlgortihemsFileUrl(URL context) {
+        return ConfigGroup.getInputFileURL(context, this.vehicleRoutingAlgortihmFile);
+    }
+
+    /**
+     * @param -- {@value #VEHICLEROUTINGALGORITHMDESC}
+     */
+//    @StringSetter(VEHICLEROUTINGALGORITHM)
+    public void setVehicleRoutingAlgortihmFileFile(String vehicleRoutingAlgortihmFile) {
+        this.vehicleRoutingAlgortihmFile = vehicleRoutingAlgortihmFile;
+    }
+
+
+    //### TravelTimeSliceWidth ###
     /**
      * @return travelTimeSliceWidth --{@value #TRAVELTIMESLICEWIDTHDESC}
      */
@@ -113,7 +142,8 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     public void setTravelTimeSliceWidth(int travelTimeSliceWidth) {
         this.travelTimeSliceWidth = travelTimeSliceWidth;
     }
-    // ---
+
+    //### TimeWindowHandling ###
     public enum TimeWindowHandling{ ignore, enforceBeginnings }
     private TimeWindowHandling timeWindowHandling = TimeWindowHandling.enforceBeginnings ;
     /**
@@ -126,7 +156,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     public TimeWindowHandling getTimeWindowHandling() {
         return this.timeWindowHandling ;
     }
-    // ---
+
 
     
     //---
@@ -153,6 +183,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         Map<String, String> map = super.getComments();
         map.put(CARRIERSFILEDE, CARRIERSFILEDESC);
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
+        map.put(VEHICLEROUTINGALGORITHM, VEHICLEROUTINGALGORITHMDESC);
         map.put(TRAVELTIMESLICEWIDTH, TRAVELTIMESLICEWIDTHDESC);
         map.put(USE_DISTANCE_CONSTRAINT, USE_DISTANCE_CONSTRAINT_DESC);
         return map;

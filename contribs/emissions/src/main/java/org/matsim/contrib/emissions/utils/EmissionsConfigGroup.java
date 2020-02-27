@@ -312,8 +312,8 @@ public final class EmissionsConfigGroup
 			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 	}
-	// ============================================
-	// ============================================
+	// ---
+	// ---
 	// yy I now think that one can get away without the following.  kai, mar'19
 	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
 	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT="Each vehicle in matsim points to a VehicleType.  For the emissions package to work, " +
@@ -352,7 +352,8 @@ public final class EmissionsConfigGroup
 	public void setWritingEmissionsEvents(boolean writingEmissionsEvents) {
 		isWritingEmissionsEvents = writingEmissionsEvents;
 	}
-	// ---
+	// ============================================
+//	// ============================================
 //	/**
 //	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
 //	 *
@@ -375,7 +376,8 @@ public final class EmissionsConfigGroup
 //	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
 //		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 //	}
-	// ---
+//	// ============================================
+	// ============================================
 //	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
@@ -391,7 +393,8 @@ public final class EmissionsConfigGroup
 	public void setEmissionCostMultiplicationFactor(double emissionCostMultiplicationFactor) {
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 	}
-	// ---
+	// ============================================
+	// ============================================
 	// 	@StringGetter(CONSIDERING_CO2_COSTS)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
@@ -407,7 +410,8 @@ public final class EmissionsConfigGroup
 	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
 		this.consideringCO2Costs = consideringCO2Costs;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(HANDLE_HIGH_AVERAGE_SPEEDS)
 	public boolean handlesHighAverageSpeeds() {
 		return handleHighAverageSpeeds;
@@ -419,33 +423,34 @@ public final class EmissionsConfigGroup
 	public void setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
 		this.handleHighAverageSpeeds = handleHighAverageSpeeds;
 	}
+	// ============================================
+	// ============================================
 	@StringGetter(Hbefa_ROADTYPE_SOURCE)
-	@Deprecated // kai, oct'18
+	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
 	public HbefaRoadTypeSource getHbefaRoadTypeSource() {
 		return hbefaRoadTypeSource;
 	}
-
 	@StringSetter(Hbefa_ROADTYPE_SOURCE)
-	@Deprecated // kai, oct'18
+	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
 	public void setHbefaRoadTypeSource(HbefaRoadTypeSource hbefaRoadTypeSource) {
 		this.hbefaRoadTypeSource = hbefaRoadTypeSource;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(NON_SCENARIO_VEHICLES)
 	public NonScenarioVehicles getNonScenarioVehicles() {
 		return nonScenarioVehicles;
 	}
-
 	@StringSetter(NON_SCENARIO_VEHICLES)
 	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
 		this.nonScenarioVehicles = nonScenarioVehicles;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(EMISSIONS_COMPUTATION_METHOD)
 	public EmissionsComputationMethod getEmissionsComputationMethod() {
 		return emissionsComputationMethod;
 	}
-
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
 	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
