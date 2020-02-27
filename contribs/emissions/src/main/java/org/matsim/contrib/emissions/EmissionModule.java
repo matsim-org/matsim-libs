@@ -162,13 +162,13 @@ public final class EmissionModule {
 				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
 				break;
-			case directlyTryAverageTable:
-				avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-				avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-				//fall-trough and create additionally detailed tables
 			case tryDetailedThenTechnologyAverageThenAverageTable:
 				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
 				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+				//fall-trough and create additionally average tables
+			case directlyTryAverageTable:
+				avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+				avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
 				break;
 			default:
 				throw new IllegalStateException("Unexpected value: " + emissionConfigGroup.getDetailedVsAverageLookupBehavior());
