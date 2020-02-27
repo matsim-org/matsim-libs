@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package org.matsim.contrib.etaxi.util;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeUpdater;
 
-/**
- * @author michalm
- */
-public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
-
-	public FifoTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
-							 MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleUpdater scheduleUpdater) {
-		super(eventsManager, taxiCfg, fleet, scheduler, scheduleUpdater,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler));
+public class ETaxiStayTaskEndTimeUpdater extends TaxiStayTaskEndTimeUpdater {
+	public ETaxiStayTaskEndTimeUpdater(TaxiConfigGroup taxiConfigGroup) {
+		super(taxiConfigGroup);
 	}
+
+	@Override
+	public double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
+		if (task instanceof ETaxiChargingTask) {
+			// FIXME underestimated due to the ongoing AUX/drive consumption
+			double duration = task.getEndTime() - task.getBeginTime();
+			return newBeginTime + duration;
+		} else {
+			return super.calcNewEndTime(vehicle, task, newBeginTime);
+		}
+	}
+
 }
