@@ -79,8 +79,17 @@ public final class EmissionModule {
 			this.eventsManager = eventsManager;
 		}
 
+		URL context = scenario.getConfig().getContext();
+
+		URL averageFleetWarmEmissionFactorsFile = null;
+		URL averageFleetColdEmissionFactorsFile = null;
+		URL detailedWarmEmissionFactorsFile = null;
+		URL detailedColdEmissionFactorsFile = null;
+
 		switch( this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() ){
 			case directlyTryAverageTable:
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
 				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
 					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
 										    " cold emissions file.") ;
@@ -91,6 +100,8 @@ public final class EmissionModule {
 				}
 				break;
 			case tryDetailedThenTechnologyAverageThenAverageTable:
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
 				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
 					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
 										    " cold emissions file.") ;
@@ -103,6 +114,8 @@ public final class EmissionModule {
 			case onlyTryDetailedElseAbort:
 				// fall-through
 			case tryDetailedThenTechnologyAverageElseAbort:
+				detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
+				detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
 				if ( this.emissionConfigGroup.getDetailedColdEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedColdEmissionFactorsFile().equals( "" ) ) {
 					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
 										    " cold emissions file.") ;
@@ -114,21 +127,6 @@ public final class EmissionModule {
 				break;
 			default:
 				throw new IllegalStateException( "Unexpected value: " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() );
-		}
-
-		URL context = scenario.getConfig().getContext();
-
-		URL averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
-		URL averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
-
-		URL detailedWarmEmissionFactorsFile;
-		URL detailedColdEmissionFactorsFile;
-		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
-			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
-			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
-		} else {
-			detailedWarmEmissionFactorsFile = null ;
-			detailedColdEmissionFactorsFile = null ;
 		}
 
 		//TODO: create roadtype mapping here from config
@@ -157,18 +155,37 @@ public final class EmissionModule {
 //			}
 //		}
 
-		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
-			avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-			avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case onlyTryDetailedElseAbort:
+				//fall-through
+			case tryDetailedThenTechnologyAverageElseAbort:
+				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+				break;
+			case directlyTryAverageTable:
+				avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+				avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+				//fall-trough and create additionally detailed tables
+			case tryDetailedThenTechnologyAverageThenAverageTable:
+				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + emissionConfigGroup.getDetailedVsAverageLookupBehavior());
 		}
 
-		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
-			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
-			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
-		}
-		else{
-			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
-		}
+//		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+//			avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+//			avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+//		}
+//
+//		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
+//			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+//			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+//		}
+//		else{
+//			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
+//		}
 		logger.info("leaving createLookupTables");
 
 		//create HBEFA Speed tables. try on detailed values first.
@@ -177,7 +194,7 @@ public final class EmissionModule {
 		} else if (avgHbefaWarmTable != null){
 			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
 		} else {
-			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");		//Is table mandantory? -> If yes throw exception
+			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");		//Is table mandatory? -> If yes throw exception
 		}
 	}
 
