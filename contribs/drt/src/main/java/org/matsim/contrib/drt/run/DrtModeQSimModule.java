@@ -39,7 +39,6 @@ import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeUpdater;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
-import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
