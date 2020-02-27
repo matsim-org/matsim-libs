@@ -74,6 +74,7 @@ class DistanceConstraint implements HardActivityConstraint {
 
 		if (vehicleTypeOfNewVehicle.getEngineInformation().getAttributes().getAttribute("fuelType")
 				.equals("electricity")) {
+			Vehicle newVehicle = context.getNewVehicle();
 
 			Double electricityCapacityinkWh = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
 					.getAttribute("engeryCapacity");
@@ -90,11 +91,12 @@ class DistanceConstraint implements HardActivityConstraint {
 				routeConsumption = routeDistance * (electricityConsumptionPerkm / 1000);
 			}
 			if (newAct.getName().contains("pickupShipment")) {
-				additionalDistance = getDistance(prevAct, newAct) + getDistance(newAct, nextAct)
-						- getDistance(prevAct, nextAct) + findMinimalAdditionalDistance(context, newAct, nextAct);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
+						- getDistance(prevAct, nextAct, newVehicle)
+						+ findMinimalAdditionalDistance(context, newAct, nextAct);
 			} else {
-				additionalDistance = getDistance(prevAct, newAct) + getDistance(newAct, nextAct)
-						- getDistance(prevAct, nextAct);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
+						- getDistance(prevAct, nextAct, newVehicle);
 
 			}
 			double additionalConsumption = additionalDistance * (electricityConsumptionPerkm / 1000);
@@ -135,14 +137,15 @@ class DistanceConstraint implements HardActivityConstraint {
 			int indexNextActicity = nextAct.getIndex();
 			int index = 0;
 			int countIndex = 0;
+			Vehicle newVehicle = context.getNewVehicle();
+			VehicleRoute route = context.getRoute();
 
 			// search the index of the activity behind the pickup activity which should be
 			// added to the tour
-			for (TourActivity tourActivity : context.getRoute().getTourActivities().getActivities()) {
+			for (TourActivity tourActivity : route.getTourActivities().getActivities()) {
 				if (tourActivity.getIndex() == indexNextActicity) {
-					while (countIndex < context.getRoute().getTourActivities().getActivities().size()) {
-						if (context.getRoute().getTourActivities().getActivities().get(countIndex)
-								.getIndex() == indexNextActicity) {
+					while (countIndex < route.getTourActivities().getActivities().size()) {
+						if (route.getTourActivities().getActivities().get(countIndex).getIndex() == indexNextActicity) {
 							index = countIndex;
 							break;
 						}
@@ -152,28 +155,31 @@ class DistanceConstraint implements HardActivityConstraint {
 			}
 
 			// search the minimal distance between every exiting TourAcitivity
-			while ((index + 1) < context.getRoute().getTourActivities().getActivities().size()) {
-				TourActivity activityBefore = context.getRoute().getTourActivities().getActivities().get(index);
-				TourActivity activityAfter = context.getRoute().getTourActivities().getActivities().get(index + 1);
-				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery)
-						+ getDistance(assignedDelivery, activityAfter) - getDistance(activityBefore, activityAfter);
+			while ((index + 1) < route.getTourActivities().getActivities().size()) {
+				TourActivity activityBefore = route.getTourActivities().getActivities().get(index);
+				TourActivity activityAfter = route.getTourActivities().getActivities().get(index + 1);
+				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle)
+						+ getDistance(assignedDelivery, activityAfter, newVehicle)
+						- getDistance(activityBefore, activityAfter, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				index++;
 			}
 			// checks the distance if the delivery is the last activity before the end of
 			// the tour
-			if (context.getRoute().getTourActivities().getActivities().size() > 0) {
-				TourActivity activityLastDelivery = context.getRoute().getTourActivities().getActivities()
-						.get(context.getRoute().getTourActivities().getActivities().size() - 1);
-				TourActivity activityEnd = context.getRoute().getEnd();
-				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery)
-						+ getDistance(assignedDelivery, activityEnd) - getDistance(activityLastDelivery, activityEnd);
+			if (route.getTourActivities().getActivities().size() > 0) {
+				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
+						.get(route.getTourActivities().getActivities().size() - 1);
+				TourActivity activityEnd = route.getEnd();
+				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle)
+						+ getDistance(assignedDelivery, activityEnd, newVehicle)
+						- getDistance(activityLastDelivery, activityEnd, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				// Checks the distance if the delivery will added directly behind the pickup
 				TourActivity newPickupActivity = newAct;
-				TourActivity activityAfter = context.getRoute().getTourActivities().getActivities().get(index);
-				possibleAdditionalDistance = getDistance(newPickupActivity, assignedDelivery)
-						+ getDistance(assignedDelivery, activityAfter) - getDistance(newPickupActivity, activityAfter);
+				TourActivity activityAfter = route.getTourActivities().getActivities().get(index);
+				possibleAdditionalDistance = getDistance(newPickupActivity, assignedDelivery, newVehicle)
+						+ getDistance(assignedDelivery, activityAfter, newVehicle)
+						- getDistance(newPickupActivity, activityAfter, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 			}
 
@@ -196,8 +202,8 @@ class DistanceConstraint implements HardActivityConstraint {
 		return minimalAdditionalDistance;
 	}
 
-	private double getDistance(TourActivity from, TourActivity to) {
-		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null); //TODO add vehicle instead of null
+	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle) {
+		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, vehicle);
 	}
 }
 
