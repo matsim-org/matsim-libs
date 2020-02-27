@@ -35,6 +35,7 @@ import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeUpdater;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.schedule.DrtTaskFactoryImpl;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -52,6 +53,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.StayTaskEndTimeUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
@@ -84,7 +87,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
-						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
+						getter.getModal(DrtScheduleInquiry.class), getter.getModal(ScheduleUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class),
 						getter.getModal(UnplannedRequestInserter.class))));
 
@@ -140,18 +143,19 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new RequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class),
 						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
-						getter.getModal(DrtScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
+						getter.getModal(ScheduleUpdater.class), getter.getModal(DrtTaskFactory.class))))
 				.asEagerSingleton();
 
-		bindModal(DrtScheduleTimingUpdater.class).toProvider(new Provider<DrtScheduleTimingUpdater>() {
-			@Inject
-			private MobsimTimer timer;
 
-			@Override
-			public DrtScheduleTimingUpdater get() {
-				return new DrtScheduleTimingUpdater(drtCfg, timer);
-			}
-		}).asEagerSingleton();
+		{ //i do not really think that we need to bind this per mode, do we?
+			bindModal(StayTaskEndTimeUpdater.class).toProvider(() -> new DrtStayTaskEndTimeUpdater(drtCfg)).asEagerSingleton();
+			bindModal(ScheduleUpdater.class).toProvider(modalProvider(
+					getter -> new ScheduleUpdater(getter.get(MobsimTimer.class),
+							getter.getModal(StayTaskEndTimeUpdater.class))
+					)
+			).asEagerSingleton();
+		}
+
 
 		addModalComponent(ParallelPathDataProvider.class,
 				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
