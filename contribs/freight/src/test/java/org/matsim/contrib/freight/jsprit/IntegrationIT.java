@@ -56,19 +56,16 @@ public class IntegrationIT {
 	
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
-		;
 		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
-//		generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes);
 		FreightUtils.runJsprit(controler);
-		double score = 0;
+		double scoreWithRunJsprit = 0;
 		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
-			score = score + carrier.getSelectedPlan().getScore();
+			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getScore();
 		}
-		System.out.print(score);
-		double score2 = generateCarrierPlans(scenario.getNetwork(), FreightUtils.getCarriers(controler.getScenario()), FreightUtils.getCarrierVehicleTypes(controler.getScenario()));
-		Assert.assertEquals("Same score", score, score2, MatsimTestUtils.EPSILON);
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), FreightUtils.getCarriers(controler.getScenario()), FreightUtils.getCarrierVehicleTypes(controler.getScenario()));
+		Assert.assertEquals("The score of both runs are not the same", scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON);
 	}
 
 	private static double generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes) {
@@ -87,8 +84,6 @@ public class IntegrationIT {
 			vrpBuilder.setRoutingCost(netBasedCosts);
 			VehicleRoutingProblem problem = vrpBuilder.build();
 
-			// VehicleRoutingAlgorithm algorithm =
-			// VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem,ALGORITHM);
 			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
