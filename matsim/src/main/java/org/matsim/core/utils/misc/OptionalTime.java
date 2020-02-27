@@ -117,7 +117,7 @@ public final class OptionalTime {
 		if (o == null || getClass() != o.getClass())
 			return false;
 		OptionalTime that = (OptionalTime)o;
-		return seconds != that.seconds; // none of them is NaN
+		return seconds == that.seconds; // none of them is NaN
 	}
 
 	@Override
