@@ -15,11 +15,11 @@
     <repositories>
         <repository>
             <id>topobyte</id>
-            <url>http://mvn.topobyte.de</url>
+            <url>https://mvn.topobyte.de</url>
         </repository>
         <repository>
             <id>slimjars</id>
-            <url>http://mvn.slimjars.com</url>
+            <url>https://mvn.slimjars.com</url>
         </repository>
 
     </repositories>
