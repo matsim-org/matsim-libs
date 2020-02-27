@@ -101,7 +101,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 							EventWriter writer = (EventWriter) constructor.newInstance(IOUtils.getOutputStream(url, false));
 							this.eventWriters.add(writer);
 						} catch (ReflectiveOperationException e) {
-							log.warn("Error using the PBWriter. Please make sure protobuf contrib is imported and on the classpath.", e);
+							throw new RuntimeException("Error using the PBWriter. Please make sure protobuf contrib on the classpath, or remove pb output format.", e);
 						}
 
 						break;
