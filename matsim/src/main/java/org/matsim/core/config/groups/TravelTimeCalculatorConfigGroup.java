@@ -43,6 +43,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public static final String GROUPNAME = "travelTimeCalculator";
 
 	public enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap}
+	public enum TravelTimeGetterType {average, linearinterpolation};
+	public enum TravelTimeAggregatorType {optimistic}
 
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
@@ -58,8 +60,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	private static final String SEPARATEMODES = "separateModes";
 
 	private TravelTimeCalculatorType travelTimeCalculator = TravelTimeCalculatorType.TravelTimeCalculatorArray;
-	private String travelTimeAggregator = "optimistic";
-	private String travelTimeGetter = "average";
+	private TravelTimeAggregatorType travelTimeAggregator = TravelTimeAggregatorType.optimistic;
+	private TravelTimeGetterType travelTimeGetter = TravelTimeGetterType.average;
 	private int traveltimeBinSize = 15 * 60; // use a default of 15min time-bins for analyzing the travel times
 	private int maxTime = 30 * 3600;
 
@@ -108,21 +110,21 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	}
 	// ---
 	@StringSetter( TRAVEL_TIME_AGGREGATOR )
-	public void setTravelTimeAggregatorType(final String travelTimeAggregator){
+	public void setTravelTimeAggregatorType(final TravelTimeAggregatorType travelTimeAggregator){
 		this.travelTimeAggregator = travelTimeAggregator;
 	}
 
 	@StringGetter( TRAVEL_TIME_AGGREGATOR )
-	public String getTravelTimeAggregatorType(){
+	public TravelTimeAggregatorType getTravelTimeAggregatorType(){
 		return this.travelTimeAggregator;
 	}
 	// ---
 	@StringSetter( TRAVEL_TIME_GETTER )
-	public void setTravelTimeGetterType(final String travelTimeGetter){
+	public void setTravelTimeGetterType(final TravelTimeGetterType travelTimeGetter){
 		this.travelTimeGetter = travelTimeGetter;
 	}
 	@StringGetter( TRAVEL_TIME_GETTER )
-	public String getTravelTimeGetterType(){
+	public TravelTimeGetterType getTravelTimeGetterType(){
 		return this.travelTimeGetter;
 	}
 	// ---

@@ -153,7 +153,7 @@ public class CalcLinkStatsTest {
 		ttcalcConfig.setTraveltimeBinSize(3600);
 //		ttcalcConfig.setTraveltimeBinSize(900); // TODO
 		
-		TravelTimeCalculator ttimeCalculator = new TravelTimeCalculator(network, ttcalcConfig);
+		TravelTimeCalculator ttimeCalculator = new TravelTimeCalculator.Builder(network).configure(ttcalcConfig).build();
 		CalcLinkStats cls = new CalcLinkStats(network);
 		
 		Id<Vehicle> vehId1 = Id.create("1001", Vehicle.class);

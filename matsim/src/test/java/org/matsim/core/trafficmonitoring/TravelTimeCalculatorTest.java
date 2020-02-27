@@ -46,6 +46,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeGetterType;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
@@ -283,7 +284,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 */
 	public void testInterpolatedTravelTimes() {
 		Config config = ConfigUtils.createConfig();
-		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+		config.travelTimeCalculator().setTravelTimeGetterType(TravelTimeGetterType.linearinterpolation);
 		int timeBinSize = 15*60;
 		config.travelTimeCalculator().setTraveltimeBinSize(timeBinSize);
 		config.travelTimeCalculator().setMaxTime(12*3600);

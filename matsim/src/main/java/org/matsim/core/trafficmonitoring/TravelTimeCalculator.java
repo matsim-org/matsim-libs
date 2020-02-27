@@ -98,16 +98,17 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	@Deprecated // user builder instead.  kai, feb'19
 	public static TravelTimeCalculator create(Network network, TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
-		configure(calculator, group, network);
+		setCalculatorType(calculator, group.getTravelTimeCalculatorType(), network);
+		setGetterType(calculator, group.getTravelTimeGetterType());
 		return calculator;
 	}
 
-	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
+	private static TravelTimeCalculator setCalculatorType(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType type, Network network) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
 
 		// Customize micro-behavior of the TravelTimeCalculator based on config. Should not be necessary for most use cases.
-		switch ( config.getTravelTimeCalculatorType() ) {
+		switch ( type ) {
 			case TravelTimeCalculatorArray:
 				calculator.ttDataFactory = new TravelTimeDataArrayFactory(network, calculator.numSlots);
 				break;
@@ -115,19 +116,21 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 				calculator.ttDataFactory = new TravelTimeDataHashMapFactory(network);
 				break;
 			default:
-				throw new RuntimeException(config.getTravelTimeCalculatorType() + " is unknown!");
+				throw new RuntimeException(type.name() + " is unknown!");
 		}
-		{
-			switch( config.getTravelTimeGetterType() ){
-				case "average":
-					calculator.travelTimeGetter = new AveragingTravelTimeGetter( calculator.aggregator );
-					break;
-				case "linearinterpolation":
-					calculator.travelTimeGetter = new LinearInterpolatingTravelTimeGetter( calculator.numSlots, calculator.timeSlice, calculator.aggregator );
-					break;
-				default:
-					throw new RuntimeException( config.getTravelTimeGetterType() + " is unknown!" );
-			}
+		return calculator;
+	}
+	
+	private static TravelTimeCalculator setGetterType(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup.TravelTimeGetterType type)	{
+		switch( type ){
+			case average:
+				calculator.travelTimeGetter = new AveragingTravelTimeGetter( calculator.aggregator );
+				break;
+			case linearinterpolation:
+				calculator.travelTimeGetter = new LinearInterpolatingTravelTimeGetter( calculator.numSlots, calculator.timeSlice, calculator.aggregator );
+				break;
+			default:
+				throw new RuntimeException( type.name() + " is unknown!" );
 		}
 		return calculator;
 	}
@@ -139,7 +142,8 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		this(network, ttconfigGroup.getTraveltimeBinSize(), ttconfigGroup.getMaxTime(), ttconfigGroup.isCalculateLinkTravelTimes(),
 			  ttconfigGroup.isCalculateLinkToLinkTravelTimes(), ttconfigGroup.isFilterModes(), CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModesAsString() ) );
 		eventsManager.addHandler(this);
-		configure(this, ttconfigGroup, network);
+		setCalculatorType(this, ttconfigGroup.getTravelTimeCalculatorType(), network);
+		setGetterType(this, ttconfigGroup.getTravelTimeGetterType());
 	}
 
 	@Deprecated // user builder instead.  kai, feb'19
@@ -172,44 +176,60 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			this.network = network ;
 		}
 
-		public void setTimeslice( int timeslice ){
+		public Builder setTimeslice( int timeslice ){
 			this.timeslice = timeslice;
+			return this;
 		}
 
-		public void setMaxTime( int maxTime ){
+		public Builder setMaxTime( int maxTime ){
 			this.maxTime = maxTime;
+			return this;
 		}
 
-		public void setCalculateLinkTravelTimes( boolean calculateLinkTravelTimes ){
+		public Builder setCalculateLinkTravelTimes( boolean calculateLinkTravelTimes ){
 			this.calculateLinkTravelTimes = calculateLinkTravelTimes;
+			return this;
 		}
 
-		public void setCalculateLinkToLinkTravelTimes( boolean calculateLinkToLinkTravelTimes ){
+		public Builder setCalculateLinkToLinkTravelTimes( boolean calculateLinkToLinkTravelTimes ){
 			this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
+			return this;
 		}
 
-		public void setFilterModes( boolean filterModes ){
+		public Builder setFilterModes( boolean filterModes ){
 			this.filterModes = filterModes;
+			return this;
 		}
 
-		public void setAnalyzedModes( Set<String> analyzedModes ){
+		public Builder setAnalyzedModes( Set<String> analyzedModes ){
 			this.analyzedModes = analyzedModes;
+			return this;
 		}
 
-		public void configure ( TravelTimeCalculatorConfigGroup ttcConfig ) {
+		public Builder configure ( TravelTimeCalculatorConfigGroup ttcConfig ) {
 			// yyyyyy this is a fix to get the outward API sorted out somewhat better.  kai, feb'19
 			// yyyyyy presumably would like to replace this with setters for {@link TravelTimeDataFactory} and {@link TravelTimeGetter}.  But it ain't that easy because
 			// they again depend on material that (currently) is only available _after_ construction of {@link TravelTimeCalculator}.  kai, feb'19
 
 			this.ttcConfig = ttcConfig ;
 			this.toBeConfigured = true ;
+			
+			this.analyzedModes = ttcConfig.getAnalyzedModes();
+			this.calculateLinkToLinkTravelTimes = ttcConfig.isCalculateLinkToLinkTravelTimes();
+			this.calculateLinkTravelTimes = ttcConfig.isCalculateLinkTravelTimes();
+			this.filterModes = ttcConfig.isFilterModes();
+			this.maxTime = ttcConfig.getMaxTime();
+			this.timeslice = ttcConfig.getTraveltimeBinSize();
+			
+			return this;
 		}
 
 		public TravelTimeCalculator build() {
 			TravelTimeCalculator abc = new TravelTimeCalculator( network, timeslice, maxTime, calculateLinkTravelTimes, calculateLinkToLinkTravelTimes, filterModes,
 				  analyzedModes );
 			if( toBeConfigured ){
-				TravelTimeCalculator.configure( abc, this.ttcConfig, this.network );
+				TravelTimeCalculator.setCalculatorType( abc, this.ttcConfig.getTravelTimeCalculatorType(), this.network );
+				TravelTimeCalculator.setGetterType(abc, ttcConfig.getTravelTimeGetterType());
 			}
 			return abc ;
 		}
