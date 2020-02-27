@@ -37,6 +37,7 @@ public final class OptionalTime {
 	 *
 	 * @throws IllegalArgumentException if seconds is Double.NaN
 	 */
+	@Deprecated
 	public static OptionalTime of(double seconds) {
 		if (Double.isNaN(seconds)) {
 			throw new IllegalArgumentException("NaN time is not allowed");

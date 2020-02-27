@@ -244,6 +244,11 @@ public final class PopulationUtils {
 		}
 
 		@Override
+		public void setEndTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
 		public String getType() {
 			return this.delegate.getType() ;
 		}
@@ -855,7 +860,11 @@ public final class PopulationUtils {
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
 		newAct.setStartTime(act.getStartTime().orElseUndefined());
-		newAct.setEndTime(act.getEndTime().orElseUndefined());
+		if (act.getEndTime().isDefined()) {
+			newAct.setEndTime(act.getEndTime().seconds());
+		} else {
+			newAct.setEndTimeUndefined();
+		}
 		newAct.setMaximumDuration(act.getMaximumDuration().orElseUndefined());
 		newAct.setFacilityId(act.getFacilityId());
 

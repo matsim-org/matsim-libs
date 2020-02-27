@@ -11,9 +11,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
 
-	private Activity act;
+	private final Activity act;
 	
-	private TimeWindow timeWindow;
+	private final TimeWindow timeWindow;
 	
 	public FreightActivity(Activity act, TimeWindow timeWindow) {
 		super();
@@ -33,6 +33,11 @@ public class FreightActivity implements Activity {
 	@Override
 	public void setEndTime(double seconds) {
 		act.setEndTime(seconds);
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		act.setEndTimeUndefined();
 	}
 
 	@Override

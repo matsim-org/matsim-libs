@@ -35,6 +35,8 @@ public interface Activity extends PlanElement {
 
 	public void setEndTime(final double seconds);
 
+	public void setEndTimeUndefined();
+
 	public String getType();
 
 	public void setType(final String type);

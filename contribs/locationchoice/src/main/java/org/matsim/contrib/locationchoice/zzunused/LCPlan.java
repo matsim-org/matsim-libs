@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -55,7 +56,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	
 	// Activity related arrays
 	/*package*/ double[] startTimes;
-	/*package*/ double[] endTimes;
+	/*package*/ OptionalTime[] endTimes;
 	/*package*/ double[] durations;
 	/*package*/ String[] types;
 	/*package*/ Coord[] coords;
@@ -166,7 +167,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		
 //		destPlan.activities = new LCActivity[activityCount];
 		destPlan.startTimes = new double[activityCount];
-		destPlan.endTimes = new double[activityCount];
+		destPlan.endTimes = new OptionalTime[activityCount];
 		destPlan.durations = new double[activityCount];
 		destPlan.types = new String[activityCount];
 		destPlan.coords = new Coord[activityCount];
@@ -188,7 +189,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				Activity activity = (Activity) planElement;
 				destPlan.planElements.add(new LCActivity(destPlan, activityCount, planElementCount));
 				destPlan.startTimes[activityCount] = activity.getStartTime().seconds();
-				destPlan.endTimes[activityCount] = activity.getEndTime().seconds();
+				destPlan.endTimes[activityCount] = activity.getEndTime();
 				destPlan.durations[activityCount] = activity.getMaximumDuration().seconds();
 				destPlan.types[activityCount] = activity.getType();
 				destPlan.coords[activityCount] = activity.getCoord();
@@ -229,7 +230,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		// activity data
 		int activities = srcPlan.startTimes.length;
 		destPlan.startTimes = new double[activities];
-		destPlan.endTimes = new double[activities];
+		destPlan.endTimes = new OptionalTime[activities];
 		destPlan.durations = new double[activities];
 		destPlan.types = new String[activities];
 		destPlan.coords = new Coord[activities];

@@ -46,12 +46,17 @@ class LCActivity implements Activity, LCPlanElement {
 	@Override
 	public final OptionalTime getEndTime() {
 		//consider having an array of OptionalDoubles instead...
-		return OptionalTime.of(this.plan.endTimes[this.arrayIndex]);
+		return this.plan.endTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setEndTime(double seconds) {
-		this.plan.endTimes[this.arrayIndex] = seconds;
+		this.plan.endTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		this.plan.endTimes[this.arrayIndex] = OptionalTime.undefined();
 	}
 
 	@Override

@@ -73,8 +73,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = OptionalTime.of(endTime);
+		this.endTime = OptionalTime.defined(endTime);
 	}
+
+	public final void setEndTimeUndefined() {
+		this.endTime = OptionalTime.undefined();
+	}
+
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.

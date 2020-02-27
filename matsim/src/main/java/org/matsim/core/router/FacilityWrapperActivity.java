@@ -48,6 +48,11 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
+	public void setEndTimeUndefined() {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
 	public String getType() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}

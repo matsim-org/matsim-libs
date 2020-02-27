@@ -144,7 +144,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
 					act.setMaximumDuration(Time.getUndefinedTime());
-					act.setEndTime(Time.getUndefinedTime());
+					act.setEndTimeUndefined();
 				}
 
 			} else {

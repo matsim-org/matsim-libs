@@ -165,7 +165,7 @@ public class TripRouterTest {
 	}
 
 	private static class EqualsActivity implements Activity {
-		Activity delegate ;
+		private final Activity delegate ;
 		@Override
 		public OptionalTime getEndTime() {
 			return this.delegate.getEndTime();
@@ -174,6 +174,12 @@ public class TripRouterTest {
 		public void setEndTime(double seconds) {
 			this.delegate.setEndTime(seconds);
 		}
+
+		@Override
+		public void setEndTimeUndefined() {
+			this.delegate.setEndTimeUndefined();
+		}
+
 		@Override
 		public String getType() {
 			return this.delegate.getType();

@@ -221,7 +221,12 @@ import org.xml.sax.Attributes;
 		}
 		this.curract.setStartTime(Time.parseTime(atts.getValue(ATTR_ACT_STARTTIME)));
 		this.curract.setMaximumDuration(Time.parseTime(atts.getValue(ATTR_ACT_MAXDUR)));
-		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
+		double endTime = Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME));
+		if (Time.isUndefinedTime(endTime)) {
+			this.curract.setEndTimeUndefined();
+		} else {
+			this.curract.setEndTime(endTime);
+		}
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
