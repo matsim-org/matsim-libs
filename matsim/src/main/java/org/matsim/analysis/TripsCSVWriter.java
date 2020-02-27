@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
@@ -51,9 +52,9 @@ import java.util.stream.Collectors;
  * @author jbischoff / SBB
  */
 public class TripsCSVWriter {
-    public static String[] HEADER = {"PersonId", "TripNumber",
-            "DepartureTime", "TravelTime", "TotalWaitingTime", "TotalDistance",
-            "ModeWithLongestShare", "Modes", "originActivityType",
+    public static String[] HEADER = {"person", "tripNumber", "tripId",
+            "departureTime", "travelTime", "totalWaitingTime", "traveledDistance", "euclideanDistance",
+            "modeWithLongestShare", "modes", "originActivityType",
             "destinationActivityType", "originFacilityId", "originLinkId",
             "fromX", "fromY", "destinationFacilityId",
             "destinationLinkId", "toX", "toY"};
@@ -91,7 +92,10 @@ public class TripsCSVWriter {
             List<String> record = new ArrayList<>();
             records.add(record);
             record.add(personId.toString());
-            record.add(Integer.toString(i + 1)); // trip number, numbered starting with 1
+            final String tripNo = Integer.toString(i + 1);
+            record.add(tripNo); // trip number, numbered starting with 0
+            String tripId = personId.toString() + "_" + tripNo;
+            record.add(tripId);
             double distance = 0.0;
             double departureTime = trip.getOriginActivity().getEndTime();
             double travelTime = trip.getDestinationActivity().getStartTime() - departureTime;
@@ -109,6 +113,7 @@ public class TripsCSVWriter {
             Id<Link> toLinkId = trip.getDestinationActivity().getLinkId();
             Coord fromCoord = getCoordFromActivity(trip.getOriginActivity());
             Coord toCoord = getCoordFromActivity(trip.getDestinationActivity());
+            int euclideanDistance = (int) CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 
             for (Leg leg : trip.getLegsOnly()) {
                 modes.add(leg.getMode());
@@ -131,6 +136,7 @@ public class TripsCSVWriter {
             record.add(Time.writeTime(travelTime));
             record.add(Time.writeTime(totalWaitingTime));
             record.add(Integer.toString((int) Math.round(distance)));
+            record.add(Integer.toString(euclideanDistance));
             record.add(currentModeWithLongestShare);
             record.add(modes.stream().collect(Collectors.joining("-")));
             record.add(lastActivityType);
