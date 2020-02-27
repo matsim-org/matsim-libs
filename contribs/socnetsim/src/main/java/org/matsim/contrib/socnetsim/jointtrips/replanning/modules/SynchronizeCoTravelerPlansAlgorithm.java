@@ -87,7 +87,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity && 
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				((Activity) pe).setMaximumDuration( Time.getUndefinedTime() );
+				((Activity) pe).setMaximumDurationUndefined();
 				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
 			}

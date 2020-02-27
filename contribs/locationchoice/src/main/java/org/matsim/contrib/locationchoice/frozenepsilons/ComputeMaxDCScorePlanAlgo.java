@@ -109,7 +109,7 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		
 		public DummyActivity(Id<Link> linkId) { this.linkId = linkId; }
 
-		private static final OptionalTime ZERO_TIME = OptionalTime.of(0);
+		private static final OptionalTime ZERO_TIME = OptionalTime.defined(0);
 		@Override
 		public OptionalTime getEndTime() { return ZERO_TIME; }
 

@@ -130,6 +130,13 @@ public class OptionalTimeTest {
 	}
 
 	@Test
+	public void test_stream() {
+		assertThat(OptionalTime.undefined().stream()).containsExactly();
+		assertThat(OptionalTime.defined(0).stream()).containsExactly(0.);
+		assertThat(OptionalTime.defined(10).stream()).containsExactly(10.);
+	}
+
+	@Test
 	public void test_equals() {
 		assertThat(OptionalTime.undefined()).isEqualTo(OptionalTime.undefined());
 		assertThat(OptionalTime.undefined()).isNotEqualTo(OptionalTime.defined(0));

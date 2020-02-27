@@ -23,6 +23,7 @@ package org.matsim.core.utils.misc;
 import java.util.NoSuchElementException;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.stream.DoubleStream;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -32,14 +33,12 @@ public final class OptionalTime {
 
 	private static OptionalTime UNDEFINED = new OptionalTime(Time.UNDEFINED_TIME);
 
-
 	/**
 	 * Creates OptionalTime that wraps a defined or undefined time
 	 *
 	 * @throws IllegalArgumentException if seconds is Double.NaN
 	 */
-	@Deprecated
-	public static OptionalTime of(double seconds) {
+	/*package*/ static OptionalTime of(double seconds) {
 		if (Double.isNaN(seconds)) {
 			throw new IllegalArgumentException("NaN time is not allowed");
 		}
@@ -53,10 +52,13 @@ public final class OptionalTime {
 	 * @throws IllegalArgumentException if seconds is Double.NaN or Time.getUndefined()
 	 */
 	public static OptionalTime defined(double seconds) {
-		if (seconds == Time.UNDEFINED_TIME) {
+		if (Double.isNaN(seconds)) {
+			throw new IllegalArgumentException("NaN time is not allowed");
+		} else if (seconds == Time.UNDEFINED_TIME) {
 			throw new IllegalArgumentException("Undefined time is not allowed");
 		}
-		return of(seconds);
+
+		return new OptionalTime(seconds);
 	}
 
 	public static OptionalTime undefined() {
@@ -92,7 +94,7 @@ public final class OptionalTime {
 		return seconds != Time.UNDEFINED_TIME ? seconds : supplier.getAsDouble();
 	}
 
-	public double orElseUndefined() {
+	/*package*/ double orElseUndefined() {
 		return seconds;
 	}
 
@@ -110,14 +112,23 @@ public final class OptionalTime {
 		}
 	}
 
+	public DoubleStream stream() {
+		if (seconds != Time.UNDEFINED_TIME) {
+			return DoubleStream.of(seconds);
+		} else {
+			return DoubleStream.empty();
+		}
+	}
+
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (!(o instanceof OptionalTime)) {
 			return false;
-		OptionalTime that = (OptionalTime)o;
-		return seconds == that.seconds; // none of them is NaN
+		}
+		return seconds == ((OptionalTime)o).seconds; // none of them is NaN
 	}
 
 	@Override
