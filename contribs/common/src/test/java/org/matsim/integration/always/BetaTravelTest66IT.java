@@ -65,6 +65,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -452,7 +453,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 					// handle first activity
 					if (i == 0) {
 						act.setStartTime(now); // set start to midnight
-						act.setEndTime(mutateTime(act.getEndTime().seconds())); // mutate the end time of the first activity
+						act.setEndTime(mutateTime(act.getEndTime())); // mutate the end time of the first activity
 						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds()); // calculate resulting duration
 						now += act.getEndTime().seconds(); // move now pointer
 					} else if (i < (max - 1)) {
@@ -488,16 +489,15 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 			}
 		}
 
-		private double mutateTime(final double time) {
-			double t = time;
-			if (!Time.isUndefinedTime(t)) {
-				t = t + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
+		private double mutateTime(final OptionalTime time) {
+			if (time.isDefined()) {
+				double t = time.seconds() + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 				if (t < 0) t = 0;
 				if (t > 24*3600) t = 24*3600;
+				return t;
 			} else {
-				t = MatsimRandom.getRandom().nextInt(24*3600);
+				return MatsimRandom.getRandom().nextInt(24*3600);
 			}
-			return t;
 		}
 	}
 

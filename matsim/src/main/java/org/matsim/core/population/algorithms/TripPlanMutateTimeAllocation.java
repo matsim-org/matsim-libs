@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -91,7 +92,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					// set start to midnight
 					act.setStartTime(now);
 					// mutate the end time of the first activity
-					act.setEndTime(mutateTime(act.getEndTime().seconds(), mutationRange));
+					act.setEndTime(mutateTime(act.getEndTime(), mutationRange));
 					// calculate resulting duration
 					if (affectingDuration) {
 						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
@@ -109,7 +110,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 							if (act.getMaximumDuration().isDefined()) {
 								// mutate the durations of all 'middle' activities
 								if (affectingDuration) {
-									act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds(), mutationRange));
+									act.setMaximumDuration(mutateTime(act.getMaximumDuration(), mutationRange));
 								}
 								now += act.getMaximumDuration().seconds();
 								// (may feel a bit disturbing since it was not mutated but it is just using the "old" value which is perfectly ok. kai, jan'14)
@@ -117,7 +118,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {
-								double newEndTime = mutateTime(act.getEndTime().seconds(), mutationRange);
+								double newEndTime = mutateTime(act.getEndTime(), mutationRange);
 								if (newEndTime < now) {
 									newEndTime = now;
 								}
@@ -129,7 +130,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 							if (act.getEndTime().isUndefined()) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
-							double newEndTime = mutateTime(act.getEndTime().seconds(), mutationRange);
+							double newEndTime = mutateTime(act.getEndTime(), mutationRange);
 							if (newEndTime < now) {
 								newEndTime = now;
 							}
@@ -163,16 +164,15 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 		}
 	}
 
-	private double mutateTime(final double time, final double mutationRange) {
-		double t = time;
-		if (!Time.isUndefinedTime(t)) {
-			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+	private double mutateTime(final OptionalTime time, final double mutationRange) {
+		if (time.isDefined()) {
+			double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;
+			return t;
 		} else {
-			t = this.random.nextInt(24*3600);
+			return this.random.nextInt(24*3600);
 		}
-		return t;
 	}
 
 	public void setUseActivityDurations(final boolean useActivityDurations) {

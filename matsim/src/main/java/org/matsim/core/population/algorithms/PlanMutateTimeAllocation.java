@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -74,7 +75,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// set start to midnight
 					act.setStartTime(now);
 					// mutate the end time of the first activity
-					act.setEndTime(mutateTime(act.getEndTime().seconds()));
+					act.setEndTime(mutateTime(act.getEndTime()));
 					// calculate resulting duration
 					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
 					// move now pointer
@@ -87,12 +88,12 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 					act.setStartTime(now);
 					if (act.getMaximumDuration().isDefined()) {
 							// mutate the durations of all 'middle' activities
-						act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
+						act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
 						now += act.getMaximumDuration().seconds();
 							// set end time accordingly
 							act.setEndTime(now);
 						} else {
-							double newEndTime = mutateTime(act.getEndTime().seconds());
+							double newEndTime = mutateTime(act.getEndTime());
 							if (newEndTime < now) {
 								newEndTime = now;
 							}
@@ -128,16 +129,15 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 		}
 	}
 
-	private double mutateTime(final double time) {
-		double t = time;
-		if (!Time.isUndefinedTime(t)) {
-			t = t + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
+	private double mutateTime(final OptionalTime time) {
+		if (time.isDefined()) {
+			double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * this.mutationRange);
 			if (t < 0) t = 0;
 			if (t > 24*3600) t = 24*3600;
+			return t;
 		} else {
-			t = this.random.nextInt(24*3600);
+			return this.random.nextInt(24*3600);
 		}
-		return t;
 	}
 
 }
