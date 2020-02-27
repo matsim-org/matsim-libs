@@ -80,7 +80,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.endTime = OptionalTime.undefined();
 	}
 
-
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
@@ -94,7 +93,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	@Override
 	public final void setStartTime(final double startTime) {
-		this.startTime = OptionalTime.of(startTime);
+		this.startTime = OptionalTime.defined(startTime);
+	}
+
+	public final void setStartTimeUndefined() {
+		this.startTime = OptionalTime.undefined();
 	}
 
 	@Override

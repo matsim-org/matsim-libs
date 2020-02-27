@@ -66,6 +66,11 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
+	public void setStartTimeUndefined() {
+		act.setStartTimeUndefined();
+	}
+
+	@Override
 	public OptionalTime getMaximumDuration() {
 		return act.getMaximumDuration();
 	}

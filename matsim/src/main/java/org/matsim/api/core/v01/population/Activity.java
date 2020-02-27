@@ -56,6 +56,8 @@ public interface Activity extends PlanElement {
 	 */
 	public void setStartTime(double seconds);
 
+	public void setStartTimeUndefined();
+
 	public OptionalTime getMaximumDuration();
 	
 	public void setMaximumDuration(double seconds) ;

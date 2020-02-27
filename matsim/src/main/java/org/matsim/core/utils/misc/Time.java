@@ -177,6 +177,11 @@ public class Time {
 		return parseTime(time, ':').orElseUndefined();
 	}
 
+	public static final OptionalTime parseOptionalTime(final String time) {
+		return parseTime(time, ':');
+	}
+
+
 	/**
 	 * Parses the given string for a textual representation for time and returns
 	 * the time value in seconds past midnight. The following formats are recognized:

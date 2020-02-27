@@ -78,7 +78,7 @@ import com.google.inject.Inject;
 					}
 					
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
-						act.setStartTime(Time.getUndefinedTime()) ;
+						act.setStartTimeUndefined() ;
 					}
 					
 				} else if ( pe instanceof Leg ) {

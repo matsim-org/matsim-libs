@@ -136,6 +136,10 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		public void setStartTime(double seconds) { }
 
 		@Override
+		public void setStartTimeUndefined() {
+		}
+
+		@Override
 		public OptionalTime getMaximumDuration() { return ZERO_TIME; }
 
 		@Override

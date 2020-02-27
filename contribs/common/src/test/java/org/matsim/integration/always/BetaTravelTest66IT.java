@@ -447,7 +447,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
 					// invalidate previous activity times because durations will change
-					act.setStartTime(Time.getUndefinedTime());
+					act.setStartTimeUndefined();
 
 					// handle first activity
 					if (i == 0) {
@@ -459,14 +459,14 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						act.setMaximumDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
-						act.setEndTime(Time.getUndefinedTime()); // <-- This line differs from the original PlanMutateTimeAllocation
+						act.setEndTimeUndefined(); // <-- This line differs from the original PlanMutateTimeAllocation
 						now += 6*3600.0;
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
 						act.setMaximumDuration(Time.getUndefinedTime());
-						act.setEndTime(Time.getUndefinedTime());
+						act.setEndTimeUndefined();
 					}
 
 				}

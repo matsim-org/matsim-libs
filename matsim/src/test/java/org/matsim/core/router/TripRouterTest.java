@@ -200,6 +200,12 @@ public class TripRouterTest {
 		public void setStartTime(double seconds) {
 			this.delegate.setStartTime(seconds);
 		}
+
+		@Override
+		public void setStartTimeUndefined() {
+			delegate.setStartTimeUndefined();
+		}
+
 		@Override
 		public OptionalTime getMaximumDuration() {
 			return this.delegate.getMaximumDuration();

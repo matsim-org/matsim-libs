@@ -274,6 +274,11 @@ public final class PopulationUtils {
 		}
 
 		@Override
+		public void setStartTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
 		public OptionalTime getMaximumDuration() {
 			return this.delegate.getMaximumDuration() ;
 		}
@@ -859,12 +864,8 @@ public final class PopulationUtils {
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
-		newAct.setStartTime(act.getStartTime().orElseUndefined());
-		if (act.getEndTime().isDefined()) {
-			newAct.setEndTime(act.getEndTime().seconds());
-		} else {
-			newAct.setEndTimeUndefined();
-		}
+		act.getStartTime().ifDefinedOrElse(newAct::setStartTime, newAct::setStartTimeUndefined);
+		act.getEndTime().ifDefinedOrElse(newAct::setEndTime, newAct::setEndTimeUndefined);
 		newAct.setMaximumDuration(act.getMaximumDuration().orElseUndefined());
 		newAct.setFacilityId(act.getFacilityId());
 

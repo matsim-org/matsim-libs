@@ -41,7 +41,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -145,7 +144,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
 			if(event.getActType().equals(FreightConstants.END)){
-				activity.setEndTime(Time.getUndefinedTime());
+				activity.setEndTimeUndefined();
 				scoringFunction.handleActivity(activity);
 			}
 			else{

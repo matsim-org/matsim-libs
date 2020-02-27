@@ -55,7 +55,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final List<PlanElement> planElements = new ArrayList<>();
 	
 	// Activity related arrays
-	/*package*/ double[] startTimes;
+	/*package*/ OptionalTime[] startTimes;
 	/*package*/ OptionalTime[] endTimes;
 	/*package*/ double[] durations;
 	/*package*/ String[] types;
@@ -166,7 +166,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 		
 //		destPlan.activities = new LCActivity[activityCount];
-		destPlan.startTimes = new double[activityCount];
+		destPlan.startTimes = new OptionalTime[activityCount];
 		destPlan.endTimes = new OptionalTime[activityCount];
 		destPlan.durations = new double[activityCount];
 		destPlan.types = new String[activityCount];
@@ -188,7 +188,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				destPlan.planElements.add(new LCActivity(destPlan, activityCount, planElementCount));
-				destPlan.startTimes[activityCount] = activity.getStartTime().seconds();
+				destPlan.startTimes[activityCount] = activity.getStartTime();
 				destPlan.endTimes[activityCount] = activity.getEndTime();
 				destPlan.durations[activityCount] = activity.getMaximumDuration().seconds();
 				destPlan.types[activityCount] = activity.getType();
@@ -229,7 +229,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 		// activity data
 		int activities = srcPlan.startTimes.length;
-		destPlan.startTimes = new double[activities];
+		destPlan.startTimes = new OptionalTime[activities];
 		destPlan.endTimes = new OptionalTime[activities];
 		destPlan.durations = new double[activities];
 		destPlan.types = new String[activities];

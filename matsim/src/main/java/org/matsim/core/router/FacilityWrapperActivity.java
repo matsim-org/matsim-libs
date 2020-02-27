@@ -78,6 +78,11 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
+	public void setStartTimeUndefined() {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
 	public OptionalTime getMaximumDuration() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}

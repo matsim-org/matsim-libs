@@ -80,12 +80,17 @@ class LCActivity implements Activity, LCPlanElement {
 	
 	@Override
 	public final OptionalTime getStartTime() {
-		return OptionalTime.of(this.plan.startTimes[this.arrayIndex]);
+		return this.plan.startTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setStartTime(double seconds) {
-		this.plan.startTimes[this.arrayIndex] = seconds;
+		this.plan.startTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+	}
+
+	@Override
+	public void setStartTimeUndefined() {
+		this.plan.startTimes[this.arrayIndex] = OptionalTime.undefined();
 	}
 
 	@Override
