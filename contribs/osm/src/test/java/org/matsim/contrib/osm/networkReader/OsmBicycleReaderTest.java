@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SuperSonicBicycleOsmNetworkReaderTest {
+public class OsmBicycleReaderTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -37,13 +37,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 				new Tag(OsmTags.CYCLEWAY, cycleway),
 				new Tag(OsmTags.BICYCLE, restrictions),
 				new Tag(OsmTags.HIGHWAY, OsmTags.RESIDENTIAL));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -63,13 +63,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.PRIMARY));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -86,13 +86,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.MOTORWAY));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -110,13 +110,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 
 		List<OsmTag> tags = Collections.singletonList(
 				new Tag(OsmTags.HIGHWAY, OsmTags.PEDESTRIAN));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -139,13 +139,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 				new Tag(OsmTags.ONEWAYBICYCLE, "no"),
 				new Tag(OsmTags.SURFACE, surface),
 				new Tag(OsmTags.ONEWAY, "yes"));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -172,13 +172,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 				new Tag(OsmTags.ONEWAY, "yes"),
 				new Tag(OsmTags.SURFACE, surface),
 				new Tag(OsmTags.CYCLEWAY, "opposite"));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -205,13 +205,13 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 				new Tag(OsmTags.ONEWAY, "reverse"),
 				new Tag(OsmTags.SURFACE, surface),
 				new Tag(OsmTags.CYCLEWAY, "opposite"));
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink(tags);
+		Utils.OsmData singleLink = Utils.createSingleLink(tags);
 
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
