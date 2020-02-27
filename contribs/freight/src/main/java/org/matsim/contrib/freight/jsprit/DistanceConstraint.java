@@ -1,8 +1,8 @@
 package org.matsim.contrib.freight.jsprit;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.vehicles.VehicleType;
 
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
@@ -32,7 +32,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
  * Creates the distance constraint.
  *
  */
-class DistanceConstraint implements HardActivityConstraint {
+public class DistanceConstraint implements HardActivityConstraint {
 
 	private final StateManager stateManager;
 
@@ -42,7 +42,7 @@ class DistanceConstraint implements HardActivityConstraint {
 
 	private final NetworkBasedTransportCosts netBasedCosts;
 
-	DistanceConstraint(StateId distanceStateId, StateManager stateManager, CarrierVehicleTypes vehicleTypes,
+	public DistanceConstraint(StateId distanceStateId, StateManager stateManager, CarrierVehicleTypes vehicleTypes,
 			NetworkBasedTransportCosts netBasedCosts) {
 		this.stateManager = stateManager;
 		this.distanceStateId = distanceStateId;
@@ -207,51 +207,51 @@ class DistanceConstraint implements HardActivityConstraint {
 	}
 }
 
-/**
- * Given class for working with the a distance constraint
- *
- */
-class DistanceUpdater implements StateUpdater, ActivityVisitor {
-
-	private final StateManager stateManager;
-
-	private final StateId distanceStateId;
-
-	private VehicleRoute vehicleRoute;
-
-	private double distance = 0.;
-
-	private TourActivity prevAct;
-
-	private final NetworkBasedTransportCosts netBasedCosts;
-
-	public DistanceUpdater(StateId distanceStateId, StateManager stateManager,
-			NetworkBasedTransportCosts netBasedCosts) {
-		this.stateManager = stateManager;
-		this.distanceStateId = distanceStateId;
-		this.netBasedCosts = netBasedCosts;
-	}
-
-	@Override
-	public void begin(VehicleRoute vehicleRoute) {
-		distance = 0.;
-		prevAct = vehicleRoute.getStart();
-		this.vehicleRoute = vehicleRoute;
-	}
-
-	@Override
-	public void visit(TourActivity tourActivity) {
-		distance += getDistance(prevAct, tourActivity);
-		prevAct = tourActivity;
-	}
-
-	@Override
-	public void finish() {
-		distance += getDistance(prevAct, vehicleRoute.getEnd());
-		stateManager.putRouteState(vehicleRoute, distanceStateId, distance);
-	}
-
-	double getDistance(TourActivity from, TourActivity to) {
-		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
-	}
-}
+///**
+// * Given class for working with the a distance constraint
+// *
+// */
+//class DistanceUpdater implements StateUpdater, ActivityVisitor {
+//
+//	private final StateManager stateManager;
+//
+//	private final StateId distanceStateId;
+//
+//	private VehicleRoute vehicleRoute;
+//
+//	private double distance = 0.;
+//
+//	private TourActivity prevAct;
+//
+//	private final NetworkBasedTransportCosts netBasedCosts;
+//
+//	public DistanceUpdater(StateId distanceStateId, StateManager stateManager,
+//			NetworkBasedTransportCosts netBasedCosts) {
+//		this.stateManager = stateManager;
+//		this.distanceStateId = distanceStateId;
+//		this.netBasedCosts = netBasedCosts;
+//	}
+//
+//	@Override
+//	public void begin(VehicleRoute vehicleRoute) {
+//		distance = 0.;
+//		prevAct = vehicleRoute.getStart();
+//		this.vehicleRoute = vehicleRoute;
+//	}
+//
+//	@Override
+//	public void visit(TourActivity tourActivity) {
+//		distance += getDistance(prevAct, tourActivity);
+//		prevAct = tourActivity;
+//	}
+//
+//	@Override
+//	public void finish() {
+//		distance += getDistance(prevAct, vehicleRoute.getEnd());
+//		stateManager.putRouteState(vehicleRoute, distanceStateId, distance);
+//	}
+//
+//	double getDistance(TourActivity from, TourActivity to) {
+//		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
+//	}
+//}
