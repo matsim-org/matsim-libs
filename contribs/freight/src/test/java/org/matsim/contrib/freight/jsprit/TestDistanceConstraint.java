@@ -1,20 +1,19 @@
 package org.matsim.contrib.freight.jsprit;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+
+import javax.management.InvalidAttributeValueException;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraint;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -25,41 +24,17 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
-import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit.Strategy;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
-import com.graphhopper.jsprit.core.algorithm.state.StateId;
-import com.graphhopper.jsprit.core.algorithm.state.StateManager;
-import com.graphhopper.jsprit.core.problem.Location;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Coordinate;
-import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -80,16 +55,14 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 1: Tour is possible with the vehicle with the small battery and the
 	 * vehicle with the small battery is cheaper
+	 * @throws InvalidAttributeValueException 
 	 */
 
 	@Test
-	public final void CarrierSmallBatteryTest_Version1() {
+	public final void CarrierSmallBatteryTest_Version1() throws InvalidAttributeValueException {
 
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/original_Chessboard_Test/Version1");
-		config.network().setInputFile(original_Chessboard);
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -123,12 +96,13 @@ public class TestDistanceConstraint {
 		createServices(carrierV1, threeServices, carriers);
 		createCarriers(carriers, fleetSize, carrierV1, scenario, vehicleTypes);
 
-		int jspritIterations = 100;
-		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
-				vehicleTypes.getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-		netBuilder.setTimeSliceWidth(1800);
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV1, 10);
+//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		final Controler controler = new Controler(scenario);
+		
+		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -147,12 +121,12 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce2,
 				MatsimTestUtils.EPSILON);
 		
-		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-				.build();
-		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-				.build();
-		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-				MatsimTestUtils.EPSILON);
+//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+//				.build();
+//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+//				.build();
+//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+//				MatsimTestUtils.EPSILON);
 
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -172,12 +146,12 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
 	 * why one vehicle with a large battery is used.
+	 * @throws InvalidAttributeValueException 
 	 */
 	@Test
-	public final void CarrierLargeBatteryTest_Version2() {
+	public final void CarrierLargeBatteryTest_Version2() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version2");
-		config.network().setInputFile(original_Chessboard);
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -212,12 +186,21 @@ public class TestDistanceConstraint {
 		createServices(carrierV2, threeServices, carriers);
 		createCarriers(carriers, fleetSize, carrierV2, scenario, vehicleTypes);
 
-		int jspritIterations = 100;
-		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
-				vehicleTypes.getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-		netBuilder.setTimeSliceWidth(1800);
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
+//		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
+//				vehicleTypes.getVehicleTypes().values());
+//		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+//		netBuilder.setTimeSliceWidth(1800);
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV2, 10);
+//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		final Controler controler = new Controler(scenario);
+		
+		FreightUtils.runJsprit(controler);
+		
+		
+		
+		
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
@@ -236,12 +219,12 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 15, maxDistanceVehilce4,
 				MatsimTestUtils.EPSILON);
 		
-		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-				.build();
-		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-				.build();
-		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-				MatsimTestUtils.EPSILON);
+//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+//				.build();
+//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+//				.build();
+//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+//				MatsimTestUtils.EPSILON);
 		
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -262,13 +245,13 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 3: costs for using one long range vehicle are higher than the costs of
 	 * using two short range truck
+	 * @throws InvalidAttributeValueException 
 	 */
 
 	@Test
-	public final void Carrier2SmallBatteryTest_Version3() {
+	public final void Carrier2SmallBatteryTest_Version3() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version3");
-		config.network().setInputFile(original_Chessboard);
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -302,12 +285,13 @@ public class TestDistanceConstraint {
 		createServices(carrierV3, threeServices, carriers);
 		createCarriers(carriers, fleetSize, carrierV3, scenario, vehicleTypes);
 
-		int jspritIterations = 100;
-		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
-				vehicleTypes.getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-		netBuilder.setTimeSliceWidth(1800);
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV3, 10);
+//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		final Controler controler = new Controler(scenario);
+		
+		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -324,12 +308,12 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce6,
 				MatsimTestUtils.EPSILON);
-		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-				.build();
-		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-				.build();
-		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-				MatsimTestUtils.EPSILON);
+//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+//				.build();
+//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+//				.build();
+//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+//				MatsimTestUtils.EPSILON);
 		
 		for (ScheduledTour scheduledTour : carrierV3.getSelectedPlan().getScheduledTours()) {
 
@@ -357,13 +341,13 @@ public class TestDistanceConstraint {
 	 * Option 4: An additional shipment outside the range of both BEVtypes.
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
+	 * @throws InvalidAttributeValueException 
 	 */
 
 	@Test
-	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() {
+	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version4");
-		config.network().setInputFile(original_Chessboard);
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -404,12 +388,13 @@ public class TestDistanceConstraint {
 		createServices(carrierV4, threeServices, carriers);
 		createCarriers(carriers, fleetSize, carrierV4, scenario, vehicleTypes);
 
-		int jspritIterations = 100;
-		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
-				vehicleTypes.getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-		netBuilder.setTimeSliceWidth(1800);
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV4, 10);
+//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		final Controler controler = new Controler(scenario);
+		
+		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
@@ -426,12 +411,12 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce8,
 				MatsimTestUtils.EPSILON);
-		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-				.build();
-		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-				.build();
-		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-				MatsimTestUtils.EPSILON);
+//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+//				.build();
+//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+//				.build();
+//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+//				MatsimTestUtils.EPSILON);
 
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
@@ -464,6 +449,7 @@ public class TestDistanceConstraint {
 	 * @param config
 	 */
 	static Config prepareConfig(Config config, int lastMATSimIteration) {
+		config.network().setInputFile(original_Chessboard);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
 				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
@@ -472,7 +458,9 @@ public class TestDistanceConstraint {
 		config.controler().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-
+		
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
 		return config;
 	}
 
@@ -556,103 +544,5 @@ public class TestDistanceConstraint {
 		singleCarrier.getCarrierCapabilities().getVehicleTypes().addAll(vehicleTypes.getVehicleTypes().values());
 
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-	}
-
-	private static void solveJspritAndMATSim(Scenario scenario, CarrierVehicleTypes vehicleTypes, Carriers carriers,
-			int jspritIterations, NetworkBasedTransportCosts netBasedCosts) {
-		solveWithJsprit(scenario, carriers, jspritIterations, vehicleTypes, netBasedCosts);
-		final Controler controler = new Controler(scenario);
-
-		scoringAndManagerFactory(scenario, carriers, controler);
-		controler.run();
-	}
-
-	/**
-	 * Solves with jsprit and gives a xml output of the plans and a plot of the
-	 * solution. Because of using the distance constraint it is necessary to create
-	 * a cost matrix before solving the vrp with jsprit. The jsprit algorithm solves
-	 * a solution for every created carrier separately.
-	 * 
-	 * @param
-	 */
-
-	private static NetworkBasedTransportCosts solveWithJsprit(Scenario scenario, Carriers carriers, int jspritIteration,
-			CarrierVehicleTypes vehicleTypes, NetworkBasedTransportCosts netBasedCosts) {
-
-		Network network = scenario.getNetwork();
-//		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network,
-//				vehicleTypes.getVehicleTypes().values());
-//		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-
-		for (Carrier singleCarrier : carriers.getCarriers().values()) {
-
-//			netBuilder.setTimeSliceWidth(1800);
-
-			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(singleCarrier,
-					network);
-			vrpBuilder.setRoutingCost(netBasedCosts);
-
-			VehicleRoutingProblem problem = vrpBuilder.build();
-
-			StateManager stateManager = new StateManager(problem);
-
-			StateId distanceStateId = stateManager.createStateId("distance");
-
-			stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
-
-			ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-			constraintManager.addConstraint(
-					new DistanceConstraint(distanceStateId, stateManager, vehicleTypes, netBasedCosts),
-					ConstraintManager.Priority.CRITICAL);
-
-			// get the algorithm out-of-the-box, search solution and get the best one.
-			//
-			VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
-					.setStateAndConstraintManager(stateManager, constraintManager)
-					.setProperty(Strategy.RADIAL_REGRET.toString(), "1.").buildAlgorithm();
-//			VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
-			algorithm.setMaxIterations(jspritIteration);
-			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-
-			// Routing bestPlan to Network
-			CarrierPlan carrierPlanServices = MatsimJspritFactory.createPlan(singleCarrier, bestSolution);
-			NetworkRouter.routePlan(carrierPlanServices, netBasedCosts);
-			singleCarrier.setSelectedPlan(carrierPlanServices);
-
-		}
-		return netBasedCosts;
-	}
-
-	/**
-	 * @param
-	 */
-	static void scoringAndManagerFactory(Scenario scenario, Carriers carriers, final Controler controler) {
-		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction2(scenario);
-		CarrierPlanStrategyManagerFactory planStrategyManagerFactory = createMyStrategymanager();
-
-		CarrierModule listener = new CarrierModule(carriers, planStrategyManagerFactory, scoringFunctionFactory);
-		controler.addOverridingModule(listener);
-	}
-
-	/**
-	 * @param scenario
-	 * @return
-	 */
-	private static CarrierScoringFunctionFactoryImpl createMyScoringFunction2(final Scenario scenario) {
-
-		return new CarrierScoringFunctionFactoryImpl(scenario.getNetwork());
-	}
-
-	/**
-	 * @return
-	 */
-	private static CarrierPlanStrategyManagerFactory createMyStrategymanager() {
-		return new CarrierPlanStrategyManagerFactory() {
-			@Override
-			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
-				return null;
-			}
-		};
 	}
 }
