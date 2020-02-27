@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributable;
+package org.matsim.utils.objectattributes.attributable;
 
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.io.XmlUtils;
@@ -48,7 +48,7 @@ public class AttributesXmlWriterDelegate {
 		try {
 			writer.write(indentation);
 			writer.write("<attributes>");
-			writer.newLine();
+			writer.write("\n");
 
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : attributes.getAsMap().entrySet()) {
@@ -60,14 +60,14 @@ public class AttributesXmlWriterDelegate {
 					writer.write("class=\"" + clazz.getName() + "\">");
 					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
-					writer.newLine();
+					writer.write("\n");
 				}
 			}
 
 			writer.write(indentation);
 			writer.write("</attributes>");
 			if (emptyLineAfter) {
-				writer.newLine();
+				writer.write("\n");
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
