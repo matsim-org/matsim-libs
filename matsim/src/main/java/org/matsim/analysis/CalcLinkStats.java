@@ -397,10 +397,10 @@ public class CalcLinkStats {
 	 * @param linkId
 	 * @return if no data is available, an array with length 0 is returned.
 	 * 
-	 * The method reflects the (wrong) logic of what is done when writing the output and should eventually be deleted or modified.
+	 * Calculates the average travel time on a link analogous to what is happening in {@linkplain #writeFile(String)}.
 	 * 
+	 * Unfortunately it's not super easy to make wrote use this method, so I'll keep it like this for now...
 	 */
-	@Deprecated
 	protected double[] getAvgTravelTimes(final Id<Link> linkId) {
 		LinkData data = this.linkData.get(linkId);
 		if (data == null) {
@@ -417,7 +417,7 @@ public class CalcLinkStats {
 		
 		for (int i = 0; i < this.nofHours; i++) {
 			volumes[i] = (data.volumes[SUM][i]) / (this.count);
-			ttimesMin[i] = (data.ttimes[MIN][i]) / (this.count);
+			ttimesMin[i] = (data.ttimes[MIN][i]);
 			ttimesSum[i] = (data.ttimes[SUM][i]) / (this.count);
 
 			if (volumes[i] == 0.) {

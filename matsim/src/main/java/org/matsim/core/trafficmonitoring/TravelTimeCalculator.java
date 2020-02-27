@@ -490,6 +490,9 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 					// if the travel time that has been measured so far is less than that minimum travel time, then do something:
 					if (travelTime < minTravelTime) {
+						log.warn("Encountered implausible travel time of " + travelTime + ". However, the travel time in the previous time slot was "
+								+ prevTravelTime + " with a binsize of " + timeSlice + "s. You would arrive before somebody who started earlier!"
+								+ " Overriding travel time to the lowest consstent value of " + minTravelTime);
 
 						data.setTravelTime(i, minTravelTime );
 						// (set the travel time to the smallest possible travel time that makes sense according to the argument above)
