@@ -120,13 +120,13 @@ public class TestWarmEmissionAnalysisModule {
 	private static final double DETAILED_PC_FACTOR_FF = .0001;
 
 	// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-	private final String 	dieselTechnology = "PC diesel";
+	private final String dieselTechnology = "PC diesel";
 	private final String dieselSizeClass = "diesel";
 	private final String dieselConcept = ">=2L";
 	private final Double dieselFreeVelocity = AVG_PASSENGER_CAR_SPEED_FF_KMH;
 	private final Double dieselSgVelocity = AVG_PASSENGER_CAR_SPEED_SG_KMH;
 	// case 4 - data in average table
-	private final String 	lpgTechnology = "PC LPG Euro-4";
+	private final String lpgTechnology = "PC LPG Euro-4";
 	private final String lpgSizeClass = "LPG";
 	private final String lpgConcept = "not specified";
 	private final Double lpgFreeVelocity = AVG_PASSENGER_CAR_SPEED_FF_KMH;
@@ -1087,6 +1087,7 @@ public class TestWarmEmissionAnalysisModule {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
+		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
 //		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
 //				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
