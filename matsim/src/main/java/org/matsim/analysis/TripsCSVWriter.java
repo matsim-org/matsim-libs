@@ -169,7 +169,7 @@ public class TripsCSVWriter {
     }
 
 
-    interface CustomTripsWriterExtension {
+    public interface CustomTripsWriterExtension {
         String[] getAdditionalHeader();
         List<String> getAdditionalColumns(TripStructureUtils.Trip trip);
     }
