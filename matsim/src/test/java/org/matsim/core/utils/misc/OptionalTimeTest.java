@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Test;
 
 /**
@@ -103,6 +104,32 @@ public class OptionalTimeTest {
 		assertThat(OptionalTime.defined(1).orElseUndefined()).isEqualTo(1);
 	}
 
+	@Test
+	public void test_ifDefined() {
+		MutableDouble counter = new MutableDouble(0);
+
+		OptionalTime.undefined().ifDefined(counter::add);
+		assertThat(counter.doubleValue()).isEqualTo(0);
+
+		OptionalTime.defined(10).ifDefined(counter::add);
+		assertThat(counter.doubleValue()).isEqualTo(10);
+	}
+
+	@Test
+	public void test_ifDefinedOrElse() {
+		MutableDouble ifCounter = new MutableDouble(0);
+		MutableDouble elseCounter = new MutableDouble(0);
+
+		OptionalTime.undefined().ifDefinedOrElse(ifCounter::add, elseCounter::increment);
+		assertThat(ifCounter.doubleValue()).isEqualTo(0);
+		assertThat(elseCounter.doubleValue()).isEqualTo(1);
+
+		OptionalTime.defined(10).ifDefinedOrElse(ifCounter::add, elseCounter::increment);
+		assertThat(ifCounter.doubleValue()).isEqualTo(10);
+		assertThat(elseCounter.doubleValue()).isEqualTo(1);
+	}
+
+	@Test
 	public void test_equals() {
 		assertThat(OptionalTime.undefined()).isEqualTo(OptionalTime.undefined());
 		assertThat(OptionalTime.undefined()).isNotEqualTo(OptionalTime.defined(0));
@@ -112,6 +139,7 @@ public class OptionalTimeTest {
 		assertThat(OptionalTime.defined(0)).isNotEqualTo(OptionalTime.defined(1));
 	}
 
+	@Test
 	public void test_hashCode() {
 		assertThat(OptionalTime.undefined()).hasSameHashCodeAs(Time.UNDEFINED_TIME);
 		assertThat(OptionalTime.defined(0)).hasSameHashCodeAs(0.);

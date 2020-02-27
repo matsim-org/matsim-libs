@@ -21,6 +21,7 @@
 package org.matsim.core.utils.misc;
 
 import java.util.NoSuchElementException;
+import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -93,6 +94,20 @@ public final class OptionalTime {
 
 	public double orElseUndefined() {
 		return seconds;
+	}
+
+	public void ifDefined(DoubleConsumer action) {
+		if (seconds != Time.UNDEFINED_TIME) {
+			action.accept(seconds);
+		}
+	}
+
+	public void ifDefinedOrElse(DoubleConsumer action, Runnable undefinedAction) {
+		if (seconds != Time.UNDEFINED_TIME) {
+			action.accept(seconds);
+		} else {
+			undefinedAction.run();
+		}
 	}
 
 	@Override
