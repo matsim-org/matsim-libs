@@ -105,11 +105,12 @@ public final class EmissionsConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average cold emission factors";
 	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
 	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
-	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emissions factor? " + "\n\t\t" +
-			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name() + " : try detailed values. Abort if values are not found. Requires DETAILED emission factors. \n\t\t" +
+	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emission factors? " + "\n\t\t" +
+			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort + " : try detailed values. Abort if values are not found. Requires DETAILED emission factors. \n\t\t" +
 			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort + " : try detailed values first, if not found try to use semi-detailed values for 'vehicleType,technology,average,average', if then not found abort. Requires DETAILED emission factors. \n\t\t" +
 			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable + "try detailed values first, if not found try to use semi-detailed values for 'vehicleType,technology,average,average', if then not found try lookup in average table. Requires DETAILED and AVERAGE emission factors. \n\t\t" +
-			DetailedVsAverageLookupBehavior.directlyTryAverageTable + "only calculate from average table. Requires AVERAGE emission factors. ";
+			DetailedVsAverageLookupBehavior.directlyTryAverageTable + "only calculate from average table. Requires AVERAGE emission factors. " +
+			"Default is " + DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort;
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "file with HBEFA detailed warm emission factors";
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "file with HBEFA detailed cold emission factors";
 	@Deprecated // should be phased out.  kai, oct'18
