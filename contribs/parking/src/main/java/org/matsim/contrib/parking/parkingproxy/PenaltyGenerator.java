@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +16,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshotwriters;
+package org.matsim.contrib.parking.parkingproxy;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
+/**
+ * A PenaltyGenerator acts as a Factory class for {@linkplain PenaltyCalculator}s. It does so
+ * by taking any input either all at once or by collecting it over a longer time and on demand
+ * builds a new instance of {@linkplain PenaltyCalculator} with the collected information.
+ * 
+ * @author tkohl / Senozon
+ *
+ */
+public interface PenaltyGenerator {
 
-public interface AgentSnapshotInfo {
-
-	public static final String marker = "marker";
-
-	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
-	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
-	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER }
-	// !!! WARNING: See comment above this enum.
-
-	Id<Person> getId() ;
-
-	double getEasting();
-
-	double getNorthing();
-
-	@Deprecated
-	double getAzimuth();
-
-	double getColorValueBetweenZeroAndOne();
-	void setColorValueBetweenZeroAndOne( double tmp ) ;
-
-	AgentState getAgentState();
-	void setAgentState( AgentState state ) ;
-
-	int getUserDefined() ;
-	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
-
+	/**
+	 * Generates an (almost) immutable {@linkplain PenaltyCalculator} based on the current state
+	 * of this class. Further data collected by this class will not change the results of already
+	 * generated {@linkplain PenaltyCalculators}. However, you may later plug in your own
+	 * {@linkplain PenaltyFunction}.
+	 * 
+	 * @return the generated immutable calculator instance
+	 */
+	public PenaltyCalculator generatePenaltyCalculator();
+	
+	/**
+	 * Resets the state of this class.
+	 */
+	public void reset();
 }
