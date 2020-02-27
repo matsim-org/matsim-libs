@@ -104,7 +104,7 @@ public final class EmissionsConfigGroup
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average warm emission factors";
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average cold emission factors";
 	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
-	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is kow deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
+	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
 	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emissions factor? " + "\n\t\t" +
 			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name() + " : try detailed values. Abort if values are not found. Requires DETAILED emission factors. \n\t\t" +
 			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort + " : try detailed values first, if not found try to use semi-detailed values for 'vehicleType,technology,average,average', if then not found abort. Requires DETAILED emission factors. \n\t\t" +
@@ -169,8 +169,7 @@ public final class EmissionsConfigGroup
 
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT);
 
-		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);
-
+//		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);	//is deprecated now. This functionality is integrated in DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR.
 		map.put(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR, DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT);
 
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, EMISSION_FACTORS_WARM_FILE_DETAILED_CMT) ;
