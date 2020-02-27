@@ -34,42 +34,39 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 
 	/*
 	 *
-	 * Abort if values are not found in detailled table
+	 * Abort if values are not found in detailed table
 	 *
 	 * */
 
-	@Test
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Test(expected=RuntimeException.class)
 	public final void testDetailed_vehTypeV1() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
-		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
 
-	@Test
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Test(expected=RuntimeException.class)
 	public final void testDetailed_vehTypeV2() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
-		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
 
-	@Test
+	// Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Test(expected=RuntimeException.class)
 	public final void testDetailed_vehTypeV2_HBEFA4() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
-		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		// --- Change input to hbefa4 sample
 		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
