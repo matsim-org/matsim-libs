@@ -39,7 +39,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
-	public enum EventsFileFormat {xml, pbf, json}
+	public enum EventsFileFormat {xml, pb, json}
 
 	public enum CompressionType {
 		none(""),
