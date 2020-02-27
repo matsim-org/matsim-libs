@@ -22,8 +22,12 @@ import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit.Strategy;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
+import com.graphhopper.jsprit.core.algorithm.state.StateId;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
@@ -35,6 +39,8 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.jsprit.DistanceConstraint;
+import org.matsim.contrib.freight.jsprit.DistanceUpdater;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -80,6 +86,7 @@ public class FreightUtils {
 	public static void runJsprit(Controler controler) throws InvalidAttributeValueException {
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ) ;
+		
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
 				controler.getScenario().getNetwork(), FreightUtils.getCarrierVehicleTypes(controler.getScenario()).getVehicleTypes().values() );
@@ -91,8 +98,8 @@ public class FreightUtils {
 				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
 					.setRoutingCost(netBasedCosts)
 					.build();
-
-			VehicleRoutingAlgorithm algorithm;
+				VehicleRoutingAlgorithm algorithm;
+			
 			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
 			if(vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals(""))	{
 				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
@@ -105,14 +112,30 @@ public class FreightUtils {
 				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
 			} else {
 				log.info("Use a VehicleRoutingAlgorithm out of the box.");
-				algorithm = new SchrimpfFactory().createAlgorithm(problem);
+				if (freightConfig.getUseDistanceConstraint().equals(FreightConfigGroup.UseDistanceConstraint.basedOnEnergyConsumption)) {
+					StateManager stateManager = new StateManager(problem);
+
+					StateId distanceStateId = stateManager.createStateId("distance");
+
+					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+
+					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+					constraintManager.addConstraint(
+							new DistanceConstraint(distanceStateId, stateManager, FreightUtils.getCarrierVehicleTypes(controler.getScenario()), netBasedCosts),
+							ConstraintManager.Priority.CRITICAL);
+					algorithm = Jsprit.Builder.newInstance(problem)
+							.setStateAndConstraintManager(stateManager, constraintManager)
+							.setProperty(Strategy.RADIAL_REGRET.toString(), "1.").buildAlgorithm(); 
+				}
+				
+				else algorithm = new SchrimpfFactory().createAlgorithm(problem);
 		//		vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
 			}
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
 			if(jspritIterations > 0) {
-				//algorithm.setMaxIterations(jspritIterations);
+				algorithm.setMaxIterations(jspritIterations);
 			} else {
 				throw new InvalidAttributeValueException ("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
 			}
@@ -182,6 +205,10 @@ public class FreightUtils {
 		return types;
 	}
 
+	/**
+	 * Use if carriers and carrierVehicleTypes are set by input file
+	 * @param scenario
+	 */
 	public static void loadCarriersAccordingToFreightConfig( Scenario scenario ){
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ) ;
 
