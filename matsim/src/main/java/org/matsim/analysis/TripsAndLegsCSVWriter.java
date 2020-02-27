@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 /**
  * @author jbischoff / SBB
  */
-public class TripsCSVWriter {
+public class TripsAndLegsCSVWriter {
     public static String[] TRIPSHEADER = {"person", "trip_number", "trip_id",
             "dep_time", "trav_time", "wait_time", "traveled_distance", "euclidean_distance",
             "longest_distance_mode", "modes", "start_activity_type",
@@ -68,7 +68,7 @@ public class TripsCSVWriter {
     private final CustomLegsWriterExtension legsWriterExtension;
 
 
-    public TripsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
+    public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
         this.scenario = scenario;
         this.separator = scenario.getConfig().global().getDefaultDelimiter();
         TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER, tripsWriterExtension.getAdditionalTripHeader());

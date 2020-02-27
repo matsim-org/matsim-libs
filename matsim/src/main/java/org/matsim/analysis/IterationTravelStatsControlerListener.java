@@ -66,9 +66,9 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     OutputDirectoryHierarchy outputDirectoryHierarchy;
 
     @Inject
-    TripsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension;
+    TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension;
     @Inject
-    TripsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
+    TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
 
 	@Override
     public void notifyIterationEnds(IterationEndsEvent event) {
@@ -78,7 +78,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
         final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
-            new TripsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension).write(experiencedPlansService.getExperiencedPlans()
+            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.legscsv));
         }
