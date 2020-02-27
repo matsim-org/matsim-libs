@@ -105,7 +105,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
 					// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-					act.setMaximumDuration(Time.getUndefinedTime());
+					act.setMaximumDurationUndefined();
 					act.setEndTimeUndefined();
 
 				}

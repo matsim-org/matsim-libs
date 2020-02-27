@@ -174,7 +174,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = OptionalTime.of(dur);
+		this.dur = OptionalTime.defined(dur);
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
+		this.dur = OptionalTime.undefined();
 	}
 
 	@Override

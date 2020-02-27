@@ -289,6 +289,11 @@ public final class PopulationUtils {
 		}
 
 		@Override
+		public void setMaximumDurationUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
 		public Id<Link> getLinkId() {
 			return this.delegate.getLinkId() ;
 		}
@@ -866,7 +871,7 @@ public final class PopulationUtils {
 		newAct.setLinkId(act.getLinkId());
 		act.getStartTime().ifDefinedOrElse(newAct::setStartTime, newAct::setStartTimeUndefined);
 		act.getEndTime().ifDefinedOrElse(newAct::setEndTime, newAct::setEndTimeUndefined);
-		newAct.setMaximumDuration(act.getMaximumDuration().orElseUndefined());
+		act.getMaximumDuration().ifDefinedOrElse(newAct::setMaximumDuration, newAct::setMaximumDurationUndefined);
 		newAct.setFacilityId(act.getFacilityId());
 
 		AttributesUtils.copyAttributesFromTo(act, newAct);

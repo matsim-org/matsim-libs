@@ -93,6 +93,11 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
+	public void setMaximumDurationUndefined() {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
 	public Id<Link> getLinkId() {
 		return wrapped.getLinkId();
 	}

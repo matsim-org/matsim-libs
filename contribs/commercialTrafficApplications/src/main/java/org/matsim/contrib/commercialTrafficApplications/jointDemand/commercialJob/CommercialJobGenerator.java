@@ -61,7 +61,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -249,7 +248,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                                 startActivity.setEndTime(lastTourElementActivity.getEndTime().seconds()
 										- lastTourElementActivity.getMaximumDuration().seconds()
                                         - lastTourLeg.getTravelTime() * firsttourTraveltimeBuffer);
-                                lastTourElementActivity.setMaximumDuration(Time.getUndefinedTime());
+                                lastTourElementActivity.setMaximumDurationUndefined();
                             }
                         }
                         lastTourLeg = leg;

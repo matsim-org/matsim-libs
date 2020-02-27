@@ -278,7 +278,8 @@ import org.xml.sax.Attributes;
 
 		Time.parseOptionalTime(atts.getValue("start_time"))
 				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
+		Time.parseOptionalTime(atts.getValue("dur"))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
 		Time.parseOptionalTime(atts.getValue("end_time"))
 				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 

@@ -215,6 +215,10 @@ public class TripRouterTest {
 			this.delegate.setMaximumDuration(seconds);
 		}
 		@Override
+		public void setMaximumDurationUndefined() {
+			this.delegate.setMaximumDurationUndefined();
+		}
+		@Override
 		public Id<Link> getLinkId() {
 			return this.delegate.getLinkId();
 		}

@@ -81,6 +81,11 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
+	public void setMaximumDurationUndefined() {
+		act.setMaximumDurationUndefined();
+	}
+
+	@Override
 	public Id<Link> getLinkId() {
 		return act.getLinkId();
 	}

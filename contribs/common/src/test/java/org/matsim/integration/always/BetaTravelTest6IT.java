@@ -460,7 +460,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-						act.setMaximumDuration(Time.getUndefinedTime());
+						act.setMaximumDurationUndefined();
 						act.setEndTimeUndefined();
 					}
 

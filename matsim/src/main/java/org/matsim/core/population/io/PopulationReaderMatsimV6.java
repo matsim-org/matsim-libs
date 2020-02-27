@@ -287,7 +287,8 @@ import com.google.inject.Inject;
 
 		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
 				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue(ATTR_ACT_MAXDUR)));
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
 		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
 				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		String fId = atts.getValue(ATTR_ACT_FACILITY);

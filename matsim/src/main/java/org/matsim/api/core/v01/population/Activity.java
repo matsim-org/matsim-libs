@@ -62,6 +62,8 @@ public interface Activity extends PlanElement {
 	
 	public void setMaximumDuration(double seconds) ;
 
+	public void setMaximumDurationUndefined();
+
 	/**
 	 * @return the if of the link to which the activity is attached.  This may start as null, but
 	 * is usually set automatically by the control(l)er before the zeroth iteration.
