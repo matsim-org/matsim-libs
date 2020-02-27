@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 /**
  * The class is designed for inheritance. Overrride createLeg() and createActivity() to obtain different visualisation
  * of VRP schedules/vehicles
- * 
+ *
  * @author michalm
  */
 public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {

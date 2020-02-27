@@ -72,6 +72,9 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
 	// try to avoid misleading comment about config context.  kai, dec'18
 
+	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+
+
 	/**
 	 * Is a namespace, so don't instantiate:
 	 */
@@ -822,6 +825,7 @@ public final class PopulationUtils {
 
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
+		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
 		out.setDepartureTime(in.getDepartureTime());
 		out.setTravelTime(in.getTravelTime());
 		if (in.getRoute() != null) {
@@ -1081,10 +1085,13 @@ public final class PopulationUtils {
 		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
 		// in the PopulationReader class.  kai, nov'18)
 	}
-
+	public static Population readPopulation( String filename ) {
+		Population population = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
+		readPopulation( population, filename );
+		return population ;
+	}
 	public static boolean comparePopulations( Population population1, Population population2 ) {
-		boolean result = PopulationUtils.equalPopulation( population1, population2 );
-		return result ;
+		return PopulationUtils.equalPopulation( population1, population2 );
 	}
 
 	// ---
@@ -1095,7 +1102,7 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
-	public static void putPersonAttribute( Person person, String key, Object value ) {
+	public static void putPersonAttribute( HasPlansAndId<?,?> person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
 	public static Object removePersonAttribute( Person person, String key ) {
@@ -1107,4 +1114,10 @@ public final class PopulationUtils {
 		person.getAttributes().clear();
 	}
 
+        public static String getSubpopulation( HasPlansAndId<?,?> person ){
+		return (String) getPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME );
+        }
+        public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
+		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
+	}
 }

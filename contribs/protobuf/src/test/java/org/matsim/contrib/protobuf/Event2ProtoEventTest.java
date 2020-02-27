@@ -256,7 +256,7 @@ public class Event2ProtoEventTest {
 	@Test
 	public final void testEvent2ProtoEventPersonMoneyEvent() {
 
-		PersonMoneyEvent e = new PersonMoneyEvent(42.0,Id.createPersonId("Bob"),-123.45);
+		PersonMoneyEvent e = new PersonMoneyEvent(42.0,Id.createPersonId("Bob"),-123.45, "taxiFare", "greedyTaxis");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
 		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.PersonMoney);
 		Assert.assertTrue(pbe.hasActStart() == false);
@@ -277,6 +277,8 @@ public class Event2ProtoEventTest {
 		Assert.assertEquals(42.0,pbe.getPersonMoney().getTime(),0.);
 		Assert.assertEquals("Bob",pbe.getPersonMoney().getPersId().getId());
 		Assert.assertEquals(-123.45,pbe.getPersonMoney().getAmount(),0);
+		Assert.assertEquals("taxiFare",pbe.getPersonMoney().getPurpose());
+		Assert.assertEquals("greedyTaxis",pbe.getPersonMoney().getTransactionPartner());
 	}
 
 	@Test

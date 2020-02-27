@@ -41,6 +41,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -147,15 +148,9 @@ public class SwissRailRaptorModuleTest {
         workScoring.setTypicalDuration(8*3600);
         f.config.planCalcScore().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        accessWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(accessWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
-        PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        egressWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(egressWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         // prepare rest of config
 
@@ -209,15 +204,24 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals("work", ((Activity) planElements.get(10)).getType());
 
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(1)).getMode());
-        Assert.assertEquals(TransportMode.non_network_walk, ((Leg) planElements.get(3)).getMode());
+        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(3)).getMode());
         Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(5)).getMode());
-        Assert.assertEquals(TransportMode.non_network_walk, ((Leg) planElements.get(7)).getMode());
+        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(7)).getMode());
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(9)).getMode());
 
-        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+
+        // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
+        // fixing it here. kai, feb'20
+
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 2)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 4)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 6)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 8)).getMaximumDuration() ) ) ;
+
     }
     
     /**
@@ -250,15 +254,7 @@ public class SwissRailRaptorModuleTest {
         workScoring.setTypicalDuration(8*3600);
         f.config.planCalcScore().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        accessWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(accessWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
-        PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        egressWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(egressWalk);
+        f.config.planCalcScore().getOrCreateModeParams(TransportMode.walk).setMarginalUtilityOfTraveling(0.0);
 
         StrategySettings reRoute = new StrategySettings();
         reRoute.setStrategyName("ReRoute");
@@ -310,9 +306,9 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((Activity) planElements.get(4)).getType());
         Assert.assertEquals("work", ((Activity) planElements.get(6)).getType());
 
-        Assert.assertEquals(TransportMode.non_network_walk, ((Leg) planElements.get(1)).getMode());
+        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(1)).getMode());
         Assert.assertEquals(TransportMode.pt, ((Leg) planElements.get(3)).getMode());
-        Assert.assertEquals(TransportMode.non_network_walk, ((Leg) planElements.get(5)).getMode());
+        Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(5)).getMode());
         
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);

@@ -86,14 +86,14 @@ public class DrtFareHandler
         if (event.getLegMode().equals(this.mode)) {
             if (!dailyFeeCharged.contains(event.getPersonId())) {
                 dailyFeeCharged.add(event.getPersonId());
-                events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee));
+                events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "drtFare", mode));
             }
             DrtRequestSubmittedEvent e = this.lastRequestSubmission.get(event.getPersonId());
             double fare = distanceFare_Meter * e.getUnsharedRideDistance() + timeFare_sec * e.getUnsharedRideTime() + baseFare;
             if (fare < minFarePerTrip) {
             	fare = minFarePerTrip;
             }
-            events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare));
+            events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare, "drtFare", mode));
         }
 
     }

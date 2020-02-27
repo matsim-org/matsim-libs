@@ -20,16 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +30,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
@@ -332,33 +330,14 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	/*package*/ abstract static class HashSetCache {
-		private final static Map<Integer, List<Set<String>>> cache = new ConcurrentHashMap<>();
+		private final static ConcurrentMap<Integer, Set<String>> cache = new ConcurrentHashMap<>();
+
 		public static Set<String> get(final Set<String> set) {
 			if (set == null) {
 				return null;
 			}
-			int size = set.size();
-			List<Set<String>> list = cache.get(size);
-			if (list == null) {
-				list = new ArrayList<>(4);
-				cache.put(size, list);
-				HashSet<String> set2 = new HashSet<>(set);
-				Set<String> set3 = Collections.unmodifiableSet(set2);
-				list.add(set3);
-				return set3;
-			}
-			for (Set<String> s : list) {
-				if (s.equals(set)) {
-					return s;
-				}
-			}
-			// not yet in cache
-			HashSet<String> set2 = new HashSet<>(set);
-			Set<String> set3 = Collections.unmodifiableSet(set2);
-			list.add(set3);
-			return set3;
+			return cache.computeIfAbsent(set.hashCode(), key -> Collections.unmodifiableSet(set));
 		}
-
 	}
 
 //	/*deliberately package*/ void setType2(String type2) {

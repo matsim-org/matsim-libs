@@ -52,7 +52,7 @@ public class AttributesXmlWriterDelegate {
 
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : attributes.getAsMap().entrySet()) {
-				Class<?> clazz = objAttribute.getValue().getClass();
+				Class<?> clazz = objAttribute.getValue().getClass(); // TODO: Does not work if value is null. Shall we allow for the value being null? - gl-oct'19
 				String converted = converter.convertToString(objAttribute.getValue());
 				if (converted != null) {
 					writer.write(indentation + "\t");

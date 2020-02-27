@@ -61,7 +61,7 @@ public class StrategyManager implements MatsimManager {
 				* strategyConfigGroup.getFractionOfIterationsToDisableInnovation() + controlerConfigGroup.getFirstIteration());
 		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
-		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
+//		setSubpopulationAttributeName(plansConfigGroup.getSubpopulationAttributeName());
 		for (Map.Entry<StrategyConfigGroup.StrategySettings, PlanStrategy> entry : planStrategies.entrySet()) {
 			PlanStrategy strategy = entry.getValue();
 			StrategyConfigGroup.StrategySettings settings = entry.getKey();
@@ -91,13 +91,13 @@ public class StrategyManager implements MatsimManager {
 		this.delegate = new GenericStrategyManager<>();
 	}
 
-	/**
-	 * @param name the name of the subpopulation attribute
-	 * in the person's object attributes.
-	 */
-	public final void setSubpopulationAttributeName(final String name) {
-		delegate.setSubpopulationAttributeName(name);
-	}
+//	/**
+//	 * @param name the name of the subpopulation attribute
+//	 * in the person's object attributes.
+//	 */
+//	public final void setSubpopulationAttributeName(final String name) {
+//		delegate.setSubpopulationAttributeName(name);
+//	}
 
 	@Deprecated
 	public final void addStrategyForDefaultSubpopulation(

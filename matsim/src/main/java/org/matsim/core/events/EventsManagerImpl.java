@@ -64,6 +64,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.misc.ClassUtils;
 
 /**
  * EventHandling
@@ -133,7 +134,20 @@ public final class EventsManagerImpl implements EventsManager {
 			this.nextCounterMsg *= 4;
 			log.info(" event # " + this.counter);
 		}
-		computeEvent(event);
+		for (HandlerInfo info : getHandlersForClass( event.getClass() )) {
+			synchronized(info.eventHandler) {
+				if (callHandlerFast(info.eventClass, event, info.eventHandler )) {
+					continue;
+				}
+				try {
+					info.method.invoke(info.eventHandler, event );
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
+				} catch (InvocationTargetException e) {
+					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
+				}
+			}
+		}
 	}
 
 
@@ -216,23 +230,6 @@ public final class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-	private void computeEvent(final Event event) {
-		for (HandlerInfo info : getHandlersForClass(event.getClass())) {
-			synchronized(info.eventHandler) {
-				if (callHandlerFast(info.eventClass, event, info.eventHandler)) {
-					continue;
-				}
-				try {
-					info.method.invoke(info.eventHandler, event);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e);
-				} catch (InvocationTargetException e) {
-					throw new RuntimeException("problem invoking EventHandler " + info.eventHandler.getClass().getCanonicalName() + " for event-class " + info.eventClass.getCanonicalName(), e.getCause());
-				}
-			}
-		}
-	}
-
 	private HandlerInfo[] getHandlersForClass(final Class<?> eventClass) {
 		Class<?> klass = eventClass;
 		HandlerInfo[] cache = this.cacheHandlers.get(eventClass);
@@ -252,7 +249,7 @@ public final class EventsManagerImpl implements EventsManager {
 			klass = klass.getSuperclass();
 		}
 		// now search in implemented interfaces
-		for (Class<?> intfc : getAllInterfaces(eventClass)) {
+		for (Class<?> intfc : ClassUtils.getAllInterfaces(eventClass )) {
 			HandlerData dat = findHandler(intfc);
 			if (dat != null) {
 				for(EventHandler handler: dat.handlerList) {
@@ -266,24 +263,8 @@ public final class EventsManagerImpl implements EventsManager {
 		return cache;
 	}
 
-	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
-		Set<Class<?>> intfs = new HashSet<Class<?>>();
-		for (Class<?> intf : klass.getInterfaces()) {
-			intfs.add(intf);
-			intfs.addAll(getAllInterfaces(intf));
-		}
-		if (!klass.isInterface()) {
-			Class<?> superclass = klass.getSuperclass();
-			while (superclass != Object.class) {
-				intfs.addAll(getAllInterfaces(superclass));
-				superclass = superclass.getSuperclass();
-			}
-		}
-		return intfs;
-	}
-
 	// this method is purely for performance reasons and need not be implemented
-	private boolean callHandlerFast(final Class<?> klass, final Event ev, final EventHandler handler) {
+	private static boolean callHandlerFast( final Class<?> klass, final Event ev, final EventHandler handler ) {
 		if (klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;

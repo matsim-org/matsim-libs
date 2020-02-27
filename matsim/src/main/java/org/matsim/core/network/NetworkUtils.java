@@ -20,12 +20,9 @@
 
 package org.matsim.core.network;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -38,6 +35,8 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import java.util.*;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -222,12 +221,14 @@ public final class NetworkUtils {
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
 		int numberOfLanes = (int) link.getNumberOfLanes(time);
-		if (numberOfLanes == 0) {
-			return 1;
-		} else {
-			return numberOfLanes;
-		}
+		return Math.max(1, numberOfLanes);
 	}
+
+	public static int getNumberOfLanesAsInt(final Link link) {
+		int numberOfLanes = (int) link.getNumberOfLanes();
+		return Math.max(1, numberOfLanes);
+	}
+
 
 	public static boolean isMultimodal(final Network network) {
 		String mode = null;
@@ -786,21 +787,65 @@ public final class NetworkUtils {
 	public static void writeNetwork(Network network, String string) {
 		new NetworkWriter(network).write(string) ;
 	}
-	
+
 	public static Link findLinkInOppositeDirection(Link link) {
-		for ( Link candidateLink : link.getToNode().getOutLinks().values() ) {
-			if ( candidateLink.getToNode().equals( link.getFromNode() ) ) {
-				return candidateLink ;
+		for (Link candidateLink : link.getToNode().getOutLinks().values()) {
+			if (candidateLink.getToNode().equals(link.getFromNode())) {
+				return candidateLink;
 			}
 		}
-		return null ;
+		return null;
 	}
-	public static void readNetwork( Network network, String string ) {
+
+	public static void readNetwork(Network network, String string) {
 		new MatsimNetworkReader(network).readFile(string);
 	}
-	public static Network readNetwork( String string ) {
-		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig() ).getNetwork() ;
+
+	public static Network readNetwork(String string) {
+		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
 		new MatsimNetworkReader(network).readFile(string);
-		return network ;
+		return network;
+	}
+
+	public static boolean compare(Network expected, Network actual) {
+
+		// check that all element from expected result are in tested network
+		for (Link link : expected.getLinks().values()) {
+			Link testLink = actual.getLinks().get(link.getId());
+			if (testLink == null) return false;
+			if (!testLinksAreEqual(link, testLink)) return false;
+		}
+
+		for (Node node : expected.getNodes().values()) {
+			Node testNode = actual.getNodes().get(node.getId());
+			if (testNode == null) return false;
+			if (!testNodesAreEqual(node, testNode)) return false;
+		}
+
+		// also check the other way around, to make sure there are no extra elements in the network
+		for (Link link : actual.getLinks().values()) {
+			Link expectedLink = expected.getLinks().get(link.getId());
+			if (expectedLink == null) return false;
+		}
+
+		for (Node node : actual.getNodes().values()) {
+			Node expectedNode = expected.getNodes().get(node.getId());
+			if (expectedNode == null) return false;
+		}
+		return true;
+	}
+
+	private static boolean testLinksAreEqual(Link expected, Link actual) {
+
+		return expected.getAllowedModes().stream().allMatch(mode -> actual.getAllowedModes().contains(mode))
+				&& expected.getCapacity() == actual.getCapacity()
+				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
+				&& expected.getFreespeed() == actual.getFreespeed()
+				&& expected.getLength() == actual.getLength()
+				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();
+	}
+
+	private static boolean testNodesAreEqual(Node expected, Node actual) {
+		return expected.getCoord().equals(actual.getCoord());
 	}
 }

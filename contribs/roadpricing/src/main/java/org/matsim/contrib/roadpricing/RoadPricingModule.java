@@ -11,14 +11,18 @@ import org.matsim.contrib.roadpricing.RoadPricingModuleDefaults.TravelDisutility
 
 import com.google.inject.Singleton;
 
+import static org.matsim.contrib.roadpricing.PlansCalcRouteWithTollOrNot.*;
+
 public final class RoadPricingModule extends AbstractModule {
 	final private static Logger LOG = Logger.getLogger(RoadPricingModule.class);
 	
 	private RoadPricingScheme scheme;
 
 	public RoadPricingModule() {	}
-	
-	RoadPricingModule( RoadPricingScheme scheme ) {
+
+	/* For the time being this has to be public, otherwise the roadpricing TollFactor
+	cannot be considered, rendering integration tests useless, JWJ Jan'20 */
+	public RoadPricingModule( RoadPricingScheme scheme ) {
 		this.scheme = scheme;
 	}
 	
@@ -38,17 +42,21 @@ public final class RoadPricingModule extends AbstractModule {
 			bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
 		}
 		// also add RoadPricingScheme as ScenarioElement.  yyyy TODO might try to get rid of this; binding it is safer
-		bind(RoadPricingInitializer.class).asEagerSingleton();
+		// (My personal preference is actually to have it as scenario element ... since then it can be set before controler is even called.  Which
+		// certainly makes more sense for a clean build sequence.  kai, oct'19)
+		bind(RoadPricingInitializer.class).in( Singleton.class );
 		
 		// add the toll to the routing disutility.  also includes "randomizing":
 		addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
 
 		// specific re-routing strategy for area toll:
 		// yyyy TODO could probably combine them somewhat
-		bind(PlansCalcRouteWithTollOrNot.class);
+//		bind(PlansCalcRouteWithTollOrNot.class); // so that ReRouteAreaToll can use it by injection; yy could replace this by traditional constructor
+//		 call. kai, oct'19
+		// done.  kai, oct'19
 		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-		addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
-		addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
+		addTravelDisutilityFactoryBinding( CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
+		addRoutingModuleBinding( CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting());
 		
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16

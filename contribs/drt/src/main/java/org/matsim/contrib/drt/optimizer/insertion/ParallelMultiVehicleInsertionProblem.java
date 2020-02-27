@@ -46,7 +46,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final InsertionCostCalculator.PenaltyCalculator penaltyCalculator;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
-	private final DetourLinksStats detourLinksStats = new DetourLinksStats();
+	// private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
@@ -63,7 +63,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest, penaltyCalculator);
 		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
 
-		detourLinksStats.updateStats(vEntries, detourLinksProvider);
+		// detourLinksStats.updateStats(vEntries, detourLinksProvider);
 		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
 		if (filteredInsertions.isEmpty()) {
 			return Optional.empty();
@@ -77,12 +77,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.min(Comparator.comparing(i -> i.cost))).join();
-	}
-
-	public void shutdown() {
-		forkJoinPool.shutdown();
-		detourLinksStats.printStats();
+				.min(Comparator.comparingDouble(i -> i.cost))).join();
 	}
 
 	private static class DetourLinksStats {

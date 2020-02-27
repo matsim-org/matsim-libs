@@ -179,8 +179,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
-			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
-					"This is a bug and may be changed eventually.  kai, jun'11") ;
+			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
 		}
 		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
 			problem = true ;
@@ -195,7 +194,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// added oct'17:
-		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null ) {
+		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null || config.planCalcScore().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +

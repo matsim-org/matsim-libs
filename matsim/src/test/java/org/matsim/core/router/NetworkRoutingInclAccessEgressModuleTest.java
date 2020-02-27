@@ -165,7 +165,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         return elements.stream()
                 .filter(element -> element instanceof Leg)
                 .map(element -> (Leg) element)
-                .filter(leg -> !leg.getMode().equals(TransportMode.non_network_walk))
+                .filter(leg -> !leg.getMode().equals(TransportMode.walk))
                 .flatMap(leg -> ((NetworkRoute) leg.getRoute()).getLinkIds().stream())
                 .collect(Collectors.toList());
     }
@@ -251,7 +251,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
     /**
-     * returns the mode of the first leg in a plan, which is not a non_network_mode
+     * returns the mode of the first leg in a plan, which is not a walk (walk is now used as access/egress mode to network modes,
+     * except if walk is routed on the network as network mode).
      */
     private static class SimpleMainModeIdentifier implements MainModeIdentifier {
 
@@ -260,7 +261,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
             return tripElements.stream()
                     .filter(element -> element instanceof Leg)
                     .map(element -> (Leg) element)
-                    .filter(leg -> !leg.getMode().equals(TransportMode.non_network_walk))
+                    .filter(leg -> !leg.getMode().equals(TransportMode.walk))
                     .map(Leg::getMode)
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("could not find main mode"));

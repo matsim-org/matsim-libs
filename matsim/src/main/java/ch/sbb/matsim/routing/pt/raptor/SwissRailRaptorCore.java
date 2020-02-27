@@ -715,7 +715,7 @@ public class SwissRailRaptorCore {
         double transferCostPerHour = raptorParams.getTransferPenaltyPerTravelTimeHour();
         double transferCostMin = raptorParams.getTransferPenaltyMinimum();
         double transferCostMax = raptorParams.getTransferPenaltyMaximum();
-        double margUtilityTransitWalk = raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.transit_walk);
+        double margUtilityTransitWalk = raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk); // replaced TransportMode.transit_walk with walk
 
         for (int stopIndex = this.improvedStops.nextSetBit(0); stopIndex >= 0; stopIndex = this.improvedStops.nextSetBit(stopIndex + 1)) {
             PathElement fromPE = this.arrivalPathPerStop[stopIndex];
@@ -834,7 +834,7 @@ public class SwissRailRaptorCore {
                         // but it can only be merged if it is not intermodal...
                         continue;
                     }
-                    String mode = TransportMode.non_network_walk;
+                    String mode = TransportMode.walk;
                     raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);
                 }
             } else {

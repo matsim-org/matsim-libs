@@ -31,7 +31,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -112,11 +111,11 @@ public final class EditTrips {
 		}
 
 	}
-	public final Trip findCurrentTrip( MobsimAgent agent ) {
+	public static Trip findCurrentTrip( MobsimAgent agent ) {
 		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
 		return findTripAtPlanElement(agent, pe);
 	}
-	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
+	public static Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
 //		log.debug("plan element to be found=" + pe ) ;
 		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent) ) ;
 		for ( Trip trip : trips ) {
@@ -130,7 +129,7 @@ public final class EditTrips {
 		}
 		throw new ReplanningException("trip not found") ;
 	}
-	public Trip findTripAtPlanElementIndex( MobsimAgent agent, int index ) {
+	public static Trip findTripAtPlanElementIndex( MobsimAgent agent, int index ) {
 		return findTripAtPlanElement( agent, WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ) ;
 	}
 	// current trip:
@@ -193,7 +192,7 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, newAct, mainMode, now, person );
 
 		// (2) there should be no access leg even with access/egress routing
-		Gbl.assertIf( ! ((Leg)newTripElements.get(1)).getMode().equals( TransportMode.non_network_walk ) );
+		Gbl.assertIf( ! (((Leg)newTripElements.get(1)).getRoute() instanceof NetworkRoute) );
 
 		// (3) modify current route within current leg:
 		replaceRemainderOfCurrentRoute(currentLeg, newTripElements, agent);
@@ -496,7 +495,18 @@ public final class EditTrips {
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
-			double departureTime = now + 0.5 * currentLeg.getTravelTime();
+			
+			double travelTime = currentLeg.getTravelTime();
+			if (Double.isInfinite(travelTime)) {
+				travelTime = currentLeg.getRoute().getTravelTime();
+				if (Double.isInfinite(travelTime)) {
+					// we don't know how long the agent will be travelling on the current leg
+					log.error("Travel time of " + agent.getId().toString() + " on following leg is unknown " + currentLeg.toString());
+					throw new RuntimeException();
+				}
+			}
+			
+			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
 			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
 			if (Double.isFinite(previousActivity.getEndTime()) && previousActivity.getEndTime() < now) {

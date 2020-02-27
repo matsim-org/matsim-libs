@@ -38,43 +38,49 @@ import cadyts.measurements.SingleLinkMeasurement;
  * @author mrieser
  */
 public final class CadytsBuilderImplGT {
-	private static Logger log = Logger.getLogger( CadytsBuilderImplGT.class ) ;
+	// yyyy why "GT"?  Is this a typo and should have been PT (or Pt, to be consistent with other classes)? kai, feb'20
 
-	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
-																		 LookUpItemFromId<T> lookUp, Class<T> idType ) {
+        // yy I also don't know where and when this is used to I am commenting it out to see if someone complains.  kai, feb'20
 
-		if (occupCounts.getCounts().size() == 0) {
-			log.warn("Counts container is empty.");
-		}
-
-		AnalyticalCalibrator<T> matsimCalibrator = CadytsBuilderImpl.buildCalibrator(config);
-
-		//add counts data into calibrator
-		int numberOfAddedMeasurements = 0 ;
-		for (Map.Entry<Id<T>, Count<T>> entry : occupCounts.getCounts().entrySet()) {
-			// (loop over all counting "items" (usually locations/stations)
-
-			T item = lookUp.getItem(Id.create(entry.getKey(), idType)) ;
-			if ( item==null ) {
-				throw new RuntimeException("item is null; entry=" + entry + " idType=" + idType ) ;
-			}
-
-			double sum = 0; 
-			for (Volume volume : entry.getValue().getVolumes().values()){
-				// (loop over the different time slots)
-				sum += volume.getValue() ;
-			}
-			numberOfAddedMeasurements++ ;
-			matsimCalibrator.addMeasurement(item, 0, 86400, sum, SingleLinkMeasurement.TYPE.COUNT_VEH );
-		}
-
-		if ( numberOfAddedMeasurements==0 ) {
-			log.warn("No measurements were added.");
-		}
-
-		if ( matsimCalibrator.getProportionalAssignment() ) {
-			throw new RuntimeException("Gunnar says that this may not work so do not set to true. kai, sep'14") ;
-		}
-		return matsimCalibrator;
-	}
+//	private static Logger log = Logger.getLogger( CadytsBuilderImplGT.class ) ;
+//
+//	private CadytsBuilderImplGT(){} // do not instantiate
+//
+//	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
+//																		 LookUpItemFromId<T> lookUp, Class<T> idType ) {
+//
+//		if (occupCounts.getCounts().size() == 0) {
+//			log.warn("Counts container is empty.");
+//		}
+//
+//		AnalyticalCalibrator<T> matsimCalibrator = CadytsBuilderImpl.buildCalibrator(config);
+//
+//		//add counts data into calibrator
+//		int numberOfAddedMeasurements = 0 ;
+//		for (Map.Entry<Id<T>, Count<T>> entry : occupCounts.getCounts().entrySet()) {
+//			// (loop over all counting "items" (usually locations/stations)
+//
+//			T item = lookUp.getItem(Id.create(entry.getKey(), idType)) ;
+//			if ( item==null ) {
+//				throw new RuntimeException("item is null; entry=" + entry + " idType=" + idType ) ;
+//			}
+//
+//			double sum = 0;
+//			for (Volume volume : entry.getValue().getVolumes().values()){
+//				// (loop over the different time slots)
+//				sum += volume.getValue() ;
+//			}
+//			numberOfAddedMeasurements++ ;
+//			matsimCalibrator.addMeasurement(item, 0, 86400, sum, SingleLinkMeasurement.TYPE.COUNT_VEH );
+//		}
+//
+//		if ( numberOfAddedMeasurements==0 ) {
+//			log.warn("No measurements were added.");
+//		}
+//
+//		if ( matsimCalibrator.getProportionalAssignment() ) {
+//			throw new RuntimeException("Gunnar says that this may not work so do not set to true. kai, sep'14") ;
+//		}
+//		return matsimCalibrator;
+//	}
 }

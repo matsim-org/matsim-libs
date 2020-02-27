@@ -118,11 +118,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		
 		// walk:
 		{
-			 ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.non_network_walk );
-			if ( params==null ) {
-				log.warn( "more routing params for non_network_walk are not provided; trying to fall back on regular walk parameters");
-				params = pcrConfig.getModeRoutingParams().get(  TransportMode.walk );
-			}
+			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
 			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;
