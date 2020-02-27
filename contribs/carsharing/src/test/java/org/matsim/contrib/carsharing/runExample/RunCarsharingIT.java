@@ -79,6 +79,7 @@ public class RunCarsharingIT {
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
+		config.plansCalcRoute().setRoutingRandomness(0.);
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
