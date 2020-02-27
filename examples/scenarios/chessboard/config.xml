@@ -56,6 +56,39 @@
 				<param name="earliestEndTime" value="" />
 				<param name="closingTime"     value="18:00:00" />
 			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType"            value="shopping" />
+				<param name="priority"        value="1" />
+				<param name="typicalDuration" value="00:30:00" />
+				<param name="minimalDuration" value="00:05:00" />
+				<param name="openingTime"     value="07:00:00" />
+				<param name="latestStartTime" value="18:00:00" />
+				<param name="earliestEndTime" value="" />
+				<param name="closingTime"     value="20:00:00" />
+			</parameterset>
+			<parameterset type="activityParams">
+				<param name="activityType"            value="leisure" />
+				<param name="priority"        value="1" />
+				<param name="typicalDuration" value="02:00:00" />
+				<param name="minimalDuration" value="00:10:00" />
+				<param name="openingTime"     value="08:00:00" />
+				<param name="latestStartTime" value="21:00:00" />
+				<param name="earliestEndTime" value="" />
+				<param name="closingTime"     value="22:00:00" />
+			</parameterset>
+		</parameterset>
+	</module>
+	<module name="strategy">
+		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="BestScore"/>
+			<param name="weight" value="0.9"/>
+		</parameterset>
+
+		<parameterset type="strategysettings">
+			<param name="strategyName" value="ReRoute"/>
+			<param name="weight" value="0.1"/>
 		</parameterset>
 	</module>
 
