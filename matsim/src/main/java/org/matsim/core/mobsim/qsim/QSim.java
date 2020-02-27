@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
@@ -195,9 +196,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	};
 
-	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
+	private final Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
-	private Injector childInjector;
+	private final Injector childInjector;
 //	private QVehicleFactory qVehicleFactory;
 	
 	@Override
@@ -341,7 +342,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
 
-	void cleanupSim() {
+	private void cleanupSim() {
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		boolean gotException = false;
@@ -352,6 +353,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			}
 			catch (Exception e) {
 				log.error("got exception while cleaning up", e);
+				gotException=true;
 			}
 		}
 
@@ -439,7 +441,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
 		if ( agent instanceof HasPerson ){
-			PopulationUtils.getOrCreateAllpersons( scenario ).addPerson( ((HasPerson) agent).getPerson() );
+			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
+				allpersons.addPerson( ((HasPerson) agent).getPerson() );
+			}
 		}
 	}
 
