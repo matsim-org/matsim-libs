@@ -17,7 +17,14 @@ import java.util.Map;
  */
 public class EventWriterPB implements EventWriter, BasicEventHandler {
 
+    /**
+     * How many events are written per batch.
+     */
+    private static int BATCH_SIZE = 1000;
+
     private final OutputStream out;
+
+    private final ProtoEvents.EventBatch.Builder batch = ProtoEvents.EventBatch.newBuilder();
 
     public EventWriterPB(OutputStream out) {
 
@@ -38,6 +45,9 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
     @Override
     public void closeFile() {
         try {
+            if (batch.getEventsCount() > 0)
+                writeBatch();
+
             out.close();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -46,17 +56,26 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
 
     @Override
     public void reset(int iteration) {
-        // Nothing to do
     }
 
     @Override
     public void handleEvent(Event event) {
         try {
-            convertEvent(event)
-                    .writeDelimitedTo(out);
+            batch.addEvents(convertEvent(event));
+
+            if (batch.getEventsCount() == BATCH_SIZE)
+                writeBatch();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * Write the collected events to the stream.
+     */
+    private void writeBatch() throws IOException {
+        batch.build().writeDelimitedTo(out);
+        batch.clearEvents();
     }
 
     public static ProtoEvents.Event convertEvent(Event event) {
@@ -70,16 +89,7 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
                     .setY(((BasicLocation) event).getCoord().getY());
         }
 
-        if (event instanceof GenericEvent) {
-            Map<String, String> attrs = event.getAttributes();
-            // Checking references is safe here because they are constant
-            attrs.keySet().removeIf(key -> key == Event.ATTRIBUTE_X || key == Event.ATTRIBUTE_Y ||
-                    key == Event.ATTRIBUTE_TIME || key == Event.ATTRIBUTE_TYPE);
-
-            builder.getGenericBuilder()
-                    .setType(event.getEventType())
-                    .putAllAttrs(attrs);
-        } else if (event instanceof ActivityEndEvent) {
+        if (event instanceof ActivityEndEvent) {
             builder.getActivityEndBuilder()
                     .setLinkId(convertId(((ActivityEndEvent) event).getLinkId()))
                     .setFacilityId(convertId(((ActivityEndEvent) event).getFacilityId()))
@@ -154,10 +164,15 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
                     .setNetworkMode(((VehicleLeavesTrafficEvent) event).getNetworkMode())
                     .setRelativePositionOnLink(((VehicleLeavesTrafficEvent) event).getRelativePositionOnLink());
         } else {
-            // TODO: should warn here
+            Map<String, String> attrs = event.getAttributes();
+            // Checking references is safe here because they are constant
+            attrs.keySet().removeIf(key -> key == Event.ATTRIBUTE_X || key == Event.ATTRIBUTE_Y ||
+                    key == Event.ATTRIBUTE_TIME || key == Event.ATTRIBUTE_TYPE);
+
+            // covers generic and all unknown events
             builder.getGenericBuilder()
                     .setType(event.getEventType())
-                    .putAllAttrs(event.getAttributes());
+                    .putAllAttrs(attrs);
         }
 
         return builder.build();
@@ -174,7 +189,7 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
             return ProtoId.getDefaultInstance();
         }
 
-        // TODO: types or indices are not converted yet
+        // types or indices are not converted yet, also probably not needed in most cases
 
         return ProtoId.newBuilder().setId(id.toString()).build();
     }

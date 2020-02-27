@@ -4,14 +4,20 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.pb.ProtoEvents;
 import org.matsim.core.utils.pb.ProtoId;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,6 +26,26 @@ public class EventWriterPBTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
+    @Rule
+    public TemporaryFolder tmp = new TemporaryFolder();
+
+    @Test
+    public void writer() throws IOException {
+
+        File file = tmp.newFile("output.pb");
+        OutputStream out = IOUtils.getOutputStream(file.toURI().toURL(), false);
+
+        EventWriterPB writer = new EventWriterPB(out);
+
+        for (int i = 1; i <= 2000; i++) {
+            writer.handleEvent(new GenericEvent(String.valueOf(i), i * i));
+        }
+
+        writer.closeFile();
+        assertThat(file)
+                .exists()
+                .isNotEmpty();
+    }
 
     @Test
     public void convertEvent() {

@@ -9,7 +9,14 @@ import "matsim/pb/Ids.proto";
 import "matsim/pb/Model.proto";
 
 /*
- * Protobuf event definition. For detailed event documentation refer to the corresponding java code.
+ * Holder of multiple events. More efficient to parse than many small messages.
+ */
+message EventBatch {
+    repeated Event events = 1;
+}
+
+/*
+  Protobuf event definition. For detailed event documentation refer to the corresponding java code.
  */
 message Event {
 
