@@ -29,32 +29,31 @@ import org.matsim.vehicles.Vehicle;
 */
 class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
 
-	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
-	private final NoiseTollCalculator calculator;
+	private final TravelDisutility travelDisutilityDelegate;
+	private final TravelDisutility tollDisutilityDelegate;
 	private final double marginalUtilityOfMoney;
-	private final double sigma ;
+	private final boolean usingRandomization;
 
-	public NoiseTollTimeDistanceTravelDisutility(TravelDisutility randomizedTimeDistanceTravelDisutility,
-												 NoiseTollCalculator calculator, double marginalUtilityOfMoney,
-												 double sigma) {
+	NoiseTollTimeDistanceTravelDisutility( TravelDisutility travelDisutilityDelegate, TravelDisutility tollDisutilityDelegate, double marginalUtilityOfMoney,
+					       boolean usingRandomization ) {
 
-		this.randomizedTimeDistanceTravelDisutility = randomizedTimeDistanceTravelDisutility;
-		this.calculator = calculator;
+		this.travelDisutilityDelegate = travelDisutilityDelegate;
+		this.tollDisutilityDelegate = tollDisutilityDelegate;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-		this.sigma = sigma;
+		this.usingRandomization = usingRandomization;
 	}
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 
-		double randomizedTimeDistanceDisutilityForLink = this.randomizedTimeDistanceTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
+		double randomizedTimeDistanceDisutilityForLink = this.travelDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle );
 
 		double logNormalRnd = 1. ;
-		if ( sigma != 0. ) {
+		if ( usingRandomization) {
 			logNormalRnd = (double) person.getCustomAttributes().get("logNormalRnd") ;
 		}
 
-		double linkExpectedTollDisutility = this.marginalUtilityOfMoney * calculator.calculateExpectedTollDisutility(link.getId(), time, person.getId());
+		double linkExpectedTollDisutility = this.marginalUtilityOfMoney * tollDisutilityDelegate.getLinkTravelDisutility(link, time, person, vehicle );
 		double randomizedTollDisutility = linkExpectedTollDisutility * logNormalRnd;
 
 		return randomizedTimeDistanceDisutilityForLink + randomizedTollDisutility;
@@ -62,7 +61,7 @@ class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		throw new UnsupportedOperationException();
+		return travelDisutilityDelegate.getLinkMinimumTravelDisutility( link ) + tollDisutilityDelegate.getLinkMinimumTravelDisutility( link );
 	}
 }
 
