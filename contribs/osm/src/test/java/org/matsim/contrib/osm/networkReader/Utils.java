@@ -2,6 +2,7 @@ package org.matsim.contrib.osm.networkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
+import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
@@ -35,6 +36,25 @@ public class Utils {
 	private static final Logger log = Logger.getLogger(Utils.class);
 
 
+	static void writeOsmData(OsmData data, Path file) {
+		try (OutputStream outputStream = Files.newOutputStream(file)) {
+			PbfWriter writer = new PbfWriter(outputStream, true);
+			for (OsmNode node : data.getNodes()) {
+				writer.write(node);
+			}
+			for (OsmWay way : data.getWays()) {
+				writer.write(way);
+			}
+			for (OsmRelation relation : data.getRelations()) {
+				writer.write(relation);
+			}
+			writer.complete();
+		} catch (IOException e) {
+			log.error("could not write osm data");
+			e.printStackTrace();
+		}
+	}
+
 	static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
 		try (OutputStream outputStream = Files.newOutputStream(file)) {
@@ -53,11 +73,11 @@ public class Utils {
 		}
 	}
 
-	static WaysAndLinks createSingleLink() {
+	static OsmData createSingleLink() {
 		return createSingleLink(Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
 	}
 
-	static WaysAndLinks createSingleLink(List<OsmTag> tags) {
+	static OsmData createSingleLink(List<OsmTag> tags) {
 
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
@@ -65,10 +85,10 @@ public class Utils {
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
 		Way way = new Way(1, nodeReference, tags);
 
-		return new WaysAndLinks(Arrays.asList(node1, node2, node3), Collections.singletonList(way));
+		return new OsmData(Arrays.asList(node1, node2, node3), Collections.singletonList(way), Collections.emptyList());
 	}
 
-	static WaysAndLinks createTwoIntersectingLinksWithDifferentLevels() {
+	static OsmData createTwoIntersectingLinksWithDifferentLevels() {
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
 		Node node3 = new Node(3, 0, 200);
@@ -78,10 +98,10 @@ public class Utils {
 		TLongArrayList nodeReferenceForWay2 = new TLongArrayList(new long[]{node4.getId(), node2.getId(), node5.getId()});
 		Way way1 = new Way(1, nodeReferenceForWay1, Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
 		Way way2 = new Way(2, nodeReferenceForWay2, Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.TERTIARY)));
-		return new WaysAndLinks(Arrays.asList(node1, node2, node3, node4, node5), Arrays.asList(way1, way2));
+		return new OsmData(Arrays.asList(node1, node2, node3, node4, node5), Arrays.asList(way1, way2));
 	}
 
-	static WaysAndLinks createGridWithDifferentLevels() {
+	static OsmData createGridWithDifferentLevels() {
 
 		List<OsmNode> nodesList = Arrays.asList(
 				new Node(1, 100, 0),
@@ -105,7 +125,7 @@ public class Utils {
 				new Way(4, new TLongArrayList(new long[]{2, 5, 9, 12}), Collections.singletonList(new Tag("highway", TERTIARY)))
 		);
 
-		return new WaysAndLinks(nodesList, waysList);
+		return new OsmData(nodesList, waysList);
 	}
 
 	static void assertEquals(Network expected, Network actual) {
@@ -157,14 +177,20 @@ public class Utils {
 		expected.getInLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getInLinks().get(id).getId()));
 	}
 
-	static class WaysAndLinks {
+	static class OsmData {
 
 		private final List<OsmNode> nodes;
 		private final List<OsmWay> ways;
+		private final List<OsmRelation> relations;
 
-		public WaysAndLinks(List<OsmNode> nodes, List<OsmWay> ways) {
+		public OsmData(List<OsmNode> nodes, List<OsmWay> ways) {
+			this(nodes, ways, null);
+		}
+
+		public OsmData(List<OsmNode> nodes, List<OsmWay> ways, List<OsmRelation> relations) {
 			this.nodes = nodes;
 			this.ways = ways;
+			this.relations = relations;
 		}
 
 		public List<OsmNode> getNodes() {
@@ -173,6 +199,10 @@ public class Utils {
 
 		public List<OsmWay> getWays() {
 			return ways;
+		}
+
+		public List<OsmRelation> getRelations() {
+			return relations;
 		}
 	}
 }
