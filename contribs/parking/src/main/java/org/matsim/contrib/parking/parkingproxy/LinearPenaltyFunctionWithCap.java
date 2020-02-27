@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +16,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vis.snapshotwriters;
+package org.matsim.contrib.parking.parkingproxy;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
+/**
+ * Uses a linear raise in penalty time per car but stays between 0 and a maximum value. In mathematical terms this means: </br>
+ * {@code P = [ 0 if c<0; r*c if 0<=c<=c_m; m if c>c_m},</br>
+ * where P is the penalty in seconds, c is the number of cars, r is the additional penalty per car, m is the maximum 
+ * penalty and c_m is the number of cars at which r*c=m.
+ * 
+ * @author tkohl / Senozon
+ *
+ */
+class LinearPenaltyFunctionWithCap implements PenaltyFunction {
+	
+	private final double penaltyPerCar;
+	private final double maxPenalty;
+	private final double areaFactor;
+	
+	public LinearPenaltyFunctionWithCap(double gridSize, double penaltyPerCar, double maxPenalty) {
+		this.penaltyPerCar = penaltyPerCar;
+		this.maxPenalty = maxPenalty;
+		this.areaFactor = gridSize * gridSize / 2500.;
+	}
 
-public interface AgentSnapshotInfo {
-
-	public static final String marker = "marker";
-
-	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
-	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
-	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER }
-	// !!! WARNING: See comment above this enum.
-
-	Id<Person> getId() ;
-
-	double getEasting();
-
-	double getNorthing();
-
-	@Deprecated
-	double getAzimuth();
-
-	double getColorValueBetweenZeroAndOne();
-	void setColorValueBetweenZeroAndOne( double tmp ) ;
-
-	AgentState getAgentState();
-	void setAgentState( AgentState state ) ;
-
-	int getUserDefined() ;
-	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
+	@Override
+	public double calculatePenalty(int numberOfCars) {
+		return Math.max(Math.min(numberOfCars * penaltyPerCar / areaFactor, maxPenalty), 0);
+	}
 
 }

@@ -309,7 +309,7 @@ public final class VehicleUtils {
 					log.info(  Gbl.FUTURE_SUPPRESSED );
 				}
 			}
-			vehicle = scenario.getVehicles().getVehicles().get(  vehicleId );
+			vehicle = scenario.getTransitVehicles().getVehicles().get(  vehicleId );
 		}
 		if ( vehicle==null ) {
 			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
