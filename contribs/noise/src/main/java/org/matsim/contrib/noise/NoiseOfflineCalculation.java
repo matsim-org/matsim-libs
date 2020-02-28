@@ -29,6 +29,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.io.File;
@@ -41,7 +42,7 @@ import java.io.IOException;
  * @author ikaddoura
  *
  */
-public class NoiseOfflineCalculation{
+public final class NoiseOfflineCalculation{
 	private static final Logger log = Logger.getLogger( NoiseOfflineCalculation.class );
 
 	private String outputDirectory;
@@ -138,8 +139,12 @@ public class NoiseOfflineCalculation{
 		return timeTracker;
 	}
 
-	public NoiseContext getNoiseContext() {
+	NoiseContext getNoiseContext() {
 		return noiseContext;
+	}
+
+	public final TravelDisutility getTollDisutility() {
+		return new NoiseTollCalculator( noiseContext );
 	}
 
 }
