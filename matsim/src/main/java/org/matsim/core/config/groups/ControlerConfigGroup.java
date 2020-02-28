@@ -29,12 +29,13 @@ import org.matsim.core.utils.misc.StringUtils;
 
 import java.util.*;
 
+
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
-	public enum EventsFileFormat {xml}
+	public enum EventsFileFormat {xml, pb, json}
 
 	public enum CompressionType {
 		none(""),
@@ -104,7 +105,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
 				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
-		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: xml."+IOUtils.NATIVE_NEWLINE+ "\t\t" +
+		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: " + Arrays.toString(EventsFileFormat.values()) + IOUtils.NATIVE_NEWLINE+ "\t\t" +
 				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");
@@ -116,6 +117,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
         map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
         map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
+
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );

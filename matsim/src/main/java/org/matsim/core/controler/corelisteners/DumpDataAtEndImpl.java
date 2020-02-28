@@ -138,20 +138,39 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpOutputTrips();
         dumpOutputLegs();
 		dumpExperiencedPlans() ;
+
 	}
 
 	private void dumpOutputEvents() {
-		try {
-			File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.events));
-			File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.events));
+		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
 			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				Controler.DefaultFiles file;
+				switch (format) {
+					case xml:
+						file = Controler.DefaultFiles.events;
+						break;
+					case pb:
+						file = Controler.DefaultFiles.eventsPb;
+						break;
+					case json:
+						file = Controler.DefaultFiles.eventsJson;
+						break;
+					default:
+						continue;
+				}
+
+				File toFile = new File(this.controlerIO.getOutputFilename(file));
+				File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), file));
+				try {
+					Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} catch (Exception ee) {
+				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+						+ "generated in the final iteration");
 			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration" );
+
 		}
 	}
 

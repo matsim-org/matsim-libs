@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,9 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.core.router.costcalculators;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,10 +38,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+import org.matsim.core.router.NetworkRoutingModule;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -48,14 +52,48 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-public class NetworkRoutingModuleTest {
+public class RandomizingTimeDistanceTravelDisutilityTest {
 
 	@Test
-	public void testRouteLeg() {
+	public void testRoutesForDifferentSigmas() {
+		
+		{
+			Set<String> routes = new HashSet<>();
+			for (int i = 0; i<=5; i++) {
+				NetworkRoute route = computeRoute(0.);
+				routes.add(route.getLinkIds().toString());	
+			}
+			System.out.println("Route (sigma = 0.0): " + routes.toString());
+			Assert.assertEquals("There should only be a single route in the sigma = 0 case.", 1, routes.size());
+		}
+		
+		{
+			Set<String> routes = new HashSet<>();
+			for (int i = 0; i<=5; i++) {
+				NetworkRoute route = computeRoute(3.);
+				routes.add(route.getLinkIds().toString());	
+			}
+			System.out.println("Route (sigma = 3.0): " + routes.toString());
+			Assert.assertEquals("There should be two routes in the sigma = 3 case.", 2, routes.size());
+		}
+	}
+	
+	public NetworkRoute computeRoute(double sigma) {
 		Fixture f = new Fixture();
-		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
-		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
-
+		PlanCalcScoreConfigGroup planCalcScoreCfg = new PlanCalcScoreConfigGroup();
+		ModeParams modeParams = new ModeParams(TransportMode.car);
+		modeParams.setMonetaryDistanceRate(-0.1);
+		planCalcScoreCfg.addModeParams(modeParams);
+		
+		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, planCalcScoreCfg);
+		factory.setSigma(sigma);
+		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(f.s.getNetwork());
+		TravelTimeCalculator calculator = builder.build();	
+		
+		TravelTime travelTime = calculator.getLinkTravelTimes();
+		TravelDisutility disutility = factory.createTravelDisutility(travelTime);
+		LeastCostPathCalculator router = TripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(f.s).createPathCalculator(f.s.getNetwork(), disutility, travelTime);
+		
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
 		fromAct.setLinkId(Id.create("1", Link.class));
@@ -66,80 +104,13 @@ public class NetworkRoutingModuleTest {
 		            TransportMode.car,
 		            f.s.getPopulation().getFactory(),
 		            f.s.getNetwork(),
-		            routeAlgo);
+		            router);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
 		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
 		Assert.assertEquals(1, result.size() );
-		Leg leg = (Leg)result.get(0) ;
-		Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-		Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
-	}
-
-	@Test
-	public void testRouteLegWithDistance() {
-		Fixture f = new Fixture();
-
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
-		fromAct.setLinkId(Id.create("1", Link.class));
-		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 3000));
-		toAct.setLinkId(Id.create("3", Link.class));
-		
-		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
-
-		{
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).setSigma(0.).createTravelDisutility(timeObject);
-
-			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
-
-			NetworkRoutingModule router =
-                    new NetworkRoutingModule(
-							TransportMode.car,
-							f.s.getPopulation().getFactory(),
-							f.s.getNetwork(),
-							routeAlgo);
-
-			List<? extends PlanElement> results = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ),
-				  FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person ) ;
-			Assert.assertEquals( 1, results.size() );
-			Leg leg = (Leg) results.get(0) ;
-			
-			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
-
-			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-			Assert.assertEquals(0.3333333333, route.getTravelCost(), 1e-8 ) ;
-		}
-		// and now with a monetary distance rate different from zero:
-		
-		{
-			double monetaryDistanceRateCar = -1.;
-			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
-
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).setSigma(0.).createTravelDisutility(timeObject);
-
-			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
-
-			NetworkRoutingModule router =
-					new NetworkRoutingModule(
-							TransportMode.car,
-							f.s.getPopulation().getFactory(),
-							f.s.getNetwork(),
-							routeAlgo);
-
-			List<? extends PlanElement> result = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ), FacilitiesUtils.toFacility(toAct,
-				  f.s.getActivityFacilities() ), 7.*3600, person ) ;
-			
-			Assert.assertEquals( 1, result.size() ) ; 
-			Leg leg = (Leg) result.get(0) ;
-			
-			Assert.assertEquals(100.0, leg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof NetworkRoute);
-
-			NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-			Assert.assertEquals(1000.3333333333, route.getTravelCost(), 1e-8 ) ;
-		}
+		Leg leg = (Leg) result.get(0) ;				
+		return (NetworkRoute) leg.getRoute();
 	}
 
 	private static class Fixture {
@@ -157,16 +128,20 @@ public class NetworkRoutingModuleTest {
 			net.addNode(n3);
 			net.addNode(n4);
 			Link l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
-			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
+			Link l2a = nf.createLink(Id.create("2a", Link.class), n2, n3);
+			Link l2b = nf.createLink(Id.create("2b", Link.class), n2, n3);
 			Link l3 = nf.createLink(Id.create("3", Link.class), n3, n4);
 			l1.setFreespeed(10.0);
-			l2.setFreespeed(10.0);
+			l2a.setFreespeed(5.0);
+			l2b.setFreespeed(20.0);
 			l3.setFreespeed(10.0);
 			l1.setLength(1000.0);
-			l2.setLength(1000.0);
+			l2a.setLength(1000.0);
+			l2b.setLength(2000.0);
 			l3.setLength(1000.0);
 			net.addLink(l1);
-			net.addLink(l2);
+			net.addLink(l2a);
+			net.addLink(l2b);
 			net.addLink(l3);
 		}
 	}
