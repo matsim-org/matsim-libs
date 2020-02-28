@@ -81,10 +81,6 @@ public final class OptionalTime {
 		return seconds != Time.UNDEFINED_TIME ? seconds : supplier.getAsDouble();
 	}
 
-	/*package*/ double orElseUndefined() {
-		return seconds;
-	}
-
 	public void ifDefined(DoubleConsumer action) {
 		if (seconds != Time.UNDEFINED_TIME) {
 			action.accept(seconds);

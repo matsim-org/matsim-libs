@@ -84,12 +84,6 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_orElseUndefined() {
-		assertThat(OptionalTime.undefined().orElseUndefined()).isEqualTo(Time.UNDEFINED_TIME);
-		assertThat(OptionalTime.defined(1).orElseUndefined()).isEqualTo(1);
-	}
-
-	@Test
 	public void test_ifDefined() {
 		MutableDouble counter = new MutableDouble(0);
 

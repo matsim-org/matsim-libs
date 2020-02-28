@@ -105,7 +105,7 @@ public class Time {
 	}
 
 	public static final String writeTime(final OptionalTime time) {
-		return writeTime(time.orElseUndefined());
+		return writeTime(time.orElse(UNDEFINED_TIME));
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class Time {
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
 	public static final double parseTime(final String time) {
-		return parseTime(time, ':').orElseUndefined();
+		return parseTime(time, ':').orElse(UNDEFINED_TIME);
 	}
 
 	public static final OptionalTime parseOptionalTime(final String time) {
