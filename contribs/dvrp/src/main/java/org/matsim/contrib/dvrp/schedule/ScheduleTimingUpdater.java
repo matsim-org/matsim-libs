@@ -2,7 +2,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,40 +16,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.scheduler;
+package org.matsim.contrib.dvrp.schedule;
+
+import static org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import java.util.List;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
+public class ScheduleTimingUpdater {
+	public interface StayTaskEndTimeCalculator {
+		double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime);
+	}
 
-/**
- * @author michalm
- */
-public class DrtScheduleTimingUpdater {
-	private final double stopDuration;
 	private final MobsimTimer timer;
+	private final StayTaskEndTimeCalculator stayTaskEndTimeCalculator;
 
-	@Inject
-	public DrtScheduleTimingUpdater(DrtConfigGroup drtCfg, MobsimTimer timer) {
-		this.stopDuration = drtCfg.getStopDuration();
+	public final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
+
+	public ScheduleTimingUpdater(MobsimTimer timer, StayTaskEndTimeCalculator stayTaskEndTimeCalculator) {
 		this.timer = timer;
+		this.stayTaskEndTimeCalculator = stayTaskEndTimeCalculator;
 	}
 
 	/**
+	 * This method should be called inside {@code VrpOptimizer.nextTask()} before anything else is done.
 	 * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e. beginTime and
 	 * endTime) of all tasks in the schedule.
 	 */
@@ -82,7 +76,7 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
-	void updateTimingsStartingFromTaskIdx(DvrpVehicle vehicle, int startIdx, double newBeginTime) {
+	public void updateTimingsStartingFromTaskIdx(DvrpVehicle vehicle, int startIdx, double newBeginTime) {
 		Schedule schedule = vehicle.getSchedule();
 		List<? extends Task> tasks = schedule.getTasks();
 
@@ -103,47 +97,14 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
-	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
-
 	private double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		switch (((DrtTaskType)task.getTaskType())) {
-			case STAY: {
-				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
-					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
-					return Math.max(newBeginTime, vehicle.getServiceEndTime());
-				} else {
-					// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
-					// must have been added at time submissionTime <= t
-					double oldEndTime = task.getEndTime();
-					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return REMOVE_STAY_TASK;// remove the task
-					} else {
-						return oldEndTime;
-					}
-				}
-			}
-
-			case DRIVE: {
-				// cannot be shortened/lengthen, therefore must be moved forward/backward
-				VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
-				// TODO one may consider recalculation of SP!!!!
-				return newBeginTime + path.getTravelTime();
-			}
-
-			case STOP: {
-				double maxEarliestPickupTime = ((DrtStopTask)task).getPickupRequests()
-						.values()
-						.stream()
-						.mapToDouble(DrtRequest::getEarliestStartTime)
-						.max()
-						.orElse(Double.NEGATIVE_INFINITY);
-				double duration = stopDuration;
-				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
-			}
-
-			default:
-				throw new IllegalStateException();
+		if (task instanceof DriveTask) {
+			// cannot be shortened/lengthen, therefore must be moved forward/backward
+			VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
+			// TODO one may consider recalculation of SP!!!!
+			return newBeginTime + path.getTravelTime();
+		} else {
+			return stayTaskEndTimeCalculator.calcNewEndTime(vehicle, (StayTask)task, newBeginTime);
 		}
 	}
-
 }
