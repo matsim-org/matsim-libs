@@ -42,15 +42,14 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 class RunJointDemandCarExample {
     public static void main(String[] args) {
 
-
-        Config config = loadConfig("jointDemand/config.xml");
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setTravelTimeSliceWidth(3600);
-        freightConfigGroup.setCarriersFile("test-carriers-car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+        freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
 
         prepareConfig(config);
 

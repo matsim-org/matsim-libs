@@ -46,7 +46,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 	private static int normalisationWrnCnt = 0;
 
 	private final String mode;
-	private double sigma = 0. ;
+	private double sigma = 3. ;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	public RandomizingTimeDistanceTravelDisutilityFactory(final String mode, PlanCalcScoreConfigGroup cnScoringGroup ) {
@@ -99,6 +99,16 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 				log.warn( "Scoring parameters are defined for different subpopulations." +
 						" The routing disutility will only consider the ones of the default subpopulation.");
 				log.warn( "This warning can safely be ignored if disutility of traveling only depends on travel time.");
+			}
+			
+			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() == 0. && this.sigma != 0. ) {
+				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the monetary distance rate "
+						+ "to be different than zero. Continuing anyway.") ;
+			}
+			
+			if ( (cnScoringGroup.getModes().get( mode ).getMarginalUtilityOfTraveling() + cnScoringGroup.getPerforming_utils_hr())  == 0. && this.sigma != 0. ) {
+				log.warn("There will be no routing randomness. The randomization of the travel disutility requires the travel time cost rate "
+						+ "to be different than zero. Continuing anyway.") ;
 			}
 		}
 	}

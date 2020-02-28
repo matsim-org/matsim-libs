@@ -104,6 +104,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setRandomSeed(4711);
 		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config );
