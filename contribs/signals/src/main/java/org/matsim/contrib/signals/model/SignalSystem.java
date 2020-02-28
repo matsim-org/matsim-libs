@@ -32,6 +32,8 @@ import org.matsim.contrib.signals.controller.SignalController;
  */
 public interface SignalSystem extends Identifiable<SignalSystem> {
 	
+	public static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
+	
 	public void setSignalSystemsManager(SignalSystemsManager signalManager);
 
 	public void updateState(double now);
