@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -342,63 +343,64 @@ final class NoiseContext {
         return NoiseEquations.calculateAngleCorrection(angle);
 	}
 	
-	public final Scenario getScenario() {
+	final Scenario getScenario() {
 		return scenario;
 	}
 	
-	public final Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
+	final Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
 		return noiseReceiverPoints;
 	}
 	
-	public final NoiseConfigGroup getNoiseParams() {
+	final NoiseConfigGroup getNoiseParams() {
 		return noiseParams;
 	}
 
-	public final double getCurrentTimeBinEndTime() {
+	final double getCurrentTimeBinEndTime() {
 		return currentTimeBinEndTime;
 	}
 
-	public final void setCurrentTimeBinEndTime(double currentTimeBinEndTime) {
+	final void setCurrentTimeBinEndTime( double currentTimeBinEndTime ) {
 		this.currentTimeBinEndTime = currentTimeBinEndTime;
 	}
 
-	public final Map<Id<Link>, NoiseLink> getNoiseLinks() {
+	final Map<Id<Link>, NoiseLink> getNoiseLinks() {
 		return noiseLinks;
 	}
 
-	public final Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
+	final Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
 		return timeInterval2linkId2noiseLinks;
 	}
 
-	public final void setEventTime(double time) {
+	final void setEventTime( double time ) {
 		this.eventTime = time;
 	}
 
-	public final double getEventTime() {
+	final double getEventTime() {
 		return eventTime;
 	}
 
-	public final Grid getGrid() {
+	final Grid getGrid() {
 		return grid;
 	}
 
-	public Set<Id<Vehicle>> getBusVehicleIDs() {
+	Set<Id<Vehicle>> getBusVehicleIDs() {
 		return asBusConsideredTransitVehicleIDs;
 	}
 
-	public Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime() {
+	Map<Id<Link>, Map<Id<Vehicle>, Double>> getLinkId2vehicleId2lastEnterTime() {
 		return linkId2vehicleId2lastEnterTime;
 	}
 
-	public Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs() {
+	Set<Id<Vehicle>> getNotConsideredTransitVehicleIDs() {
 		return notConsideredTransitVehicleIDs;
 	}
 
-	public Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId() {
+	Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId() {
 		return vehicleId2personId;
 	}
 
-	public Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs() {
+	Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs() {
 		return ignoredNetworkModeVehicleIDs;
 	}
+
 }
