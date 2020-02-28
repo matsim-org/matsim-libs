@@ -34,12 +34,12 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
-import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.RequestQueue;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -53,7 +53,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final Integer rebalancingInterval;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
-	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
 	private final DepotFinder depotFinder;
@@ -63,9 +63,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-			DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
-			UnplannedRequestInserter requestInserter) {
+		   RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
+		   ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
+		   UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;

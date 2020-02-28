@@ -30,12 +30,14 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
+import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
@@ -89,8 +91,9 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				ScheduleTimingUpdater scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
 				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						eTaxiScheduler, chargingInfrastructure).get();
+						eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure).get();
 			}
 		});
 
@@ -112,6 +115,10 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 					}
 				}).asEagerSingleton();
+
+		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
+				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+						new ETaxiStayTaskEndTimeCalculator(taxiCfg)))).asEagerSingleton();
 
 		bindModal(DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<ETaxiActionCreator>(taxiCfg.getMode()) {
