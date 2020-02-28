@@ -36,7 +36,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -180,15 +179,15 @@ public class DemandGenerationTest extends MatsimTestCase {
 			assertEquals(1, pers.getPlans().size());
 			p = pers.getPlans().get(0);
 			assertNotNull(p);
-			for (int i = 0; i < p.getPlanElements().size(); i++){
+			for (int i = 0; i < p.getPlanElements().size(); i++) {
 				PlanElement element = p.getPlanElements().get(i);
 				assertNotNull(element);
 			}
-			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime(), EPSILON);
+			assertEquals(homeEndTime, ((Activity)p.getPlanElements().get(0)).getEndTime().seconds(), EPSILON);
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(0)).getLinkId());
-			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime(), EPSILON);
+			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime().seconds(), EPSILON);
 			assertEquals(Id.create(3, Link.class), ((Activity)p.getPlanElements().get(2)).getLinkId());
-			assertEquals(Time.UNDEFINED_TIME, ((Activity)p.getPlanElements().get(4)).getEndTime(), EPSILON);
+			assertTrue(((Activity)p.getPlanElements().get(4)).getEndTime().isUndefined());
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(4)).getLinkId());
 
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(1)).getMode());

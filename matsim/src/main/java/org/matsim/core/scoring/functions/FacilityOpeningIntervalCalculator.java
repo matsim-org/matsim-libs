@@ -50,7 +50,7 @@ public final class FacilityOpeningIntervalCalculator implements OpeningIntervalC
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		double[] openInterval = new double[]{Time.getUndefinedTime(), Time.getUndefinedTime()};
 
 		boolean foundAct = false;
 

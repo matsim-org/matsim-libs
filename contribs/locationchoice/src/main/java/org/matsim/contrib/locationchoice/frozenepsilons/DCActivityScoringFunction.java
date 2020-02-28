@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -34,7 +39,7 @@ import org.matsim.facilities.OpeningTime;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import java.util.*;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 
 // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
@@ -225,7 +230,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		double[] openInterval = new double[]{Time.getUndefinedTime(), Time.getUndefinedTime()};
 		boolean foundAct = false;
 
 		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16
