@@ -140,7 +140,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	}
 
 	private void dumpOutputEvents() {
-		for (ControlerConfigGroup.EventsFileFormat format : controlerConfigGroup.getEventsFileFormats()) {
+		for (ControlerConfigGroup.EventsFileFormat format : this.controlerConfigGroup.getEventsFileFormats()) {
 			try {
 				Controler.DefaultFiles file;
 				switch (format) {
@@ -149,6 +149,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 						break;
 					case pb:
 						file = Controler.DefaultFiles.eventsPb;
+						break;
+					case json:
+						file = Controler.DefaultFiles.eventsJson;
 						break;
 					default:
 						continue;

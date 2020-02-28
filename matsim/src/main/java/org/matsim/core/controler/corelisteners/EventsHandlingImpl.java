@@ -20,6 +20,8 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -40,10 +42,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterJson;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.File;
 import org.matsim.core.utils.io.IOUtils;
 
 @Singleton
@@ -103,7 +105,10 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 						} catch (ReflectiveOperationException e) {
 							throw new RuntimeException("Error using the PBWriter. Please make sure protobuf contrib on the classpath, or remove pb output format.", e);
 						}
-
+						break;
+					case json:
+						this.eventWriters.add(new EventWriterJson(new File(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.eventsJson))));
 						break;
 					default:
 						log.warn("Unknown events file format specified: " + format.toString() + ".");
