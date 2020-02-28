@@ -72,7 +72,11 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
 	// try to avoid misleading comment about config context.  kai, dec'18
 
-	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+	/**
+	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+	 */
+	@Deprecated
+	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
 
 
 	/**
