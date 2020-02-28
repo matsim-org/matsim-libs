@@ -20,13 +20,26 @@
 
 package org.matsim.core.events;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.api.core.v01.events.HasFacilityId;
+import org.matsim.api.core.v01.events.HasLinkId;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
@@ -45,23 +58,23 @@ import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
-	public interface CustomEventMapper<T extends Event> /* extends Function<GenericEvent, T> */ {
-		T apply(GenericEvent event);
-	}
+public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 
 	static public final String EVENT = "event";
 
 	private final EventsManager events;
-	private final Map<String, CustomEventMapper> customEventMappers = new HashMap<>();
+	private final Map<String, MatsimEventsReader.CustomEventMapper> customEventMappers = new HashMap<>();
 
 	public EventsReaderXMLv1(final EventsManager events) {
 		this.events = events;
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
 	}
 	@Override
-	public void addCustomEventMapper(String eventType, CustomEventMapper cem) {
+	public void addCustomEventMapper(String eventType, MatsimEventsReader.CustomEventMapper cem) {
 		customEventMappers.put(eventType, cem);
 	}
 
@@ -107,7 +120,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			// (this is the new version, marked by the new events name)
 
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
@@ -122,7 +135,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				vehicleId = Id.create( atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class ) ;
 			} else {
 				// for the old events type, we set the vehicle id to the driver id if the vehicle id does not exist:
-				vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Vehicle.class);
+				vehicleId = Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Vehicle.class);
 			}
 			// retrofit position:
 			double position ;
@@ -132,7 +145,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				position = 1.0 ;
 			}
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					vehicleId,
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
@@ -203,7 +216,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new TeleportationArrivalEvent(
 					time, 
 					Id.create(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON), Person.class), 
-					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE))));
+					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE)),atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_MODE)));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
 			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
@@ -231,7 +244,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				String value = atts.getValue(ii);
 				event.getAttributes().put(key, value);
 			}
-			CustomEventMapper cem = customEventMappers.get(eventType);
+			MatsimEventsReader.CustomEventMapper cem = customEventMappers.get(eventType);
 			if (cem != null) {
 				this.events.processEvent(cem.apply(event));
 			} else {

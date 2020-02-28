@@ -266,7 +266,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 					out.write('\t');
 					out.write(String.valueOf(iterator.next()));
 				}
-				out.newLine();
+				out.write(IOUtils.NATIVE_NEWLINE);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

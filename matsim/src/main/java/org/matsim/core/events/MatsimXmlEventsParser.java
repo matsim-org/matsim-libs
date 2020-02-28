@@ -24,5 +24,5 @@
 import org.matsim.core.utils.io.MatsimXmlParser;
 
 abstract class MatsimXmlEventsParser extends MatsimXmlParser {
-	public abstract void addCustomEventMapper( String key, EventsReaderXMLv1.CustomEventMapper value );
+	public abstract void addCustomEventMapper( String key, MatsimEventsReader.CustomEventMapper value );
 }

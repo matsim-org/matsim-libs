@@ -68,6 +68,7 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 		DestinationChoiceContext lcContext = (DestinationChoiceContext) scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
 
+		// only necessary if vou overwritten one of the following classes BestReplyLocationChoicePlanAlgorithm or BestReplyLocationChoiceStrategymodule
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
 
 		if ( !FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm() )) {

@@ -25,7 +25,8 @@ import org.matsim.contrib.accessibility.SpatialGrid;
  * @author tthunig
  *
  */
-class Interpolation {
+public final class Interpolation {
+	// used from outside
 
 	private static final Logger log = Logger.getLogger(Interpolation.class);
 	
