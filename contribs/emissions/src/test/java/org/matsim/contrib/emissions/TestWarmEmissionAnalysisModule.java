@@ -253,6 +253,13 @@ public class TestWarmEmissionAnalysisModule {
 			// test result:
 			switch( this.emissionsComputationMethod ) {
 				case StopAndGoFraction:
+					//KMT Feb'20: Trying to understand the result:
+					// - StopAndGo fraction is computed as 0 --> ONLY freeFlow values needed and looked up
+					// - DETAILED FreeFlow value is available in the table (1.0E-4 g/km);  StopAndGo value is NOT available in the table
+					// - AVERAGE  FreeFlow value is available in the table (1.0 g/km) ;    StopAndGo value is NOT available in the table ( 10.0 g/km)
+					// --> It seems like it was intended (or only implemented) in a way, that if one of the detailed values is missing (FreeFlow or StopGo) there is a fallback to average. So the result of this would be 1.0 g/km * 0.1 km = 0.1 g/km
+					// --> Now, after implementing the new fallback behaviour, it is looking up both values (FreeFlow or StopGo) ways independently from each other. Therefore the result comes from the detailed table (1.0E-4 g/km) * * 0.1 km = 1.0E-5 g/km
+					// -----> We need a decision here, if we want allow that inconsistent(?) lookup of FreeFlow and Detailed values with different grade of detail or not.
 					Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
 					break;
 				case AverageSpeed:
