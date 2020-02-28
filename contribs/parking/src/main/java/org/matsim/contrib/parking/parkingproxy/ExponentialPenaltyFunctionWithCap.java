@@ -1,11 +1,8 @@
-package org.matsim.contrib.protobuf;
 /* *********************************************************************** *
  * project: org.matsim.*
- *
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,37 +16,34 @@ package org.matsim.contrib.protobuf;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.protobuf.events.ProtobufEvents;
-import org.matsim.core.events.handler.BasicEventHandler;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
+package org.matsim.contrib.parking.parkingproxy;
 
 /**
- * Created by laemmel on 17/02/16.
+ * Uses n exponential raise in penalty time per car but stays between 0 and a maximum value. In mathematical terms this means: </br>
+ * {@code P = [ 0 if c<0; m*b^(c/c_m - 1); m if c>c_m},</br>
+ * where P is the penalty in seconds, c is the number of cars, r is the additional penalty per car, m is the maximum 
+ * penalty and c_m is the number of cars at which r*c=m.
+ * 
+ * @author tkohl / Senozon
+ *
  */
-public class ProtoEventsWriter implements BasicEventHandler{
-
-	private final FileOutputStream fos;
-
-	public ProtoEventsWriter(FileOutputStream fos) {
-		this.fos = fos;
-	}
-
-
-	@Override
-	public void handleEvent(Event event) {
-		ProtobufEvents.Event pe = Event2ProtoEvent.getProtoEvent(event);
-		try {
-			pe.writeDelimitedTo(this.fos);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+class ExponentialPenaltyFunctionWithCap implements PenaltyFunction {
+	
+	private final double basis;
+	private final double maxPenalty;
+	private final int carsForMax;
+	private final double areaFactor;
+	
+	public ExponentialPenaltyFunctionWithCap(double basis, double gridSize, double maxPenalty, int carsForMax) {
+		this.basis = basis;
+		this.maxPenalty = maxPenalty;
+		this.carsForMax = carsForMax;
+		this.areaFactor = gridSize * gridSize / 25000.;
 	}
 
 	@Override
-	public void reset(int iteration) {
-
+	public double calculatePenalty(int numberOfCars) {
+		return Math.max(Math.min(maxPenalty / basis * (Math.pow(basis, (double)numberOfCars / (double)carsForMax)) / areaFactor, maxPenalty), 0);
 	}
+
 }

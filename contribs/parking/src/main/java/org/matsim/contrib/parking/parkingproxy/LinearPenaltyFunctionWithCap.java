@@ -1,11 +1,8 @@
-package org.matsim.contrib.protobuf;
 /* *********************************************************************** *
  * project: org.matsim.*
- *
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,37 +16,32 @@ package org.matsim.contrib.protobuf;
  *                                                                         *
  * *********************************************************************** */
 
-import org.matsim.contrib.protobuf.events.ProtobufEvents;
-import org.matsim.core.api.experimental.events.EventsManager;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+package org.matsim.contrib.parking.parkingproxy;
 
 /**
- * Created by laemmel on 17/02/16.
+ * Uses a linear raise in penalty time per car but stays between 0 and a maximum value. In mathematical terms this means: </br>
+ * {@code P = [ 0 if c<0; r*c if 0<=c<=c_m; m if c>c_m},</br>
+ * where P is the penalty in seconds, c is the number of cars, r is the additional penalty per car, m is the maximum 
+ * penalty and c_m is the number of cars at which r*c=m.
+ * 
+ * @author tkohl / Senozon
+ *
  */
-public class ProtoEventsParser {
-
-	private final EventsManager em;
-
-	public ProtoEventsParser(EventsManager em) {
-		this.em = em;
+class LinearPenaltyFunctionWithCap implements PenaltyFunction {
+	
+	private final double penaltyPerCar;
+	private final double maxPenalty;
+	private final double areaFactor;
+	
+	public LinearPenaltyFunctionWithCap(double gridSize, double penaltyPerCar, double maxPenalty) {
+		this.penaltyPerCar = penaltyPerCar;
+		this.maxPenalty = maxPenalty;
+		this.areaFactor = gridSize * gridSize / 2500.;
 	}
 
-	public void parse(String file) {
-		try {
-			FileInputStream fis = new FileInputStream(file);
-
-			ProtobufEvents.Event pe;
-			while ((pe = ProtobufEvents.Event.parseDelimitedFrom(fis)) != null) {
-				this.em.processEvent(ProtoEvent2Event.getEvent(pe));
-			}
-			fis.close();
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	@Override
+	public double calculatePenalty(int numberOfCars) {
+		return Math.max(Math.min(numberOfCars * penaltyPerCar / areaFactor, maxPenalty), 0);
 	}
+
 }
