@@ -98,8 +98,8 @@ public class TestDistanceConstraint {
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
-		CarrierUtils.setJspritIterations(carrierV1, 10);
-//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		CarrierUtils.setJspritIterations(carrierV1, 25);
+
 		final Controler controler = new Controler(scenario);
 		
 		FreightUtils.runJsprit(controler);
@@ -120,13 +120,6 @@ public class TestDistanceConstraint {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce2,
 				MatsimTestUtils.EPSILON);
-		
-//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-//				.build();
-//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-//				.build();
-//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-//				MatsimTestUtils.EPSILON);
 
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV1.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -186,21 +179,13 @@ public class TestDistanceConstraint {
 		createServices(carrierV2, threeServices, carriers);
 		createCarriers(carriers, fleetSize, carrierV2, scenario, vehicleTypes);
 
-//		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
-//				vehicleTypes.getVehicleTypes().values());
-//		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-//		netBuilder.setTimeSliceWidth(1800);
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV2, 10);
-//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
 		final Controler controler = new Controler(scenario);
 		
-		FreightUtils.runJsprit(controler);
-		
-		
-		
-		
+		FreightUtils.runJsprit(controler);		
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
@@ -218,13 +203,6 @@ public class TestDistanceConstraint {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 15, maxDistanceVehilce4,
 				MatsimTestUtils.EPSILON);
-		
-//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-//				.build();
-//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-//				.build();
-//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-//				MatsimTestUtils.EPSILON);
 		
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
@@ -288,7 +266,7 @@ public class TestDistanceConstraint {
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV3, 10);
-//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
 		final Controler controler = new Controler(scenario);
 		
 		FreightUtils.runJsprit(controler);
@@ -308,13 +286,7 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce6,
 				MatsimTestUtils.EPSILON);
-//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-//				.build();
-//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-//				.build();
-//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-//				MatsimTestUtils.EPSILON);
-		
+	
 		for (ScheduledTour scheduledTour : carrierV3.getSelectedPlan().getScheduledTours()) {
 
 			double distanceTour = 0.0;
@@ -391,7 +363,7 @@ public class TestDistanceConstraint {
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV4, 10);
-//		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
 		final Controler controler = new Controler(scenario);
 		
 		FreightUtils.runJsprit(controler);
@@ -411,12 +383,6 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce8,
 				MatsimTestUtils.EPSILON);
-//		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
-//				.build();
-//		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
-//				.build();
-//		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
-//				MatsimTestUtils.EPSILON);
 
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
