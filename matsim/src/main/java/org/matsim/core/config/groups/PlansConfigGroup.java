@@ -21,10 +21,12 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 
 import java.net.URL;
 import java.util.Map;
@@ -224,6 +226,14 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_CRS )
 	public void setInputCRS(String inputCRS) {
 		this.inputCRS = inputCRS;
+	}
+
+	/**
+	 * @deprecated -- replace extraction of subpopulation by {@link PopulationUtils#getSubpopulation(HasPlansAndId)}
+	 */
+	@Deprecated
+	public String getSubpopulationAttributeName(){
+		return PopulationUtils.SUBPOPULATION_ATTRIBUTE_NAME;
 	}
 
 
