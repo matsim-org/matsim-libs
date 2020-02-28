@@ -206,6 +206,12 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			return this;
 		}
 
+		/**
+		 * Uses the config to set parameters. <b>This overrides all previously set parameters, so use it at the beginning!</b>
+		 * 
+		 * @param ttcConfig
+		 * @return
+		 */
 		public Builder configure ( TravelTimeCalculatorConfigGroup ttcConfig ) {
 			// yyyyyy this is a fix to get the outward API sorted out somewhat better.  kai, feb'19
 			// yyyyyy presumably would like to replace this with setters for {@link TravelTimeDataFactory} and {@link TravelTimeGetter}.  But it ain't that easy because

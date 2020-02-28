@@ -119,13 +119,9 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 //			eventsManager.addHandler(calculator);
 //			return TravelTimeCalculator.configure(calculator, config, network);
 			TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( network );
-			builder.setTimeslice( config.getTraveltimeBinSize() );
-			builder.setMaxTime( config.getMaxTime() );
-			builder.setCalculateLinkTravelTimes( config.isCalculateLinkTravelTimes() );
-			builder.setCalculateLinkToLinkTravelTimes( config.isCalculateLinkToLinkTravelTimes() );
+			builder.configure( config );
 			builder.setFilterModes( true ); // no point asking the config since we are in "separateModes" anyways.
 			builder.setAnalyzedModes( CollectionUtils.stringToSet( mode ) );
-			builder.configure( config );
 			TravelTimeCalculator calculator = builder.build();
 			eventsManager.addHandler( calculator );
 			return calculator ;
