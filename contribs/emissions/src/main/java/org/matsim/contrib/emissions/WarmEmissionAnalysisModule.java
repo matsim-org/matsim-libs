@@ -99,18 +99,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			Set<String> roadCategories = new HashSet<>();
 			Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf( HbefaTrafficSituation.class );
 			Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf( HbefaVehicleCategory.class );
-//		Set<String> emissionsConcepts = new HashSet<>();
-//		Set<String> technologies = new HashSet<>();
-//		Set<String> sizeClasses = new HashSet<>();
 			Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
 			Set<Pollutant> pollutantsInTable = EnumSet.noneOf( Pollutant.class );
 			for( HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet() ){
 				roadCategories.add( emissionFactorKey.getHbefaRoadCategory() );
 				trafficSituations.add( emissionFactorKey.getHbefaTrafficSituation() );
 				vehicleCategories.add( emissionFactorKey.getHbefaVehicleCategory() );
-//			emissionsConcepts.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaEmConcept() );
-//			technologies.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaTechnology() );
-//			sizeClasses.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaSizeClass() );
 				vehicleAttributes.add( emissionFactorKey.getHbefaVehicleAttributes() );
 				pollutantsInTable.add( emissionFactorKey.getHbefaComponent() );
 			}
@@ -118,18 +112,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				for( HbefaTrafficSituation trafficSituation : trafficSituations ){
 					for( HbefaVehicleCategory vehicleCategory : vehicleCategories ){
 						for( HbefaVehicleAttributes vehicleAttribute : vehicleAttributes ){
-//					for( String emissionsConcept : emissionsConcepts ){
-//						for( String technology : technologies ){
-//							for( String sizeClass : sizeClasses ){
 							for( Pollutant pollutant : pollutantsInTable ){
 								HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 								key.setHbefaRoadCategory( roadCategory );
 								key.setHbefaTrafficSituation( trafficSituation );
 								key.setHbefaVehicleCategory( vehicleCategory );
 								key.setHbefaVehicleAttributes( vehicleAttribute );
-//									key.getHbefaVehicleAttributes().setHbefaEmConcept( emissionsConcept );
-//									key.getHbefaVehicleAttributes().setHbefaTechnology( technology );
-//									key.getHbefaVehicleAttributes().setHbefaSizeClass( sizeClass );
 								key.setHbefaComponent( pollutant );
 								HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get( key );
 								if( result == null ){
@@ -140,10 +128,38 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 														    "we are now just aborting." );
 								}
 							}
-//							}
-//						}
 						}
 					}
+				}
+			}
+			// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
+			// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
+			// where some detailed values exist and others don't.  So the thing to check would be if for each existing
+			//   roadCategory x vehicleCategory x vehicleAttribute x pollutant
+			// there is a freeflow and a stopgo entry.  Maybe something like this here:
+			Set<String> freeflowSet = new HashSet<>();
+			Set<String> stopgoSet = new HashSet<>();
+			for( HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet() ){
+				String syntheticKey = key.getHbefaRoadCategory() + "--" + key.getHbefaVehicleCategory() + "--" + key.getHbefaVehicleAttributes() + "--" + key.getHbefaComponent() ;
+				switch(key.getHbefaTrafficSituation()){
+					case FREEFLOW:
+						freeflowSet.add( syntheticKey );
+						break;
+					case STOPANDGO:
+						stopgoSet.add( syntheticKey );
+						break;
+					default:
+						// do nothing
+				}
+			}
+			for( String syntheticKey : freeflowSet ){
+				if ( !stopgoSet.contains( syntheticKey ) ) {
+					throw new RuntimeException( "inconsistent" );
+				}
+			}
+			for( String syntheticKey : stopgoSet ){
+				if ( !freeflowSet.contains( syntheticKey ) ) {
+					throw new RuntimeException( "inconsistent" );
 				}
 			}
 		}
