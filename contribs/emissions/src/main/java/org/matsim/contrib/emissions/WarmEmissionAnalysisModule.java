@@ -29,6 +29,7 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -90,6 +91,62 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		Gbl.assertNotNull( eventsManager );
 		this.eventsManager = eventsManager;
+
+		if ( detailedHbefaWarmTable!=null ){
+			// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
+			// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
+			// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
+			Set<String> roadCategories = new HashSet<>();
+			Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf( HbefaTrafficSituation.class );
+			Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf( HbefaVehicleCategory.class );
+//		Set<String> emissionsConcepts = new HashSet<>();
+//		Set<String> technologies = new HashSet<>();
+//		Set<String> sizeClasses = new HashSet<>();
+			Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+			Set<Pollutant> pollutantsInTable = EnumSet.noneOf( Pollutant.class );
+			for( HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet() ){
+				roadCategories.add( emissionFactorKey.getHbefaRoadCategory() );
+				trafficSituations.add( emissionFactorKey.getHbefaTrafficSituation() );
+				vehicleCategories.add( emissionFactorKey.getHbefaVehicleCategory() );
+//			emissionsConcepts.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaEmConcept() );
+//			technologies.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaTechnology() );
+//			sizeClasses.add( emissionFactorKey.getHbefaVehicleAttributes().getHbefaSizeClass() );
+				vehicleAttributes.add( emissionFactorKey.getHbefaVehicleAttributes() );
+				pollutantsInTable.add( emissionFactorKey.getHbefaComponent() );
+			}
+			for( String roadCategory : roadCategories ){
+				for( HbefaTrafficSituation trafficSituation : trafficSituations ){
+					for( HbefaVehicleCategory vehicleCategory : vehicleCategories ){
+						for( HbefaVehicleAttributes vehicleAttribute : vehicleAttributes ){
+//					for( String emissionsConcept : emissionsConcepts ){
+//						for( String technology : technologies ){
+//							for( String sizeClass : sizeClasses ){
+							for( Pollutant pollutant : pollutantsInTable ){
+								HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+								key.setHbefaRoadCategory( roadCategory );
+								key.setHbefaTrafficSituation( trafficSituation );
+								key.setHbefaVehicleCategory( vehicleCategory );
+								key.setHbefaVehicleAttributes( vehicleAttribute );
+//									key.getHbefaVehicleAttributes().setHbefaEmConcept( emissionsConcept );
+//									key.getHbefaVehicleAttributes().setHbefaTechnology( technology );
+//									key.getHbefaVehicleAttributes().setHbefaSizeClass( sizeClass );
+								key.setHbefaComponent( pollutant );
+								HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get( key );
+								if( result == null ){
+									throw new RuntimeException( "emissions factor for key=" + key + " is missing." +
+														    "  There used to be some " +
+														    "fallback, but it was " +
+														    "inconsistent and confusing, so " +
+														    "we are now just aborting." );
+								}
+							}
+//							}
+//						}
+						}
+					}
+				}
+			}
+		}
 
 	}
 
@@ -163,7 +220,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
 														   double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
 
-		Map<Pollutant, Double> warmEmissionsOfEvent = new HashMap<>();
+		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>( Pollutant.class );
 
 //		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
 //			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
