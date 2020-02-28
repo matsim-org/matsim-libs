@@ -269,7 +269,8 @@ public final class EventsReaderJson {
 			this.events.processEvent(new TeleportationArrivalEvent(
 					time, 
 					Id.create(o.get(TeleportationArrivalEvent.ATTRIBUTE_PERSON).asText(), Person.class),
-					o.get(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE).asDouble()));
+					o.get(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE).asDouble(),
+					o.path(TeleportationArrivalEvent.ATTRIBUTE_MODE).asText(null)));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			double delay = o.path(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY).asDouble(0.0);
 			this.events.processEvent(new VehicleArrivesAtFacilityEvent(

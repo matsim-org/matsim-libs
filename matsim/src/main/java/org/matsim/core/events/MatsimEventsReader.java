@@ -94,8 +94,8 @@ public final class MatsimEventsReader implements MatsimReader {
 			case xml:
 				new XmlEventsReader(this.events, this.customEventMappers).parse(stream);
 				break;
-			case pbf:
-				throw new UnsupportedOperationException("PBF is currently not supported to read from a stream");
+			case pb:
+				throw new UnsupportedOperationException("PB (Protobuf) is currently not supported to read from a stream");
 			case json:
 				EventsReaderJson reader = new EventsReaderJson(this.events);
 				for (Map.Entry<String, CustomEventMapper> entry : this.customEventMappers.entrySet()) {
