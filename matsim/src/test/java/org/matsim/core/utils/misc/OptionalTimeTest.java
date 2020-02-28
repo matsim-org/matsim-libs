@@ -35,6 +35,9 @@ public class OptionalTimeTest {
 	@Test
 	public void test_defined() {
 		//defined
+		assertThat(OptionalTime.defined(0).seconds()).isEqualTo(0);
+		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));//cached, so the same
+
 		assertThat(OptionalTime.defined(1).seconds()).isEqualTo(1);
 		assertThat(OptionalTime.defined(-Double.MAX_VALUE).seconds()).isEqualTo(-Double.MAX_VALUE);
 		assertThat(OptionalTime.defined(Double.POSITIVE_INFINITY).seconds()).isEqualTo(Double.POSITIVE_INFINITY);
