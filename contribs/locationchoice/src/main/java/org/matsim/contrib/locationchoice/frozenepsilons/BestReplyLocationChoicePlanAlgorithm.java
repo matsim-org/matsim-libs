@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -52,7 +50,6 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
-import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.StagesAsNormalActivities;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
@@ -67,9 +64,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
 	private final FrozenTastesConfigGroup dccg;
@@ -91,12 +85,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
-		this.nearestLinks = nearestLinks;
-		
-		// Cache maps since otherwise they would be created on the fly every time when accessing them via the config object.
-		this.teleportedModeSpeeds = this.lcContext.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
-		
+
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
 
@@ -122,7 +111,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 	private void handleActivities( final Plan plan, final int personIndex ) {
 
-		// yyyy todo reconstruct the algo based on PlanElements with algo based on trips, using the following material:
 		List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
 
 		int actLegIndex = -1;
@@ -161,64 +149,8 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 				// ===
 
 				this.setLocationOfActivityToFacilityId(actToMove, choice );
-
 			}
-
-
 		}
-
-
-
-
-//		int actlegIndex = -1;
-//		for (PlanElement pe : plan.getPlanElements()) {
-//			actlegIndex++;
-//			if (pe instanceof Activity) {
-//				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
-//				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
-//
-//					List<? extends PlanElement> actslegs = plan.getPlanElements();
-//					final Activity actToMove = (Activity) pe;
-//					final PlanElement prevAct = actslegs.get( actlegIndex - 2 );
-//					if ( ! ( prevAct instanceof Activity ) ) {
-//						log.warn("") ;
-//						log.warn( "prevAct is not an activity; agentId=" + plan.getPerson().getId() ) ;
-//						log.warn( "prevAct=" + prevAct ) ;
-//						log.warn("") ;
-//						for( PlanElement planElement : plan.getPlanElements() ){
-//							log.warn( planElement ) ;
-//						}
-//						log.warn("") ;
-//					}
-//					final Activity actPre = (Activity) prevAct;
-//
-//					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
-//					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
-//					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
-//					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
-//					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
-//						  actToMove.getType() );
-//
-//					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
-//
-//					double x = (coordPre.getX() + coordPost.getX()) / 2.0;
-//					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
-//					Coord center = new Coord(x, y);
-//
-//					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
-//
-//					// === this is where the work is done:
-//					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
-//							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
-//							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
-//					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
-//					// ===
-//
-//					this.setLocationOfActivityToFacilityId(actToMove, choice );
-//
-//				}
-//			}
-//		}
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
