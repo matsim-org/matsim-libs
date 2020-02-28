@@ -1,5 +1,5 @@
 /**
- * The parking contrib is split into two substantially different parts<ul>
+ * The parking contrib is split into three substantially different parts<ul>
  * <li> Parking Choice, based on work of Rashid Waraich. Parts of the contrib are used in the carsharing contrib.
  * 		<p> Its main goal, as far as we understand it, is the simulation of parking choice (e.g. between garages). There is no modelling of circulating traffic searching for parking or walking of agents to/from parking.
  * 
@@ -7,7 +7,9 @@
  * 		<p> The main goal is to model parking search, including walk legs of agents and vehicles searching for parking spaces.
  * </ul>
  * 
- * 
+ * <ul> Parking Proxy by Tobias Kohl (Senozon)
+ * 		<p>This was designed for large scenarios where it's not feasable to fully simulate parking agents. Rather, the additional time needed for parking is estimated</p>
+ * </ul>
  * @author jfbischoff, nagel
  *
  */

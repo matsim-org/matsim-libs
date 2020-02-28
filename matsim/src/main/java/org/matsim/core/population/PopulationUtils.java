@@ -73,6 +73,13 @@ public final class PopulationUtils {
 	// try to avoid misleading comment about config context.  kai, dec'18
 
 	/**
+	 * @deprecated -- this is public only because it is needed in the also deprecated method {@link PlansConfigGroup#getSubpopulationAttributeName()}
+	 */
+	@Deprecated
+	public static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+
+
+	/**
 	 * Is a namespace, so don't instantiate:
 	 */
 	private PopulationUtils() {}
@@ -1099,7 +1106,7 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
-	public static void putPersonAttribute( Person person, String key, Object value ) {
+	public static void putPersonAttribute( HasPlansAndId<?,?> person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
 	public static Object removePersonAttribute( Person person, String key ) {
@@ -1110,5 +1117,42 @@ public final class PopulationUtils {
 		//population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
 		person.getAttributes().clear();
 	}
+
+        public static String getSubpopulation( HasPlansAndId<?,?> person ){
+		return (String) getPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME );
+        }
+        public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
+		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
+	}
+
+	public static Population getOrCreateAllpersons( Scenario  scenario ) {
+		Population map = (Population) scenario.getScenarioElement( "allpersons" );
+		if ( map==null ) {
+			log.info( "adding scenario element for allpersons container" );
+			map = new PopulationImpl( scenario.getPopulation().getFactory() );
+			scenario.addScenarioElement("allpersons" , map);
+		}
+		return map;
+	}
+	private static int tryStdCnt = 5;
+	private static int tryTrnCnt = 5;
+	public static Person findPerson( Id<Person> personId, Scenario scenario ) {
+		Person person = getOrCreateAllpersons( scenario ).getPersons().get( personId );
+		if ( person==null ) {
+			if ( tryStdCnt>0){
+				tryStdCnt--;
+				log.info( "personId=" + personId + " not in allPersons; trying standard vehicles container ..." );
+				if ( tryStdCnt==0 ) {
+					log.info( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			person = scenario.getPopulation().getPersons().get(  personId );
+		}
+		if ( person==null ) {
+			log.info( "unable to find person for personId=" + personId + "; will return null") ;
+		}
+		return person ;
+	}
+
 
 }

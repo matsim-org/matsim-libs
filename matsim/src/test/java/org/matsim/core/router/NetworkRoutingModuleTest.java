@@ -89,7 +89,7 @@ public class NetworkRoutingModuleTest {
 		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).setSigma(0.).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -117,7 +117,7 @@ public class NetworkRoutingModuleTest {
 			double monetaryDistanceRateCar = -1.;
 			f.s.getConfig().planCalcScore().getModes().get(TransportMode.car).setMonetaryDistanceRate(monetaryDistanceRateCar);
 
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).setSigma(0.).createTravelDisutility(timeObject);
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
