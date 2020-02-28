@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This calculates transport-times, transport-costs and the distance to cover the distance from one location to another. 
  * It calculates these values based on a {@link Network} to serve as {@link VehicleRoutingTransportCosts} in the {@link VehicleRoutingProblem}.
+ * The distance includes the links of the path and the fromLink and not the toLink.
  * 
  * <p>It can be used with multiple threads. Note that each thread gets its own leastCostPathCalculator. It is created only once and cached afterwards. Thus
  * it requires a threadSafe leastCostPathCalculatorFactory (the calculator itself does not need to be thread-safe). 
@@ -561,6 +562,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			Id<Link> toLinkId = Id.create(toId.getId(), Link.class);
 			Link fromLink = network.getLinks().get(fromLinkId);
 			Link toLink = network.getLinks().get(toLinkId);
+			// because path not includes in&out Link
 			double travelDistance = fromLink.getLength();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
