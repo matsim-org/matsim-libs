@@ -33,21 +33,6 @@ import org.junit.Test;
  */
 public class OptionalTimeTest {
 	@Test
-	public void test_of() {
-		//defined
-		assertThat(OptionalTime.of(1).seconds()).isEqualTo(1);
-		assertThat(OptionalTime.of(-Double.MAX_VALUE).seconds()).isEqualTo(-Double.MAX_VALUE);
-		assertThat(OptionalTime.of(Double.POSITIVE_INFINITY).seconds()).isEqualTo(Double.POSITIVE_INFINITY);
-
-		//undefined
-		assertThat(OptionalTime.of(Time.UNDEFINED_TIME).isUndefined()).isTrue();
-
-		//NaN
-		assertThatThrownBy(() -> OptionalTime.defined(Double.NaN)).isExactlyInstanceOf(IllegalArgumentException.class)
-				.hasMessage("NaN time is not allowed");
-	}
-
-	@Test
 	public void test_defined() {
 		//defined
 		assertThat(OptionalTime.defined(1).seconds()).isEqualTo(1);

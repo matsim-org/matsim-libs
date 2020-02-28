@@ -34,19 +34,6 @@ public final class OptionalTime {
 	private static OptionalTime UNDEFINED = new OptionalTime(Time.UNDEFINED_TIME);
 
 	/**
-	 * Creates OptionalTime that wraps a defined or undefined time
-	 *
-	 * @throws IllegalArgumentException if seconds is Double.NaN
-	 */
-	/*package*/ static OptionalTime of(double seconds) {
-		if (Double.isNaN(seconds)) {
-			throw new IllegalArgumentException("NaN time is not allowed");
-		}
-
-		return seconds == Time.UNDEFINED_TIME ? UNDEFINED : new OptionalTime(seconds);
-	}
-
-	/**
 	 * Creates OptionalTime that wraps only a defined time
 	 *
 	 * @throws IllegalArgumentException if seconds is Double.NaN or Time.getUndefined()

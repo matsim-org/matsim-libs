@@ -234,7 +234,7 @@ public class Time {
 		if (isNegative) {
 			seconds = -seconds;
 		}
-		return OptionalTime.of(seconds);
+		return seconds == Time.UNDEFINED_TIME ? OptionalTime.undefined() : OptionalTime.defined(seconds);
 	}
 
 	/**
