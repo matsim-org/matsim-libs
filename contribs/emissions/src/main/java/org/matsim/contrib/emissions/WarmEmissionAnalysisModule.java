@@ -247,12 +247,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
 				fractionStopGo = getFractionStopAndGo( vehicleId, freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
+				logger.info("fractionStopGo is: " + fractionStopGo);
 
 				double efStopGo_gpkm = 0. ;
 				if ( fractionStopGo>0 ){
 					// compute emissions from stop-go fraction:
 					efkey.setHbefaTrafficSituation( STOPANDGO );
 					efStopGo_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
+					logger.warn( "pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm );
 				}
 
 				double efFreeFlow_gpkm = 0. ;
