@@ -110,12 +110,14 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
             for (Person p : scenario.getPopulation().getPersons().values()) {
                 List<String> line = new ArrayList<>();
                 line.add(p.getId().toString());
-                Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
                 String x = "";
                 String y = "";
-                if (firstAct.getCoord() != null) {
-                    x = Double.toString(firstAct.getCoord().getX());
-                    y = Double.toString(firstAct.getCoord().getY());
+                if (p.getSelectedPlan().getPlanElements().size() > 0) {
+                    Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
+                    if (firstAct.getCoord() != null) {
+                        x = Double.toString(firstAct.getCoord().getX());
+                        y = Double.toString(firstAct.getCoord().getY());
+                    }
                 }
                 line.add(x);
                 line.add(y);
