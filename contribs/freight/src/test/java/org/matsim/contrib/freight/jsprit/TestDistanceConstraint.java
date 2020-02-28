@@ -7,6 +7,7 @@ import javax.management.InvalidAttributeValueException;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -48,6 +49,10 @@ import org.matsim.vehicles.VehicleUtils;
  *
  */
 public class TestDistanceConstraint {
+
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	
 	static final Logger log = Logger.getLogger(TestDistanceConstraint.class);
 
 	private static final String original_Chessboard = "https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
@@ -55,14 +60,15 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 1: Tour is possible with the vehicle with the small battery and the
 	 * vehicle with the small battery is cheaper
-	 * @throws InvalidAttributeValueException 
+	 * 
+	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
 	public final void CarrierSmallBatteryTest_Version1() throws InvalidAttributeValueException {
 
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("output/original_Chessboard_Test/Version1");
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -101,7 +107,7 @@ public class TestDistanceConstraint {
 		CarrierUtils.setJspritIterations(carrierV1, 25);
 
 		final Controler controler = new Controler(scenario);
-		
+
 		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
@@ -139,12 +145,13 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
 	 * why one vehicle with a large battery is used.
-	 * @throws InvalidAttributeValueException 
+	 * 
+	 * @throws InvalidAttributeValueException
 	 */
 	@Test
 	public final void CarrierLargeBatteryTest_Version2() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version2");
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -184,8 +191,8 @@ public class TestDistanceConstraint {
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
 		final Controler controler = new Controler(scenario);
-		
-		FreightUtils.runJsprit(controler);		
+
+		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
@@ -203,7 +210,7 @@ public class TestDistanceConstraint {
 				MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 15, maxDistanceVehilce4,
 				MatsimTestUtils.EPSILON);
-		
+
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
@@ -223,13 +230,14 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 3: costs for using one long range vehicle are higher than the costs of
 	 * using two short range truck
-	 * @throws InvalidAttributeValueException 
+	 * 
+	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
 	public final void Carrier2SmallBatteryTest_Version3() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version3");
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -268,7 +276,7 @@ public class TestDistanceConstraint {
 		CarrierUtils.setJspritIterations(carrierV3, 10);
 
 		final Controler controler = new Controler(scenario);
-		
+
 		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
@@ -286,7 +294,7 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce6,
 				MatsimTestUtils.EPSILON);
-	
+
 		for (ScheduledTour scheduledTour : carrierV3.getSelectedPlan().getScheduledTours()) {
 
 			double distanceTour = 0.0;
@@ -313,13 +321,14 @@ public class TestDistanceConstraint {
 	 * Option 4: An additional shipment outside the range of both BEVtypes.
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
-	 * @throws InvalidAttributeValueException 
+	 * 
+	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
 	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
-		config.controler().setOutputDirectory("output/original_Chessboard/Test/Version4");
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -365,7 +374,7 @@ public class TestDistanceConstraint {
 		CarrierUtils.setJspritIterations(carrierV4, 10);
 
 		final Controler controler = new Controler(scenario);
-		
+
 		FreightUtils.runJsprit(controler);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
@@ -415,6 +424,7 @@ public class TestDistanceConstraint {
 	 * @param config
 	 */
 	static Config prepareConfig(Config config, int lastMATSimIteration) {
+		
 		config.network().setInputFile(original_Chessboard);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
@@ -424,7 +434,7 @@ public class TestDistanceConstraint {
 		config.controler().setLastIteration(lastMATSimIteration);
 		config.global().setRandomSeed(4177);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		
+
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
 		return config;
