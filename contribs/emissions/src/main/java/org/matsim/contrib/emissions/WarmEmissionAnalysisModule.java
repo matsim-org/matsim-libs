@@ -319,26 +319,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				logger.info("try reading detailed values");
 				if (this.detailedHbefaWarmTable.get(efkey) != null) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.info("Lookup result for " + efkey + " is " + ef);
-					return ef;
-				} else {
-					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
-					// put this into a new key ...
-					efkey2.setHbefaVehicleAttributes(attribs2);
-					// ... and try to look up:
-					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
-						logger.info("Lookup result for " + efkey2 + " is " + this.detailedHbefaWarmTable.get(efkey2));
-						return this.detailedHbefaWarmTable.get(efkey2);
-					}
-				}
-				break;
-			case tryDetailedThenTechnologyAverageElseAbort:
-				//Look up detailed values
-				logger.info("try reading detailed values");
-				if (this.detailedHbefaWarmTable.get(efkey) != null) {
-					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.info("Lookup result for " + efkey + " is " + ef);
+					logger.info("Lookup result for " + efkey + " is " + ef.toString());
 					return ef;
 				} else {
 					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
@@ -348,7 +329,27 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-						logger.info("Lookup result for " + efkey + " is " + ef2);
+						logger.info("Lookup result for " + efkey + " is " + ef2.toString());
+						return ef2;
+					}
+				}
+				break;
+			case tryDetailedThenTechnologyAverageElseAbort:
+				//Look up detailed values
+				logger.info("try reading detailed values");
+				if (this.detailedHbefaWarmTable.get(efkey) != null) {
+					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
+					logger.info("Lookup result for " + efkey + " is " + ef.toString());
+					return ef;
+				} else {
+					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
+					HbefaVehicleAttributes attribs2 = tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					// put this into a new key ...
+					efkey2.setHbefaVehicleAttributes(attribs2);
+					// ... and try to look up:
+					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
+						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
+						logger.info("Lookup result for " + efkey + " is " + ef2.toString());
 						return ef2;
 					}
 
@@ -362,7 +363,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 						if (this.detailedHbefaWarmTable.get(efkey2) != null) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-							logger.info("Lookup result for " + efkey + " is " + ef2);
+							logger.info("Lookup result for " + efkey + " is " + ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -375,7 +376,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				logger.info("try reading detailed values");
 				if (this.detailedHbefaWarmTable.get(efkey) != null) {
 					HbefaWarmEmissionFactor ef = this.detailedHbefaWarmTable.get(efkey);
-					logger.info("Lookup result for " + efkey + " is " + ef);
+					logger.info("Lookup result for " + efkey + " is " + ef.toString());
 					return ef;
 				} else {
 					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
@@ -385,7 +386,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// ... and try to look up:
 					if (this.detailedHbefaWarmTable.get(efkey2) != null) {
 						HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-						logger.info("Lookup result for " + efkey + " is " + ef2);
+						logger.info("Lookup result for " + efkey + " is " + ef2.toString());
 						return ef2;
 					}
 
@@ -399,7 +400,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 						if (this.detailedHbefaWarmTable.get(efkey2) != null) {
 							HbefaWarmEmissionFactor ef2 = this.detailedHbefaWarmTable.get(efkey2);
-							logger.info("Lookup result for " + efkey + " is " + ef2);
+							logger.info("Lookup result for " + efkey + " is " + ef2.toString());
 							return ef2;
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
@@ -412,7 +413,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey3.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 				if (this.avgHbefaWarmTable.get(efkey3) != null) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey3);
-					logger.info("Lookup result for " + efkey3 + " is " + ef);
+					logger.info("Lookup result for " + efkey3 + " is " + ef.toString());
 					Gbl.assertNotNull(ef);
 					return ef;
 				}
@@ -422,7 +423,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 				if (this.avgHbefaWarmTable.get(efkey) != null) {
 					HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey);
-					logger.info("Lookup result for " + efkey + " is " + ef);
+					logger.info("Lookup result for " + efkey + " is " + ef.toString());
 					Gbl.assertNotNull(ef);
 					return ef;
 				} else {
