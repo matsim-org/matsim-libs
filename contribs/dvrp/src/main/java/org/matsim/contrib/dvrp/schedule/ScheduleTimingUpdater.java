@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -20,25 +18,28 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import com.google.inject.Inject;
+import static org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+
+import java.util.List;
+
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.utils.misc.Time;
 
-import java.util.List;
+public class ScheduleTimingUpdater {
+	public interface StayTaskEndTimeCalculator {
+		double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime);
+	}
 
-public class ScheduleUpdater {
-
-	MobsimTimer timer;
-	StayTaskEndTimeUpdater stayTaskEndTimeUpdater;
+	private final MobsimTimer timer;
+	private final StayTaskEndTimeCalculator stayTaskEndTimeCalculator;
 
 	public final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
 
-	public ScheduleUpdater(MobsimTimer timer, StayTaskEndTimeUpdater stayTaskEndTimeUpdater) {
+	public ScheduleTimingUpdater(MobsimTimer timer, StayTaskEndTimeCalculator stayTaskEndTimeCalculator) {
 		this.timer = timer;
-		this.stayTaskEndTimeUpdater = stayTaskEndTimeUpdater;
+		this.stayTaskEndTimeCalculator = stayTaskEndTimeCalculator;
 	}
 
 	/**
@@ -49,15 +50,16 @@ public class ScheduleUpdater {
 	public void updateBeforeNextTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
-		if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
+		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
 		}
+
 		updateTimingsStartingFromCurrentTask(vehicle, timer.getTimeOfDay());
 	}
 
 	public void updateTimings(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() != Schedule.ScheduleStatus.STARTED) {
+		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return;
 		}
 
@@ -96,14 +98,13 @@ public class ScheduleUpdater {
 	}
 
 	private double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		if (task instanceof DriveTask){
+		if (task instanceof DriveTask) {
 			// cannot be shortened/lengthen, therefore must be moved forward/backward
 			VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
 			// TODO one may consider recalculation of SP!!!!
 			return newBeginTime + path.getTravelTime();
 		} else {
-			return stayTaskEndTimeUpdater.calcNewEndTime(vehicle, task, newBeginTime);
+			return stayTaskEndTimeCalculator.calcNewEndTime(vehicle, (StayTask)task, newBeginTime);
 		}
 	}
-
 }

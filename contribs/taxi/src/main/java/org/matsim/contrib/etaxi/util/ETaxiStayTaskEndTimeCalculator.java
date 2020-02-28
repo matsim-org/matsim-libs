@@ -21,18 +21,18 @@
 package org.matsim.contrib.etaxi.util;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeUpdater;
+import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeCalculator;
 
-public class ETaxiStayTaskEndTimeUpdater extends TaxiStayTaskEndTimeUpdater {
-	public ETaxiStayTaskEndTimeUpdater(TaxiConfigGroup taxiConfigGroup) {
+public class ETaxiStayTaskEndTimeCalculator extends TaxiStayTaskEndTimeCalculator {
+	public ETaxiStayTaskEndTimeCalculator(TaxiConfigGroup taxiConfigGroup) {
 		super(taxiConfigGroup);
 	}
 
 	@Override
-	public double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
+	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
 		if (task instanceof ETaxiChargingTask) {
 			// FIXME underestimated due to the ongoing AUX/drive consumption
 			double duration = task.getEndTime() - task.getBeginTime();
@@ -41,5 +41,4 @@ public class ETaxiStayTaskEndTimeUpdater extends TaxiStayTaskEndTimeUpdater {
 			return super.calcNewEndTime(vehicle, task, newBeginTime);
 		}
 	}
-
 }

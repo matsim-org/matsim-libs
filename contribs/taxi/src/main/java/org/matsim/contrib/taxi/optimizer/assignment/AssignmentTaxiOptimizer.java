@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -35,14 +35,14 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class AssignmentTaxiOptimizer extends DefaultTaxiOptimizer {
 	public AssignmentTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
-			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleUpdater scheduleUpdater) {
-		this(eventsManager, taxiCfg, fleet, scheduler, scheduleUpdater,
+			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater) {
+		this(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
 				new AssignmentRequestInserter(fleet, network, timer, travelTime, travelDisutility, scheduler,
 						(AssignmentTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()));
 	}
 
 	public AssignmentTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-								   TaxiScheduler scheduler, ScheduleUpdater scheduleUpdater, AssignmentRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, scheduler, scheduleUpdater, requestInserter);
+								   TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, AssignmentRequestInserter requestInserter) {
+		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, requestInserter);
 	}
 }

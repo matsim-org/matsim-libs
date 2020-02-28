@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.RequestQueue;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -49,13 +49,13 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
-	private ScheduleUpdater scheduleUpdater;
+	private ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleUpdater scheduleUpdater, UnplannedRequestInserter requestInserter) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, UnplannedRequestInserter requestInserter) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
-		this.scheduleUpdater = scheduleUpdater;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.requestInserter = requestInserter;
 		this.taxiCfg = taxiCfg;
 		params = taxiCfg.getTaxiOptimizerParams();
@@ -75,7 +75,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 			// perhaps by checking if there are any unplanned requests??
 			if (params.doUpdateTimelines) {
 				for (DvrpVehicle v : fleet.getVehicles().values()) {
-					scheduleUpdater.updateTimings(v);
+					scheduleTimingUpdater.updateTimings(v);
 				}
 			}
 
@@ -106,7 +106,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void nextTask(DvrpVehicle vehicle) {
-		scheduleUpdater.updateBeforeNextTask(vehicle);
+		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
 		scheduler.updateBeforeNextTask(vehicle);
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();

@@ -23,7 +23,7 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
@@ -53,11 +53,11 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
 	private final URL context;
-	private final ScheduleUpdater scheduleUpdater;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public DefaultTaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 										Network network, MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-										TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleUpdater scheduleUpdater, URL context) {
+										TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, URL context) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -66,7 +66,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.scheduler = scheduler;
-		this.scheduleUpdater = scheduleUpdater;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.context = context;
 	}
 
@@ -75,15 +75,15 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
 			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, scheduler, scheduleUpdater);
+						travelDisutility, scheduler, scheduleTimingUpdater);
 			case FifoTaxiOptimizerParams.SET_NAME:
 				return new FifoTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, scheduler, scheduleUpdater);
+						travelDisutility, scheduler, scheduleTimingUpdater);
 			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleUpdater, network, timer,
+				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer,
 						travelTime, travelDisutility);
 			case ZonalTaxiOptimizerParams.SET_NAME:
-				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleUpdater, network, timer, travelTime,
+				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime,
 						travelDisutility, context);
 		}
 		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());

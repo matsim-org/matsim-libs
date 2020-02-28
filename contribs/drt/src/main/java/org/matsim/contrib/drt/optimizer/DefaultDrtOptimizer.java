@@ -39,7 +39,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.RequestQueue;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -53,7 +53,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final Integer rebalancingInterval;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
-	private final ScheduleUpdater scheduleUpdater;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
 	private final DepotFinder depotFinder;
@@ -64,7 +64,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 		   RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
-		   ScheduleUpdater scheduleUpdater, EmptyVehicleRelocator relocator,
+		   ScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
 		   UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
@@ -72,7 +72,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.depotFinder = depotFinder;
 		this.rebalancingStrategy = rebalancingStrategy;
 		this.scheduleInquiry = scheduleInquiry;
-		this.scheduleUpdater = scheduleUpdater;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
 		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
@@ -88,7 +88,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 		if (!unplannedRequests.getSchedulableRequests().isEmpty()) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
-				scheduleUpdater.updateTimings(v);
+				scheduleTimingUpdater.updateTimings(v);
 			}
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
@@ -126,7 +126,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void nextTask(DvrpVehicle vehicle) {
-		scheduleUpdater.updateBeforeNextTask(vehicle);
+		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
 
 		vehicle.getSchedule().nextTask();
 

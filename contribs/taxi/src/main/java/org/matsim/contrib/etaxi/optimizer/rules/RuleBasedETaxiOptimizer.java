@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.ScheduleUpdater;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
@@ -52,16 +52,16 @@ import org.matsim.core.router.util.TravelTime;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			ETaxiScheduler eScheduler, ScheduleUpdater scheduleUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
+			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure) {
 		double cellSize = ((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
 				.getCellSize();
-		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler,  scheduleUpdater, network, timer, travelTime,
+		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, network, timer, travelTime,
 				travelDisutility, chargingInfrastructure, new SquareGridSystem(network, cellSize));
 	}
 
 	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			ETaxiScheduler eScheduler, ScheduleUpdater scheduleUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
+			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure, ZonalSystem zonalSystem) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, eScheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
@@ -71,7 +71,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 				((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
 				idleTaxiRegistry, unplannedRequestRegistry);
 
-		return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleUpdater, chargingInfrastructure,
+		return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, chargingInfrastructure,
 				idleTaxiRegistry, unplannedRequestRegistry, dispatchFinder, requestInserter);
 	}
 
@@ -83,10 +83,10 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	private final IdleTaxiZonalRegistry idleTaxiRegistry;
 
 	public RuleBasedETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-								   ETaxiScheduler eScheduler, ScheduleUpdater  scheduleUpdater, ChargingInfrastructure chargingInfrastructure,
+								   ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, ChargingInfrastructure chargingInfrastructure,
 								   IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
 								   BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleUpdater, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
+		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
 		this.params = (RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;

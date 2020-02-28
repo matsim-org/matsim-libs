@@ -18,30 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.schedule;
+package org.matsim.contrib.taxi.scheduler;
 
-import com.google.inject.Inject;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
+
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 
-import static org.matsim.contrib.dvrp.schedule.ScheduleUpdater.REMOVE_STAY_TASK;
+public class TaxiStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayTaskEndTimeCalculator {
 
-public class DrtStayTaskEndTimeUpdater implements StayTaskEndTimeUpdater {
+	private final TaxiConfigGroup taxiConfigGroup;
 
-	final double stopDuration;
-
-	public DrtStayTaskEndTimeUpdater(DrtConfigGroup drtConfigGroup) {
-		this.stopDuration = drtConfigGroup.getStopDuration();
+	public TaxiStayTaskEndTimeCalculator(TaxiConfigGroup taxiConfigGroup) {
+		this.taxiConfigGroup = taxiConfigGroup;
 	}
 
 	@Override
-	public double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		if(! (task instanceof StayTask) ){
-			throw new IllegalArgumentException();
-		}
-		switch (((DrtTaskType)task.getTaskType())) {
+	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
+		switch (((TaxiTaskType)task.getTaskType())) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
@@ -57,15 +56,14 @@ public class DrtStayTaskEndTimeUpdater implements StayTaskEndTimeUpdater {
 					}
 				}
 			}
-			case STOP: {
-				double maxEarliestPickupTime = ((DrtStopTask)task).getPickupRequests()
-						.values()
-						.stream()
-						.mapToDouble(DrtRequest::getEarliestStartTime)
-						.max()
-						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
-				double duration = stopDuration;
-				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
+			case PICKUP: {
+				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();
+				// the actual pickup starts at max(t, t0)
+				return Math.max(newBeginTime, t0) + taxiConfigGroup.getPickupDuration();
+			}
+			case DROPOFF: {
+				// cannot be shortened/lengthen, therefore must be moved forward/backward
+				return newBeginTime + taxiConfigGroup.getDropoffDuration();
 			}
 
 			default:
