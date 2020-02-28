@@ -48,7 +48,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class RunJointDemandDRTExample {
     public static void main(String[] args) {
 
-        Config config = loadConfig("jointDemand/config.xml");
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
         prepareConfig(config);
 		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
 				config.plansCalcRoute());
@@ -113,14 +113,14 @@ class RunJointDemandDRTExample {
         drtCfg.setMaxTravelTimeAlpha(5);
         drtCfg.setMaxTravelTimeBeta(15 * 60);
         drtCfg.setStopDuration(60);
-        drtCfg.setVehiclesFile("drtVehicles.xml");
+        drtCfg.setVehiclesFile("jointDemand_vehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setCarriersFile("test-carriers-drt.xml");
+        freightConfigGroup.setCarriersFile("jointDemand_carriers_drt.xml");
         freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
     }
 }

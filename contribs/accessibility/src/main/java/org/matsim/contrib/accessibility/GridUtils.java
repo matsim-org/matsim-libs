@@ -19,14 +19,16 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-final class GridUtils {
+public final class GridUtils {
+	// used from outside, e.g. in vsp playgrounds
+
 	private static final Logger LOG = Logger.getLogger(GridUtils.class);
 
 	/**
 	 * @param shapeFileName
 	 * @return Geometry determines the scenario boundary for the accessibility measure
 	 */
-	public static Geometry getBoundary(String shapeFileName){
+	public static Geometry getBoundary( String shapeFileName ){
 
 		try{
 			// get boundaries of study area
@@ -62,7 +64,7 @@ final class GridUtils {
 	 * 
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByShapeFileV2(Geometry boundary, double gridSize) {
+	static ActivityFacilitiesImpl createGridLayerByGridSizeByShapeFileV2( Geometry boundary, double gridSize ) {
 		LOG.info("Setting statring points for accessibility measure ...");
 
 		int skippedPoints = 0;
@@ -97,7 +99,7 @@ final class GridUtils {
 		return measuringPoints;
 	}
 
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(BoundingBox box, int gridSize) {
+	static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2( BoundingBox box, int gridSize ) {
 		return createGridLayerByGridSizeByBoundingBoxV2(box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), gridSize);
 	}
 
@@ -111,7 +113,7 @@ final class GridUtils {
 	 * 
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(double minX, double minY, double maxX, double maxY, int gridSize) {
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2( double minX, double minY, double maxX, double maxY, int gridSize ) {
 		LOG.info("Start creating measure points on a grid.");
 		int skippedPoints = 0;
 		int setPoints = 0;
@@ -135,11 +137,11 @@ final class GridUtils {
 		return measuringPoints;
 	}
 	
-	public static ActivityFacilities createHexagonLayer(BoundingBox box, int maxDiameter_m) {
+	static ActivityFacilities createHexagonLayer( BoundingBox box, int maxDiameter_m ) {
 		return createHexagonLayer(box.getXMin(), box.getYMin(), box.getXMax(), box.getYMax(), maxDiameter_m);
 	}
 	
-	public static ActivityFacilities createHexagonLayer(double minX, double minY, double maxX, double maxY, int maxDiameter_m) {
+	private static ActivityFacilities createHexagonLayer( double minX, double minY, double maxX, double maxY, int maxDiameter_m ) {
 		LOG.info("Start creating measure points on a hexagon pattern.");
 		double inRadius_m = Math.sqrt(3) / 4 * maxDiameter_m;
 		int skippedPoints = 0;
@@ -196,7 +198,7 @@ final class GridUtils {
 	 * @param grid SpatialGrid containing measured accessibilities
 	 * @param fileName output file
 	 */
-	public static void writeSpatialGridTable(SpatialGrid grid, String fileName){
+	static void writeSpatialGridTable( SpatialGrid grid, String fileName ){
 
 		LOG.info("Writing spatial grid table " + fileName + " ...");
 		SpatialGridTableWriter sgTableWriter = new SpatialGridTableWriter();

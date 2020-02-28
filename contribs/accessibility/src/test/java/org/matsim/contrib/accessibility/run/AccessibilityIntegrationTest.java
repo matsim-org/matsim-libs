@@ -134,6 +134,8 @@ public class AccessibilityIntegrationTest {
 
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class) ;
 
+		config.plansCalcRoute().setRoutingRandomness(0.);
+
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
@@ -167,6 +169,8 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
+		
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config);
 
@@ -207,6 +211,8 @@ public class AccessibilityIntegrationTest {
 		acg.setUseOpportunityWeights(true);
 		acg.setWeightExponent(2.);
 
+		config.plansCalcRoute().setRoutingRandomness(0.);
+
 		final Scenario sc = createTestScenarioUsingOpportunityWeights(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
@@ -231,6 +237,8 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
+
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
@@ -269,6 +277,8 @@ public class AccessibilityIntegrationTest {
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile);
 		//		acg.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
 		acg.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
+
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
@@ -319,6 +329,8 @@ public class AccessibilityIntegrationTest {
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
+		
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		Controler controler = new Controler(sc);
 

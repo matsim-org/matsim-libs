@@ -125,6 +125,8 @@ public class TinyAccessibilityTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
+		config.plansCalcRoute().setRoutingRandomness(0.);
+
 		return config;
 	}
 
