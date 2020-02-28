@@ -46,8 +46,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
-
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -55,16 +53,12 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
-import org.apache.log4j.Logger;
-
 import javax.management.InvalidAttributeValueException;
 
 public class TestFreightUtils {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -103,9 +97,8 @@ public class TestFreightUtils {
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
-		final EngineInformation engineInfo = carrierVehType.getEngineInformation() ;
-		engineInfo.setFuelType( FuelType.diesel );
-		engineInfo.setFuelConsumption( 0.015 );
+		carrierVehType.getAttributes().putAttribute("fuelType", "diesel");
+		carrierVehType.getAttributes().putAttribute("fuelConsumption", 0.015);
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
 		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -228,8 +221,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals( EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType() );
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
+			Assert.assertEquals("diesel", carrierVehicleType.getAttributes().getAttribute("fuelType"));
+			Assert.assertEquals(0.015, (double)carrierVehicleType.getAttributes().getAttribute("fuelConsumption"), 0.0);
 		}
 		
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
@@ -240,8 +233,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals( EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType() );
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
+			Assert.assertEquals("diesel", carrierVehicleType.getAttributes().getAttribute("fuelType"));
+			Assert.assertEquals(0.015, (double)carrierVehicleType.getAttributes().getAttribute("fuelConsumption"), 0.0);
 		}
 	}
 
