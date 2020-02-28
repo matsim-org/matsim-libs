@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.events.algorithms.EventWriterJson;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -70,7 +71,7 @@ public class CustomEventTest {
 	}
 
 	@Test
-	public void testCustomEventCanBeWrittenAndRead() {
+	public void testCustomEventCanBeWrittenAndRead_XML() {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintStream ps = new PrintStream(baos);
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
@@ -93,13 +94,52 @@ public class CustomEventTest {
 			}
 		});
 		EventsReaderXMLv1 eventsReaderXMLv1 = new EventsReaderXMLv1(eventsManager2);
-		eventsReaderXMLv1.addCustomEventMapper("rain", new EventsReaderXMLv1.CustomEventMapper() {
+		eventsReaderXMLv1.addCustomEventMapper("rain", new MatsimEventsReader.CustomEventMapper() {
 			@Override
 			public Event apply(GenericEvent event) {
 				return new RainOnPersonEvent(event.getTime(), Id.createPersonId(event.getAttributes().get("person")));
 			}
 		});
 		eventsReaderXMLv1.parse(new ByteArrayInputStream(buf));
+		Assert.assertEquals(1, oneEvent.size());
+		Event event = oneEvent.get(0);
+		Assert.assertTrue(event instanceof RainOnPersonEvent);
+		RainOnPersonEvent ropEvent = ((RainOnPersonEvent) event);
+		Assert.assertEquals(0.0, ropEvent.getTime(), 1e-7);
+		Assert.assertEquals(Id.createPersonId("wurst"), ropEvent.getPersonId());
+	}
+
+	@Test
+	public void testCustomEventCanBeWrittenAndRead_Json() {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		PrintStream ps = new PrintStream(baos);
+		EventsManager eventsManager1 = EventsUtils.createEventsManager();
+		EventWriterJson handler = new EventWriterJson(ps);
+		eventsManager1.addHandler(handler);
+		eventsManager1.processEvent(new RainOnPersonEvent(0, Id.createPersonId("wurst")));
+		handler.closeFile();
+		byte[] buf = baos.toByteArray();
+		final ArrayList<Event> oneEvent = new ArrayList<>();
+		EventsManager eventsManager2 = EventsUtils.createEventsManager();
+		eventsManager2.addHandler(new BasicEventHandler() {
+			@Override
+			public void handleEvent(Event event) {
+				oneEvent.add(event);
+			}
+
+			@Override
+			public void reset(int iteration) {
+
+			}
+		});
+		EventsReaderJson eventsReader = new EventsReaderJson(eventsManager2);
+		eventsReader.addCustomEventMapper("rain", new MatsimEventsReader.CustomEventMapper() {
+			@Override
+			public Event apply(GenericEvent event) {
+				return new RainOnPersonEvent(event.getTime(), Id.createPersonId(event.getAttributes().get("person")));
+			}
+		});
+		eventsReader.parse(new ByteArrayInputStream(buf));
 		Assert.assertEquals(1, oneEvent.size());
 		Event event = oneEvent.get(0);
 		Assert.assertTrue(event instanceof RainOnPersonEvent);
