@@ -388,7 +388,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 							return this.detailedHbefaWarmTable.get(efkey2);
 						}
 						//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-						logger.warn("That also did not worked ");
+						logger.warn("That also did not work.");
+						logger.warn("");
 					}
 				}
 				logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with the average table");
@@ -420,8 +421,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				throw new IllegalStateException("Unexpected value: " + ecg.getDetailedVsAverageLookupBehavior());
 		}
 
-		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specified this in the config OR " +
-				"you should use an other fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
+		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specify this in " +
+                                                           "the config OR " +
+				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
 	/**
