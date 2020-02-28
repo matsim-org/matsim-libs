@@ -72,6 +72,7 @@ public final class OutputDirectoryLogging {
 		}
 
 		collectLogMessagesAppender = new CollectLogMessagesAppender();
+		collectLogMessagesAppender.start();
 		{
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.getConfiguration().getRootLogger().addAppender(collectLogMessagesAppender, Level.ALL, null);
