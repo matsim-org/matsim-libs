@@ -101,7 +101,7 @@ public class Gui extends JFrame {
 	private File configFile;
 	private File lastUsedDirectory;
 	private ConfigEditor editor = null;
-	
+	private ScheduleValidatorWindow transitValidator = null;
 	
 	private Gui(final String title, final Class<?> mainClass) {
 		setTitle( title );
@@ -426,6 +426,24 @@ public class Gui extends JFrame {
 				}
 				popSampler.setVisible(true);
 			}
+		});
+
+		JMenuItem mntmTransitValidator = new JMenuItem("Validate TransitSchedule…");
+		this.mnTools.add(mntmTransitValidator);
+		mntmTransitValidator.addActionListener(e -> {
+			if (this.transitValidator == null) {
+				this.transitValidator = new ScheduleValidatorWindow();
+			}
+			String configFilename = this.txtConfigfilename.getText();
+			if (!configFilename.isEmpty()) {
+				Config config = ConfigUtils.createConfig();
+				try {
+					ConfigUtils.loadConfig(config, configFilename);
+					this.transitValidator.loadFromConfig(config, new File(configFilename).getParentFile());
+				} catch (Exception ignore) {
+				}
+			}
+			this.transitValidator.setVisible(true);
 		});
 	}
 	

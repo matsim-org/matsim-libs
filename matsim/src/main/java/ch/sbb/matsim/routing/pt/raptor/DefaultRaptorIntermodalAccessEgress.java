@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
+import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
+
 /**
  * A default implementation of {@link RaptorIntermodalAccessEgress} returning a new RIntermodalAccessEgress,
  * which contains a list of legs (same as in the input), the associated travel time as well as the disutility.
@@ -20,7 +22,7 @@ import org.matsim.core.utils.misc.Time;
 public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAccessEgress {
 
     @Override
-    public RIntermodalAccessEgress calcIntermodalAccessEgress(final List<? extends PlanElement> legs, RaptorParameters params, Person person) {
+    public RIntermodalAccessEgress calcIntermodalAccessEgress(final List<? extends PlanElement> legs, RaptorParameters params, Person person, Direction direction) {
         double disutility = 0.0;
         double tTime = 0.0;
         for (PlanElement pe : legs) {
@@ -33,6 +35,6 @@ public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAcce
                 }
             }
         }
-        return new RIntermodalAccessEgress(legs, disutility, tTime);
+        return new RIntermodalAccessEgress(legs, disutility, tTime, direction);
     }
 }
