@@ -130,7 +130,9 @@ class ChoiceSet {
 	 * The "score", which is behind the "Double" in the TreeMap, is some pseudo score 0.6, 0.84, ..., see {ChoiceSet#generateReducedChoiceSet(ArrayList)}.
 	 * Well, no, not any more, just setting all of them to 0.2.
 	 *
-	 *
+	 * because of the return-typ from the constructPath method from the MultiNodeDijkstra and BackwardFastMultiNodeDijkstra class, we don't overwrite
+	 * the whole path between activity we want to change and the activity before/after that. That means the score includes the new path and the old path,
+	 * because it is the same in all destinations and the score is not used in the plan file, we decided to keep the information on the basis of a cleaner code
 	 *
 	 */
 	private List<ScoredAlternative> createReducedChoiceSetWithPseudoScores(
