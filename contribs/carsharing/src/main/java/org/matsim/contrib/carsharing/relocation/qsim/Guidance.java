@@ -9,13 +9,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 
 /**
@@ -54,7 +52,7 @@ public class Guidance {
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
 		Route route = ((Leg) trip.get(0)).getRoute();
 
-		double travelTime = route != null ? route.getTravelTime() : Time.UNDEFINED_TIME;
+		double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
 
 		return travelTime;
     }

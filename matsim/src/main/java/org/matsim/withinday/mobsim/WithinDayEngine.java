@@ -20,6 +20,13 @@
 
 package org.matsim.withinday.mobsim;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -35,12 +42,6 @@ import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * This Class implements the MobsimEngine interface. If added to a
@@ -163,7 +164,7 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 		 * that point in time. 
 		 */
 		if (!initialReplanningPerformed && isInitialReplanning()) {
-			initialReplanningModule.doReplanning(Time.UNDEFINED_TIME);
+			initialReplanningModule.doReplanning(Time.getUndefinedTime());
 			initialReplanningPerformed = true;
 		}
 		

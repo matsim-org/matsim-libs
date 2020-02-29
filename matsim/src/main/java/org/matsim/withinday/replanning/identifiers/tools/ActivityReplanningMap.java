@@ -20,6 +20,15 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -41,10 +50,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class tracks agents and their activity end times. It can be used to identify
@@ -85,8 +90,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
 	
 	// package protected to be accessible for test case
-	/*package*/ double simStartTime = Time.UNDEFINED_TIME;
-	/*package*/ double timeStepSize = Time.UNDEFINED_TIME;
+	/*package*/ double simStartTime = Time.getUndefinedTime();
+	/*package*/ double timeStepSize = Time.getUndefinedTime();
 
 	@Inject
 	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {

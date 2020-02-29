@@ -20,7 +20,20 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.Injector;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -63,18 +76,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.inject.Injector;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -509,10 +511,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
 		Double configuredStartTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
-		if (configuredStartTime == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(configuredStartTime)) {
 			configuredStartTime = 0.0;
 		}
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
+		if ((Time.isUndefinedTime(this.stopTime)) || (this.stopTime == 0)) {
 			this.stopTime = Double.MAX_VALUE;
 		}
 

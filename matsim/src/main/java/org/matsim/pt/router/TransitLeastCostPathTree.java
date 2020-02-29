@@ -20,7 +20,14 @@
 
 package org.matsim.pt.router;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -292,7 +299,7 @@ public class TransitLeastCostPathTree {
 				}
 
 				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
-						Time.UNDEFINED_TIME,null,null);
+						Time.getUndefinedTime(),null,null);
 
 				downstreamLink = null;
 			} else {

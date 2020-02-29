@@ -163,7 +163,8 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,
+						previousActivity.getEndTime().seconds(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
@@ -173,7 +174,8 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode,
+						activityToRelocate.getEndTime().seconds(), planTmp.getPerson(), null );
 				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---

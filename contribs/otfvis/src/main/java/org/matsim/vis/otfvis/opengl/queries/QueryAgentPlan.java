@@ -152,9 +152,11 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		Activity act = simulationView.getCurrentActivity(agent);
 		if (act != null) {
 			Coord c2 = getCoord(act);
-			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
+			if (simulationView.getTime() > act.getStartTime().seconds() && simulationView.getTime() <= act.getEndTime()
+					.seconds()) {
 				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
-				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
+				activityInfo.finished = (simulationView.getTime() - act.getStartTime().seconds()) / (act.getEndTime()
+						.seconds() - act.getStartTime().seconds());
 				result.acts.add(activityInfo);
 			}
 		}

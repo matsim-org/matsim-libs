@@ -4,8 +4,10 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,7 +43,6 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -58,9 +59,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
 /**
  * @author mrieser / SBB
@@ -217,10 +217,10 @@ public class SwissRailRaptorModuleTest {
         // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
         // fixing it here. kai, feb'20
 
-        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 2)).getMaximumDuration() ) ) ;
-        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 4)).getMaximumDuration() ) ) ;
-        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 6)).getMaximumDuration() ) ) ;
-        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 8)).getMaximumDuration() ) ) ;
+		Assert.assertTrue((((Activity)planElements.get(2)).getMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(4)).getMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(6)).getMaximumDuration().isUndefined())) ;
+		Assert.assertTrue((((Activity)planElements.get(8)).getMaximumDuration().isUndefined())) ;
 
     }
     
