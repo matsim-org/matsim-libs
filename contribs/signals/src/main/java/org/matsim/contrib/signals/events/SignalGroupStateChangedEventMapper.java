@@ -30,7 +30,8 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-public class SignalGroupStateChangedEventMapper implements MatsimEventsReader.CustomEventMapper {
+public final class SignalGroupStateChangedEventMapper implements MatsimEventsReader.CustomEventMapper {
+
 	@Override
 	public Event apply(GenericEvent event) {
 		Id<SignalSystem> systemId = Id.create(event.getAttributes().get(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALSYSTEM_ID), SignalSystem.class);

@@ -47,7 +47,7 @@ import javax.xml.bind.annotation.XmlType;
     "xCoord",
     "yCoord"
 })
-public class XMLCoordinateType {
+final class XMLCoordinateType {
 
     @XmlElement(required = true)
     protected BigDecimal xCoord;

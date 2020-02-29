@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
  * @author dgrether
  *
  */
-public class SignalGroupImpl implements SignalGroup {
+public final class SignalGroupImpl implements SignalGroup {
 	
 	private Id<SignalGroup> id;
 	private Map<Id<Signal>, Signal> signals = new HashMap<>();

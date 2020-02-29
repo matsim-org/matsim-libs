@@ -31,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class SignalSystemsDataImpl implements SignalSystemsData {
+public final class SignalSystemsDataImpl implements SignalSystemsData {
 
 	private SignalSystemsDataFactory factory = new SignalSystemsDataFactoryImpl();
 	

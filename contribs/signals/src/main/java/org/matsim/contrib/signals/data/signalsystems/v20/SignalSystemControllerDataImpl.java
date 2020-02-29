@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemControl
+ * SignalSystemControllerDataImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.signalgroups.v20;
+package org.matsim.contrib.signals.data.signalsystems.v20;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 
@@ -30,15 +32,42 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public interface SignalControlData extends MatsimToplevelContainer {
-	
+public final class SignalSystemControllerDataImpl implements SignalSystemControllerData {
+
+	private String controllerIdentifier;
+	private Id<SignalSystem> signalSystemId;
+	private Map<Id<SignalPlan>, SignalPlanData> signalPlanData;
+
+	public SignalSystemControllerDataImpl(Id<SignalSystem> signalSystemId) {
+		this.signalSystemId = signalSystemId;
+	}
+
 	@Override
-	public SignalControlDataFactory getFactory();
-	
-	public void setFactory(SignalControlDataFactory factory);
-	
-	public Map<Id<SignalSystem>, SignalSystemControllerData> getSignalSystemControllerDataBySystemId();
-	
-	public void addSignalSystemControllerData(SignalSystemControllerData controllerData);
-	
+	public void addSignalPlanData(SignalPlanData plan) {
+		if (this.signalPlanData == null){
+			this.signalPlanData = new TreeMap<>();
+		}
+		this.signalPlanData.put(plan.getId(), plan);
+	}
+
+	@Override
+	public String getControllerIdentifier() {
+		return this.controllerIdentifier;
+	}
+
+	@Override
+	public Id<SignalSystem> getSignalSystemId() {
+		return this.signalSystemId;
+	}
+
+	@Override
+	public Map<Id<SignalPlan>, SignalPlanData> getSignalPlanData() {
+		return this.signalPlanData;
+	}
+
+	@Override
+	public void setControllerIdentifier(String identifier) {
+		this.controllerIdentifier = identifier;
+	}
+
 }
