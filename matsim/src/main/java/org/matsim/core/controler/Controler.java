@@ -22,9 +22,8 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
@@ -106,8 +105,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 
 	private static final Logger log = Logger.getLogger(Controler.class);
 
-	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
-		  "%d{ISO8601} %5p %C{1}:%L %m%n");
+	public static final PatternLayout DEFAULTLOG4JLAYOUT = PatternLayout.newBuilder().withPattern("%d{ISO8601} %5p %C{1}:%L %m%n").build();
 
 	private final Config config;
 	private Scenario scenario;

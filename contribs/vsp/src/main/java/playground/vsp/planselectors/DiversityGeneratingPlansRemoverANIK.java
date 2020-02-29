@@ -166,14 +166,15 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 		for ( ; it1.hasNext() && it2.hasNext() ; ) {
 			Activity act1 = it1.next() ;
 			Activity act2 = it2.next() ;
-			
-			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+
+			if ( Double.isInfinite(act1.getEndTime().seconds()) && Double.isInfinite(
+					act2.getEndTime().seconds()) ){
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times
 				
 				// Calculate the difference of both activities' end times.
-				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+				double delta = Math.abs(act1.getEndTime().seconds() - act2.getEndTime().seconds()) ;
 				if (delta <= similarTimeInterval) {
 					// This one is similar. Proceed with the next activity.
 				} else {

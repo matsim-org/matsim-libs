@@ -71,9 +71,9 @@ public class TripPlanMutateTimeAllocationTest {
 						affectingDuration, new Random(2011));
 		mutator.run(plan);
 
-		Assert.assertEquals(0.0, ptAct1.getMaximumDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct2.getMaximumDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct3.getMaximumDuration(), 1e-8);
-		Assert.assertEquals(0.0, ptAct4.getMaximumDuration(), 1e-8);
+		Assert.assertEquals(0.0, ptAct1.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct2.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct3.getMaximumDuration().seconds(), 1e-8);
+		Assert.assertEquals(0.0, ptAct4.getMaximumDuration().seconds(), 1e-8);
 	}
 }

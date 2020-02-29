@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -103,7 +102,7 @@ public class EndLegMessage extends EventMessage {
 		// schedule enter link event
 		// only, if car leg and is not empty
 		if (vehicle.getCurrentLeg().getMode().equals(TransportMode.car) && (vehicle.getCurrentLinkRoute()!=null && vehicle.getCurrentLinkRoute().length!=0)){
-			event = new LinkEnterEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId().toString(), org.matsim.vehicles.Vehicle.class), 
+			event = new LinkEnterEvent(this.getMessageArrivalTime(), Id.create(vehicle.getOwnerPerson().getId().toString(), org.matsim.vehicles.Vehicle.class),
 					vehicle.getCurrentLinkId());
 
 			eventsManager.processEvent(event);
@@ -111,7 +110,7 @@ public class EndLegMessage extends EventMessage {
 
 		// schedule VehicleLeavesTrafficEvent
 		Id<org.matsim.vehicles.Vehicle> vehicleId = Id.create( this.vehicle.getOwnerPerson().getId() , org.matsim.vehicles.Vehicle.class ) ;
-		event = new VehicleLeavesTrafficEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), 
+		event = new VehicleLeavesTrafficEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(),
 				vehicleId, this.vehicle.getCurrentLeg().getMode(), 1.0 );
 		eventsManager.processEvent(event);
 
@@ -121,11 +120,10 @@ public class EndLegMessage extends EventMessage {
 
 		// schedule ActStartEvent
 		Activity nextAct = this.vehicle.getNextActivity();
-		double actStartEventTime = nextAct.getStartTime();
+		double actStartEventTime = nextAct.getStartTime().isUndefined() ?
+				this.getMessageArrivalTime() :
+				Math.max(this.getMessageArrivalTime(), nextAct.getStartTime().seconds());
 
-		if (this.getMessageArrivalTime() > actStartEventTime) {
-			actStartEventTime = this.getMessageArrivalTime();
-		}
 		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(),
 				nextAct.getFacilityId(), nextAct.getType(), nextAct.getCoord() );
 		// mobsim needs to know where activity takes place.  jdeqsim does not have access/egress legs; thus using act.getCoord() seems justified.

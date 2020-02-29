@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -54,9 +55,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private final List<PlanElement> planElements = new ArrayList<>();
 	
 	// Activity related arrays
-	/*package*/ double[] startTimes;
-	/*package*/ double[] endTimes;
-	/*package*/ double[] durations;
+	/*package*/ OptionalTime[] startTimes;
+	/*package*/ OptionalTime[] endTimes;
+	/*package*/ OptionalTime[] durations;
 	/*package*/ String[] types;
 	/*package*/ Coord[] coords;
 	/*package*/ Id<Link>[] linkIds;
@@ -165,9 +166,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		}
 		
 //		destPlan.activities = new LCActivity[activityCount];
-		destPlan.startTimes = new double[activityCount];
-		destPlan.endTimes = new double[activityCount];
-		destPlan.durations = new double[activityCount];
+		destPlan.startTimes = new OptionalTime[activityCount];
+		destPlan.endTimes = new OptionalTime[activityCount];
+		destPlan.durations = new OptionalTime[activityCount];
 		destPlan.types = new String[activityCount];
 		destPlan.coords = new Coord[activityCount];
 		destPlan.linkIds = new Id[activityCount];
@@ -228,9 +229,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 		// activity data
 		int activities = srcPlan.startTimes.length;
-		destPlan.startTimes = new double[activities];
-		destPlan.endTimes = new double[activities];
-		destPlan.durations = new double[activities];
+		destPlan.startTimes = new OptionalTime[activities];
+		destPlan.endTimes = new OptionalTime[activities];
+		destPlan.durations = new OptionalTime[activities];
 		destPlan.types = new String[activities];
 		destPlan.coords = new Coord[activities];
 		destPlan.linkIds = new Id[activities];
