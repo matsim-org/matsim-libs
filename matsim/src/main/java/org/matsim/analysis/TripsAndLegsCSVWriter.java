@@ -113,8 +113,8 @@ public class TripsAndLegsCSVWriter {
             String tripId = personId.toString() + "_" + tripNo;
             tripRecord.add(tripId);
             double distance = 0.0;
-            double departureTime = trip.getOriginActivity().getEndTime();
-            double travelTime = trip.getDestinationActivity().getStartTime() - departureTime;
+            double departureTime = trip.getOriginActivity().getEndTime().orElse(0);
+            double travelTime = trip.getDestinationActivity().getStartTime().orElse(0) - departureTime;
             //experienced plans have a start time
 
             double totalWaitingTime = 0.0;
