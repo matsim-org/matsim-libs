@@ -46,17 +46,14 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType.XMLStop;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalControlWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalControlWriter20 extends MatsimJaxbXmlWriter {
 
 	private static final Logger log = Logger.getLogger(SignalControlWriter20.class);
 	

@@ -17,14 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.controller.sylvia;
+package org.matsim.contrib.signals.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.model.SignalGroup;
 
 /**
@@ -37,7 +37,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  * @author tthunig
  *
  */
-public final class FixedTimeSignalPhase {
+final class FixedTimeSignalPhase {
 
 	private static final Logger log = Logger.getLogger(FixedTimeSignalPhase.class);
 	private Integer on = null;

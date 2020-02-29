@@ -89,7 +89,6 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 				delegate = new PlanStrategyImpl( new ExpBetaPlanSelector( config.planCalcScore() ) );
 				break;
 		}
-		delegate.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
 		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities) );
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
