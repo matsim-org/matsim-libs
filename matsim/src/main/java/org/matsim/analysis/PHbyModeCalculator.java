@@ -98,7 +98,7 @@ public class PHbyModeCalculator {
                 	} else if (pe instanceof Activity) {
                 		Activity act = (Activity) pe;
                 		if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
-                			double duration = act.getEndTime() - act.getStartTime();
+                            double duration = act.getEndTime().orElse(0) - act.getStartTime().orElse(0);
                             if (Double.isNaN(duration)) {duration = 0.0; }
                             return new AbstractMap.SimpleEntry<>(STAGE_ACTIVITY,new TravelTimeAndWaitTime(0.0, duration));
                 		}
