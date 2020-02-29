@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
  * 
  */
 @XmlRegistry
-public class ObjectFactory {
+public final class ObjectFactory {
 
     private final static QName _Coordinate_QNAME = new QName("http://www.matsim.org/files/dtd", "coordinate");
 

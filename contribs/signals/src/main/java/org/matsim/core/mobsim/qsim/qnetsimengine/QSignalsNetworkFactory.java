@@ -42,7 +42,7 @@ import com.google.inject.Inject;
  * 
  * @author tthunig
  */
-public class QSignalsNetworkFactory implements QNetworkFactory{
+public final class QSignalsNetworkFactory implements QNetworkFactory{
 
 	private final QNetworkFactory delegate;
 	

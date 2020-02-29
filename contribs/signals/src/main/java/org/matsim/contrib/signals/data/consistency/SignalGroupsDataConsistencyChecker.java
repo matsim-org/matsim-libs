@@ -37,7 +37,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  * @author dgrether
  *
  */
-public class SignalGroupsDataConsistencyChecker implements ConsistencyChecker {
+public final class SignalGroupsDataConsistencyChecker implements ConsistencyChecker {
 
 	
 	private static final Logger log = Logger.getLogger(SignalGroupsDataConsistencyChecker.class);
