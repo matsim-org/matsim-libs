@@ -12,8 +12,8 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result;
 
-public class RunWithParkingProxyTest{
-        private static final Logger log = Logger.getLogger( RunWithParkingProxyTest.class ) ;
+public class RunWithParkingProxyIT {
+        private static final Logger log = Logger.getLogger(RunWithParkingProxyIT.class);
         @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
         @Test
