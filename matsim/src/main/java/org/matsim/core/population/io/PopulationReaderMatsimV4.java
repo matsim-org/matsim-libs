@@ -275,9 +275,14 @@ import org.xml.sax.Attributes;
 			throw new IllegalArgumentException(
 					"In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
-		this.curract.setStartTime(Time.parseTime(atts.getValue("start_time")));
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue("dur")));
-		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
+
+		Time.parseOptionalTime(atts.getValue("start_time"))
+				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+		Time.parseOptionalTime(atts.getValue("dur"))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+		Time.parseOptionalTime(atts.getValue("end_time"))
+				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
+
 		String fId = atts.getValue("facility");
 		if (fId != null) {
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
