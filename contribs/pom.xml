@@ -198,7 +198,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.13</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
@@ -260,29 +260,6 @@
 					</plugins>
 				</pluginManagement>
 			</build>
-		</profile>
-		<profile>
-			<id>java-9+</id>
-			<activation>
-				<jdk>[9</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>javax.xml.bind</groupId>
-					<artifactId>jaxb-api</artifactId>
-					<version>2.3.1</version>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.xml.bind</groupId>
-					<artifactId>jaxb-core</artifactId>
-					<version>2.3.0.1</version>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.xml.bind</groupId>
-					<artifactId>jaxb-impl</artifactId>
-					<version>2.3.0.1</version>
-				</dependency>
-			</dependencies>
 		</profile>
 	</profiles>
 
