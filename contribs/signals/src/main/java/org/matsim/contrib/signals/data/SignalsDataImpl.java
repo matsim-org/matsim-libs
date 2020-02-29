@@ -25,11 +25,11 @@ import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.conflicts.ConflictDataImpl;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 
@@ -38,7 +38,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
  * @author dgrether
  *
  */
-public class SignalsDataImpl implements SignalsData {
+public final class SignalsDataImpl implements SignalsData {
 
 	private SignalSystemsData signalsystemsdata;
 	private SignalGroupsData signalgroupsdata;

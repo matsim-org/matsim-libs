@@ -19,12 +19,16 @@
 
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import org.apache.log4j.Logger;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.validation.SchemaFactory;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
@@ -32,21 +36,12 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.validation.SchemaFactory;
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimesReader10 extends AbstractSignalsReader {
+public final class AmberTimesReader10 extends AbstractSignalsReader {
 
-	private static final Logger log = Logger.getLogger(AmberTimesReader10.class);
 	private AmberTimesData amberTimesData;
 
 	public AmberTimesReader10(AmberTimesData amberTimesData) {
