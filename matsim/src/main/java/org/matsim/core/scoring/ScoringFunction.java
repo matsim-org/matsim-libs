@@ -43,8 +43,8 @@ public interface ScoringFunction {
 	/**
 	 * Tells the scoring function about an Activity. The Activity which
 	 * the agent is in when the simulation starts will have a startTime
-	 * of Time.UNDEFINED_TIME. The Activity which the agent is in when
-	 * the simulation ends will have an endTime of Time.UNDEFINED_TIME.
+	 * of Time.getUndefinedTime(). The Activity which the agent is in when
+	 * the simulation ends will have an endTime of Time.getUndefinedTime().
 	 * It is up to the implementation what to make of this, 
 	 * especially to "wrap" it "around".
 	 * @param activity

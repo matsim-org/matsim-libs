@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -107,12 +108,17 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		private final Id<Link> linkId;
 		
 		public DummyActivity(Id<Link> linkId) { this.linkId = linkId; }
-		
+
+		private static final OptionalTime ZERO_TIME = OptionalTime.defined(0);
 		@Override
-		public double getEndTime() { return 0; }
+		public OptionalTime getEndTime() { return ZERO_TIME; }
 
 		@Override
 		public void setEndTime(double seconds) { }
+
+		@Override
+		public void setEndTimeUndefined() {
+		}
 
 		@Override
 		public String getType() { return this.type; }
@@ -124,16 +130,24 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		public Coord getCoord() { return null; }
 
 		@Override
-		public double getStartTime() { return 0; }
+		public OptionalTime getStartTime() { return ZERO_TIME; }
 
 		@Override
 		public void setStartTime(double seconds) { }
 
 		@Override
-		public double getMaximumDuration() { return 0; }
+		public void setStartTimeUndefined() {
+		}
+
+		@Override
+		public OptionalTime getMaximumDuration() { return ZERO_TIME; }
 
 		@Override
 		public void setMaximumDuration(double seconds) { }
+
+		@Override
+		public void setMaximumDurationUndefined() {
+		}
 
 		@Override
 		public Id<Link> getLinkId() { return this.linkId; }

@@ -1397,8 +1397,8 @@ public class QSimTest {
 		// first test without special settings
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(act1.getEndTime() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times

@@ -31,9 +31,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -164,15 +165,21 @@ public class TripRouterTest {
 	}
 
 	private static class EqualsActivity implements Activity {
-		Activity delegate ;
+		private final Activity delegate ;
 		@Override
-		public double getEndTime() {
+		public OptionalTime getEndTime() {
 			return this.delegate.getEndTime();
 		}
 		@Override
 		public void setEndTime(double seconds) {
 			this.delegate.setEndTime(seconds);
 		}
+
+		@Override
+		public void setEndTimeUndefined() {
+			this.delegate.setEndTimeUndefined();
+		}
+
 		@Override
 		public String getType() {
 			return this.delegate.getType();
@@ -186,20 +193,30 @@ public class TripRouterTest {
 			return this.delegate.getCoord();
 		}
 		@Override
-		public double getStartTime() {
+		public OptionalTime getStartTime() {
 			return this.delegate.getStartTime();
 		}
 		@Override
 		public void setStartTime(double seconds) {
 			this.delegate.setStartTime(seconds);
 		}
+
 		@Override
-		public double getMaximumDuration() {
+		public void setStartTimeUndefined() {
+			delegate.setStartTimeUndefined();
+		}
+
+		@Override
+		public OptionalTime getMaximumDuration() {
 			return this.delegate.getMaximumDuration();
 		}
 		@Override
 		public void setMaximumDuration(double seconds) {
 			this.delegate.setMaximumDuration(seconds);
+		}
+		@Override
+		public void setMaximumDurationUndefined() {
+			this.delegate.setMaximumDurationUndefined();
 		}
 		@Override
 		public Id<Link> getLinkId() {
