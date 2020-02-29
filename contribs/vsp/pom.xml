@@ -101,27 +101,27 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagfilter</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-set</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-areafilter</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>de.micromata.jak</groupId>

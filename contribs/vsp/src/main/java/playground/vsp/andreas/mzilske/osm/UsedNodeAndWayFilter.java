@@ -128,7 +128,7 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 				requiredNodes.set(nodeReference.getNodeId());
 			}
 		}
-		wayIterator.release();
+		wayIterator.close();
 
 
 		// send on all required nodes
@@ -141,7 +141,7 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 			}
 			sink.process(nodeContainer);
 		}
-		nodeIterator.release();
+		nodeIterator.close();
 		nodeIterator = null;
 
 		wayIterator = allWays.iterate();
@@ -152,7 +152,7 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 			}
 			sink.process(way);
 		}
-		wayIterator.release();
+		wayIterator.close();
 		wayIterator = null;
 
 		// send on all relations
@@ -160,34 +160,29 @@ public class UsedNodeAndWayFilter implements SinkSource, EntityProcessor {
 		while (relationIterator.hasNext()) {
 			sink.process(relationIterator.next());
 		}
-		relationIterator.release();
+		relationIterator.close();
 		relationIterator = null;
 
 		// done
 		sink.complete();
 	}
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void release() {
+	@Override
+	public void close() {
 		if (allNodes != null) {
-			allNodes.release();
+			allNodes.close();
 		}
 		if (allWays != null) {
-			allWays.release();			
+			allWays.close();
 		}
 		if (allRelations != null) {
-			allRelations.release();
+			allRelations.close();
 		}
-		sink.release();
+		sink.close();
 	}
 
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	public void setSink(Sink sink) {
 		this.sink = sink;
 	}
