@@ -50,6 +50,8 @@ public class RunPSimTest {
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
 		config.addModule(pSimConfigGroup);
 		pSimConfigGroup.setIterationsPerCycle(20);
+		
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		//identify selector strategies
 		Field[] selectors = DefaultPlanStrategiesModule.DefaultSelector.class.getDeclaredFields();
@@ -124,6 +126,7 @@ public class RunPSimTest {
 		config.controler().setCreateGraphs(false);
 		config.controler().setDumpDataAtEnd(false);
 		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);

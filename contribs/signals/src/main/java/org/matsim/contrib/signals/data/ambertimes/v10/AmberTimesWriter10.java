@@ -49,7 +49,7 @@ import org.matsim.contrib.signals.model.Signal;
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
+public final class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 	
 		private static final Logger log = Logger.getLogger(AmberTimesWriter10.class);
 		

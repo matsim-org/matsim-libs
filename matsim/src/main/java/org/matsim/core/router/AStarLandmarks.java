@@ -153,7 +153,7 @@ public class AStarLandmarks extends AStarEuclidean {
 		double[] estTravelTimes = new double[actLandmarkCount];
 		this.activeLandmarkIndexes = new int[actLandmarkCount];
 		for (int i = 0; i < estTravelTimes.length; i++) {
-			estTravelTimes[i] = Time.UNDEFINED_TIME;
+			estTravelTimes[i] = Time.getUndefinedTime();
 		}
 		double tmpTravTime;
 		for (int i = 0; i < this.landmarks.length; i++) {

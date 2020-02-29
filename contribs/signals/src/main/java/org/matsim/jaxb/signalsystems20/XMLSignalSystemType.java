@@ -50,12 +50,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "signalSystemType", propOrder = {
     "signals"
 })
-public class XMLSignalSystemType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalSystemType extends XMLMatsimObjectType {
 
     @XmlElement(required = true)
-    protected XMLSignalSystemType.XMLSignals signals;
+    private XMLSignalSystemType.XMLSignals signals;
 
     /**
      * Gets the value of the signals property.

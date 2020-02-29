@@ -69,7 +69,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         @Override
         public void handleActivity(Activity act) {
             if(act instanceof FreightActivity) {
-                double actStartTime = act.getStartTime();
+				double actStartTime = act.getStartTime().seconds();
 
 //                log.info(act + " start: " + Time.writeTime(actStartTime));
                 TimeWindow tw = ((FreightActivity) act).getTimeWindow();
@@ -80,7 +80,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                     score += penalty_score;
 
                 }
-                double actTimeCosts = (act.getEndTime()-actStartTime)*timeParameter;
+				double actTimeCosts = (act.getEndTime().seconds() -actStartTime)*timeParameter;
 //                log.info("actCosts " + actTimeCosts);
                 assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
                 score += actTimeCosts*(-1);

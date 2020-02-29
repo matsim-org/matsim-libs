@@ -88,7 +88,7 @@ private Network network;
 		Node zielNode = NetworkUtils.getNearestNode(((Network) network),coord1);
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, person, null);
 		if (isInteresting(path)) {
-			origin.setEndTime(origin.getEndTime() + travelTimeToEntry);
+			origin.setEndTime(origin.getEndTime().seconds() + travelTimeToEntry);
 			sink.process(person);
 		}
 	}

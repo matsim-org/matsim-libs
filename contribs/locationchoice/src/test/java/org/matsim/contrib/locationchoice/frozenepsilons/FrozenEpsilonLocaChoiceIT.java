@@ -104,6 +104,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setRandomSeed(4711);
 		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 
+		config.plansCalcRoute().setRoutingRandomness(0.);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config );
@@ -411,15 +412,15 @@ public class FrozenEpsilonLocaChoiceIT{
 						}
 						// Note that the following "check" method is deliberately a bit imprecise (see implementation), since we are only interested in the
 						// (approximate) distribution.  kai, mar'19
-						check( 684, cnt[0] );
-						check( 380, cnt[1] ) ;
-						check( 408, cnt[2] ) ;
-						check( 304, cnt[3] ) ;
-						check( 122, cnt[4] ) ;
-						check( 66, cnt[5] ) ;
-						check( 16, cnt[6] ) ;
-						check( 18, cnt[7] ) ;
-						check( 8, cnt[8] ) ;
+						check( 410, cnt[0] );
+						check( 376, cnt[1] ) ;
+						check( 414, cnt[2] ) ;
+						check( 386, cnt[3] ) ;
+						check( 242, cnt[4] ) ;
+						check( 108, cnt[5] ) ;
+						check( 36, cnt[6] ) ;
+						check( 20, cnt[7] ) ;
+						check( 6, cnt[8] ) ;
 
 					}
 

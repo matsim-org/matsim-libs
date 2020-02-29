@@ -41,7 +41,7 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 	protected final Scenario scenario;
 	protected final ActivityEndRescheduler internalInterface;
 
-	protected double time = Time.UNDEFINED_TIME;
+	protected double time = Time.getUndefinedTime();
 
 	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
 		this.id = id;
@@ -64,7 +64,7 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 	}
 	
 	public void reset() {
-		this.time = Time.UNDEFINED_TIME;
+		this.time = Time.getUndefinedTime();
 	}
 	
 	@Override	

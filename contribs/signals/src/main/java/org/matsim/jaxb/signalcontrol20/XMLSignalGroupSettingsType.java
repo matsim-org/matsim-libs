@@ -60,9 +60,7 @@ import org.matsim.jaxb.Adapter1;
     "onset",
     "dropping"
 })
-public class XMLSignalGroupSettingsType
-    extends XMLIdRefType
-{
+public final class XMLSignalGroupSettingsType extends XMLIdRefType {
 
     @XmlElement(required = true)
     protected XMLSignalGroupSettingsType.XMLOnset onset;
