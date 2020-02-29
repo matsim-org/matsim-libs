@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -37,12 +38,17 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public double getEndTime() {
+	public OptionalTime getEndTime() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 
 	@Override
 	public void setEndTime(double seconds) {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 
@@ -62,7 +68,7 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public double getStartTime() {
+	public OptionalTime getStartTime() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 
@@ -72,12 +78,22 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public void setStartTimeUndefined() {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
+	public OptionalTime getMaximumDuration() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 
 	@Override
 	public void setMaximumDuration(double seconds) {
+		throw new UnsupportedOperationException( "only facility fields access are supported" );
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 
