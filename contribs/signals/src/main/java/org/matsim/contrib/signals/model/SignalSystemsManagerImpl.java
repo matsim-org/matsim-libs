@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 /**
  * @author dgrether
  */
-public class SignalSystemsManagerImpl implements SignalSystemsManager {
+public final class SignalSystemsManagerImpl implements SignalSystemsManager {
 
 	private SortedMap<Id<SignalSystem>, SignalSystem> signalSystems = new TreeMap<>();
 	

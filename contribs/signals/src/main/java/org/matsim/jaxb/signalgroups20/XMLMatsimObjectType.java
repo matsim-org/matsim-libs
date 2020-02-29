@@ -41,10 +41,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlSeeAlso({
     XMLSignalGroupType.class
 })
-public class XMLMatsimObjectType {
+class XMLMatsimObjectType {
 
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
 
     /**
      * Gets the value of the id property.

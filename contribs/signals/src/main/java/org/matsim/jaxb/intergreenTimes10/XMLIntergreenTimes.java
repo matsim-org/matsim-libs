@@ -51,9 +51,9 @@ import javax.xml.bind.annotation.XmlType;
     "signalSystem"
 })
 @XmlRootElement(name = "intergreenTimes")
-public class XMLIntergreenTimes {
+public final class XMLIntergreenTimes {
 
-    protected List<XMLIntergreenTimes.XMLSignalSystem> signalSystem;
+    private List<XMLIntergreenTimes.XMLSignalSystem> signalSystem;
 
     /**
      * Gets the value of the signalSystem property.

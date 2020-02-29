@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SignalDefinitionData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.signalgroups.v20;
+package org.matsim.contrib.signals.data.signalsystems.v20;
 
-import java.util.SortedMap;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.lanes.Lane;
+
+
 /**
- * 
+ * Holds data modelling the physics of a signal on one link/lane. 
  * @author dgrether
  *
  */
-public interface SignalPlanData {
-
-	public Id<SignalPlan> getId();
-
-	public void addSignalGroupSettings(SignalGroupSettingsData signalGroupSettings);
-
-	public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
-
+public interface SignalData extends Identifiable<Signal> {
 	/**
-	 * @return 0.0 if not set
+	 * @return the Id of the Signal 
 	 */
-	public double getStartTime();
+	@Override
+	public Id<Signal> getId();
 	/**
-	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
+	 * @return the Id of the Link the signal is located on.
 	 */
-	public void setStartTime(Double seconds);
-	/**
-	 * @return 0.0 if not set
-	 */
-	public double getEndTime();
-	/**
-	 * Set the time of day the  plan should be activated. Set start and end to 0.0 if the plan should be active all day.
-	 */
-	public void setEndTime(Double seconds);
-	/**
-	 * @return null if not set
-	 */
-	public Integer getCycleTime();
-
-	public void setCycleTime(Integer cycleTime);
-	/**
-	 * @return 0 if not set
-	 */
-	public int getOffset();
-
-	public void setOffset(int seconds);
+	public Id<Link> getLinkId();
 	
+	public void setLinkId(Id<Link> id);
+	/**
+	 * @return A Set of Lane Ids, if the signal is placed on cerain lanes. Maybe null or empty if the signal is
+	 * on the link.
+	 */
+	public Set<Id<Lane>> getLaneIds();
+	
+	public void addLaneId(Id<Lane> laneId);
+	/**
+	 * @return Returns a Set of link Ids to that driving is allowed when the signal 
+	 * is activated. May return null if no turning  move restrictions are set.
+	 */
+	public Set<Id<Link>> getTurningMoveRestrictions();
+	
+	public void addTurningMoveRestriction(Id<Link> linkId);
+
 }

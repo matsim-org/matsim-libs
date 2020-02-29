@@ -48,7 +48,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author jbischoff
  * 
  */
-public class SignalGroupsWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalGroupsWriter20 extends MatsimJaxbXmlWriter {
 
 	private static final Logger log = Logger.getLogger(SignalGroupsWriter20.class);
 

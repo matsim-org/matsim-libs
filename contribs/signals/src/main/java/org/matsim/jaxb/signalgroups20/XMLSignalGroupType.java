@@ -40,12 +40,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "signalGroupType", propOrder = {
     "signal"
 })
-public class XMLSignalGroupType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalGroupType extends XMLMatsimObjectType {
 
     @XmlElement(required = true)
-    protected List<XMLIdRefType> signal;
+    private List<XMLIdRefType> signal;
 
     /**
      * Gets the value of the signal property.

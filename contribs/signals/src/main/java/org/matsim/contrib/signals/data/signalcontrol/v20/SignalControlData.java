@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalSystemsControlDataFactory
+ * SignalSystemControl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,12 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.signalgroups.v20;
+package org.matsim.contrib.signals.data.signalcontrol.v20;
+
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimFactory;
-import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 
@@ -30,11 +31,15 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public interface SignalControlDataFactory extends MatsimFactory {
-
-	public SignalSystemControllerData createSignalSystemControllerData(Id<SignalSystem> signalSystemId);
+public interface SignalControlData extends MatsimToplevelContainer {
 	
-	public SignalPlanData createSignalPlanData(Id<SignalPlan> id);
+	@Override
+	public SignalControlDataFactory getFactory();
 	
-	public SignalGroupSettingsData createSignalGroupSettingsData(Id<SignalGroup> signalGroupId);
+	public void setFactory(SignalControlDataFactory factory);
+	
+	public Map<Id<SignalSystem>, SignalSystemControllerData> getSignalSystemControllerDataBySystemId();
+	
+	public void addSignalSystemControllerData(SignalSystemControllerData controllerData);
+	
 }
