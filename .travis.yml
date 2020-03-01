@@ -40,9 +40,7 @@ stages:
 
 # this is the script run in the "test" stage:
 # 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
-script: mvn install --batch-mode --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn surefire:test failsafe:integration-test failsafe:verify --batch-mode -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true -Dtest=RunWithParkingProxyIT
-
-# -Dmaven.test.redirectTestOutputToFile 
+script: mvn install --batch-mode --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn surefire:test failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true
 
 # I just added -DskipTests here since I think that we only want to run
 # the IT tests.  kai, sep'18 
@@ -77,39 +75,39 @@ env:
   global:
     - MAVEN_OPTS="-Xmx2g"
   matrix:
-    # - MODULE=matsim                        
-    # # sorted from longest to shortest (to minimise the overall test stage duration)
-    # - MODULE=contribs/vsp
-    # - MODULE=contribs/common
-    # - MODULE=contribs/taxi
-    # - MODULE=contribs/minibus
-    # - MODULE=contribs/signals
-    # - MODULE=contribs/bicycle
-    # - MODULE=contribs/cadytsIntegration
-    # - MODULE=contribs/carsharing
-    # - MODULE=contribs/commercialTrafficApplications
-    # - MODULE=contribs/drt
-    # - MODULE=contribs/locationchoice
-    # - MODULE=contribs/av
-    # - MODULE=contribs/ev
-    # - MODULE=contribs/dvrp
-    # - MODULE=contribs/emissions
-    # - MODULE=contribs/decongestion
-    # - MODULE=contribs/noise
-    # - MODULE=contribs/accidents
-    # - MODULE=contribs/freight
+    - MODULE=matsim                        
+    # sorted from longest to shortest (to minimise the overall test stage duration)
+    - MODULE=contribs/vsp
+    - MODULE=contribs/common
+    - MODULE=contribs/taxi
+    - MODULE=contribs/minibus
+    - MODULE=contribs/signals
+    - MODULE=contribs/bicycle
+    - MODULE=contribs/cadytsIntegration
+    - MODULE=contribs/carsharing
+    - MODULE=contribs/commercialTrafficApplications
+    - MODULE=contribs/drt
+    - MODULE=contribs/locationchoice
+    - MODULE=contribs/av
+    - MODULE=contribs/ev
+    - MODULE=contribs/dvrp
+    - MODULE=contribs/emissions
+    - MODULE=contribs/decongestion
+    - MODULE=contribs/noise
+    - MODULE=contribs/accidents
+    - MODULE=contribs/freight
     - MODULE=contribs/parking
-    # - MODULE=contribs/matrixbasedptrouter
-    # - MODULE=contribs/accessibility
-    # - MODULE=contribs/integration
-    # - MODULE=contribs/multimodal
-    # - MODULE=contribs/protobuf
-    # - MODULE=contribs/socnetsim
-    # - MODULE=contribs/pseudosimulation
-    # - MODULE=contribs/roadpricing
-    # - MODULE=contribs/analysis
-    # - MODULE=contribs/eventsBasedPTRouter
-    # - MODULE=contribs/hybridsim
-    # - MODULE=contribs/otfvis
-    # - MODULE=contribs/osm
+    - MODULE=contribs/matrixbasedptrouter
+    - MODULE=contribs/accessibility
+    - MODULE=contribs/integration
+    - MODULE=contribs/multimodal
+    - MODULE=contribs/protobuf
+    - MODULE=contribs/socnetsim
+    - MODULE=contribs/pseudosimulation
+    - MODULE=contribs/roadpricing
+    - MODULE=contribs/analysis
+    - MODULE=contribs/eventsBasedPTRouter
+    - MODULE=contribs/hybridsim
+    - MODULE=contribs/otfvis
+    - MODULE=contribs/osm
 

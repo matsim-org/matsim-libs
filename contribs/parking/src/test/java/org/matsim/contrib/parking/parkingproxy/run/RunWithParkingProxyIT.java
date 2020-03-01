@@ -1,6 +1,7 @@
 package org.matsim.contrib.parking.parkingproxy.run;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Population;
@@ -17,6 +18,7 @@ public class RunWithParkingProxyIT {
         @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
         @Test
+        @Ignore
         public void testMain(){
                 RunWithParkingProxy.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "chessboard" ), "config.xml" ).toString()
                                 , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
