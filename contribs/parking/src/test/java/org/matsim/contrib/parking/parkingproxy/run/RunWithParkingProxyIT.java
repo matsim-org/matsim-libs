@@ -27,6 +27,7 @@ public class RunWithParkingProxyIT {
                                 , "--config:parkingProxy.method=events"
                                 , "--config:qsim.usingThreadpool=false"
                                 , "--config:global.numberOfThreads=1"
+                                , "--config:controler.routingAlgorithmType=FastAStarLandmarks"
                 } );
                 {
                         String expected = utils.getInputDirectory() + "/output_events.xml.gz" ;
