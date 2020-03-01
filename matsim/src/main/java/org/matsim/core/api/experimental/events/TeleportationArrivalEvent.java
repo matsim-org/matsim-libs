@@ -34,7 +34,7 @@ public final class TeleportationArrivalEvent extends Event implements HasPersonI
 
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_DISTANCE = "distance";
-	public static final String ATTRIBUTE_MODE = "mode";
+    public static final String ATTRIBUTE_MODE = "mode";
 
 	public static final String EVENT_TYPE = "travelled";
     private final String mode;
@@ -67,7 +67,7 @@ public final class TeleportationArrivalEvent extends Event implements HasPersonI
         Map<String, String> attributes = super.getAttributes();
 //        attributes.put(ATTRIBUTE_PERSON, agentId.toString()); // done in super-class
         attributes.put(ATTRIBUTE_DISTANCE, Double.toString(distance));
-        attributes.put(ATTRIBUTE_MODE,mode);
+        attributes.put(ATTRIBUTE_MODE, mode);
         return attributes;
     }
 }
