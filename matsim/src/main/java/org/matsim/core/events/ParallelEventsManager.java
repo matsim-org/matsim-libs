@@ -46,7 +46,7 @@ public final class ParallelEventsManager implements EventsManager {
 	private final static Logger log = Logger.getLogger(ParallelEventsManager.class);
 
 	private Distributor distributor;
-	private EventsManager[] eventsManagers;
+	private EventsManager[] eventsManagers = new EventsManager[0];
 	private final List<EventHandler> eventsHandlers;
 	private final boolean oneThreadPerHandler;
 	private final boolean syncOnTimeSteps;
