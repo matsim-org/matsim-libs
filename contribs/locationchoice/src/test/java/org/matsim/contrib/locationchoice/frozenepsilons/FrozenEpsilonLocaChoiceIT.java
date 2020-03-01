@@ -96,7 +96,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class );;
-
 		dccg.setAlgorithm( bestResponse );
 		// yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
 
@@ -104,7 +103,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setRandomSeed(4711);
 		dccg.setTravelTimeApproximationLevel( ApproximationLevel.localRouting );
 
-		config.plansCalcRoute().setRoutingRandomness(0.);
+		config.plansCalcRoute().setRoutingRandomness(3.);
 
 		// SCENARIO:
 		final Scenario scenario = ScenarioUtils.createScenario(config );
