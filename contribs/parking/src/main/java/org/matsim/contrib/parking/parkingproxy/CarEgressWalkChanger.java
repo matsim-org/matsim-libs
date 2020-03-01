@@ -92,6 +92,8 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		// we need to roll back the changes we made before the mobsim, otherwise we can't apply
 		// a different penalty next iteration.
 		this.changeEgressTimes(event.getServices().getScenario().getPopulation().getPersons().values(), true);
+		// yyyy this is something we do not like: to just "fake" something and take it back afterwards.  Would be good to find some other design
+		// eventually.  Not so obvious, though ...   kai, mar'20
 	}
 
 	/**
