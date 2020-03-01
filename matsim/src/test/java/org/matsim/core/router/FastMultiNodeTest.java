@@ -53,6 +53,8 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToOne() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -109,6 +111,8 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToMany() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -198,6 +202,8 @@ public class FastMultiNodeTest {
 	public void testFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness( 0. );
+
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -314,7 +320,7 @@ public class FastMultiNodeTest {
 	 *                     |
 	 *                     n5
 	 */
-	private void createNetwork(Scenario scenario) {
+	private static void createNetwork( Scenario scenario ) {
 
 		/*
 		 * create nodes

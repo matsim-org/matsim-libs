@@ -147,7 +147,9 @@ public class NetworkRoutingModuleTest {
 	private static class Fixture {
 		public final Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		public Fixture() {
+		Fixture() {
+			s.getConfig().plansCalcRoute().setRoutingRandomness( 0. );
+
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();
 			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord(0, 0));
