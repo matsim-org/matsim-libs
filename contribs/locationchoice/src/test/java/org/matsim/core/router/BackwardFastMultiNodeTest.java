@@ -61,7 +61,8 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(searchAllEndNodes).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -119,7 +120,8 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -207,7 +209,8 @@ public class BackwardFastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		

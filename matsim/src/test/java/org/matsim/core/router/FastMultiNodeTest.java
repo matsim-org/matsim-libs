@@ -58,7 +58,8 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory().
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -113,7 +114,8 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
@@ -201,7 +203,8 @@ public class FastMultiNodeTest {
 		createNetwork(scenario);
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).setSigma(0.).createTravelDisutility(travelTime);
+                TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car,
+                                config ).createTravelDisutility(travelTime );
 		FastMultiNodeDijkstra dijkstra = (FastMultiNodeDijkstra) new FastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		

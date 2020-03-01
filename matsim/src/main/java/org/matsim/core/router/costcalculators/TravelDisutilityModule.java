@@ -32,10 +32,9 @@ public class TravelDisutilityModule extends AbstractModule {
         PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
         for (String mode : routeConfigGroup.getNetworkModes()) {
 
-            final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig().planCalcScore() );
-            builder.setSigma( routeConfigGroup.getRoutingRandomness() );
+            final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() );
 
-            addTravelDisutilityFactoryBinding(mode ).toInstance( builder );
+                addTravelDisutilityFactoryBinding(mode ).toInstance( builder );
         }
     }
 
