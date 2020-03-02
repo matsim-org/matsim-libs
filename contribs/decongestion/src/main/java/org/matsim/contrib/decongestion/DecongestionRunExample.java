@@ -109,8 +109,7 @@ public class DecongestionRunExample {
 			@Override
 			public void install() {
 				final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-				travelDisutilityFactory.setSigma(0.);
-				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
+                                this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
 			}
 		});	
 		

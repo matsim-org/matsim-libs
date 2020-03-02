@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.noise;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -48,8 +47,7 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 
 		if ( travelDisutilityFactoryDelegate instanceof RandomizingTimeDistanceTravelDisutilityFactory ){
-			((RandomizingTimeDistanceTravelDisutilityFactory) travelDisutilityFactoryDelegate).setSigma( plansCalcRouteConfigGroup.getRoutingRandomness() );
-		}
+                }
 		
 		return new NoiseTollTimeDistanceTravelDisutility(
 				travelDisutilityFactoryDelegate.createTravelDisutility(timeCalculator ),
