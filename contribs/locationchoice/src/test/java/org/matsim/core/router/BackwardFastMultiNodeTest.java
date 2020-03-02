@@ -56,6 +56,7 @@ public class BackwardFastMultiNodeTest {
 	private void runTestBackwardsFastMultiNodeDijkstra_OneToOne(boolean searchAllEndNodes) {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -115,6 +116,7 @@ public class BackwardFastMultiNodeTest {
 	public void testBackwardsFastMultiNodeDijkstra_OneToMany() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
@@ -204,6 +206,7 @@ public class BackwardFastMultiNodeTest {
 	public void testBackwardsFastMultiNodeDijkstra_OneToMany_SearchAllNodes() {
 		
 		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setRoutingRandomness(0.);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
