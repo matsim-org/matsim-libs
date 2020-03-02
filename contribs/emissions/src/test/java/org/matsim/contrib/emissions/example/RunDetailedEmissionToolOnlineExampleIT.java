@@ -45,11 +45,9 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	 * This is by now (feb'20) the default. Setting it here for the tests explicitly
 	 *
 	 * */
-
 	@SuppressWarnings("static-method")
-	@Test
+	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 	public final void testDetailed_vehTypeV1() {
-		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
@@ -58,19 +56,11 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
 	}
 
-	/**
-	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
-	 */
 	@SuppressWarnings("static-method")
-	@Test
+	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 	public final void testDetailed_vehTypeV2() {
-		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
@@ -78,10 +68,6 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
 	}
 
 
@@ -91,7 +77,6 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	 * this was the previous behaviour.
 	 *
 	 * */
-
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testDetailed_vehTypeV1_FallbackToAverage() {
