@@ -73,7 +73,6 @@ public class FreightUtils {
 	 * 	- building and solving the VRP for all carriers using jsprit
 	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 *
-	 *
 	 * @param controler The MATSim controler.
 	 * @throws InvalidAttributeValueException
 	 */
@@ -93,12 +92,12 @@ public class FreightUtils {
 					.build();
 
 			VehicleRoutingAlgorithm algorithm;
-			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
-			if(vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals(""))	{
-				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
+			final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgortihmFile();
+			if(vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.equals(""))	{
+				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgorithmFile);
 				URL vraURL;
 				try {
-					vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
+					vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgorithmFile);
 				} catch (Exception e){
 					throw new RuntimeException(e);
 				}
@@ -106,15 +105,14 @@ public class FreightUtils {
 			} else {
 				log.info("Use a VehicleRoutingAlgorithm out of the box.");
 				algorithm = new SchrimpfFactory().createAlgorithm(problem);
-		//		vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
 			}
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
 			if(jspritIterations > 0) {
-				//algorithm.setMaxIterations(jspritIterations);
+				algorithm.setMaxIterations(jspritIterations);
 			} else {
-				throw new InvalidAttributeValueException ("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
+				throw new InvalidAttributeValueException ("Carrier has invalid number of jsprit iterations. It must be positive." + carrier.getId().toString());
 			}
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
