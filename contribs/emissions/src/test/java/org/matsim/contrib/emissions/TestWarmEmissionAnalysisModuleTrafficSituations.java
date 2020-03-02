@@ -118,7 +118,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
-		ecg.setUsingDetailedEmissionCalculation(true); //declare using detailed values
+		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort); //declare using detailed values
 
 		weam = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
