@@ -20,6 +20,14 @@
 
 package org.matsim.core.network;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,16 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 /*deliberately package*/ class LinkImpl implements Link {
 
@@ -210,7 +209,7 @@ import java.util.concurrent.ConcurrentMap;
 
 	@Override
 	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.getUndefinedTime());
+		return this.getCapacity() / network.getCapacityPeriod();
 	}
 	@Override
 	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
@@ -228,7 +227,6 @@ import java.util.concurrent.ConcurrentMap;
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
-//		return getFreespeed(Time.UNDEFINED_TIME);
 	}
 
 	/**
@@ -262,7 +260,6 @@ import java.util.concurrent.ConcurrentMap;
 	@Override
 	public double getNumberOfLanes() {
 		return this.nofLanes;
-//		return this.getNumberOfLanes(Time.UNDEFINED_TIME);
 	}
 
 	@Override

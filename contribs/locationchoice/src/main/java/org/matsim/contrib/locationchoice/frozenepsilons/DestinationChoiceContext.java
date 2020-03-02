@@ -127,15 +127,13 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private void readOrCreateKVals(long seed) {
 		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, this.scenario);
 		this.arekValsRead = computer.run();
-		ObjectAttributes personsKValues = computer.getPersonsKValues();
-		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
-		
+
 		this.personIndices = new TObjectIntHashMap<>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;
 		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
 			this.personIndices.put(personId, personIndex);
-			this.personsKValuesArray[personIndex] = (Double) personsKValues.getAttribute(personId.toString(), "k");
+			this.personsKValuesArray[personIndex] = (Double) scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("k");
 			personIndex++;
 		}		
 		
@@ -147,7 +145,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			Id<ActivityFacility> facilityId = facility.getId();
 			
 			this.facilityIndices.put(facilityId, facilityIndex);
-			this.facilitiesKValuesArray[facilityIndex] = (Double) facilitiesKValues.getAttribute(facilityId.toString(), "k");
+			this.facilitiesKValuesArray[facilityIndex] = (Double) facility.getAttributes().getAttribute("k");
 			this.faciliesWithIndexMap.put(facilityId, new ActivityFacilityWithIndex(facility, facilityIndex));
 			
 			facilityIndex++;

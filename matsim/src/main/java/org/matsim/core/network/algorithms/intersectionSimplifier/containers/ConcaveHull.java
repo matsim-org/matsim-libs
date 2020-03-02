@@ -137,7 +137,7 @@ public class ConcaveHull {
 			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 			try{
 				bw.write("iteration,firstX,firstY,secondX,secondY");
-				bw.newLine();
+				bw.write("\n");
 			} catch (IOException e) {
 				throw new RuntimeException("Could not write to BufferedWriter " + filename);
 			} finally{
@@ -153,7 +153,7 @@ public class ConcaveHull {
 			bw = IOUtils.getBufferedWriter(filename);
 			try{
 				bw.write("iteration,firstX,firstY,secondX,secondY");
-				bw.newLine();
+				bw.write("\n");
 			} catch (IOException e) {
 				throw new RuntimeException("Could not write to BufferedWriter " + filename);
 			} finally{

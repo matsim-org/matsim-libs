@@ -31,7 +31,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -112,11 +111,11 @@ public final class EditTrips {
 		}
 
 	}
-	public final Trip findCurrentTrip( MobsimAgent agent ) {
+	public static Trip findCurrentTrip( MobsimAgent agent ) {
 		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
 		return findTripAtPlanElement(agent, pe);
 	}
-	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
+	public static Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
 //		log.debug("plan element to be found=" + pe ) ;
 		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent) ) ;
 		for ( Trip trip : trips ) {
@@ -130,7 +129,7 @@ public final class EditTrips {
 		}
 		throw new ReplanningException("trip not found") ;
 	}
-	public Trip findTripAtPlanElementIndex( MobsimAgent agent, int index ) {
+	public static Trip findTripAtPlanElementIndex( MobsimAgent agent, int index ) {
 		return findTripAtPlanElement( agent, WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ) ;
 	}
 	// current trip:
@@ -510,9 +509,11 @@ public final class EditTrips {
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
 			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
-			if (Double.isFinite(previousActivity.getEndTime()) && previousActivity.getEndTime() < now) {
+			if (Double.isFinite(
+					previousActivity.getEndTime().seconds()) && previousActivity.getEndTime().seconds()
+					< now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
-				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime() + currentLeg.getTravelTime();
+				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + currentLeg.getTravelTime();
 				// plausibility check: The agent can only arrive after the current time
 				if (departureTimeAccordingToPlannedActivityEnd > now) {
 					departureTime = departureTimeAccordingToPlannedActivityEnd;

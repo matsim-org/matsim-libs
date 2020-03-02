@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -20,7 +19,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Inject;
 
 /*
  * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
@@ -73,7 +73,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
 //				logger.info("[agentId="+ agentId + "][currentTime="+Time.writeTime(time)+"][actDuration="+plannedActivity.getDuration()+
 //						"[timeWindow="+ plannedActivity.getTimeWindow() + "][plannedActEnd="+ Time.writeTime(act.getEndTime()) + "][newActEnd="+Time.writeTime(newEndTime)+"]");
-				act.setMaximumDuration(Time.UNDEFINED_TIME);
+				act.setMaximumDurationUndefined();
 				act.setEndTime(newEndTime);
 //				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				WithinDayAgentUtils.resetCaches( mobsimAgent );

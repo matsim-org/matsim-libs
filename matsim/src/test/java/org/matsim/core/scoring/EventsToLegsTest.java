@@ -24,12 +24,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -50,9 +46,9 @@ public class EventsToLegsTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.addLegHandler(lh);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), "walk"));
-		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, Id.create("1", Person.class), 50.0));
-		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), Id.create("l2", Link.class), "walk"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), TransportMode.walk));
+		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, Id.create("1", Person.class), 50.0, TransportMode.walk));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), Id.create("l2", Link.class), TransportMode.walk));
 		assertLeg(lh, 10., 20., 50.0, "walk");
 	}
 
@@ -72,6 +68,8 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, Id.createLinkId("l3"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -112,6 +110,8 @@ public class EventsToLegsTest {
 
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId1, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -128,6 +128,8 @@ public class EventsToLegsTest {
 		//driver leaves out vehicle after 10 seconds, no driving at all
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 0.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -148,6 +150,8 @@ public class EventsToLegsTest {
 				new VehicleLeavesTrafficEvent(25.0, agentId1, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 500.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 

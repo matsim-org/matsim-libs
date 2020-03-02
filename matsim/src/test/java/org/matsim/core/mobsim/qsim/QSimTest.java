@@ -20,14 +20,9 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -91,10 +86,16 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 @RunWith(Parameterized.class)
 public class QSimTest {
 
-	private final static Logger log = Logger.getLogger(QSimTest.class);
+	private final static Logger log = LogManager.getLogger(QSimTest.class);
 
 	private final boolean isUsingFastCapacityUpdate;
 
@@ -1342,9 +1343,9 @@ public class QSimTest {
 
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter(Level.WARN);
-		Logger.getRootLogger().addAppender(logger);
+		logger.activate();
 		createQSim(f, events).run();
-		Logger.getRootLogger().removeAppender(logger);
+		logger.deactivate();
 
 		return logger;
 	}
@@ -1396,8 +1397,8 @@ public class QSimTest {
 		// first test without special settings
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(act1.getEndTime() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times

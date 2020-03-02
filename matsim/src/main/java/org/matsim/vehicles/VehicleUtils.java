@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.util.HashMap;
@@ -280,10 +281,39 @@ public final class VehicleUtils {
 	public static Vehicles getOrCreateAllvehicles( Scenario  scenario ) {
 		Vehicles map = (Vehicles) scenario.getScenarioElement( "allvehicles" );
 		if ( map==null ) {
+			log.info( "adding scenario element for allvehicles container" );
 			map = new VehiclesImpl();
 			scenario.addScenarioElement("allvehicles" , map);
 		}
 		return map;
 	}
-
+	private static int tryStdCnt = 5;
+	private static int tryTrnCnt = 5;
+	public static Vehicle findVehicle( Id<Vehicle> vehicleId, Scenario scenario) {
+		Vehicle vehicle = getOrCreateAllvehicles( scenario ).getVehicles().get( vehicleId );
+		if ( vehicle==null ) {
+			if ( tryStdCnt>0){
+				tryStdCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying standard vehicles container ..." );
+				if ( tryStdCnt==0 ) {
+					log.info( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			vehicle = scenario.getVehicles().getVehicles().get(  vehicleId );
+		}
+		if ( vehicle==null ) {
+			if ( tryTrnCnt>0 ) {
+				tryTrnCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying transit vehicles container ..." );
+				if ( tryTrnCnt==0 ) {
+					log.info(  Gbl.FUTURE_SUPPRESSED );
+				}
+			}
+			vehicle = scenario.getTransitVehicles().getVehicles().get(  vehicleId );
+		}
+		if ( vehicle==null ) {
+			log.info( "unable to find vehicle for vehicleId=" + vehicleId + "; will return null") ;
+		}
+		return vehicle ;
+	}
 }

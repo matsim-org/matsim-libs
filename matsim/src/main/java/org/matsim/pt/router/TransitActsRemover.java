@@ -43,7 +43,8 @@ import java.util.List;
  */
 
 /**
- * Consider using TripsToLegsAlgorithm instead to circumvene problems with different types of access / egress legs and stage activities.
+ * @deprecated -- use {@link org.matsim.core.population.algorithms.TripsToLegsAlgorithm} instead to circumvene problems with different types of access /
+ * egress legs and stage activities.
  */
 @Deprecated
 public class TransitActsRemover implements PlanAlgorithm {

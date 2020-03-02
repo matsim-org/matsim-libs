@@ -35,10 +35,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "matsimTimeAttributeType")
-public class XMLMatsimTimeAttributeType {
+final class XMLMatsimTimeAttributeType {
 
     @XmlAttribute(required = true)
-    protected double seconds;
+    private double seconds;
 
     /**
      * Gets the value of the seconds property.

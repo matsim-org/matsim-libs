@@ -53,17 +53,6 @@ public class ETaxiScheduler extends TaxiScheduler {
 		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
 	}
 
-	@Override
-	protected double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		if (task instanceof ETaxiChargingTask) {
-			// FIXME underestimated due to the ongoing AUX/drive consumption
-			double duration = task.getEndTime() - task.getBeginTime();
-			return newBeginTime + duration;
-		} else {
-			return super.calcNewEndTime(vehicle, task, newBeginTime);
-		}
-	}
-
 	// FIXME underestimated due to the ongoing AUX/drive consumption
 	// not a big issue for e-rule-based dispatching (no look ahead)
 	// more problematic for e-assignment dispatching
