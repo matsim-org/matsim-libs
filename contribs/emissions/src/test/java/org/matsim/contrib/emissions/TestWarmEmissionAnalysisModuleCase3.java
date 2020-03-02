@@ -26,11 +26,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -39,7 +37,6 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
 
-import static org.matsim.contrib.emissions.Pollutant.NO2;
 import static org.matsim.contrib.emissions.Pollutant.PM;
 
 /**
@@ -103,9 +100,8 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	private final String dieselTechnology = "PC diesel";
 	private final String dieselSizeClass = "diesel";
 	private final String dieselConcept = ">=2L";
-	private final Double dieselFreeVelocity = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private final Double dieselSgVelocity = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_SG_KMH;
-	private final Double noeFreeSpeed = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_FF_KMH;
+	private final Double dieselFreeVelocity = 20.; //km/h
+	private final Double dieselSgVelocity = 10.; //km/h
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {

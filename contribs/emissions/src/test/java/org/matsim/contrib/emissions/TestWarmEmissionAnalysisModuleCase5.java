@@ -26,11 +26,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.DetailedVsAverageLookupBehavior;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -39,7 +37,6 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
 
-import static org.matsim.contrib.emissions.Pollutant.NO2;
 import static org.matsim.contrib.emissions.Pollutant.PM;
 
 /**
@@ -87,35 +84,23 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	//Old list of pollutants
 //	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
-	static final String HBEFA_ROAD_CATEGORY = "URB";
-	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
-	private boolean excep =false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
 	private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
 
-	// emission factors for tables - no duplicates!
-	private static final Double DETAILED_PETROL_FACTOR_FF = .1;
 	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
-	private static final Double DETAILED_SGFF_FACTOR_FF =   .000011;
-	private static final Double DETAILED_SGFF_FACTOR_SG = 	.0000011;
-	private static final Double AVG_PC_FACTOR_FF = 1.;
-	private static final Double AVG_PC_FACTOR_SG = 10.;
 
 	// vehicle information for regular test cases
-
-	private static final Double PETROL_SPEED_FF = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private static final Double PETROL_SPEED_SG = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_SG_KMH;
 
 	// case 5 - data in detailed table, stop go speed zero
 	private final String zeroRoadCatgory = "URB_case6";
 	private final String zeroTechnology = "zero technology";
 	private final String zeroConcept = "zero concept";
 	private final String zeroSizeClass = "zero size class";
-	private final Double zeroFreeVelocity = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private final Double zeroSgVelocity = 0.;
+	private final Double zeroFreeVelocity = 20.; //km/h
+	private final Double zeroSgVelocity = 0.; //km/h
 
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")

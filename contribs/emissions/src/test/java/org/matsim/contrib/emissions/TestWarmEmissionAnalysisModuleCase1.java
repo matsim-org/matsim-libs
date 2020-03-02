@@ -91,7 +91,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
-	private final boolean excep =false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
 	private WarmEmissionAnalysisModule emissionsModule;
@@ -104,8 +103,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	private static final String PETROL_TECHNOLOGY = "PC petrol <1,4L";
 	private static final String PETROL_SIZE_CLASS ="<ECE petrol (4S)";
 	private static final String PETROL_CONCEPT ="<1,4L";
-	private static final Double PETROL_SPEED_FF = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private static final Double PETROL_SPEED_SG = TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_SG_KMH;
+	private static final Double PETROL_SPEED_FF = 20.; //km/h
+	private static final Double PETROL_SPEED_SG = 10.; //km/h
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {
