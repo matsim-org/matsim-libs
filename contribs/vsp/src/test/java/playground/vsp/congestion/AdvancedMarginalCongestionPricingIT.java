@@ -277,7 +277,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
 				tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -358,7 +358,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
 				tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -444,7 +444,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
 				tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -512,7 +512,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config),
 				tollHandler, controler.getConfig().planCalcScore());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

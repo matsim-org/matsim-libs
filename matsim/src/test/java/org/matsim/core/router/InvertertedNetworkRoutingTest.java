@@ -47,7 +47,7 @@ public class InvertertedNetworkRoutingTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() );
+		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));

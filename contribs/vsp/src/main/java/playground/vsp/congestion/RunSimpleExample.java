@@ -71,7 +71,7 @@ public class RunSimpleExample {
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
 		
 		final CongestionTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new CongestionTollTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
+				new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig()),
 				tollHandler, controler.getConfig().planCalcScore());		
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
