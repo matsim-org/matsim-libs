@@ -1,7 +1,8 @@
 package org.matsim.utils;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.testcases.utils.LogCounter;
@@ -11,12 +12,12 @@ import org.matsim.testcases.utils.LogCounter;
  */
 public class MemoryObserverTest {
 
-	private final static Logger LOG = Logger.getLogger(MemoryObserverTest.class);
+	private final static Logger LOG = LogManager.getLogger(MemoryObserverTest.class);
 
 	@Test
 	public void testStartStop() throws InterruptedException {
 		LogCounter logger = new LogCounter(Level.INFO);
-		Logger.getRootLogger().addAppender(logger);
+		logger.activate();
 
 		int count1 = logger.getInfoCount();
 
@@ -36,7 +37,7 @@ public class MemoryObserverTest {
 		Thread.sleep(900);
 		int count5 = logger.getInfoCount();
 
-		Logger.getRootLogger().removeAppender(logger);
+		logger.deactivate();
 
 		int activeLogs1 = count2 - count1;
 		int inactiveLogs2 = count3 - count2;
@@ -56,7 +57,7 @@ public class MemoryObserverTest {
 	@Test
 	public void testDoubleStart() throws InterruptedException {
 		LogCounter logger = new LogCounter(Level.INFO);
-		Logger.getRootLogger().addAppender(logger);
+		logger.activate();
 
 		int count1 = logger.getInfoCount();
 
@@ -73,7 +74,7 @@ public class MemoryObserverTest {
 		Thread.sleep(900);
 		int count4 = logger.getInfoCount();
 
-		Logger.getRootLogger().removeAppender(logger);
+		logger.deactivate();
 
 		int activeLogs1 = count2 - count1;
 		int activeLogs2 = count3 - count2;

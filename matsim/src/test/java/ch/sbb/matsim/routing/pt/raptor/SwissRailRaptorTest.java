@@ -4,7 +4,13 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -45,12 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -588,10 +589,10 @@ public class SwissRailRaptorTest {
         double duration = 0.0;
         for (PlanElement pe : planElements) {
             if (pe instanceof Activity) {
-                Activity act = (Activity) pe;
-                double endTime = act.getEndTime();
-                double startTime = act.getStartTime();
-                if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+                Activity act = (Activity)pe;
+				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
+                    double startTime = act.getStartTime().seconds();
+					double endTime = act.getEndTime().seconds();
                     duration += (endTime - startTime);
                 }
             } else if (pe instanceof Leg) {

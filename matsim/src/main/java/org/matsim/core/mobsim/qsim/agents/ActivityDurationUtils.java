@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
 public class ActivityDurationUtils {
 
@@ -37,33 +36,35 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if ( Time.isUndefinedTime(act.getMaximumDuration()) && (Time.isUndefinedTime(act.getEndTime()))) {
-			return Double.POSITIVE_INFINITY ;
+		if (act.getMaximumDuration().isUndefined() && act.getEndTime().isUndefined()) {
+			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
-			if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
+			if (activityDurationInterpretation.equals(
+					PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
-				if (Time.isUndefinedTime(act.getMaximumDuration())) {
-					departure = act.getEndTime();
-				} else if (Time.isUndefinedTime(act.getEndTime())) {
-					departure = now + act.getMaximumDuration();
+				if (act.getMaximumDuration().isUndefined()) {
+					departure = act.getEndTime().seconds();
+				} else if (act.getEndTime().isUndefined()) {
+					departure = now + act.getMaximumDuration().seconds();
 				} else {
-					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
+					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration().seconds());
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
-				if (!Time.isUndefinedTime(act.getEndTime())) {
-					departure = act.getEndTime();
+				if (act.getEndTime().isDefined()) {
+					departure = act.getEndTime().seconds();
 				} else {
 					throw new IllegalStateException("activity end time not set and using something else not allowed.");
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if (!Time.isUndefinedTime(act.getEndTime())) {
-					departure = act.getEndTime();
-				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
-					departure = now + act.getMaximumDuration() ;
+				if (act.getEndTime().isDefined()) {
+					departure = act.getEndTime().seconds();
+				} else if (act.getMaximumDuration().isDefined()) {
+					departure = now + act.getMaximumDuration().seconds();
 				} else {
-					throw new IllegalStateException("neither activity end time nor activity duration defined; don't know what to do.");
+					throw new IllegalStateException(
+							"neither activity end time nor activity duration defined; don't know what to do.");
 				}
 			} else {
 				throw new IllegalStateException("should not happen") ;

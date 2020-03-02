@@ -1,13 +1,6 @@
 package org.matsim.api.core.v01;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 /**
@@ -207,52 +200,52 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 	public Iterator<V> iterator() {
 		return new DataIterator<>(this);
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == this)
-            return true;
-        if (!(o instanceof Map))
-            return false;
-        if (o instanceof IdMap) {
-        	IdMap<?,?> m = (IdMap<?,?>) o;
-        	if (this.size != m.size)
-        		return false;
-        	for (int i=0; i<this.data.length && i<m.data.length; i++) { // one of the data arrays may have more capacity than the other despite having the same number of non-null entries. This is okay if and only if the additional entries are null. This gets checked implicitly by the loop because we already know they have the same number of nun-null elements.
-        		if (this.data[i] != m.data[i])
-        			return false;
-        	}
-        	return true;
-        } else {
-        	Map<Id<?>,?> m = (Map<Id<?>,?>) o;
-        	try {
-                Iterator<java.util.Map.Entry<Id<T>, V>> iter = entrySet().iterator();
-                while (iter.hasNext()) {
-                    java.util.Map.Entry<Id<T>, V> e = iter.next();
-                    Id<T> key = e.getKey();
-                    V value = e.getValue();
-                    if (value == null) {
-                        if (!(m.get(key)==null && m.containsKey(key)))
-                            return false;
-                    } else {
-                        if (!value.equals(m.get(key)))
-                            return false;
-                    }
-                }
-            } catch (ClassCastException noIdAsKey) {
-                return false;
-            } catch (NullPointerException unused) {
-                return false;
-            }
-            return true;
-        }
+			return true;
+		if (!(o instanceof Map))
+			return false;
+		if (o instanceof IdMap) {
+			IdMap<?, ?> m = (IdMap<?, ?>) o;
+			if (this.size != m.size)
+				return false;
+			for (int i = 0; i < this.data.length && i < m.data.length; i++) { // one of the data arrays may have more capacity than the other despite having the same number of non-null entries. This is okay if and only if the additional entries are null. This gets checked implicitly by the loop because we already know they have the same number of nun-null elements.
+				if (this.data[i] != m.data[i])
+					return false;
+			}
+			return true;
+		} else {
+			Map<Id<?>, ?> m = (Map<Id<?>, ?>) o;
+			try {
+				Iterator<java.util.Map.Entry<Id<T>, V>> iter = entrySet().iterator();
+				while (iter.hasNext()) {
+					java.util.Map.Entry<Id<T>, V> e = iter.next();
+					Id<T> key = e.getKey();
+					V value = e.getValue();
+					if (value == null) {
+						if (!(m.get(key) == null && m.containsKey(key)))
+							return false;
+					} else {
+						if (!value.equals(m.get(key)))
+							return false;
+					}
+				}
+			} catch (ClassCastException noIdAsKey) {
+				return false;
+			} catch (NullPointerException unused) {
+				return false;
+			}
+			return true;
+		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int h = 0;
-		for (int i=0; i<data.length; i++) {
-			h += data[i] == null ? 0 : i^data[i].hashCode();
+		for (int i = 0; i < data.length; i++) {
+			h += data[i] == null ? 0 : i ^ data[i].hashCode();
 		}
 		return h;
 	}
@@ -300,7 +293,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			T[] values = (T[]) a;
+			T[] values = a;
 			if (values == null) {
 				values = (T[]) new Object[this.map.size];
 			} else if (values.length < this.map.size) {
@@ -536,9 +529,9 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		@Override
 		public boolean containsAll(Collection<?> c) {
 			for (Object e : c)
-	            if (!contains(e))
-	                return false;
-	        return true;
+				if (!contains(e))
+					return false;
+			return true;
 		}
 
 		@Override
@@ -594,36 +587,36 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		public void clear() {
 			this.map.clear();
 		}
-		
+
 		@Override
 		public boolean equals(Object o) {
 			if (o == this)
-	            return true;
-	        if (!(o instanceof Set))
-	            return false;
-	        if(o instanceof KeySet) {
-	        	KeySet<?,?> k = (KeySet<?,?>) o;
-	        	if(this.size()!=k.size())
-	        		return false;
-	        	for (int i=0; i<this.map.data.length && i<k.map.data.length; i++) { // one of the data arrays may have more capacity than the other despite having the same number of non-null entries. This is okay if and only if the additional entries are null. This gets checked implicitly by the loop because we already know they have the same number of nun-null elements.
-	        		if((this.map.data[i]==null && k.map.data[i]!=null) || (this.map.data[i]!=null && k.map.data[i]==null))
-	        			return false;
-	        	}
-	        	return true;
-	        } else {
-		        Collection<?> c = (Collection<?>) o;
-		        if (c.size() != size())
-		            return false;
-		        try {
-		            return containsAll(c);
-		        } catch (ClassCastException unused)   {
-		            return false;
-		        } catch (NullPointerException unused) {
-		            return false;
-		        }
-	        }
+				return true;
+			if (!(o instanceof Set))
+				return false;
+			if (o instanceof KeySet) {
+				KeySet<?, ?> k = (KeySet<?, ?>) o;
+				if (this.size() != k.size())
+					return false;
+				for (int i = 0; i < this.map.data.length && i < k.map.data.length; i++) { // one of the data arrays may have more capacity than the other despite having the same number of non-null entries. This is okay if and only if the additional entries are null. This gets checked implicitly by the loop because we already know they have the same number of nun-null elements.
+					if ((this.map.data[i] == null && k.map.data[i] != null) || (this.map.data[i] != null && k.map.data[i] == null))
+						return false;
+				}
+				return true;
+			} else {
+				Collection<?> c = (Collection<?>) o;
+				if (c.size() != size())
+					return false;
+				try {
+					return containsAll(c);
+				} catch (ClassCastException unused) {
+					return false;
+				} catch (NullPointerException unused) {
+					return false;
+				}
+			}
 		}
-		
+
 		@Override
 		public int hashCode() {
 			int h = 0;
@@ -655,7 +648,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		@Override
 		public boolean contains(Object o) {
 			if (o instanceof Map.Entry) {
-				Map.Entry<?,?> e = (Map.Entry<?,?>) o;
+				Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
 				return e.getValue().equals(this.map.get(e.getKey()));
 			}
 			return false;
@@ -740,30 +733,30 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		public void clear() {
 			this.map.clear();
 		}
-		
+
 		@Override
 		public boolean equals(Object o) {
 			if (o == this)
-	            return true;
-	        if (!(o instanceof Set))
-	            return false;
-	        if(o instanceof EntrySet) {
-	        	EntrySet<?,?> e = (EntrySet<?,?>) o;
-	        	return this.map.equals(e.map);
-	        } else {
-	        	Collection<?> c = (Collection<?>) o;
-	            if (c.size() != size())
-	                return false;
-	            try {
-	                return containsAll(c);
-	            } catch (ClassCastException unused)   {
-	                return false;
-	            } catch (NullPointerException unused) {
-	                return false;
-	            }
-	        }
+				return true;
+			if (!(o instanceof Set))
+				return false;
+			if (o instanceof EntrySet) {
+				EntrySet<?, ?> e = (EntrySet<?, ?>) o;
+				return this.map.equals(e.map);
+			} else {
+				Collection<?> c = (Collection<?>) o;
+				if (c.size() != size())
+					return false;
+				try {
+					return containsAll(c);
+				} catch (ClassCastException unused) {
+					return false;
+				} catch (NullPointerException unused) {
+					return false;
+				}
+			}
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return this.map.hashCode();
@@ -796,27 +789,27 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		public V setValue(V value) {
 			return this.map.put(this.index, value);
 		}
-		
+
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
-            if (!(o instanceof Map.Entry))
-                return false;
-            if (o instanceof Entry) {
-            	Entry<?, ?> e = (Entry<?, ?>) o;
-            	return this.index == e.index && this.value.equals(e.value); // Since our values should never be null we can skip the null-check they do in AbstractMap#eq(Object, Object)
-            } else {
-	            Map.Entry<?,?> e = (Map.Entry<?,?>) o;
-	            if (e.getKey() == null || e.getValue() == null)
-	            	return false; // our keys and values should never be null
-	            return this.getKey().equals(e.getKey()) && this.value.equals(e.getValue());
-	        }
-        }
+			if (!(o instanceof Map.Entry))
+				return false;
+			if (o instanceof Entry) {
+				Entry<?, ?> e = (Entry<?, ?>) o;
+				return this.index == e.index && this.value.equals(e.value); // Since our values should never be null we can skip the null-check they do in AbstractMap#eq(Object, Object)
+			} else {
+				Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+				if (e.getKey() == null || e.getValue() == null)
+					return false; // our keys and values should never be null
+				return this.getKey().equals(e.getKey()) && this.value.equals(e.getValue());
+			}
+		}
 
-        @Override
-        public int hashCode() {
-            return index ^ (value == null ? 0 : value.hashCode());
-        }
+		@Override
+		public int hashCode() {
+			return index ^ (value == null ? 0 : value.hashCode());
+		}
 	}
 
 	private static class EntryIterator<T, V> implements Iterator<Map.Entry<Id<T>, V>> {

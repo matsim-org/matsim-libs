@@ -45,6 +45,9 @@ import java.io.IOException;
  */
 @Deprecated
 public final class SpatialGrid{
+	// yy this class was set to deprecated by DZ.  Quite possibly, we decided this together.  Still, I can't remember the reason.  Could you please
+	// write down a half-sentence of justification?  Thanks.  kai, feb'20
+
 	private static final Logger LOG = Logger.getLogger(SpatialGrid.class);
 	
 	private double[][] matrix;

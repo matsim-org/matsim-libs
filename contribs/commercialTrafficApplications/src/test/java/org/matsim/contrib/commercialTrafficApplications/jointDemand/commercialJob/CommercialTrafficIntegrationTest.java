@@ -14,12 +14,12 @@ public class CommercialTrafficIntegrationTest {
 
     @Test
     public void runCommercialTrafficIT() {
-        Config config = ConfigUtils.loadConfig("config.xml");
+        Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
         config.controler().setLastIteration(5);
         ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setCarriersFile("test-carriers-car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
+        freightConfigGroup.setCarriersFile("jointDemand_carriers_car.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("jointDemand_vehicleTypes.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
         Controler controler = new Controler(scenario);

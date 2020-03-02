@@ -92,7 +92,7 @@ public class OsmMain {
 			}
 
 			@Override
-			public void release() {
+			public void close() {
 				
 			}
 			

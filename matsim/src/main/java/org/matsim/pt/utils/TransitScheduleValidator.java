@@ -391,6 +391,9 @@ public abstract class TransitScheduleValidator {
 
 		public void addIssue(final ValidationIssue issue) {
 			this.issues.add(issue);
+			if (issue.severity == Severity.ERROR) {
+				this.isValid = false;
+			}
 		}
 
 		public void add(final ValidationResult otherResult) {

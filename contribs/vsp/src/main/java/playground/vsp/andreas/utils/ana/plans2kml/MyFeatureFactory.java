@@ -216,7 +216,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		buffer.append(STARTUL);
 		buffer.append(STARTLI);
 		buffer.append("StartTime: ");
-		buffer.append(Time.writeTime(act.getStartTime()));
+		buffer.append(Time.writeTime(act.getStartTime().seconds()));
 		buffer.append(ENDLI);
 //		buffer.append(STARTLI);
 //		buffer.append("Duration: ");
@@ -224,7 +224,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 //		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("EndTime: ");
-		buffer.append(Time.writeTime(act.getEndTime()));
+		buffer.append(Time.writeTime(act.getEndTime().seconds()));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("X: ");
