@@ -115,25 +115,24 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
-		bindModal(EmptyVehicleRelocator.class).toProvider(
-				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
+		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
 
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
+			@Inject
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+			private TravelTime travelTime;
 
-					@Inject
-					private MobsimTimer timer;
+			@Inject
+			private MobsimTimer timer;
 
-					@Override
-					public EmptyVehicleRelocator get() {
-						Network network = getModalInstance(Network.class);
-						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
-					}
-				}).asEagerSingleton();
+			@Override
+			public EmptyVehicleRelocator get() {
+				Network network = getModalInstance(Network.class);
+				DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+			}
+		}).asEagerSingleton();
 
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
@@ -145,23 +144,22 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				.asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
-				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class), new DrtStayTaskEndTimeCalculator(drtCfg))))
-				.asEagerSingleton();
+				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+						new DrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
 
-		addModalComponent(ParallelPathDataProvider.class,
-				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
+		addModalComponent(ParallelPathDataProvider.class, new ModalProviders.AbstractProvider<>(getMode()) {
+			@Inject
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+			private TravelTime travelTime;
 
-					@Override
-					public ParallelPathDataProvider get() {
-						Network network = getModalInstance(Network.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
-					}
-				});
+			@Override
+			public ParallelPathDataProvider get() {
+				Network network = getModalInstance(Network.class);
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
+			}
+		});
 		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
