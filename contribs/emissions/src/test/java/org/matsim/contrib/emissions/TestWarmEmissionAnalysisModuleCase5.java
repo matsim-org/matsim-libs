@@ -44,6 +44,11 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
 
 /**
  * @author julia
+ */
+
+/*
+ * Case 5 - data in detailed table, stop go speed zero
+ */
 
 
 /*

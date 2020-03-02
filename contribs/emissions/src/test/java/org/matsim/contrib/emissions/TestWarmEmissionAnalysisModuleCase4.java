@@ -45,7 +45,11 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
 
 /**
  * @author julia
+ */
 
+/*
+ * 	Case 4 - data in average table
+ */
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule

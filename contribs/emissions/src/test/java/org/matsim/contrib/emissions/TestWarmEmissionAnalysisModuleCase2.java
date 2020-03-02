@@ -47,7 +47,12 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
 
 /**
  * @author julia
+ * /
 
+/*
+ *  Case 2 - free flow entry in both tables, stop go entry in average table -> use average
+ * 	see (*) below.  kai, jan'20
+ */
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule

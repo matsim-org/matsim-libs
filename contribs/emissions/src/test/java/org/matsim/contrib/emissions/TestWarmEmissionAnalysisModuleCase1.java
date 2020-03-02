@@ -46,6 +46,11 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
 
 /**
  * @author julia
+ * */
+
+/*
+ * Case 1 - data in both tables -> use detailed
+ */
 
 
 /*

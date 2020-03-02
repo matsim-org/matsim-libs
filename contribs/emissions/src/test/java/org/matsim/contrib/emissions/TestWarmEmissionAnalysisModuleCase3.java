@@ -44,7 +44,11 @@ import static org.matsim.contrib.emissions.Pollutant.PM;
 
 /**
  * @author julia
+ */
 
+/*
+ * Case 3 - stop go entry in both tables, free flow entry in average table -> use average (now fail)
+ */
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
