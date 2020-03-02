@@ -20,7 +20,6 @@ package org.matsim.contrib.freight.utils;
 
 import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
@@ -39,7 +38,6 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
@@ -73,26 +71,26 @@ public class FreightUtils {
 	 * 	- building and solving the VRP for all carriers using jsprit
 	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 *
-	 * @param controler The MATSim controler.
+	 *
+	 * @param scenario
+	 * @param freightConfigGroup
 	 * @throws InvalidAttributeValueException
 	 */
-	public static void runJsprit(Controler controler) throws InvalidAttributeValueException {
-
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ) ;
+	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws InvalidAttributeValueException {
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
-				controler.getScenario().getNetwork(), FreightUtils.getCarrierVehicleTypes(controler.getScenario()).getVehicleTypes().values() );
+				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 
-		Carriers carriers = FreightUtils.getCarriers(controler.getScenario());
+		Carriers carriers = FreightUtils.getCarriers(scenario);
 
 		for (Carrier carrier : carriers.getCarriers().values()){
-				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
+				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
 					.setRoutingCost(netBasedCosts)
 					.build();
 
 			VehicleRoutingAlgorithm algorithm;
-			final String vehicleRoutingAlgorithmFile = freightConfig.getVehicleRoutingAlgortihmFile();
+			final String vehicleRoutingAlgorithmFile = freightConfigGroup.getVehicleRoutingAlgortihmFile();
 			if(vehicleRoutingAlgorithmFile != null && !vehicleRoutingAlgorithmFile.equals(""))	{
 				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgorithmFile);
 				URL vraURL;
