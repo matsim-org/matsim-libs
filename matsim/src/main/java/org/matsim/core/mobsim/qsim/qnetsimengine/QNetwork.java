@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
@@ -30,9 +33,6 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 import org.matsim.vis.snapshotwriters.VisLink;
-
-import java.util.Collections;
-import java.util.Map;
 
 /**
  *
@@ -51,7 +51,7 @@ public class QNetwork implements NetsimNetwork {
 
 	private final QNetworkFactory queueNetworkFactory;
 
-	QNetsimEngine simEngine; // only for tests...
+	QNetsimEngineI simEngine; // only for tests...
 
 	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
@@ -60,9 +60,9 @@ public class QNetwork implements NetsimNetwork {
 		this.nodes = new IdMap<>(Node.class);
 	}
 
-	public void initialize(QNetsimEngine simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
+	public void initialize(QNetsimEngineI simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
 		this.simEngine = simEngine;
-		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.ii);
+		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.getNetsimInternalInterface());
 		for (Node n : this.network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
 		}
