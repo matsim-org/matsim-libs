@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * NetsimWrappingQVehicleProvider.java
+ * QSimEngineRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,26 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetsim.qsim;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
+
+import java.util.concurrent.Callable;
+
+import org.matsim.core.gbl.Gbl;
 
 /**
- * @author thibautd
+ * Split up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches.
+ * 
+ * @author droeder @ Senozon Deutschland GmbH
  */
-public class NetsimWrappingQVehicleProvider implements QVehicleProvider {
-	private final QNetsimEngineI netsim;
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
+	
+	private volatile boolean simulationRunning = true;
+	private boolean movingNodes;
 
-	public NetsimWrappingQVehicleProvider(
-			final QNetsimEngineI netsim) {
-		this.netsim = netsim;
+	QNetsimEngineRunnerForThreadpool() {
 	}
 
 	@Override
-	public QVehicle getVehicle(final Id id) {
-		return netsim.getVehicles().get( id );
+	public Boolean call() {
+		if (!this.simulationRunning) {
+			Gbl.printCurrentThreadCpuTime();
+			return false;
+		}
+
+		if (this.movingNodes) {
+			moveNodes();
+		} else {
+			moveLinks();
+		}
+		return true ;
+	}
+
+	public final void afterSim() {
+		this.simulationRunning  = false;
+	}
+
+	public final void setMovingNodes(boolean movingNodes) {
+		this.movingNodes = movingNodes;
 	}
 }
-

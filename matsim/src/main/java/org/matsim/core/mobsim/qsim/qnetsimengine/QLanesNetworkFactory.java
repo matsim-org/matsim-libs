@@ -21,6 +21,10 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -29,16 +33,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.lanes.ModelLane;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.lanes.Lanes;
 import org.matsim.lanes.LanesToLinkAssignment;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.lanes.LanesUtils;
-
-import java.util.List;
-
-import javax.inject.Inject;
+import org.matsim.lanes.ModelLane;
+import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
 public final class QLanesNetworkFactory implements QNetworkFactory {
@@ -78,7 +78,7 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngineWithThreadpool.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 		delegate.initializeFactory(agentCounter, mobsimTimer, netsimEngine1);
 	}
