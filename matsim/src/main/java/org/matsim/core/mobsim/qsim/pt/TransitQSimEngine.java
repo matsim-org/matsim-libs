@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
 import org.matsim.pt.Umlauf;
+import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -56,6 +57,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 
 	private Collection<MobsimAgent> ptDrivers;
+	private final UmlaufBuilder umlaufBuilder;
 
 	public static class TransitAgentTriesToTeleportException extends RuntimeException {
 
@@ -87,14 +89,15 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
 	}
 
-	public TransitQSimEngine(QSim queueSimulation) {
-		this(queueSimulation, new SimpleTransitStopHandlerFactory());
+	TransitQSimEngine(QSim queueSimulation) {
+		this(queueSimulation, new SimpleTransitStopHandlerFactory(), new ReconstructingUmlaufBuilder(queueSimulation.getScenario()) );
 	}
 	
 	@Inject
-	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory) {
+	public TransitQSimEngine(QSim queueSimulation, TransitStopHandlerFactory stopHandlerFactory, UmlaufBuilder umlaufBuilder) {
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();
+		this.umlaufBuilder = umlaufBuilder;
 		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
 		this.stopHandlerFactory = stopHandlerFactory;
 	}
@@ -139,16 +142,10 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return drivers;
 	}
 
-	private static UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
+	private UmlaufCache getOrCreateUmlaufCache(final Scenario scenario) {
 		UmlaufCache umlaufCache;
 
-		ReconstructingUmlaufBuilder reconstructingUmlaufBuilder =
-				new ReconstructingUmlaufBuilder(
-						scenario.getNetwork(),
-						scenario.getTransitSchedule().getTransitLines().values(),
-						scenario.getTransitVehicles(),
-						scenario.getConfig().planCalcScore());
-		Collection<Umlauf> umlaeufe = reconstructingUmlaufBuilder.build();
+		Collection<Umlauf> umlaeufe = umlaufBuilder.build();
 		umlaufCache = new UmlaufCache(scenario.getTransitSchedule(), umlaeufe);
 
 		return umlaufCache;

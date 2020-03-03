@@ -26,8 +26,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -37,7 +39,13 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
+/**
+ * Generates Umlaeufe (= vehicle runs) from the transit schedule.  Will do something interesting only if {@link Departure}s in the
+ * {@link org.matsim.pt.transitSchedule.api.TransitSchedule} have vehicle ids, <i>and</i> the same vehicle is used for multiple departures.
+ *
+ * @author (of documentation) kai
+ */
+public final class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private static final Logger log = Logger.getLogger(ReconstructingUmlaufBuilder.class);
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
@@ -49,18 +57,19 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	};
 
-	private Collection<TransitLine> transitLines;
-	private Vehicles vehicles;
+	private final Collection<TransitLine> transitLines;
+	private final Vehicles vehicles;
 	private Map<Id<Umlauf>,Umlauf> umlaeufe = null;
 	private ArrayList<UmlaufStueck> umlaufStuecke;
-	private UmlaufInterpolator umlaufInterpolator;
-	private Map<Id<Vehicle>, Id<Umlauf>> umlaufIdsByVehicleId;
+	private final UmlaufInterpolator umlaufInterpolator;
+	private final Map<Id<Vehicle>, Id<Umlauf>> umlaufIdsByVehicleId;
 
-	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
-			Vehicles basicVehicles, PlanCalcScoreConfigGroup config) {
-		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
-		this.transitLines = transitLines;
-		this.vehicles = basicVehicles;
+	@Inject public ReconstructingUmlaufBuilder( Scenario scenario ) {
+		// (normal constructor used from TransitQSimEngine for testing :-(.  kai, mar'20) yy change
+
+		this.umlaufInterpolator = new UmlaufInterpolator(scenario.getNetwork(), scenario.getConfig().planCalcScore());
+		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
+		this.vehicles = scenario.getTransitVehicles();
 		this.umlaufIdsByVehicleId = new HashMap<>();
 	}
 
@@ -72,7 +81,11 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		createUmlaeufe();
 		return umlaeufe.values();
 	}
-	
+
+	/**
+	 * (connect multiple umlautStuecke to one umlauf.  will do anything interesting only if same vehicle is shared across multiple departures.  vehicle
+	 * id can be set for departures in transit schedule.  but usually isn't)
+	 */
 	private void createUmlaeufe(){
 		int cnt = 0;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
@@ -100,6 +113,9 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		return id;
 	}
 
+	/**
+	 * (create the data structures. each transit vehicles gets an empty umlauf)
+	 */
 	private void createEmptyUmlaeufe() {
 		for (Vehicle vehicle : vehicles.getVehicles().values()) {
 			UmlaufImpl umlauf = new UmlaufImpl(this.createUmlaufIdFromVehicle(vehicle));
@@ -108,6 +124,9 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		}
 	}
 
+	/**
+	 * (one for each "departure" in the transit schedule.  also sort them by departure time)
+	 */
 	private void createUmlaufStuecke() {
 		this.umlaufStuecke = new ArrayList<>();
 		log.info("Generating UmlaufStuecke ...");
