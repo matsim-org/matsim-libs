@@ -57,12 +57,12 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity actTemplate = ((Activity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
-				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
@@ -84,12 +84,12 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
-				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
@@ -111,12 +111,12 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof LCActivity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((LCActivity) pe).setEndTime(actTemplate.getEndTime());
+				((LCActivity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((LCActivity) pe).setCoord(actTemplate.getCoord());
 				((LCActivity) pe).setFacilityId(actTemplate.getFacilityId());
 				((LCActivity) pe).setLinkId(actTemplate.getLinkId());
-				((LCActivity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((LCActivity) pe).setStartTime(actTemplate.getStartTime());
+				((LCActivity) pe).setMaximumDuration(actTemplate.getMaximumDuration().seconds());
+				((LCActivity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((LCActivity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LCLeg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));

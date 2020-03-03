@@ -42,12 +42,14 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -62,6 +64,7 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -195,9 +198,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	};
 
-	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
+	private final Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
-	private Injector childInjector;
+	private final Injector childInjector;
 //	private QVehicleFactory qVehicleFactory;
 	
 	@Override
@@ -341,7 +344,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
 
-	void cleanupSim() {
+	private void cleanupSim() {
 		this.listenerManager.fireQueueSimulationBeforeCleanupEvent();
 
 		boolean gotException = false;
@@ -352,6 +355,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			}
 			catch (Exception e) {
 				log.error("got exception while cleaning up", e);
+				gotException=true;
 			}
 		}
 
@@ -438,6 +442,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
+		if ( agent instanceof HasPerson ){
+			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
+				allpersons.addPerson( ((HasPerson) agent).getPerson() );
+			}
+		}
 	}
 
 	private void arrangeNextAgentAction(final MobsimAgent agent) {
@@ -501,10 +511,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
 		Double configuredStartTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
-		if (configuredStartTime == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(configuredStartTime)) {
 			configuredStartTime = 0.0;
 		}
-		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) {
+		if ((Time.isUndefinedTime(this.stopTime)) || (this.stopTime == 0)) {
 			this.stopTime = Double.MAX_VALUE;
 		}
 

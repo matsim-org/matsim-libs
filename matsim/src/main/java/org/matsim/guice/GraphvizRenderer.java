@@ -5,19 +5,26 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Key;
-import com.google.inject.grapher.*;
-import com.google.inject.grapher.graphviz.*;
-import com.google.inject.name.Names;
+import com.google.inject.grapher.BindingEdge;
+import com.google.inject.grapher.DependencyEdge;
+import com.google.inject.grapher.Edge;
+import com.google.inject.grapher.ImplementationNode;
+import com.google.inject.grapher.InstanceNode;
+import com.google.inject.grapher.InterfaceNode;
+import com.google.inject.grapher.NameFactory;
+import com.google.inject.grapher.Node;
+import com.google.inject.grapher.NodeId;
+import com.google.inject.grapher.ShortNameFactory;
+import com.google.inject.grapher.graphviz.ArrowType;
+import com.google.inject.grapher.graphviz.CompassPoint;
+import com.google.inject.grapher.graphviz.EdgeStyle;
+import com.google.inject.grapher.graphviz.GraphvizEdge;
+import com.google.inject.grapher.graphviz.GraphvizNode;
+import com.google.inject.grapher.graphviz.NodeStyle;
+import com.google.inject.grapher.graphviz.PortIdFactory;
+import com.google.inject.grapher.graphviz.PortIdFactoryImpl;
 import com.google.inject.spi.InjectionPoint;
-import org.jgrapht.DirectedGraph;
-import org.matsim.core.controler.PrepareForSim;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.jgrapht.Graph;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Member;
@@ -36,7 +43,7 @@ public class GraphvizRenderer {
 	private PrintWriter out;
 	private String rankdir = "TB";
 
-	public void render(DirectedGraph<Node, Edge> graph) {
+	public void render(Graph<Node, Edge> graph) {
 		for (Node node : graph.vertexSet()) {
 			if (node instanceof InstanceNode) {
 				newInstanceNode(((InstanceNode) node));

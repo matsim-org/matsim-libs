@@ -100,8 +100,14 @@ public class CarrierUtils{
 	private static final String JSPRIT_ITERATIONS="jspritIterations" ;
 	public static int getJspritIterations( Carrier carrier ) {
 		Integer result = (Integer) carrier.getAttributes().getAttribute( JSPRIT_ITERATIONS );
-		return (int) result ;
+		if (result == null){
+			log.error("Requested attribute jspritIterations does not exists. Will return " + Integer.MIN_VALUE);
+			return Integer.MIN_VALUE;
+		} else {
+			return result ;
+		}
 	}
+
 	public static void setJspritIterations( Carrier carrier, int jspritIterations ) {
 		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
 	}

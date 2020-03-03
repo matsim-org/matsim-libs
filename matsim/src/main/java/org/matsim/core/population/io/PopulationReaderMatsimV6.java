@@ -19,13 +19,21 @@
 
 package org.matsim.core.population.io;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,9 +53,7 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegat
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Stack;
+import com.google.inject.Inject;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v6.dtd</code>.
@@ -278,9 +284,13 @@ import java.util.Stack;
 		} else {
 			throw new IllegalArgumentException("In this version of MATSim either the coords or the link must be specified for an Act.");
 		}
-		this.curract.setStartTime(Time.parseTime(atts.getValue(ATTR_ACT_STARTTIME)));
-		this.curract.setMaximumDuration(Time.parseTime(atts.getValue(ATTR_ACT_MAXDUR)));
-		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
+
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_STARTTIME))
+				.ifDefinedOrElse(curract::setStartTime, curract::setStartTimeUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_MAXDUR))
+				.ifDefinedOrElse(curract::setMaximumDuration, curract::setMaximumDurationUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_ACT_ENDTIME))
+				.ifDefinedOrElse(curract::setEndTime, curract::setEndTimeUndefined);
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
 			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));

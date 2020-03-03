@@ -32,11 +32,7 @@ import org.matsim.vis.otfvis.caching.SceneGraph;
 /**
  * @author dgrether
  */
-public class OTFSignalReader extends OTFLaneReader {
-
-	public OTFSignalReader() {
-		super();
-	}
+final class OTFSignalReader extends OTFLaneReader {
 
 	@Override
 	public void readConstData(ByteBuffer in) throws IOException {

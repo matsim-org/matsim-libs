@@ -19,18 +19,22 @@
 
 package org.matsim.run;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.config.*;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.internal.MatsimParameters;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.PtConstants;
 
 
 public class ConvertOldPlanCalcScoreConfigGroup {
@@ -389,10 +393,10 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			if ( actType.isScoringThisActivityAtAll() ) {
 				// (checking consistency only if activity is scored at all)
 
-				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (!Time.isUndefinedTime(actType.getClosingTime()))) {
 					hasOpeningAndClosingTime = true;
 				}
-				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
+				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
 					hasOpeningTimeAndLatePenalty = true;
 				}
 				if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {

@@ -46,10 +46,10 @@ import javax.xml.bind.annotation.XmlType;
     XMLFacilityId.class,
     XMLLinkId.class
 })
-public class XMLIdRefType {
+class XMLIdRefType {
 
     @XmlAttribute(required = true)
-    protected String refId;
+    private String refId;
 
     /**
      * Gets the value of the refId property.

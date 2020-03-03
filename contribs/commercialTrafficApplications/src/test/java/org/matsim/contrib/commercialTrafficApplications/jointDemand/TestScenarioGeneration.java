@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -33,6 +31,7 @@ import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJo
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -44,7 +43,8 @@ public class TestScenarioGeneration {
 
 
     public static Scenario generateScenario(){
-        Config config = loadConfig("config.xml",new JointDemandConfigGroup());
+
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml",new JointDemandConfigGroup());
         Scenario scenario = createScenario(config);
         addPopulation(scenario);
         return scenario;

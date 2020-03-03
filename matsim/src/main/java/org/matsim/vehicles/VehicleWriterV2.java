@@ -130,7 +130,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				}
 				this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
 				//attributes for capacity
-				this.writer.newLine();
+				this.writer.write("\n");
 				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes(), false );
 				this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 			}
@@ -160,7 +160,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 			if (vt.getEngineInformation() != null & !vt.getEngineInformation().getAttributes().isEmpty()) {
 				atts.clear();
 				this.writeStartTag(VehicleSchemaV2Names.ENGINEINFORMATION, atts);
-				this.writer.newLine();
+				this.writer.write("\n");
 				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vt.getEngineInformation().getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 			}
@@ -180,7 +180,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				}
 				this.writeStartTag(VehicleSchemaV2Names.COSTINFORMATION, atts);
 				//attributes for costInformation
-				this.writer.newLine();
+				this.writer.write("\n");
 				attributesWriter.writeAttributes( "\t\t\t" , this.writer , costInformation.getAttributes(), false );
 				this.writeEndTag(VehicleSchemaV2Names.COSTINFORMATION);
 			}

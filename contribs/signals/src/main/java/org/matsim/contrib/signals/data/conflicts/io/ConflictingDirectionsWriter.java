@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 /**
  * @author tthunig
  */
-public class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
+public final class ConflictingDirectionsWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	private static final Logger LOG = Logger.getLogger(ConflictingDirectionsWriter.class);
 	

@@ -35,7 +35,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -53,7 +52,6 @@ public class PKMbyModeCalculator {
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
     private final static String FILENAME = "pkm_modestats";
-    private final DecimalFormat df = new DecimalFormat();
 
 
     @Inject
@@ -97,7 +95,7 @@ public class PKMbyModeCalculator {
             for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
-                    csvPrinter.print(df.format(e.getValue().getOrDefault(mode,0.0)/1000.0));
+                    csvPrinter.print(e.getValue().getOrDefault(mode, 0.0) / 1000.0);
                 }
                 csvPrinter.println();
             }
