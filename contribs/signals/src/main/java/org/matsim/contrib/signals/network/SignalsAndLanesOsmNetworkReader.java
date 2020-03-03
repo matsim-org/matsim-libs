@@ -19,15 +19,7 @@
 
 package org.matsim.contrib.signals.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -136,6 +128,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final Map<Long, Double> turnRadii = new HashMap<>();
 	private Map<Id<Link>, Coord> linkToOrigToNodeCoord = new HashMap<>();
 	private Map<Id<Link>, Coord> linkToOrigFromNodeCoord = new HashMap<>();
+	private Set<Id<Link>> loopLinks = new HashSet<>();
 
 	// Node stuff
 	Set<Long> signalizedOsmNodes = new HashSet<>();
@@ -166,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_27";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_03";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -359,12 +352,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	protected void createMatsimData() {
 		super.createMatsimData();
 
+		for (Id<Link> linkId : loopLinks){
+			network.removeLink(linkId);
+		}
+
+
 		// TODO check and clean this method!
 //		for (Id<SignalSystem> set : this.systems.getSignalSystemData().keySet()) {
 //			LOG.warn(set.toString());
 //			this.systems.getSignalSystemData().get(set).
 //		}
 		// lanes were already created (via setOrModifyLinkAttributes()) but without toLinks. add toLinks now:
+
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
@@ -2093,7 +2092,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			l.setFromNode(network.getNodes().get(Id.createNodeId(simplifiedOsmNodeId)));
 			l.setLength(NetworkUtils.getEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
 		}
-
+		if (l.getToNode().equals(l.getFromNode())){
+			loopLinks.add(l.getId());
+		}
 		// convert lane directions
 		String turnLanesOsm;
 		if (forwardDirection) {
