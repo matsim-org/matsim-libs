@@ -1,21 +1,16 @@
 package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableMap;
-import java.util.concurrent.ConcurrentSkipListMap;
-
 import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.quadtree.Quadtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.GeometryUtils;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Separate from {@link NoiseContext} for better testability.
@@ -53,9 +48,9 @@ final class ShieldingContext {
         final Point fromPoint = GeometryUtils.createGeotoolsPoint(link.getFromNode().getCoord());
         final Point toPoint = GeometryUtils.createGeotoolsPoint(link.getToNode().getCoord());
 
-        Geometry projectedLineOfSight = constructLineOfSight(rpPoint, projectedPoint);
-        Geometry fromLineOfSight = constructLineOfSight(rpPoint, fromPoint);
-        Geometry toLineOfSight = constructLineOfSight(rpPoint, toPoint);
+        LineString projectedLineOfSight = constructLineOfSight(rpPoint, projectedPoint);
+        LineString fromLineOfSight = constructLineOfSight(rpPoint, fromPoint);
+        LineString toLineOfSight = constructLineOfSight(rpPoint, toPoint);
 
         NavigableMap<Double, Coordinate> edgeCandidates = getObstructionEdges(rpPoint, projectedPoint, projectedLineOfSight, fromLineOfSight, toLineOfSight);
         edgeCandidates.put(projectedLineOfSight.getLength(), projectedPoint.getCoordinate());
@@ -69,6 +64,10 @@ final class ShieldingContext {
 
             double distToCurrentEdge = 0;
             while (lastFixedEdge != projectedPoint.getCoordinate()) {
+                if(edgeCandidates.isEmpty()) {
+                    logger.warn("Skipping obstacle as distance appears to be 0.");
+                    return correctionTermShielding;
+                }
                 Iterator<Coordinate> edgesIterator = edgeCandidates.values().iterator();
                 double maxSlope = Double.NEGATIVE_INFINITY;
                 double tmpDistance = 0;
@@ -92,7 +91,6 @@ final class ShieldingContext {
             consideredEdges.remove(projectedPoint.getCoordinate());
 
             if(consideredEdges.isEmpty()) {
-                logger.warn("No edge candiates found. Skippig obstacle");
                 return correctionTermShielding;
             }
 
@@ -127,13 +125,17 @@ final class ShieldingContext {
     /**
      * Returns an ordered map of distances and coords to all obstruction edges
      */
-    private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Point receiver, Point source, Geometry directLineOfSight,
-                                                                          Geometry fromLineOfSight, Geometry toLineOfSight) {
+    private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Point receiver, Point source, LineString directLineOfSight,
+                                                                          LineString fromLineOfSight, LineString toLineOfSight) {
+
         final Collection<NoiseBarrier> candidates =
                 noiseBarriers.query(directLineOfSight.getEnvelopeInternal());
         ConcurrentSkipListMap<Double, Coordinate> edgeCandidates = new ConcurrentSkipListMap<>();
-        candidates.stream().forEach(noiseBarrier -> {
-            if (isObstructing(receiver, source, directLineOfSight, fromLineOfSight, toLineOfSight, noiseBarrier.getGeometry())) {
+        for (NoiseBarrier noiseBarrier : candidates) {
+            //prepared geometry for repeated geometry relate-checks reduces run-time by 30%,
+            //nkuehnel, mar '20
+            final PreparedGeometry prepare = PreparedGeometryFactory.prepare(noiseBarrier.getGeometry());
+            if (isObstructing(receiver, source, directLineOfSight, fromLineOfSight, toLineOfSight, prepare)) {
                 Geometry intersection = directLineOfSight.intersection(noiseBarrier.getGeometry());
                 for (Coordinate coordinate : intersection.getCoordinates()) {
                     coordinate.z = noiseBarrier.getHeight();
@@ -141,7 +143,7 @@ final class ShieldingContext {
                     edgeCandidates.put(distance, coordinate);
                 }
             }
-        });
+        }
         return edgeCandidates;
     }
 
@@ -152,17 +154,19 @@ final class ShieldingContext {
      * 2) the direct projected line of sight must intersect the barrier
      * 3) the line of sight from receiver to the from-Node of the link intersects the barrier
      * 4) the line of sight from receiver to the to-Node of the link intersects the barrier
+     *
+     * Uses prepared geometry for the barrier polygon to cache intersection graphs.
      */
     private boolean isObstructing(Geometry receiver, Geometry source, Geometry lineOfSight,
-                                  Geometry fromLineOfSight, Geometry toLineOfSight, Geometry barrier) {
-        return !barrier.contains(receiver)
-                && !barrier.contains(source)
-                && lineOfSight.intersects(barrier)
-                && fromLineOfSight.intersects(barrier)
-                && toLineOfSight.intersects(barrier);
+                                  Geometry fromLineOfSight, Geometry toLineOfSight, PreparedGeometry barrier) {
+        return barrier.intersects(lineOfSight)
+                && barrier.intersects(fromLineOfSight)
+                && barrier.intersects(toLineOfSight)
+                && !barrier.contains(receiver)
+                && !barrier.contains(source);
     }
 
-    private Geometry constructLineOfSight(Point receiver, Point source) {
+    private LineString constructLineOfSight(Point receiver, Point source) {
         Coordinate[] lineOfSightCoords = new Coordinate[2];
         lineOfSightCoords[0] = receiver.getCoordinate();
         lineOfSightCoords[1] = source.getCoordinate();
