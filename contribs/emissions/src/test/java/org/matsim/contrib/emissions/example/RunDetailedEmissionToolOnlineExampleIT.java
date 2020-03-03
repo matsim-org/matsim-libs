@@ -50,6 +50,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	public final void testDetailed_vehTypeV1() {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.global().setNumberOfThreads(1);
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
@@ -63,6 +64,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	public final void testDetailed_vehTypeV2() {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.global().setNumberOfThreads(1);
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
@@ -83,6 +85,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.global().setNumberOfThreads(1);
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
@@ -105,6 +108,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.global().setNumberOfThreads(1);
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
