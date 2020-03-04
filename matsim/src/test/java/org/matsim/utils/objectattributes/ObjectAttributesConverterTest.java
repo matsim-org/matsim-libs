@@ -25,6 +25,9 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Month;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -46,5 +49,17 @@ public class ObjectAttributesConverterTest {
 		final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 		Object converted = converter.convert(Month.class.getCanonicalName(), "JANUARY");
 		Assert.assertEquals("unexpected enum converted from String value", Month.JANUARY, converted);
+	}
+
+	@Test
+	public void testHashMap() {
+
+		var expectedString = "{\"a\":\"value-a\",\"b\":\"value-b\"}";
+		final var converter = new ObjectAttributesConverter();
+
+		Map<String, String> parsed = (Map<String, String>) converter.convert("java.util.Map", expectedString);
+		var serialized = converter.convertToString(parsed);
+
+		assertEquals(expectedString, serialized);
 	}
 }

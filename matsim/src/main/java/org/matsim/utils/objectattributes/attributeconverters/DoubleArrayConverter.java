@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.objectattributes;/*
+package org.matsim.utils.objectattributes.attributeconverters;/*
  * created by jbischoff, 22.08.2018
  */
 
 import org.apache.log4j.Logger;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
 public class DoubleArrayConverter implements AttributeConverter<double[]> {
 

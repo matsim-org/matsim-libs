@@ -32,6 +32,7 @@ import java.util.Set;
 
 /**
  * Object that converts arbitrary objects to and from strings based on the logic defined by {@AttributeConverter}s
+ *
  * @author thibautd
  */
 public class ObjectAttributesConverter {
@@ -47,13 +48,14 @@ public class ObjectAttributesConverter {
 	}
 
 	public ObjectAttributesConverter() {
-		this.converters.put(String.class.getName(), new StringConverter() );
-		this.converters.put(Integer.class.getName(), new IntegerConverter() );
-		this.converters.put(Float.class.getName(), new FloatConverter() );
-		this.converters.put(Double.class.getName(), new DoubleConverter() );
-		this.converters.put(Boolean.class.getName(), new BooleanConverter() );
-		this.converters.put(Long.class.getName(), new LongConverter() );
+		this.converters.put(String.class.getName(), new StringConverter());
+		this.converters.put(Integer.class.getName(), new IntegerConverter());
+		this.converters.put(Float.class.getName(), new FloatConverter());
+		this.converters.put(Double.class.getName(), new DoubleConverter());
+		this.converters.put(Boolean.class.getName(), new BooleanConverter());
+		this.converters.put(Long.class.getName(), new LongConverter());
 		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
+		this.converters.put(Map.class.getName(), new StringStringMapConverter());
 	}
 
 	public Object convert(String className, String value) {
@@ -85,7 +87,10 @@ public class ObjectAttributesConverter {
 	}
 
 	public String convertToString(Object o) {
-		AttributeConverter converter = getConverter(o.getClass().getName());
+
+		// obviously this will not work this way if we have more generic conversion, but good for now, janek (Mar, 2020)
+		var className = o instanceof Map ? Map.class.getName() : o.getClass().getName();
+		AttributeConverter converter = getConverter(className);
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
