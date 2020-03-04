@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -107,6 +109,12 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	public GreedyUmlaufBuilderImpl(UmlaufInterpolator interpolator, Collection<TransitLine> transitLines) {
 		this.interpolator = interpolator;
 		this.transitLines = transitLines;
+	}
+
+	@Inject
+	GreedyUmlaufBuilderImpl( Scenario scenario ) {
+		interpolator = new UmlaufInterpolator( scenario.getNetwork(), scenario.getConfig().planCalcScore() );
+		this.transitLines = scenario.getTransitSchedule().getTransitLines().values();
 	}
 	
 	private static boolean canBuild() {
