@@ -37,6 +37,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -153,6 +154,9 @@ public class CreatePseudoNetwork {
 				newFacility.setStopAreaId(Id.create(toFacility.getId(), TransitStopArea.class));
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
+				toFacility.getAttributes().getAsMap().keySet().forEach(atrKey -> {
+					TransitScheduleUtils.putStopFacilityAttribute(newFacility, atrKey, toFacility.getAttributes().getAttribute(atrKey));
+				});
 				copies.add(newFacility);
 				this.nodes.put(newFacility, toNode);
 				this.schedule.addStopFacility(newFacility);
