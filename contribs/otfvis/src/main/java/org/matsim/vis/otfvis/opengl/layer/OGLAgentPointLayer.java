@@ -151,27 +151,30 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	public void addAgent(AgentSnapshotInfo agInfo) {
 		Color color;
 		switch ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme() ) {
-		case bvg:
-			color = bvgColoringScheme(agInfo);
-			break;
-		case bvg2:
-			color = bvg2ColoringScheme(agInfo);
-			break;
-		case byId:
-			color = byIdColoringScheme(agInfo);
-			break;
-		case gtfs:
-			color = gtfsColoringScheme(agInfo);
-			break;
-		case standard:
-			color = standardColoringScheme(agInfo);
-			break;
-		case taxicab:
-			color = taxicabColoringScheme(agInfo) ;
-			break;
-		default:
-			color = standardColoringScheme(agInfo);
-			break;
+			case bvg:
+				color = bvgColoringScheme(agInfo);
+				break;
+			case bvg2:
+				color = bvg2ColoringScheme(agInfo);
+				break;
+			case byId:
+				color = byIdColoringScheme(agInfo);
+				break;
+			case gtfs:
+				color = gtfsColoringScheme(agInfo);
+				break;
+			case standard:
+				color = standardColoringScheme(agInfo);
+				break;
+			case taxicab:
+				color = taxicabColoringScheme(agInfo) ;
+				break;
+			case infection:
+				color = infectionColoringScheme(agInfo);
+				break;
+			default:
+				color = standardColoringScheme(agInfo);
+				break;
 		}
 
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
@@ -187,7 +190,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		this.colorsIN.put( (byte)color.getRed());
 		this.colorsIN.put( (byte)color.getGreen());
 		this.colorsIN.put((byte)color.getBlue());
-		this.colorsIN.put( (byte) ALPHA);
+		this.colorsIN.put( (byte) color.getAlpha());
 
 		this.count++;
 	}
@@ -216,6 +219,19 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 			return Color.MAGENTA;
 		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
 			return Color.BLUE;
+		} else {
+			return Color.YELLOW;
+		}
+	}
+	private static Color infectionColoringScheme(AgentSnapshotInfo agInfo) {
+		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
+			return redToGreenColorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne());
+		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
+			return Color.ORANGE;
+		} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
+			return Color.MAGENTA;
+		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
+			return new Color( 0.f, 0.f, 1.f, 0.1f );
 		} else {
 			return Color.YELLOW;
 		}
