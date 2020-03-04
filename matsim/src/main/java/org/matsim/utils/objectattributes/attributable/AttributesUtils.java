@@ -62,7 +62,7 @@ public class AttributesUtils {
 	}
 
 	private static boolean isValueObject(Object value) {
-		return value instanceof String || ClassUtils.isPrimitiveOrWrapper(value.getClass());
+		return value instanceof String || value.getClass().isEnum() || ClassUtils.isPrimitiveOrWrapper(value.getClass());
 	}
 
 	private static Object copyValue(Object value) {
