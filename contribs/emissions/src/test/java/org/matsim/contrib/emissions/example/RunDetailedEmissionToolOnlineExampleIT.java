@@ -20,6 +20,7 @@ package org.matsim.contrib.emissions.example;
 
 import static org.junit.Assert.*;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -46,8 +47,11 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	 *
 	 * */
 	@SuppressWarnings("static-method")
-	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Test
 	public final void testDetailed_vehTypeV1() {
+		boolean gotAnException = false ;
+		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.global().setNumberOfThreads(1);
@@ -57,11 +61,17 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+		} catch (Exception ee ) {
+			gotAnException = true ;
+		}
+		Assert.assertTrue( gotAnException );
 	}
 
 	@SuppressWarnings("static-method")
 	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 	public final void testDetailed_vehTypeV2() {
+			boolean gotAnException = false ;
+			try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.global().setNumberOfThreads(1);
@@ -70,6 +80,10 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+			} catch (Exception ee ) {
+				gotAnException = true ;
+			}
+		Assert.assertTrue( gotAnException );
 	}
 
 
