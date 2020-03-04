@@ -20,29 +20,25 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.core.gbl.Gbl;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.matsim.core.mobsim.qsim.QSim;
 
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Phaser;
-
 /**
- * These are the "threads" of the {@link QNetsimEngine}. The "run()" method is implicitly called by starting the thread.
+ * These are the "threads" of the {@link QNetsimEngineWithThreadpool}. The "run()" method is implicitly called by starting the thread.
  * 
+ * @author droeder after
  * @author (of this documentation) nagel
  *
  */
-class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnable, Callable<Boolean> {
+abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry {
 
 	private double time = 0.0;
-
-	private volatile boolean simulationRunning = true;
-
-	private final Phaser startBarrier;
-	private final Phaser separationBarrier;
-	private final Phaser endBarrier;
 
 	/*
 	 * This needs to be thread-safe since QNodes could be activated concurrently
@@ -74,97 +70,20 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	private boolean lockNodes = false;
 	private boolean lockLinks = false;
 
-	private boolean movingNodes;
-
 	/*package*/ long[] runTimes;
 	private long startTime = 0;
 	{	
-		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngine.numObservedTimeSteps];
+		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngineWithThreadpool.numObservedTimeSteps];
 		else runTimes = null;
 	}
-	
-	/*package*/ QNetsimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
-		this.startBarrier = startBarrier;
-		this.separationBarrier = separationBarrier;
-		this.endBarrier = endBarrier;
-	}
-	QNetsimEngineRunner() {
-		// this is the execution path with invokeAll and the threadpool; it does not need (and should not use) the barriers.
-		// kai, jan'14
-		this.startBarrier = null;
-		this.separationBarrier = null;
-		this.endBarrier = null;
-	}
 
-	/*package*/ void setTime(final double t) {
+	/*package*/ final void setTime(final double t) {
 		time = t;
 	}
 
-	public void afterSim() {
-		this.simulationRunning = false;
-	}
+	public abstract void afterSim() ;
 
-	@Override
-	public Boolean call() {
-		// implementing "call" and "run" side by side because it seems the easier way to 
-		// experimentally switch between the two types of threading.
-		// kai, jan'14
-
-		// Check if Simulation is still running. Otherwise print CPU usage and end thread.
-		if (!this.simulationRunning) {
-			Gbl.printCurrentThreadCpuTime();
-			return false;
-		}
-
-		if (this.movingNodes) {
-			moveNodes();
-		} else {
-			moveLinks();
-		}
-		return true ;
-	}
-
-	@Override
-	public void run() {
-
-		// The method is ended when the simulationRunning flag is set to false.
-		while(true) {
-
-			/*
-			 * The threads wait at the startBarrier until they are triggered in the next 
-			 * time step by the run() method in the QNetsimEngine.
-			 */
-			startBarrier.arriveAndAwaitAdvance();
-
-			if (QSim.analyzeRunTimes) this.startTime = System.nanoTime();
-			
-			// Check if Simulation is still running. Otherwise print CPU usage and end thread.
-			if (!this.simulationRunning) {
-				Gbl.printCurrentThreadCpuTime();
-				return;
-			}
-
-			moveNodes();
-
-			// After moving the QNodes all we use a Phaser to synchronize the threads.
-			this.separationBarrier.arriveAndAwaitAdvance();
-
-			moveLinks();
-
-			if (QSim.analyzeRunTimes) {
-				long end = System.nanoTime();
-				int bin = (int) this.time;
-				if (bin < this.runTimes.length) this.runTimes[bin] = end - this.startTime;
-			}
-			
-			/*
-			 * The end of moving is synchronized with the endBarrier. If all threads 
-			 * reach this barrier the main thread can go on.
-			 */
-			this.endBarrier.arriveAndAwaitAdvance();
-		}
-	}
-	private void moveNodes() {
+	protected void moveNodes() {
 		boolean remainsActive;
 		this.lockNodes = true;
 		QNodeI node;
@@ -176,7 +95,8 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 		}
 		this.lockNodes = false;
 	}
-	private void moveLinks() {
+	
+	protected final void moveLinks() {
 		boolean remainsActive;
 		lockLinks = true;
 		QLinkI link;
@@ -197,13 +117,13 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void registerLinkAsActive(QLinkI link) {
+	protected final void registerLinkAsActive(QLinkI link) {
 		if (!lockLinks) linksList.add(link);
 		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
 	}
 
 	@Override
-	public int getNumberOfSimulatedLinks() {
+	public final int getNumberOfSimulatedLinks() {
 		return this.linksList.size();
 	}
 
@@ -213,7 +133,7 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void registerNodeAsActive(QNodeI node) {
+	protected final void registerNodeAsActive(QNodeI node) {
 		if (!this.lockNodes) this.nodesQueue.add(node);
 		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}
@@ -225,11 +145,19 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	 * cdobler, sep'14
 	 */
 	@Override
-	public int getNumberOfSimulatedNodes() {
+	public final int getNumberOfSimulatedNodes() {
 		return this.nodesQueue.size();
 	}
 
-	public void setMovingNodes(boolean movingNodes) {
-		this.movingNodes = movingNodes;
+	protected final void startMeasure() {
+		if (QSim.analyzeRunTimes) this.startTime = System.nanoTime();		
+	}
+
+	protected final void endMeasure() {
+		if (QSim.analyzeRunTimes) {
+			long end = System.nanoTime();
+			int bin = (int) this.time;
+			if (bin < this.runTimes.length) this.runTimes[bin] = end - this.startTime;
+		}
 	}
 }

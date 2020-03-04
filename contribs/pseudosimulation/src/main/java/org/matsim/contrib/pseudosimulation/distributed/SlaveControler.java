@@ -273,14 +273,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         else {
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
+                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
                     bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                 }
             });
-            disutilityFactory.setSigma(0.1);
 
         }
         matsimControler.addOverridingModule(new AbstractModule() {

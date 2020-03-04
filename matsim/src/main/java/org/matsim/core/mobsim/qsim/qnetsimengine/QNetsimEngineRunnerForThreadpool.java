@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DefaultTravelCostCalculatorFactoryImpl
+ * QSimEngineRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.decongestion.routing;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import com.google.inject.Inject;
+import java.util.concurrent.Callable;
 
-import org.matsim.contrib.decongestion.data.DecongestionInfo;
-
+import org.matsim.core.gbl.Gbl;
 
 /**
- * @author ikaddoura
- *
+ * Split up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches.
+ * 
+ * @author droeder @ Senozon Deutschland GmbH
  */
-public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
-	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
-
-	@Inject
-	private Scenario scenario;
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
 	
-	@Inject
-	private DecongestionInfo info;
-		
-	public TollTimeDistanceTravelDisutilityFactory() {
-		log.info("Using the toll-adjusted travel disutility factory in the decongestion package.");
+	private volatile boolean simulationRunning = true;
+	private boolean movingNodes;
+
+	QNetsimEngineRunnerForThreadpool() {
 	}
 
 	@Override
-	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig(), info);
+	public Boolean call() {
+		if (!this.simulationRunning) {
+			Gbl.printCurrentThreadCpuTime();
+			return false;
+		}
+
+		if (this.movingNodes) {
+			moveNodes();
+		} else {
+			moveLinks();
+		}
+		return true ;
 	}
 
+	public final void afterSim() {
+		this.simulationRunning  = false;
+	}
+
+	public final void setMovingNodes(boolean movingNodes) {
+		this.movingNodes = movingNodes;
+	}
 }
