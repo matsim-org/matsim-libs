@@ -38,7 +38,7 @@ public class AttributesUtils {
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
 		for (var entry : from.getAsMap().entrySet()) {
-			var value = ClassUtils.isPrimitiveOrWrapper(entry.getValue().getClass()) ? entry.getValue() : copyValue(entry.getValue());
+			var value = isValueObject(entry.getValue()) ? entry.getValue() : copyValue(entry.getValue());
 			to.putAttribute(entry.getKey(), value);
 		}
 	}
@@ -59,6 +59,10 @@ public class AttributesUtils {
 	@Deprecated
 	public static boolean isEmpty(Attributes attributes) {
 		return attributes.size() == 0;
+	}
+
+	private static boolean isValueObject(Object value) {
+		return value instanceof String || ClassUtils.isPrimitiveOrWrapper(value.getClass());
 	}
 
 	private static Object copyValue(Object value) {
