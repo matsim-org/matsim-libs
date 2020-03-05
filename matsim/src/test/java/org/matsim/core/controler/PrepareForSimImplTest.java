@@ -439,7 +439,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
@@ -449,7 +449,7 @@ public class PrepareForSimImplTest {
 			plan.addLeg(leg2);
 			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
 			plan.addActivity(activity3);
-			Leg leg3 = pf.createLeg(TransportMode.egress_walk);
+			Leg leg3 = pf.createLeg("egress_walk");
 			TripStructureUtils.setRoutingMode(leg3, null);
 			plan.addLeg(leg3);
 			Activity activity4 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
@@ -548,7 +548,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
@@ -578,7 +578,7 @@ public class PrepareForSimImplTest {
 			plan.addLeg(leg6);
 			Activity activity7 = pf.createActivityFromCoord("walk interaction", new Coord((double) 1900, -10));
 			plan.addActivity(activity7);
-			Leg leg7 = pf.createLeg(TransportMode.egress_walk);
+			Leg leg7 = pf.createLeg("egress_walk");
 			TripStructureUtils.setRoutingMode(leg7, null);
 			plan.addLeg(leg7);
 			Activity activity8 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
@@ -649,7 +649,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
