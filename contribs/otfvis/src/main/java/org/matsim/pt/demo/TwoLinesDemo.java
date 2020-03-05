@@ -48,10 +48,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.analysis.RouteOccupancy;
 import org.matsim.pt.analysis.VehicleTracker;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -261,11 +262,11 @@ public class TwoLinesDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
+			leg1.setRoute(new DefaultTransitPassengerRoute(stop1, tLine1, tRoute1, stop3));
 			Activity act2 = pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:01:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
+			leg2.setRoute(new DefaultTransitPassengerRoute(stop3, tLine2, tRoute2, stop6));
 			Activity act3 = pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);
@@ -284,11 +285,11 @@ public class TwoLinesDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop3));
+			leg1.setRoute(new DefaultTransitPassengerRoute(stop1, tLine1, tRoute1, stop3));
 			Activity act2 = pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:06:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop3, tLine2, tRoute2, stop6));
+			leg2.setRoute(new DefaultTransitPassengerRoute(stop3, tLine2, tRoute2, stop6));
 			Activity act3 = pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);
@@ -307,11 +308,11 @@ public class TwoLinesDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(3, Link.class));
 			act1.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg1 = pb.createLeg(TransportMode.pt);
-			leg1.setRoute(new ExperimentalTransitRoute(stop1, tLine1, tRoute1, stop4));
+			leg1.setRoute(new DefaultTransitPassengerRoute(stop1, tLine1, tRoute1, stop4));
 			Activity act2 = pb.createActivityFromLinkId("pt interaction", Id.create(3, Link.class));
 			act2.setEndTime(Time.parseTime("07:11:00"));
 			Leg leg2 = pb.createLeg(TransportMode.pt);
-			leg2.setRoute(new ExperimentalTransitRoute(stop4, tLine2, tRoute2, stop6));
+			leg2.setRoute(new DefaultTransitPassengerRoute(stop4, tLine2, tRoute2, stop6));
 			Activity act3 = pb.createActivityFromLinkId("pt interaction", Id.create(6, Link.class));
 
 			plan.addActivity(act1);

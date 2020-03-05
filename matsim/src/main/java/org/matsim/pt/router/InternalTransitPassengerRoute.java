@@ -26,12 +26,12 @@ import java.util.List;
  * @author aneumann
  *
  */
-public class TransitPassengerRoute {
+public class InternalTransitPassengerRoute {
 
 	private final double cost;
 	private final List<RouteSegment> route;
 
-	public TransitPassengerRoute(double cost, List<RouteSegment> leastCostRoute) {
+	public InternalTransitPassengerRoute(double cost, List<RouteSegment> leastCostRoute) {
 		this.cost = cost;
 		this.route = leastCostRoute;
 		
