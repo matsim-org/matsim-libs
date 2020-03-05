@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_03";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_05";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -736,11 +736,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					Set<OsmNode> tempNodes = new HashSet<>();
 					for (OsmWay way : node.ways.values()) {
 						String oneway = way.tags.get(TAG_ONEWAY);
-						if (oneway != null && !oneway.equals("no"))
-							break;
+						//sbraun 05032020 alles was kein Onewaytag hat wird übersprungen -> änder das -> evtl. die ganz Logik rausnehmen
+						//-> Fixed Error in Junction System 1420523170 in Benchmark Network
+						if (oneway != null && !oneway.equals("no")||oneway==null)
+							continue;						//changed to continue
 						for (int i = 0; i < way.nodes.size(); i++) {
 							if (otherSuit == true)
-								break;
+								continue;					//changed to continue
 							otherNode = nodes.get(way.nodes.get(i));
 
 							boolean nodeSignalized = signalizedOsmNodes.contains(node.id);
@@ -768,20 +770,33 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 								double distance = NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
 										otherNode.coord.getX(), otherNode.coord.getY());
+
+
 								OsmWay origWay = way;
 								int counter = 0;
-								while (counter < 3 && (otherNode.ways.size()==2 && distance < SIGNAL_MERGE_DISTANCE && !isNodeAtJunction(otherNode) )){
-									counter++;
+								Set<Long> passedWays = new HashSet<>();
+								passedWays.add(origWay.id);
+								//sbraun 05032020 changed from otherNode.ways.size()==2 and from counter < 3
+								while (counter < 5 && (otherNode.ways.size()<=2 && distance < SIGNAL_MERGE_DISTANCE && !isNodeAtJunction(otherNode) )){
+									//counter++;
 									if (!checkedNodes.contains(otherNode)) {
 										for (OsmWay tempWay : otherNode.ways.values()) {
-											if (!(origWay.id == tempWay.id)) {
+											//if (!(origWay.id == tempWay.id)) {
+											if (!passedWays.contains(tempWay.id)){
 												tempNodes.add(otherNode);
-												OsmNode tempNode = nodes.get(origWay.nodes.get(0));
+												//sbraun05032020 try tempWay instead of Origway
+												OsmNode tempNode = nodes.get(tempWay.nodes.get(0));
+												//sbraun 05032020 wenn kleine Mittelwege keine Onewways sind ist die Reihenfolge manchmal anders rum
+												/*if (tempNodes.contains(tempNode)){
+													tempNode = nodes.get(origWay.nodes.get(origWay.nodes.size()-1));
+												}*/
+
 												distance += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
 														otherNode.coord.getX(), otherNode.coord.getY());
 
 												otherNodeSignalized = signalizedOsmNodes.contains(tempNode.id);
 												otherNode = tempNode;
+												passedWays.add(tempWay.id);
 												origWay = tempWay;
 												break;
 											}
@@ -789,7 +804,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 										if(otherNodeSignalized==nodeSignalized && isNodeAtJunction(otherNode) && !node.equals(otherNode)){
 											break;
 										}
-
+										counter++;
 									}
 								}
 
