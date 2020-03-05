@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
-import org.locationtech.jts.index.quadtree.Quadtree;
+import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.GeometryUtils;
@@ -21,12 +21,14 @@ final class ShieldingContext {
 
     private final static Logger logger = Logger.getLogger(ShieldingContext.class);
 
-    private final Quadtree noiseBarriers;
+    //STRtree increases performance by ~40% by reducing the amount of potential
+    //obstruction candidates. nkuehnel, mar '20
+    private final STRtree noiseBarriers;
     private final static double GROUND_HEIGHT = 0.5;
 
     ShieldingContext(Collection<? extends NoiseBarrier> noiseBarriers) {
 
-        this.noiseBarriers = new Quadtree();
+        this.noiseBarriers = new STRtree();
         for (NoiseBarrier barrier : noiseBarriers) {
             try {
                 this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
@@ -127,15 +129,15 @@ final class ShieldingContext {
      */
     private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Point receiver, Point source, LineString directLineOfSight,
                                                                           LineString fromLineOfSight, LineString toLineOfSight) {
-
         final Collection<NoiseBarrier> candidates =
                 noiseBarriers.query(directLineOfSight.getEnvelopeInternal());
+
         ConcurrentSkipListMap<Double, Coordinate> edgeCandidates = new ConcurrentSkipListMap<>();
         for (NoiseBarrier noiseBarrier : candidates) {
             //prepared geometry for repeated geometry relate-checks reduces run-time by 30%,
             //nkuehnel, mar '20
             final PreparedGeometry prepare = PreparedGeometryFactory.prepare(noiseBarrier.getGeometry());
-            if (isObstructing(receiver, source, directLineOfSight, fromLineOfSight, toLineOfSight, prepare)) {
+            if (isObstructing(receiver, source, fromLineOfSight, toLineOfSight, prepare)) {
                 Geometry intersection = directLineOfSight.intersection(noiseBarrier.getGeometry());
                 for (Coordinate coordinate : intersection.getCoordinates()) {
                     coordinate.z = noiseBarrier.getHeight();
@@ -157,10 +159,9 @@ final class ShieldingContext {
      *
      * Uses prepared geometry for the barrier polygon to cache intersection graphs.
      */
-    private boolean isObstructing(Geometry receiver, Geometry source, Geometry lineOfSight,
-                                  Geometry fromLineOfSight, Geometry toLineOfSight, PreparedGeometry barrier) {
-        return barrier.intersects(lineOfSight)
-                && barrier.intersects(fromLineOfSight)
+    private boolean isObstructing(Geometry receiver, Geometry source, Geometry fromLineOfSight,
+                                  Geometry toLineOfSight, PreparedGeometry barrier) {
+        return barrier.intersects(fromLineOfSight)
                 && barrier.intersects(toLineOfSight)
                 && !barrier.contains(receiver)
                 && !barrier.contains(source);
