@@ -23,7 +23,6 @@ package org.matsim.contrib.freight;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.net.URL;
 import java.util.Map;
@@ -52,10 +51,10 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
     
-    public enum UseDistanceConstraint {noDistanceConstraint, basedOnEnergyConsumption};
-    private static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraint";
-    private UseDistanceConstraint useDistanceConstraint = UseDistanceConstraint.noDistanceConstraint;
-    private static final String USE_DISTANCE_CONSTRAINT_DESC = "Using Distant constraint within tour planning. This does NOT ensure that the tours in MATSim will respect this limitation";
+    public enum UseDistanceConstraintForTourPlanning {noDistanceConstraint, basedOnEnergyConsumption};
+    private static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraintForTourPlanning";
+    private UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning = UseDistanceConstraintForTourPlanning.noDistanceConstraint;
+    private static final String USE_DISTANCE_CONSTRAINT_DESC = "Use distant constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation";
 
     public FreightConfigGroup() {
         super(GROUPNAME);
@@ -165,15 +164,15 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
 	 * @return useDistanceConstraint
 	 */
     @StringGetter(USE_DISTANCE_CONSTRAINT)
-	public UseDistanceConstraint getUseDistanceConstraint() {
-		return useDistanceConstraint;
+	public UseDistanceConstraintForTourPlanning getUseDistanceConstraintForTourPlanning() {
+		return useDistanceConstraintForTourPlanning;
 	}
 	/**
-	 * @param useDistanceConstraint {@value #USE_DISTANCE_CONSTRAINT_DESC}
+	 * @param useDistanceConstraintForTourPlanning {@value #USE_DISTANCE_CONSTRAINT_DESC}
 	 */
     @StringSetter(USE_DISTANCE_CONSTRAINT)
-	public void setUseDistanceConstraint(UseDistanceConstraint useDistanceConstraint) {
-		this.useDistanceConstraint = useDistanceConstraint;
+	public void setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning) {
+		this.useDistanceConstraintForTourPlanning = useDistanceConstraintForTourPlanning;
 	}
 
 	//---

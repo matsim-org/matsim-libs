@@ -112,8 +112,8 @@ public class FreightUtils {
 				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
 			} else {
 				log.info("Use a VehicleRoutingAlgorithm out of the box.");
-				if (freightConfig.getUseDistanceConstraint()
-						.equals(FreightConfigGroup.UseDistanceConstraint.basedOnEnergyConsumption)) {
+				if (freightConfig.getUseDistanceConstraintForTourPlanning()
+						.equals(FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption)) {
 					log.info("Use the distanceConstraint based on energy consumption.");
 					StateManager stateManager = new StateManager(problem);
 

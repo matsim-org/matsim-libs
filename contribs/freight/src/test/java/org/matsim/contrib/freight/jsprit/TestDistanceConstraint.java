@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraint;
+import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -436,7 +436,7 @@ public class TestDistanceConstraint {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
+		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
 		return config;
 	}
 

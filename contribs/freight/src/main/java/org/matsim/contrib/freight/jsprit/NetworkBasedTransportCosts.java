@@ -204,12 +204,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	static class TransportData {
 		public final double transportCosts;
 		public final double transportTime;
-		public final double distance;
-		public TransportData(double transportCosts, double transportTime, double distance) {
+		public final double transportDistance;
+		public TransportData(double transportCosts, double transportTime, double transportDistance) {
 			super();
 			this.transportCosts = transportCosts;
 			this.transportTime = transportTime;
-			this.distance = distance;
+			this.transportDistance = transportDistance;
 		}
 		
 	}
@@ -682,7 +682,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		TransportData data = costCache.get(transportDataKey);
 		double travelDistance;
 		if(data != null){
-			travelDistance = data.distance;
+			travelDistance = data.transportDistance;
 		}
 		else{
 			informStartCalc();
@@ -707,7 +707,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			if(existingData == null){
 				existingData = newData;
 			}
-			travelDistance = existingData.distance;
+			travelDistance = existingData.transportDistance;
 			informEndCalc();
 		}
 		return travelDistance;
