@@ -25,6 +25,7 @@ import com.jogamp.opengl.util.texture.Texture;
 import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.opengl.drawer.FastColorizer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
@@ -54,9 +55,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 	private final static int BUFFERSIZE = 10000;
 
-	private static FastColorizer redToGreenColorizer = new FastColorizer(
-					new double[] { 0.0, 30., 50.}, new Color[] {Color.RED, Color.YELLOW, Color.GREEN});
-
+	private static FastColorizer redToGreenColorizer ;
 
 	private int count = 0;
 
@@ -77,7 +76,11 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	private static final Logger log = Logger.getLogger(OGLAgentPointLayer.class);
 
 	public OGLAgentPointLayer() {
-		// Empty constructor.
+		if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme()== OTFVisConfigGroup.ColoringScheme.infection){
+			redToGreenColorizer = new FastColorizer( new double[]{0.0, 30., 50.}, new Color[]{Color.RED, Color.YELLOW, Color.GREEN}, 1000, 25 );
+		} else {
+			redToGreenColorizer = new FastColorizer( new double[]{0.0, 30., 50.}, new Color[]{Color.RED, Color.YELLOW, Color.GREEN} );
+		}
 	}
 
 	@Override
@@ -227,9 +230,11 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 			return redToGreenColorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne());
 		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
-			return Color.ORANGE;
+			return new Color( 1.f, 0.65f, 0.f, 0.03f );
 		} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
-			return Color.MAGENTA;
+			return new Color( 0.f, 1.f, 1.f, 0.1f );
+		} else if ( agInfo.getAgentState()==AgentState.MARKER ) {
+			return Color.RED;
 		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
 			return new Color( 0.f, 0.f, 1.f, 0.1f );
 		} else {
