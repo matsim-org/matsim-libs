@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -66,12 +67,7 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
             if (prevLeg != null) {
                 Coord coord = findCoordinate(prevLeg, leg);
                 Id<Link> linkId = leg.getRoute().getStartLinkId();
-                Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
-                        coord, linkId);
-                act.setMaximumDuration(0.0);
-                double time = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
-                act.setStartTime(time);
-                act.setEndTime(time);
+                Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndMode(coord, linkId, TransportMode.pt);
                 planElements.add(act);
             }
             planElements.add(leg);
