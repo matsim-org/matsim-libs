@@ -232,9 +232,9 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 			
 			// Check leg modes remain unchanged
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg1.getMode());
 			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg3.getMode());
 			
 			// Check routing mode:
 			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
@@ -318,15 +318,15 @@ public class PrepareForSimImplTest {
 			// TODO: Currently all TransportMode.non_network_walk legs are replaced by TransportMode.walk, so we cannot check
 			// the correct handling of them right now.
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg2.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg2.getMode());
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg3.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, leg4.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg4.getMode());
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg5.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg6.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg6.getMode());
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg7.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt, leg8.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg8.getMode());
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg9.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg10.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg10.getMode());
 //			Assert.assertEquals("wrong routing mode!", TransportMode.non_network_walk, leg11.getMode());
 			
 			// Check routing mode remains unchanged
@@ -439,7 +439,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
@@ -449,7 +449,7 @@ public class PrepareForSimImplTest {
 			plan.addLeg(leg2);
 			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
 			plan.addActivity(activity3);
-			Leg leg3 = pf.createLeg(TransportMode.egress_walk);
+			Leg leg3 = pf.createLeg("egress_walk");
 			TripStructureUtils.setRoutingMode(leg3, null);
 			plan.addLeg(leg3);
 			Activity activity4 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
@@ -476,9 +476,9 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 			
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.car, leg2.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.walk, leg3.getMode());
 			
 			// Check routing mode:
 			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
@@ -531,9 +531,9 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 			
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.car, leg2.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
 			
 			// Check routing mode:
 			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
@@ -548,7 +548,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
@@ -578,7 +578,7 @@ public class PrepareForSimImplTest {
 			plan.addLeg(leg6);
 			Activity activity7 = pf.createActivityFromCoord("walk interaction", new Coord((double) 1900, -10));
 			plan.addActivity(activity7);
-			Leg leg7 = pf.createLeg(TransportMode.egress_walk);
+			Leg leg7 = pf.createLeg("egress_walk");
 			TripStructureUtils.setRoutingMode(leg7, null);
 			plan.addLeg(leg7);
 			Activity activity8 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
@@ -606,13 +606,13 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 			
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt, leg4.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg5.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.pt, leg6.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg7.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg2.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg4.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg5.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.pt, leg6.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg7.getMode());
 			
 			/*
 			 * Check routing mode:
@@ -649,7 +649,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
-			Leg leg1 = pf.createLeg(TransportMode.access_walk);
+			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);
 			Activity activity2 = pf.createActivityFromCoord("drt interaction", new Coord((double) 0, -10));
@@ -696,11 +696,11 @@ public class PrepareForSimImplTest {
 			prepareForSimImpl.run();
 			
 			// Check replacement of outdated helper modes.
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.drt, leg2.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg4.getMode());
-			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg5.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong leg mode!", TransportMode.drt, leg2.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg3.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg4.getMode());
+			Assert.assertEquals("wrong leg mode replacement!", TransportMode.walk, leg5.getMode());
 			
 			/*
 			 * Check routing mode:

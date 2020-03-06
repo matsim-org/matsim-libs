@@ -321,6 +321,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								}
 							} else {
 								if (plansConfigGroup.getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier)) {
+									for (Leg leg: legs) {
+										replaceOutdatedAccessEgressWalkModes(leg, routingMode);
+									}
 									routingMode = getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(
 											person, trip);
 								} else {
@@ -348,7 +351,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 						}
 
 						for (Leg leg : legs) {
-							replaceOutdatedAccessEgressHelperModes(leg, routingMode);
+							replaceOutdatedAccessEgressWalkModes(leg, routingMode);
+							replaceOutdatedNonNetworkWalk(leg, routingMode);
 							replaceOutdatedFallbackModesAndReturnOldMainMode(leg, routingMode);
 						}
 					}
@@ -385,15 +389,17 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		return routingMode;
 	}
 
-	private void replaceOutdatedAccessEgressHelperModes(Leg leg, String routingMode) {
+	private void replaceOutdatedAccessEgressWalkModes(Leg leg, String routingMode) {
 		// access_walk and egress_walk were replaced by non_network_walk
 		if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
 			leg.setMode(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg, routingMode);
 		}
+	}
 
-		// non_network_walk as access/egress to modes other than walk on the network was replaced by walk. -
-		// kn/gl-nov'19
+	// non_network_walk as access/egress to modes other than walk on the network was replaced by walk. -
+	// kn/gl-nov'19
+	private void replaceOutdatedNonNetworkWalk(Leg leg, String routingMode) {
 		if (leg.getMode().equals(TransportMode.non_network_walk)) {
 			leg.setMode(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg, routingMode);

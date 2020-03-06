@@ -21,7 +21,7 @@
 
  package org.matsim.utils.objectattributes.attributable;
 
-import org.matsim.utils.objectattributes.AttributeConverter;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.util.Map;
 
@@ -37,8 +37,9 @@ public class AttributesUtils {
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
-		for ( Map.Entry<String, Object> entry : from.getAsMap().entrySet() ) {
-			to.putAttribute( entry.getKey() , entry.getValue() );
+		for (var entry : from.getAsMap().entrySet()) {
+			var value = isValueObject(entry.getValue()) ? entry.getValue() : copyValue(entry.getValue());
+			to.putAttribute(entry.getKey(), value);
 		}
 	}
 
@@ -51,12 +52,25 @@ public class AttributesUtils {
 	}
 
 	/**
-	 * @deprecated use {@link Attributes#isEmpty()} instead
 	 * @param attributes collection of attributes
 	 * @return <code>true</code> if the attributes collection does not contain any attribute
+	 * @deprecated use {@link Attributes#isEmpty()} instead
 	 */
 	@Deprecated
 	public static boolean isEmpty(Attributes attributes) {
 		return attributes.size() == 0;
+	}
+
+	private static boolean isValueObject(Object value) {
+		return value instanceof String || value.getClass().isEnum() || ClassUtils.isPrimitiveOrWrapper(value.getClass());
+	}
+
+	private static Object copyValue(Object value) {
+
+		if (value instanceof Map) {
+			return Map.copyOf((Map) value);
+		} else {
+			throw new RuntimeException("Can't copy " + value.getClass().getName() + ". Implement copy logic right at this line.");
+		}
 	}
 }
