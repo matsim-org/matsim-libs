@@ -28,6 +28,7 @@ import java.time.Month;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author thibautd
@@ -61,5 +62,19 @@ public class ObjectAttributesConverterTest {
 		var serialized = converter.convertToString(parsed);
 
 		assertEquals(expectedString, serialized);
+	}
+
+	@Test
+	public void testUnsupported() {
+
+		final var converter = new ObjectAttributesConverter();
+		var serialized = converter.convertToString(new UnsupportedType());
+		var parsed = converter.convert(UnsupportedType.class.getName(), "some-value");
+
+		assertNull(serialized);
+		assertNull(parsed);
+	}
+
+	private static class UnsupportedType {
 	}
 }
