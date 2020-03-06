@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.AbstractModule;
@@ -41,15 +42,14 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class PtTutorialIT {
 
-	private static final class EnterVehicleEventCounter implements BasicEventHandler {
+	private static final class EnterVehicleEventCounter implements PersonEntersVehicleEventHandler {
 		private long cnt = 0 ;
 		@Override public void reset(int iteration) {
 			cnt = 0 ;
 		}
-		@Override public void handleEvent( Event event ) {
+		@Override public void handleEvent( PersonEntersVehicleEvent event ) {
 			if ( event instanceof PersonEntersVehicleEvent ) {
 				cnt++ ;
-//				System.err.println( event ) ;
 			}
 		}
 		public final long getCnt() {
