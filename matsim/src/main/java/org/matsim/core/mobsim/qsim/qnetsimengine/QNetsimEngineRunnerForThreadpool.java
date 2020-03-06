@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * QSimEngineRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.utils.objectattributes;/*
- * created by jbischoff, 22.08.2018
+package org.matsim.core.mobsim.qsim.qnetsimengine;
+
+import java.util.concurrent.Callable;
+
+import org.matsim.core.gbl.Gbl;
+
+/**
+ * Split up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches.
+ * 
+ * @author droeder @ Senozon Deutschland GmbH
  */
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
+	
+	private volatile boolean simulationRunning = true;
+	private boolean movingNodes;
 
-import org.apache.log4j.Logger;
+	QNetsimEngineRunnerForThreadpool() {
+	}
 
-public class DoubleArrayConverter implements AttributeConverter<double[]> {
+	@Override
+	public Boolean call() {
+		if (!this.simulationRunning) {
+			Gbl.printCurrentThreadCpuTime();
+			return false;
+		}
 
-    private static final String DELIMITER = ",";
+		if (this.movingNodes) {
+			moveNodes();
+		} else {
+			moveLinks();
+		}
+		return true ;
+	}
 
-    @Override
-    public double[] convert(String value) {
-        String[] values = value.split(DELIMITER);
-        double[] result = new double[values.length];
-        for (int i = 0; i < values.length; i++) {
-            result[i] = Double.parseDouble(values[i]);
-        }
-        return result;
-    }
+	public final void afterSim() {
+		this.simulationRunning  = false;
+	}
 
-    @Override
-    public String convertToString(Object o) {
-        if (!(o instanceof double[])) {
-            Logger.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
-            return null;
-        }
-        double[] s = (double[]) o;
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < s.length; i++) {
-            if (i > 0) {
-                result.append(DELIMITER);
-            }
-            result.append(s[i]);
-        }
-        return result.toString();
-    }
+	public final void setMovingNodes(boolean movingNodes) {
+		this.movingNodes = movingNodes;
+	}
 }

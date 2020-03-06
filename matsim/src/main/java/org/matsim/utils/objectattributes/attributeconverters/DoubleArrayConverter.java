@@ -1,11 +1,9 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * DoubleArrayConverterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2016 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,33 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributeconverters;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-/**
- * @author jbischoff
+package org.matsim.utils.objectattributes.attributeconverters;/*
+ * created by jbischoff, 22.08.2018
  */
-public class DoubleArrayConverterTest {
 
+import org.apache.log4j.Logger;
+import org.matsim.utils.objectattributes.AttributeConverter;
 
-    @Test
-    public void testFromToString() {
-        final DoubleArrayConverter converter = new DoubleArrayConverter();
-        String a = "-0.1,0,0.0005,17.3,5.2E22";
-        double[] array = converter.convert(a);
-        Assert.assertEquals(array.length, 5);
-        Assert.assertEquals(array[0], -0.1, 0.00005);
-        Assert.assertEquals(array[1], 0.0, 0.00005);
-        Assert.assertEquals(array[2], 0.0005, 0.00005);
-        Assert.assertEquals(array[3], 17.3, 0.00005);
-        Assert.assertEquals(array[4], 5.2E22, 0.00005);
+public class DoubleArrayConverter implements AttributeConverter<double[]> {
 
-        String b = converter.convertToString(array);
-        Assert.assertEquals("-0.1,0.0,5.0E-4,17.3,5.2E22", b);
+    private static final String DELIMITER = ",";
 
-
+    @Override
+    public double[] convert(String value) {
+        String[] values = value.split(DELIMITER);
+        double[] result = new double[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = Double.parseDouble(values[i]);
+        }
+        return result;
     }
 
+    @Override
+    public String convertToString(Object o) {
+        if (!(o instanceof double[])) {
+            Logger.getLogger(getClass()).error("Object is not of type double[] " + o.getClass().toString());
+            return null;
+        }
+        double[] s = (double[]) o;
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < s.length; i++) {
+            if (i > 0) {
+                result.append(DELIMITER);
+            }
+            result.append(s[i]);
+        }
+        return result.toString();
+    }
 }
