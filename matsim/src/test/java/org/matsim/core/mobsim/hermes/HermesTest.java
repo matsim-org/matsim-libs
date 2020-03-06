@@ -68,7 +68,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -102,12 +101,12 @@ public class HermesTest {
 		return Arrays.asList(capacityUpdates);
 	}
 
-	private static Hermes createHermes(MutableScenario scenario, EventsManager events) {
+	protected static Hermes createHermes(MutableScenario scenario, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		return new HermesBuilder().build(scenario, events);
 	}
 
-	private static Hermes createHermes(Fixture f, EventsManager events) {
+	protected static Hermes createHermes(Fixture f, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		return new HermesBuilder().build(f.scenario, events);
 	}
@@ -570,241 +569,6 @@ public class HermesTest {
 
 		/* finish */
 		Assert.assertEquals("wrong number of link enter events.", 0, collector.events.size());
-	}
-
-	/**
-	 * Tests that the flow capacity can be reached (but not exceeded) by
-	 * agents driving over a link.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
-	public void testFlowCapacityDriving() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-
-		// add a lot of persons with legs from link1 to link3, starting at 6:30
-		for (int i = 1; i <= 10000; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			Plan plan = PersonUtils.createAndAddPlan(person, true);
-			/* exact dep. time: 6:29:48. The agents needs:
-			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
-			 * the buffer of link 1.
-			 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
-			 * - the agent takes 10 sec. to travel along link 2, after which it gets placed in the buffer of link 2
-			 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
-			 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
-			 * to start 1 + 10 + 1 = 12 secs earlier.
-			 * So, the start time is 7*3600 - 1800 - 12 = 7*3600 - 1812
-			 */
-			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
-			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-			leg.setRoute(route);
-			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			f.plans.addPerson(person);
-		}
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
-		events.addHandler(vAnalyzer);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		sim.run();
-
-		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
-		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
-		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
-
-		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
-		//		} else {
-		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest
-		//		}
-	}
-
-
-	/**
-	 * Tests that on a link with a flow capacity of 0.25 vehicles per time step, after the first vehicle
-	 * at time step t, the second vehicle may pass in time step t + 4 and the third in time step t+8.
-	 *
-	 * @author michaz
-	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
-	public void testFlowCapacityDrivingFraction() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
-
-		// add a lot of persons with legs from link1 to link3, starting at 6:30
-		for (int i = 1; i <= 3; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			Plan plan = PersonUtils.createAndAddPlan(person, true);
-			/* exact dep. time: 6:29:48. The agents needs:
-			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
-			 * the buffer of link 1.
-			 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
-			 * - the agent takes 10 sec. to travel along link 2, after which it gets placed in the buffer of link 2
-			 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
-			 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
-			 * to start 1 + 10 + 1 = 12 secs earlier.
-			 * So, the start time is 7*3600 - 1800 - 12 = 7*3600 - 1812
-			 */
-			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
-			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-			leg.setRoute(route);
-			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			f.plans.addPerson(person);
-		}
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(1, 7*3600, f.network);
-		events.addHandler(vAnalyzer);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		sim.run();
-
-		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-
-		Assert.assertEquals(1, volume[7*3600 - 1800]); // First vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 4]); // Second vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 8]); // Third vehicle
-	}
-
-	/**
-	 * Tests that the flow capacity can be reached (but not exceeded) by
-	 * agents starting on a link. Due to the different handling of these
-	 * agents and their direct placing in the Buffer, it makes sense to
-	 * test this specifically.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
-	public void testFlowCapacityStarting() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-
-		// add a lot of persons with legs from link2 to link3
-		for (int i = 1; i <= 10000; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			Plan plan = PersonUtils.createAndAddPlan(person, true);
-			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
-			a2.setEndTime(7*3600 - 1801);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
-			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-			leg.setRoute(route);
-			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			f.plans.addPerson(person);
-		}
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
-		events.addHandler(vAnalyzer);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		sim.run();
-
-		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
-		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
-		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
-
-		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
-		//		} else {
-		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest
-		//		}
-	}
-
-	/**
-	 * Tests that the flow capacity of a link can be reached (but not exceeded) by
-	 * agents starting on that link or driving through that link. This especially
-	 * insures that the flow capacity measures both kinds (starting, driving) together.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
-	public void testFlowCapacityMixed() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-
-		// add a lot of persons with legs from link2 to link3
-		for (int i = 1; i <= 5000; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			Plan plan = PersonUtils.createAndAddPlan(person, true);
-			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
-			a2.setEndTime(7*3600 - 1801);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
-			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-			leg.setRoute(route);
-			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			f.plans.addPerson(person);
-		}
-		// add a lot of persons with legs from link1 to link3
-		for (int i = 5001; i <= 10000; i++) {
-			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
-			Plan plan = PersonUtils.createAndAddPlan(person, true);
-			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a2.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
-			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-			leg.setRoute(route);
-			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
-			f.plans.addPerson(person);
-		}
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
-		events.addHandler(vAnalyzer);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		sim.run();
-
-		/* finish */
-		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
-		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
-		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
-
-		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
-		//		} else {
-		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest	
-		//		}
-
 	}
 
 	/**
@@ -1474,7 +1238,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	private static final class Fixture {
+	public static final class Fixture {
 		final Config config;
 		final Scenario scenario;
 		final Network network;
