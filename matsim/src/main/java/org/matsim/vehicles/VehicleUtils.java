@@ -130,13 +130,22 @@ public final class VehicleUtils {
 	}
 
     /**
-     * Attaches a vehicle id to a person, so that the router knows which vehicle to use for which mode and person
-     */
-    public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
+	 * Attaches vehicle ids to a person, so that the router knows which vehicle to use for which mode and person.
+	 *
+	 * @param modeToVehicle mode string mapped to vehicle ids. The provided map is copied and stored as unmodifiable map.
+	 *                      If a mode key already exists in the persons's attributes it is overridden. Otherwise, existing
+	 *                      and provided values are merged into one map
+	 */
+	public static void insertVehicleIdsIntoAttributes(Person person, Map<String, Id<Vehicle>> modeToVehicle) {
 		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
-		Map<String, Id<Vehicle>> map = attr == null ? Collections.unmodifiableMap(new HashMap<>()) : ((Map<String, Id<Vehicle>>) attr);
-		map.put(mode, vehicleId);
-		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
+		var toInsert = new HashMap<>(modeToVehicle);
+		if (attr != null) {
+			Map<String, Id<Vehicle>> attrMap = (Map<String, Id<Vehicle>>) attr;
+			for (var entry : attrMap.entrySet()) {
+				toInsert.putIfAbsent(entry.getKey(), entry.getValue());
+			}
+		}
+		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, Collections.unmodifiableMap(toInsert));
 	}
 	//******** general VehicleType attributes ************
 

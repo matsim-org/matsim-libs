@@ -18,37 +18,14 @@
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -61,6 +38,13 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Generates carriers and tours depending on next iteration's freight demand
@@ -284,7 +268,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                 if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
                     scenario.getVehicles().addVehicleType(carrierVehicle.getType());
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-                VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,CarrierUtils.getCarrierMode(carrier),vid);
+                VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());

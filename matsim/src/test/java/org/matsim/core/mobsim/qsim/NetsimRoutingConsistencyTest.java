@@ -57,6 +57,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 public class NetsimRoutingConsistencyTest {
 		@Test
@@ -160,7 +161,7 @@ public class NetsimRoutingConsistencyTest {
 
 			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
 					VehicleUtils.getDefaultVehicleType());
-			VehicleUtils.insertVehicleIdIntoAttributes(person, TransportMode.car, vehicle.getId());
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
 			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
 			scenario.getVehicles().addVehicle(vehicle);
 

@@ -27,12 +27,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -45,6 +48,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
@@ -53,12 +57,8 @@ import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -201,23 +201,32 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworkAndMainModes();
 
-		for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
-			for (Person person : scenario.getPopulation().getPersons().values()) {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
 
-				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, modeType.getKey());
+			var modeToVehicle = modeVehicleTypes.entrySet().stream()
+					// map mode type to vehicle id
+					.map(modeType -> Tuple.of(modeType, createVehicleId(person, modeType.getKey())))
+					// create a corresponding vehicle
+					.peek(tuple -> createAndAddVehicleIfNecessary(tuple.getSecond(), tuple.getFirst().getValue()))
+					// write mode-string to vehicle-id into a map
+					.collect(Collectors.toMap(tuple -> tuple.getFirst().getKey(), Tuple::getSecond));
 
-				if (qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType.getKey())) {
-					if (!hasWarned) {
-						log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
-						hasWarned = true;
-					}
-
-					vehicleId = Id.createVehicleId(person.getId());
-				}
-				createAndAddVehicleIfNecessary(vehicleId, modeType.getValue());
-				VehicleUtils.insertVehicleIdIntoAttributes(person, modeType.getKey(), vehicleId);
-			}
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, modeToVehicle);
 		}
+	}
+
+	private Id<Vehicle> createVehicleId(Person person, String modeType) {
+
+		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType)) {
+			if (!hasWarned) {
+				log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
+				hasWarned = true;
+			}
+
+			return Id.createVehicleId(person.getId());
+		}
+
+		return VehicleUtils.createVehicleId(person, modeType);
 	}
 
 	private Map<String, VehicleType> getVehicleTypesForAllNetworkAndMainModes() {
@@ -233,7 +242,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		modes.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
 
 		for (String mode : modes) {
-			VehicleType type = null;
+			VehicleType type;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 					type = VehicleUtils.getDefaultVehicleType();
@@ -271,7 +280,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
 	
 	private void adaptOutdatedPlansForRoutingMode() {
-		population.getPersons().values().stream().forEach(person -> {
+		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 					List<Leg> legs = trip.getLegsOnly();
@@ -281,15 +290,14 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 						for (Leg leg : legs) {
 							// 1. check all legs either have the same routing mode or all have routingMode==null
 							if (TripStructureUtils.getRoutingMode(leg) == null) {
-								if (routingMode == null) {
-									// outdated initial plan without routingMode
-								} else {
+								if (routingMode != null) {
 									String errorMessage = "Found a mixed trip having some legs with routingMode set and others without. "
 											+ "This is inconsistent. Agent id: " + person.getId().toString()
 											+ "\nTrip: " + trip.getTripElements().toString();
 									log.error(errorMessage);
 									throw new RuntimeException(errorMessage);
 								}
+
 							} else {
 								if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
 									TripStructureUtils.setRoutingMode(leg, routingMode);
@@ -321,7 +329,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								}
 							} else {
 								if (plansConfigGroup.getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier)) {
-									for (Leg leg: legs) {
+									for (Leg leg : legs) {
 										replaceOutdatedAccessEgressWalkModes(leg, routingMode);
 									}
 									routingMode = getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(
@@ -331,7 +339,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 											+ "Person id " + person.getId().toString()
 											+ "\nTrip: " + trip.getTripElements().toString()
 											+ "\nTerminating. Take care to inject an adequate MainModeIdentifier and set config switch "
-											+ "plansConfigGroup.setHandlingOfPlansWithoutRoutingMode(" 
+											+ "plansConfigGroup.setHandlingOfPlansWithoutRoutingMode("
 											+ HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier.toString() + ").";
 									log.error(errorMessage);
 									throw new RuntimeException(errorMessage);
@@ -358,7 +366,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					}
 				}
 			}
-		});
+		}
 	}
 
 	private String getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(Person person, Trip trip) {
@@ -372,7 +380,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			log.error(
 					"Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: "
 							+ trip.getTripElements());
-			new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
+			throw new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
 		}
 		routingMode = backwardCompatibilityMainModeIdentifier.identifyMainMode(trip.getTripElements());
 		if (routingMode != null) {
@@ -409,8 +417,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	/**
 	 * Method to replace outdated TransportModes such as drt_fallback or transit_walk.
 	 * Some of those were also used as access/egress to pt/drt helper modes.
-	 * 
-	 * @param leg
+	 *
 	 * @param routingMode new routingMode which will be set at the leg
 	 * @return null if no fallback mode was found or the main mode of the fallback mode found
 	 */
