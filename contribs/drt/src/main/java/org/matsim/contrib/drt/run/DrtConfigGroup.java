@@ -40,6 +40,7 @@ import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
@@ -254,6 +255,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
+		}
+
+		if(config.plans().getActivityDurationInterpretation().equals(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)){
+			log.warn("plans.ActivityDurationInterpretation should be set to 'minOfDurationAndEndTime' but it is not!!" +
+					"This has the consequence that the passenger agent lengthens the stage activity if it arrives early after a drt leg.");
 		}
 	}
 
