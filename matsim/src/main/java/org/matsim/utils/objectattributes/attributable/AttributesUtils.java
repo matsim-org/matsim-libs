@@ -21,10 +21,6 @@
 
  package org.matsim.utils.objectattributes.attributable;
 
-import org.apache.commons.lang3.ClassUtils;
-
-import java.util.Map;
-
 /**
  * @author thibautd
  */
@@ -38,8 +34,7 @@ public class AttributesUtils {
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
 		for (var entry : from.getAsMap().entrySet()) {
-			var value = isValueObject(entry.getValue()) ? entry.getValue() : copyValue(entry.getValue());
-			to.putAttribute(entry.getKey(), value);
+			to.putAttribute(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -59,18 +54,5 @@ public class AttributesUtils {
 	@Deprecated
 	public static boolean isEmpty(Attributes attributes) {
 		return attributes.size() == 0;
-	}
-
-	private static boolean isValueObject(Object value) {
-		return value instanceof String || value.getClass().isEnum() || ClassUtils.isPrimitiveOrWrapper(value.getClass());
-	}
-
-	private static Object copyValue(Object value) {
-
-		if (value instanceof Map) {
-			return Map.copyOf((Map) value);
-		} else {
-			throw new RuntimeException("Can't copy " + value.getClass().getName() + ". Implement copy logic right at this line.");
-		}
 	}
 }

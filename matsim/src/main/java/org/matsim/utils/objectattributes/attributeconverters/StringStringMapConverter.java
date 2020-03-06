@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class StringStringMapConverter implements AttributeConverter<Map<String, String>> {
@@ -16,7 +17,7 @@ public class StringStringMapConverter implements AttributeConverter<Map<String, 
 	@Override
 	public Map<String, String> convert(String value) {
 		try {
-			return mapper.readValue(value, mapType);
+			return Collections.unmodifiableMap(mapper.readValue(value, mapType));
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 
 /**
@@ -89,25 +89,25 @@ public final class VehicleUtils {
 	}
 
 	public static void copyFromTo( VehicleType in, VehicleType out ) {
-		out.setMaximumVelocity( in.getMaximumVelocity() ) ;
-		out.setDescription( in.getDescription() ) ;
-		out.setPcuEquivalents( in.getPcuEquivalents() ) ;
-		out.setLength( in.getLength() ) ;
-		out.setWidth( in.getLength() ) ;
-		out.setFlowEfficiencyFactor( in.getFlowEfficiencyFactor() ) ;
-		out.setNetworkMode( in.getNetworkMode() ) ;
+		out.setMaximumVelocity(in.getMaximumVelocity());
+		out.setDescription(in.getDescription());
+		out.setPcuEquivalents(in.getPcuEquivalents());
+		out.setLength(in.getLength());
+		out.setWidth(in.getLength());
+		out.setFlowEfficiencyFactor(in.getFlowEfficiencyFactor());
+		out.setNetworkMode(in.getNetworkMode());
 		// (all the deprecated setters are copied via the attributes!)
-		AttributesUtils.copyAttributesFromTo( in, out );
+		AttributesUtils.copyAttributesFromTo(in, out);
 
-		CostInformation cost = in.getCostInformation();;
-		out.getCostInformation().setCostsPerSecond( cost.getCostsPerSecond() ).setCostsPerMeter( cost.getCostsPerMeter() ).setFixedCost( cost.getFixedCosts() ) ;
-		AttributesUtils.copyAttributesFromTo( cost, out.getCostInformation() );
+		CostInformation cost = in.getCostInformation();
+		out.getCostInformation().setCostsPerSecond(cost.getCostsPerSecond()).setCostsPerMeter(cost.getCostsPerMeter()).setFixedCost(cost.getFixedCosts());
+		AttributesUtils.copyAttributesFromTo(cost, out.getCostInformation());
 
-		VehicleCapacity cap = in.getCapacity() ;
-		out.getCapacity().setWeightInTons( cap.getWeightInTons() ).setSeats( cap.getSeats() ).setSeats( cap.getStandingRoom() ).setVolumeInCubicMeters( cap.getVolumeInCubicMeters() ) ;
-		AttributesUtils.copyAttributesFromTo( cap, out.getCapacity() );
+		VehicleCapacity cap = in.getCapacity();
+		out.getCapacity().setWeightInTons(cap.getWeightInTons()).setSeats(cap.getSeats()).setSeats(cap.getStandingRoom()).setVolumeInCubicMeters(cap.getVolumeInCubicMeters());
+		AttributesUtils.copyAttributesFromTo(cap, out.getCapacity());
 
-		AttributesUtils.copyAttributesFromTo( in.getEngineInformation(), out.getEngineInformation() );
+		AttributesUtils.copyAttributesFromTo(in.getEngineInformation(), out.getEngineInformation());
 
 	}
 
@@ -133,11 +133,11 @@ public final class VehicleUtils {
      * Attaches a vehicle id to a person, so that the router knows which vehicle to use for which mode and person
      */
     public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
-        Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
-        Map<String, Id<Vehicle>> map = attr == null ? new HashMap<>() : ((Map<String, Id<Vehicle>>) attr);
-        map.put(mode, vehicleId);
-        person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
-    }
+		Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+		Map<String, Id<Vehicle>> map = attr == null ? Collections.unmodifiableMap(new HashMap<>()) : ((Map<String, Id<Vehicle>>) attr);
+		map.put(mode, vehicleId);
+		person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
+	}
 	//******** general VehicleType attributes ************
 
 	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
