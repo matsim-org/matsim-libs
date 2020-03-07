@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -131,14 +132,8 @@ public class DvrpRoutingModule implements RoutingModule {
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility, double now) {
-		Activity activity = scenario.getPopulation()
-				.getFactory()
-				.createActivityFromCoord(PlanCalcScoreConfigGroup.createStageActivityType(mode),
-						stopFacility.getCoord());
-		activity.setMaximumDuration(0);
-		activity.setStartTime(now);
-		activity.setEndTime(now);
-		activity.setLinkId(stopFacility.getLinkId());
+		Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndMode(stopFacility.getCoord(),
+				stopFacility.getLinkId(), mode);
 		return activity;
 	}
 }

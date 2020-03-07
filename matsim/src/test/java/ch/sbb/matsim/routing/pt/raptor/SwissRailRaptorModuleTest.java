@@ -209,18 +209,26 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(7)).getMode());
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(9)).getMode());
 
-//        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
-//        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
-//        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
-//        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration().seconds(), 0.0);
+        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration().seconds(), 0.0);
+
+        Assert.assertTrue( ((Activity) planElements.get(2)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(4)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(6)).getEndTime().isUndefined() );
+        Assert.assertTrue( ((Activity) planElements.get(8)).getEndTime().isUndefined() );
 
         // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
-        // fixing it here. kai, feb'20
+        // fixing it here:
 
-		Assert.assertTrue((((Activity)planElements.get(2)).getMaximumDuration().isUndefined())) ;
-		Assert.assertTrue((((Activity)planElements.get(4)).getMaximumDuration().isUndefined())) ;
-		Assert.assertTrue((((Activity)planElements.get(6)).getMaximumDuration().isUndefined())) ;
-		Assert.assertTrue((((Activity)planElements.get(8)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(2)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(4)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(6)).getMaximumDuration().isUndefined())) ;
+//		Assert.assertTrue((((Activity)planElements.get(8)).getMaximumDuration().isUndefined())) ;
+
+        // (And that is actually where I should have noticed that something is wrong, since durations need to be zero, and endTimes need to be undefined.  :-(
+        // :-( :-(  kai, mar'20)
 
     }
     
