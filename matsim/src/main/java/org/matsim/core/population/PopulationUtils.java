@@ -833,8 +833,8 @@ public final class PopulationUtils {
 		return act ;
 	}
 
-	public static Activity createStageActivityFromCoordLinkIdAndMode( final Coord interactionCoord, final Id<Link> interactionLink, String mode ) {
-		Activity act = createActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(mode), interactionCoord, interactionLink);
+	public static Activity createStageActivityFromCoordLinkIdAndModePrefix(final Coord interactionCoord, final Id<Link> interactionLink, String modePrefix ) {
+		Activity act = createActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
 		act.setMaximumDuration(0.0);
 		return act;
 	}
