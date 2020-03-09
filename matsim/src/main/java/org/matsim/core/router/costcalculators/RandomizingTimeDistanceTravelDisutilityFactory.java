@@ -62,6 +62,10 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 
 	@Override
 	public TravelDisutility createTravelDisutility( final TravelTime travelTime) {
+		// yyyy This here should honor subpopulations.  It is really not so difficult; something like cnScoringGroup.getScoringParameters( "subpop"
+		// ).getMarginalUtilityOfMoney(); That line, or some variant of it, would need to be in the TravelDisutility directly. And I am quite unsure what is the status of
+		// the "default" subpopulation anyways ... I seem to recall that Thibaut wanted to get rid of that.  The following method at least outputs
+		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
 		logWarningsIfNecessary( cnScoringGroup );
 
 		final PlanCalcScoreConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
