@@ -20,12 +20,6 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -38,28 +32,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
@@ -80,6 +58,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
+
+import java.util.*;
 
 @RunWith(Parameterized.class)
 public class HermesTest {
@@ -113,7 +93,7 @@ public class HermesTest {
 		// TODO - fix these two!
 		Id.flush();
 		ScenarioImporter.flush();
-		HermesConfig.SIM_STEPS = 30*60*60;
+		HermesConfigGroup.SIM_STEPS = 30 * 60 * 60;
 	}
 
 	/**
@@ -320,7 +300,7 @@ public class HermesTest {
 
 		/* run sim */
 		Hermes sim = createHermes(f, events);
-		HermesConfig.SIM_STEPS = 10*3600;
+		HermesConfigGroup.SIM_STEPS = 10 * 3600;
 		sim.run();
 
 		/* finish */
@@ -852,7 +832,7 @@ public class HermesTest {
 		events.addHandler(collector);
 
 		Hermes sim = createHermes(scenario, events);
-		HermesConfig.SIM_STEPS = 11*3600;
+		HermesConfigGroup.SIM_STEPS = 11 * 3600;
 		sim.run();
 		Assert.assertEquals(7.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals(11.0*3600, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -948,7 +928,7 @@ public class HermesTest {
 
 		// run the simulation
 		Hermes sim = createHermes(scenario, events);
-		HermesConfig.SIM_STEPS = (int) simEndTime;
+		HermesConfigGroup.SIM_STEPS = (int) simEndTime;
 		sim.run();
 		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test

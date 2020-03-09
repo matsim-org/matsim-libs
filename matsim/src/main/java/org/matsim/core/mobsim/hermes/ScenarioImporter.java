@@ -1,55 +1,24 @@
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 public class ScenarioImporter {
 
@@ -118,7 +87,7 @@ public class ScenarioImporter {
     	log.info(String.format("ETHZ reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
     	time = System.currentTimeMillis();
     	generatePlans();
-    	log.info(String.format("ETHZ generatePlans (SBB mode %b) took %d ms", HermesConfig.SBB_SCENARIO, System.currentTimeMillis() - time));
+        log.info(String.format("ETHZ generatePlans (SBB mode %b) took %d ms", System.currentTimeMillis() - time));
     	time = System.currentTimeMillis();
         generateRealms();
         log.info(String.format("ETHZ generateRealms took %d ms", System.currentTimeMillis() - time));
@@ -176,7 +145,7 @@ public class ScenarioImporter {
             	flowCapactiy = (int) Math.round(matsim_link.getFlowCapacityPerSec());
             }
 
-            if (link_id > HermesConfig.MAX_LINK_ID) {
+            if (link_id > HermesConfigGroup.MAX_LINK_ID) {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
@@ -259,7 +228,7 @@ public class ScenarioImporter {
                 case Agent.SleepForType:
                 case Agent.SleepUntilType:
                     int sleep = Agent.getSleepPlanEntry(planentry);
-                    realm.delayedAgents().get(Math.min(sleep, HermesConfig.SIM_STEPS + 1)).add(agent);
+                    realm.delayedAgents().get(Math.min(sleep, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
                     break;
                 default:
                     Realm.log(0, String.format("ERROR -> unknow plan element type %d",type));
@@ -310,10 +279,10 @@ public class ScenarioImporter {
 
         if (Double.isFinite(act.getEndTime())) {
             time = (int) Math.round(act.getEndTime());
-            flatplan.add(Agent.prepareSleepUntilEntry(eventid, (int)time));
+            flatplan.add(Agent.prepareSleepUntilEntry(eventid, time));
         } else if (Double.isFinite(act.getMaximumDuration())) {
             time = (int) Math.round(act.getMaximumDuration());
-            flatplan.add(Agent.prepareSleepForEntry(eventid, (int)time));
+            flatplan.add(Agent.prepareSleepForEntry(eventid, time));
         } else {
             // TODO - better way to handle this?
             flatplan.add(Agent.prepareSleepForEntry(eventid, 0));
@@ -337,7 +306,7 @@ public class ScenarioImporter {
                     Id.createVehicleId(id.toString()) :
                 v.getId();
         int velocity = v == null ?
-        		HermesConfig.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
+                HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
         int egressId = endLId.index();
         events.add(new PersonEntersVehicleEvent(0, id, vid));
         events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
@@ -452,19 +421,15 @@ public class ScenarioImporter {
             PlanArray flatplan,
             EventArray events) {
 
-        if (events.size() >= HermesConfig.MAX_EVENTS_AGENT) {
+        if (events.size() >= HermesConfigGroup.MAX_EVENTS_AGENT) {
             throw new RuntimeException("exceeded maximum number of agent events");
         }
 
-        hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);;
+        hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);
     }
 
     private boolean isGoodDouble(double value) {
-        if (!Double.isNaN(value) && !Double.isInfinite(value)) {
-            return true;
-        } else {
-            return false;
-        }
+        return !Double.isNaN(value) && !Double.isInfinite(value);
     }
 
     private double delay_helper(double expected, double delay_a, double delay_b) {
@@ -500,20 +465,14 @@ public class ScenarioImporter {
         ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
         Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
         VehicleType vt = v.getType();
-        int velocity = (int)Math.min( Math.round(v.getType().getMaximumVelocity()), HermesConfig.MAX_VEHICLE_VELOCITY);
+        int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
         NetworkRoute nr = tr.getRoute();
         int endid = nr.getEndLinkId().index();
 
-        Id<Person> driverid = null;
+        Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
         String legmode = null;
 
-        if (HermesConfig.SBB_SCENARIO) {
-            driverid = Id.createPersonId("pt_" + tl.getId().toString() + "_" + tr.getId().toString() + "_" + depart.getId().toString());
-        } else {
-            driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
-        }
-
-        legmode = "car";
+        legmode = TransportMode.car;
 
         // Sleep until the time of departure
         flatplan.add(Agent.prepareSleepUntilEntry(0, (int) Math.round(depart.getDepartureTime())));
