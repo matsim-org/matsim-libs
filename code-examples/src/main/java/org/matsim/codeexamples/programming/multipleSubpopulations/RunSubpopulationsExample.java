@@ -41,6 +41,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import java.io.File;
 import java.net.URL;
 
+import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.*;
+
 /**
  * This example illustrates how to go about modelling subpopulations, 
  * and specifically dealing with the replanning strategies for the different
@@ -70,7 +72,7 @@ public class RunSubpopulationsExample {
 	final static String CONFIG = "scenarios/equil-extended/config-with-subpopulation.xml";
 	final static String OUTPUT = "./output/example";
 
-	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
+//	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
 	private static final String SUBPOP1_NAME = "time";
 	private static final String SUBPOP2_NAME = "reroute";
 	/**
@@ -85,47 +87,26 @@ public class RunSubpopulationsExample {
 		ConfigUtils.loadConfig(config, CONFIG);
 		config.plans().setInputFile(PLANS);
 //		config.plans().setInputPersonAttributeFile(OBJECT_ATTRIBUTES);
-		config.plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
+//		config.plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
 		config.network().setInputFile(EQUIL_NETWORK);
 		config.controler().setOutputDirectory(OUTPUT);
 		
-		/* Strategies set up in the 'strategy' module of the config file are
-		 * only applicable to the 'default' population, i.e. those agents without 
-		 * a subpopulation attribute. For all agents with a subpopulation
-		 * attribute, you need to set up the suite of strategies for the 
-		 * subpopulation(s).
+		/* Strategies set up in the 'strategy' module of the config file are only applicable to the 'default' population, i.e. those agents without a subpopulation
+		 * attribute. For all agents with a subpopulation attribute, you need to set up the suite of strategies for the subpopulation(s).
 		 */
 				
 		/* Set up the subpopulations. */
 		{
 			/* Set up the 'time' subpopulation to only consider time allocation 
 			 * as a strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings timeStrategySettings = new StrategySettings();
-			timeStrategySettings.setStrategyName( DefaultStrategy.TimeAllocationMutator );
-			timeStrategySettings.setSubpopulation(SUBPOP1_NAME);
-			timeStrategySettings.setWeight(0.2);
-			config.strategy().addStrategySettings(timeStrategySettings);
-			
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings();
-			changeExpBetaStrategySettings.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
-			changeExpBetaStrategySettings.setSubpopulation(SUBPOP1_NAME);
-			changeExpBetaStrategySettings.setWeight(0.8);
-			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultStrategy.TimeAllocationMutator ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.2 ) );
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP1_NAME ).setWeight(0.8 ) );
 		}
 		{
 			/* Set up the `reroute' subpopulation to consider rerouting as a 
 			 * strategy, 20% of the time, and the balance using ChangeExpBeta. */
-			StrategySettings rerouteStrategySettings = new StrategySettings( ) ;
-			rerouteStrategySettings.setStrategyName( DefaultStrategy.ReRoute );
-			rerouteStrategySettings.setSubpopulation(SUBPOP2_NAME);
-			rerouteStrategySettings.setWeight(0.2);
-			config.strategy().addStrategySettings(rerouteStrategySettings);
-
-			StrategySettings changeExpBetaStrategySettings = new StrategySettings();
-			changeExpBetaStrategySettings.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
-			changeExpBetaStrategySettings.setSubpopulation(SUBPOP2_NAME);
-			changeExpBetaStrategySettings.setWeight(0.8);
-			config.strategy().addStrategySettings(changeExpBetaStrategySettings);
+			config.strategy().addStrategySettings( new StrategySettings( ).setStrategyName( DefaultStrategy.ReRoute ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.2 ) );
+			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.8 ) );
 		}
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
@@ -183,7 +164,8 @@ public class RunSubpopulationsExample {
 
 			/* Set the subpopulation attribute. */
 //			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), SUBPOP_ATTRIB_NAME, prefix);
-			PopulationUtils.putPersonAttribute( person, SUBPOP_ATTRIB_NAME, prefix );
+//			PopulationUtils.putPersonAttribute( person, SUBPOP_ATTRIB_NAME, prefix );
+			PopulationUtils.putSubpopulation( person, prefix );
 		}
 	}
 

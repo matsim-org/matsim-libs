@@ -30,8 +30,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 /**
- * @author nagel
+ * Short script-in-java explaining how to use {@link org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory}.  This is now
+ * (mar'20) the default anyways, see {@link org.matsim.core.router.costcalculators.TravelDisutilityModule}. So for this particular case the script is not
+ * doing anything that is truly necessary.  Leaving it here for reference anyways.
+ * <br/>
+ * Note that this randomizes the prefactor of the marginal cost of distance.  I (kn) find this quite plausible, since it reflects different utilities of
+ * money, e.g. between rich people and poor, or commercial vs private travel.
  *
+ * @author nagel
  */
 public class RunRandomizingRouterExample {
 
@@ -43,21 +49,24 @@ public class RunRandomizingRouterExample {
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		config.controler().setLastIteration(1);
 
+		config.plansCalcRoute().setRoutingRandomness( 3. );
+		// (This is currently the default anyways. kai, mar'20)
+
 		Scenario scenario = ScenarioUtils.createScenario(config) ;
 
 		Controler controler = new Controler( scenario ) ;
 
-		final RandomizingTimeDistanceTravelDisutilityFactory factory =
-				new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() );
-		factory.setSigma(3.) ; 	// this sets the routing randomness (currently between time and money only, so be careful
-								// that you have a monetary term in the standard disutility, e.g. a distance cost)
-		
 		controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
-				this.bindCarTravelDisutilityFactory().toInstance( factory );
+			@Override public void install() {
+				addTravelDisutilityFactoryBinding( TransportMode.car ).toInstance(
+						new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config ) );
+				// (This is currently the default anyways. kai, mar'20)
 			}
 		});
+
+		// this sets the routing randomness (currently between time and money only, so be careful
+		// that you have a monetary term in the standard disutility, e.g. a distance cost)
+
 
 		controler.run();
 

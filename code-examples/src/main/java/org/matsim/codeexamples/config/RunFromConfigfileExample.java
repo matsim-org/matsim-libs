@@ -31,6 +31,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.Map;
+
 
 /**
  * runs a mobsim and writes events output.  See the config file for configuration details.
@@ -49,29 +51,17 @@ public final class RunFromConfigfileExample {
 			config = ConfigUtils.loadConfig(  "scenarios/equil/config.xml" ) ;
 		}
 
-//		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
-
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 
-		// if vehicles are not auto generated but explicitly loaded from a vehicles file, vehicles have to be attached to
-		// agents.
+		// if vehicles are not auto generated but explicitly loaded from a vehicles file, vehicles have to be attached to agents.
 		if (config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Vehicle vehicle = scenario.getVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
-				VehicleUtils.insertVehicleIdIntoAttributes(person, vehicle.getType().getId().toString(), vehicle.getId());
+				VehicleUtils.insertVehicleIdsIntoAttributes( person, Map.of( vehicle.getType().getNetworkMode(), vehicle.getId() ) );
 			}
 		}
 
 		Controler controler = new Controler(scenario);
-//		controler.addOverridingModule( new AbstractModule(){
-//			@Override public void install(){
-//				this.addControlerListenerBinding().toInstance( new StartupListener(){
-//					@Override public void notifyStartup( StartupEvent event ){
-//						PopulationUtils.writePopulation( scenario.getPopulation(), "input-plans-with-person-attributes.xml.gz" ) ;
-//					}
-//				} );
-//			}
-//		} ) ;
 
 		controler.run();
 	}

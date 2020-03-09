@@ -12,7 +12,7 @@ final class ExtremeTimePenaltyScoring implements SumScoringFunction.ActivityScor
 	private double score;
 
 	@Override public void handleFirstActivity(Activity act) {
-		if (act.getEndTime() < (6 * 60 * 60)) {
+		if (act.getEndTime().seconds() < (6 * 60 * 60)) {
 			score -= 300.0;
 		} 
 	}
@@ -20,7 +20,7 @@ final class ExtremeTimePenaltyScoring implements SumScoringFunction.ActivityScor
 	@Override public void handleActivity(Activity act) {} // Not doing anything on mid-day activities.
 
 	@Override public void handleLastActivity(Activity act) {	
-		if (act.getStartTime() > (20.0 * 60 * 60)) {
+		if (act.getStartTime().seconds() > (20.0 * 60 * 60)) {
 			score -= 100.0;
 		}
 	}
