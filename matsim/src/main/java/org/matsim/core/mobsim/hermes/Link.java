@@ -139,6 +139,7 @@ public class Link {
 
     public void reset() {
     	queue.clear();
+    	this.lastFlowUpdate = 0;
     }
 
     public boolean push(Agent agent) {
