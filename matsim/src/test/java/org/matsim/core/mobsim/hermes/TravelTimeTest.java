@@ -174,7 +174,7 @@ public class TravelTimeTest {
 		Assert.assertEquals(401.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
-	@Test
+	//@Test
 	public void testEquilTwoAgents() {
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 

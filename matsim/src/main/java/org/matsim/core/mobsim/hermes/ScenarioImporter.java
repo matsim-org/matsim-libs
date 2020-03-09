@@ -98,9 +98,9 @@ public class ScenarioImporter {
     public static void flush() {
     	instance = null;
     }
-    
+
     public static ScenarioImporter instance(Scenario scenario, EventsManager eventsManager) {
-    	// if instance is null or the scenario changed or events manager changed, re-do everything. 
+    	// if instance is null or the scenario changed or events manager changed, re-do everything.
     	if (instance == null || !scenario.equals(instance.scenario) || !eventsManager.equals(instance.eventsManager)) {
     		System.out.println("ETHZ rebuilding scenario!");
             instance = new ScenarioImporter(scenario, eventsManager);
@@ -162,16 +162,25 @@ public class ScenarioImporter {
         for (org.matsim.api.core.v01.network.Link matsim_link : matsim_links) {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
             int speed = Math.max(1, (int) Math.round(matsim_link.getFreespeed()));
-            int flow = (int) Math.round(matsim_link.getFlowCapacityPerSec());
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
             int capacity = (int) (matsim_link.getLength() / 7.5 * lanes);
             int link_id  = matsim_link.getId().index();
+            int flowCapactiy, flowPeriod;
+
+            if (matsim_link.getFlowCapacityPerSec() < 1) {
+            	flowPeriod = (int) (1 / matsim_link.getFlowCapacityPerSec());
+            	flowCapactiy = 1;
+
+            } else {
+            	flowPeriod = 1;
+            	flowCapactiy = (int) Math.round(matsim_link.getFlowCapacityPerSec());
+            }
 
             if (link_id > HermesConfig.MAX_LINK_ID) {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
-            hermes_links[link_id] = new Link(link_id, capacity, length, speed);
+            hermes_links[link_id] = new Link(link_id, capacity, length, speed, flowPeriod, flowCapactiy);
         }
     }
 

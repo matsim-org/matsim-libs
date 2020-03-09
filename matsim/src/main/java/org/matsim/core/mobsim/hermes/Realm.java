@@ -249,8 +249,9 @@ public class Realm {
     protected int processLinks(Link link) {
         int routed = 0;
         Agent agent = link.queue().peek();
+        int curr_flow = link.flow(secs);
 
-        while (agent.linkFinishTime <= secs) {
+        while (agent.linkFinishTime <= secs && curr_flow > 0) {
             boolean finished = agent.finished();
             // if finished, install times on last event.
             if (finished) {
@@ -258,6 +259,7 @@ public class Realm {
             }
             if (finished || processAgent(agent, link.id())) {
                 link.pop();
+                curr_flow -= 1;
                 routed += 1;
                 if ((agent = link.queue().peek()) == null) {
                     break;
@@ -272,10 +274,6 @@ public class Realm {
             add_delayed_link(link, Math.max(agent.linkFinishTime, secs + 1));
         }
         return routed;
-    }
-
-    public void tick() {
-
     }
 
     public void run() throws Exception {
