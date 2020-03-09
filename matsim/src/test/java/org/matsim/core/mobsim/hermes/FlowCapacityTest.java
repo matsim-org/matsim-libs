@@ -34,25 +34,25 @@ public class FlowCapacityTest {
 	public FlowCapacityTest(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
-	
+
 	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
 	public static Collection<Object> parameterObjects () {
 		Object [] capacityUpdates = new Object [] { false, true };
 		return Arrays.asList(capacityUpdates);
 	}
-	
+
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
 	 * agents driving over a link.
 	 *
 	 * @author mrieser
 	 */
-	@Test // TODO - later, Hermes is not currently modeling flow capacity
+	@Test
 	public void testFlowCapacityDriving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
-		for (int i = 1; i <= 10000; i++) {
+		for (int i = 1; i <= 12000; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			/* exact dep. time: 6:29:48. The agents needs:
@@ -87,28 +87,28 @@ public class FlowCapacityTest {
 
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		System.out.println("#vehicles 3-4: " + Integer.toString(volume[3]));
+		System.out.println("#vehicles 4-5: " + Integer.toString(volume[4]));
+		System.out.println("#vehicles 5-6: " + Integer.toString(volume[5]));
 		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
 		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
 		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
 
-		//		if(this.isUsingFastCapacityUpdate) {
-		Assert.assertEquals(3001, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(999, volume[8]); // all the rest
-		//		} else {
-		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
-		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest
-		//		}
+
+		Assert.assertEquals(0, volume[5]);    // no vehicles
+		Assert.assertEquals(3602, volume[6]); // we should have half of the maximum flow in this hour
+		Assert.assertEquals(7200, volume[7]); // we should have maximum flow in this hour
+		Assert.assertEquals(1198, volume[8]); // all the rest
+
 	}
-	
+
 	/**
 	 * Tests that on a link with a flow capacity of 0.25 vehicles per time step, after the first vehicle
 	 * at time step t, the second vehicle may pass in time step t + 4 and the third in time step t+8.
 	 *
 	 * @author michaz
 	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
+	@Test
 	public void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
@@ -149,10 +149,9 @@ public class FlowCapacityTest {
 
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-
-		Assert.assertEquals(1, volume[7*3600 - 1800]); // First vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 4]); // Second vehicle
-		Assert.assertEquals(1, volume[7*3600 - 1800 + 8]); // Third vehicle
+		Assert.assertEquals(1, volume[7*3600 - 1801]); // First vehicle
+		Assert.assertEquals(1, volume[7*3600 - 1801 + 4]); // Second vehicle
+		Assert.assertEquals(1, volume[7*3600 - 1801 + 8]); // Third vehicle
 	}
 
 	/**
@@ -163,7 +162,7 @@ public class FlowCapacityTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
+	//@Test // TODO - later, flow capacity is not accounted for vehicles that start within a link.
 	public void testFlowCapacityStarting() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -215,7 +214,7 @@ public class FlowCapacityTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later, Hermes is not currently modeling flow capacity
+	//@Test // TODO - later, flow capacity is not accounted for vehicles that start within a link.
 	public void testFlowCapacityMixed() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -270,9 +269,9 @@ public class FlowCapacityTest {
 		//		} else {
 		//			Assert.assertEquals(3000, volume[6]); // we should have half of the maximum flow in this hour
 		//			Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		//			Assert.assertEquals(1000, volume[8]); // all the rest	
+		//			Assert.assertEquals(1000, volume[8]); // all the rest
 		//		}
 
 	}
-	
+
 }

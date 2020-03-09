@@ -118,11 +118,20 @@ public class Link {
     private final int velocity;
     // Queues of agents on this link. Boundary links use both queues.
     private final AgentQueue queue;
+    // Number of time steps necessary to reset the flow.
+    private final int flowPeriod;
+    // Number of vehicles that can leave the link per time period.
+    private final int flowCapacity;
+    // When (which timestep) flow was updated the last time.
+    private int lastFlowUpdate;
 
-    public Link(int id, int capacity, int length, int velocity) {
+    public Link(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity) {
         this.id = id;
         this.length = length;
         this.velocity = velocity;
+        this.flowPeriod = flowPeriod;
+        this.flowCapacity = flowCapacity;
+        this.lastFlowUpdate = 0;
         // We do not preallocate using the capacity because it leads to huge memory waste.
         //this.queue = new AgentQueue(Math.max(1, capacity));
         this.queue = new AgentQueue(Math.max(1, capacity), Math.max(1, 16));
@@ -150,6 +159,15 @@ public class Link {
 
     public int length() {
         return this.length;
+    }
+
+    public int flow(int timestep) {
+    	if (timestep - lastFlowUpdate >= flowPeriod) {
+    		lastFlowUpdate = timestep;
+    		return flowCapacity;
+    	} else {
+    		return 0;
+    	}
     }
 
     public int velocity() {
