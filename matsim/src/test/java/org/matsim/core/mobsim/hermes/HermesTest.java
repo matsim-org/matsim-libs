@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -65,7 +64,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -82,7 +80,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
-import org.matsim.vehicles.Vehicle;
 
 @RunWith(Parameterized.class)
 public class HermesTest {
@@ -625,154 +622,6 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(14).getClass());
 	}
 
-
-	/**
-	 * Tests that an agent whose car isn't available waits for it to become available.
-	 *
-	 * @author michaz
-	 */
-	//@Test // TODO - later, Hermes does not model cars individually
-	public void testWaitingForCar() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
-		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
-		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
-		l1.setTravelTime(10);
-		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
-		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
-		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
-		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
-		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-		l2.setRoute(route2);
-		PopulationUtils.createAndAddActivityFromLinkId(plan, "l", f.link3.getId());
-		f.plans.addPerson(person);
-
-		Person personWhoBringsTheCar = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
-		Plan planWhichBringsTheCar = PersonUtils.createAndAddPlan(personWhoBringsTheCar, true);
-		Activity aa1 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "h", f.link1.getId());
-		aa1.setEndTime(7.0*3600 + 30);
-		Leg ll1 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.car );
-		TripStructureUtils.setRoutingMode( ll1, TransportMode.car );
-		NetworkRoute route3 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId());
-		route3.setLinkIds(f.link1.getId(), f.linkIdsNone, f.link2.getId());
-		route3.setVehicleId(Id.create(1, Vehicle.class)); // We drive the car that person 1 needs.
-		ll1.setRoute(route3);
-		Activity aa2 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "w", f.link2.getId());
-		aa2.setEndTime(7.0*3600 + 60);
-		Leg ll2 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.other );
-		TripStructureUtils.setRoutingMode( ll2, TransportMode.other );
-		ll2.setTravelTime(10);
-		ll2.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId()));
-		PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "l", f.link3.getId());
-		f.plans.addPerson(personWhoBringsTheCar);
-
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsCollector collector = new EventsCollector();
-		events.addHandler(collector);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		sim.run();
-
-		/* finish */
-		List<Event> allEvents = collector.getEvents();
-		for (Event event : allEvents) {
-			System.out.println(event);
-		}
-		Assert.assertEquals("wrong number of events.", 31, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(7).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(8).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(9).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(10).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(11).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(12).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(13).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(14).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(15).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(16).getClass());
-		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(17).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleEntersTrafficEvent.class, allEvents.get(18).getClass());
-		Assert.assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(19).getClass());
-		Assert.assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(20).getClass());
-		Assert.assertEquals("wrong type of event.", VehicleLeavesTrafficEvent.class, allEvents.get(21).getClass());
-		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(22).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(23).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(24).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(25).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(26).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(27).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(28).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(29).getClass());
-	}
-
-	/**
-	 * Tests that vehicles are not teleported if they are missing, but that an Exception is thrown instead.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes does not model cars individually
-	public void testVehicleTeleportationFalse() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
-		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
-		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Plan plan = PersonUtils.createAndAddPlan(person, true);
-		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
-		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
-		l1.setTravelTime(10);
-		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
-		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
-		a2.setEndTime(7.0*3600 + 20);
-		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
-		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
-		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
-		l2.setRoute(route2);
-		PopulationUtils.createAndAddActivityFromLinkId(plan, "l", f.link3.getId());
-		f.plans.addPerson(person);
-
-		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		EventsCollector collector = new EventsCollector();
-		events.addHandler(collector);
-
-		/* run sim */
-		Hermes sim = createHermes(f, events);
-		try {
-			sim.run();
-			Assert.fail("expected RuntimeException, but there was none.");
-		} catch (RuntimeException e) {
-			log.info("catched expected RuntimeException: " + e.getMessage());
-		}
-
-		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 7, allEvents.size());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
-		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
-		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(3).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
-		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(5).getClass());
-		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(6).getClass());
-	}
-
 	/**
 	 * Tests that a vehicle starts its route even when start and end link are the same.
 	 *
@@ -897,87 +746,6 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of event.", PersonLeavesVehicleEvent.class, allEvents.get(17).getClass());
 		Assert.assertEquals("wrong type of event.", PersonArrivalEvent.class, allEvents.get(18).getClass());
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(19).getClass());
-	}
-
-	/**
-	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
-	 * does not lead to the destination link.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
-	public void testConsistentRoutes_WrongRoute() {
-		EventsManager events = EventsUtils.createEventsManager();
-		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
-		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "5", events); // route should continue on link 4
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
-	}
-
-	/**
-	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
-	 * starts at another link than the previous activity is located at.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
-	public void testConsistentRoutes_WrongStartLink() {
-		EventsManager events = EventsUtils.createEventsManager();
-		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
-		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("2", "3 4", "5", events); // first act is on link 1, not 2
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
-	}
-
-	/**
-	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
-	 * starts at another link than the previous activity is located at.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
-	public void testConsistentRoutes_WrongEndLink() {
-		EventsManager events = EventsUtils.createEventsManager();
-		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
-		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 3", "4", events); // second act is on link 5, not 4
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
-	}
-
-	/**
-	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
-	 * does not specify all nodes, so it is unclear at one node or another how to
-	 * continue.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
-	public void testConsistentRoutes_ImpossibleRoute() {
-		EventsManager events = EventsUtils.createEventsManager();
-		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
-		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "2 4", "5", events); // link 3 is missing
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
-	}
-
-	/**
-	 * Tests that the QueueSimulation reports a problem if the route of a vehicle
-	 * is not specified, even that the destination link is different from the departure link.
-	 *
-	 * @author mrieser
-	 */
-	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
-	public void testConsistentRoutes_MissingRoute() {
-		EventsManager events = EventsUtils.createEventsManager();
-		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
-		events.addHandler(counter);
-		LogCounter logger = runConsistentRoutesTestSim("1", "", "5", events); // no links at all
-		Assert.assertEquals(0, counter.getCounter()); // the agent should have been removed from the sim, so nobody travels there
-		Assert.assertTrue((logger.getWarnCount() + logger.getErrorCount()) > 0); // there should have been at least a warning
 	}
 
 	/** Prepares miscellaneous data for the testConsistentRoutes() tests:
