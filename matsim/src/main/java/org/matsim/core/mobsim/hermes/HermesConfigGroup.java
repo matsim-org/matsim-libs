@@ -6,7 +6,7 @@ import org.matsim.core.utils.misc.Time;
 import java.util.Map;
 
 public class HermesConfigGroup extends ReflectiveConfigGroup {
-    private static final String GROUPNAME = "hermes";
+    public static final String NAME = "hermes";
     private static final String END_TIME = "endTime";
 
     // Maximum number of links (limited to 24 bits in the plan)
@@ -32,7 +32,7 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
 
 
     public HermesConfigGroup() {
-        super(GROUPNAME);
+        super(NAME);
     }
 
     public int getEndTime() {
