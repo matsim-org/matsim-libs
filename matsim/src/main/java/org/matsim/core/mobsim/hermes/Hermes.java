@@ -38,7 +38,7 @@ public final class Hermes implements Mobsim {
 				int matsim_id = si.matsim_id(agent.id(),  false);
 				eventsManager.processEvent(
 						new PersonStuckEvent(
-								HermesConfig.SIM_STEPS, Id.get(matsim_id, Person.class), Id.createLinkId("0"), "zero"));
+								HermesConfigGroup.SIM_STEPS, Id.get(matsim_id, Person.class), Id.createLinkId("0"), "zero"));
 			}
 		}
 	}

@@ -1,9 +1,5 @@
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -15,6 +11,10 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class Realm {
 	private final ScenarioImporter si;
@@ -53,26 +53,27 @@ public class Realm {
         this.eventsManager = (ParallelEventsManager)eventsManager;
 
 	// the last position is to store events that will not happen...
-        for (int i = 0; i <= HermesConfig.SIM_STEPS + 1; i++) {
+        for (int i = 0; i <= HermesConfigGroup.SIM_STEPS + 1; i++) {
             delayedLinksByWakeupTime.add(new ArrayDeque<>());
             delayedAgentsByWakeupTime.add(new ArrayDeque<>());
         }
     }
 
     public static void log(int time, String s) {
-        if (HermesConfig.DEBUG_REALMS) {
+        if (HermesConfigGroup.DEBUG_REALMS) {
             System.out.println(String.format("ETHZ [ time = %d ] %s", time, s));
         }
     }
 
     private void add_delayed_agent(Agent agent, int until) {
-        if (HermesConfig.DEBUG_REALMS) log(secs, String.format("agent %d delayed until %d", agent.id, until));
-        delayedAgentsByWakeupTime.get(Math.min(until, HermesConfig.SIM_STEPS + 1)).add(agent);
+        if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("agent %d delayed until %d", agent.id, until));
+        delayedAgentsByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
     }
 
     private void add_delayed_link(Link link, int until) {
-        if (HermesConfig.DEBUG_REALMS) log(secs, String.format("link %d delayed until %d size %d peek agent %d", link.id(), until, link.queue().size(), link.queue().peek().id));
-        delayedLinksByWakeupTime.get(Math.min(until, HermesConfig.SIM_STEPS + 1)).add(link);
+        if (HermesConfigGroup.DEBUG_REALMS)
+            log(secs, String.format("link %d delayed until %d size %d peek agent %d", link.id(), until, link.queue().size(), link.queue().peek().id));
+        delayedLinksByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(link);
     }
 
     private void advanceAgentandSetEventTime(Agent agent) {
@@ -83,10 +84,12 @@ public class Realm {
 
     private void advanceAgent(Agent agent) {
         long centry = agent.currPlan();
-        if (HermesConfig.DEBUG_REALMS) log(secs, String.format("agent %d finished %s (prev plan index is %d)", agent.id, Agent.toString(centry), agent.planIndex));
+        if (HermesConfigGroup.DEBUG_REALMS)
+            log(secs, String.format("agent %d finished %s (prev plan index is %d)", agent.id, Agent.toString(centry), agent.planIndex));
         agent.planIndex++;
         long nentry = agent.currPlan();
-        if (HermesConfig.DEBUG_REALMS) log(secs, String.format("agent %d starting %s (new plan index is %d)", agent.id, Agent.toString(nentry), agent.planIndex));
+        if (HermesConfigGroup.DEBUG_REALMS)
+            log(secs, String.format("agent %d starting %s (new plan index is %d)", agent.id, Agent.toString(nentry), agent.planIndex));
     }
 
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
@@ -97,7 +100,7 @@ public class Realm {
         // this ensures that if no velocity is provided for the vehicle, we use the link
         velocity = velocity == 0 ? next.velocity() : velocity;
         // the max(1, ...) ensures that a link hop takes at least on step.
-        int traveltime = HermesConfig.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
+        int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
 
         if (next.push(agent)) {
@@ -281,19 +284,19 @@ public class Realm {
         Agent agent = null;
         Link link = null;
 
-    	while (secs != HermesConfig.SIM_STEPS) {
+        while (secs != HermesConfigGroup.SIM_STEPS) {
             while ((agent = delayedAgentsByWakeupTime.get(secs).poll()) != null) {
-                if (HermesConfig.DEBUG_REALMS) log(secs, String.format("Processing agent %d", agent.id));
+                if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing agent %d", agent.id));
                 routed += processAgentActivities(agent);
             }
             while ((link = delayedLinksByWakeupTime.get(secs).poll()) != null) {
-                if (HermesConfig.DEBUG_REALMS) log(secs, String.format("Processing link %d", link.id()));
+                if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing link %d", link.id()));
                 routed += processLinks(link);
             }
 
-            if (HermesConfig.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
+            if (HermesConfigGroup.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
 
-            if (HermesConfig.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
+            if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
                 eventsManager.processEvents(sorted_events);
                 sorted_events = new EventArray();
             }
@@ -311,7 +314,8 @@ public class Realm {
 
             for (; agent.eventsIndex <= eventid; agent.eventsIndex++) {
             	agentevents.get(agent.eventsIndex).setTime(time);
-                if (HermesConfig.DEBUG_REALMS) log(secs, String.format("agent %d setEventTime (eventsIndex=%d) %s", agent.id, agent.eventsIndex, agentevents.get(agent.eventsIndex).toString()));
+                if (HermesConfigGroup.DEBUG_REALMS)
+                    log(secs, String.format("agent %d setEventTime (eventsIndex=%d) %s", agent.id, agent.eventsIndex, agentevents.get(agent.eventsIndex).toString()));
                 sorted_events.add(agentevents.get(agent.eventsIndex));
             }
 

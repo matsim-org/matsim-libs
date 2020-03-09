@@ -1,10 +1,9 @@
 package org.matsim.core.mobsim.hermes;
 
+import org.matsim.core.events.EventArray;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import org.matsim.core.events.EventArray;
-import org.matsim.core.mobsim.hermes.Hermes;
 
 public class Agent {
 
@@ -104,24 +103,18 @@ public class Agent {
     public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this(id, plan, events);
         this.capacity = capacity;
-        this.passagersByStop = new ArrayList<>(HermesConfig.MAX_STOP_IDX + 1);
-        for(int i = 0; i < HermesConfig.MAX_STOP_IDX  + 1; i++) {
+        this.passagersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
+        for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
             this.passagersByStop.add(new ArrayList<>());
         }
     }
 
-    public void reset() {
-    	plan.clear();
-        events.clear();
-    	planIndex = 0;
-    	eventsIndex = 0;
-    	linkFinishTime = 0;
-    	if (capacity > 0) {
-    		passagersInside = 0;
-    		for(int i = 0; i < HermesConfig.MAX_STOP_IDX  + 1; i++) {
-                this.passagersByStop.get(i).clear();
-    		}
-    	}
+    public static long preparePlanEventEntry(long type, long element) {
+        long planEntry = (type << 60) | element;
+        if (HermesConfigGroup.DEBUG_EVENTS) {
+            validatePlanEntry(planEntry);
+        }
+        return planEntry;
     }
 
     public int id() { return this.id; }
@@ -188,50 +181,56 @@ public class Agent {
         }
     }
 
-    public static long preparePlanEventEntry(long type, long element) {
-        long planEntry = (type << 60) | element;
-        if (HermesConfig.DEBUG_EVENTS) {
-            validatePlanEntry(planEntry);
-        }
-        return planEntry;
-    }
-
     public static long preparePlanEventEntry(long type, long eventid, long element) {
-        if (eventid > HermesConfig.MAX_EVENTS_AGENT) {
+        if (eventid > HermesConfigGroup.MAX_EVENTS_AGENT) {
             throw new RuntimeException(String.format("eventid above limit: %d", eventid));
         }
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    public static long prepareStopDelay(long type, long departure, long element) {
-    	return preparePlanEventEntry(type, (departure << 40) | element);
-    }
-
     private static long prepapreLinkEntryElement(long linkid, long velocity) {
-        if (linkid > HermesConfig.MAX_LINK_ID) {
+        if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
 
         // Checking for velocities that are too high.
-        velocity = Math.min(velocity, HermesConfig.MAX_VEHICLE_VELOCITY);
+        velocity = Math.min(velocity, HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 
         // Checking for velocities that are too low.
-        velocity = velocity < 0 ? HermesConfig.MAX_VEHICLE_VELOCITY : velocity;
+        velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
 
         return (linkid << 8) | velocity;
     }
 
+    public static long prepareStopDelay(long type, long departure, long element) {
+        return preparePlanEventEntry(type, (departure << 40) | element);
+    }
+
     private static long prepareRouteStopEntry(long routeid, long stopid, long stopidx) {
-        if (stopid > HermesConfig.MAX_STOP_ROUTE_ID) {
+        if (stopid > HermesConfigGroup.MAX_STOP_ROUTE_ID) {
             throw new RuntimeException(String.format("stopid above limit: %d", stopid));
         }
-        if (routeid > HermesConfig.MAX_STOP_ROUTE_ID) {
+        if (routeid > HermesConfigGroup.MAX_STOP_ROUTE_ID) {
             throw new RuntimeException(String.format("routeid above limit: %d", routeid));
         }
-        if (stopidx > HermesConfig.MAX_STOP_IDX) {
+        if (stopidx > HermesConfigGroup.MAX_STOP_IDX) {
             throw new RuntimeException(String.format("station index above limit: %d", stopidx));
         }
         return (stopidx << 32) | (routeid << 16) | stopid;
+    }
+
+    public void reset() {
+        plan.clear();
+        events.clear();
+        planIndex = 0;
+        eventsIndex = 0;
+        linkFinishTime = 0;
+        if (capacity > 0) {
+            passagersInside = 0;
+            for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
+                this.passagersByStop.get(i).clear();
+            }
+        }
     }
 
     public static long prepareLinkEntry(int eventid, int linkid, int velocity) {
