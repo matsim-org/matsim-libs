@@ -62,9 +62,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
 	private final FrozenTastesConfigGroup dccg;
@@ -86,12 +83,9 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
-		this.nearestLinks = nearestLinks;
-		
+
 		// Cache maps since otherwise they would be created on the fly every time when accessing them via the config object.
-		this.teleportedModeSpeeds = this.lcContext.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
-		
+
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
 
@@ -226,9 +220,14 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	 */
 	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxDCScore = 0.0;
-		double scale = this.scaleEpsilon.getEpsilonFactor(type);		
-		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
-		maxDCScore *= scale; // apply the scale factors given in the config file
+		double scale = this.scaleEpsilon.getEpsilonFactor(type);
+		if(person.getAttributes().getAttribute(type) != null) {
+			maxDCScore = (Double) person.getAttributes().getAttribute(type);
+			maxDCScore *= scale;
+		}
+
+//		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
+//		maxDCScore *= scale; // apply the scale factors given in the config file
 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)

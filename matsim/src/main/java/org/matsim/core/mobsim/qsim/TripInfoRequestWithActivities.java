@@ -23,22 +23,28 @@ package org.matsim.core.mobsim.qsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-class TripInfoRequestWithActivities implements TripInfoRequest {
+class TripInfoRequestWithActivities implements TripInfo.Request{
+	// this is a pure data class and so one could decide the not have it behind an interface.  However, having it behind the interface means that only
+	// hte getters are public, which leaves us more room to refactor.  kai, jan'20
+
 	private final Facility fromFacility;
 	private final Facility toFacility;
 	private final double time;
 	private final TimeInterpretation timeInterpretation;
-	private final Activity fromActivity;
-	private final Activity toActivity;
+	private final Route route;
+//	private final Activity fromActivity;
+//	private final Activity toActivity;
 
-	private TripInfoRequestWithActivities(Scenario scenario, Activity fromActivity, Activity toActivity, double time,
-			TimeInterpretation timeInterpretation) {
-		this.fromActivity = fromActivity;
-		this.toActivity = toActivity;
+	private TripInfoRequestWithActivities( Scenario scenario, Activity fromActivity, Activity toActivity, double time,
+					       TimeInterpretation timeInterpretation, Route route ) {
+		this.route = route;
+//		this.fromActivity = fromActivity;
+//		this.toActivity = toActivity;
 		this.fromFacility = FacilitiesUtils.toFacility(fromActivity, scenario.getActivityFacilities());
 		this.toFacility = FacilitiesUtils.toFacility(toActivity, scenario.getActivityFacilities());
 		this.time = time;
@@ -65,16 +71,24 @@ class TripInfoRequestWithActivities implements TripInfoRequest {
 		return timeInterpretation;
 	}
 
-	Activity getFromActivity() {
-		return fromActivity;
+	@Override
+	public Route getPlannedRoute(){
+		return route;
 	}
 
-	Activity getToActivity() {
-		return toActivity;
-	}
+//	Activity getFromActivity() {
+//		return fromActivity;
+//	}
+//
+//	Activity getToActivity() {
+//		return toActivity;
+//	}
+	// these were used in the code to actually change the activity end time.  There is, however, no guarantee that these are still the behavioral objects
+	// .  kai, jan'20
 
 	static class Builder {
 		private final Scenario scenario;
+		private Route route;
 		// this is deliberately a builder and not a constructor so that we can add arguments later without having to add constructors with longer and longer
 		// argument lists.  kai, mar'19
 
@@ -107,8 +121,13 @@ class TripInfoRequestWithActivities implements TripInfoRequest {
 			return this;
 		}
 
-		TripInfoRequest createRequest() {
-			return new TripInfoRequestWithActivities(scenario, fromActivity, toActivity, time, timeInterpretation);
+		Builder setPlannedRoute( Route route ) {
+			this.route = route ;
+			return this ;
+		}
+
+		TripInfo.Request createRequest() {
+			return new TripInfoRequestWithActivities(scenario, fromActivity, toActivity, time, timeInterpretation, route);
 		}
 	}
 }

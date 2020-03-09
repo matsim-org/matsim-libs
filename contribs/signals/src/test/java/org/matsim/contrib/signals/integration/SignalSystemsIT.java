@@ -89,8 +89,10 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 			
 			Assert.assertEquals("different events files after iteration 0 ",
-					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
-					EventsFileComparator.Result.FILES_ARE_EQUAL);
+					EventsFileComparator.Result.FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "0.events.xml.gz",
+							iterationOutput + "0.events.xml.gz")
+					   );
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
@@ -111,10 +113,11 @@ public class SignalSystemsIT {
 			//iteration 10 
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 			
-			Assert.assertTrue("different event files after iteration 10",
-					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
-							EventsFileComparator.Result.FILES_ARE_EQUAL);
-			
+			Assert.assertEquals("different event files after iteration 10",
+					EventsFileComparator.Result.FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz" )
+					   );
+
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(inputDirectory + "10.plans.xml.gz");
@@ -179,8 +182,10 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 			
 			Assert.assertEquals("different events files after iteration 0 ",
-					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
-					EventsFileComparator.Result.FILES_ARE_EQUAL);
+					EventsFileComparator.Result.FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "0.events.xml.gz",
+							iterationOutput + "0.events.xml.gz")
+					   );
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
@@ -201,9 +206,10 @@ public class SignalSystemsIT {
 			//iteration 10 
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 			
-			Assert.assertTrue("different event files after iteration 10",
-					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
-							EventsFileComparator.Result.FILES_ARE_EQUAL);
+			Assert.assertEquals("different event files after iteration 10",
+					EventsFileComparator.Result.FILES_ARE_EQUAL,
+					new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz")
+					   );
 			
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());

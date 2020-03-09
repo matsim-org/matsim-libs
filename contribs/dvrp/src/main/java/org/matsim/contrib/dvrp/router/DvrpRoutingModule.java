@@ -106,7 +106,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			}
 
 			// interaction activity:
-			trip.add(createDrtStageActivity(accessFacility));
+			trip.add(createDrtStageActivity(accessFacility, now));
 			now++;
 		}
 
@@ -121,7 +121,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
-			trip.add(createDrtStageActivity(egressFacility));
+			trip.add(createDrtStageActivity(egressFacility, now));
 
 			// egress (sub-)trip:
 			trip.addAll(egressTrip);
@@ -130,12 +130,14 @@ public class DvrpRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	private Activity createDrtStageActivity(Facility stopFacility) {
+	private Activity createDrtStageActivity(Facility stopFacility, double now) {
 		Activity activity = scenario.getPopulation()
 				.getFactory()
 				.createActivityFromCoord(PlanCalcScoreConfigGroup.createStageActivityType(mode),
 						stopFacility.getCoord());
 		activity.setMaximumDuration(0);
+		activity.setStartTime(now);
+		activity.setEndTime(now);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
 	}

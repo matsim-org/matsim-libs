@@ -120,6 +120,8 @@ message PersonMoneyEvent {
 	double time = 1;
 	PersonId persId = 2;
 	double amount = 3;
+	string purpose = 4;
+	string transactionPartner = 5;
 }
 
 message PersonStuckEvent {

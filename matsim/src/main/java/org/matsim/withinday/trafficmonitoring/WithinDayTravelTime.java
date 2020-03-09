@@ -336,7 +336,7 @@ public class WithinDayTravelTime implements TravelTime,
 		
 		
 		for (Link link : this.network.getLinks().values()) {
-			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
+			double freeSpeedTravelTime = link.getLength() / link.getFreespeed();
 
 			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 			travelTimeInfo.travelTime = freeSpeedTravelTime;
