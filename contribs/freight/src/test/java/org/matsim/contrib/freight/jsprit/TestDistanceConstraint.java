@@ -102,23 +102,23 @@ public class TestDistanceConstraint {
 		FleetSize fleetSize = FleetSize.INFINITE;
 
 		Carrier carrierV1 = CarrierUtils.createCarrier(Id.create("Carrier_Version1", Carrier.class));
-		VehicleType newVT1 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V1", VehicleType.class));
-		newVT1.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
-		newVT1.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT1.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 450.);
-		newVT1.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 15.);
-		newVT1.getCapacity().setOther(80.);
-		newVT1.setDescription("Carrier_Version1");
-		VehicleType newVT2 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V1", VehicleType.class));
-		newVT2.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
-		newVT2.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT2.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 300.);
-		newVT2.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 10.);
-		newVT2.setDescription("Carrier_Version1");
-		newVT2.getCapacity().setOther(80.);
+		VehicleType vehicleType_LargeV1 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V1", VehicleType.class));
+		vehicleType_LargeV1.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_LargeV1.getEngineInformation(), "electricity");
+		vehicleType_LargeV1.getEngineInformation().getAttributes().putAttribute("energyCapacity", 450.);
+		vehicleType_LargeV1.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 15.);
+		vehicleType_LargeV1.getCapacity().setOther(80.);
+		vehicleType_LargeV1.setDescription("Carrier_Version1");
+		VehicleType vehicleType_SmallV1 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V1", VehicleType.class));
+		vehicleType_SmallV1.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
+		VehicleUtils.setHbefaTechnology(vehicleType_SmallV1.getEngineInformation(), "electricity");
+		vehicleType_SmallV1.getEngineInformation().getAttributes().putAttribute("energyCapacity", 300.);
+		vehicleType_SmallV1.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 10.);
+		vehicleType_SmallV1.setDescription("Carrier_Version1");
+		vehicleType_SmallV1.getCapacity().setOther(80.);
 
-		vehicleTypes.getVehicleTypes().put(newVT1.getId(), newVT1);
-		vehicleTypes.getVehicleTypes().put(newVT2.getId(), newVT2);
+		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV1.getId(), vehicleType_LargeV1);
+		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV1.getId(), vehicleType_SmallV1);
 
 		boolean threeServices = false;
 		createServices(carrierV1, threeServices, carriers);
@@ -135,14 +135,14 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
 
-		Assert.assertEquals(newVT2.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
+		Assert.assertEquals(vehicleType_SmallV1.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getVehicleType().getId());
-		double maxDistanceVehicle1 = (double) newVT1.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT1.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
-		double maxDistanceVehilce2 = (double) newVT2.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT2.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
+		double maxDistanceVehicle1 = (double) vehicleType_LargeV1.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_LargeV1.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
+		double maxDistanceVehilce2 = (double) vehicleType_SmallV1.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_SmallV1.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle1,
 				MatsimTestUtils.EPSILON);
@@ -186,23 +186,23 @@ public class TestDistanceConstraint {
 
 		Carrier carrierV2 = CarrierUtils.createCarrier(Id.create("Carrier_Version2", Carrier.class));
 
-		VehicleType newVT3 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V2", VehicleType.class));
-		newVT3.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
-		newVT3.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT3.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 450.);
-		newVT3.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 15.);
-		newVT3.setDescription("Carrier_Version2");
-		newVT3.getCapacity().setOther(80.);
-		VehicleType newVT4 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V2", VehicleType.class));
-		newVT4.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
-		newVT4.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT4.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 150.);
-		newVT4.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 10.);
-		newVT4.setDescription("Carrier_Version2");
-		newVT4.getCapacity().setOther(80.);
+		VehicleType vehicleType_LargeV2 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V2", VehicleType.class));
+		vehicleType_LargeV2.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_LargeV2.getEngineInformation(), "electricity");
+		vehicleType_LargeV2.getEngineInformation().getAttributes().putAttribute("energyCapacity", 450.);
+		vehicleType_LargeV2.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 15.);
+		vehicleType_LargeV2.setDescription("Carrier_Version2");
+		vehicleType_LargeV2.getCapacity().setOther(80.);
+		VehicleType vehicleType_SmallV2 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V2", VehicleType.class));
+		vehicleType_SmallV2.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
+		VehicleUtils.setHbefaTechnology(vehicleType_SmallV2.getEngineInformation(), "electricity");
+		vehicleType_SmallV2.getEngineInformation().getAttributes().putAttribute("energyCapacity", 150.);
+		vehicleType_SmallV2.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 10.);
+		vehicleType_SmallV2.setDescription("Carrier_Version2");
+		vehicleType_SmallV2.getCapacity().setOther(80.);
 
-		vehicleTypes.getVehicleTypes().put(newVT3.getId(), newVT3);
-		vehicleTypes.getVehicleTypes().put(newVT4.getId(), newVT4);
+		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV2.getId(), vehicleType_LargeV2);
+		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV2.getId(), vehicleType_SmallV2);
 
 		boolean threeServices = false;
 		createServices(carrierV2, threeServices, carriers);
@@ -219,14 +219,14 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
-		Assert.assertEquals(newVT3.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
+		Assert.assertEquals(vehicleType_LargeV2.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
 				.getVehicle().getVehicleType().getId());
-		double maxDistanceVehicle3 = (double) newVT3.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT3.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
-		double maxDistanceVehilce4 = (double) newVT4.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT4.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
+		double maxDistanceVehicle3 = (double) vehicleType_LargeV2.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_LargeV2.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
+		double maxDistanceVehilce4 = (double) vehicleType_SmallV2.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_SmallV2.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle3,
 				MatsimTestUtils.EPSILON);
@@ -271,23 +271,23 @@ public class TestDistanceConstraint {
 		FleetSize fleetSize = FleetSize.INFINITE;
 		Carrier carrierV3 = CarrierUtils.createCarrier(Id.create("Carrier_Version3", Carrier.class));
 
-		VehicleType newVT5 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V3", VehicleType.class));
-		newVT5.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
-		newVT5.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT5.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 450.);
-		newVT5.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 15.);
-		newVT5.setDescription("Carrier_Version3");
-		newVT5.getCapacity().setOther(80.);
-		VehicleType newVT6 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V3", VehicleType.class));
-		newVT6.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(40.);
-		newVT6.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT6.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 300.);
-		newVT6.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 10.);
-		newVT6.setDescription("Carrier_Version3");
-		newVT6.getCapacity().setOther(40.);
+		VehicleType vehicleType_LargeV3 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V3", VehicleType.class));
+		vehicleType_LargeV3.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_LargeV3.getEngineInformation(), "electricity");
+		vehicleType_LargeV3.getEngineInformation().getAttributes().putAttribute("energyCapacity", 450.);
+		vehicleType_LargeV3.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 15.);
+		vehicleType_LargeV3.setDescription("Carrier_Version3");
+		vehicleType_LargeV3.getCapacity().setOther(80.);
+		VehicleType vehicleType_SmallV3 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V3", VehicleType.class));
+		vehicleType_SmallV3.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(40.);
+		VehicleUtils.setHbefaTechnology(vehicleType_SmallV3.getEngineInformation(), "electricity");
+		vehicleType_SmallV3.getEngineInformation().getAttributes().putAttribute("energyCapacity", 300.);
+		vehicleType_SmallV3.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 10.);
+		vehicleType_SmallV3.setDescription("Carrier_Version3");
+		vehicleType_SmallV3.getCapacity().setOther(40.);
 
-		vehicleTypes.getVehicleTypes().put(newVT5.getId(), newVT5);
-		vehicleTypes.getVehicleTypes().put(newVT6.getId(), newVT6);
+		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV3.getId(), vehicleType_LargeV3);
+		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV3.getId(), vehicleType_SmallV3);
 
 		boolean threeServices = false;
 		createServices(carrierV3, threeServices, carriers);
@@ -304,12 +304,12 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
 
-		double maxDistanceVehicle5 = (double) newVT5.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT5.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
-		double maxDistanceVehilce6 = (double) newVT6.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT6.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
+		double maxDistanceVehicle5 = (double) vehicleType_LargeV3.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_LargeV3.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
+		double maxDistanceVehilce6 = (double) vehicleType_SmallV3.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_SmallV3.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle5,
 				MatsimTestUtils.EPSILON);
@@ -329,7 +329,7 @@ public class TestDistanceConstraint {
 								0, scenario.getNetwork());
 				}
 			}
-			Assert.assertEquals(newVT6.getId(), scheduledTour.getVehicle().getVehicleType().getId());
+			Assert.assertEquals(vehicleType_SmallV3.getId(), scheduledTour.getVehicle().getVehicleType().getId());
 			if (distanceTour == 12000)
 				Assert.assertEquals("The schedulded tour has a non expected distance", 12000, distanceTour,
 						MatsimTestUtils.EPSILON);
@@ -362,30 +362,30 @@ public class TestDistanceConstraint {
 		FleetSize fleetSize = FleetSize.INFINITE;
 		Carrier carrierV4 = CarrierUtils.createCarrier(Id.create("Carrier_Version4", Carrier.class));
 
-		VehicleType newVT7 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V4", VehicleType.class));
-		newVT7.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
-		newVT7.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT7.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 450.);
-		newVT7.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 15.);
-		newVT7.setDescription("Carrier_Version4");
-		newVT7.getCapacity().setOther(120.);
-		VehicleType newVT8 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V4", VehicleType.class));
-		newVT8.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
-		newVT8.getEngineInformation().getAttributes().putAttribute("fuelType", "electricity");
-		newVT8.getEngineInformation().getAttributes().putAttribute("engeryCapacity", 300.);
-		newVT8.getEngineInformation().getAttributes().putAttribute("engeryConsumptionPerKm", 10.);
-		newVT8.setDescription("Carrier_Version4");
-		newVT8.getCapacity().setOther(120.);
-		VehicleType newVT9 = VehicleUtils.createVehicleType(Id.create("DieselVehicle", VehicleType.class));
-		newVT9.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(400.);
-		newVT9.getEngineInformation().getAttributes().putAttribute("fuelType", "diesel");
-		newVT9.getEngineInformation().getAttributes().putAttribute("fuelConsumptionLitersPerMeter", 0.0001625);
-		newVT9.setDescription("Carrier_Version4");
-		newVT9.getCapacity().setOther(40.);
+		VehicleType vehicleType_LargeV4 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V4", VehicleType.class));
+		vehicleType_LargeV4.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_LargeV4.getEngineInformation(), "electricity");
+		vehicleType_LargeV4.getEngineInformation().getAttributes().putAttribute("energyCapacity", 450.);
+		vehicleType_LargeV4.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 15.);
+		vehicleType_LargeV4.setDescription("Carrier_Version4");
+		vehicleType_LargeV4.getCapacity().setOther(120.);
+		VehicleType vehicleType_SmallV4 = VehicleUtils.createVehicleType(Id.create("SmallBattery_V4", VehicleType.class));
+		vehicleType_SmallV4.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(70.);
+		VehicleUtils.setHbefaTechnology(vehicleType_SmallV4.getEngineInformation(), "electricity");
+		vehicleType_SmallV4.getEngineInformation().getAttributes().putAttribute("energyCapacity", 300.);
+		vehicleType_SmallV4.getEngineInformation().getAttributes().putAttribute("energyConsumptionPerKm", 10.);
+		vehicleType_SmallV4.setDescription("Carrier_Version4");
+		vehicleType_SmallV4.getCapacity().setOther(120.);
+		VehicleType vehicleType_Diesel = VehicleUtils.createVehicleType(Id.create("DieselVehicle", VehicleType.class));
+		vehicleType_Diesel.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(400.);
+		VehicleUtils.setHbefaTechnology(vehicleType_Diesel.getEngineInformation(), "diesel");
+		vehicleType_Diesel.getEngineInformation().getAttributes().putAttribute("fuelConsumptionLitersPerMeter", 0.0001625);
+		vehicleType_Diesel.setDescription("Carrier_Version4");
+		vehicleType_Diesel.getCapacity().setOther(40.);
 
-		vehicleTypes.getVehicleTypes().put(newVT7.getId(), newVT7);
-		vehicleTypes.getVehicleTypes().put(newVT8.getId(), newVT8);
-		vehicleTypes.getVehicleTypes().put(newVT9.getId(), newVT9);
+		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV4.getId(), vehicleType_LargeV4);
+		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV4.getId(), vehicleType_SmallV4);
+		vehicleTypes.getVehicleTypes().put(vehicleType_Diesel.getId(), vehicleType_Diesel);
 
 		boolean threeServices = true;
 		createServices(carrierV4, threeServices, carriers);
@@ -402,12 +402,12 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
 
-		double maxDistanceVehicle7 = (double) newVT7.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT7.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
-		double maxDistanceVehilce8 = (double) newVT8.getEngineInformation().getAttributes()
-				.getAttribute("engeryCapacity")
-				/ (double) newVT8.getEngineInformation().getAttributes().getAttribute("engeryConsumptionPerKm");
+		double maxDistanceVehicle7 = (double) vehicleType_LargeV4.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_LargeV4.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
+		double maxDistanceVehilce8 = (double) vehicleType_SmallV4.getEngineInformation().getAttributes()
+				.getAttribute("energyCapacity")
+				/ (double) vehicleType_SmallV4.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle7,
 				MatsimTestUtils.EPSILON);

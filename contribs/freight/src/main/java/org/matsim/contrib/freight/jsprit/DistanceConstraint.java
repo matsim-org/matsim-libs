@@ -32,6 +32,7 @@ import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author rewert
@@ -87,14 +88,13 @@ public class DistanceConstraint implements HardActivityConstraint {
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
 				.get(Id.create(context.getNewVehicle().getType().getTypeId().toString(), VehicleType.class));
 
-		if (vehicleTypeOfNewVehicle.getEngineInformation().getAttributes().getAttribute("fuelType")
-				.equals("electricity")) {
+		if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity")) {
 			Vehicle newVehicle = context.getNewVehicle();
 
 			Double electricityCapacityinkWh = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
-					.getAttribute("engeryCapacity");
+					.getAttribute("energyCapacity");
 			Double electricityConsumptionPerkm = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
-					.getAttribute("engeryConsumptionPerKm");
+					.getAttribute("energyConsumptionPerKm");
 			Double routeConsumption = null;
 
 			Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
