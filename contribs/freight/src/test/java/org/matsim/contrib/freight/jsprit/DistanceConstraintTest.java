@@ -443,7 +443,7 @@ public class DistanceConstraintTest {
 	 * @param config
 	 */
 	static void prepareConfig(Config config) {
-		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").getFile());
+		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").toString());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
 				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
