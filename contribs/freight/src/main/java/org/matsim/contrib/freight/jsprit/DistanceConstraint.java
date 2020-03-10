@@ -1,3 +1,24 @@
+/*
+ *   *********************************************************************** *
+ *   project: org.matsim.*
+ *   *********************************************************************** *
+ *                                                                           *
+ *   copyright       : (C) 2020 by the members listed in the COPYING,        *
+ *                     LICENSE and WARRANTY file.                            *
+ *   email           : info at matsim dot org                                *
+ *                                                                           *
+ *   *********************************************************************** *
+ *                                                                           *
+ *     This program is free software; you can redistribute it and/or modify  *
+ *     it under the terms of the GNU General Public License as published by  *
+ *     the Free Software Foundation; either version 2 of the License, or     *
+ *     (at your option) any later version.                                   *
+ *     See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                           *
+ *   ***********************************************************************
+ *
+ */
+
 package org.matsim.contrib.freight.jsprit;
 
 import org.matsim.api.core.v01.Id;
@@ -15,19 +36,16 @@ import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 /**
  * @author rewert
  * 
- *         Includes all classes and methods for the distance constraint of every
- *         electric vehicle based on the capacity and the consumption of the
- *         battery. The base for calculating the consumption is only the driven
- *         distance and not the transported weight or other influences. But is
- *         possible to integrate it.
+ * 	Includes all classes and methods for the distance constraint of every
+ * 	electric vehicle based on the capacity and the consumption of the
+ *  battery. The base for calculating the consumption is only the driven
+ * 	distance and not the transported weight or other influences. But is
+ * 	possible to integrate it.
  * 
- *         !! No recharging is integrated. Vehicles are totally loaded at the
- *         beginning.
+ * 	!! No recharging is integrated. Vehicles are totally loaded at the
+ * 	beginning.
  *
- */
-/**
- * Creates the distance constraint.
- *
+ * 	Creates the distance constraint.
  */
 public class DistanceConstraint implements HardActivityConstraint {
 
@@ -118,7 +136,7 @@ public class DistanceConstraint implements HardActivityConstraint {
 	 * after the pickup, delivery as the last activity before the end and delivery
 	 * directly behind the new pickup. This method gives back the minimal distance
 	 * of this three options.
-	 * 
+	 *
 	 * @param context
 	 * @param newAct
 	 * @param nextAct
@@ -186,7 +204,7 @@ public class DistanceConstraint implements HardActivityConstraint {
 
 	/**
 	 * Checks if the find possible distance is the minimal one.
-	 * 
+	 *
 	 * @param minimalAdditionalDistance
 	 * @param possibleAdditionalDistance
 	 * @return
