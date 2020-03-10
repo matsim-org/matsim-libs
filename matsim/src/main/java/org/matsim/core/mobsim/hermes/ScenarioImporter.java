@@ -87,7 +87,7 @@ public class ScenarioImporter {
     	log.info(String.format("ETHZ reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
     	time = System.currentTimeMillis();
     	generatePlans();
-        log.info(String.format("ETHZ generatePlans (SBB mode %b) took %d ms", System.currentTimeMillis() - time));
+        log.info(String.format("ETHZ generatePlans took %d ms", System.currentTimeMillis() - time));
     	time = System.currentTimeMillis();
         generateRealms();
         log.info(String.format("ETHZ generateRealms took %d ms", System.currentTimeMillis() - time));
