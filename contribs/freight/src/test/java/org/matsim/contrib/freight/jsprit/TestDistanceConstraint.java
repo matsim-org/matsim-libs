@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.jsprit;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import org.matsim.vehicles.Vehicle;
@@ -74,15 +77,15 @@ public class TestDistanceConstraint {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-	
+
 	static final Logger log = Logger.getLogger(TestDistanceConstraint.class);
 
-	private static final String original_Chessboard = "https://raw.githubusercontent.com/matsim-org/matsim/master/examples/scenarios/freight-chessboard-9x9/grid9x9.xml";
+	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
 	/**
 	 * Option 1: Tour is possible with the vehicle with the small battery and the
 	 * vehicle with the small battery is cheaper
-	 * 
+	 *
 	 * @throws InvalidAttributeValueException
 	 */
 	@Test
@@ -90,7 +93,7 @@ public class TestDistanceConstraint {
 
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config = prepareConfig(config, 0);
+		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -119,9 +122,8 @@ public class TestDistanceConstraint {
 		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV1.getId(), vehicleType_LargeV1);
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV1.getId(), vehicleType_SmallV1);
 
-		boolean threeServices = false;
-		createServices(carrierV1, threeServices, carriers);
-		createCarriers(carriers, fleetSize, carrierV1, scenario, vehicleTypes);
+		carriers.addCarrier(addTwoServicesToCarrier(carrierV1));
+		createCarriers(carriers, fleetSize, carrierV1, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -166,14 +168,14 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
 	 * why one vehicle with a large battery is used.
-	 * 
+	 *
 	 * @throws InvalidAttributeValueException
 	 */
 	@Test
 	public final void CarrierLargeBatteryTest_Version2() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config = prepareConfig(config, 0);
+		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -203,9 +205,8 @@ public class TestDistanceConstraint {
 		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV2.getId(), vehicleType_LargeV2);
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV2.getId(), vehicleType_SmallV2);
 
-		boolean threeServices = false;
-		createServices(carrierV2, threeServices, carriers);
-		createCarriers(carriers, fleetSize, carrierV2, scenario, vehicleTypes);
+		carriers.addCarrier(addTwoServicesToCarrier(carrierV2));
+		createCarriers(carriers, fleetSize, carrierV2, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -219,7 +220,7 @@ public class TestDistanceConstraint {
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
 		Assert.assertEquals(vehicleType_LargeV2.getId(), carrierV2.getSelectedPlan().getScheduledTours().iterator().next()
-				.getVehicle().getVehicleType().getId());
+				.getVehicle().getType().getId());
 		double maxDistanceVehicle3 = (double) vehicleType_LargeV2.getEngineInformation().getAttributes()
 				.getAttribute("energyCapacity")
 				/ (double) vehicleType_LargeV2.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
@@ -251,7 +252,7 @@ public class TestDistanceConstraint {
 	/**
 	 * Option 3: costs for using one long range vehicle are higher than the costs of
 	 * using two short range truck
-	 * 
+	 *
 	 * @throws InvalidAttributeValueException
 	 */
 
@@ -259,7 +260,7 @@ public class TestDistanceConstraint {
 	public final void Carrier2SmallBatteryTest_Version3() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config = prepareConfig(config, 0);
+		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -288,9 +289,8 @@ public class TestDistanceConstraint {
 		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV3.getId(), vehicleType_LargeV3);
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV3.getId(), vehicleType_SmallV3);
 
-		boolean threeServices = false;
-		createServices(carrierV3, threeServices, carriers);
-		createCarriers(carriers, fleetSize, carrierV3, scenario, vehicleTypes);
+		carriers.addCarrier(addTwoServicesToCarrier(carrierV3));
+		createCarriers(carriers, fleetSize, carrierV3, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -328,7 +328,7 @@ public class TestDistanceConstraint {
 								0, scenario.getNetwork());
 				}
 			}
-			Assert.assertEquals(vehicleType_SmallV3.getId(), scheduledTour.getVehicle().getVehicleType().getId());
+			Assert.assertEquals(vehicleType_SmallV3.getId(), scheduledTour.getVehicle().getType().getId());
 			if (distanceTour == 12000)
 				Assert.assertEquals("The schedulded tour has a non expected distance", 12000, distanceTour,
 						MatsimTestUtils.EPSILON);
@@ -342,7 +342,7 @@ public class TestDistanceConstraint {
 	 * Option 4: An additional shipment outside the range of both BEVtypes.
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
-	 * 
+	 *
 	 * @throws InvalidAttributeValueException
 	 */
 
@@ -350,7 +350,7 @@ public class TestDistanceConstraint {
 	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config = prepareConfig(config, 0);
+		prepareConfig(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -386,9 +386,8 @@ public class TestDistanceConstraint {
 		vehicleTypes.getVehicleTypes().put(vehicleType_SmallV4.getId(), vehicleType_SmallV4);
 		vehicleTypes.getVehicleTypes().put(vehicleType_Diesel.getId(), vehicleType_Diesel);
 
-		boolean threeServices = true;
-		createServices(carrierV4, threeServices, carriers);
-		createCarriers(carriers, fleetSize, carrierV4, scenario, vehicleTypes);
+		carriers.addCarrier(addThreeServicesToCarrier(carrierV4));
+		createCarriers(carriers, fleetSize, carrierV4, vehicleTypes);
 
 		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
 		scenario.addScenarioElement("carriers", carriers);
@@ -416,7 +415,7 @@ public class TestDistanceConstraint {
 
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
 
-			String thisTypeId = scheduledTour.getVehicle().getVehicleType().getId().toString();
+			String thisTypeId = scheduledTour.getVehicle().getType().getId().toString();
 			double distanceTour = 0.0;
 			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
 			for (Tour.TourElement element : elements) {
@@ -427,10 +426,10 @@ public class TestDistanceConstraint {
 								0, scenario.getNetwork());
 				}
 			}
-			if (thisTypeId == "SmallBattery_V4")
+			if (thisTypeId.equals("SmallBattery_V4"))
 				Assert.assertEquals("The schedulded tour has a non expected distance", 24000, distanceTour,
 						MatsimTestUtils.EPSILON);
-			else if (thisTypeId == "DieselVehicle")
+			else if (thisTypeId.equals("DieselVehicle"))
 				Assert.assertEquals("The schedulded tour has a non expected distance", 36000, distanceTour,
 						MatsimTestUtils.EPSILON);
 			else
@@ -439,65 +438,69 @@ public class TestDistanceConstraint {
 	}
 
 	/**
-	 * Deletes the existing output file and sets the number of the last MATSim
-	 * iteration.
-	 * 
+	 * Deletes the existing output file and sets the number of the last MATSim iteration to 0.
+	 *
 	 * @param config
 	 */
-	static Config prepareConfig(Config config, int lastMATSimIteration) {
-		
-		config.network().setInputFile(original_Chessboard);
+	static void prepareConfig(Config config) {
+		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").getFile());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		new OutputDirectoryHierarchy(config.controler().getOutputDirectory(), config.controler().getRunId(),
 				config.controler().getOverwriteFileSetting(), CompressionType.gzip);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
-		config.controler().setLastIteration(lastMATSimIteration);
+		config.controler().setLastIteration(0);
 		config.global().setRandomSeed(4177);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption);
-		return config;
 	}
 
-	private static void createServices(Carrier carrier, boolean threeServices, Carriers carriers) {
-// Service 1		
+	private static Carrier addTwoServicesToCarrier(Carrier carrier) {
+		// Service 1
 		CarrierService service1 = CarrierService.Builder
 				.newInstance(Id.create("Service1", CarrierService.class), Id.createLinkId("j(3,8)"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
 				.setCapacityDemand(40).build();
 		CarrierUtils.addService(carrier, service1);
 
-// Service 2
+		// Service 2
 		CarrierService service2 = CarrierService.Builder
 				.newInstance(Id.create("Service2", CarrierService.class), Id.createLinkId("j(0,3)R"))
 				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
 				.setCapacityDemand(40).build();
 		CarrierUtils.addService(carrier, service2);
 
-// Service 3
-		if (threeServices == true) {
-			CarrierService service3 = CarrierService.Builder
-					.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
-					.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
-					.setCapacityDemand(40).build();
-			CarrierUtils.addService(carrier, service3);
-		}
-		carriers.addCarrier(carrier);
+		return carrier;
 	}
+
+	private static Carrier addThreeServicesToCarrier(Carrier carrier) {
+		// Services 1 and 2
+		addTwoServicesToCarrier(carrier);
+
+		// Service 3
+		CarrierService service3 = CarrierService.Builder
+				.newInstance(Id.create("Service3", CarrierService.class), Id.createLinkId("j(9,2)"))
+				.setServiceDuration(20).setServiceStartTimeWindow(TimeWindow.newInstance(8 * 3600, 10 * 3600))
+				.setCapacityDemand(40).build();
+		CarrierUtils.addService(carrier, service3);
+
+		return carrier;
+	}
+
 
 	/**
 	 * Creates the vehicle at the depot, ads this vehicle to the carriers and sets
 	 * the capabilities. Sets TimeWindow for the carriers.
-	 * 
+	 *
 	 * @param
 	 */
-	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier, Scenario scenario,
-			CarrierVehicleTypes vehicleTypes) {
+	private static void createCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
+									   CarrierVehicleTypes vehicleTypes) {
 		double earliestStartingTime = 8 * 3600;
 		double latestFinishingTime = 10 * 3600;
-		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
+		List<CarrierVehicle> vehicles = new ArrayList<>();
 		for (VehicleType singleVehicleType : vehicleTypes.getVehicleTypes().values()) {
 			if (singleCarrier.getId().toString().equals(singleVehicleType.getDescription()))
 				vehicles.add(createGarbageTruck(singleVehicleType.getId().toString(), earliestStartingTime,
@@ -505,19 +508,18 @@ public class TestDistanceConstraint {
 		}
 
 		// define Carriers
-
 		defineCarriers(carriers, fleetSize, singleCarrier, vehicles, vehicleTypes);
 	}
 
 	/**
 	 * Method for creating a new carrierVehicle
-	 * 
+	 *
 	 * @param
-	 * 
+	 *
 	 * @return new carrierVehicle at the depot
 	 */
 	static CarrierVehicle createGarbageTruck(String vehicleName, double earliestStartingTime,
-			double latestFinishingTime, VehicleType singleVehicleType) {
+											 double latestFinishingTime, VehicleType singleVehicleType) {
 
 		return CarrierVehicle.Builder.newInstance(Id.create(vehicleName, Vehicle.class), Id.createLinkId("i(1,8)"))
 				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime)
@@ -527,12 +529,12 @@ public class TestDistanceConstraint {
 	/**
 	 * Defines and sets the Capabilities of the Carrier, including the vehicleTypes
 	 * for the carriers
-	 * 
+	 *
 	 * @param
-	 * 
+	 *
 	 */
 	private static void defineCarriers(Carriers carriers, FleetSize fleetSize, Carrier singleCarrier,
-			List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {
+									   List<CarrierVehicle> vehicles, CarrierVehicleTypes vehicleTypes) {
 
 		singleCarrier.setCarrierCapabilities(CarrierCapabilities.Builder.newInstance().setFleetSize(fleetSize).build());
 		for (CarrierVehicle carrierVehicle : vehicles) {
