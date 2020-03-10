@@ -85,7 +85,6 @@ public class TestDistanceConstraint {
 	 * 
 	 * @throws InvalidAttributeValueException
 	 */
-
 	@Test
 	public final void CarrierSmallBatteryTest_Version1() throws InvalidAttributeValueException {
 
@@ -135,8 +134,8 @@ public class TestDistanceConstraint {
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
 
-		Assert.assertEquals(vehicleType_SmallV1.getId(), carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
-				.getVehicle().getVehicleType().getId());
+		Assert.assertEquals(vehicleType_SmallV1.getId(), ((Vehicle) carrierV1.getSelectedPlan().getScheduledTours().iterator().next()
+				.getVehicle()).getType().getId());
 		double maxDistanceVehicle1 = (double) vehicleType_LargeV1.getEngineInformation().getAttributes()
 				.getAttribute("energyCapacity")
 				/ (double) vehicleType_LargeV1.getEngineInformation().getAttributes().getAttribute("energyConsumptionPerKm");
