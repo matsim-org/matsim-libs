@@ -73,12 +73,12 @@ import org.matsim.vehicles.VehicleUtils;
  * 	correct working of the constraint
  *
  */
-public class TestDistanceConstraint {
+public class DistanceConstraintTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	static final Logger log = Logger.getLogger(TestDistanceConstraint.class);
+	static final Logger log = Logger.getLogger(DistanceConstraintTest.class);
 
 	final static URL SCENARIO_URL = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 

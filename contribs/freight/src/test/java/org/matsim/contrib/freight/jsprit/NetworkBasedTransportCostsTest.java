@@ -22,7 +22,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 
-public class TestNetworkBasedTransportCosts extends MatsimTestCase{
+public class NetworkBasedTransportCostsTest extends MatsimTestCase{
 
 
 	@Test

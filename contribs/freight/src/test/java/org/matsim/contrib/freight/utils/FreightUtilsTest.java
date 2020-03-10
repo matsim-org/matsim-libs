@@ -55,7 +55,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import org.junit.Assert;
 import javax.management.InvalidAttributeValueException;
 
-public class TestFreightUtils {
+public class FreightUtilsTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -365,7 +365,7 @@ public class TestFreightUtils {
 	 * @return String location of the packageInputDirectory
 	 */
 	private static String getPackageInputDirectory() {
-		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
+		String classInputDirectory = "test/input/" + FreightUtilsTest.class.getCanonicalName().replace('.', '/') + "/";
 		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
 		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
 		return packageInputDirectory;

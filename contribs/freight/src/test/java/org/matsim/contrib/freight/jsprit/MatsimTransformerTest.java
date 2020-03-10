@@ -35,7 +35,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
-public class TestMatsimTransformer {
+public class MatsimTransformerTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();	
