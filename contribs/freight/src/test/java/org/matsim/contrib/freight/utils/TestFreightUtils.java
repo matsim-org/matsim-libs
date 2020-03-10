@@ -97,8 +97,10 @@ public class TestFreightUtils {
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
-		carrierVehType.getAttributes().putAttribute("fuelType", "diesel");
-		carrierVehType.getAttributes().putAttribute("fuelConsumption", 0.015);
+		VehicleUtils.setHbefaTechnology(carrierVehType.getEngineInformation(), "diesel");
+//		carrierVehType.getAttributes().putAttribute("fuelType", "diesel");
+		VehicleUtils.setFuelConsumption(carrierVehType, 0.015);
+//		carrierVehType.getAttributes().putAttribute("fuelConsumption", 0.015);
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
 		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -221,8 +223,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals("diesel", carrierVehicleType.getAttributes().getAttribute("fuelType"));
-			Assert.assertEquals(0.015, (double)carrierVehicleType.getAttributes().getAttribute("fuelConsumption"), 0.0);
+			Assert.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
+			Assert.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);
 		}
 		
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
@@ -233,9 +235,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals("diesel", carrierVehicleType.getAttributes().getAttribute("fuelType"));
-			Assert.assertEquals(0.015, (double)carrierVehicleType.getAttributes().getAttribute("fuelConsumption"), 0.0);
-		}
+			Assert.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
+			Assert.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);		}
 	}
 
 	@Test
