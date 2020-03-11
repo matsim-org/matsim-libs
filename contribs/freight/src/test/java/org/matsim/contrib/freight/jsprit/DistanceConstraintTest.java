@@ -210,7 +210,8 @@ public class DistanceConstraintTest {
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
 		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
-
+		
+		
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
 
