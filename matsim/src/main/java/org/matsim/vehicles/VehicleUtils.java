@@ -47,6 +47,8 @@ public final class VehicleUtils {
 	private static final String EGRESSTIME = "egressTimeInSecondsPerPerson";
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
+	private static final String ENERGYCONSUMPTION = "energyConsumptionKWhPerMeter";
+	private static final String ENERGYCAPACITY = "energyCapacityInKWhOrLiters";
 	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
 	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
@@ -229,6 +231,21 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( HBEFA_EMISSIONS_CONCEPT, emissionsConcept ) ;
 	}
 
+	public static Double getEnergyConsumptionKWhPerMeter(EngineInformation engineInformation) {
+    	return (Double) engineInformation.getAttributes().getAttribute(ENERGYCONSUMPTION);
+ 	}
+
+	public static void setEnergyConsumptionKWhPerMeter(EngineInformation engineInformation, double energyConsumptionKWhPerMeter) {
+		 engineInformation.getAttributes().putAttribute(ENERGYCONSUMPTION, energyConsumptionKWhPerMeter);
+	}
+
+	public static Double getEnergyCapacity(EngineInformation engineInformation) {
+		return (Double) engineInformation.getAttributes().getAttribute(ENERGYCAPACITY);
+	}
+
+	public static void setEnergyCapacity(EngineInformation engineInformation, double energyCapacityInKWhOrLiters) {
+		engineInformation.getAttributes().putAttribute(ENERGYCAPACITY, energyCapacityInKWhOrLiters);
+	}
 	//******** CostInformation attributes ************
 
 	@Deprecated

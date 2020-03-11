@@ -91,10 +91,8 @@ public class DistanceConstraint implements HardActivityConstraint {
 		if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity")) {
 			Vehicle newVehicle = context.getNewVehicle();
 
-			Double electricityCapacityinkWh = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
-					.getAttribute("energyCapacity");
-			Double electricityConsumptionPerkm = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
-					.getAttribute("energyConsumptionPerKm");
+			Double electricityCapacityinkWh = VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
+			Double electricityConsumptionPerMeter = VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
 			Double routeConsumption = null;
 
 			Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
@@ -103,7 +101,7 @@ public class DistanceConstraint implements HardActivityConstraint {
 				routeDistance = 0.;
 				routeConsumption = 0.;
 			} else {
-				routeConsumption = routeDistance * (electricityConsumptionPerkm / 1000);
+				routeConsumption = routeDistance * (electricityConsumptionPerMeter);
 			}
 			if (newAct.getName().contains("pickupShipment")) {
 				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
@@ -114,7 +112,7 @@ public class DistanceConstraint implements HardActivityConstraint {
 						- getDistance(prevAct, nextAct, newVehicle);
 
 			}
-			double additionalConsumption = additionalDistance * (electricityConsumptionPerkm / 1000);
+			double additionalConsumption = additionalDistance * (electricityConsumptionPerMeter);
 			double newRouteConsumption = routeConsumption + additionalConsumption;
 
 			if (newRouteConsumption > electricityCapacityinkWh) {
