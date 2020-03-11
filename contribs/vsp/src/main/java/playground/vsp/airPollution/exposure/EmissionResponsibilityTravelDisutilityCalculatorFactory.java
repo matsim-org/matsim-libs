@@ -51,9 +51,8 @@ public class EmissionResponsibilityTravelDisutilityCalculatorFactory implements 
 
     @Override
     public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-        randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
 
-        return new EmissionResponsibilityTollTimeDistanceTravelDisutility(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
+            return new EmissionResponsibilityTollTimeDistanceTravelDisutility(this.randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
                 timeCalculator,
                 this.cnScoringGroup.getMarginalUtilityOfMoney(),
                 this.emissionModule,

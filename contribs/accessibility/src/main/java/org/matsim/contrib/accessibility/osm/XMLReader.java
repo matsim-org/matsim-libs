@@ -1,17 +1,6 @@
 //This software is released into the Public Domain.  See copying.txt for details.
 package org.matsim.contrib.accessibility.osm;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
 import org.openstreetmap.osmosis.core.OsmosisRuntimeException;
 import org.openstreetmap.osmosis.core.task.v0_6.RunnableSource;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
@@ -20,6 +9,16 @@ import org.openstreetmap.osmosis.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.xml.v0_6.impl.OsmHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
 * An OSM data source reading from an xml file. The entire contents of the file are read.
@@ -116,7 +115,7 @@ class XMLReader implements RunnableSource {
      } catch (IOException e) {
          throw new OsmosisRuntimeException("Unable to read XML file " + file + ".", e);
      } finally {
-         sink.release();
+         sink.close();
 
          if (inputStream != null) {
              try {

@@ -6,9 +6,6 @@ import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.reporting.SolutionPrinter;
 import com.graphhopper.jsprit.core.util.Solutions;
-
-import javax.management.InvalidAttributeValueException;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,10 +17,11 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.management.InvalidAttributeValueException;
 
 public class IntegrationIT {
 
@@ -49,16 +47,17 @@ public class IntegrationIT {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFilename);
 	
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-		Controler controler = new Controler(scenario);
-		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+
+		for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values()) {
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
-		FreightUtils.runJsprit(controler);
+
+		FreightUtils.runJsprit(scenario, freightConfigGroup);
 		double scoreWithRunJsprit = 0;
-		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+		for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values()) {
 			scoreWithRunJsprit = scoreWithRunJsprit + carrier.getSelectedPlan().getScore();
 		}
-		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), FreightUtils.getCarriers(controler.getScenario()), FreightUtils.getCarrierVehicleTypes(controler.getScenario()));
+		double scoreRunWithOldStructure = generateCarrierPlans(scenario.getNetwork(), FreightUtils.getCarriers(scenario), FreightUtils.getCarrierVehicleTypes(scenario));
 		Assert.assertEquals("The score of both runs are not the same", scoreWithRunJsprit, scoreRunWithOldStructure, MatsimTestUtils.EPSILON);
 	}
 

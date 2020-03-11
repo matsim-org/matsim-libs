@@ -4,14 +4,14 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
 
 import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
-
-import java.util.List;
 
 /**
  * A default implementation of {@link RaptorIntermodalAccessEgress} returning a new RIntermodalAccessEgress,
@@ -29,7 +29,7 @@ public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAcce
             if (pe instanceof Leg) {
                 String mode = ((Leg) pe).getMode();
                 double travelTime = ((Leg) pe).getTravelTime();
-                if (Time.getUndefinedTime() != travelTime) {
+                if (!Time.isUndefinedTime(travelTime)) {
                     tTime += travelTime;
                     disutility += travelTime * -params.getMarginalUtilityOfTravelTime_utl_s(mode);
                 }

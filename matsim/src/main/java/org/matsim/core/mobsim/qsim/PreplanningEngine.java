@@ -257,7 +257,7 @@ public final class PreplanningEngine implements MobsimEngine {
 				}
 
 				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg ).getOriginActivity();
-				if (originActivity.getEndTime() < now + 2.) {
+				if (originActivity.getEndTime().seconds() < now + 2.) {
 					originActivity.setEndTime(now + 2.);
 					WithinDayAgentUtils.resetCaches(agent); // !!!!!!!!
 				}
@@ -287,10 +287,12 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
 		Gbl.assertNotNull(drtTrip);
 
+		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() );
+
 		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
 								 .setFromActivity( drtTrip.getOriginActivity() )
 								 .setToActivity(drtTrip.getDestinationActivity())
-								 .setTime(drtTrip.getOriginActivity().getEndTime())
+								 .setTime( expectedEndTimeOfOriginActivity )
 								 .setPlannedRoute( leg.getRoute() )
 								 .createRequest();
 
@@ -331,7 +333,9 @@ public final class PreplanningEngine implements MobsimEngine {
 		// yyyy means for time being we always depart 15min before pickup.  kai, mar'19
 		WithinDayAgentUtils.resetCaches(agent);
 
-		log.warn("agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity().getEndTime());
+		log.warn("agentId=" + agent.getId() + " | newActEndTime=" + inputTrip.getOriginActivity()
+				.getEndTime()
+				.seconds());
 
 		//		result.add( inputTrip.getOriginActivity() ) ;
 		// ---

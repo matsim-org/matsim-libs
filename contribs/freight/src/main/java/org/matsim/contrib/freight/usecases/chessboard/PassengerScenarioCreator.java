@@ -82,7 +82,8 @@ final class PassengerScenarioCreator {
 			act1.setEndTime(8*60*60);
 			plan.addActivity(act1);
 			Leg leg1 = popFactory.createLeg(TransportMode.car);
-			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(), act1.getEndTime(), person, null);
+			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(),
+					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute = RouteUtils.createLinkNetworkRouteImpl(homeId, getLinkIds(path1), workId);
 			leg1.setRoute(linkNetworkRoute);
 			plan.addLeg(leg1);
@@ -92,7 +93,8 @@ final class PassengerScenarioCreator {
 			plan.addActivity(act2);
 
 			Leg leg2 = popFactory.createLeg(TransportMode.car);
-			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(), act1.getEndTime(), person, null);
+			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(),
+					act1.getEndTime().seconds(), person, null);
 			NetworkRoute linkNetworkRoute2 = RouteUtils.createLinkNetworkRouteImpl(workId, getLinkIds(path2), homeId);
 			leg2.setRoute(linkNetworkRoute2);
 			plan.addLeg(leg2);

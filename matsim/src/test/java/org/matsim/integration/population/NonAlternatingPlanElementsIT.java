@@ -21,6 +21,7 @@ package org.matsim.integration.population;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -243,8 +244,8 @@ public class NonAlternatingPlanElementsIT {
 		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
 		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		stops.add(f.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0));
-		stops.add(f.createTransitRouteStop(stopFacility2, 180, Time.UNDEFINED_TIME));
+		stops.add(f.createTransitRouteStop(stopFacility1, Time.getUndefinedTime(), 0));
+		stops.add(f.createTransitRouteStop(stopFacility2, 180, Time.getUndefinedTime()));
 		TransitRoute route1 = f.createTransitRoute(Id.create(1, TransitRoute.class), netRoute, stops, "bus");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);

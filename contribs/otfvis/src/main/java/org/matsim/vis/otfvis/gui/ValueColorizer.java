@@ -35,6 +35,7 @@ public class ValueColorizer implements Serializable {
 	private final double[] values;
 
 	private final Color[] colors;
+	private final int alpha ;
 
 	// CONSTRUCTION
 
@@ -44,8 +45,13 @@ public class ValueColorizer implements Serializable {
 	}
 
 	public ValueColorizer(double[] values, Color[] colors) {
+		this( values, colors, 255);
+	}
+
+	public ValueColorizer(double[] values, Color[] colors, int alpha) {
 		this.values = values.clone();
 		this.colors = colors.clone();
+		this.alpha = alpha;
 	}
 
 	// COLOR GENERATION
@@ -72,7 +78,7 @@ public class ValueColorizer implements Serializable {
 		final int g = bound(w * this.colors[u].getGreen() + (1 - w) * this.colors[u - 1].getGreen());
 		final int b = bound(w * this.colors[u].getBlue() + (1 - w) * this.colors[u - 1].getBlue());
 
-		return new Color(r, g, b);
+		return new Color(r, g, b, alpha);
 	}
 
 }

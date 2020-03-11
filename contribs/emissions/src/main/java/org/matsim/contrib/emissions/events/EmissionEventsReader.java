@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
@@ -32,7 +28,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import static org.matsim.core.events.EventsReaderXMLv1.*;
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -50,7 +48,7 @@ public final class EmissionEventsReader implements MatsimReader {
 
 		// yyyy should be possible to make these mappers available to other readers (that may want to combine event types that are not in the core).  kai, jan'19
 
-		this.delegate.addCustomEventMapper( WarmEmissionEvent.EVENT_TYPE, (CustomEventMapper<WarmEmissionEvent>) event -> {
+		this.delegate.addCustomEventMapper( WarmEmissionEvent.EVENT_TYPE, (MatsimEventsReader.CustomEventMapper<WarmEmissionEvent>) event -> {
 
 			Map<String, String> attributes = event.getAttributes();
 			Map<Pollutant, Double> warmEmissions = new LinkedHashMap<>();
@@ -80,7 +78,7 @@ public final class EmissionEventsReader implements MatsimReader {
 			return new WarmEmissionEvent( time, linkId, vehicleId, warmEmissions );
 		} );
 
-		this.delegate.addCustomEventMapper( ColdEmissionEvent.EVENT_TYPE, (CustomEventMapper<ColdEmissionEvent>) event -> {
+		this.delegate.addCustomEventMapper( ColdEmissionEvent.EVENT_TYPE, (MatsimEventsReader.CustomEventMapper<ColdEmissionEvent>) event -> {
 
 			Map<String, String> attributes = event.getAttributes();
 			Map<Pollutant, Double> coldEmissions = new LinkedHashMap<>();

@@ -574,7 +574,7 @@ public class WithinDayTravelTime implements TravelTime,
 		private CyclicBarrier startBarrier = null;
 		private CyclicBarrier endBarrier = null;
 		
-		private double time = Time.UNDEFINED_TIME;
+		private double time = Time.getUndefinedTime();
 		private Collection<TravelTimeInfo> activeTravelTimeInfos;
 
 		public UpdateMeanTravelTimesRunnable() {

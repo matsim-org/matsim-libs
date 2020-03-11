@@ -101,27 +101,35 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
+			<exclusions>
+				<!-- needed to compile in IntelliJ with Eclipse compiler -->
+				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-tagfilter</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-set</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-areafilter</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>de.micromata.jak</groupId>
@@ -139,6 +147,18 @@
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.12</version>
+			<exclusions>
+				<!-- needed to compile in IntelliJ with Eclipse compiler -->
+				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.jcraft/jsch -->
 		<dependency>
@@ -157,23 +177,10 @@
 			<artifactId>drt</artifactId>
 			<version>${matsim.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-graphics</artifactId>
+			<version>11.0.2</version>
+		</dependency>
 	</dependencies>
-
-	<profiles>
-		<profile>
-			<id>java-9+</id>
-			<activation>
-				<jdk>[9</jdk>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.openjfx</groupId>
-					<artifactId>javafx-graphics</artifactId>
-					<version>11.0.2</version>
-					<type>pom</type>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 </project>

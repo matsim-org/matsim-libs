@@ -25,12 +25,13 @@ package org.matsim.contrib.signals.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
-import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
 
-public class SignalGroupStateChangedEventMapper implements EventsReaderXMLv1.CustomEventMapper {
+public final class SignalGroupStateChangedEventMapper implements MatsimEventsReader.CustomEventMapper {
+
 	@Override
 	public Event apply(GenericEvent event) {
 		Id<SignalSystem> systemId = Id.create(event.getAttributes().get(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALSYSTEM_ID), SignalSystem.class);

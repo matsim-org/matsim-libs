@@ -57,12 +57,20 @@
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
+			<exclusions>
+				<!-- needed to compile in IntelliJ with Eclipse compiler -->
+				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-xml</artifactId>
-			<version>0.45</version>
+			<version>0.47</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -83,7 +91,7 @@
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
-			<version>21.2</version>
+			<version>21.5</version>
 		</dependency>
 	</dependencies>
 </project>

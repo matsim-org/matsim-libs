@@ -20,7 +20,7 @@ package org.matsim.contrib.freight.utils;
 
 import java.net.URL;
 import java.util.Collection;
-
+import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,8 +33,8 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -59,6 +59,8 @@ public class FreightUtilsTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
+
+	private static final Logger log = Logger.getLogger(FreightUtilsTest.class);
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -98,9 +100,7 @@ public class FreightUtilsTest {
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		VehicleUtils.setHbefaTechnology(carrierVehType.getEngineInformation(), "diesel");
-//		carrierVehType.getAttributes().putAttribute("fuelType", "diesel");
 		VehicleUtils.setFuelConsumption(carrierVehType, 0.015);
-//		carrierVehType.getAttributes().putAttribute("fuelConsumption", 0.015);
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
 		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -425,17 +425,19 @@ public class FreightUtilsTest {
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
-		ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
+
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
+		freightConfig.setVehicleRoutingAlgortihmFileFile(vraFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
 
-		setJspritIterationsForCarriers(controler);
+		setJspritIterationsForCarriers(scenario);
 
 		try {
-			FreightUtils.runJsprit(controler);
+			FreightUtils.runJsprit(scenario, freightConfig);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -453,9 +455,10 @@ public class FreightUtilsTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-		Controler controler = new Controler(scenario);
 
-		FreightUtils.runJsprit(controler);
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
+
+		FreightUtils.runJsprit(scenario, freightConfig);
 	}
 
 	/**
@@ -467,16 +470,16 @@ public class FreightUtilsTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-		Controler controler = new Controler(scenario);
 
-		setJspritIterationsForCarriers(controler);
+		setJspritIterationsForCarriers(scenario);
 
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
 		try {
-			FreightUtils.runJsprit(controler);
+			FreightUtils.runJsprit(scenario, freightConfig);
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		Assert.assertNull(ConfigUtils.addOrGetModule(controler.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgortihmFile());
+		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgortihmFile());
 	}
 
 	private Config prepareConfig(){
@@ -493,8 +496,8 @@ public class FreightUtilsTest {
 		return config;
 	}
 
-	private void setJspritIterationsForCarriers(Controler controler) {
-		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+	private void setJspritIterationsForCarriers(Scenario scenario) {
+		for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values()) {
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
 	}

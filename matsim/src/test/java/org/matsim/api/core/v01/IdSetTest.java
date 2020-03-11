@@ -274,7 +274,7 @@ public class IdSetTest {
 		Assert.assertEquals(id3, array4[1]);
 		Assert.assertEquals(id4, array4[2]);
 	}
-	
+
 	@Test
 	public void testEqualsAndHashCode() {
 		Id<Person> id1 = Id.create("1", Person.class);
@@ -287,45 +287,45 @@ public class IdSetTest {
 		IdSet<Person> setA = new IdSet<>(Person.class, 4);
 		IdSet<Person> setB = new IdSet<>(Person.class, 4);
 		IdSet<Link> setWrongType = new IdSet<>(Link.class, 4);
-		
+
 		Assert.assertEquals(setA, setA);
 		Assert.assertEquals(setA, setB);
 		Assert.assertNotEquals(setA, setWrongType);
-		
+
 		setA.add(id1);
-		
+
 		Assert.assertEquals(setA, setA);
 		Assert.assertNotEquals(setA, setB);
 		Assert.assertEquals(setA.hashCode(), setA.hashCode());
 		Assert.assertNotEquals(setA.hashCode(), setB.hashCode());
-		
+
 		setB.add(id1);
-		
+
 		Assert.assertEquals(setA, setB);
 		Assert.assertEquals(setA.hashCode(), setB.hashCode());
-		
+
 		setA.add(id2);
 		setA.add(id3);
-		
+
 		Assert.assertNotEquals(setA, setB);
 		Assert.assertNotEquals(setA.hashCode(), setB.hashCode());
-		
+
 		setB.add(id3);
 		setB.add(id2);
-		
+
 		Assert.assertEquals(setA, setB);
 		Assert.assertEquals(setA.hashCode(), setB.hashCode());
-		
+
 		setA.add(id4);
 		setA.add(id5);
 		setA.add(id6);
 		setA.remove(id4);
 		setA.remove(id5);
 		setA.remove(id6);
-		
+
 		Assert.assertEquals(setA, setB);
 		Assert.assertEquals(setA.hashCode(), setB.hashCode());
-		
+
 		setA.add(id4);
 		HashSet<Id<Person>> hSetA = new HashSet<Id<Person>>(setA);
 

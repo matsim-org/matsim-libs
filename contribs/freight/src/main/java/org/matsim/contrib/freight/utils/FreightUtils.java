@@ -36,7 +36,6 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
@@ -64,34 +63,32 @@ public class FreightUtils {
 	private static final String ATTR_SKILLS = "skills";
 
 	/**
-	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all
-	 * {@link Carriers}, doing the following steps: - creating NetbasedCosts based
-	 * on the network - building and solving the VRP for all carriers using jsprit -
-	 * take the (best) solution, route and add it as {@link CarrierPlan} to the
-	 * {@link Carrier}.
+	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
+	 * 	- creating NetbasedCosts based on the network
+	 * 	- building and solving the VRP for all carriers using jsprit
+	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
 	 *
 	 *
-	 * @param controler The MATSim controler.
+	 * @param scenario
+	 * @param freightConfigGroup
 	 * @throws InvalidAttributeValueException
 	 */
-	public static void runJsprit(Controler controler) throws InvalidAttributeValueException {
-
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule(controler.getConfig(), FreightConfigGroup.class);
+	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws InvalidAttributeValueException {
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
-				controler.getScenario().getNetwork(),
-				FreightUtils.getCarrierVehicleTypes(controler.getScenario()).getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 
-		Carriers carriers = FreightUtils.getCarriers(controler.getScenario());
+		Carriers carriers = FreightUtils.getCarriers(scenario);
 
-		for (Carrier carrier : carriers.getCarriers().values()) {
-			VehicleRoutingProblem problem = MatsimJspritFactory
-					.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
-					.setRoutingCost(netBasedCosts).build();
+		for (Carrier carrier : carriers.getCarriers().values()){
+				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
+					.setRoutingCost(netBasedCosts)
+					.build();
+
 			VehicleRoutingAlgorithm algorithm;
 
-			algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(controler.getScenario(), freightConfig, netBasedCosts, problem);
+			algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightConfigGroup, netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(),
 					VehicleRoutingAlgorithmListeners.Priority.HIGH);
@@ -136,10 +133,8 @@ public class FreightUtils {
 			if (carrier.getShipments().size() > 0) {
 				copyShipments(carrierWS, carrier);
 			}
-			// copyPickups(carrierWS, carrier); //Not implemented yet due to missing
-			// CarrierPickup in freight contrib, kmt Sep18
-			// copyDeliveries(carrierWS, carrier); //Not implemented yet due to missing
-			// CarrierDelivery in freight contrib, kmt Sep18
+			//			copyPickups(carrierWS, carrier);	//Not implemented yet due to missing CarrierPickup in freight contrib, kmt Sep18
+			//			copyDeliveries(carrierWS, carrier); //Not implemented yet due to missing CarrierDelivery in freight contrib, kmt Sep18
 			if (carrier.getServices().size() > 0) {
 				createShipmentsFromServices(carrierWS, carrier);
 			}
@@ -179,26 +174,24 @@ public class FreightUtils {
 
 	/**
 	 * Use if carriers and carrierVehicleTypes are set by input file
-	 * 
+	 *
 	 * @param scenario
 	 */
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
 				FreightConfigGroup.class);
 
-		Carriers carriers = getOrCreateCarriers(scenario); // also registers with scenario
-		new CarrierPlanXmlReader(carriers)
-				.readURL(IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()));
+		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
+		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
-		new CarrierVehicleTypeReader(vehTypes).readURL(
-				IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()));
-		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehTypes);
+		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
+		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**
 	 * NOT implemented yet due to missing CarrierDelivery in freight contrib, kmt
 	 * Sep18
-	 * 
+	 *
 	 * @param carrierWS
 	 * @param carrier
 	 */
@@ -209,7 +202,7 @@ public class FreightUtils {
 	/**
 	 * NOT implemented yet due to missing CarrierPickup in freight contrib, kmt
 	 * Sep18
-	 * 
+	 *
 	 * @param carrierWS
 	 * @param carrier
 	 */
@@ -220,7 +213,7 @@ public class FreightUtils {
 	/**
 	 * Copy all shipments from the existing carrier to the new carrier with
 	 * shipments.
-	 * 
+	 *
 	 * @param carrierWS the "new" carrier with Shipments
 	 * @param carrier   the already existing carrier
 	 */
@@ -229,14 +222,13 @@ public class FreightUtils {
 			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
-
 	}
 
 	/**
 	 * Transform all services from the existing carrier to the new carrier with
 	 * shipments. The location of the depot from which the "old" carrier starts the
 	 * tour to the service is used as fromLocation for the new Shipment.
-	 * 
+	 *
 	 * @param carrierWS the "new" carrier with Shipments
 	 * @param carrier   the already existing carrier
 	 */
@@ -245,15 +237,13 @@ public class FreightUtils {
 		try {
 			carrier.getSelectedPlan();
 		} catch (Exception e) {
-			throw new RuntimeException("Carrier " + carrier.getId()
-					+ " has NO selectedPlan. --> CanNOT create a new carrier from solution");
+			throw new RuntimeException("Carrier " + carrier.getId() + " has NO selectedPlan. --> CanNOT create a new carrier from solution");
 		}
 		Collection<ScheduledTour> tours;
 		try {
 			tours = carrier.getSelectedPlan().getScheduledTours();
 		} catch (Exception e) {
-			throw new RuntimeException("Carrier " + carrier.getId()
-					+ " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
+			throw new RuntimeException("Carrier " + carrier.getId() + " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
 		}
 		for (ScheduledTour tour : tours) {
 			Id<Link> depotForTour = tour.getVehicle().getLocation();
@@ -274,21 +264,7 @@ public class FreightUtils {
 					// .setPickupServiceTime(pickupServiceTime) //Not set yet, because in service we
 					// have now time for that. Maybe change it later, kmt sep18
 					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
-					.setPickupTimeWindow(
-							TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd())) // limited
-																												// to
-																												// end
-																												// of
-																												// delivery
-																												// timeWindow
-																												// (pickup
-																												// later
-																												// as
-																												// latest
-																												// delivery
-																												// is
-																												// not
-																												// usefull)
+					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// limited to end of delivery timeWindow (pickup later as latest delivery is not usefull)
 					.build();
 			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
@@ -296,7 +272,7 @@ public class FreightUtils {
 
 	/**
 	 * Adds a skill to the vehicle's {@link org.matsim.vehicles.VehicleType}.
-	 * 
+	 *
 	 * @param vehicleType the vehicle type to change;
 	 * @param skill       the skill.
 	 */
@@ -306,7 +282,7 @@ public class FreightUtils {
 
 	/**
 	 * Checks if a given skill is available in the given attributes.
-	 * 
+	 *
 	 * @param type  the {@link VehicleType};
 	 * @param skill the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
@@ -320,7 +296,7 @@ public class FreightUtils {
 	/**
 	 * Sets the given skills as an attribute. If prior skills were set, they will be
 	 * overwritten.
-	 * 
+	 *
 	 * @param type   for which skills are set;
 	 * @param skills that are converted to an attribute.
 	 */
@@ -342,7 +318,7 @@ public class FreightUtils {
 
 	/**
 	 * Adds a skill to the {@link com.graphhopper.jsprit.core.problem.job.Shipment}.
-	 * 
+	 *
 	 * @param shipment the vehicle type to change;
 	 * @param skill    the skill.
 	 */
@@ -352,7 +328,7 @@ public class FreightUtils {
 
 	/**
 	 * Checks if a given skill is available in the given attributes.
-	 * 
+	 *
 	 * @param shipment the {@link CarrierShipment};
 	 * @param skill    the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
@@ -366,7 +342,7 @@ public class FreightUtils {
 	/**
 	 * Sets the given skills as an attribute. If prior skills were set, they will be
 	 * overwritten.
-	 * 
+	 *
 	 * @param shipment for which skills are set;
 	 * @param skills   that are converted to an attribute.
 	 */
@@ -386,9 +362,10 @@ public class FreightUtils {
 		return Collections.unmodifiableList(convertSkillsAttributeToList(shipment.getAttributes()));
 	}
 
+
 	/**
 	 * Adds a skill to the {@link CarrierService}.
-	 * 
+	 *
 	 * @param service the vehicle type to change;
 	 * @param skill   the skill.
 	 */
@@ -398,7 +375,7 @@ public class FreightUtils {
 
 	/**
 	 * Checks if a given skill is available in the given attributes.
-	 * 
+	 *
 	 * @param service the {@link CarrierService};
 	 * @param skill   the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
@@ -412,7 +389,7 @@ public class FreightUtils {
 	/**
 	 * Sets the given skills as an attribute. If prior skills were set, they will be
 	 * overwritten.
-	 * 
+	 *
 	 * @param service for which skills are set;
 	 * @param skills  that are converted to an attribute.
 	 */
@@ -432,9 +409,11 @@ public class FreightUtils {
 		return Collections.unmodifiableList(convertSkillsAttributeToList(service.getAttributes()));
 	}
 
+
+
 	/**
 	 * A general method to add a skill to any {@link Attributes} object.
-	 * 
+	 *
 	 * @param attributes where skill is added, if it doesn't already exist;
 	 * @param skill      to be added.
 	 */
@@ -453,7 +432,7 @@ public class FreightUtils {
 
 	/**
 	 * Checks if a given skill is available in the given attributes.
-	 * 
+	 *
 	 * @param attributes the {@link Attributes} container to check for the skill;
 	 * @param skill      the free-form type skill.
 	 * @return <code>true</code> if the skill is in the skill set; or
@@ -470,7 +449,7 @@ public class FreightUtils {
 
 	/**
 	 * Converts the 'skills' attribute to a list of strings.
-	 * 
+	 *
 	 * @param attributes the {@link Attributes} container that is checked for the
 	 *                   skill(s) to be converted.
 	 * @return the {@link List} of skills, possibly empty, as parsed from the
