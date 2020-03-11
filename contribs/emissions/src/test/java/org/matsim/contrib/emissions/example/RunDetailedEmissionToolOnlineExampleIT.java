@@ -68,7 +68,8 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	}
 
 	@SuppressWarnings("static-method")
-	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Test
 	public final void testDetailed_vehTypeV2() {
 			boolean gotAnException = false ;
 			try {
