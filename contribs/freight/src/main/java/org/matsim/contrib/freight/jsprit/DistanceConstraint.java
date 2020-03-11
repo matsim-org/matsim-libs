@@ -48,7 +48,7 @@ import org.matsim.vehicles.VehicleUtils;
  *
  * 	Creates the distance constraint.
  */
-public class DistanceConstraint implements HardActivityConstraint {
+/*pacakge-private*/ class DistanceConstraint implements HardActivityConstraint {
 
 	private final StateManager stateManager;
 
