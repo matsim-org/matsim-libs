@@ -77,7 +77,9 @@ public class CustomEventTest {
 		EventsManager eventsManager1 = EventsUtils.createEventsManager();
 		EventWriterXML handler = new EventWriterXML(ps);
 		eventsManager1.addHandler(handler);
+		eventsManager1.initProcessing();
 		eventsManager1.processEvent(new RainOnPersonEvent(0, Id.createPersonId("wurst")));
+		eventsManager1.finishProcessing();
 		handler.closeFile();
 		byte[] buf = baos.toByteArray();
 		final ArrayList<Event> oneEvent = new ArrayList<>();
@@ -93,6 +95,7 @@ public class CustomEventTest {
 
 			}
 		});
+		eventsManager2.initProcessing();
 		EventsReaderXMLv1 eventsReaderXMLv1 = new EventsReaderXMLv1(eventsManager2);
 		eventsReaderXMLv1.addCustomEventMapper("rain", new MatsimEventsReader.CustomEventMapper() {
 			@Override
@@ -101,6 +104,7 @@ public class CustomEventTest {
 			}
 		});
 		eventsReaderXMLv1.parse(new ByteArrayInputStream(buf));
+		eventsManager2.finishProcessing();
 		Assert.assertEquals(1, oneEvent.size());
 		Event event = oneEvent.get(0);
 		Assert.assertTrue(event instanceof RainOnPersonEvent);

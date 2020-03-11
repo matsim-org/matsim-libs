@@ -27,9 +27,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
@@ -51,9 +48,9 @@ public final class ParallelEventsManager implements EventsManager {
 	private final boolean oneThreadPerHandler;
 	private final boolean syncOnTimeSteps;
 	private final int numOfThreads;
-	private final AtomicBoolean hadException;
 	private final ExceptionHandler uncaughtExceptionHandler;
 	private int iteration = 0;
+	private final BlockingQueue<EventArray> eventQueue;
 
 	private final int eventsQueueSize = 1048576 * 32;
 	private final int eventsArraySize;
@@ -75,15 +72,15 @@ public final class ParallelEventsManager implements EventsManager {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
 		this.numOfThreads = numOfThreads;
-		this.hadException = new AtomicBoolean(false);
 		this.eventsHandlers = new ArrayList<EventHandler>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
-		this.uncaughtExceptionHandler = new ExceptionHandler(this.hadException);
+		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
+		this.uncaughtExceptionHandler = new ExceptionHandler();
 	}
 
 	private void initialize() {
 		int numHandlers = oneThreadPerHandler ? this.eventsHandlers.size() : Math.min(this.numOfThreads, this.eventsHandlers.size());
-		this.distributor = new Distributor(new ProcessEventsRunnable[numHandlers]);
+		this.distributor = new Distributor(new ProcessEventsRunnable[numHandlers], eventQueue);
 		this.eventsManagers = new EventsManager[numHandlers];
 
 		// create event managers
@@ -142,11 +139,11 @@ public final class ParallelEventsManager implements EventsManager {
 	public void processEvent(final Event event) {
 		EventArray array = new EventArray(1);
 		array.add(event);
-		this.distributor.processEvents(array);
+		this.eventQueue.add(array);
 	}
 
 	public void processEvents(final EventArray events) {
-		this.distributor.processEvents(events);
+		this.eventQueue.add(events);
 	}
 
 	@Override
@@ -195,8 +192,8 @@ public final class ParallelEventsManager implements EventsManager {
 
 		teardown();
 
-		if (this.hadException.get()) {
-			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
+		if (this.uncaughtExceptionHandler.hadException()) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", this.uncaughtExceptionHandler.exception);
 		}
 
 		iteration += 1;
@@ -208,8 +205,8 @@ public final class ParallelEventsManager implements EventsManager {
 			flush();
 		}
 
-		if (this.hadException.get()) {
-			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
+		if (this.uncaughtExceptionHandler.hadException()) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", this.uncaughtExceptionHandler.exception);
 		}
 
 	}
@@ -218,34 +215,32 @@ public final class ParallelEventsManager implements EventsManager {
 		try {
 			this.distributor.flush();
 		} catch (InterruptedException e) {
-			throw new RuntimeException("Exception while waiting on flush... " + e.getMessage());
+			throw new RuntimeException("Exception while waiting on flush... " + e.getMessage(), this.uncaughtExceptionHandler.exception);
 		}
 	}
 
 	private class Distributor extends Thread {
 
 		private final ProcessEventsRunnable[] runnables;
-		private final BlockingQueue<EventArray> inputQueue;
+		private final BlockingQueue<EventArray> eventQueue;
 
 		// When set to true, the distributor will process all events until all events in the event manager are processed.
 		// This is used when the simulation needs to sync with event processing and make sure there are no unprocessed
 		// events in the system.
 		private boolean shouldFlush = false;
 
-		public Distributor(ProcessEventsRunnable[] runnables) {
+		public Distributor(ProcessEventsRunnable[] runnables, BlockingQueue<EventArray> eventQueue) {
 			this.runnables = runnables;
-			this.inputQueue = new ArrayBlockingQueue<>(eventsQueueSize);
-		}
-
-		public final void processEvents(EventArray events) {
-			this.inputQueue.add(events);
+			this.eventQueue = eventQueue;
 		}
 
 		// TODO - do we need to support stopping?
 		public void flush() throws InterruptedException {
-			synchronized (this) {
-				shouldFlush = true;
-				this.wait();
+			if (this.isAlive()) {
+				synchronized (this) {
+					shouldFlush = true;
+					this.wait();
+				}
 			}
 		}
 
@@ -261,7 +256,7 @@ public final class ParallelEventsManager implements EventsManager {
 			try {
 				EventArray events = new EventArray(eventsArraySize);
 				while (true) {
-					EventArray earray = this.inputQueue.poll(100, TimeUnit.MILLISECONDS);
+					EventArray earray = this.eventQueue.poll(100, TimeUnit.MILLISECONDS);
 					if (earray == null) {
 						synchronized (this) {
 							// check if we can finish the flush
@@ -276,7 +271,7 @@ public final class ParallelEventsManager implements EventsManager {
 									runnable.flush();
 								}
 								// termination criteria for the flush
-								if (inputQueue.isEmpty()) {
+								if (eventQueue.isEmpty()) {
 									shouldFlush = false;
 									this.notify();
 									//Gbl.printCurrentThreadCpuTime();
@@ -327,9 +322,11 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 
 		public void flush() throws InterruptedException {
-			synchronized (this) {
-				shouldFlush = true;
-				this.wait();
+			if (this.isAlive()) {
+				synchronized (this) {
+					shouldFlush = true;
+					this.wait();
+				}
 			}
 		}
 
@@ -365,16 +362,24 @@ public final class ParallelEventsManager implements EventsManager {
 	 */
 	private static class ExceptionHandler implements UncaughtExceptionHandler {
 
-		private final AtomicBoolean hadException;
+		private volatile boolean hadException = false;
+		private volatile Throwable exception;
 
-		ExceptionHandler(final AtomicBoolean hadException) {
-			this.hadException = hadException;
-		}
 
 		@Override
 		public void uncaughtException(Thread t, Throwable e) {
-			this.hadException.set(true);
+			this.hadException = true;
+			this.exception = e;
 			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
 		}
+
+		public boolean hadException() {
+			return this.hadException;
+		}
+
+		public Throwable exception() {
+			return this.exception;
+		}
+
 	}
 }
