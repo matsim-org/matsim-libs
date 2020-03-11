@@ -23,6 +23,8 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
 import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -630,28 +632,58 @@ public class MatsimJspritFactory {
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
-			algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
+			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
+				case noDistanceConstraint:
+					algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
+					break;
+				case basedOnEnergyConsumption:
+					log.info("Use the distanceConstraint based on energy consumption.");
+					StateManager stateManager = new StateManager(problem);
+
+					StateId distanceStateId = stateManager.createStateId("distance");
+
+					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+
+					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+					constraintManager.addConstraint(
+							new DistanceConstraint(distanceStateId, stateManager,
+									FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+							ConstraintManager.Priority.CRITICAL);
+
+					AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+					AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+					xmlReader.read(vraURL);
+					algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, algorithmConfig, 0, null, stateManager, constraintManager, false);
+					break;
+				default:
+					throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
+			}
+
 		} else {
 			log.info("Use a VehicleRoutingAlgorithm out of the box.");
-			if (freightConfig.getUseDistanceConstraintForTourPlanning()
-					.equals(FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption)) {
-				log.info("Use the distanceConstraint based on energy consumption.");
-				StateManager stateManager = new StateManager(problem);
+			switch (freightConfig.getUseDistanceConstraintForTourPlanning()) {
+				case noDistanceConstraint:
+					algorithm = new SchrimpfFactory().createAlgorithm(problem);
+					break;
+				case basedOnEnergyConsumption:
+					log.info("Use the distanceConstraint based on energy consumption.");
+					StateManager stateManager = new StateManager(problem);
 
-				StateId distanceStateId = stateManager.createStateId("distance");
+					StateId distanceStateId = stateManager.createStateId("distance");
 
-				stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
 
-				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-				constraintManager.addConstraint(
-						new DistanceConstraint(distanceStateId, stateManager,
-								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
-						ConstraintManager.Priority.CRITICAL);
-				algorithm = Jsprit.Builder.newInstance(problem)
-						.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+					constraintManager.addConstraint(
+							new DistanceConstraint(distanceStateId, stateManager,
+									FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+							ConstraintManager.Priority.CRITICAL);
+					algorithm = Jsprit.Builder.newInstance(problem)
+							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+					break;
+				default:
+					throw new IllegalStateException("Unexpected value: " + freightConfig.getUseDistanceConstraintForTourPlanning());
 			}
-			else
-				algorithm = new SchrimpfFactory().createAlgorithm(problem);
 		}
 		return algorithm;
 	}
