@@ -129,9 +129,8 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV1, 25);
 
-		final Controler controler = new Controler(scenario);
-
-		FreightUtils.runJsprit(controler);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightUtils.runJsprit(scenario, freightConfigGroup);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -212,9 +211,8 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
-		final Controler controler = new Controler(scenario);
-
-		FreightUtils.runJsprit(controler);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightUtils.runJsprit(scenario, freightConfigGroup);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
@@ -297,9 +295,8 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV3, 10);
 
-		final Controler controler = new Controler(scenario);
-
-		FreightUtils.runJsprit(controler);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightUtils.runJsprit(scenario, freightConfigGroup);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -392,9 +389,8 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV4, 10);
 
-		final Controler controler = new Controler(scenario);
-
-		FreightUtils.runJsprit(controler);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		FreightUtils.runJsprit(scenario, freightConfigGroup);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
