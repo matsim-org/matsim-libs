@@ -83,7 +83,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 	@Override
 	public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct,
-			TourActivity nextAct, double v) {
+			TourActivity nextAct, double departureTime) {
 		double additionalDistance;
 
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
@@ -105,12 +105,12 @@ import org.matsim.vehicles.VehicleUtils;
 				routeConsumption = routeDistance * (electricityConsumptionPerMeter);
 			}
 			if (newAct.getName().contains("pickupShipment")) {
-				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
-						- getDistance(prevAct, nextAct, newVehicle)
-						+ findMinimalAdditionalDistance(context, newAct, nextAct);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle,departureTime) + getDistance(newAct, nextAct, newVehicle,departureTime)
+						- getDistance(prevAct, nextAct, newVehicle,departureTime)
+						+ findMinimalAdditionalDistance(context, newAct, nextAct,departureTime);
 			} else {
-				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
-						- getDistance(prevAct, nextAct, newVehicle);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle,departureTime) + getDistance(newAct, nextAct, newVehicle,departureTime)
+						- getDistance(prevAct, nextAct, newVehicle,departureTime);
 
 			}
 			double additionalConsumption = additionalDistance * (electricityConsumptionPerMeter);
@@ -142,7 +142,7 @@ import org.matsim.vehicles.VehicleUtils;
 	 * @return minimal distance of the associated delivery
 	 */
 	private double findMinimalAdditionalDistance(JobInsertionContext context, TourActivity newAct,
-			TourActivity nextAct) {
+			TourActivity nextAct, double departureTime) {
 		double minimalAdditionalDistance = 0;
 
 		if (context.getAssociatedActivities().get(1).getName().contains("deliverShipment")) {
@@ -172,9 +172,9 @@ import org.matsim.vehicles.VehicleUtils;
 			while ((index + 1) < route.getTourActivities().getActivities().size()) {
 				TourActivity activityBefore = route.getTourActivities().getActivities().get(index);
 				TourActivity activityAfter = route.getTourActivities().getActivities().get(index + 1);
-				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle)
-						- getDistance(activityBefore, activityAfter, newVehicle);
+				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle,departureTime)
+						+ getDistance(assignedDelivery, activityAfter, newVehicle,departureTime)
+						- getDistance(activityBefore, activityAfter, newVehicle,departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				index++;
 			}
@@ -184,15 +184,15 @@ import org.matsim.vehicles.VehicleUtils;
 				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
 						.get(route.getTourActivities().getActivities().size() - 1);
 				TourActivity activityEnd = route.getEnd();
-				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityEnd, newVehicle)
-						- getDistance(activityLastDelivery, activityEnd, newVehicle);
+				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle,departureTime)
+						+ getDistance(assignedDelivery, activityEnd, newVehicle,departureTime)
+						- getDistance(activityLastDelivery, activityEnd, newVehicle,departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				// Checks the distance if the delivery will added directly behind the pickup
 				TourActivity activityAfter = route.getTourActivities().getActivities().get(index);
-				possibleAdditionalDistance = getDistance(newAct, assignedDelivery, newVehicle)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle)
-						- getDistance(newAct, activityAfter, newVehicle);
+				possibleAdditionalDistance = getDistance(newAct, assignedDelivery, newVehicle,departureTime)
+						+ getDistance(assignedDelivery, activityAfter, newVehicle,departureTime)
+						- getDistance(newAct, activityAfter, newVehicle,departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 			}
 
@@ -215,8 +215,8 @@ import org.matsim.vehicles.VehicleUtils;
 		return minimalAdditionalDistance;
 	}
 
-	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle) {
-		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, vehicle);
+	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
+		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), departureTime, null, vehicle);
 		Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance, distance >= 0.);
 		return distance;
 	}
