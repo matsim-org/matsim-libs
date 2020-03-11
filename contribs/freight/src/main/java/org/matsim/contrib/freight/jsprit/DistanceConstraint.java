@@ -21,6 +21,7 @@
 
 package org.matsim.contrib.freight.jsprit;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
@@ -188,11 +189,10 @@ import org.matsim.vehicles.VehicleUtils;
 						- getDistance(activityLastDelivery, activityEnd, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				// Checks the distance if the delivery will added directly behind the pickup
-				TourActivity newPickupActivity = newAct;
 				TourActivity activityAfter = route.getTourActivities().getActivities().get(index);
-				possibleAdditionalDistance = getDistance(newPickupActivity, assignedDelivery, newVehicle)
+				possibleAdditionalDistance = getDistance(newAct, assignedDelivery, newVehicle)
 						+ getDistance(assignedDelivery, activityAfter, newVehicle)
-						- getDistance(newPickupActivity, activityAfter, newVehicle);
+						- getDistance(newAct, activityAfter, newVehicle);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 			}
 
@@ -205,7 +205,7 @@ import org.matsim.vehicles.VehicleUtils;
 	 *
 	 * @param minimalAdditionalDistance
 	 * @param possibleAdditionalDistance
-	 * @return
+	 * @return the minimal transport distance
 	 */
 	private double findMinimalDistance(double minimalAdditionalDistance, double possibleAdditionalDistance) {
 		if (minimalAdditionalDistance == 0)
@@ -216,6 +216,8 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle) {
-		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, vehicle);
+		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, vehicle);
+		Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance, distance >= 0.);
+		return distance;
 	}
 }

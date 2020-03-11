@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011 Stefan Schroeder.
  * eMail: stefan.schroeder@kit.edu
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Public License v2.0
  * which accompanies this distribution, and is available at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * 
+ *
  * Contributors:
  *     Stefan Schroeder - initial API and implementation
  ******************************************************************************/
@@ -40,52 +40,52 @@ import java.util.concurrent.ConcurrentHashMap;
  * This calculates transport-times, transport-costs and the distance to cover the distance from one location to another. 
  * It calculates these values based on a {@link Network} to serve as {@link VehicleRoutingTransportCosts} in the {@link VehicleRoutingProblem}.
  * The distance includes the links of the path and the fromLink and not the toLink.
- * 
+ *
  * <p>It can be used with multiple threads. Note that each thread gets its own leastCostPathCalculator. It is created only once and cached afterwards. Thus
  * it requires a threadSafe leastCostPathCalculatorFactory (the calculator itself does not need to be thread-safe). 
- * 
+ *
  * <p>If the client of this class requests cost-information to get from from-location to to-location at a certain time and with a certain vehicle, it looks up whether there
  * is already an entry in the cache. If so, it returns the cached value, if not it calculates new values with a leastCostPathCalculator defined in here. It looks up the cached values
  * according to the {@link TransportDataKey}.
- * 
+ *
  * <p>Two TransportDataKeys are equal if the following data are equal</br>
  * - from-locations</br>
  * - to-locations</br>
  * - time and</br>
  * - vehicleTypes
- * 
+ *
  * <p>Keep in mind that if you have many locations, small time-bins and many vehicleTypes, calculations get very time- and memory-consuming.
- * 
+ *
  * @author stefan schröder
  *
  */
 public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	public interface InternalLeastCostPathCalculatorListener {
-		
+
 		public void startCalculation(long routerId);
-		
+
 		public void endCalculation(long routerId);
-		
+
 	}
-	
+
 	/**
 	 * This creates a matsim-vehicle {@link org.matsim.vehicles.Vehicle} from a matsim-freight-vehicle {@link CarrierVehicle} and jsprit-vehicle .
-	 * 
+	 *
 	 * @author stefan schröder
 	 *
 	 */
 	public static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
 
 		private Id<org.matsim.vehicles.Vehicle> id;
-		
+
 		private org.matsim.vehicles.VehicleType type;
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
 			this.type = makeType(vehicle.getType().getTypeId(),vehicle.getType().getMaxVelocity());
 		}
-		
+
 		public MatsimVehicleWrapper(CarrierVehicle vehicle) {
 			this.id = vehicle.getId();
 			this.type = vehicle.getType();
@@ -107,19 +107,19 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			return type;
 		}
 	}
-	
+
 	/**
 	 * The key to cache {@link TransportData}. 
-	 * 
+	 *
 	 * <p>Two TransportDataKeys are equal if the following data are equal</br>
 	 * - from-locations</br>
 	 * - to-locations</br>
 	 * - time and</br>
 	 * - vehicleTypes
-	 *  
+	 *
 	 * <p>The time-value is usually a representative value for a certain time-bin. If the time-bin's width is 1, it calculates and caches each and every transport-data which might be 
 	 * a) very time-consuming and b) very memory-consuming.
-	 * 
+	 *
 	 * @author stefan schröder
 	 *
 	 */
@@ -145,7 +145,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		public double getTime() {
 			return time;
 		}
-		
+
 		public String getVehicleType() {
 			return vehicleType;
 		}
@@ -191,13 +191,13 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 				return false;
 			return true;
 		}
-		
-		
+
+
 	}
-	
+
 	/**
 	 * Stores transport-costs, transport-times and the distance of travel.
-	 * 
+	 *
 	 * @author stefan schröder
 	 *
 	 */
@@ -211,24 +211,24 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			this.transportTime = transportTime;
 			this.transportDistance = transportDistance;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Calculates vehicle-type-dependent travelDisutility per link.
-	 * 
+	 *
 	 * <p>Note that it uses <code>vehicleType.getCostInformation().perDistanceUnit</code> and
 	 * <code>vehicleType.getCostInformation().perTimeUnit</code> to calculate time and distance related transport costs.
-	 * 
+	 *
 	 * @author stefan
 	 *
 	 */
 	static class BaseVehicleTransportCosts implements TravelDisutility{
-		
+
 		private TravelTime travelTime;
-		
+
 		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
-		
+
 		/**
 		 * Constructs travelDisutility according to the builder.
 		 *
@@ -256,30 +256,30 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			}
 			return minDisutility;
 		}
-		
+
 	}
-	
+
 	private static class VehicleTypeVarCosts {
 		final double perMeter;
 		final double perSecond;
-		
+
 		VehicleTypeVarCosts(double perMeter, double perSecond) {
 			super();
 			this.perMeter = perMeter;
 			this.perSecond = perSecond;
 		}
 	}
-	
+
 	/**
 	 * Calculates disutilites including toll.
-	 * 
+	 *
 	 * @author stefan
 	 *
 	 */
 	static class VehicleTransportCostsIncludingToll implements TravelDisutility{
 
 //		private static Logger logger = Logger.getLogger(VehicleTransportCostsIncludingToll.class);
-		
+
 		private TravelDisutility baseTransportDisutility;
 
 		private VehicleTypeDependentRoadPricingCalculator vehicleTypeDependentPricingCalculator;
@@ -310,11 +310,11 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	public static class Builder {
 
 		public static Builder newInstance(Network network, Collection<VehicleType> vehicleTypes ){
-			return new Builder(network, vehicleTypes); 
+			return new Builder(network, vehicleTypes);
 		}
 
-		
-		
+
+
 		public static Builder newInstance(Network network) {
 			return new Builder(network, Collections.<VehicleType> emptyList());
 		}
@@ -339,34 +339,34 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		};
 
 		private TravelDisutility baseDisutility;
-		
+
 		private TravelDisutility finalDisutility;
-		
+
 		private int timeSliceWidth = Integer.MAX_VALUE;
 
 		private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new LeastCostPathCalculatorFactory() {
-			
+
 			@Override
 			public LeastCostPathCalculator createPathCalculator(Network network, TravelDisutility travelCosts, TravelTime travelTimes) {
 				return new FastDijkstraFactory().createPathCalculator(network, travelCosts, travelTime);
 			}
 		};
-		
+
 		private VehicleTypeDependentRoadPricingCalculator roadPricingCalculator = new VehicleTypeDependentRoadPricingCalculator();
 
 		private boolean withToll = false;
-		
+
 		private Network network;
-		
+
 		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
 
 		private boolean isFIFO = false;
 
 		private String defaultTypeId = UUID.randomUUID().toString();
-		
+
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of {@link VehicleType}.
-		 * 
+		 *
 		 * @param network
 		 * @param vehicleTypes must be all vehicleTypes and their assigned costInformation in the system.
 		 */
@@ -384,7 +384,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		/**
 		 * Sets the travelTime. By default travelTime is based on <code>link.getFreespeed();</code>.
-		 *  
+		 *
 		 * @param travelTime
 		 * @return this builder
 		 */
@@ -395,14 +395,14 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		/**
 		 * Sets travelTime and travelDisutility.
-		 * 
+		 *
 		 */
 		public Builder setBaseTravelTimeAndDisutility(TravelTime travelTime, TravelDisutility travelDisutility){
 			this.travelTime = travelTime;
 			this.baseDisutility = travelDisutility;
 			return this;
 		}
-		
+
 		/**
 		 * Sets the width of the time-bin. By default it is Integer.MAX_VALUE().
 		 * <p></p>
@@ -413,7 +413,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			this.timeSliceWidth = timeSliceWidth;
 			return this;
 		}
-		
+
 		/**
 		 * Ensures FIFO. ! NOT YET ENABLED.
 		 */
@@ -427,7 +427,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 * <p>NOTE, make sure the leastCostPathCalculatorFactory is threadSafe, since for each thread a new LCPA is created with
 		 * the same LCPA-factory. That is, memorizing data in the factory-obj might violate thread-safety.
 		 * <p>By default it use {@link FastDijkstraFactory}
-		 * 
+		 *
 		 * @param {@link {@link LeastCostPathCalculatorFactory}
 		 * @return this builder
 		 */
@@ -435,7 +435,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			this.leastCostPathCalculatorFactory = leastCostPathCalcFactory;
 			return this;
 		}
-		
+
 		public Builder setRoadPricingCalculator(VehicleTypeDependentRoadPricingCalculator calculator){
 			withToll = true;
 			this.roadPricingCalculator = calculator;
@@ -450,7 +450,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 * <li> yyyy These free speed travel times do <i>not</i> take the time-dependent network into account. kai, jan'14
 		 * <li> Either can be changed with builder.setTravelTime(...) or with builder.setBaseTravelTimeAndDisutility(...).
 		 * </ul>
-		 * 
+		 *
 		 * @return {@link NetworkBasedTransportCosts}
 		 */
 		public NetworkBasedTransportCosts build(){
@@ -467,7 +467,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		/**
 		 * Adds type-specific costs. If typeId already exists, existing entry is overwritten.
-		 * 
+		 *
 		 * @param typeId
 		 * @param fix
 		 * @param perSecond
@@ -478,14 +478,14 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 
 	}
-	
+
 	private Network network;
-	
+
 	/**
 	 * cost-cache to cache transport-costs and transport-times (see {@link TransportData}) according to {@link TransportDataKey}
 	 */
 	private final ConcurrentHashMap<TransportDataKey, TransportData> costCache = new ConcurrentHashMap<TransportDataKey, TransportData>();
-	
+
 	/**
 	 * caches leastCostPathCalculators according to <code>Thread.currentThread().getId()</code>
 	 */
@@ -505,18 +505,18 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	public final Counter ttRequestedCounter;
 
 	private Map<String, org.matsim.vehicles.Vehicle> matsimVehicles = new HashMap<String, org.matsim.vehicles.Vehicle>();
-	
+
 	private VehicleTypeDependentRoadPricingCalculator roadPricingCalc;
-	
+
 	/**
 	 * by default sets the {@link FastDijkstraFactory}
 	 */
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	
+
 	private Collection<InternalLeastCostPathCalculatorListener> listeners = new ArrayList<InternalLeastCostPathCalculatorListener>();
 
 	private String defaultTypeId;
-	
+
 	private NetworkBasedTransportCosts(Builder builder) {
 		super();
 		this.travelDisutility = builder.finalDisutility;
@@ -532,11 +532,11 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Gets the transport-time.
-	 * 
+	 *
 	 * <p>If <code>fromId.equals(toId)</code> it returns 0.0. Otherwise, it looks up in the cache whether the transport-time has already been computed
 	 * (see {@link TransportDataKey}, {@link TransportData}). If so, it returns
 	 * the cached travel-time. If not, it computes and caches new values with the leastCostPathCalc defined in here.  
-	 * 
+	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
@@ -552,7 +552,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		TransportDataKey transportDataKey = makeKey(fromId.getId(),toId.getId(),timeSlice,typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportTime;
-		
+
 		if(data != null){
 			transportTime = data.transportTime;
 		}
@@ -563,17 +563,22 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			Link fromLink = network.getLinks().get(fromLinkId);
 			Link toLink = network.getLinks().get(toLinkId);
 			// because path not includes in&out Link
-			double travelDistance = fromLink.getLength();
+
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
 			LeastCostPathCalculator router = createLeastCostPathCalculator();
 			Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime, null, matsimVehicle);
 //			if(path == null) return Double.MAX_VALUE;
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime+path.travelTime, null, matsimVehicle);
 			double additionalTimeTo = travelTime.getLinkTravelTime(toLink, departureTime+path.travelTime, null, matsimVehicle);
-			Iterator<Link> iter = path.links.iterator();
-			while (iter.hasNext()) {
-			Link link = iter.next();	
-			travelDistance = travelDistance + link.getLength();}
+//---	For the time being, do not calculate distance when not explicitly asked for. Reason: Unnecessary calculation time for (standard) casesWITHOUT distance constraint
+//			double travelDistance = fromLink.getLength();
+//			Iterator<Link> iter = path.links.iterator();
+//			while (iter.hasNext()) {
+//				Link link = iter.next();
+//				travelDistance = travelDistance + link.getLength();
+//			}
+			double travelDistance = Double.MIN_VALUE;
+//----
 			transportTime = path.travelTime;
 			TransportData newData = new TransportData(path.travelCost+additionalCostTo,path.travelTime+additionalTimeTo, travelDistance);
 			TransportData existingData = costCache.putIfAbsent(transportDataKey, newData);
@@ -602,18 +607,18 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	}
 	/**
 	 * Gets the transport-costs.
-	 * 
+	 *
 	 * <p>If <code>fromId.equals(toId)</code> it returns 0.0. Otherwise, it looks up in the cache whether the transport-costs have already been computed 
 	 * (see {@link TransportDataKey}, {@link TransportData}). If so, it returns
 	 * the cached travel-cost value. If not, it computes and caches new values with the leastCostPathCalc defined in here.  
-	 * 
+	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
 	public double getTransportCost(Location fromId, Location toId, double departureTime, Driver driver, Vehicle vehicle) {
 		if(fromId ==  null || toId == null) throw new IllegalStateException(
-                "either fromId ("+fromId+") or toId ("+toId+") is null [departureTime="+departureTime+"][vehicle="+vehicle+"]");
-        if(fromId.equals(toId)){
+				"either fromId ("+fromId+") or toId ("+toId+") is null [departureTime="+departureTime+"][vehicle="+vehicle+"]");
+		if(fromId.equals(toId)){
 			return 0.0;
 		}
 		if(vehicle == null) {
@@ -624,13 +629,13 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
-	
+
 		int timeSlice = getTimeSlice(departureTime);
 		String typeId = vehicle.getType().getTypeId();
 		TransportDataKey transportDataKey = makeKey(fromId.getId(),toId.getId(),timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
 		double transportCost;
-		
+
 		if(data != null){
 			transportCost = data.transportCosts;
 		}
@@ -642,10 +647,16 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			double additionalCostTo = travelDisutility.getLinkTravelDisutility(toLink, departureTime+path.travelTime, null, matsimVehicle);
 			double additionalTimeTo = travelTime.getLinkTravelTime(toLink, departureTime+path.travelTime,null,matsimVehicle);
 			Iterator<Link> iter = path.links.iterator();
-			double travelDistance = fromLink.getLength();
-			while (iter.hasNext()) {
-			Link link = iter.next();	
-			travelDistance = travelDistance + link.getLength();}
+
+//---	For the time being, do not calculate distance when not explicitly asked for. Reason: Unnecessary calculation time for (standard) casesWITHOUT distance constraint
+//			double travelDistance = fromLink.getLength();
+//			Iterator<Link> iter = path.links.iterator();
+//			while (iter.hasNext()) {
+//				Link link = iter.next();
+//				travelDistance = travelDistance + link.getLength();
+//			}
+			double travelDistance = Double.MIN_VALUE;
+//----
 			TransportData newData = new TransportData(path.travelCost+additionalCostTo,path.travelTime+additionalTimeTo, travelDistance);
 			TransportData existingData = costCache.putIfAbsent(transportDataKey, newData);
 			ttMemorizedCounter.incCounter();
@@ -661,11 +672,11 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Gets the distance for the transport.
-	 * 
+	 *
 	 * <p>If <code>fromId.equals(toId)</code> it returns 0.0. Otherwise, it looks up in the cache whether the transport-distance has already been computed
 	 * (see {@link TransportDataKey}, {@link TransportData}). If so, it returns
 	 * the cached distance. If not, it computes and caches new values with the leastCostPathCalc defined in here.  
-	 * 
+	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 //	@Override //TODO perhaps need override
@@ -699,8 +710,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			double additionalTimeTo = travelTime.getLinkTravelTime(toLink, departureTime+path.travelTime, null, matsimVehicle);
 			Iterator<Link> iter = path.links.iterator();
 			while (iter.hasNext()) {
-			Link link = iter.next();	
-			travelDistance = travelDistance + link.getLength();}
+				Link link = iter.next();
+				travelDistance = travelDistance + link.getLength();}
 			TransportData newData = new TransportData(path.travelCost+additionalCostTo,path.travelTime+additionalTimeTo, travelDistance);
 			TransportData existingData = costCache.putIfAbsent(transportDataKey, newData);
 			ttMemorizedCounter.incCounter();
@@ -712,7 +723,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		return travelDistance;
 	}
-	
+
 	/**
 	 * @return the listeners
 	 */
@@ -722,9 +733,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Backward transport-costs are approximated by calculating <code>getTransportCost(fromId, toId, arrivalTime, driver, vehicle);</code>.
-	 * 
+	 *
 	 * <p>This is a rather bad approximation. If you require this, you should implement another {@link VehicleRoutingTransportCosts}
-	 * 
+	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
@@ -734,9 +745,9 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Backward transport-time are approximated by calculating <code>getTransportTime(fromId, toId, arrivalTime, driver, vehicle);</code>.
-	 * 
+	 *
 	 * <p>This is a rather bad approximation. If you require this, you should implement another {@link VehicleRoutingTransportCosts}.
-	 * 
+	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
 	@Override
@@ -761,7 +772,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	LeastCostPathCalculator getRouter(){
 		return createLeastCostPathCalculator();
 	}
-	
+
 	private LeastCostPathCalculator createLeastCostPathCalculator(){
 		LeastCostPathCalculator router = routerCache.get(Thread.currentThread().getId());
 		if(router == null){
@@ -773,7 +784,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		return router;
 	}
-	
+
 	private int getTimeSlice(double time) {
 		int timeSlice = (int) (time/timeSliceWidth);
 		return timeSlice;
@@ -781,7 +792,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Gets the network the calculation is based on.
-	 * 
+	 *
 	 * @return
 	 */
 	public Network getNetwork() {
@@ -790,16 +801,16 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	/**
 	 * Gets the travel-time.
-	 * 
+	 *
 	 * @return {@link TravelTime}
 	 */
 	public TravelTime getTravelTime() {
 		return travelTime;
 	}
-	
+
 	/**
 	 * Gets the {@link VehicleTypeDependentRoadPricingCalculator}
-	 * 
+	 *
 	 * @return {@link VehicleTypeDependentRoadPricingCalculator}
 	 */
 	public VehicleTypeDependentRoadPricingCalculator getRoadPricingCalculator(){

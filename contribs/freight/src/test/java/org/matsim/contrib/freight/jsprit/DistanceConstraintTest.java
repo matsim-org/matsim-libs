@@ -439,7 +439,7 @@ public class DistanceConstraintTest {
 	/**
 	 * Deletes the existing output file and sets the number of the last MATSim iteration to 0.
 	 *
-	 * @param config
+	 * @param config the config
 	 */
 	static void prepareConfig(Config config) {
 		config.network().setInputFile(IOUtils.extendUrl(SCENARIO_URL, "grid9x9.xml").toString());

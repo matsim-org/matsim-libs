@@ -27,8 +27,9 @@ import com.graphhopper.jsprit.core.algorithm.state.StateUpdater;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import org.junit.Assert;
 
-	/**
+/**
 	 * Given class for working with the a distance constraint
 	 *
 	 */
@@ -73,7 +74,9 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 		}
 
 		double getDistance(TourActivity from, TourActivity to) {
-			return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
+			double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
+			Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance, distance >= 0.);
+			return distance;
 		}
 	}
 
