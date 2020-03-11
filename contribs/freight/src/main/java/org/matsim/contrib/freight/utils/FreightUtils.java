@@ -20,16 +20,10 @@ package org.matsim.contrib.freight.utils;
 
 import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
-import com.graphhopper.jsprit.core.algorithm.state.StateId;
-import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -38,8 +32,6 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.jsprit.DistanceConstraint;
-import org.matsim.contrib.freight.jsprit.DistanceUpdater;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
@@ -50,7 +42,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
 import javax.management.InvalidAttributeValueException;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -100,39 +91,7 @@ public class FreightUtils {
 					.setRoutingCost(netBasedCosts).build();
 			VehicleRoutingAlgorithm algorithm;
 
-			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
-			if (vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals("")) {
-				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
-				URL vraURL;
-				try {
-					vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
-			} else {
-				log.info("Use a VehicleRoutingAlgorithm out of the box.");
-				if (freightConfig.getUseDistanceConstraintForTourPlanning()
-						.equals(FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption)) {
-					log.info("Use the distanceConstraint based on energy consumption.");
-					StateManager stateManager = new StateManager(problem);
-
-					StateId distanceStateId = stateManager.createStateId("distance");
-
-					stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
-
-					ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-					constraintManager.addConstraint(
-							new DistanceConstraint(distanceStateId, stateManager,
-									FreightUtils.getCarrierVehicleTypes(controler.getScenario()), netBasedCosts),
-							ConstraintManager.Priority.CRITICAL);
-					algorithm = Jsprit.Builder.newInstance(problem)
-							.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
-				}
-
-				else
-					algorithm = new SchrimpfFactory().createAlgorithm(problem);
-			}
+			algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(controler.getScenario(), freightConfig, netBasedCosts, problem);
 
 			algorithm.getAlgorithmListeners().addListener(new StopWatch(),
 					VehicleRoutingAlgorithmListeners.Priority.HIGH);

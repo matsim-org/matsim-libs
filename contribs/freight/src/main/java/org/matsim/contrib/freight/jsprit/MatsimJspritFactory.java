@@ -12,15 +12,25 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.jsprit;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.algorithm.state.StateId;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -47,6 +57,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -608,4 +619,40 @@ public class MatsimJspritFactory {
 		return carrierPlan;
 	}
 
+	public static VehicleRoutingAlgorithm loadOrCreateVehicleRoutingAlgorithm(Scenario scenario, FreightConfigGroup freightConfig, NetworkBasedTransportCosts netBasedCosts, VehicleRoutingProblem problem) {
+		VehicleRoutingAlgorithm algorithm;
+		final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
+		if (vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals("")) {
+			log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
+			URL vraURL;
+			try {
+				vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
+		} else {
+			log.info("Use a VehicleRoutingAlgorithm out of the box.");
+			if (freightConfig.getUseDistanceConstraintForTourPlanning()
+					.equals(FreightConfigGroup.UseDistanceConstraintForTourPlanning.basedOnEnergyConsumption)) {
+				log.info("Use the distanceConstraint based on energy consumption.");
+				StateManager stateManager = new StateManager(problem);
+
+				StateId distanceStateId = stateManager.createStateId("distance");
+
+				stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
+
+				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+				constraintManager.addConstraint(
+						new DistanceConstraint(distanceStateId, stateManager,
+								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
+						ConstraintManager.Priority.CRITICAL);
+				algorithm = Jsprit.Builder.newInstance(problem)
+						.setStateAndConstraintManager(stateManager, constraintManager).buildAlgorithm();
+			}
+			else
+				algorithm = new SchrimpfFactory().createAlgorithm(problem);
+		}
+		return algorithm;
+	}
 }
