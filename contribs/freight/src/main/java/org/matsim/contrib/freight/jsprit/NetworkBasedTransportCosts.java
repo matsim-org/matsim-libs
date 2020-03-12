@@ -744,7 +744,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 	 *
 	 * @Throws {@link IllegalStateException} if vehicle is null
 	 */
-//	@Override //TODO perhaps need override
+
 	public double getTransportDistance(Location fromId, Location toId, double departureTime, Driver driver,
 			Vehicle vehicle) {
 		if (fromId.equals(toId)) {

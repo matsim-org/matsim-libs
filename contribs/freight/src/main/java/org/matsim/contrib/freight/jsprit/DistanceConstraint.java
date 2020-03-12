@@ -38,18 +38,18 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author rewert
  * 
- * 	Includes all classes and methods for the distance constraint of every
- * 	electric vehicle based on the capacity and the consumption of the
- *  battery. The base for calculating the consumption is only the driven
- * 	distance and not the transported weight or other influences. But is
- * 	possible to integrate it.
+ *         Includes all classes and methods for the distance constraint of every
+ *         electric vehicle based on the capacity and the consumption of the
+ *         battery. The base for calculating the consumption is only the driven
+ *         distance and not the transported weight or other influences. But is
+ *         possible to integrate it.
  * 
- * 	!! No recharging is integrated. Vehicles are totally loaded at the
- * 	beginning.
+ *         !! No recharging is integrated. Vehicles are totally loaded at the
+ *         beginning.
  *
- * 	Creates the distance constraint.
+ *         Creates the distance constraint.
  */
-/*pacakge-private*/ class DistanceConstraint implements HardActivityConstraint {
+/* pacakge-private */ class DistanceConstraint implements HardActivityConstraint {
 
 	private final StateManager stateManager;
 
@@ -68,17 +68,16 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	/**
-	 * When adding a TourActivity to the tour and the vehicle of the tour is
-	 * electric drive the algorithm always checks the fulfilled method if all
-	 * conditions (constraints) are fulfilled or not. This method is always been
-	 * checked by the distance constraint, if the new vehicle is electric. Because
-	 * every activity is added separately and the pickup before the delivery of a
-	 * shipment, it will investigate which additional distance is necessary for the
-	 * pickup and which minimal additional distance of the associated Delivery is
-	 * needed. This is also important for the fulfilled decision of this function.
-	 * At the end the conditions checks if the electric consumption of the tour
-	 * including the additional shipment is possible with the used capacity of the
-	 * battery.
+	 * When adding a TourActivity to the tour and the new vehicle has an
+	 * energyCapacity (fuel or electricity etc.) the algorithm always checks the
+	 * fulfilled method if all conditions (constraints) are fulfilled or not.
+	 * Because every activity is added separately and the pickup before the delivery
+	 * of a shipment, it will investigate which additional distance is necessary for
+	 * the pickup and which minimal additional distance of the associated Delivery
+	 * is needed. This is also important for the fulfilled decision of this
+	 * function. At the end the conditions checks if the consumption of the tour
+	 * including the additional shipment is possible with the possible
+	 * energyCapacity.
 	 */
 
 	@Override
@@ -88,12 +87,18 @@ import org.matsim.vehicles.VehicleUtils;
 
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
 				.get(Id.create(context.getNewVehicle().getType().getTypeId().toString(), VehicleType.class));
+		if (VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation()) != null) {
 
-		if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity")) {
 			Vehicle newVehicle = context.getNewVehicle();
 
-			Double electricityCapacityinkWh = VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
-			Double electricityConsumptionPerMeter = VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
+			Double energyCapacityInKWhOrLiters = VehicleUtils
+					.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation());
+			Double consumptionPerMeter;
+			if (VehicleUtils.getHbefaTechnology(vehicleTypeOfNewVehicle.getEngineInformation()).equals("electricity"))
+				consumptionPerMeter = VehicleUtils
+						.getEnergyConsumptionKWhPerMeter(vehicleTypeOfNewVehicle.getEngineInformation());
+			else
+				consumptionPerMeter = VehicleUtils.getFuelConsumption(vehicleTypeOfNewVehicle);
 			Double routeConsumption = null;
 
 			Double routeDistance = stateManager.getRouteState(context.getRoute(), distanceStateId, Double.class);
@@ -102,21 +107,23 @@ import org.matsim.vehicles.VehicleUtils;
 				routeDistance = 0.;
 				routeConsumption = 0.;
 			} else {
-				routeConsumption = routeDistance * (electricityConsumptionPerMeter);
+				routeConsumption = routeDistance * (consumptionPerMeter);
 			}
 			if (newAct.getName().contains("pickupShipment")) {
-				additionalDistance = getDistance(prevAct, newAct, newVehicle,departureTime) + getDistance(newAct, nextAct, newVehicle,departureTime)
-						- getDistance(prevAct, nextAct, newVehicle,departureTime)
-						+ findMinimalAdditionalDistance(context, newAct, nextAct,departureTime);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle, departureTime)
+						+ getDistance(newAct, nextAct, newVehicle, departureTime)
+						- getDistance(prevAct, nextAct, newVehicle, departureTime)
+						+ findMinimalAdditionalDistance(context, newAct, nextAct, departureTime);
 			} else {
-				additionalDistance = getDistance(prevAct, newAct, newVehicle,departureTime) + getDistance(newAct, nextAct, newVehicle,departureTime)
-						- getDistance(prevAct, nextAct, newVehicle,departureTime);
+				additionalDistance = getDistance(prevAct, newAct, newVehicle, departureTime)
+						+ getDistance(newAct, nextAct, newVehicle, departureTime)
+						- getDistance(prevAct, nextAct, newVehicle, departureTime);
 
 			}
-			double additionalConsumption = additionalDistance * (electricityConsumptionPerMeter);
+			double additionalConsumption = additionalDistance * (consumptionPerMeter);
 			double newRouteConsumption = routeConsumption + additionalConsumption;
 
-			if (newRouteConsumption > electricityCapacityinkWh) {
+			if (newRouteConsumption > energyCapacityInKWhOrLiters) {
 				return ConstraintsStatus.NOT_FULFILLED;
 			} else
 				return ConstraintsStatus.FULFILLED;
@@ -141,8 +148,8 @@ import org.matsim.vehicles.VehicleUtils;
 	 * @param nextAct
 	 * @return minimal distance of the associated delivery
 	 */
-	private double findMinimalAdditionalDistance(JobInsertionContext context, TourActivity newAct,
-			TourActivity nextAct, double departureTime) {
+	private double findMinimalAdditionalDistance(JobInsertionContext context, TourActivity newAct, TourActivity nextAct,
+			double departureTime) {
 		double minimalAdditionalDistance = 0;
 
 		if (context.getAssociatedActivities().get(1).getName().contains("deliverShipment")) {
@@ -172,9 +179,9 @@ import org.matsim.vehicles.VehicleUtils;
 			while ((index + 1) < route.getTourActivities().getActivities().size()) {
 				TourActivity activityBefore = route.getTourActivities().getActivities().get(index);
 				TourActivity activityAfter = route.getTourActivities().getActivities().get(index + 1);
-				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle,departureTime)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle,departureTime)
-						- getDistance(activityBefore, activityAfter, newVehicle,departureTime);
+				double possibleAdditionalDistance = getDistance(activityBefore, assignedDelivery, newVehicle,
+						departureTime) + getDistance(assignedDelivery, activityAfter, newVehicle, departureTime)
+						- getDistance(activityBefore, activityAfter, newVehicle, departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				index++;
 			}
@@ -184,15 +191,15 @@ import org.matsim.vehicles.VehicleUtils;
 				TourActivity activityLastDelivery = route.getTourActivities().getActivities()
 						.get(route.getTourActivities().getActivities().size() - 1);
 				TourActivity activityEnd = route.getEnd();
-				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle,departureTime)
-						+ getDistance(assignedDelivery, activityEnd, newVehicle,departureTime)
-						- getDistance(activityLastDelivery, activityEnd, newVehicle,departureTime);
+				double possibleAdditionalDistance = getDistance(activityLastDelivery, assignedDelivery, newVehicle,
+						departureTime) + getDistance(assignedDelivery, activityEnd, newVehicle, departureTime)
+						- getDistance(activityLastDelivery, activityEnd, newVehicle, departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 				// Checks the distance if the delivery will added directly behind the pickup
 				TourActivity activityAfter = route.getTourActivities().getActivities().get(index);
-				possibleAdditionalDistance = getDistance(newAct, assignedDelivery, newVehicle,departureTime)
-						+ getDistance(assignedDelivery, activityAfter, newVehicle,departureTime)
-						- getDistance(newAct, activityAfter, newVehicle,departureTime);
+				possibleAdditionalDistance = getDistance(newAct, assignedDelivery, newVehicle, departureTime)
+						+ getDistance(assignedDelivery, activityAfter, newVehicle, departureTime)
+						- getDistance(newAct, activityAfter, newVehicle, departureTime);
 				minimalAdditionalDistance = findMinimalDistance(minimalAdditionalDistance, possibleAdditionalDistance);
 			}
 
@@ -216,8 +223,10 @@ import org.matsim.vehicles.VehicleUtils;
 	}
 
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
-		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), departureTime, null, vehicle);
-		Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString() + " distance " + distance, distance >= 0.);
+		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), departureTime, null,
+				vehicle);
+		Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+				+ " distance " + distance, distance >= 0.);
 		return distance;
 	}
 }
