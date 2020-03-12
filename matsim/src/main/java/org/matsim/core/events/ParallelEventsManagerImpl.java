@@ -163,7 +163,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		this.threads = new Thread[numberOfThreads];
 		// the additional 1 is for the simulation barrier
 		for (int i = 0; i < numberOfThreads; i++) {
-			events[i] = (EventsManagerImpl) EventsUtils.createEventsManager();
+			events[i] = new EventsManagerImpl();
 		}
 	}
 

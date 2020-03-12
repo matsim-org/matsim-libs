@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -70,7 +71,7 @@ public class TaxiFareHandlerTest {
 		multiTaxiCfg.addParameterSet(taxiCfg);
 		config.addModule(multiTaxiCfg);
 		final MutableDouble fare = new MutableDouble(0);
-		EventsManager events = EventsUtils.createEventsManager();
+		ParallelEventsManager events = new ParallelEventsManager(false);
         TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
@@ -84,6 +85,7 @@ public class TaxiFareHandlerTest {
 			@Override
 			public void reset(int iteration) {}
 		});
+		events.initProcessing();
 		Id<Person> p1 = Id.createPersonId("p1");
 		Id<Vehicle> t1 = Id.createVehicleId("v1");
 		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
@@ -95,6 +97,7 @@ public class TaxiFareHandlerTest {
 		events.processEvent(new PersonEntersVehicleEvent(240.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(241,t1,Id.createLinkId("23")));
 		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
+		events.flush();
 
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2
 		Assert.assertEquals(-6.2, fare.getValue(), 0);
@@ -104,6 +107,7 @@ public class TaxiFareHandlerTest {
 		events.processEvent(new PersonEntersVehicleEvent(400.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(401,t1,Id.createLinkId("34")));
 		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), taxiCfg.getMode()));
+		events.finishProcessing();
 
 		/*
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
