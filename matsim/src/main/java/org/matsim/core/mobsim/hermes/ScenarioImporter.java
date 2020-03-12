@@ -100,7 +100,10 @@ public class ScenarioImporter {
     		public void run() {
     	    	// reset links
     	    	for (int i = 0; i < hermes_links.length; i++) {
-    	    		hermes_links[i].reset();
+    	    	    Link link = hermes_links[i];
+    	    	    if (link != null) {
+                    link.reset();
+                }
     	    	}
     	    	// reset agent plans and events
     	        for (int i = 0; i < hermes_agents.length; i++) {
@@ -126,7 +129,7 @@ public class ScenarioImporter {
         Network network = scenario.getNetwork();
         Collection<? extends org.matsim.api.core.v01.network.Link> matsim_links =
             network.getLinks().values();
-        hermes_links = new Link[matsim_links.size()];
+        hermes_links = new Link[Id.getNumberOfIds(Link.class)];
 
         for (org.matsim.api.core.v01.network.Link matsim_link : matsim_links) {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
@@ -161,7 +164,7 @@ public class ScenarioImporter {
             	route_stops_by_index.add(new ArrayList<>());
             }
         }
-        line_of_route = new int[route_stops_by_index.size()];
+        line_of_route = new int[Id.getNumberOfIds(TransitRoute.class)];
 
     }
 
@@ -235,11 +238,14 @@ public class ScenarioImporter {
             }
         }
 
-        // TODO - coulnd't this be folded in the prev loop?
+        // TODO - couldn't this be folded in the prev loop?
         for (int i = 0; i < hermes_links.length; i++) {
-            int nextwakeup = hermes_links[i].nexttime();
-            if (nextwakeup > 0) {
-                realm.delayedLinks().get(nextwakeup).add(hermes_links[i]);
+            Link link = hermes_links[i];
+            if (link != null) {
+                int nextwakeup = link.nexttime();
+                if (nextwakeup > 0) {
+                    realm.delayedLinks().get(nextwakeup).add(link);
+                }
             }
         }
     }
