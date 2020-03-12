@@ -39,13 +39,12 @@ import org.matsim.vehicles.VehicleUtils;
  * @author rewert
  * 
  *         Includes all classes and methods for the distance constraint of every
- *         electric vehicle based on the capacity and the consumption of the
- *         battery. The base for calculating the consumption is only the driven
- *         distance and not the transported weight or other influences. But is
- *         possible to integrate it.
+ *         vehicle with an energyCapacity. The base for calculating the
+ *         consumption is only the driven distance and not the transported
+ *         weight or other influences. But is possible to integrate it.
  * 
- *         !! No recharging is integrated. Vehicles are totally loaded at the
- *         beginning.
+ *         !! No recharging or refueling is integrated. Vehicles are totally
+ *         full at the beginning.
  *
  *         Creates the distance constraint.
  */
