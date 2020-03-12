@@ -192,7 +192,9 @@ public class EmissionGridAnalyzer {
         EmissionEventsReader eventsReader = new EmissionEventsReader(eventsManager);
         EmissionsOnLinkEventHandler handler = new EmissionsOnLinkEventHandler(binSize);
         eventsManager.addHandler(handler);
+        eventsManager.initProcessing();
         eventsReader.readFile(eventsFile);
+        eventsManager.finishProcessing();
         return handler.getTimeBins();
     }
 
