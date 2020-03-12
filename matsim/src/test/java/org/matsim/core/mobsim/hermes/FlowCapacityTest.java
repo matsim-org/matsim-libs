@@ -1,14 +1,8 @@
 package org.matsim.core.mobsim.hermes;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -24,22 +18,9 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 
-@RunWith(Parameterized.class)
 public class FlowCapacityTest {
 
 	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
-
-	private final boolean isUsingFastCapacityUpdate;
-
-	public FlowCapacityTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
 
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
@@ -49,7 +30,7 @@ public class FlowCapacityTest {
 	 */
 	@Test
 	public void testFlowCapacityDriving() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 12000; i++) {
@@ -110,7 +91,7 @@ public class FlowCapacityTest {
 	 */
 	@Test
 	public void testFlowCapacityDrivingFraction() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
