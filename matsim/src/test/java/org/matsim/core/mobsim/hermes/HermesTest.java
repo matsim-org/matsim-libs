@@ -25,9 +25,6 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,22 +58,9 @@ import org.matsim.testcases.utils.LogCounter;
 
 import java.util.*;
 
-@RunWith(Parameterized.class)
 public class HermesTest {
 
 	private final static Logger log = Logger.getLogger(HermesTest.class);
-
-	private final boolean isUsingFastCapacityUpdate;
-
-	public HermesTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
 
 	protected static Hermes createHermes(MutableScenario scenario, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -104,7 +88,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testSingleAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -144,7 +128,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testSingleAgentWithEndOnLeg() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
 		final PopulationFactory pf = f.scenario.getPopulation().getFactory();
@@ -190,7 +174,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testTwoAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
@@ -231,7 +215,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testTeleportationSingleAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -278,7 +262,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testSingleAgentImmediateDeparture() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -323,7 +307,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testSingleAgent_EmptyRoute() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		// add a single person with leg from link1 to link1
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -396,7 +380,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testSingleAgent_LastLinkIsLoop() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
 
 		// add a single person with leg from link1 to loop-link
@@ -466,7 +450,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testAgentWithoutLeg() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -493,7 +477,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testAgentWithoutLegWithEndtime() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -521,7 +505,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testAgentWithLastActWithEndtime() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -555,7 +539,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testVehicleTeleportationTrue() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
@@ -609,7 +593,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testCircleAsRoute() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -671,7 +655,7 @@ public class HermesTest {
 	 */
 	@Test
 	public void testRouteWithEndLinkTwice() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -741,7 +725,7 @@ public class HermesTest {
 	 * @author mrieser
 	 **/
 	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture();
 
 		/* enhance network */
 		Node node5 = NetworkUtils.createAndAddNode(f.network, Id.create("5", Node.class), new Coord(3100, 0));
@@ -791,7 +775,6 @@ public class HermesTest {
 	public void testStartAndEndTime() {
 
 		final Config config = ConfigUtils.createConfig();
-		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		// ---
 
@@ -848,8 +831,6 @@ public class HermesTest {
 	public void testCleanupSim_EarlyEnd() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-
-		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 		double simEndTime = 8.0*3600;
 
@@ -934,34 +915,6 @@ public class HermesTest {
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
 	}
 
-	/**
-	 * A simple events handler that counts the number of enter link events on one specific link.
-	 * Used by some tests in the class.
-	 *
-	 * @author mrieser
-	 */
-	/*package*/ final static class EnterLinkEventCounter implements LinkEnterEventHandler {
-		private final String linkId;
-		private int counter = 0;
-		public EnterLinkEventCounter(final String linkId) {
-			this.linkId = linkId;
-		}
-
-		@Override
-		public void handleEvent(final LinkEnterEvent event) {
-			if (event.getLinkId().toString().equals(this.linkId)) this.counter++;
-		}
-
-		@Override
-		public void reset(final int iteration) {
-			this.counter = 0;
-		}
-
-		public int getCounter() {
-			return this.counter;
-		}
-	}
-
 	/*package*/ final static class FirstLastEventCollector implements BasicEventHandler {
 		public Event firstEvent = null;
 		public Event lastEvent = null;
@@ -1001,13 +954,11 @@ public class HermesTest {
 		final ArrayList<Id<Link>> linkIdsNone;
 		final ArrayList<Id<Link>> linkIds2;
 
-		public Fixture(boolean isUsingFastCapacityUpdate) {
+		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.qsim().setFlowCapFactor(1.0);
 			this.config.qsim().setStorageCapFactor(1.0);
-
-			this.config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 
 			/* build network */
 			this.network = this.scenario.getNetwork();
