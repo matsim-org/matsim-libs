@@ -224,8 +224,9 @@ import org.matsim.vehicles.VehicleUtils;
 	private double getDistance(TourActivity from, TourActivity to, Vehicle vehicle, double departureTime) {
 		double distance = netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), departureTime, null,
 				vehicle);
-		Assert.assertTrue("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
-				+ " distance " + distance, distance >= 0.);
+		if (!(distance >= 0.))
+			throw new AssertionError("Distance must not be negativ! From, to" + from.toString() + ", " + to.toString()
+					+ " distance " + distance);
 		return distance;
 	}
 }
