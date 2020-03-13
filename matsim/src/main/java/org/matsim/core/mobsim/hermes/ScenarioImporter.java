@@ -129,7 +129,7 @@ public class ScenarioImporter {
         Network network = scenario.getNetwork();
         Collection<? extends org.matsim.api.core.v01.network.Link> matsim_links =
             network.getLinks().values();
-        hermes_links = new Link[Id.getNumberOfIds(Link.class)];
+        hermes_links = new Link[Id.getNumberOfIds(org.matsim.api.core.v01.network.Link.class)];
 
         for (org.matsim.api.core.v01.network.Link matsim_link : matsim_links) {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
