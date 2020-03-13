@@ -75,7 +75,6 @@ public class TripsAndLegsCSVWriter {
         LEGSHEADER = ArrayUtils.addAll(LEGSHEADER, legWriterExtension.getAdditionalLegHeader());
         this.tripsWriterExtension = tripsWriterExtension;
         this.legsWriterExtension = legWriterExtension;
-
     }
 
     public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {

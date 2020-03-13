@@ -51,6 +51,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -830,6 +831,12 @@ public final class PopulationUtils {
 		// (can't do this from the factory since factory method only exists with coord or with linkId. kai, jun'16)
 		plan.addActivity(act);
 		return act ;
+	}
+
+	public static Activity createStageActivityFromCoordLinkIdAndModePrefix(final Coord interactionCoord, final Id<Link> interactionLink, String modePrefix ) {
+		Activity act = createActivityFromCoordAndLinkId(PlanCalcScoreConfigGroup.createStageActivityType(modePrefix), interactionCoord, interactionLink);
+		act.setMaximumDuration(0.0);
+		return act;
 	}
 
 
