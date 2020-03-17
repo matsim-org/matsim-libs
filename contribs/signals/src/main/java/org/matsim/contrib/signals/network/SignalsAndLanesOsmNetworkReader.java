@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_05";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_17";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -989,8 +989,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode junctionNode = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
-
-					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
+                    //sbraun 05032020 added oneway.equals("no"), doesnt really make sense but works...
+					if ((oneway != null && !oneway.equals("-1"))|| oneway == null || oneway.equals("no")) {
 						// positive oneway or no oneway
 
 						//TODO 20200124 sbraun: loops over all nodes of this way to find the closest junction. The problem seems
@@ -1213,7 +1213,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<LinkVector> inLinks = constructInLinkVectors(node);
 		double inLinksAngle = inLinks.get(0).getRotationToOtherInLink(inLinks.get(1));
 		int cycle = CYCLE_TIME;
-		if (inLinksAngle > 3 / 4 * Math.PI && inLinksAngle < 5 / 4 * Math.PI) {
+		//sbraun
+		if (inLinksAngle > (3. / 4. * Math.PI) && inLinksAngle < (5. / 4. * Math.PI)) {
 			if (!this.makePedestrianSignals) {
 				this.systems.getSignalSystemData().remove(signalSystem.getId());
 				LOG.warn(signalSystem.getId().toString());
@@ -1858,7 +1859,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				reverseLink = lvec;
 			}
 		}
-		if (reverseLink.getRotation() < (2 - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
+		if (reverseLink.getRotation() < (2. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
 				&& reverseLink.getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI)
 			reverseLink = null;
 		int it = 1;
@@ -1887,7 +1888,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
 				// slight_right,sharp_right)
 				for (LinkVector lvec : tempLinks) {
-					if (lvec.dirTheta < (1 - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
+					if (lvec.dirTheta < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
 						tempLinks.add(lvec);
 				}
 				if (tempLinks.size() == 1) { // if there is just one "right"
@@ -1932,7 +1933,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								lane.addToLinkId(lvec.getLink().getId());
 					}
 					if (tempDir == 2) { // lane direction: "slight_left"
-						if (tempLinks.get(1).dirTheta > 3 * Math.PI / 2 || !tempLinks.get(1).equals(reverseLink))
+						if (tempLinks.get(1).dirTheta > 3. * Math.PI / 2. || !tempLinks.get(1).equals(reverseLink))
 							lane.addToLinkId(tempLinks.get(0).getLink().getId());
 						else
 							lane.addToLinkId(tempLinks.get(1).getLink().getId());
@@ -2291,10 +2292,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 		private void calculateTheta() {
-			if (this.y >= 0) {
+			if (this.y >= 0.) {
 				this.theta = Math.atan2(this.y, this.x);
 			} else {
-				this.theta = 2 * Math.PI + Math.atan2(this.y, this.x);
+				this.theta = 2. * Math.PI + Math.atan2(this.y, this.x);
 			}
 		}
 
