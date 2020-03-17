@@ -992,14 +992,32 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
                     //sbraun 05032020 added oneway.equals("no"), doesnt really make sense but works...
 					if ((oneway != null && !oneway.equals("-1"))|| oneway == null || oneway.equals("no")) {
 						// positive oneway or no oneway
-
 						//TODO 20200124 sbraun: loops over all nodes of this way to find the closest junction. The problem seems
 						//that once he found that node he continue to loop over the nodes of the way, so once junction is found it continues to look
+
+
+
+                        double distance = 0;
+                        OsmNode tempNode = signalNode;
+                        OsmNode nextNode = signalNode;
+                        for (int j = i; j< way.nodes.size()-1; j++){
+                            nextNode = this.nodes.get(way.nodes.get(j + 1));
+                            distance += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
+                                    nextNode.coord.getX(), nextNode.coord.getY());
+
+                            if (isNodeAtJunction(nextNode)){
+                                junctionNode = nextNode;
+                                break;
+                            }
+                            if (distance >= SIGNAL_MERGE_DISTANCE) break;
+                            tempNode = nextNode;
+                        }
+                        /*
 						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
 						if (nextNode.ways.size() > 1) {
 							// either a junction or the end point of this way where a new way start
 							junctionNode = nextNode;
-						}
+						}*/
 
 						//TODO sbraun20200130 This is only used once in Cottbus and it will only rest above junctionNode to Null again.
 						if (i < way.nodes.size() - 2) {
@@ -1016,7 +1034,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						signalizedOsmNodes.add(junctionNode.id);
 
 						//TODO sbraun20200128: This could have been checked further up, would be much clearer -> dont have code above double in this method
-					} else if ((oneway != null && oneway.equals("-1")) || oneway == null) {
+					} else if ((oneway != null && oneway.equals("-1")) || oneway == null || oneway.equals("no") ){
 						// "else" = no nearby junction found in positive direction. try reverse direction:
 						// "if" = reverse oneway or no oneway (check opposite direction)
 						OsmNode prevNode = this.nodes.get(way.nodes.get(i - 1));
