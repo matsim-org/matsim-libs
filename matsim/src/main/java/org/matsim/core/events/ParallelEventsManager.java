@@ -231,19 +231,18 @@ public final class ParallelEventsManager implements EventsManager {
 		// When set to true, the distributor will process all events until all events in the event manager are processed.
 		// This is used when the simulation needs to sync with event processing and make sure there are no unprocessed
 		// events in the system.
-		private boolean shouldFlush = false;
+		private volatile boolean shouldFlush = false;
 
 		public Distributor(ProcessEventsRunnable[] runnables, BlockingQueue<EventArray> eventQueue) {
 			this.runnables = runnables;
 			this.eventQueue = eventQueue;
 		}
 
-		// TODO - do we need to support stopping?
 		public void flush() throws InterruptedException {
-			if (this.isAlive()) {
-				synchronized (this) {
-					shouldFlush = true;
-					this.wait();
+			synchronized (this) {
+				shouldFlush = true;
+				while (shouldFlush && this.isAlive()) {
+					this.wait(1);
 				}
 			}
 		}
@@ -260,7 +259,7 @@ public final class ParallelEventsManager implements EventsManager {
 			try {
 				EventArray events = new EventArray(eventsArraySize);
 				while (true) {
-					EventArray earray = this.eventQueue.poll(100, TimeUnit.MILLISECONDS);
+					EventArray earray = this.eventQueue.poll(50, TimeUnit.MICROSECONDS);
 					if (earray == null) {
 						synchronized (this) {
 							// check if we can finish the flush
@@ -318,7 +317,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 		private final EventsManager eventsManager;
 		private final BlockingQueue<EventArray> eventsQueue;
-		private boolean shouldFlush = false;
+		private volatile boolean processing = false;
 
 		public ProcessEventsRunnable(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
@@ -326,34 +325,20 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 
 		public void flush() throws InterruptedException {
-			if (this.isAlive()) {
-				synchronized (this) {
-					shouldFlush = true;
-					this.wait();
-				}
-			}
+			while (this.isAlive() && (!this.eventsQueue.isEmpty() || processing)) ;
 		}
 
 		@Override
 		public void run() {
 			try {
 				while (true) {
-					EventArray events = this.eventsQueue.poll(100, TimeUnit.MILLISECONDS);
+					EventArray events = this.eventsQueue.take();
 
-					if (events == null) {
-						synchronized (this) {
-							if (shouldFlush) {
-								shouldFlush = false;
-								this.notify();
-								//Gbl.printCurrentThreadCpuTime();
-							}
-						}
-						continue;
-					}
-
+					processing = true;
 					for (int i = 0; i < events.size(); i++) {
 						this.eventsManager.processEvent(events.get(i));
 					}
+					processing = false;
 				}
 			} catch (InterruptedException e) {
 				return;
