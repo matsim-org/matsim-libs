@@ -300,7 +300,7 @@ public final class ParallelEventsManager implements EventsManager {
 							Event event = earray.get(i);
 							events.add(event);
 							// if the buffer is full or if we need to flush
-							if (events.size() == eventsArraySize || shouldFlush) { // TODO - I think we can eliminate this "shouldFlush"
+							if (events.size() == eventsArraySize || shouldFlush) {
 								distribute(events);
 								events = new EventArray(eventsArraySize);
 							}
