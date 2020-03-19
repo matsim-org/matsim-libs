@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_17";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_19_workedOnPushToNEarbyJunctionLogic";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -292,11 +292,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	@Override
 	protected void preprocessOsmData() {
 		super.preprocessOsmData();
-		
+		//sbraun 19032020: Reihenfolge geändert: PushOverShortWays sollte als erstes passieren
 //		simplifiyRoundaboutSignals();
+		long a = 1435315632;
+		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
+
 		pushSignalsIntoNearbyJunctions();
+		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
 		pushingSingnalsIntoEndpoints();
+		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
+
 		pushSignalsOverShortWays();
+		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
 		removeSignalsAtDeadEnds();
 		// TODO check and clean this methods
 	}
@@ -929,6 +936,25 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	private void pushSignalsOverShortWays() {
+		//sbraun 19032020 added this for the situation that there is a signal between two short ways.
+//		for (OsmNode node: this.nodes.values()){
+//			if (signalizedOsmNodes.contains(node.id) && !makePedestrianSignals && node.ways.size()==2){
+//				List<OsmWay> shortWays = new LinkedList();
+//				for (OsmWay way : node.ways.values()){
+//					if (way.nodes.size()==2) shortWays.add(way);
+//				}
+//				if (shortWays.size()==1){
+//					OsmWay way = shortWays.get(0);
+//					pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
+//					pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
+//				}
+//				//in between two short ways puxh signal to the more important junction
+//				if (shortWays.size()==2){
+//
+//				}
+//			}
+//		}
+		//sbraun 19032020: old
 		for (OsmWay way : this.ways.values()) {
 			if(way.nodes.size()==2) {
                 pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
@@ -984,6 +1010,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private void pushSignalsIntoNearbyJunctions() {
 		for (OsmWay way : this.ways.values()) {
 			// go through all nodes, except the first and the last
+			//sbraun 19032020
 			for (int i = 1; i < way.nodes.size() - 1; i++) {
 				OsmNode signalNode = this.nodes.get(way.nodes.get(i));
 				OsmNode junctionNode = null;
@@ -995,23 +1022,107 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						//TODO 20200124 sbraun: loops over all nodes of this way to find the closest junction. The problem seems
 						//that once he found that node he continue to loop over the nodes of the way, so once junction is found it continues to look
 
+                        double distancePos = 0;
+						double distanceNeg = 0;
 
-
-                        double distance = 0;
-                        OsmNode tempNode = signalNode;
+						OsmNode tempNode = signalNode;
                         OsmNode nextNode = signalNode;
+						OsmNode junctionNodePosDir = null;
+						OsmNode	junctionNodeNegDir = null;
+
+						//TODO this checks just one way
+						//check positive direction
                         for (int j = i; j< way.nodes.size()-1; j++){
                             nextNode = this.nodes.get(way.nodes.get(j + 1));
-                            distance += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
+                            distancePos += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
                                     nextNode.coord.getX(), nextNode.coord.getY());
 
                             if (isNodeAtJunction(nextNode)){
-                                junctionNode = nextNode;
+								junctionNodePosDir = nextNode;
                                 break;
                             }
-                            if (distance >= SIGNAL_MERGE_DISTANCE) break;
+                            if (distancePos >= SIGNAL_MERGE_DISTANCE) break;
                             tempNode = nextNode;
                         }
+						if (i!=0) {
+							for (int j = i; j > 0; j--) {
+								nextNode = this.nodes.get(way.nodes.get(j - 1));
+								distanceNeg += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
+										nextNode.coord.getX(), nextNode.coord.getY());
+
+								if (isNodeAtJunction(nextNode)) {
+									junctionNodeNegDir = nextNode;
+									break;
+								}
+								if (distanceNeg >= SIGNAL_MERGE_DISTANCE) break;
+								tempNode = nextNode;
+							}
+						}
+
+						if (junctionNodePosDir!=null && junctionNodeNegDir!=null){
+							//logic to decide which junction should be prioritised
+							int topLayerPos = -1;
+							int topLayerNeg = -1;
+							int topLayerCounterPos = 0;
+							int topLayerCounterNeg = 0;
+							//Check the toplevel hierarchy (best is 1) and count how many ways are of that level
+							for (OsmWay wayJunPos :junctionNodePosDir.ways.values()){
+								if (wayJunPos.hierarchy< topLayerPos &&  wayJunPos.hierarchy!=-1){
+									topLayerPos = wayJunPos.hierarchy;
+									if (topLayerCounterPos != 0)  topLayerCounterPos = 0;
+								}
+								if (wayJunPos.hierarchy == topLayerPos &&  wayJunPos.hierarchy!=-1) topLayerCounterPos++;
+							}
+							for (OsmWay wayJunNeg :junctionNodeNegDir.ways.values()){
+								if (wayJunNeg.hierarchy< topLayerNeg &&  wayJunNeg.hierarchy!=-1){
+									topLayerNeg = wayJunNeg.hierarchy;
+									if (topLayerCounterNeg != 0)  topLayerCounterNeg = 0;
+								}
+								if (wayJunNeg.hierarchy == topLayerNeg &&  wayJunNeg.hierarchy!=-1) topLayerCounterNeg++;
+							}
+							//sbraun 19032020
+							//rather complicated but it compares firstly the hierarchies of the ways the junction node is on
+							//if that is equal than it has a count of the number of ways in the same hierarchy
+							//if that is equal it takes the one junction with more ways
+							if (topLayerPos == -1 || topLayerNeg == -1) {
+								if (topLayerPos == -1 && topLayerNeg == -1) {
+									if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
+										junctionNode = junctionNodePosDir;
+									} else junctionNode = junctionNodeNegDir;
+								} else {
+									if (topLayerPos == -1){
+										junctionNode = junctionNodeNegDir;
+									}else junctionNode = junctionNodePosDir;
+								}
+							}else{
+								if (topLayerPos==topLayerNeg){
+									if (topLayerCounterPos==topLayerCounterNeg){
+										//same hierarchy and same number of ways on that node with the same hierarchy
+										if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
+											junctionNode = junctionNodePosDir;
+										} else junctionNode = junctionNodeNegDir;
+									} else {
+										if (topLayerCounterPos>topLayerCounterNeg){
+											junctionNode = junctionNodePosDir;
+										} else junctionNode = junctionNodeNegDir;
+									}
+
+								}else{
+									if (topLayerPos < topLayerNeg){
+										junctionNode = junctionNodePosDir;
+									} else junctionNode = junctionNodeNegDir;
+								}
+							}
+
+						} else{
+							if (junctionNodePosDir != null) {
+								junctionNode = junctionNodePosDir;
+							} else junctionNode = junctionNodeNegDir;
+						}
+
+
+
+
                         /*
 						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
 						if (nextNode.ways.size() > 1) {
