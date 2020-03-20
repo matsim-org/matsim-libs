@@ -21,9 +21,10 @@
  */
 package org.matsim.contrib.signals.controller.laemmerFix;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -49,11 +50,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.Map;
 
 /**
  * @author tthunig
@@ -69,6 +69,7 @@ public class LaemmerIT {
 	private static final int maxCycleTime = 90;
 	private static final int cycleIntergreenTime = 10;
 	private static final Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
+	private static final Id<SignalGroup> signalGroupId1l = Id.create("SignalGroup1l", SignalGroup.class);
 	private static final Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
 	private static final Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
 	
@@ -426,11 +427,11 @@ public class LaemmerIT {
 	 * Test Laemmer with multiple iterations (some variables have to be reset after iterations).
 	 */
 	@Test
-	@Ignore
 	public void testMultipleIterations() {
-		//TODO why does this work even if reset is not implemented??
 		Fixture fixture = new Fixture(500, 2000, 5.0, Regime.COMBINED);
-		fixture.setLastIteration(1);
+		int lastIt = 1;
+		fixture.setLastIteration(lastIt);
+		fixture.addLeftTurnTraffic();
 		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
 		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
 
@@ -441,17 +442,26 @@ public class LaemmerIT {
 		Double avgDelayWE = avgDelayPerLink.get(Id.createLinkId("2_3"));
 		Double avgDelayNS = avgDelayPerLink.get(Id.createLinkId("7_3"));
 		
-		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", "
+		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId1l) + ", "
 				+ totalSignalGreenTimes.get(signalGroupId2));
-		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", "
+		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId1l) + ", "
 				+ avgSignalGreenTimePerCycle.get(signalGroupId2));
 		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
 		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
 
-		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", 3172.0, totalSignalGreenTimes.get(signalGroupId1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", 1504.0, totalSignalGreenTimes.get(signalGroupId2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", 41.736, avgSignalGreenTimePerCycle.get(signalGroupId1), .01);
-		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", 19.789, avgSignalGreenTimePerCycle.get(signalGroupId2), .01);
+		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", 3023.0, totalSignalGreenTimes.get(signalGroupId1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("total green time of signal group 1l should be the same as in the first iteration", 599.0, totalSignalGreenTimes.get(signalGroupId1l), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", 1501.0, totalSignalGreenTimes.get(signalGroupId2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", 28.252, avgSignalGreenTimePerCycle.get(signalGroupId1), .01);
+		Assert.assertEquals("avg green time of signal group 1l should be the same as in the first iteration", 5.598, avgSignalGreenTimePerCycle.get(signalGroupId1l), .01);
+		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", 14.028, avgSignalGreenTimePerCycle.get(signalGroupId2), .01);
+		Assert.assertEquals("avg cycle time should be the same as in the first iteration", 64.037, avgCycleTimePerSystem.get(signalSystemId), .01);
+		Assert.assertEquals("avg delay in direction WE should be the same as in the first iteration", 304.106, avgDelayWE, .01);
+		Assert.assertEquals("avg delay in direction NS should be the same as in the first iteration", 322.704, avgDelayNS, .01);
+		// compare signal event files
+		long checksum_it0 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it.0/signalEvents2Via.csv");
+		long checksum_itLast = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it."+lastIt+"/signalEvents2Via.csv");
+		Assert.assertEquals("Signal events are different", checksum_it0, checksum_itLast);
 	}
 	
 	// TODO test stochasticity (laemmer better than fixed-time; different than for constant demand)
@@ -500,6 +510,11 @@ public class LaemmerIT {
 		void doublePopulation() {
 			scenario.getConfig().qsim().setFlowCapFactor(2.0);
 			createSimplePopulationWithoutLeftTurns(scenario.getPopulation(), flowNS, flowWE, "-2");
+		}
+		
+		void addLeftTurnTraffic() {
+			String[] linksWEleft = {"1_2-6_7", "5_4-8_9"};
+	        createPopulationForRelation(0.1 * flowWE, scenario.getPopulation(), linksWEleft, "-left");
 		}
 		
 		void setLastIteration(int lastIteration) {
