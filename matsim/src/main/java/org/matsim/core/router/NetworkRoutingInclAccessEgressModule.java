@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -225,7 +224,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 	
 	private static Activity createInteractionActivity( final Coord interactionCoord, final Id<Link> interactionLink, final String mode ) {
-		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndMode(interactionCoord, interactionLink, mode);
+		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
 		act.setMaximumDuration(0.0);
 		return act;
 	}

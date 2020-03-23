@@ -75,7 +75,6 @@ public class TripsAndLegsCSVWriter {
         LEGSHEADER = ArrayUtils.addAll(LEGSHEADER, legWriterExtension.getAdditionalLegHeader());
         this.tripsWriterExtension = tripsWriterExtension;
         this.legsWriterExtension = legWriterExtension;
-
     }
 
     public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
@@ -190,7 +189,7 @@ public class TripsAndLegsCSVWriter {
                 if (pe instanceof Activity) {
                     Activity currentAct = (Activity) pe;
                     if (prevLeg != null) {
-                        List<String> legRecord = getLegRecord(prevLeg, personId.toString(), tripId, prevAct, currentAct);
+                        List<String> legRecord = getLegRecord(prevLeg, personId.toString(), tripId, prevAct, currentAct, trip);
                         legRecords.add(legRecord);
                     }
                     prevAct = currentAct;
@@ -204,7 +203,7 @@ public class TripsAndLegsCSVWriter {
         return record;
     }
 
-    private List<String> getLegRecord(Leg leg, String personId, String tripId, Activity previousAct, Activity nextAct) {
+    private List<String> getLegRecord(Leg leg, String personId, String tripId, Activity previousAct, Activity nextAct, TripStructureUtils.Trip trip) {
         List<String> record = new ArrayList<>();
         record.add(personId);
         record.add(tripId);
@@ -242,6 +241,10 @@ public class TripsAndLegsCSVWriter {
         record.add(transitLine);
         record.add(transitRoute);
 
+        record.addAll(legsWriterExtension.getAdditionalLegColumns(trip, leg));
+        if (LEGSHEADER.length != record.size()) {
+            throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional leg columns. Must be " + LEGSHEADER.length + " , but is " + record.size());
+        }
 
         return record;
     }

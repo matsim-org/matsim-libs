@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -67,7 +66,7 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
             if (prevLeg != null) {
                 Coord coord = findCoordinate(prevLeg, leg);
                 Id<Link> linkId = leg.getRoute().getStartLinkId();
-                Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndMode(coord, linkId, TransportMode.pt);
+                Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(coord, linkId, TransportMode.pt);
                 planElements.add(act);
             }
             planElements.add(leg);
