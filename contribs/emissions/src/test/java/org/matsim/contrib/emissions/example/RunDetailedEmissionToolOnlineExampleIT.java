@@ -87,7 +87,6 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 		Assert.assertTrue( gotAnException );
 	}
 
-
 	/*
 	 *
 	 * Fallback to Average
