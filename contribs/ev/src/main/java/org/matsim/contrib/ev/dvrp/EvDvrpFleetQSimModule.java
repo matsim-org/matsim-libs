@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 
 import com.google.inject.Inject;
+import org.matsim.core.controler.IterationScoped;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,6 +55,6 @@ public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 								evFleet));
 
 			}
-		}).asEagerSingleton();
+		}).in(IterationScoped.class);
 	}
 }

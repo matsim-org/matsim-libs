@@ -22,10 +22,16 @@
  package org.matsim.core.controler;
 
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 public final class NewControlerModule extends AbstractModule {
 	@Override
 	public void install() {
+		binder().bindScope(IterationScoped.class, SimpleScope.ITERATION);
+		addControlerListenerBinding().toInstance((BeforeMobsimListener) event -> SimpleScope.ITERATION.enter());
+		addControlerListenerBinding().toInstance((AfterMobsimListener) event -> SimpleScope.ITERATION.exit());
+
 		bind(ControlerI.class).to(NewControler.class).asEagerSingleton();
 		bind(ControlerListenerManagerImpl.class).asEagerSingleton();
 		bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);

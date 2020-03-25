@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.stats;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
@@ -50,7 +51,7 @@ public class EvStatsModule extends AbstractModule {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
 							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
-					bind(ChargerPowerCollector.class).asEagerSingleton();
+					bind(ChargerPowerCollector.class).in(IterationScoped.class);
 					// add more time profiles if necessary
 				}
 			}

@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.VehicleType;
@@ -52,9 +53,9 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).in(IterationScoped.class);
 				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
-						.asEagerSingleton();
+						.in(IterationScoped.class);
 			}
 		});
 

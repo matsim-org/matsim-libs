@@ -1,6 +1,7 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -22,17 +23,17 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 			private EventsManager eventsManager;
 
 			@Inject
-			private MobsimTimer mobsimTimer;
+			private Provider<MobsimTimer> mobsimTimer;
 
 			@Inject
-			private PreplanningEngine preplanningEngine;
+			private Provider<PreplanningEngine> preplanningEngine;
 
 			@Inject
 			private PassengerRequestEventToPassengerEngineForwarder passengerRequestEventForwarder;
 
 			@Override
 			public PassengerEngine get() {
-				return new PassengerEngine(getMode(), eventsManager, mobsimTimer, preplanningEngine,
+				return new PassengerEngine(getMode(), eventsManager, mobsimTimer.get(), preplanningEngine.get(),
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
 						passengerRequestEventForwarder);

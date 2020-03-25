@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.core.controler.IterationScoped;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -58,7 +59,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 			protected void configureQSim() {
 				bindModal(Fleet.class).toProvider(ModalProviders.createProvider(getMode(),
 						getter -> Fleets.createDefaultFleet(getter.getModal(FleetSpecification.class),
-								getter.getModal(Network.class).getLinks()::get))).asEagerSingleton();
+								getter.getModal(Network.class).getLinks()::get))).in(IterationScoped.class);
 			}
 		});
 

@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.discharging;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
@@ -38,8 +39,8 @@ public class DischargingModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.bind(DriveDischargingHandler.class).asEagerSingleton();
-				this.bind(AuxDischargingHandler.class).asEagerSingleton();
+				this.bind(DriveDischargingHandler.class).in(IterationScoped.class);
+				this.bind(AuxDischargingHandler.class).in(IterationScoped.class);
 				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 
 				//by default, no vehicle will be AUX-discharged when not moving

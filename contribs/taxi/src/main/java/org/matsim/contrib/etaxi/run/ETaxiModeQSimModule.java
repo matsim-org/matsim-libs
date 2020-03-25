@@ -45,6 +45,7 @@ import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -53,6 +54,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
+
+import javax.inject.Provider;
 
 public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
@@ -70,7 +73,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 			@Inject
-			private MobsimTimer timer;
+			private Provider<MobsimTimer> timer;
 
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
@@ -89,7 +92,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime, travelDisutility,
+				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer.get(), travelTime, travelDisutility,
 						eTaxiScheduler, chargingInfrastructure).get();
 			}
 		});
@@ -97,7 +100,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(ETaxiScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<ETaxiScheduler>(taxiCfg.getMode()) {
 					@Inject
-					private MobsimTimer timer;
+					private Provider<MobsimTimer> timer;
 
 					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
@@ -109,14 +112,14 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
+						return new ETaxiScheduler(taxiCfg, fleet, network, timer.get(), travelTime, travelDisutility);
 					}
-				}).asEagerSingleton();
+				}).in(IterationScoped.class);
 
 		bindModal(DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<ETaxiActionCreator>(taxiCfg.getMode()) {
 					@Inject
-					private MobsimTimer timer;
+					private Provider<MobsimTimer> timer;
 
 					@Inject
 					private DvrpConfigGroup dvrpCfg;
@@ -124,17 +127,17 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public ETaxiActionCreator get() {
 						PassengerEngine passengerEngine = getModalInstance(PassengerEngine.class);
-						return new ETaxiActionCreator(new TaxiActionCreator(passengerEngine, taxiCfg, timer, dvrpCfg));
+						return new ETaxiActionCreator(new TaxiActionCreator(passengerEngine, taxiCfg, timer.get(), dvrpCfg));
 					}
-				}).asEagerSingleton();
+				}).in(IterationScoped.class);
 
 		bindModal(PassengerRequestCreator.class).toProvider(modalProvider(
 				getter -> new TaxiRequestCreator(getMode(), getter.getModal(SubmittedTaxiRequestsCollector.class))))
-				.asEagerSingleton();
+				.in(IterationScoped.class);
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).in(IterationScoped.class);
 
-		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).asEagerSingleton();
+		bindModal(SubmittedTaxiRequestsCollector.class).to(SubmittedTaxiRequestsCollector.class).in(IterationScoped.class);
 
 		addModalQSimComponentBinding().toProvider(modalProvider(
 				getter -> new TaxiSimulationConsistencyChecker(getter.getModal(SubmittedTaxiRequestsCollector.class),

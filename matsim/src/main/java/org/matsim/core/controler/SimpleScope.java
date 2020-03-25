@@ -38,6 +38,8 @@ import java.util.Map;
  */
 public class SimpleScope implements Scope {
 
+    public static final SimpleScope ITERATION = new SimpleScope();
+
     private static final Provider<Object> SEEDED_KEY_PROVIDER =
             new Provider<Object>() {
                 public Object get() {

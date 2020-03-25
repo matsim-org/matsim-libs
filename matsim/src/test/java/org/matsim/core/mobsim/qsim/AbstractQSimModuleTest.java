@@ -21,9 +21,7 @@
 
  package org.matsim.core.mobsim.qsim;
 
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicLong;
-
+import com.google.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -40,42 +39,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AbstractQSimModuleTest {	
-	@Test
-	public void testOverrides() {
-		AbstractQSimModule moduleA = new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				getConfig().createModule("testA");
-				bind(String.class).toInstance("testAString");
-			}
-		};
-
-		AbstractQSimModule moduleB = new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				getConfig().createModule("testB");
-				bind(String.class).toInstance("testBString");
-			}
-		};
-
-		AbstractQSimModule composite = AbstractQSimModule.overrideQSimModules(Collections.singleton(moduleA),
-				Collections.singletonList(moduleB));
-
-		Config config = ConfigUtils.createConfig();
-		composite.setConfig(config);
-
-		Injector injector = Guice.createInjector(composite);
-
-		Assert.assertTrue(config.getModules().containsKey("testA"));
-		Assert.assertTrue(config.getModules().containsKey("testB"));
-
-		Assert.assertEquals("testBString", injector.getInstance(String.class));
-	}
 
 	@Test
 	public void testOverrideAgentFactory() {
@@ -108,7 +74,7 @@ public class AbstractQSimModuleTest {
 		@Override
 		protected void configureQSim() {
 			bind(AtomicLong.class).toInstance(value);
-			bind(AgentFactory.class).to(TestAgentFactory.class).asEagerSingleton();
+			bind(AgentFactory.class).to(TestAgentFactory.class).in(IterationScoped.class);
 		}
 	}
 

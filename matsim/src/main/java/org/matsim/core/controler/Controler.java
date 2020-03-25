@@ -23,7 +23,6 @@ package org.matsim.core.controler;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -129,8 +128,6 @@ public final class Controler implements ControlerI, MatsimServices {
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
 	private AbstractModule overrides = AbstractModule.emptyModule();
 
-	private List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
-
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -217,28 +214,15 @@ public final class Controler implements ControlerI, MatsimServices {
 		// td, nov 16
 		this.injectorCreated = true;
 
-		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
-				}, Names.named("overrides"))).toInstance(overridingQSimModules);
-			}
-		});
-
 		// check config consistency just before creating injector; sometimes, we can provide better error messages there:
 		config.removeConfigConsistencyChecker( UnmaterializedConfigGroupChecker.class );
 		config.checkConsistency();
 		config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
 
-		SimpleScope iterationScope = new SimpleScope();
 		final Set<AbstractModule> standardModules = Collections.singleton(
 				new AbstractModule(){
 					@Override
 					public void install(){
-						binder().bindScope(IterationScoped.class, iterationScope);
-						addControlerListenerBinding().toInstance((BeforeMobsimListener) event -> iterationScope.enter());
-						addControlerListenerBinding().toInstance((AfterMobsimListener) event -> iterationScope.exit());
-
 						install( new NewControlerModule() );
 						install( new ControlerDefaultCoreListenersModule() );
 						for( AbstractModule module : modules ){
@@ -475,9 +459,10 @@ public final class Controler implements ControlerI, MatsimServices {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
-		overridingQSimModules.add(qsimModule);
+		addQSimModule(qsimModule);
 		return this ;
 	}
+
 	public final Controler addQSimModule(AbstractQSimModule qsimModule) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override

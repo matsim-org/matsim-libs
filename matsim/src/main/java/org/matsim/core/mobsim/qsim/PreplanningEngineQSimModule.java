@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import org.matsim.core.controler.IterationScoped;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -28,7 +30,7 @@ public class PreplanningEngineQSimModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PreplanningEngine.class).asEagerSingleton();
+		bind(PreplanningEngine.class).in(IterationScoped.class);
 		addQSimComponentBinding(COMPONENT_NAME).to(PreplanningEngine.class);
 	}
 }

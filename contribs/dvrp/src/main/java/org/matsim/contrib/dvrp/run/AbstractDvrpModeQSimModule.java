@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
@@ -65,47 +66,23 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 		return bind(modalKey(typeLiteral));
 	}
 
-	/**
-	 * Adding this method to AbstractDvrpModeQSimModule prevents accidentally calling
-	 * AbstractModule.addMobsimListenerBinding() from the AbstractDvrpModeQSimModule.configureQSim() method.
-	 * (which has happened to me at least twice, michal.mac, feb'19)
-	 * <p>
-	 * Normally, if an AbstractQSimModule class is an inner class of an outer AbstractModule class,
-	 * addMobsimListenerBinding() will call AbstractModule.addMobsimListenerBinding(), which will have no effect (
-	 * too late for adding a listener with the controller scope).
-	 * <p>
-	 * However, quite likely, the programmer intention is to add a listener with the mobsim/QSim scope, as if
-	 * addQSimComponentBinding() or addModalQSimComponentBinding() were called.
-	 * <p>
-	 * Although less likely, other methods of AbstractModule could also be accidentally called. Therefore, one should
-	 * consider prefixing calls with "this" (e.g. this.addModalQSimComponentBinding()) when an AbstractQSimModule
-	 * is inside an AbstractModule.
-	 *
-	 * @throws RuntimeException
-	 */
-	@Deprecated
-	protected final LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
-		throw new UnsupportedOperationException(
-				"Very likely you wanted to call addQSimComponentBinding() or addModalQSimComponentBinding()");
-	}
-
 	protected final LinkedBindingBuilder<QSimComponent> addModalQSimComponentBinding() {
 		return addQSimComponentBinding(getDvrpMode());
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass, Key<? extends T> key) {
-		bind(componentClass).annotatedWith(getDvrpMode()).to(key).asEagerSingleton();
+		bind(componentClass).annotatedWith(getDvrpMode()).to(key).in(IterationScoped.class);
 		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass,
 			Provider<T> componentProvider) {
-		bind(componentClass).annotatedWith(getDvrpMode()).toProvider(componentProvider).asEagerSingleton();
+		bind(componentClass).annotatedWith(getDvrpMode()).toProvider(componentProvider).in(IterationScoped.class);
 		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
-		bind(componentClass).annotatedWith(getDvrpMode()).to(componentClass).asEagerSingleton();
+		bind(componentClass).annotatedWith(getDvrpMode()).to(componentClass).in(IterationScoped.class);
 		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
 	}
 

@@ -21,26 +21,24 @@
 
  package org.matsim.core.mobsim.qsim;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Consumer;
-
+import com.google.inject.Injector;
+import com.google.inject.Scopes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.name.Names;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Builds a new QSim. By default, the QSim is completely empty, i.e. there are
@@ -183,21 +181,21 @@ public class QSimBuilder {
 	 */
 	public QSim build(Scenario scenario, EventsManager eventsManager) {
 		// First, load standard QSim module
-		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager);
-
-		// Add all overrides
-		for (AbstractModule override : overridingControllerModules) {
-			controllerModule = AbstractModule.override(Collections.singleton(controllerModule), override);
-		}
+		AbstractModule controllerModule = new AbstractModule() {
+			@Override
+			public void install() {
+				install(new StandaloneQSimModule(scenario, eventsManager));
+				qsimModules.forEach(this::installQSimModule);
+			}
+		};
 
 		// Override components and modules
 		controllerModule = AbstractModule.override(Collections.singleton(controllerModule), new AbstractModule() {
 			@Override
 			public void install() {
 				bind(QSimComponentsConfig.class).toInstance(components);
-				qsimModules.forEach(this::installQSimModule);
-				bind(Key.get(new TypeLiteral<List<AbstractQSimModule>>() {
-				}, Names.named("overrides"))).toInstance(overridingQSimModules);
+				overridingControllerModules.forEach(this::install);
+				overridingQSimModules.forEach(this::installQSimModule);
 			}
 		});
 
@@ -217,6 +215,7 @@ public class QSimBuilder {
 
 		@Override
 		public void install() {
+			binder().bindScope(IterationScoped.class, Scopes.SINGLETON);
 			install(new ScenarioByInstanceModule(scenario));
 			bind(EventsManager.class).toInstance(eventsManager);
 			install(new QSimModule(false));

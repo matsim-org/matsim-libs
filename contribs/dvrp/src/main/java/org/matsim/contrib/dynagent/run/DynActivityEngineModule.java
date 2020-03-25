@@ -1,5 +1,6 @@
 package org.matsim.contrib.dynagent.run;
 
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 
@@ -8,7 +9,7 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(DynActivityEngine.class).asEagerSingleton();
+		bind(DynActivityEngine.class).in(IterationScoped.class);
 		addQSimComponentBinding( COMPONENT_NAME ).to( DynActivityEngine.class );
 	}
 

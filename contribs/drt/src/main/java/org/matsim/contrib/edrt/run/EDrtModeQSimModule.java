@@ -59,6 +59,7 @@ import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -93,18 +94,18 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(DepotFinder.class), getter.getModal(RebalancingStrategy.class),
 						getter.getModal(DrtScheduleInquiry.class), getter.getModal(DrtScheduleTimingUpdater.class),
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
-				.asEagerSingleton();
+				.in(IterationScoped.class);
 
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge
 		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
 
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
+		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).in(IterationScoped.class);
 
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<EmptyVehicleChargingScheduler>(drtCfg.getMode()) {
 					@Inject
-					private MobsimTimer timer;
+					private Provider<MobsimTimer> timer;
 
 					@Inject
 					private ChargingInfrastructure chargingInfrastructure;
@@ -112,9 +113,9 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public EmptyVehicleChargingScheduler get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
+						return new EmptyVehicleChargingScheduler(timer.get(), taskFactory, chargingInfrastructure);
 					}
-				}).asEagerSingleton();
+				}).in(IterationScoped.class);
 
 		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
@@ -126,12 +127,12 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
 		bindModal(VehicleData.EntryFactory.class).toProvider(
-				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
+				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).in(IterationScoped.class);
 
 		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(
 				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
 						InsertionCostCalculator.RejectSoftConstraintViolations.class :
-						InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+						InsertionCostCalculator.DiscourageSoftConstraintViolations.class).in(IterationScoped.class);
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 
@@ -142,7 +143,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					private TravelTime travelTime;
 
 					@Inject
-					private MobsimTimer timer;
+					private Provider<MobsimTimer> timer;
 
 					@Override
 					public EmptyVehicleRelocator get() {
@@ -150,28 +151,28 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer, taskFactory);
+						return new EmptyVehicleRelocator(network, travelTime, travelDisutility, timer.get(), taskFactory);
 					}
-				}).asEagerSingleton();
+				}).in(IterationScoped.class);
 
-		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
+		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).in(IterationScoped.class);
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
 				getter -> new RequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class),
 						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
 						getter.getModal(DrtScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
-				.asEagerSingleton();
+				.in(IterationScoped.class);
 
 		bindModal(DrtScheduleTimingUpdater.class).toProvider(new Provider<DrtScheduleTimingUpdater>() {
 			@Inject
-			private MobsimTimer timer;
+			private Provider<MobsimTimer> timer;
 
 			@Override
 			public DrtScheduleTimingUpdater get() {
-				return new DrtScheduleTimingUpdater(drtCfg, timer);
+				return new DrtScheduleTimingUpdater(drtCfg, timer.get());
 			}
-		}).asEagerSingleton();
+		}).in(IterationScoped.class);
 
 		addModalComponent(ParallelPathDataProvider.class,
 				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
@@ -191,20 +192,19 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
 				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerEngine.class),
-						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
-				asEagerSingleton();
+						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).in(IterationScoped.class);
 
 		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
 			@Inject
 			private EventsManager events;
 			@Inject
-			private MobsimTimer timer;
+			private Provider<MobsimTimer> timer;
 
 			@Override
 			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events, timer);
+				return new DrtRequestCreator(getMode(), events, timer.get());
 			}
-		}).asEagerSingleton();
+		}).in(IterationScoped.class);
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}

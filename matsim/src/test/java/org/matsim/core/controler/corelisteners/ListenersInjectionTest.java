@@ -28,6 +28,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -79,6 +81,9 @@ public class ListenersInjectionTest {
                     @Override
                     public void install() {
                         // put dummy dependencies to get the listenners happy
+						binder().bindScope(IterationScoped.class, SimpleScope.ITERATION);
+						addControlerListenerBinding().toInstance((BeforeMobsimListener) event -> SimpleScope.ITERATION.enter());
+						addControlerListenerBinding().toInstance((AfterMobsimListener) event -> SimpleScope.ITERATION.exit());
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
 						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, config.controler().getCompressionType() ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
@@ -87,9 +92,10 @@ public class ListenersInjectionTest {
                 },
 				new ControlerDefaultCoreListenersModule());
 
-
+		SimpleScope.ITERATION.enter();
 		final ControlerListener o1 = injector.getInstance( klass );
 		final ControlerListener o2 = injector.getInstance( klass );
+		SimpleScope.ITERATION.exit();
 
 		Assert.assertSame(
 				"Two different instances of "+klass.getName()+" returned by injector!",

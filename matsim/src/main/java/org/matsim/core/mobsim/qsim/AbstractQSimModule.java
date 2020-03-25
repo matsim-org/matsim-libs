@@ -21,22 +21,21 @@
 
  package org.matsim.core.mobsim.qsim;
 
+import com.google.inject.Module;
+import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
+import org.matsim.core.mobsim.qsim.components.QSimComponent;
+
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.inject.multibindings.Multibinder;
-import org.matsim.core.controler.IterationScoped;
-import org.matsim.core.mobsim.framework.AbstractMobsimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponent;
+public abstract class AbstractQSimModule extends AbstractModule {
 
-import com.google.inject.Module;
-import com.google.inject.binder.LinkedBindingBuilder;
-import com.google.inject.name.Names;
-import com.google.inject.util.Modules;
-
-public abstract class AbstractQSimModule extends AbstractMobsimModule {
-	@Override
 	protected final void configureMobsim() {
 		configureQSim();
 	}
@@ -68,24 +67,10 @@ public abstract class AbstractQSimModule extends AbstractMobsimModule {
 	protected abstract void configureQSim();
 	
 	protected void install(AbstractQSimModule module) {
-		module.setParent(this);
 		super.install(module);
 	}
 
-	public static AbstractQSimModule overrideQSimModules(Collection<AbstractQSimModule> base,
-			List<AbstractQSimModule> overrides) {
-		Module composite = Modules.override(base).with(overrides);
-
-		AbstractQSimModule wrapper = new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				install(composite);
-			}
-		};
-
-		base.forEach(m -> m.setParent(wrapper));
-		overrides.forEach(m -> m.setParent(wrapper));
-
-		return wrapper;
+	public final void install() {
+		configureMobsim();
 	}
 }

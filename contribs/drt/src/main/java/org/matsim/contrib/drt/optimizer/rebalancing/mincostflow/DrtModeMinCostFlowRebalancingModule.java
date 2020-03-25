@@ -30,6 +30,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.IterationScoped;
 
 /**
  * @author michalm
@@ -54,15 +55,15 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
+								getter.getModal(MinCostRelocationCalculator.class), params))).in(IterationScoped.class);
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
-								params))).asEagerSingleton();
+								params))).in(IterationScoped.class);
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Network.class)))).asEagerSingleton();
+								getter.getModal(Network.class)))).in(IterationScoped.class);
 			}
 		});
 
