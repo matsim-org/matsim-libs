@@ -82,7 +82,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int DEFAULT_LANE_OFFSET = 35;
 	private final static int INTERGREENTIME = 5;
 	private final static int MIN_GREENTIME = 10;
-	private final static double SIGNAL_MERGE_DISTANCE = 40; //changed from 40m sb 16.01.2020
+	private final static double SIGNAL_MERGE_DISTANCE = 30; //changed from 40m sb 25.03.2020
 	private final static double SIGNAL_LANES_CAPACITY = 2000.0;
 	private final static double THROUGHLINK_ANGLE_TOLERANCE = 0.1666667;
 	private final static int PEDESTRIAN_CROSSING_TIME = 20;
@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_19_workedOnPushToNEarbyJunctionLogic";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_25_adp30m";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -292,18 +292,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	@Override
 	protected void preprocessOsmData() {
 		super.preprocessOsmData();
-		//sbraun 19032020: Reihenfolge geändert: PushOverShortWays sollte als erstes passieren
 //		simplifiyRoundaboutSignals();
-		long a = 1435315632;
-		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
-
 		pushSignalsIntoNearbyJunctions();
-		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
 		pushingSingnalsIntoEndpoints();
-		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
-
 		pushSignalsOverShortWays();
-		LOG.warn("AAAAAAAA"+signalizedOsmNodes.contains(a));
 		removeSignalsAtDeadEnds();
 		// TODO check and clean this methods
 	}
@@ -954,6 +946,83 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //				}
 //			}
 //		}
+		//sbraun20200305 new logic -> irgendwie nicht schoen und code Wiederholung von #pushIntoNearbyJunction
+		for (Long id : nodes.keySet()){
+			if (!signalizedOsmNodes.contains(id)) continue;
+
+			HashSet<Long> shortWays = new HashSet<>();
+
+			for (OsmWay way : nodes.get(id).ways.values()){
+				if(way.nodes.size()==2) {
+					shortWays.add(way.id);
+				}
+			}
+
+			if (shortWays.size()== 1){
+
+				OsmWay way = ways.get(shortWays.iterator().next());
+				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
+				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
+			}
+
+			if (shortWays.size() > 1){
+				OsmWay bestWay = null;
+				int hierarchyBestWay = 999;
+				int hierarchCounterBW = 0;
+
+				for (long wayId : shortWays){
+					OsmWay tempWay = ways.get(wayId);
+					OsmNode tempNode = null;
+
+
+					int hierarchy = 999;
+					int hierarchCounter = 0;
+
+					for (Long node : tempWay.nodes){
+						if (!node.equals(id)){
+							tempNode = nodes.get(node);
+							break;
+						}
+					}
+
+					for( OsmWay wayOfTempNode :tempNode.ways.values()){
+
+						if (hierarchy > wayOfTempNode.hierarchy){
+							hierarchy = wayOfTempNode.hierarchy;
+							hierarchCounter = 1;
+						}
+						if (hierarchy == wayOfTempNode.hierarchy) hierarchCounter += 1;
+
+					}
+
+
+
+					if (hierarchy < hierarchyBestWay){
+						bestWay = tempWay;
+						hierarchyBestWay = hierarchy;
+						hierarchCounterBW =  hierarchCounter;
+					} else {
+						if (hierarchy == hierarchyBestWay &&hierarchCounter>hierarchCounterBW){
+							bestWay = tempWay;
+							hierarchyBestWay = hierarchy;
+							hierarchCounterBW =  hierarchCounter;
+						}
+					}
+
+				}
+
+				pushSignalOverShortWay(bestWay, this.nodes.get(bestWay.nodes.get(0)), this.nodes.get(bestWay.nodes.get(1)));
+				pushSignalOverShortWay(bestWay, this.nodes.get(bestWay.nodes.get(1)), this.nodes.get(bestWay.nodes.get(0)));
+
+			}
+
+
+		}
+
+
+
+
+
 		//sbraun 19032020: old
 		for (OsmWay way : this.ways.values()) {
 			if(way.nodes.size()==2) {
@@ -1030,7 +1099,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						OsmNode junctionNodePosDir = null;
 						OsmNode	junctionNodeNegDir = null;
 
-						//TODO this checks just one way
+						//TODO this checks just one way -> put this all in a seperate method???
 						//check positive direction
                         for (int j = i; j< way.nodes.size()-1; j++){
                             nextNode = this.nodes.get(way.nodes.get(j + 1));
@@ -1044,6 +1113,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
                             if (distancePos >= SIGNAL_MERGE_DISTANCE) break;
                             tempNode = nextNode;
                         }
+                        //negative direction
 						if (i!=0) {
 							for (int j = i; j > 0; j--) {
 								nextNode = this.nodes.get(way.nodes.get(j - 1));
