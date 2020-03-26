@@ -62,6 +62,7 @@ class FeatureNoiseBarriersReader {
         }
 
         final FeatureIterator features = featureCollection.features();
+        int idCounter = 0;
         while (features.hasNext()) {
             SimpleFeature feature = (SimpleFeature) features.next();
 
@@ -81,7 +82,14 @@ class FeatureNoiseBarriersReader {
             if(!polygon.isValid()) {
                 continue;
             }
-            Id<NoiseBarrier> id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
+            Id<NoiseBarrier> id;
+            try {
+                id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
+            } catch (Exception e) {
+                id = Id.create(idCounter, NoiseBarrier.class);
+                idCounter++;
+            }
+
             double height = getHeight(feature);
 
 

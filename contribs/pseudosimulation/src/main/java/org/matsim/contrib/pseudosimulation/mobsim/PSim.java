@@ -3,38 +3,14 @@
  */
 package org.matsim.contrib.pseudosimulation.mobsim;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,6 +21,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author illenberger
@@ -162,8 +141,7 @@ public class PSim implements Mobsim {
                     /*
                      * Make sure that the activity does not end before the previous activity.
                      */
-                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime() );
-
+                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime().orElse(0));
                     if( idx > 0 ){
                         /*
                          * If this is not the first activity, then there must exist a leg before.
@@ -205,7 +183,7 @@ public class PSim implements Mobsim {
                                 travelTime = route.getTravelTime();
                                 eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
                                         route.getDistance()
-                                        // Double.NaN
+                                        , prevLeg.getMode()
                                 ) );
                             } catch( NullPointerException e ){
                                 Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );

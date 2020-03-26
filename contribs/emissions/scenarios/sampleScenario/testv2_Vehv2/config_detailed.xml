@@ -213,6 +213,8 @@
 		<!-- <param name="networkModes" value="car,ride" /> -->
 		<param name="networkModes" value="car" />
 
+		<param name="clearDefaultTeleportedModeParams" value="true"/>
+
 		<parameterset type="teleportedModeParameters" >
 			<param name="mode" value="bike" />
 

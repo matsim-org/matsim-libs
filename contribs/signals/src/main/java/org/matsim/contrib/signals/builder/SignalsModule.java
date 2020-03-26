@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
@@ -83,8 +84,8 @@ public class SignalsModule extends AbstractModule {
 			// bindings for sensor-based signals (also works for fixed-time signals)
 			bind(SignalModelFactory.class).to(SignalModelFactoryImpl.class);
 			addControlerListenerBinding().to(SensorBasedSignalControlerListener.class);
-			bind(LinkSensorManager.class).asEagerSingleton();
-			bind(DownstreamSensor.class).asEagerSingleton();
+			bind(LinkSensorManager.class).in(Singleton.class);
+			bind(DownstreamSensor.class).in(Singleton.class);
 //			// bind factory for all specified signal controller
 			for (String identifier : signalControllerFactoryClassNames.keySet()) {
 				/* note: This cannot be called before (e.g. in the constructor or from outside),
@@ -94,7 +95,7 @@ public class SignalsModule extends AbstractModule {
 			}
 			
 			// general signal bindings
-			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
+			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class).in(Singleton.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
 //			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 

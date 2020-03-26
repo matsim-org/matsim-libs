@@ -74,7 +74,11 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 			}
 		});
 
-		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		if (matsimServices.getConfig().controler().isCreateGraphs()) {
+		  collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		} else {
+		  collector.setChartTypes();
+		}
 		return collector;
 	}
 }

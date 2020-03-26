@@ -19,22 +19,18 @@
 
 package org.matsim.contrib.taxi.schedule;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
-public class TaxiDropoffTask extends StayTaskImpl implements TaxiTaskWithRequest {
+import com.google.common.base.MoreObjects;
+
+public class TaxiDropoffTask extends StayTask {
 	private final TaxiRequest request;
 
 	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
-		super(beginTime, endTime, request.getToLink());
-
+		super(TaxiTaskType.DROPOFF, beginTime, endTime, request.getToLink());
 		this.request = request;
 		request.setDropoffTask(this);
-	}
-
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.DROPOFF;
 	}
 
 	public TaxiRequest getRequest() {
@@ -42,7 +38,7 @@ public class TaxiDropoffTask extends StayTaskImpl implements TaxiTaskWithRequest
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
 	}
 }

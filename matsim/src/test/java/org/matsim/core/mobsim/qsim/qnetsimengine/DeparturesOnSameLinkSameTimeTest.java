@@ -194,14 +194,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 				p.addPlan(plan);
 				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
 
-				a1.setEndTime(0*3600);
+				a1.setEndTime(0 * 3600);
 				Leg leg = population.getFactory().createLeg(travelMode);
 				plan.addActivity(a1);
 				plan.addLeg(leg);
 				LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 				NetworkRoute route;
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				route= (NetworkRoute) factory.createRoute(link1.getId(), link2.getId());
+				route = (NetworkRoute) factory.createRoute(link1.getId(), link2.getId());
 				linkIds.add(link2.getId());
 				route.setLinkIds(link1.getId(), linkIds, link2.getId());
 				leg.setRoute(route);
@@ -211,7 +211,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 				population.addPerson(p);
 
 				Id<Vehicle> vehId = Id.createVehicleId(i);
-				VehicleUtils.insertVehicleIdIntoAttributes(p, travelMode, vehId);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(travelMode, vehId));
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

@@ -8,10 +8,9 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 import com.google.inject.Provides;
@@ -29,12 +28,12 @@ public class JointQSimModule extends AbstractQSimModule {
 		addNamedComponent(PassengerUnboardingAgentFactory.class, JOINT_PASSENGER_UNBOARDING);
 		addNamedComponent(JointModesDepartureHandler.class, JOINT_MODES_DEPARTURE_HANDLER);
 		addNamedComponent(PopulationAgentSourceWithVehicles.class, AGENTS_SOURCE_WITH_VEHICLES);
-		addNamedComponent(QNetsimEngine.class, REPLACEMENT_QNETSIM_ENGINE);
+		addNamedComponent(QNetsimEngineI.class, REPLACEMENT_QNETSIM_ENGINE);
 	}
 
 	@Provides
 	@Singleton
-	JointModesDepartureHandler provideJoinModesDepartureHandler(QNetsimEngine netsimEngine) {
+	JointModesDepartureHandler provideJoinModesDepartureHandler(QNetsimEngineI netsimEngine) {
 		return new JointModesDepartureHandler(netsimEngine);
 	}
 
@@ -48,7 +47,7 @@ public class JointQSimModule extends AbstractQSimModule {
 	@Provides
 	@Singleton
 	PassengerUnboardingAgentFactory providePassengerUnboardingAgentFactory(Config config, QSim qsim,
-			QNetsimEngine netsimEngine) {
+			QNetsimEngineI netsimEngine) {
 		return new PassengerUnboardingAgentFactory(
 				config.transit().isUseTransit() ? new TransitAgentFactory(qsim) : new DefaultAgentFactory(qsim),
 				new NetsimWrappingQVehicleProvider(netsimEngine));

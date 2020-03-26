@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>28.1-jre</version>
+			<version>28.2-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>4.6</version>
+			<version>5.1</version>
 		</dependency>
 		<dependency>
 			<groupId>one.util</groupId>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.12.2</version>
+			<version>3.15.0</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

@@ -34,12 +34,101 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.util.Map;
 import java.util.Random;
 
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
+
 public class PlanCalcScoreConfigGroupTest {
 	private static final Logger log =
 		Logger.getLogger(PlanCalcScoreConfigGroupTest.class);
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		if ( ! fullyHierarchical ){
+			// mode params are there for default modes:
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
+
+			// default stage/interaction params are there for pt and drt (as a service):
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
+		}
+		// default stage/interaction params for modes routed on the network are not yet there:
+//		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+//			Assert.assertNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+//		}
+	}
+	private void testResultsAfterCheckConsistency( Config config ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		// default stage/interaction params for modes routed on the network are now there:
+		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+		}
+	}
+
+	@Test
+	public void testFullyHierarchicalVersion() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, true ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
+	@Test
+	public void testVersionWoScoringparams() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, false ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
 
 	@Test
 	public void testAddActivityParams() {

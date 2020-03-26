@@ -1,15 +1,13 @@
 package org.matsim.vehicles;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
-import org.junit.*;
-import org.matsim.core.utils.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.*;
-import java.util.Objects;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class VehicleWriteReadTest{
 	private static final Logger log = Logger.getLogger( VehicleWriteReadTest.class ) ;

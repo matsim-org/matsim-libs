@@ -26,6 +26,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.pt.ReconstructingUmlaufBuilder;
+import org.matsim.pt.UmlaufBuilder;
 
 public class TransitEngineModule extends AbstractQSimModule {
 	public final static String TRANSIT_ENGINE_NAME = "TransitEngine";
@@ -41,6 +43,8 @@ public class TransitEngineModule extends AbstractQSimModule {
 			// Explicit bindings are required, so although it may not be used, we need provide something.
 			bind( TransitStopHandlerFactory.class ).to( SimpleTransitStopHandlerFactory.class );
 		}
+
+		bind( UmlaufBuilder.class ).to( ReconstructingUmlaufBuilder.class );
 
 	}
 }

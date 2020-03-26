@@ -1,11 +1,6 @@
 package org.matsim.api.core.v01;
 
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -217,6 +212,40 @@ public class IdSet<T> implements Set<Id<T>> {
 	public void clear() {
 		this.size = 0;
 		this.data.clear();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this)
+			return true;
+		if (!(o instanceof Set))
+			return false;
+		if (o instanceof IdSet) {
+			IdSet<?> m = (IdSet<?>) o;
+			return this.idClass.equals(m.idClass) && this.size == m.size && this.data.equals(m.data);
+		} else {
+			Collection<?> c = (Collection<?>) o;
+			if (c.size() != size())
+				return false;
+			try {
+				return containsAll(c);
+			} catch (ClassCastException unused) {
+				return false;
+			} catch (NullPointerException unused) {
+				return false;
+			}
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		if (isEmpty())
+			return -1;
+		int h = 0;
+		for (int i = 0; i < this.data.length(); i++) {
+			h += this.data.get(i) ? i : 0;
+		}
+		return h;
 	}
 
 	private static class IdSetIterator<T> implements Iterator<Id<T>> {

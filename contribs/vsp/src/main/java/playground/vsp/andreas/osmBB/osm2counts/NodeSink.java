@@ -1,8 +1,5 @@
 package playground.vsp.andreas.osmBB.osm2counts;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.openstreetmap.osmosis.core.container.v0_6.BoundContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
@@ -12,6 +9,9 @@ import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class NodeSink implements Sink{
 	
@@ -90,7 +90,7 @@ public class NodeSink implements Sink{
 	}
 
 	@Override
-	public void release() {
+	public void close() {
 		// nothing to do here		
 	}
 

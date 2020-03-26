@@ -24,6 +24,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.MainModeIdentifier;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourFirstModeIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourModeIdentifier;
@@ -32,12 +33,12 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifier
  * @author thibautd
  */
 public class TourModeUnifierModule extends AbstractMultithreadedModule {
-	final Set<String> stages; // formerly StageActivityTypes
-	final SubtourModeIdentifier modeIdentifier;
+	private final Predicate<String> stages; // formerly StageActivityTypes
+	private final SubtourModeIdentifier modeIdentifier;
 
 	public TourModeUnifierModule(
 			final int nThreads,
-			final Set<String> stages,
+			final Predicate<String> stages,
 			final MainModeIdentifier modeIdentifier) {
 		this( nThreads,
 				stages,
@@ -47,7 +48,7 @@ public class TourModeUnifierModule extends AbstractMultithreadedModule {
 
 	public TourModeUnifierModule(
 			final int nThreads,
-			final Set<String> stages,
+			final Predicate<String> stages,
 			final SubtourModeIdentifier modeIdentifier) {
 		super( nThreads );
 		this.stages = stages;

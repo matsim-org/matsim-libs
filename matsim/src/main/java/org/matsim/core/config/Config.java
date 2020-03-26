@@ -20,8 +20,18 @@
 
 package org.matsim.core.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -47,16 +57,10 @@ import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.*;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -211,6 +215,7 @@ public final class Config implements MatsimExtensionPoint {
 
 		this.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		this.addConfigConsistencyChecker(new UnmaterializedConfigGroupChecker());
+		this.addConfigConsistencyChecker(new BeanValidationConfigConsistencyChecker());
 	}
 
 	/**
@@ -280,20 +285,30 @@ public final class Config implements MatsimExtensionPoint {
 		if (m != null) {
 			// (3) this is the corresponding test: m is general, module is specialized:
 			if (m.getClass() == ConfigGroup.class && specializedConfigModule.getClass() != ConfigGroup.class) {
-
 				// (4) go through everything in m (from parsing) and add it to module:
-				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
-					specializedConfigModule.addParam(e.getKey(), e.getValue());
-				}
+				copyTo(m, specializedConfigModule);
 
 				// (5) register the resulting module under "name" (which will over-write m):
 				this.modules.put(name, specializedConfigModule);
-
 			} else {
 				throw new IllegalArgumentException("Module " + name + " exists already.");
 			}
 		}
 		this.modules.put(name, specializedConfigModule);
+	}
+
+	private static void copyTo(ConfigGroup source, ConfigGroup destination) {
+		for (Map.Entry<String, String> e : source.getParams().entrySet()) {
+			destination.addParam(e.getKey(), e.getValue());
+		}
+
+		for (Collection<? extends ConfigGroup> sourceSets : source.getParameterSets().values()) {
+			for (ConfigGroup sourceSet : sourceSets) {
+				ConfigGroup destinationSet = destination.createParameterSet(sourceSet.getName());
+				copyTo(sourceSet, destinationSet);
+				destination.addParameterSet(destinationSet);
+			}
+		}
 	}
 
 	/**

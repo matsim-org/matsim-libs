@@ -8,11 +8,11 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../matsim/src/test/resources/test/scenarios/berlin/network.xml.gz" />
+		<param name="inputNetworkFile" value="network.xml.gz" />
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../../matsim/src/test/resources/test/scenarios/berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
+		<param name="inputPlansFile" value="plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
 	</module>
 
 	<module name="controler">
@@ -62,6 +62,15 @@
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="bike"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="ride"/>
 			</parameterset>
 
 			<parameterset type="activityParams">

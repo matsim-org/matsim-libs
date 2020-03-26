@@ -28,7 +28,7 @@ class QNetsimEngineDepartureHandlerProvider implements Provider<VehicularDepartu
 	// yyyyyy should return an interface.  Otherwise one must inherit from the implementation, which we don't like! kai, may'18
 
 	@Inject
-	QNetsimEngine qNetsimEngine;
+	QNetsimEngineI qNetsimEngine;
 
 	@Override
 	public VehicularDepartureHandler get() {

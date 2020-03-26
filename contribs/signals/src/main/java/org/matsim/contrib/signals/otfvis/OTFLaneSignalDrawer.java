@@ -38,9 +38,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 
-public class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
-
-//	private static final Logger log = Logger.getLogger(OTFLaneSignalDrawer.class);
+final class OTFLaneSignalDrawer extends OTFGLAbstractDrawableReceiver {
 	
 	private static final int glListName = 2342;
 	

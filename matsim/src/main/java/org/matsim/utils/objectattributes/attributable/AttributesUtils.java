@@ -21,10 +21,6 @@
 
  package org.matsim.utils.objectattributes.attributable;
 
-import org.matsim.utils.objectattributes.AttributeConverter;
-
-import java.util.Map;
-
 /**
  * @author thibautd
  */
@@ -37,8 +33,8 @@ public class AttributesUtils {
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
 	 */
 	public static void copyTo( Attributes from , Attributes to ) {
-		for ( Map.Entry<String, Object> entry : from.getAsMap().entrySet() ) {
-			to.putAttribute( entry.getKey() , entry.getValue() );
+		for (var entry : from.getAsMap().entrySet()) {
+			to.putAttribute(entry.getKey(), entry.getValue());
 		}
 	}
 
@@ -51,9 +47,9 @@ public class AttributesUtils {
 	}
 
 	/**
-	 * @deprecated use {@link Attributes#isEmpty()} instead
 	 * @param attributes collection of attributes
 	 * @return <code>true</code> if the attributes collection does not contain any attribute
+	 * @deprecated use {@link Attributes#isEmpty()} instead
 	 */
 	@Deprecated
 	public static boolean isEmpty(Attributes attributes) {

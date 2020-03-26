@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * 
@@ -111,11 +110,11 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-        if (activity.getStartTime() != Time.UNDEFINED_TIME) {
-            startActivity(activity.getStartTime(), activity);
+		if (activity.getStartTime().isDefined()) {
+			startActivity(activity.getStartTime().seconds(), activity);
         }
-        if (activity.getEndTime() != Time.UNDEFINED_TIME) {
-            endActivity(activity.getEndTime(), activity);
+		if (activity.getEndTime().isDefined()) {
+			endActivity(activity.getEndTime().seconds(), activity);
         }
     }
 

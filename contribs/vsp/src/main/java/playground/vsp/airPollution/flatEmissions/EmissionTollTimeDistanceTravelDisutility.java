@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -96,10 +96,10 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
 
         if(hotspotLinks == null){
             // pricing applies for all links
-            linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
+            linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, linkTravelTime );
         } else {
             // pricing applies for the current link
-            if(hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, link.getLength(), linkTravelTime);
+            if(hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(emissionVehicle, link, linkTravelTime );
                 // pricing applies not for the current link
             else linkExpectedEmissionDisutility = 0.0;
         }
@@ -107,7 +107,7 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
 		return randomizedTimeDistanceDisutilityForLink + linkExpectedEmissionDisutility * logNormalRnd;
     }
 
-    private double calculateExpectedEmissionDisutility(Vehicle vehicle, Link link, double distance, double linkTravelTime) {
+    private double calculateExpectedEmissionDisutility( Vehicle vehicle, Link link, double linkTravelTime ) {
         double linkExpectedEmissionDisutility;
 
 		/* The following is an estimate of the warm emission costs that an agent (depending on her vehicle type and
@@ -115,16 +115,8 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-        WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionAnalysisModule();
-        Map<String, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-                vehicle,
-////                NetworkUtils.getType(((Link) link)),
-//                    EmissionUtils.getHbefaRoadType( link ),
-//                link.getFreespeed(),
-//                distance,
-                link,
-                linkTravelTime
-        );
+        Map<Pollutant, Double> expectedWarmEmissions = this.emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(
+                vehicle, link, linkTravelTime );
         double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
         linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;
 

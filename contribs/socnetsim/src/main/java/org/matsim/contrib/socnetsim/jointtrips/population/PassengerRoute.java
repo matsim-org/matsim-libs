@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class PassengerRoute implements Route {
 	private double distance = Double.NaN;
-	private double travelTime = Time.UNDEFINED_TIME;
+	private double travelTime = Time.getUndefinedTime();
 	private Id<Link> startLink = null;
 	private Id<Link> endLink = null;
 	private Id<Person> driver = null;

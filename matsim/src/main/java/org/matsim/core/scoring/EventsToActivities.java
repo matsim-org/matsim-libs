@@ -55,8 +55,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private IdMap<Person, Activity> activities = new IdMap<>(Person.class);
-    private List<ActivityHandler> activityHandlers = new ArrayList<>();
+    private final IdMap<Person, Activity> activities = new IdMap<>(Person.class);
+    private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
 
@@ -91,6 +91,12 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
+
+        activity.setCoord( event.getCoord() );
+        // (this is debatable. However, it seems to me that once an activity event "knows" where it is, there is no reason to pass that knowledge on into the
+        // activity.  ???  kai, feb'20)
+        //I find this very useful (jb)
+
         this.activities.put(event.getPersonId(), activity);
     }
 

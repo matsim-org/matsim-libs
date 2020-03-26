@@ -19,28 +19,26 @@
 
 package org.matsim.contrib.dynagent.run;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
- * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
- * called before that of ActivityEngine)
+ * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
-	// This is now _additive_ to the normal ActivityEngine!
+	public final static String COMPONENT_NAME = "DynActivityEngine";
 
 	private InternalInterface internalInterface;
 
@@ -82,8 +80,7 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return false ;
-			// (this means "I am not responsible").
+			return false; // (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();

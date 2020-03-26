@@ -31,8 +31,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.edrt.schedule.EDrtTask;
 import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.ev.dvrp.ETask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
 import org.matsim.contrib.ev.fleet.Battery;
@@ -91,7 +91,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 
 		List<? extends Task> tasks = schedule.getTasks();
 		for (int i = nextTaskIdx; i < tasks.size() - 1; i++) {
-			socBeforeNextTask -= ((EDrtTask)tasks.get(i)).getTotalEnergy();
+			socBeforeNextTask -= ((ETask)tasks.get(i)).getTotalEnergy();
 		}
 
 		if (socBeforeNextTask < minimumRelativeSoc * battery.getCapacity()) {

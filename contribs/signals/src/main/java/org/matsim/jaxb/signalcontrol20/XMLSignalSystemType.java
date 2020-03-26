@@ -37,12 +37,10 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "signalSystemType", propOrder = {
     "signalSystemController"
 })
-public class XMLSignalSystemType
-    extends XMLIdRefType
-{
+public final class XMLSignalSystemType extends XMLIdRefType {
 
     @XmlElement(required = true)
-    protected XMLSignalSystemControllerType signalSystemController;
+    private XMLSignalSystemControllerType signalSystemController;
 
     /**
      * Gets the value of the signalSystemController property.

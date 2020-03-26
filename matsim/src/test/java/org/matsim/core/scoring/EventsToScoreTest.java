@@ -53,7 +53,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore e2s = EventsToScore.createWithoutScoreUpdating(scenario, sfFactory, events);
 		e2s.beginIteration(0);
-		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
+		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4, "tollRefund", "motorwayOperator"));
 		e2s.finish();
 		assertEquals(3.4, e2s.getAgentScore(person.getId()));
 	}
@@ -84,7 +84,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			e2s.beginIteration(mockIteration); ;
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
-			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
+			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98, "bribe", "contractor" ));
 			
 			e2s.finish() ;
 			

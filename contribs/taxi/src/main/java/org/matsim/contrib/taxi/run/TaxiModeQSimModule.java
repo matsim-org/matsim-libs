@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
@@ -39,6 +40,7 @@ import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
@@ -89,8 +91,10 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+
+				ScheduleTimingUpdater scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
 				return new DefaultTaxiOptimizerProvider(events, taxiCfg, fleet, network, timer.get(), travelTime,
-						travelDisutility, taxiScheduler, getConfig().getContext()).get();
+						travelDisutility, taxiScheduler, scheduleTimingUpdater, getConfig().getContext()).get();
 			}
 		});
 
@@ -112,6 +116,10 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 						return new TaxiScheduler(taxiCfg, fleet, network, timer.get(), travelTime, travelDisutility);
 					}
 				}).in(IterationScoped.class);
+
+		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
+				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
+						new TaxiStayTaskEndTimeCalculator(taxiCfg)))).asEagerSingleton();
 
 		bindModal(DynActionCreator.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiActionCreator>(taxiCfg.getMode()) {

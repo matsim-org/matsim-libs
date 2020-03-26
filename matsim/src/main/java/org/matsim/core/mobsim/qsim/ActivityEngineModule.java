@@ -29,6 +29,6 @@ public class ActivityEngineModule extends AbstractQSimModule {
 	@Override
 	protected void configureQSim() {
 		bind( ActivityEngineDefaultImpl.class ).in(IterationScoped.class);
-		addNamedComponent( ActivityEngineDefaultImpl.class, COMPONENT_NAME );
+		addQSimComponentBinding( COMPONENT_NAME ).to( ActivityEngineDefaultImpl.class );
 	}
 }

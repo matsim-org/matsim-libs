@@ -32,7 +32,11 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 	
 	@Override
 	protected void configureQSim() {
-		bind(QNetsimEngine.class).in(IterationScoped.class);
+		if(this.getConfig().qsim().isUsingThreadpool()) {
+			bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).in(IterationScoped.class);
+		}else {
+			bind(QNetsimEngineI.class).to(QNetsimEngineWithBarriers.class).asEagerSingleton();
+		}
 		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in(IterationScoped.class);
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
@@ -42,6 +46,6 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 		}
 		
 		addNamedComponent(VehicularDepartureHandler.class, COMPONENT_NAME);
-		addNamedComponent(QNetsimEngine.class, COMPONENT_NAME);
+		addNamedComponent(QNetsimEngineI.class, COMPONENT_NAME);
 	}
 }

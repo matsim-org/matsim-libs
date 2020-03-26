@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -43,6 +42,7 @@ import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public final class ParkingChoiceSimulation
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
@@ -129,8 +129,8 @@ public final class ParkingChoiceSimulation
 						firstDepartureTimeOfDay.get(personId));
 			} else {
 				Activity activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
-				
-				double endTime=activityBeforeNextCarLeg.getEndTime();
+
+				double endTime= activityBeforeNextCarLeg.getEndTime().seconds();
 				double parkingDuration=0;
 				
 				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
@@ -141,7 +141,7 @@ public final class ParkingChoiceSimulation
 					
 					for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
 						if (planElements.get(i) instanceof Activity) {
-							parkingDuration+= ((Activity) planElements.get(i)).getMaximumDuration();
+							parkingDuration+= ((Activity)planElements.get(i)).getMaximumDuration().seconds();
 						}
 						
 						if (planElements.get(i) == activityBeforeNextCarLeg) {
@@ -201,13 +201,13 @@ public final class ParkingChoiceSimulation
 				parkingAttributes.facilityId = firstActivityAfterLastCarLegOfDay.getFacilityId();
 				parkingAttributes.actType = firstActivityAfterLastCarLegOfDay.getType();
 
-				double startTime = firstActivityAfterLastCarLegOfDay.getStartTime();
-				if (startTime == Double.NEGATIVE_INFINITY || startTime == Double.POSITIVE_INFINITY) {
+				OptionalTime startTime = firstActivityAfterLastCarLegOfDay.getStartTime();
+				if (startTime.isUndefined() || startTime.seconds() == Double.POSITIVE_INFINITY) {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				} else {
-					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime,
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime.seconds(),
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				}
 				parkingAttributes.legIndex = 0;
 

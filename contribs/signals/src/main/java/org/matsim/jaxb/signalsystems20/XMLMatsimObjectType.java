@@ -42,10 +42,10 @@ import javax.xml.bind.annotation.XmlType;
     XMLSignalSystemType.class,
     XMLSignalType.class
 })
-public class XMLMatsimObjectType {
+class XMLMatsimObjectType {
 
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
 
     /**
      * Gets the value of the id property.

@@ -27,8 +27,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.IdleDynActivity;
+import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -113,7 +122,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Activity act = (Activity) currentPlanElement;
 		//TODO: assume something different regarding initial parking location
 
-		return new IdleDynActivity(act.getType(), act.getEndTime());
+		return new IdleDynActivity(act.getType(), act.getEndTime().seconds());
 	}
 
 	@Override
@@ -209,11 +218,17 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
-		double endTime =nextPlannedActivity.getEndTime() ; 
-		if (endTime == Time.UNDEFINED_TIME){
-			endTime = Double.POSITIVE_INFINITY;
+		final double endTime;
+		if (nextPlannedActivity.getEndTime().isUndefined()) {
+			if (nextPlannedActivity.getMaximumDuration().isUndefined()) {
+                endTime = Double.POSITIVE_INFINITY;
+                //last activity of a day
+            } else {
+				endTime = now + nextPlannedActivity.getMaximumDuration().seconds();
+            }
+		} else {
+			endTime = nextPlannedActivity.getEndTime().seconds();
 		}
-
 		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
 	}
