@@ -22,7 +22,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 
-public class TestNetworkBasedTransportCosts extends MatsimTestCase{
+public class NetworkBasedTransportCostsTest extends MatsimTestCase{
 
 
 	@Test
@@ -55,7 +55,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		
 		assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
 		assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
-
+		assertEquals(20000.0, c.getTransportDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		assertEquals(20000.0, c.getTransportDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 	}
 	
 	@Test
@@ -146,7 +147,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		
 		assertEquals(20000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
 		assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
-
+		assertEquals(20000.0, networkBasedTransportCosts.getTransportDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		assertEquals(20000.0, networkBasedTransportCosts.getTransportDistance(Location.newInstance("6"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 	}
 
 }

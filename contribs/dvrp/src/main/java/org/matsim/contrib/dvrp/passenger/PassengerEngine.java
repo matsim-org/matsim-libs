@@ -301,9 +301,9 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.empty());
 		} else {
 			//not much else can be done for immediate requests
-			PassengerRequest request = requestEntry.request;
-			eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), request.getPassengerId(),
-					request.getFromLink().getId(), request.getMode()));
+			//set the passenger agent to abort - the event will be thrown by the QSim
+			requestEntry.passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+			internalInterface.arrangeNextAgentState(requestEntry.passenger);
 		}
 	}
 
