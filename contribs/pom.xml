@@ -96,9 +96,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<linksource>true</linksource>
-					<additionalparam>-Xdoclint:none</additionalparam>
+					<doclint>none</doclint>
 				</configuration>
 			</plugin>
 		</plugins>
