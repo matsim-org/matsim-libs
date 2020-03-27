@@ -313,7 +313,8 @@ import org.xml.sax.Attributes;
 			mode = "undefined";
 		}
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
 		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
