@@ -37,7 +37,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -147,8 +147,8 @@ public class TripsAndLegsCSVWriter {
                     currentModeWithLongestShare = leg.getMode();
 
                 }
-                if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-                    ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+                if (leg.getRoute() instanceof TransitPassengerRoute) {
+                    TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
                     firstPtBoardingStop = firstPtBoardingStop != null ? firstPtBoardingStop : route.getAccessStopId().toString();
                     lastPtEgressStop = route.getEgressStopId().toString();
                 }
@@ -229,8 +229,8 @@ public class TripsAndLegsCSVWriter {
         String transitRoute = "";
         String ptAccessStop = "";
         String ptEgressStop = "";
-        if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-            ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+        if (leg.getRoute() instanceof TransitPassengerRoute) {
+            TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
             transitLine = route.getLineId().toString();
             transitRoute = route.getRouteId().toString();
             ptAccessStop = route.getAccessStopId().toString();

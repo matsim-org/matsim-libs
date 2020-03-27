@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -155,7 +155,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = (((Leg)planElement).getRoute());
-						ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
@@ -180,7 +180,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = ((Leg)planElement).getRoute();
-						ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
