@@ -24,24 +24,38 @@ package org.matsim.withinday.controller;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExampleWithinDayControllerTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testRun() {
-        Config config = utils.loadConfig("test/scenarios/equil/config.xml");
-        config.controler().setLastIteration(1);
-        config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
-        Controler controler = new Controler(config);
-        ExampleWithinDayController.configure(controler);
-        controler.run();
-    }
+	@Test
+	public void testRun() {
+		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setLastIteration(1);
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//plans are missing departure times, so clear all routes to re-route all legs and provide some departure times
+		scenario.getPopulation()
+				.getPersons()
+				.values()
+				.stream()
+				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
+				.filter(Leg.class::isInstance)
+				.forEach(planElement -> ((Leg)planElement).setRoute(null));
+
+		final Controler controler = new Controler(scenario);
+		ExampleWithinDayController.configure(controler);
+		controler.run();
+	}
 
 }
