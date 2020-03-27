@@ -198,13 +198,18 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getDepartureTime() {
-			return this.delegate.getDepartureTime() ;
+		public OptionalTime getOptionalDepartureTime() {
+			return this.delegate.getOptionalDepartureTime() ;
 		}
 
 		@Override
 		public void setDepartureTime(double seconds) {
 			throw new UnsupportedOperationException() ;
+		}
+
+		@Override
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
@@ -981,7 +986,7 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.getUndefinedTime());
+				next_leg.setDepartureTimeUndefined();
 				next_leg.setTravelTime(Time.getUndefinedTime());
 				next_leg.setRoute(null);
 			}
@@ -1011,7 +1016,7 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.getUndefinedTime());
+				prev_leg.setDepartureTimeUndefined();
 				prev_leg.setTravelTime(Time.getUndefinedTime());
 				prev_leg.setRoute(null);
 

@@ -65,7 +65,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	
 	// Leg related arrays
 	/*package*/ Route[] routes;
-	/*package*/ double[] depTimes;
+	/*package*/ OptionalTime[] depTimes;
 	/*package*/ double[] arrTimes;
 	/*package*/ double[] travTimes;
 	/*package*/ String[] modes;
@@ -176,7 +176,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				
 //		destPlan.legs = new LCLeg[legCount];
 		destPlan.routes = new Route[legCount];
-		destPlan.depTimes = new double[legCount];
+		destPlan.depTimes = new OptionalTime[legCount];
 		destPlan.arrTimes = new double[legCount];
 		destPlan.travTimes = new double[legCount];
 		destPlan.modes = new String[legCount];
@@ -201,7 +201,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				Leg leg = (Leg) planElement;
 				destPlan.planElements.add(new LCLeg(destPlan, legCount, planElementCount));
 				destPlan.routes[legCount] = leg.getRoute();
-				destPlan.depTimes[legCount] = leg.getDepartureTime();
+				destPlan.depTimes[legCount] = leg.getOptionalDepartureTime();
 				Leg r = ((Leg) leg);
 				destPlan.arrTimes[legCount] = r.getDepartureTime() + r.getTravelTime();
 				destPlan.travTimes[legCount] = leg.getTravelTime();
@@ -248,7 +248,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		// leg data
 		int legs = srcPlan.routes.length;
 		destPlan.routes = new Route[legs];
-		destPlan.depTimes = new double[legs];
+		destPlan.depTimes = new OptionalTime[legs];
 		destPlan.arrTimes = new double[legs];
 		destPlan.travTimes = new double[legs];
 		destPlan.modes = new String[legs];

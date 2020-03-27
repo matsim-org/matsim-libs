@@ -20,6 +20,7 @@
 
 package org.matsim.api.core.v01.population;
 
+import org.matsim.core.utils.misc.OptionalTime;
 
 public interface Leg extends PlanElement {
 
@@ -35,9 +36,15 @@ public interface Leg extends PlanElement {
 
     public void setRoute(Route route);
 
-    public double getDepartureTime();
+    public default double getDepartureTime() {
+        return getOptionalDepartureTime().seconds();
+    }
+
+    public OptionalTime getOptionalDepartureTime();
 
     public void setDepartureTime(final double seconds);
+
+    public void setDepartureTimeUndefined();
 
     /**
      * Design thoughts:<ul>

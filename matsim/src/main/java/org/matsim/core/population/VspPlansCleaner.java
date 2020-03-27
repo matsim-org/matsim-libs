@@ -84,7 +84,7 @@ import com.google.inject.Inject;
 				} else if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
 					if (plansConfigGroup.isRemovingUnneccessaryPlanAttributes()) {
-//						leg.setDepartureTime(Time.getUndefinedTime()) ;
+//						leg.setDepartureTimeUndefined() ;
 						//this information is not unneccesary, but may be used, e.g., by DRTRoutes and others.
 						if ( leg.getRoute()!=null ) {
 							leg.setTravelTime( Time.getUndefinedTime());

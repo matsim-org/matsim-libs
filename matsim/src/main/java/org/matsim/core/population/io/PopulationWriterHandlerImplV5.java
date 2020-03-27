@@ -209,7 +209,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(encodeAttributeValue(leg.getMode()));
 		out.write("\"");
-		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
+		if (leg.getOptionalDepartureTime().isDefined()) {
 			out.write(" dep_time=\"");
 			out.write(Time.writeTime(leg.getDepartureTime()));
 			out.write("\"");

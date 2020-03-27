@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -30,7 +31,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private Route route = null;
 
-	private double depTime = Time.getUndefinedTime();
+	private OptionalTime depTime = OptionalTime.undefined();
 	private double travTime = Time.getUndefinedTime();
 	private String mode;
 
@@ -54,13 +55,18 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final double getDepartureTime() {
+	public final OptionalTime getOptionalDepartureTime() {
 		return this.depTime;
 	}
 
 	@Override
 	public final void setDepartureTime(final double depTime) {
-		this.depTime = depTime;
+		this.depTime = OptionalTime.defined(depTime);
+	}
+
+	@Override
+	public void setDepartureTimeUndefined() {
+		this.depTime = OptionalTime.undefined();
 	}
 
 	@Override

@@ -149,7 +149,7 @@ public class PlanGenome implements Plan {
             } else {
                 // remove an in-between act
                 Leg prev_leg = (Leg) getPlanElements().get(index - 1); // prev leg;
-                prev_leg.setDepartureTime(Time.getUndefinedTime());
+                prev_leg.setDepartureTimeUndefined();
                 prev_leg.setTravelTime(Time.getUndefinedTime());
                 prev_leg.setRoute(null);
 
@@ -176,7 +176,7 @@ public class PlanGenome implements Plan {
             if (index != getPlanElements().size() - 2) {
                 // not the last leg
                 Leg next_leg = (Leg) getPlanElements().get(index + 2);
-                next_leg.setDepartureTime(Time.getUndefinedTime());
+                next_leg.setDepartureTimeUndefined();
                 next_leg.setTravelTime(Time.getUndefinedTime());
                 next_leg.setRoute(null);
             }

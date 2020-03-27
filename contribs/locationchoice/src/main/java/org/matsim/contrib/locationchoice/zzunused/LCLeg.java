@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -60,13 +61,18 @@ class LCLeg implements Leg, LCPlanElement {
 	}
 
 	@Override
-	public final double getDepartureTime() {
+	public final OptionalTime getOptionalDepartureTime() {
 		return this.plan.depTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setDepartureTime(double seconds) {
-		this.plan.depTimes[this.arrayIndex] = seconds;
+		this.plan.depTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+	}
+
+	@Override
+	public void setDepartureTimeUndefined() {
+		this.plan.depTimes[this.arrayIndex] = OptionalTime.undefined();
 	}
 
 	@Override
