@@ -20,10 +20,8 @@
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerDataImpl;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -33,7 +31,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class SignalControlDataFactoryImpl implements SignalControlDataFactory {
+public final class SignalControlDataFactoryImpl implements SignalControlDataFactory {
 
 	@Override
 	public SignalGroupSettingsData createSignalGroupSettingsData(Id<SignalGroup> signalGroupId) {

@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -38,7 +36,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -229,9 +226,11 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                         plan.addLeg(leg);
                         if (lastTourElementActivity != null) {
                             lastTourElementActivity.setEndTime(tourLeg.getExpectedDepartureTime());
-                            if (Time.isUndefinedTime(startActivity.getEndTime())) {
-                                startActivity.setEndTime(lastTourElementActivity.getEndTime() - lastTourElementActivity.getMaximumDuration() - lastTourLeg.getTravelTime() * firsttourTraveltimeBuffer);
-                                lastTourElementActivity.setMaximumDuration(Time.getUndefinedTime());
+                            if (startActivity.getEndTime().isUndefined()) {
+                                startActivity.setEndTime(lastTourElementActivity.getEndTime().seconds()
+										- lastTourElementActivity.getMaximumDuration().seconds()
+                                        - lastTourLeg.getTravelTime() * firsttourTraveltimeBuffer);
+                                lastTourElementActivity.setMaximumDurationUndefined();
                             }
                         }
                         lastTourLeg = leg;
@@ -269,7 +268,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                 if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
                     scenario.getVehicles().addVehicleType(carrierVehicle.getType());
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-                VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,CarrierUtils.getCarrierMode(carrier),vid);
+                VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());

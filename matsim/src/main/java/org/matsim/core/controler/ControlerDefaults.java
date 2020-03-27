@@ -38,18 +38,27 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
  * @author nagel
  *
  */
+/**
+ * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
+ */
 public final class ControlerDefaults {
 	
 	private ControlerDefaults(){} // should not be instantiated
 
+	/**
+	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
+	 */
 	public static ScoringFunctionFactory createDefaultScoringFunctionFactory(Scenario scenario) {
 		return new CharyparNagelScoringFunctionFactory( scenario );
 	}
 
+	/**
+	 * @deprecated -- this pre-dates guice injection; one should rather use guice and {@link ControlerDefaultsModule}.  kai, mar'20
+	 */
 	public static TravelDisutilityFactory createDefaultTravelDisutilityFactory(Scenario scenario) {
-		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig().planCalcScore() );
-		builder.setSigma(0.); // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
-		return builder;
+		final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, scenario.getConfig() );
+                // tendency to set this to 3. right away (i.e. through PlansCalcRouteConfigGroup default). kai/bk, mar'15
+                return builder;
 	}
 
 }

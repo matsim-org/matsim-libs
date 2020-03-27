@@ -27,7 +27,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class AmberTimesDataFactoryImpl implements AmberTimesDataFactory {
+final class AmberTimesDataFactoryImpl implements AmberTimesDataFactory {
 
 	@Override
 	public AmberTimeData createAmberTimeData(Id<SignalSystem> signalSystemId) {

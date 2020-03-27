@@ -49,10 +49,8 @@ public final class CongestionTollTimeDistanceTravelDisutilityFactory implements 
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		
-		timeDistanceTravelDisutilityFactory.setSigma(sigma);
-		
-		return new CongestionTollTimeDistanceTravelDisutility(
+
+                return new CongestionTollTimeDistanceTravelDisutility(
 				timeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.tollHandler,
 				cnScoringGroup.getMarginalUtilityOfMoney(),

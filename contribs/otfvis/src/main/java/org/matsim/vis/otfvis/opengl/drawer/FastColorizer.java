@@ -14,8 +14,12 @@ public class FastColorizer {
 		this(ds, colors, 1000);
 	}
 
-	private FastColorizer(double[] ds, Color[] colors, int grain) {
-		ValueColorizer helper = new ValueColorizer(ds,colors);
+	public FastColorizer(double[] ds, Color[] colors, int grain ){
+		this(ds,colors,grain,255);
+	}
+
+	public FastColorizer(double[] ds, Color[] colors, int grain, int alpha ){
+		ValueColorizer helper = new ValueColorizer(ds,colors,alpha);
 		this.grain = grain;
 		this.fastValues = new Color[grain];
 		this.minVal = ds[0];

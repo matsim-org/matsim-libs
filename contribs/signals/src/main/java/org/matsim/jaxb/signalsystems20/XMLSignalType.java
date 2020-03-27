@@ -60,14 +60,12 @@ import javax.xml.bind.annotation.XmlType;
     "lane",
     "turningMoveRestrictions"
 })
-public class XMLSignalType
-    extends XMLMatsimObjectType
-{
+public final class XMLSignalType extends XMLMatsimObjectType {
 
-    protected List<XMLSignalType.XMLLane> lane;
-    protected XMLSignalType.XMLTurningMoveRestrictions turningMoveRestrictions;
+    private List<XMLSignalType.XMLLane> lane;
+    private XMLSignalType.XMLTurningMoveRestrictions turningMoveRestrictions;
     @XmlAttribute(required = true)
-    protected String linkIdRef;
+    private String linkIdRef;
 
     /**
      * Gets the value of the lane property.

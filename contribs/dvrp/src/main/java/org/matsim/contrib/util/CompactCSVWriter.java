@@ -19,11 +19,11 @@
 
 package org.matsim.contrib.util;
 
-import java.io.*;
-
+import com.opencsv.CSVWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import com.opencsv.CSVWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 public class CompactCSVWriter extends CSVWriter {
 	public static final String[] EMPTY_LINE = {};
@@ -34,7 +34,7 @@ public class CompactCSVWriter extends CSVWriter {
 	}
 
 	public CompactCSVWriter(Writer writer, char separator) {
-		super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
+		super(writer, separator, CSVWriter.NO_QUOTE_CHARACTER, '"', "\n");
 	}
 
 	@Override

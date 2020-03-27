@@ -27,12 +27,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
@@ -66,6 +62,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
+    private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
@@ -90,6 +87,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
+	private int writeTripsInterval = 10;
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
@@ -111,12 +109,15 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");
+        map.put(WRITE_TRIPS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations trips CSV are written " +
+                "to a file. `0' disables trips writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
-				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
+                "written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false. If enabled, the router takes travel times needed for turning moves into account."
 		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
-		map.put(FIRST_ITERATION, "Default=0; The first iteration number to be executed.");
-		map.put(LAST_ITERATION, "Default=1000; The last iteration number to be executed");
+        map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
+        map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
+
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
@@ -194,6 +195,16 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		return this.runId;
 	}
 
+    @StringGetter(WRITE_TRIPS_INTERVAL)
+    public int getWriteTripsInterval() {
+        return writeTripsInterval;
+    }
+
+    @StringSetter(WRITE_TRIPS_INTERVAL)
+    public void setWriteTripsInterval(int writeTripsInterval) {
+        this.writeTripsInterval = writeTripsInterval;
+    }
+
 	@StringSetter( RUNID )
 	public void setRunId(final String runid) {
 		if (runid == null) {
@@ -217,6 +228,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setLinkToLinkRoutingEnabled(final boolean enabled) {
 		this.linkToLinkRoutingEnabled = enabled;
 	}
+
 
     @StringGetter( EVENTS_FILE_FORMAT )
 	private String getEventsFileFormatAsString() {

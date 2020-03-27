@@ -47,12 +47,12 @@ import javax.xml.bind.annotation.XmlType;
     "xCoord",
     "yCoord"
 })
-public class XMLCoordinateType {
+final class XMLCoordinateType {
 
     @XmlElement(required = true)
-    protected BigDecimal xCoord;
+    private BigDecimal xCoord;
     @XmlElement(required = true)
-    protected BigDecimal yCoord;
+    private BigDecimal yCoord;
 
     /**
      * Gets the value of the xCoord property.

@@ -24,9 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -43,7 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -51,6 +48,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Save waiting times of agents while mobsim is running
@@ -93,17 +93,17 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
 							endTime-=24*3600;
-						cacheWaitTimes[i] = Time.UNDEFINED_TIME;
+						cacheWaitTimes[i] = Time.getUndefinedTime();
 						SORTED_DEPARTURES:
 						for(double departure:sortedDepartures) {
-							double arrivalTime = departure+(stop.getArrivalOffset()!=Time.UNDEFINED_TIME?stop.getArrivalOffset():stop.getDepartureOffset()); 
+							double arrivalTime = departure+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset());
 							if(arrivalTime>=endTime) {
 								cacheWaitTimes[i] = arrivalTime-endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
-						if(cacheWaitTimes[i]==Time.UNDEFINED_TIME)
-							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(stop.getArrivalOffset()!=Time.UNDEFINED_TIME?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
+						if(Time.isUndefinedTime(cacheWaitTimes[i]))
+							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}
@@ -155,7 +155,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = (((Leg)planElement).getRoute());
-						ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
@@ -180,7 +180,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = ((Leg)planElement).getRoute();
-						ExperimentalTransitRoute eRoute = (ExperimentalTransitRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());

@@ -20,16 +20,18 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Level;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Configuration;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
-import org.matsim.core.utils.io.IOUtils;
-
-import java.io.IOException;
 
 /**
  * 
@@ -70,16 +72,23 @@ public final class OutputDirectoryLogging {
 		}
 
 		collectLogMessagesAppender = new CollectLogMessagesAppender();
-		Logger.getRootLogger().addAppender(collectLogMessagesAppender);
+		collectLogMessagesAppender.start();
+		{
+			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+			ctx.getConfiguration().getRootLogger().addAppender(collectLogMessagesAppender, Level.ALL, null);
+			ctx.updateLoggers();
+		}
 	}
 
 	/**
 	 * Initializes log4j to write log output to files in output directory.
-	 * @param outputDirectoryHierarchy TODO
+	 * @param outputDirectoryHierarchy
 	 */
 	public final static void initLogging(OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		if (collectLogMessagesAppender != null) {
-			Logger.getRootLogger().removeAppender(collectLogMessagesAppender);
+			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
+			ctx.updateLoggers();
 		}
 		try {
 			String outputFilename = outputDirectoryHierarchy.getOutputFilename(LOGFILE);
@@ -99,12 +108,14 @@ public final class OutputDirectoryLogging {
 	 *
 	 * @param outputDirectory the outputdirectory to create the files, whithout seperator at the end.
 	 * @throws IOException
-	 * @see IOUtils#closeOutputDirLogging()
+	 * @see OutputDirectoryLogging#closeOutputDirLogging()
 	 * @author dgrether
 	 */
 	public static void initLoggingWithOutputDirectory(final String outputDirectory) throws IOException {
 		if (collectLogMessagesAppender != null) {
-			Logger.getRootLogger().removeAppender(collectLogMessagesAppender);
+			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+			ctx.getConfiguration().getRootLogger().removeAppender(collectLogMessagesAppender.getName());
+			ctx.updateLoggers();
 		}
 		String logfilename = outputDirectory + System.getProperty("file.separator") + LOGFILE;
 		String warnlogfilename = outputDirectory + System.getProperty("file.separator") + WARNLOGFILE;
@@ -112,23 +123,36 @@ public final class OutputDirectoryLogging {
 	}
 
 	private static void initLogging(String outputFilename, String warnLogfileName) throws IOException {
-		Logger root = Logger.getRootLogger();
-		final boolean appendToExistingFile = false; 
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputFilename, appendToExistingFile);
-		appender.setName(LOGFILE);
-		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, warnLogfileName, appendToExistingFile);
-		warnErrorAppender.setName(WARNLOGFILE);
-		warnErrorAppender.setThreshold(Level.WARN);
-		root.addAppender(warnErrorAppender);
+		// code inspired from http://logging.apache.org/log4j/2.x/manual/customconfig.html#AddingToCurrent
+
+		final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		final Configuration config = ctx.getConfiguration();
+		final boolean appendToExistingFile = false;
+
+		FileAppender appender;
+		{ // the "all" logfile
+			appender = FileAppender.newBuilder().setName(LOGFILE).setLayout(Controler.DEFAULTLOG4JLAYOUT).withFileName(outputFilename).withAppend(appendToExistingFile).build();
+			appender.start();
+			config.getRootLogger().addAppender(appender, Level.ALL, null);
+		}
+
+		FileAppender warnErrorAppender;
+		{ // the "warnings and errors" logfile
+			warnErrorAppender = FileAppender.newBuilder().setName(WARNLOGFILE).setLayout(Controler.DEFAULTLOG4JLAYOUT).withFileName(warnLogfileName).withAppend(appendToExistingFile).build();
+			warnErrorAppender.start();
+			config.getRootLogger().addAppender(warnErrorAppender, Level.WARN, null);
+		}
+
+		ctx.updateLoggers();
+
 		if (collectLogMessagesAppender != null) {
-			for (LoggingEvent e : collectLogMessagesAppender.getLogEvents()) {
+			for (LogEvent e : collectLogMessagesAppender.getLogEvents()) {
 				appender.append(e);
-				if (e.getLevel().isGreaterOrEqual(Level.WARN)) {
+				if (e.getLevel().isMoreSpecificThan(Level.WARN)) {
 					warnErrorAppender.append(e);
 				}
 			}
-			collectLogMessagesAppender.close();
+			collectLogMessagesAppender.stop();
 			collectLogMessagesAppender = null;
 		}
 		Gbl.printSystemInfo();
@@ -138,23 +162,24 @@ public final class OutputDirectoryLogging {
 	/**
 	 * Call this method to close the log file streams opened by a call of initOutputDirLogging().
 	 * This avoids problems concerning open streams after the termination of the program.
-	 * @see IOUtils#initLoggingWithOutputDirectory(String)
+	 * @see OutputDirectoryLogging#initLoggingWithOutputDirectory(String)
 	 */
 	public static void closeOutputDirLogging() {
 		//might also be sent to the warn logstream but then you end up with a warning even if everything is alright
 		String endLoggingInfo = "closing the logfile, i.e. messages sent to the logger after this message are not written to the logfile.";
 		log.info(endLoggingInfo);
-		Logger root = Logger.getRootLogger();
-		Appender app = root.getAppender(LOGFILE);
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		org.apache.logging.log4j.core.Logger root = LoggerContext.getContext(false).getRootLogger();
+		Appender app = root.getAppenders().get(LOGFILE);
 		if (app != null) {
 			root.removeAppender(app);
-			app.close();
+			app.stop();
 		}
-		app = root.getAppender(WARNLOGFILE);
+		app = root.getAppenders().get(WARNLOGFILE);
 		if (app != null) {
 			root.removeAppender(app);
-			app.close();
+			app.stop();
 		}
+		ctx.updateLoggers();
 	}
-
 }

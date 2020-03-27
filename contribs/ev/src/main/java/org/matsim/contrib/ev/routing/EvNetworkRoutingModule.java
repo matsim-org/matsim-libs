@@ -52,7 +52,6 @@ import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
 /**
@@ -75,7 +74,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final TravelTime travelTime;
 	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
-	private final String stageActivityType;
+	private final String stageActivityModePrefix;
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
 
@@ -93,7 +92,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		this.chargingInfrastructureSpecification = chargingInfrastructureSpecification;
 		this.driveConsumptionFactory = driveConsumptionFactory;
 		this.auxConsumptionFactory = auxConsumptionFactory;
-		stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+		stageActivityModePrefix = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
 		this.evConfigGroup = evConfigGroup;
 		this.vehicleSuffix = mode.equals(TransportMode.car) ? "" : "_" + mode;
 	}
@@ -152,12 +151,12 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					Leg lastLeg = (Leg)routeSegment.get(0);
 					lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
 					stagedRoute.add(lastLeg);
-					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
-							selectedChargerLink.getCoord(), selectedChargerLink.getId());
+					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
+							selectedChargerLink.getId(), stageActivityModePrefix);
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
-					lastArrivaltime += chargeAct.getMaximumDuration();
+					lastArrivaltime += chargeAct.getMaximumDuration().seconds();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
 				}

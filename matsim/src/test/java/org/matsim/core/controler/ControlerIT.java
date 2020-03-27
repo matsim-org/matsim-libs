@@ -932,11 +932,12 @@ public class ControlerIT {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 

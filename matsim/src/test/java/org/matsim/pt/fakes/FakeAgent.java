@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -67,10 +67,14 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 		this.exitStop = exitStop;
 		this.dummyLeg = PopulationUtils.createLeg(TransportMode.pt);
 		if ((enterStop != null) && (exitStop != null)) {
-			Route route = new ExperimentalTransitRoute(enterStop, null, null, exitStop);
+			Route route = new DefaultTransitPassengerRoute(enterStop, null, null, exitStop);
 			route.setStartLinkId(enterStop.getLinkId());
 			route.setEndLinkId(exitStop.getLinkId());
-			route.setRouteDescription("PT1 " + enterStop.getId().toString() + " T1 " + exitStop.getId().toString());
+			route.setRouteDescription("{" + 
+					"\"accessFacilityId\":\"" + enterStop.getId().toString() + "\"," +
+					"\"egressFacilityId\":\"" + exitStop.getId().toString() + "\"," + 
+					"\"transitLineId\":\"T1\"" +
+			"}");
 			this.dummyLeg.setRoute(route);
 		}
 	}

@@ -77,6 +77,8 @@ public class DrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
+		drtCfg.setMaxTravelTimeAlpha(1.5);
+		drtCfg.setMaxTravelTimeBeta(5 * 60);
 
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
 				.getFacilities()

@@ -30,11 +30,8 @@ import javax.xml.validation.SchemaFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalsystems20.XMLIdRefType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
@@ -51,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalSystemsReader20 extends AbstractSignalsReader {
+public final class SignalSystemsReader20 extends AbstractSignalsReader {
 
 	private SignalSystemsData signalSystemsData;
 

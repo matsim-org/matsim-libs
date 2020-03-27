@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.model.Signal;
@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * @author dgrether, tthunig
  */
-public class SignalSystemsDataConsistencyChecker {
+public final class SignalSystemsDataConsistencyChecker {
 
 	
 	private static final Logger log = Logger.getLogger(SignalSystemsDataConsistencyChecker.class);

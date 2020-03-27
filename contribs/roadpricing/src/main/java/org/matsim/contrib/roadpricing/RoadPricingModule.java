@@ -55,7 +55,7 @@ public final class RoadPricingModule extends AbstractModule {
 //		 call. kai, oct'19
 		// done.  kai, oct'19
 		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-		addTravelDisutilityFactoryBinding( CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
+		addTravelDisutilityFactoryBinding( CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()));
 		addRoutingModuleBinding( CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting());
 		
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try

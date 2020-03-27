@@ -23,7 +23,6 @@
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.utils.objectattributes.DoubleArrayConverter;
 
 /**
  * @author jbischoff

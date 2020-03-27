@@ -19,9 +19,19 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -79,7 +89,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				}
 				final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
 				if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-					passengerPosition.setAgentState( AgentState.PERSON_OTHER_MODE );
+					passengerPosition.setAgentState( AgentState.MARKER );
 				}
 				positions.add(passengerPosition);
 				first = false;
@@ -96,7 +106,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			final Person person = scenario.getPopulation().getPersons().get( pa.getId() );
 			if ( person != null ) {
 				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
-					agInfo.setAgentState( AgentState.PERSON_OTHER_MODE );
+					agInfo.setAgentState( AgentState.MARKER );
 				}
 			}
 
@@ -160,12 +170,12 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 		if ( driverAgent instanceof HasPerson ){
 			if( PopulationUtils.getPersonAttribute( ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker ) != null ){
-				pos.setAgentState( AgentState.PERSON_OTHER_MODE );
+				pos.setAgentState( AgentState.MARKER );
 			}
 		}
 		final Person person = scenario.getPopulation().getPersons().get( driverAgent.getId() );
 		if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-			pos.setAgentState( AgentState.PERSON_OTHER_MODE );
+			pos.setAgentState( AgentState.MARKER );
 		}
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 

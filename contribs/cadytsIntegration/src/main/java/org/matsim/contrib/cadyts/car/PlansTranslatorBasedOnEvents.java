@@ -45,9 +45,10 @@ import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
+public final class PlansTranslatorBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler,
 VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	// could be/remain public as long as constructor is package-private. kai, feb'20
+	// used from outside, e.g. vsp-playgrounds
 	
 	private static final Logger log = Logger.getLogger(PlansTranslatorBasedOnEvents.class);
 

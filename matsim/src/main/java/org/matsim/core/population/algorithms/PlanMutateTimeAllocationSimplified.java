@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -70,12 +69,12 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		for ( Activity act : TripStructureUtils.getActivities( plan , stageActivityHandling ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-			if ( !Time.isUndefinedTime( act.getEndTime() ) ) {
-				act.setEndTime(mutateTime(act.getEndTime()));
+			if (act.getEndTime().isDefined()) {
+				act.setEndTime(mutateTime(act.getEndTime().seconds()));
 			}
 			if ( affectingDuration ) {
-				if ( !Time.isUndefinedTime( act.getMaximumDuration() ) ) {
-					act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
+				if ( act.getMaximumDuration().isDefined()) {
+					act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
 				}
 			}
 		}
