@@ -141,7 +141,7 @@ public class RelocationAgent implements MobsimDriverAgent {
 	protected void endLeg() {
 		try {
 			Leg leg = (Leg) this.getCurrentPlanElement();
-			leg.setTravelTime(this.getTimeOfDay() - leg.getDepartureTime());
+			leg.setTravelTime(this.getTimeOfDay() - leg.getDepartureTime().seconds());
 		} catch (Exception e) {
 			// do nothing
 		}

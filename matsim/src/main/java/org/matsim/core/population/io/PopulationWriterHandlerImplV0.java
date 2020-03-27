@@ -162,8 +162,8 @@ import org.matsim.core.utils.misc.Time;
 	public void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg");
 		out.write(" mode=\"" + leg.getMode() + "\"");
-		if (leg.getDepartureTime() != Integer.MIN_VALUE)
-			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime()) + "\"");
+		if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
+			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime().seconds()) + "\"");
 		if (leg.getTravelTime() != Integer.MIN_VALUE)
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
 //		if (leg instanceof LegImpl){

@@ -139,7 +139,7 @@ public class TripsAndLegsCSVWriter {
                 distance += legDist;
                 Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
                 if (boardingTime != null) {
-                    double waitingTime = boardingTime - leg.getDepartureTime();
+					double waitingTime = boardingTime - leg.getDepartureTime().seconds();
                     totalWaitingTime += waitingTime;
                 }
                 if (legDist > currentLongestShareDistance) {
@@ -207,12 +207,12 @@ public class TripsAndLegsCSVWriter {
         List<String> record = new ArrayList<>();
         record.add(personId);
         record.add(tripId);
-        record.add(Time.writeTime(leg.getDepartureTime()));
+		record.add(Time.writeTime(leg.getDepartureTime().seconds()));
         record.add(Time.writeTime(leg.getTravelTime()));
         Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
         double waitingTime = 0.;
         if (boardingTime != null) {
-            waitingTime = boardingTime - leg.getDepartureTime();
+			waitingTime = boardingTime - leg.getDepartureTime().seconds();
         }
         record.add(Time.writeTime(waitingTime));
         record.add(Integer.toString((int) leg.getRoute().getDistance()));

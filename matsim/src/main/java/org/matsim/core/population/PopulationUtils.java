@@ -198,8 +198,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalTime getOptionalDepartureTime() {
-			return this.delegate.getOptionalDepartureTime() ;
+		public OptionalTime getDepartureTime() {
+			return this.delegate.getDepartureTime() ;
 		}
 
 		@Override
@@ -871,7 +871,7 @@ public final class PopulationUtils {
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
-		in.getOptionalDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
+		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
 		out.setTravelTime(in.getTravelTime());
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());

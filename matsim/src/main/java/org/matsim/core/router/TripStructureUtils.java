@@ -322,7 +322,7 @@ public final class TripStructureUtils {
 	public static OptionalTime getDepartureTime(Trip trip) {
 		// does this always make sense?
 		Leg leg = (Leg) trip.getTripElements().get(0);
-		return leg.getOptionalDepartureTime();
+		return leg.getDepartureTime();
 	}
 
 	/**

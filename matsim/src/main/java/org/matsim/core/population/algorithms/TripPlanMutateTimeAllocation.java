@@ -159,7 +159,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 				}
 				final double arrTime = now;
 				// set planned arrival time accordingly
-				leg.setTravelTime( arrTime - leg.getDepartureTime() );
+				leg.setTravelTime( arrTime - leg.getDepartureTime().seconds());
 			}
 		}
 	}

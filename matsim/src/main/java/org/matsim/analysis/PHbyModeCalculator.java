@@ -82,12 +82,13 @@ public class PHbyModeCalculator {
                             if (attr != null) {
                             	enterVehicleTime = (Double) attr;
                             }
-                            waitTime = enterVehicleTime - leg.getDepartureTime();
+							waitTime = enterVehicleTime - leg.getDepartureTime().seconds();
                             if (!Double.isFinite(waitTime)) {waitTime = 0.0;}
                             if (waitTime >= 0.0) {
                             	travelTime -= waitTime;
                             } else {
-                            	throw new RuntimeException("negative wait time" + enterVehicleTime + " " + leg.getDepartureTime());
+								throw new RuntimeException("negative wait time" + enterVehicleTime + " " + leg.getDepartureTime()
+										.seconds());
                             }
                         }
 

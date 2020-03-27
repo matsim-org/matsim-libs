@@ -67,8 +67,9 @@ import org.matsim.facilities.ActivityFacility;
 			} else if (pe instanceof Leg) {
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
-				r.setTravelTime( legTemplate.getDepartureTime() + legTemplate.getTravelTime() - r.getDepartureTime() );
-				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				r.setTravelTime( legTemplate.getDepartureTime().seconds()
+						+ legTemplate.getTravelTime() - r.getDepartureTime().seconds());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
 				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
@@ -94,8 +95,8 @@ import org.matsim.facilities.ActivityFacility;
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
-				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime() );
-				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime().seconds());
+				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
 				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
@@ -121,7 +122,7 @@ import org.matsim.facilities.ActivityFacility;
 			} else if (pe instanceof LCLeg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
 				((LCLeg) pe).setArrivalTime(legTemplate.getArrivalTime());
-				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime());
+				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((LCLeg) pe).setMode(legTemplate.getMode());
 				((LCLeg) pe).setRoute(legTemplate.getRoute());
 				((LCLeg) pe).setTravelTime(legTemplate.getTravelTime());
@@ -187,7 +188,7 @@ import org.matsim.facilities.ActivityFacility;
 		if (leg instanceof Leg) {
 			final double arrTime = arrivalTime;
 			Leg r = ((Leg) leg);
-			r.setTravelTime( arrTime - r.getDepartureTime() );
+			r.setTravelTime( arrTime - r.getDepartureTime().seconds());
 		} else if (leg instanceof LCLeg) {
 			((LCLeg) leg).setArrivalTime(arrivalTime);
 		} else throw new RuntimeException("Unexpected type of leg was found: " + leg.getClass().toString() + ". Aborting!");

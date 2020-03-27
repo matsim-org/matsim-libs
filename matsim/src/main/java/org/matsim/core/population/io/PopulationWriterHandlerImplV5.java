@@ -209,9 +209,9 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(encodeAttributeValue(leg.getMode()));
 		out.write("\"");
-		if (leg.getOptionalDepartureTime().isDefined()) {
+		if (leg.getDepartureTime().isDefined()) {
 			out.write(" dep_time=\"");
-			out.write(Time.writeTime(leg.getDepartureTime()));
+			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
 		if (!Time.isUndefinedTime(leg.getTravelTime())) {

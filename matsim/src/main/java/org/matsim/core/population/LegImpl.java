@@ -55,7 +55,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final OptionalTime getOptionalDepartureTime() {
+	public final OptionalTime getDepartureTime() {
 		return this.depTime;
 	}
 
@@ -95,7 +95,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.getMode()
 				+ "]"
 				+ "[depTime="
-				+ Time.writeTime(this.getOptionalDepartureTime())
+				+ Time.writeTime(this.getDepartureTime())
 				+ "]"
 				+ "[travTime="
 				+ Time.writeTime(this.getTravelTime())

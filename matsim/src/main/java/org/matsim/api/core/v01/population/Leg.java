@@ -36,11 +36,7 @@ public interface Leg extends PlanElement {
 
     public void setRoute(Route route);
 
-    public default double getDepartureTime() {
-        return getOptionalDepartureTime().seconds();
-    }
-
-    public OptionalTime getOptionalDepartureTime();
+    public OptionalTime getDepartureTime();
 
     public void setDepartureTime(final double seconds);
 
