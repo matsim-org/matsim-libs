@@ -46,7 +46,7 @@ public class OnlyTravelTimeDependentScoringFunction implements ScoringFunction {
 	@Override
 	public void handleLeg(Leg leg) {
 		startTime = leg.getDepartureTime().seconds();
-		score = score - (leg.getDepartureTime().seconds() + leg.getTravelTime() - startTime);
+		score = score - (leg.getDepartureTime().seconds() + leg.getTravelTime().seconds() - startTime);
 		startTime = Double.NaN;
 	}
 

@@ -278,13 +278,13 @@ public class PlanGenome implements Plan {
                 Leg l = (Leg) pe;
                 Leg l2 = createAndAddLeg(l.getMode());
 				l2.setDepartureTime(l.getDepartureTime().seconds());
-                l2.setTravelTime(l.getTravelTime());
+				l2.setTravelTime(l.getTravelTime().seconds());
                 TripStructureUtils.setRoutingMode(l2, TripStructureUtils.getRoutingMode(l));
                 if (pe instanceof Leg) {
                     // get the arrival time information only if available
                     Leg r = ((Leg) pe);
 					l2.setTravelTime( r.getDepartureTime().seconds()
-							+ r.getTravelTime() - l2.getDepartureTime().seconds());
+							+ r.getTravelTime().seconds() - l2.getDepartureTime().seconds());
                 }
                 if (l.getRoute() != null) {
                     l2.setRoute(l.getRoute().clone());

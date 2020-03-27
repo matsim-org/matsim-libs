@@ -87,7 +87,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		public void handleEvent(PersonArrivalEvent event) {
 			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds());
 			double travelTime = currentLeg.getDepartureTime().seconds()
-					+ currentLeg.getTravelTime() - currentLeg.getDepartureTime().seconds();
+					+ currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);

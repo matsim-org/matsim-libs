@@ -76,7 +76,7 @@ class LCLeg implements Leg, LCPlanElement {
 	}
 
 	@Override
-	public final OptionalTime getOptionalTravelTime() {
+	public final OptionalTime getTravelTime() {
 		return this.plan.travTimes[this.arrayIndex];
 	}
 

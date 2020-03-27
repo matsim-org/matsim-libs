@@ -133,8 +133,8 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (leg.getOptionalTravelTime().isDefined()) {
-					now += leg.getTravelTime();
+				if (leg.getTravelTime().isDefined()) {
+					now += leg.getTravelTime().seconds();
 				}
 				final double arrTime = now;
 				// set planned arrival time accordingly

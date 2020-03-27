@@ -98,7 +98,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
 				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					OptionalTime.defined(route.getTravelTime()) : leg.getOptionalTravelTime();
+					OptionalTime.defined(route.getTravelTime()) : leg.getTravelTime();
 
 				if ( legDur.isDefined()) {
 					now -= legDur.seconds();
@@ -140,7 +140,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
 				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-						OptionalTime.defined(route.getTravelTime()) : leg.getOptionalTravelTime();
+						OptionalTime.defined(route.getTravelTime()) : leg.getTravelTime();
 
 				if ( legDur.isDefined()) {
 					tt += legDur.seconds();

@@ -213,8 +213,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalTime getOptionalTravelTime() {
-			return this.delegate.getOptionalTravelTime() ;
+		public OptionalTime getTravelTime() {
+			return this.delegate.getTravelTime() ;
 		}
 
 		@Override
@@ -878,7 +878,7 @@ public final class PopulationUtils {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
 		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
-		in.getOptionalTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
+		in.getTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
@@ -1119,7 +1119,7 @@ public final class PopulationUtils {
 		if ( leg.getRoute()!=null ) {
 			return leg.getRoute().getTravelTime() ;
 		} else {
-			return leg.getTravelTime() ;
+			return leg.getTravelTime().seconds();
 		}
 	}
 	public static void sampleDown( Population pop, double sample ) {

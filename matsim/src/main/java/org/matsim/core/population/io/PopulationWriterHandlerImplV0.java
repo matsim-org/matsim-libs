@@ -164,8 +164,8 @@ import org.matsim.core.utils.misc.Time;
 		out.write(" mode=\"" + leg.getMode() + "\"");
 		if (leg.getDepartureTime().seconds() != Integer.MIN_VALUE)
 			out.write(" dep_time=\"" + Time.writeTime(leg.getDepartureTime().seconds()) + "\"");
-		if (leg.getTravelTime() != Integer.MIN_VALUE)
-			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
+		if (leg.getTravelTime().seconds() != Integer.MIN_VALUE)
+			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime().seconds()) + "\"");
 //		if (leg instanceof LegImpl){
 //			LegImpl l = (LegImpl)leg;
 //			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime())

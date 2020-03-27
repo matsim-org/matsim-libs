@@ -184,7 +184,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		leg.setTravelTime( 0.0 - leg.getDepartureTime().seconds());
 
 		PlanRouterAdapter.handleLeg(router, person, leg, fromAct, toAct, fromAct.getEndTime().seconds());
-		return leg.getTravelTime();
+		return leg.getTravelTime().seconds();
 	}
 
 	private List<SubChain> calcActChainsDefinedFixedTypes(final Plan plan) {

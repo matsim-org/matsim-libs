@@ -219,9 +219,9 @@ import org.matsim.vehicles.Vehicle;
 			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
-		if (leg.getOptionalTravelTime().isDefined()) {
+		if (leg.getTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
-			out.write(Time.writeTime(leg.getTravelTime()));
+			out.write(Time.writeTime(leg.getTravelTime().seconds()));
 			out.write("\"");
 		}
 //		if (leg instanceof LegImpl) {

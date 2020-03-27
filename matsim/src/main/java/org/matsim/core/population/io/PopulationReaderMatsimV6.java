@@ -355,7 +355,7 @@ import com.google.inject.Inject;
 			}
 		}
 		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
 		}
 
 		this.routeDescription = null;
@@ -464,7 +464,7 @@ import com.google.inject.Inject;
 			}
 		}
 		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getOptionalTravelTime().orElse(Time.getUndefinedTime()));
+			this.currRoute.setTravelTime(this.currleg.getTravelTime().orElse(Time.getUndefinedTime()));
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

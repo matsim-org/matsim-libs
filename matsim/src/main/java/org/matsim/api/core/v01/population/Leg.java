@@ -49,11 +49,7 @@ public interface Leg extends PlanElement {
      * kai/benjamin, jun'11
      * </ul>
      */
-    public default double getTravelTime() {
-        return getOptionalTravelTime().seconds();
-    }
-
-    public OptionalTime getOptionalTravelTime();
+    public OptionalTime getTravelTime();
 
     public void setTravelTime(final double seconds);
 

@@ -203,8 +203,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				destPlan.routes[legCount] = leg.getRoute();
 				destPlan.depTimes[legCount] = leg.getDepartureTime();
 				Leg r = ((Leg) leg);
-				destPlan.arrTimes[legCount] = OptionalTime.defined(r.getDepartureTime().seconds() + r.getTravelTime());
-				destPlan.travTimes[legCount] = leg.getOptionalTravelTime();
+				destPlan.arrTimes[legCount] = OptionalTime.defined(r.getDepartureTime().seconds() + r.getTravelTime()
+						.seconds());
+				destPlan.travTimes[legCount] = leg.getTravelTime();
 				destPlan.modes[legCount] = leg.getMode();
 				legCount++;
 			}

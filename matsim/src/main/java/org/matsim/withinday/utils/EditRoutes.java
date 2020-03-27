@@ -168,7 +168,7 @@ public final class EditRoutes {
 
 		Leg newLeg = (Leg) planElements.get(0);
 
-		leg.setTravelTime(newLeg.getTravelTime());
+		leg.setTravelTime(newLeg.getTravelTime().seconds());
 		leg.setRoute(newLeg.getRoute());
 
 		return true;

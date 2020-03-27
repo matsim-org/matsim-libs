@@ -149,7 +149,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility,
 							lastArrivaltime, person);
 					Leg lastLeg = (Leg)routeSegment.get(0);
-					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime();
+					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
 							selectedChargerLink.getId(), stageActivityModePrefix);

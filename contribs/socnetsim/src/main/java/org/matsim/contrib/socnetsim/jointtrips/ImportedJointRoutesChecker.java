@@ -98,7 +98,7 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 	private static double updateTime(
 			final double currTime,
 			final Leg leg) {
-		return currTime + leg.getOptionalTravelTime().orElse(0);
+		return currTime + leg.getTravelTime().orElse(0);
 	}
 }
 

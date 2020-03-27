@@ -70,7 +70,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final OptionalTime getOptionalTravelTime() {
+	public final OptionalTime getTravelTime() {
 		return this.travTime;
 	}
 
@@ -103,7 +103,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(this.getDepartureTime())
 				+ "]"
 				+ "[travTime="
-				+ Time.writeTime(this.getOptionalTravelTime())
+				+ Time.writeTime(this.getTravelTime())
 				+ "]"
 				+ "[arrTime="
 				+ (depTime.isDefined() && travTime.isDefined()?

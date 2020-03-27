@@ -106,7 +106,7 @@ public final class RaptorUtils {
                         if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
-						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime();
+						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
                     }
                 }
             } else if (part.line != null) {

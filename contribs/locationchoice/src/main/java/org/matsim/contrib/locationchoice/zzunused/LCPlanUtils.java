@@ -68,11 +68,11 @@ import org.matsim.facilities.ActivityFacility;
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
 				r.setTravelTime( legTemplate.getDepartureTime().seconds()
-						+ legTemplate.getTravelTime() - r.getDepartureTime().seconds());
+						+ legTemplate.getTravelTime().seconds() - r.getDepartureTime().seconds());
 				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
-				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -99,7 +99,7 @@ import org.matsim.facilities.ActivityFacility;
 				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
-				((Leg) pe).setTravelTime(legTemplate.getTravelTime());
+				((Leg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}
@@ -125,7 +125,7 @@ import org.matsim.facilities.ActivityFacility;
 				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((LCLeg) pe).setMode(legTemplate.getMode());
 				((LCLeg) pe).setRoute(legTemplate.getRoute());
-				((LCLeg) pe).setTravelTime(legTemplate.getTravelTime());
+				((LCLeg) pe).setTravelTime(legTemplate.getTravelTime().seconds());
 			} else throw new RuntimeException("Unexpected PlanElement type was found: " + pe.getClass().toString() + ". Aborting!");
 			actLegIndex++;
 		}

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.scoring.functions;
 
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -46,8 +48,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Random;
 
 /**
  * @author thibautd
@@ -87,12 +87,13 @@ public class CharyparNagelLegScoringPtChangeTest {
 		scoring1.handleEvent( enterVehicle );
 		scoring2.handleEvent( enterVehicle );
 
-		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime().seconds() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
+		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime().seconds() + leg.getTravelTime()
+				.seconds(), Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
 		scoring1.handleEvent( leaveVehicle );
 		scoring2.handleEvent( leaveVehicle );
 
 		final Event arrival = new PersonArrivalEvent(
-				leg.getDepartureTime().seconds() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+				leg.getDepartureTime().seconds() + leg.getTravelTime().seconds(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
 		scoring1.handleEvent( arrival );
 		scoring2.handleEvent( arrival );
 

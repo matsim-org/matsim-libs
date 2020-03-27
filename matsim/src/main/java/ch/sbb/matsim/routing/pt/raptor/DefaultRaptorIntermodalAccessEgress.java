@@ -28,7 +28,7 @@ public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAcce
         for (PlanElement pe : legs) {
             if (pe instanceof Leg) {
                 String mode = ((Leg) pe).getMode();
-                OptionalTime travelTime = ((Leg) pe).getOptionalTravelTime();
+                OptionalTime travelTime = ((Leg) pe).getTravelTime();
                 if (travelTime.isDefined()) {
                     tTime += travelTime.seconds();
                     disutility += travelTime.seconds() * -params.getMarginalUtilityOfTravelTime_utl_s(mode);

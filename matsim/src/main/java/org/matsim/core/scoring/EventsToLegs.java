@@ -273,7 +273,7 @@ public final class EventsToLegs
 		Leg leg = legs.get(event.getPersonId());
 		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
 		double travelTime = leg.getDepartureTime().seconds()
-				+ leg.getTravelTime() - leg.getDepartureTime().seconds();
+				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 		assert experiencedRoute.size() >= 1;
