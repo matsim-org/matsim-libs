@@ -95,7 +95,7 @@ import org.matsim.facilities.ActivityFacility;
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
 				Leg r = ((Leg) pe);
-				r.setTravelTime( legTemplate.getArrivalTime() - r.getDepartureTime().seconds());
+				r.setTravelTime( legTemplate.getArrivalTime().seconds() - r.getDepartureTime().seconds());
 				((Leg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((Leg) pe).setMode(legTemplate.getMode());
 				((Leg) pe).setRoute(legTemplate.getRoute());
@@ -121,7 +121,7 @@ import org.matsim.facilities.ActivityFacility;
 				((LCActivity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LCLeg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
-				((LCLeg) pe).setArrivalTime(legTemplate.getArrivalTime());
+				((LCLeg) pe).setArrivalTime(legTemplate.getArrivalTime().seconds());
 				((LCLeg) pe).setDepartureTime(legTemplate.getDepartureTime().seconds());
 				((LCLeg) pe).setMode(legTemplate.getMode());
 				((LCLeg) pe).setRoute(legTemplate.getRoute());

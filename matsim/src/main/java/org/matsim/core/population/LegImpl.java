@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private Route route = null;
 
 	private OptionalTime depTime = OptionalTime.undefined();
-	private double travTime = Time.getUndefinedTime();
+	private OptionalTime travTime = OptionalTime.undefined();
 	private String mode;
 
 	private final Attributes attributes = new Attributes();
@@ -70,13 +70,18 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final double getTravelTime() {
+	public final OptionalTime getOptionalTravelTime() {
 		return this.travTime;
 	}
 
 	@Override
 	public final void setTravelTime(final double travTime) {
-		this.travTime = travTime;
+		this.travTime = OptionalTime.defined(travTime);
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travTime = OptionalTime.undefined();
 	}
 
 	@Override
@@ -98,11 +103,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(this.getDepartureTime())
 				+ "]"
 				+ "[travTime="
-				+ Time.writeTime(this.getTravelTime())
+				+ Time.writeTime(this.getOptionalTravelTime())
 				+ "]"
 				+ "[arrTime="
-				+ (depTime.isDefined() ?
-				Time.writeTime(depTime.seconds() + travTime) :
+				+ (depTime.isDefined() && travTime.isDefined()?
+				Time.writeTime(depTime.seconds() + travTime.seconds()) :
 				Time.writeTime(OptionalTime.undefined()))
 				+ "]"
 				+ "[route="

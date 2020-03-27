@@ -337,9 +337,9 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 					now += r.getTravelTime();
 				}
 				else {
-					now += !Time.isUndefinedTime(((Leg) pe).getTravelTime()) ?
-							((Leg) pe).getTravelTime() :
-							0; // no info: just assume instantaneous. This will give poor results!
+					// no info: just assume instantaneous (i.e. 0). This will give poor results!
+					now += ((Leg) pe).getOptionalTravelTime().orElse(0);
+
 				}
 			}
 		}

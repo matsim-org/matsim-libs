@@ -259,7 +259,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
 		if (  !Time.isUndefinedTime(travelTimeFromRoute ) ) {
 			return travelTimeFromRoute ;
-		} else if ( !Time.isUndefinedTime(((Leg) currentPlanElement).getTravelTime() ) ) {
+		} else if ( ((Leg) currentPlanElement).getOptionalTravelTime().isDefined() ) {
 			return ((Leg) currentPlanElement).getTravelTime()  ;
 		} else {
 			return null ;

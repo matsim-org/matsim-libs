@@ -67,7 +67,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -473,7 +472,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);
 					// let duration untouched. if defined add it to now
-					if (!Time.isUndefinedTime(leg.getTravelTime())) {
+					if (leg.getOptionalTravelTime().isDefined()) {
 						now += leg.getTravelTime();
 					}
 					// set planned arrival time accordingly

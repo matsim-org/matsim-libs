@@ -219,7 +219,7 @@ import org.matsim.vehicles.Vehicle;
 			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(leg.getTravelTime())) {
+		if (leg.getOptionalTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");

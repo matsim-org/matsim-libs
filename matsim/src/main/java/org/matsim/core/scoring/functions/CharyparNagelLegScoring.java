@@ -173,7 +173,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	@Override
 	public void handleLeg(Leg leg) {
 		Gbl.assertIf( leg.getDepartureTime().isDefined() ) ;
-		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+		Gbl.assertIf( leg.getOptionalTravelTime().isDefined() );
 
 		double legScore = calcLegScore(
 				leg.getDepartureTime().seconds(), leg.getDepartureTime().seconds() + leg.getTravelTime(), leg);

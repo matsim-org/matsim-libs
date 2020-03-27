@@ -96,11 +96,12 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					route.getTravelTime() : leg.getTravelTime();
+				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
+				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
+					OptionalTime.defined(route.getTravelTime()) : leg.getOptionalTravelTime();
 
-				if ( !Time.isUndefinedTime(legDur) ) {
-					now -= legDur;
+				if ( legDur.isDefined()) {
+					now -= legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );
@@ -137,11 +138,12 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					route.getTravelTime() : leg.getTravelTime();
+				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
+				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
+						OptionalTime.defined(route.getTravelTime()) : leg.getOptionalTravelTime();
 
-				if ( !Time.isUndefinedTime(legDur) ) {
-					tt += legDur;
+				if ( legDur.isDefined()) {
+					tt += legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );

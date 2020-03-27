@@ -102,8 +102,8 @@ public class AgentId2PlannedDepartureTimeMap {
 						}
 
 						// add the legs travel time
-						if(Double.isInfinite(leg.getTravelTime())){
-							log.debug("Infinite travel time founde");
+						if(leg.getOptionalTravelTime().isUndefined()){
+							log.debug("Undefined travel time found");
 						} else {
 							runningTime += leg.getTravelTime();
 						}

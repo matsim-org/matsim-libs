@@ -213,14 +213,20 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getTravelTime() {
-			return this.delegate.getTravelTime() ;
+		public OptionalTime getOptionalTravelTime() {
+			return this.delegate.getOptionalTravelTime() ;
 		}
 
 		@Override
 		public void setTravelTime(double seconds) {
 			throw new UnsupportedOperationException() ;
 		}
+
+		@Override
+		public void setTravelTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
 		@Override
 		public String toString() {
 			return this.delegate.toString() ;
@@ -872,7 +878,7 @@ public final class PopulationUtils {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
 		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
-		out.setTravelTime(in.getTravelTime());
+		in.getOptionalTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
@@ -1017,7 +1023,7 @@ public final class PopulationUtils {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
 				prev_leg.setDepartureTimeUndefined();
-				prev_leg.setTravelTime(Time.getUndefinedTime());
+				prev_leg.setTravelTimeUndefined();
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg

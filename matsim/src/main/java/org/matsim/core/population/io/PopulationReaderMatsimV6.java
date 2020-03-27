@@ -393,7 +393,8 @@ import com.google.inject.Inject;
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
 		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
 				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
@@ -463,7 +464,7 @@ import com.google.inject.Inject;
 			}
 		}
 		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			this.currRoute.setTravelTime(this.currleg.getOptionalTravelTime().orElse(Time.getUndefinedTime()));
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

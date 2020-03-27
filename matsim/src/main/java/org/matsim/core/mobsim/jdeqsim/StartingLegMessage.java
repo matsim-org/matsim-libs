@@ -55,7 +55,7 @@ public class StartingLegMessage extends EventMessage {
 			}
 
 		} else {
-			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getTravelTime());
+			scheduleEndLegMessage(getMessageArrivalTime() + vehicle.getCurrentLeg().getOptionalTravelTime().orElse(0));
 		}
 	}
 

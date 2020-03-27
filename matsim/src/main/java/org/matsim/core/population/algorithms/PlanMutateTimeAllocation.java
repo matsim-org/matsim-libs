@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -118,7 +117,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (!Time.isUndefinedTime(leg.getTravelTime())) {
+				if (leg.getOptionalTravelTime().isDefined()) {
 					now += leg.getTravelTime();
 				}
 				final double arrTime = now;

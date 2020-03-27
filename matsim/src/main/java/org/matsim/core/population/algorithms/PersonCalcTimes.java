@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Calculates all time informations in all plans of a person<br>
@@ -94,11 +94,8 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 					leg = (Leg) pe;
 
 					leg.setDepartureTime(act.getEndTime().seconds());
-					double ttime = leg.getTravelTime();
-					if (Time.isUndefinedTime(ttime)) {
-						ttime = 0;
-					}
-					leg.setTravelTime( leg.getDepartureTime().seconds() + ttime - leg.getDepartureTime()
+					OptionalTime ttime = leg.getOptionalTravelTime();
+					leg.setTravelTime( leg.getDepartureTime().seconds() + ttime.orElse(0) - leg.getDepartureTime()
 							.seconds());
 				}
 			}

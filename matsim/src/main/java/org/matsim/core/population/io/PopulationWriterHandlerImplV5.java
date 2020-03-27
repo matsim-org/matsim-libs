@@ -214,7 +214,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(leg.getTravelTime())) {
+		if (leg.getOptionalTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");

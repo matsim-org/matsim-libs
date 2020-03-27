@@ -29,6 +29,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,7 +48,13 @@ public class ExampleWithinDayControllerTest {
 		config.controler().setLastIteration(1);
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		preparePlans(scenario);
+		final Controler controler = new Controler(scenario);
+		ExampleWithinDayController.configure(controler);
+		controler.run();
+	}
 
+	private static void preparePlans(Scenario scenario) {
 		//plans are missing departure times, so clear all routes to re-route all legs and provide some departure times
 		scenario.getPopulation()
 				.getPersons()
@@ -53,9 +64,12 @@ public class ExampleWithinDayControllerTest {
 				.filter(Leg.class::isInstance)
 				.forEach(planElement -> ((Leg)planElement).setRoute(null));
 
-		final Controler controler = new Controler(scenario);
-		ExampleWithinDayController.configure(controler);
-		controler.run();
+		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(
+				scenario.getConfig().planCalcScore());
+		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get());
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
+		scenario.getPopulation().getPersons().values().forEach(pp4s::run);
+
 	}
 
 }
