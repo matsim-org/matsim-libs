@@ -91,12 +91,25 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "leg [mode=" + this.getMode() + "]" +
-				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
-				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +
-				"[route=" + this.route + "]";
+		return "leg [mode="
+				+ this.getMode()
+				+ "]"
+				+ "[depTime="
+				+ Time.writeTime(this.getOptionalDepartureTime())
+				+ "]"
+				+ "[travTime="
+				+ Time.writeTime(this.getTravelTime())
+				+ "]"
+				+ "[arrTime="
+				+ (depTime.isDefined() ?
+				Time.writeTime(depTime.seconds() + travTime) :
+				Time.writeTime(OptionalTime.undefined()))
+				+ "]"
+				+ "[route="
+				+ this.route
+				+ "]";
 	}
+
 
 	@Override
 	public Attributes getAttributes() {
