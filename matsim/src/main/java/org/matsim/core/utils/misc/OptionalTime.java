@@ -23,7 +23,10 @@ package org.matsim.core.utils.misc;
 import java.util.NoSuchElementException;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -104,6 +107,16 @@ public final class OptionalTime {
 		} else {
 			return DoubleStream.empty();
 		}
+	}
+
+	public OptionalTime or(OptionalTime optionalTime) {
+		Preconditions.checkNotNull(optionalTime);
+		return seconds != Time.UNDEFINED_TIME ? this : optionalTime;
+	}
+
+	public OptionalTime or(Supplier<OptionalTime> supplier) {
+		Preconditions.checkNotNull(supplier);
+		return seconds != Time.UNDEFINED_TIME ? this : Preconditions.checkNotNull(supplier.get());
 	}
 
 	@Override
