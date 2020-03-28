@@ -1,7 +1,17 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import static org.junit.Assert.*;
+import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
+import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -54,19 +64,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
-import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
-import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -86,6 +85,8 @@ public class FrozenEpsilonLocaChoiceIT{
 	 * For Maven, the surefire-plugin can be configured to run each test individually in a separate JVM which
 	 * solves this problem, but I don't know how to solve this in IntelliJ or Eclipse.
 	 * -mrieser/2019Sept26
+	 *
+	 * Confirmed: This tests fails when called AFTER BestReplyIT, michalm/mar'20
 	 */
 	@Test
 	public void testLocationChoiceJan2013() {
