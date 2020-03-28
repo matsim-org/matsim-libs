@@ -993,7 +993,7 @@ public final class PopulationUtils {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
 				next_leg.setDepartureTimeUndefined();
-				next_leg.setTravelTime(Time.getUndefinedTime());
+				next_leg.setTravelTimeUndefined();
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act

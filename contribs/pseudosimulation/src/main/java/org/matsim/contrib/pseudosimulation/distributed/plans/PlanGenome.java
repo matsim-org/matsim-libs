@@ -19,7 +19,6 @@ import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentTyp
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -150,7 +149,7 @@ public class PlanGenome implements Plan {
                 // remove an in-between act
                 Leg prev_leg = (Leg) getPlanElements().get(index - 1); // prev leg;
                 prev_leg.setDepartureTimeUndefined();
-                prev_leg.setTravelTime(Time.getUndefinedTime());
+                prev_leg.setTravelTimeUndefined();
                 prev_leg.setRoute(null);
 
                 getPlanElements().remove(index + 1); // following leg
@@ -177,7 +176,7 @@ public class PlanGenome implements Plan {
                 // not the last leg
                 Leg next_leg = (Leg) getPlanElements().get(index + 2);
                 next_leg.setDepartureTimeUndefined();
-                next_leg.setTravelTime(Time.getUndefinedTime());
+                next_leg.setTravelTimeUndefined();
                 next_leg.setRoute(null);
             }
             getPlanElements().remove(index + 1); // following act

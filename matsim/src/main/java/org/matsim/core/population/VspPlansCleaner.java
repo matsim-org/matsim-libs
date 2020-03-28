@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
@@ -87,7 +86,7 @@ import com.google.inject.Inject;
 //						leg.setDepartureTimeUndefined() ;
 						//this information is not unneccesary, but may be used, e.g., by DRTRoutes and others.
 						if ( leg.getRoute()!=null ) {
-							leg.setTravelTime( Time.getUndefinedTime());
+							leg.setTravelTimeUndefined();
 						}
 						
 					}
