@@ -8,6 +8,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -48,12 +50,12 @@ public class EmissionGridAnalyzer {
     private final GridType gridType;
     private final double gridSize;
     private final Network network;
-    private final Geometry bounds;
+    private final PreparedGeometry bounds;
     private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> timeBins;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
                                  final double countScaleFactor, final GridType gridType, final Network network,
-                                 final Geometry bounds) {
+                                 final PreparedGeometry bounds) {
         this.binSize = binSize;
         this.network = network;
         this.gridType = gridType;
@@ -272,7 +274,7 @@ public class EmissionGridAnalyzer {
         private double smoothingRadius = 1.0;
         private double countScaleFactor = 1.0;
         private Network network;
-        private Geometry bounds;
+        private PreparedGeometry bounds;
         private GridType gridType = GridType.Square;
 
         /**
@@ -343,6 +345,11 @@ public class EmissionGridAnalyzer {
         }
 
         public Builder withBounds(Geometry bounds) {
+            this.bounds = new PreparedGeometryFactory().create(bounds);
+            return this;
+        }
+
+        public Builder withBounds(PreparedGeometry bounds) {
             this.bounds = bounds;
             return this;
         }
@@ -363,7 +370,7 @@ public class EmissionGridAnalyzer {
                 throw new IllegalArgumentException("A smoothing radius smaller than the grid size may lead to artifacts.In fact: Smoothing radius should be much bigger than grid size!");
 
             if (bounds == null)
-                bounds = createBounds();
+                bounds = new PreparedGeometryFactory().create(createBounds());
             return new EmissionGridAnalyzer(binSize, gridSize, smoothingRadius, countScaleFactor, gridType, network, bounds);
         }
 
@@ -376,8 +383,6 @@ public class EmissionGridAnalyzer {
         }
 
         private Geometry createBounds() {
-            if (bounds != null)
-                return bounds;
 
             double[] box = NetworkUtils.getBoundingBox(network.getNodes().values());
             return factory.createPolygon(new Coordinate[]{
