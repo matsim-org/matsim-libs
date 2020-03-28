@@ -1,5 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,8 +16,8 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.spatial.Grid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriter;
@@ -23,7 +25,9 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -367,5 +371,103 @@ public class EmissionGridAnalyzerTest {
         byte[] jsonFileData = Files.readAllBytes(jsonFile);
 
         assertTrue(jsonFileData.length > 0);
+    }
+
+    @Test
+    public void process_regression() throws IOException {
+
+     /*   final String emissionEventOutputFileName = "output_events.emissions.xml.gz";
+
+        // -------------------------- Create Emission events ----------------------
+
+        var config = ConfigUtils.loadConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml", new EmissionsConfigGroup());
+        //config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+
+        var scenario = ScenarioUtils.loadScenario(config);
+
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+
+        AbstractModule module = new AbstractModule(){
+            @Override
+            public void install(){
+                bind( Scenario.class ).toInstance( scenario );
+                bind( EventsManager.class ).toInstance( eventsManager );
+                bind( EmissionModule.class ) ;
+            }
+        };;
+
+        com.google.inject.Injector injector = Injector.createInjector(config, module );
+
+        EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
+        EventWriterXML emissionEventWriter = new EventWriterXML( testUtils.getOutputDirectory() + emissionEventOutputFileName );
+        emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+
+        MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+        matsimEventsReader.readFile("./scenarios/sampleScenario/output_events.xml.gz");
+
+        emissionEventWriter.closeFile();
+
+      //  var controler = new Controler(scenario);
+      //  controler.run();
+*/
+        //--------------- Now, write to grid -----------------------
+
+        var network = NetworkUtils.readNetwork("./scenarios/sampleScenario/sample_network.xml");
+        var analyzer = new EmissionGridAnalyzer.Builder()
+                .withGridSize(10)
+                .withTimeBinSize(1000000) // aiming for single time bin
+                .withNetwork(network)
+                .withSmoothingRadius(50)
+                .withGridType(EmissionGridAnalyzer.GridType.Square)
+                .build();
+
+        var map = analyzer.process(testUtils.getInputDirectory() + "output_events.emissions.xml.gz");
+        writeGridToCSV(map, testUtils.getOutputDirectory() + "actual-pollution.csv");
+
+
+        var expected = Files.readString(Paths.get(testUtils.getInputDirectory() + "expected-pollution.csv"), StandardCharsets.UTF_8);
+        var actual = Files.readString(Paths.get(testUtils.getOutputDirectory() + "actual-pollution.csv"), StandardCharsets.UTF_8);
+
+        assertEquals(expected, actual);
+    }
+
+    private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, String outputPath) {
+
+        var pollutants = Pollutant.values();
+
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(outputPath), CSVFormat.TDF)) {
+
+            //print header with all possible pollutants
+            printer.print("timeBinStartTime");
+            printer.print("x");
+            printer.print("y");
+
+            for (var p : pollutants) {
+                printer.print(p.toString());
+            }
+            printer.println();
+
+            //print values if pollutant was not present just print 0 instead
+            for (TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin : bins.getTimeBins()) {
+                final double timeBinStartTime = bin.getStartTime();
+                for (Grid.Cell<Map<Pollutant, Double>> cell : bin.getValue().getCells()) {
+
+                    printer.print(timeBinStartTime);
+                    printer.print(cell.getCoordinate().x);
+                    printer.print(cell.getCoordinate().y);
+
+                    for (var p : pollutants) {
+                        if (cell.getValue().containsKey(p)) {
+                            printer.print(cell.getValue().get(p));
+                        } else {
+                            printer.print(0);
+                        }
+                    }
+                    printer.println();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
