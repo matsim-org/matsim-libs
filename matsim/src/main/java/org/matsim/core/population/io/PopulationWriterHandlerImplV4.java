@@ -267,7 +267,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Double.toString(route.getDistance()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(route.getTravelTime())) {
+		if (route.getOptionalTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(route.getTravelTime()));
 			out.write("\"");

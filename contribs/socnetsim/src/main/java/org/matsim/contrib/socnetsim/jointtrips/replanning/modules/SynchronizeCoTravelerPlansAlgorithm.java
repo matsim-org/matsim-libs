@@ -35,7 +35,6 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -96,9 +95,9 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
-				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					OptionalTime.defined(route.getTravelTime()) : leg.getTravelTime();
+				final OptionalTime legDur = route != null ?
+						route.getOptionalTravelTime().or(leg::getTravelTime) :
+						leg.getTravelTime();
 
 				if ( legDur.isDefined()) {
 					now -= legDur.seconds();
@@ -138,9 +137,9 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				// TODO temp changes (assuming Route.getTravelTime() will be adapted to return OptionalTime)
-				final OptionalTime legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-						OptionalTime.defined(route.getTravelTime()) : leg.getTravelTime();
+				final OptionalTime legDur = route != null ?
+						route.getOptionalTravelTime().or(leg::getTravelTime) :
+						leg.getTravelTime();
 
 				if ( legDur.isDefined()) {
 					tt += legDur.seconds();

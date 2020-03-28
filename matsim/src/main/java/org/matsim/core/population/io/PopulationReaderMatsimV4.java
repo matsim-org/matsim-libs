@@ -348,7 +348,8 @@ import org.xml.sax.Attributes;
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("dist")));
 		}
 		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			Time.parseOptionalTime(atts.getValue("trav_time"))
+					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
 		}
 	}
 

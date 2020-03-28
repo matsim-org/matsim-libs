@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * @author thibautd
@@ -110,8 +110,8 @@ public class DriverRoute implements Route , NetworkRoute {
 	}
 
 	@Override
-	public double getTravelTime() {
-		return netRoute.getTravelTime();
+	public OptionalTime getOptionalTravelTime() {
+		return netRoute.getOptionalTravelTime();
 	}
 
 	@Override
@@ -124,6 +124,11 @@ public class DriverRoute implements Route , NetworkRoute {
 	@Override
 	public void setTravelTime(final double travelTime) {
 		netRoute.setTravelTime(travelTime);
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		netRoute.setTravelTimeUndefined();
 	}
 
 	@Override

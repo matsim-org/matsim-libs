@@ -354,7 +354,7 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
+		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
 			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
 		}
 
@@ -423,8 +423,10 @@ import com.google.inject.Inject;
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("trav_time") != null) {
-			this.currRoute.setTravelTime(Time.parseTime(atts.getValue("trav_time")));
+			Time.parseOptionalTime(atts.getValue("trav_time"))
+					.ifDefinedOrElse(currRoute::setTravelTime, currRoute::setTravelTimeUndefined);
 		}
+
 		if (atts.getValue("distance") != null) {
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
 		}
@@ -463,8 +465,8 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime().orElse(Time.getUndefinedTime()));
+		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
+			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

@@ -1115,12 +1115,8 @@ public final class PopulationUtils {
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
-	public static double decideOnTravelTimeForLeg( Leg leg ) {
-		if ( leg.getRoute()!=null ) {
-			return leg.getRoute().getTravelTime() ;
-		} else {
-			return leg.getTravelTime().seconds();
-		}
+	public static OptionalTime decideOnTravelTimeForLeg( Leg leg ) {
+		return leg.getRoute() !=null ? leg.getRoute().getOptionalTravelTime() : leg.getTravelTime();
 	}
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;
