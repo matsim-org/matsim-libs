@@ -26,12 +26,10 @@ import org.matsim.core.utils.collections.Tuple;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
@@ -51,11 +49,7 @@ public class EmissionGridAnalyzer {
     private final double gridSize;
     private final Network network;
     private final Geometry bounds;
-    private TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> emissionsByPollutant;
-    private TimeBinMap<Grid<Map<Pollutant, Double>>> binHolder;
     private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> timeBins;
-
-    private double shortestDistanceWithWeightToZero = Double.MAX_VALUE;
 
     private EmissionGridAnalyzer(final double binSize, final double gridSize, final double smoothingRadius,
                                  final double countScaleFactor, final GridType gridType, final Network network,
@@ -81,19 +75,18 @@ public class EmissionGridAnalyzer {
      * @return TimeBinMap containing a grid which maps pollutants to values.
      */
     public TimeBinMap<Grid<Map<Pollutant, Double>>> process(String eventsFile) {
-    	
+
         TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinsWithEmissions = processEventsFile(eventsFile);
         TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
 
         logger.info("Starting grid computation...");
-        
-        timeBinsWithEmissions.getTimeBins().forEach(bin -> {
-            logger.info("creating grid for time bin with start time: " + bin.getStartTime());
-            Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue() );
-            result.getTimeBin(bin.getStartTime()).setValue(grid);
-        });
 
-        logger.info("Shortest distance with weight equal to 0: " + shortestDistanceWithWeightToZero);
+        for (var bin : timeBinsWithEmissions.getTimeBins()) {
+            logger.info("creating grid for time bin with start time: " + bin.getStartTime());
+            Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
+            result.getTimeBin(bin.getStartTime()).setValue(grid);
+        }
+
         return result;
     }
 
@@ -102,20 +95,19 @@ public class EmissionGridAnalyzer {
      * Process the events file of the given path, and set up an iterator that will be used for
      * returning the results one bin at a time; see processNextTimeBin().
      *
-     * @param eventsFile
+     * @param eventsFile /path/to/input/events-file.xml.gz
      */
     public void processTimeBinsWithEmissions(String eventsFile) {
 
-        this.emissionsByPollutant = processEventsFile(eventsFile);
+        TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> emissionsByPollutant = processEventsFile(eventsFile);
 
         logger.info("!! Event data ready for first time bin grid.");
-
-        this.binHolder = new TimeBinMap<>(binSize);
-        this.timeBins = this.emissionsByPollutant.getTimeBins().iterator();
+        this.timeBins = emissionsByPollutant.getTimeBins().iterator();
     }
 
     /**
      * Whether or not there are more time bins to process
+     *
      * @throws RuntimeException if processTimeBinsWithEmissions was not called before this method
      */
     public boolean hasNextTimeBin() {
@@ -131,7 +123,6 @@ public class EmissionGridAnalyzer {
      *
      * @return tuple containing the start time of the next time bin and the emissions grid for that time bin. Returns
      * null if there are no further time bins.
-     *
      */
     public Tuple<Double, String> processNextTimeBin() {
         if (this.timeBins == null) throw new RuntimeException("Must call processTimeBinsWithEmissions() first.");
@@ -140,11 +131,11 @@ public class EmissionGridAnalyzer {
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.timeBins.next();
         logger.info("creating grid for time bin with start time: " + nextBin.getStartTime());
 
-        Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue() );
+        Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
 
         ObjectMapper mapper = createObjectMapper();
         try {
-            return new Tuple(nextBin.getStartTime(), mapper.writeValueAsString(grid));
+            return Tuple.of(nextBin.getStartTime(), mapper.writeValueAsString(grid));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -171,8 +162,9 @@ public class EmissionGridAnalyzer {
     /**
      * Works like {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer#process(String)} but writes the
      * result into a JSON-File
+     *
      * @param eventsFile Path to the events file e.g. '/path/to/events.xml.gz
-     * @param jsonFile Path to the output file e.g. '/path/to/emissions.json
+     * @param jsonFile   Path to the output file e.g. '/path/to/emissions.json
      */
     public void processToJsonFile(String eventsFile, String jsonFile) {
 
@@ -198,20 +190,24 @@ public class EmissionGridAnalyzer {
 
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
-        Grid<Map<Pollutant, Double>> grid = createGrid();
-        int counter = 0;
+        final var grid = createGrid();
+        final var counter = new AtomicInteger();
 
-        for (Id<Link> id : linksWithEmissions.keySet()) {
-            counter++;
-            if (counter % 10000 == 0)
-                logger.info("processing: " + counter * 100 / linksWithEmissions.keySet().size() + "% done");
-            if (network.getLinks().containsKey(id)) {
-                Link link = network.getLinks().get(id);
-                if (isWithinBounds(link)) {
-                    processLink(link, linksWithEmissions.get(id), grid);
-                }
-            }
-        }
+        // using stream's forEach here, instead of for each loop, to parallelize processing
+        linksWithEmissions.entrySet().parallelStream()
+                .forEach(entry -> {
+                    var count = counter.incrementAndGet();
+                    if (count % 10000 == 0)
+                        logger.info("processing: " + count * 100 / linksWithEmissions.keySet().size() + "% done");
+
+                    if (network.getLinks().containsKey(entry.getKey()) && isWithinBounds(network.getLinks().get(entry.getKey()))) {
+                        processLink(network.getLinks().get(entry.getKey()), entry.getValue(), grid);
+                    }
+                });
+
+        grid.getCells().parallelStream()
+                .forEach(cell -> removeTinyValuesFromResults(cell.getValue()));
+
         return grid;
     }
 
@@ -221,32 +217,25 @@ public class EmissionGridAnalyzer {
         // use 5*smoothing radius as longer distances result in a weighting of effectively 0
         Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 5);
 
-        grid.getCells(clip).forEach(cell -> {
+        for (var cell : grid.getCells(clip)) {
             double normalizationFactor = grid.getCellArea() / (Math.PI * smoothingRadius * smoothingRadius);
             double weight = SpatialInterpolation.calculateWeightFromLine(
                     transformToCoordinate(link.getFromNode()), transformToCoordinate(link.getToNode()),
                     cell.getCoordinate(), smoothingRadius);
             processCell(cell, emissions, weight * normalizationFactor);
-        });
+        }
     }
 
     private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, EmissionsByPollutant emissions, double weight) {
 
-        // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
-        // the cell weight
-        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
-                emissions.getEmissions().entrySet().stream()
-                    .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)) )
-                                                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
-
-        Map<Pollutant, Double> valuesWithoutTinyResults = removeTinyValuesFromResults(newValues);
-        cell.setValue(valuesWithoutTinyResults);
+        for (var entry : emissions.getEmissions().entrySet()) {
+            var emissionValue = entry.getValue() * weight * countScaleFactor;
+            cell.getValue().merge(entry.getKey(), emissionValue, Double::sum);
+        }
     }
 
-    private Map<Pollutant, Double> removeTinyValuesFromResults( Map<Pollutant, Double> values ) {
-        return values.entrySet().stream()
-                .filter(entry -> entry.getValue() >= minimumThreshold)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    private void removeTinyValuesFromResults(Map<Pollutant, Double> values) {
+        values.entrySet().removeIf(entry -> entry.getValue() < minimumThreshold);
     }
 
     private boolean isWithinBounds(Link link) {
@@ -257,9 +246,9 @@ public class EmissionGridAnalyzer {
     private Grid<Map<Pollutant, Double>> createGrid() {
 
         if (gridType == GridType.Hexagonal)
-            return new HexagonalGrid<>(gridSize, HashMap::new, bounds);
+            return new HexagonalGrid<>(gridSize, ConcurrentHashMap::new, bounds);
         else
-            return new SquareGrid<>(gridSize, HashMap::new, bounds);
+            return new SquareGrid<>(gridSize, ConcurrentHashMap::new, bounds);
     }
 
     private ObjectMapper createObjectMapper() {
@@ -288,6 +277,7 @@ public class EmissionGridAnalyzer {
 
         /**
          * Sets the duration of a time bin
+         *
          * @param size duration of a time bin. Usually MATSim uses seconds as time unit but the implementation doesn't
          *             really care.
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
@@ -299,6 +289,7 @@ public class EmissionGridAnalyzer {
 
         /**
          * Sets the used grid type. Default is Square
+         *
          * @param type The grid type. Currently either Square or Hexagonal
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
          */
@@ -309,6 +300,7 @@ public class EmissionGridAnalyzer {
 
         /**
          * Sets the horizontal distance between grid cells.
+         *
          * @param size The horizontal distance between grid cells. Should conform to the units used by the supplied network.
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
          */
@@ -319,6 +311,7 @@ public class EmissionGridAnalyzer {
 
         /**
          * Sets the smoothing radius for the spatial interpolation of pollution over grid cells
+         *
          * @param radius The radius where things are smoothed. Should be the same unit as the gridSize
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
          */
@@ -340,6 +333,7 @@ public class EmissionGridAnalyzer {
 
         /**
          * MATSim network that was used for the simulation run
+         *
          * @param network a network
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer.Builder}
          */
@@ -355,9 +349,10 @@ public class EmissionGridAnalyzer {
 
         /**
          * Builds a new Instance of {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
+         *
          * @return {@link org.matsim.contrib.emissions.analysis.EmissionGridAnalyzer}
          * @throws java.lang.IllegalArgumentException if binSize, gridSize, smoothingRadius are <= 0, and if
-         * network was not set
+         *                                            network was not set
          */
         public EmissionGridAnalyzer build() {
 
