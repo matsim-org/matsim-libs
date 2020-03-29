@@ -277,8 +277,8 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
+		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		this.routeDescription = null;
@@ -384,8 +384,8 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
+		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

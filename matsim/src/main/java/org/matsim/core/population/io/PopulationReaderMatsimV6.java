@@ -354,8 +354,8 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
+		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		this.routeDescription = null;
@@ -465,8 +465,8 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined() && this.currleg.getTravelTime().isDefined()) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime().seconds());
+		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {
