@@ -474,9 +474,10 @@ public final class PopulationUtils {
 			case minOfDurationAndEndTime:
 				return Math.min(now + act.getMaximumDuration().seconds(), act.getEndTime().seconds());
 			default:
-				break;
+				throw new IllegalArgumentException(
+						"Unsupported 'activityDurationInterpretation' enum type: " + config.plans()
+								.getActivityDurationInterpretation());
 		}
-		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
