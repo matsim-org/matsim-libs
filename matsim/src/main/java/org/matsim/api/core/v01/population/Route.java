@@ -33,11 +33,7 @@ public interface Route extends MatsimPopulationObject {
 
 	public void setDistance(final double distance);
 
-	public default double getTravelTime() {
-		return getOptionalTravelTime().seconds();
-	}
-
-	public OptionalTime getOptionalTravelTime();
+	public OptionalTime getTravelTime();
 
 	public void setTravelTime(final double travelTime);
 

@@ -258,7 +258,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			return null;
 		}
 		Leg leg = (Leg)currentPlanElement;
-		final OptionalTime travelTime = leg.getRoute().getOptionalTravelTime().or(leg::getTravelTime);
+		final OptionalTime travelTime = leg.getRoute().getTravelTime().or(leg::getTravelTime);
 		return travelTime.isDefined() ? travelTime.seconds() : null;
 	}
 

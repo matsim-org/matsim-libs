@@ -205,7 +205,7 @@ public class PSim implements Mobsim {
                                     continue;
                                 }
 
-                                travelTime = route.getOptionalTravelTime().orElse(0);
+                                travelTime = route.getTravelTime().orElse(0);
                                 eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
                                         route.getDistance()
                                         , prevLeg.getMode()

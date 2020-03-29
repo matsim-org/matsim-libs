@@ -110,8 +110,8 @@ public class DriverRoute implements Route , NetworkRoute {
 	}
 
 	@Override
-	public OptionalTime getOptionalTravelTime() {
-		return netRoute.getOptionalTravelTime();
+	public OptionalTime getTravelTime() {
+		return netRoute.getTravelTime();
 	}
 
 	@Override

@@ -60,7 +60,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	}
 
 	@Override
-	public final OptionalTime getOptionalTravelTime() {
+	public final OptionalTime getTravelTime() {
 		return this.travTime;
 	}
 

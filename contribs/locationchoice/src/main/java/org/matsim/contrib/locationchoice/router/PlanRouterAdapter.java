@@ -77,7 +77,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		leg.setDepartureTime(tripLeg.getDepartureTime().seconds());
 
 		return tripLeg.getRoute() != null ?
-				tripLeg.getRoute().getOptionalTravelTime().or(tripLeg::getTravelTime).seconds() :
+				tripLeg.getRoute().getTravelTime().or(tripLeg::getTravelTime).seconds() :
 				tripLeg.getTravelTime().seconds();
 	}
 

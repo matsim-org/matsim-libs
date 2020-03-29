@@ -418,8 +418,8 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Deprecated
 		@Override
-		public OptionalTime getOptionalTravelTime() {
-			return this.delegate.getOptionalTravelTime();
+		public OptionalTime getTravelTime() {
+			return this.delegate.getTravelTime();
 		}
 
 		@Override

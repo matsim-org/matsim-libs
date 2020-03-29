@@ -255,7 +255,7 @@ import org.matsim.vehicles.Vehicle;
 		out.write(encodeAttributeValue(route.getEndLinkId().toString()));
 		out.write("\"");
 		out.write(" trav_time=\"");
-		out.write(Time.writeTime(route.getOptionalTravelTime()));
+		out.write(Time.writeTime(route.getTravelTime()));
 		out.write("\"");
 		out.write(" distance=\"");
 		out.write(Double.toString(route.getDistance()));

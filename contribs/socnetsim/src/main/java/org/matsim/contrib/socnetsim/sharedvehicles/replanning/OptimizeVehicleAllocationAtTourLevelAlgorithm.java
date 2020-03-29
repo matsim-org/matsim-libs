@@ -333,7 +333,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			else if ( pe instanceof Leg ) {
 				Leg leg = (Leg)pe;
 				final Route r = leg.getRoute();
-				OptionalTime tt = r != null ? r.getOptionalTravelTime().or(leg::getTravelTime) : leg.getTravelTime();
+				OptionalTime tt = r != null ? r.getTravelTime().or(leg::getTravelTime) : leg.getTravelTime();
 				now += tt.orElse(0);// no info: just assume instantaneous (i.e. 0). This will give poor results!
 			}
 		}

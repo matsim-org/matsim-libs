@@ -194,7 +194,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             startLinkIdString = route.getStartLinkId().toString();
             travelCost = route.getTravelCost();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
             vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
             List<Id<Link>> linkIds = route.getLinkIds();
             linkIdStrings = new ArrayList<>();
@@ -233,7 +233,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             routeDescription = route.getRouteDescription();
             startLinkIdString = route.getStartLinkId().toString();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
         }
 
         @Override

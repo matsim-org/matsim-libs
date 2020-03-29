@@ -1117,7 +1117,7 @@ public final class PopulationUtils {
 		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
 	public static OptionalTime decideOnTravelTimeForLeg( Leg leg ) {
-		return leg.getRoute() !=null ? leg.getRoute().getOptionalTravelTime() : leg.getTravelTime();
+		return leg.getRoute() !=null ? leg.getRoute().getTravelTime() : leg.getTravelTime();
 	}
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;

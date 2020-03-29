@@ -277,7 +277,7 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+		if (this.currRoute.getTravelTime().isUndefined()) {
 			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
@@ -384,7 +384,7 @@ import org.xml.sax.Attributes;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+		if (this.currRoute.getTravelTime().isUndefined()) {
 			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 

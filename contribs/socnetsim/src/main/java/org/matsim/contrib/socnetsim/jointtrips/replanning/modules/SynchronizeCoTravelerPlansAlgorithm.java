@@ -96,7 +96,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Route route = leg.getRoute();
 
 				final OptionalTime legDur = route != null ?
-						route.getOptionalTravelTime().or(leg::getTravelTime) :
+						route.getTravelTime().or(leg::getTravelTime) :
 						leg.getTravelTime();
 
 				if ( legDur.isDefined()) {
@@ -138,7 +138,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Route route = leg.getRoute();
 
 				final OptionalTime legDur = route != null ?
-						route.getOptionalTravelTime().or(leg::getTravelTime) :
+						route.getTravelTime().or(leg::getTravelTime) :
 						leg.getTravelTime();
 
 				if ( legDur.isDefined()) {

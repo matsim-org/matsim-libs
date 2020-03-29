@@ -354,7 +354,7 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+		if (this.currRoute.getTravelTime().isUndefined()) {
 			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 
@@ -465,7 +465,7 @@ import com.google.inject.Inject;
 				}
 			}
 		}
-		if (this.currRoute.getOptionalTravelTime().isUndefined()) {
+		if (this.currRoute.getTravelTime().isUndefined()) {
 			this.currleg.getTravelTime().ifDefined(this.currRoute::setTravelTime);
 		}
 

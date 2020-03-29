@@ -63,7 +63,7 @@ class VehicleOnlyNetworkRoute implements NetworkRoute {
 	}
 
 	@Override
-	public OptionalTime getOptionalTravelTime() {
+	public OptionalTime getTravelTime() {
 		throw new UnsupportedOperationException();
 	}
 

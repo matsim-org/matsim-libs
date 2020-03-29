@@ -51,7 +51,7 @@ public class StaticPassengerDynLeg implements PassengerDynLeg {
 
 	@Override
 	public Double getExpectedTravelTime() {
-		return route.getTravelTime();
+		return route.getTravelTime().seconds();
 	}
 
 	@Override

@@ -84,10 +84,10 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testTravelTime() {
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(null, null);
-		assertTrue(route.getOptionalTravelTime().isUndefined());
+		assertTrue(route.getTravelTime().isUndefined());
 		double traveltime = 987.65;
 		route.setTravelTime(traveltime);
-		assertEquals(traveltime, route.getTravelTime(), MatsimTestCase.EPSILON);
+		assertEquals(traveltime, route.getTravelTime().seconds(), MatsimTestCase.EPSILON);
 	}
 
 	public void testSetRouteDescription_PtRoute() {

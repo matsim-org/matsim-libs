@@ -64,7 +64,7 @@ public class PassengerRoute implements Route {
 	}
 
 	@Override
-	public OptionalTime getOptionalTravelTime() {
+	public OptionalTime getTravelTime() {
 		return travelTime;
 	}
 
