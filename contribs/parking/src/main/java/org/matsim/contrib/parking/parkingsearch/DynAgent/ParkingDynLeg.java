@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 public class ParkingDynLeg implements DriverDynLeg {
@@ -137,11 +138,11 @@ public class ParkingDynLeg implements DriverDynLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		// travel time estimation does not take into account time required for
 		// parking search
 		// TODO add travel time at the destination link??
-		return route.getTravelTime().seconds();
+		return route.getTravelTime();
 	}
 
 	public Double getExpectedTravelDistance() {

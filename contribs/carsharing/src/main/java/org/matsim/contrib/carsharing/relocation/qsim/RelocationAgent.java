@@ -24,6 +24,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -289,10 +290,11 @@ public class RelocationAgent implements MobsimDriverAgent {
 		this.state = State.ABORT;
 	}
 
+	private static final OptionalTime BIKE_EXPECTED_TRAVEL_TIME = OptionalTime.defined(600);
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		if (this.transportMode.equals("bike"))
-			return 600.0;
+			return BIKE_EXPECTED_TRAVEL_TIME;
 		else
 			return this.guidance.getExpectedTravelTime(this.network.getLinks().get(this.getCurrentLinkId()),
 					this.network.getLinks().get(this.getDestinationLinkId()), this.getTimeOfDay(), this.transportMode,

@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
@@ -82,13 +81,13 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if ( agent.getExpectedTravelTime()==null || Time.isUndefinedTime(agent.getExpectedTravelTime()) ) {
+		if ( agent.getExpectedTravelTime().isUndefined() ) {
 			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
 					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
 		}
 
-		Double travelTime = agent.getExpectedTravelTime() ;
+		double travelTime = agent.getExpectedTravelTime().seconds() ;
 		if ( withTravelTimeCheck ) {
 			Double speed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( agent.getMode() ) ;
 			Facility dpfac = agent.getCurrentFacility() ;

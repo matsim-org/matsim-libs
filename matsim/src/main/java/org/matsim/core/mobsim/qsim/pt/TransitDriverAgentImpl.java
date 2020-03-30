@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -189,8 +190,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 	
 	@Override
-	public Double getExpectedTravelTime() {
-		return ((Leg) this.currentPlanElement).getTravelTime().seconds();
+	public OptionalTime getExpectedTravelTime() {
+		return ((Leg) this.currentPlanElement).getTravelTime();
 	}
 
     @Override
