@@ -8,7 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -37,6 +39,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -67,10 +70,14 @@ public class TripsAndLegsCSVWriterTest {
 	private static int end_x;
 	private static int end_y;
 	private static int trip_id;
+	private static int distance;
+	private static int mode;
+	
 
 	final Id<Link> link1 = Id.create(10723, Link.class);
 	final Id<Link> link2 = Id.create(123160, Link.class);
 	final Id<Link> link3 = Id.create(130181, Link.class);
+	ArrayList<Leg> legList = new ArrayList<Leg>();
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -99,6 +106,7 @@ public class TripsAndLegsCSVWriterTest {
 		route1_1_1.setDistance(100);
 		leg1_1_1.setRoute(route1_1_1);
 		leg1_1_1.setTravelTime(300.0);
+		legList.add(leg1_1_1);
 		person1_plan1.addLeg(leg1_1_1);
 		// ****************************************************************************************
 		Activity act1_1_2 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
@@ -113,30 +121,29 @@ public class TripsAndLegsCSVWriterTest {
 		route1_1_2.setDistance(5000);
 		leg1_1_2.setRoute(route1_1_2);
 		leg1_1_2.setTravelTime(1800.0);
+		legList.add(leg1_1_2);
 		person1_plan1.addLeg(leg1_1_2);
 		// ***************************************************************************************
-		Activity act1_1_3 = PopulationUtils.createActivityFromLinkId("car interaction", link3);
+		Activity act1_1_3 = PopulationUtils.createActivityFromLinkId("car interaction", link2);
 		act1_1_3.setStartTime(24000.0);
 		act1_1_3.setEndTime(24000.0);
-		act1_1_3.setLinkId(link3);
+		act1_1_3.setLinkId(link2);
 		act1_1_3.setCoord(CoordUtils.createCoord(111.0, 213.0));
 		act1_1_3.setFacilityId(Id.create("id3", ActivityFacility.class));
 		person1_plan1.addActivity(act1_1_3);
 		Leg leg1_1_3 = PopulationUtils.createLeg(TransportMode.walk);
-		Route route1_1_3 = RouteUtils.createGenericRouteImpl(link3, link3);
+		Route route1_1_3 = RouteUtils.createGenericRouteImpl(link2, link3);
 		route1_1_3.setDistance(300);
 		leg1_1_3.setRoute(route1_1_3);
 		leg1_1_3.setTravelTime(900.0);
+		legList.add(leg1_1_3);
 		person1_plan1.addLeg(leg1_1_3);
-		// **********************Trip
-		// ends***********************************************************
+		// **********************Trip ends***********************************************************
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
 		tour1.put("dep_time", LocalTime.of(21900 / 3600, (21900 % 3600) / 60, (21900 % 3600) % 60).format(dtf));
 		tour1.put("trav_time", LocalTime.of(3000 / 3600, (3000 % 3600) / 60, (3000 % 3600) % 60).format(dtf));
 		tour1.put("traveled_distance", "5400");
-		tour1.put("euclidean_distance",
-				(int) CoordUtils.calcEuclideanDistance(act1_1_1.getCoord(), act1_1_3.getCoord()));
 		tour1.put("longest_distance_mode", new String(TransportMode.car));
 		tour1.put("modes", new String(TransportMode.walk + "-" + TransportMode.car + "-" + TransportMode.walk));
 		tour1.put("start_activity_type", "home");
@@ -153,23 +160,26 @@ public class TripsAndLegsCSVWriterTest {
 		act1_1_4.setStartTime(24900.0);
 		act1_1_4.setEndTime(46500.0);
 		act1_1_4.setLinkId(link3);
-		act1_1_4.setCoord(CoordUtils.createCoord(111.0, 213.0));
+		act1_1_4.setCoord(CoordUtils.createCoord(120.0, 150.0));
 		act1_1_4.setFacilityId(Id.create("id4", ActivityFacility.class));
 		person1_plan1.addActivity(act1_1_4);
 		Leg leg1_1_4 = PopulationUtils.createLeg(TransportMode.walk);
-		Route route1_1_4 = RouteUtils.createGenericRouteImpl(link3, link3);
+		Route route1_1_4 = RouteUtils.createGenericRouteImpl(link3, link2);
 		route1_1_4.setDistance(300);
 		leg1_1_4.setTravelTime(900.0);
 		leg1_1_4.setRoute(route1_1_4);
+		legList.add(leg1_1_4);
 		person1_plan1.addLeg(leg1_1_4);
 		// **************************************************************************************
 		tour1.put("end_facility_id", String.valueOf(act1_1_4.getFacilityId()));
 		tour1.put("end_link", String.valueOf(act1_1_4.getLinkId()));
 		tour1.put("end_x", String.valueOf(act1_1_4.getCoord().getX()));
 		tour1.put("end_y", String.valueOf(act1_1_4.getCoord().getY()));
+		tour1.put("euclidean_distance",
+				(int) CoordUtils.calcEuclideanDistance(act1_1_1.getCoord(), act1_1_4.getCoord()));
 		persontrips.put("person1_1", tour1);
 		// ***************************************************************************************
-		Activity act1_1_5 = PopulationUtils.createActivityFromLinkId("car interaction", link3);
+		Activity act1_1_5 = PopulationUtils.createActivityFromLinkId("car interaction", link2);
 		act1_1_5.setStartTime(47400.0);
 		act1_1_5.setEndTime(47400.0);
 		act1_1_5.setLinkId(link2);
@@ -181,6 +191,7 @@ public class TripsAndLegsCSVWriterTest {
 		route1_1_5.setDistance(5000);
 		leg1_1_5.setTravelTime(1800.0);
 		leg1_1_5.setRoute(route1_1_5);
+		legList.add(leg1_1_5);
 		person1_plan1.addLeg(leg1_1_5);
 		// ******************************************************************************************
 		Activity act1_1_6 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
@@ -191,8 +202,11 @@ public class TripsAndLegsCSVWriterTest {
 		act1_1_6.setFacilityId(Id.create("id6", ActivityFacility.class));
 		person1_plan1.addActivity(act1_1_6);
 		Leg leg1_1_6 = PopulationUtils.createLeg(TransportMode.walk);
+		Route route1_1_6 = RouteUtils.createGenericRouteImpl(link1, link1);
+		route1_1_6.setDistance(5000);
 		leg1_1_6.setRoute(route1_1_1);
 		leg1_1_6.setTravelTime(300.0);
+		legList.add(leg1_1_6);
 		person1_plan1.addLeg(leg1_1_6);
 		// *******************************************************************************************+
 		Activity act1_1_7 = PopulationUtils.createActivityFromLinkId("home", link1);
@@ -201,8 +215,7 @@ public class TripsAndLegsCSVWriterTest {
 		act1_1_7.setCoord(CoordUtils.createCoord(11.0, 22.0));
 		act1_1_7.setFacilityId(Id.create("id1", ActivityFacility.class));
 		person1_plan1.addActivity(act1_1_7);
-		// **********************Trip
-		// ends***********************************************************
+		// **********************Trip ends***********************************************************
 
 		tour2.put("dep_time", LocalTime.of(46500 / 3600, (46500 % 3600) / 60, (46500 % 3600) % 60).format(dtf));
 		tour2.put("trav_time", LocalTime.of(3000 / 3600, (3000 % 3600) / 60, (3000 % 3600) % 60).format(dtf));
@@ -243,9 +256,10 @@ public class TripsAndLegsCSVWriterTest {
 		route2_1_1.setDistance(100);
 		leg2_1_1.setRoute(route1_1_1);
 		leg2_1_1.setTravelTime(300.0);
+		legList.add(leg2_1_1);
 		person2_plan1.addLeg(leg2_1_1);
 		// ****************************************************************************************
-		Activity act2_1_2 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity act2_1_2 = PopulationUtils.createActivityFromLinkId("pt interaction", link1);
 		act2_1_2.setStartTime(22200.0);
 		act2_1_2.setEndTime(22200.0);
 		act2_1_2.setLinkId(link1);
@@ -255,33 +269,34 @@ public class TripsAndLegsCSVWriterTest {
 		Leg leg2_1_2 = PopulationUtils.createLeg(TransportMode.pt);
 		Route route2_1_2 = RouteUtils.createGenericRouteImpl(link1, link2);
 		route2_1_2.setDistance(5000);
+		leg2_1_2.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 22200.0);
 		leg2_1_2.setRoute(route2_1_2);
 		leg2_1_2.setTravelTime(1800.0);
 		person2_plan1.addLeg(leg2_1_2);
 		// ***************************************************************************************
-		Activity act2_1_3 = PopulationUtils.createActivityFromLinkId("car interaction", link3);
+		Activity act2_1_3 = PopulationUtils.createActivityFromLinkId("pt interaction", link3);
 		act2_1_3.setStartTime(24000.0);
 		act2_1_3.setEndTime(24000.0);
-		act2_1_3.setLinkId(link3);
+		act2_1_3.setLinkId(link2);
 		act2_1_3.setCoord(CoordUtils.createCoord(111.0, 213.0));
 		act2_1_3.setFacilityId(Id.create("id7", ActivityFacility.class));
 		person1_plan1.addActivity(act2_1_3);
 		Leg leg2_1_3 = PopulationUtils.createLeg(TransportMode.walk);
-		Route route2_1_3 = RouteUtils.createGenericRouteImpl(link3, link3);
+		Route route2_1_3 = RouteUtils.createGenericRouteImpl(link2, link3);
 		route2_1_3.setDistance(300);
 		leg2_1_3.setRoute(route2_1_3);
 		leg2_1_3.setTravelTime(900.0);
+		legList.add(leg2_1_3);
 		person2_plan1.addLeg(leg2_1_3);
 
 		Activity act2_1_4 = PopulationUtils.createActivityFromLinkId("shopping", link3);
 		act2_1_4.setStartTime(24900.0);
 		act2_1_4.setEndTime(46500.0);
 		// act2_1_4.setLinkId(link3);
-		act2_1_4.setCoord(CoordUtils.createCoord(111.0, 213.0));
+		act2_1_4.setCoord(CoordUtils.createCoord(120.0, 150.0));
 		// act2_1_4.setFacilityId(Id.create("id8", ActivityFacility.class));
 		person2_plan1.addActivity(act2_1_4);
-		// **********************Trip
-		// ends***********************************************************
+		// **********************Trip ends***********************************************************
 		Map<String, Object> tour2_1 = new HashMap<String, Object>();
 		tour2_1.put("dep_time", LocalTime.of(21900 / 3600, (21900 % 3600) / 60, (21900 % 3600) % 60).format(dtf));
 		tour2_1.put("trav_time", LocalTime.of(3000 / 3600, (3000 % 3600) / 60, (3000 % 3600) % 60).format(dtf));
@@ -304,11 +319,11 @@ public class TripsAndLegsCSVWriterTest {
 		map.put(Id.create("person2", Person.class), person2_plan1);
 
 		performTest(utils.getOutputDirectory() + "/trip.csv", utils.getOutputDirectory() + "/leg.csv", map,
-				persontrips);
+				persontrips, legList);
 	}
 
 	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map,
-			Map<String, Object> persontrips) {
+			Map<String, Object> persontrips, ArrayList<Leg> legLists) {
 
 		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
 		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
@@ -317,10 +332,12 @@ public class TripsAndLegsCSVWriterTest {
 		TripsAndLegsCSVWriter tripsAndLegsWriter = new TripsAndLegsCSVWriter(scenario, tripsWriterExtension,
 				legWriterExtension);
 		tripsAndLegsWriter.write(map, tripsFilename, legsFilename);
-		readAndValidateValues(persontrips, tripsFilename, legsFilename);
+		readAndValidateTrips(persontrips, tripsFilename);
+		readAndValidateLegs(persontrips, legLists, legsFilename);
 	}
 
-	private void readAndValidateValues(Map<String, Object> persontrips, String tripFile, String legFile) {
+	/*******************Reading and validating the trips file************************/
+	private void readAndValidateTrips(Map<String, Object> persontrips, String tripFile) {
 
 		BufferedReader br;
 		String line;
@@ -332,47 +349,31 @@ public class TripsAndLegsCSVWriterTest {
 			while ((line = br.readLine()) != null) {
 
 				String[] column = line.split(";");
-				String dep_time_value = column[dep_time];
-				String trav_time_value = column[trav_time];
-				String traveled_distance_value = column[traveled_distance];
-				Integer euclidean_distance_value = Integer.parseInt(column[euclidean_distance]);
-				String longest_distance_mode_value = column[longest_distance_mode];
-				String modes_value = column[modes];
-				String start_activity_type_value = column[start_activity_type];
-				String end_activity_type_value = column[end_activity_type];
-				String start_facility_id_value = column[start_facility_id];
-				String start_link_value = column[start_link];
-				String start_x_value = column[start_x];
-				String start_y_value = column[start_y];
-				String end_facility_id_value = column[end_facility_id];
-				String end_link_value = column[end_link];
-				String end_x_value = column[end_x];
-				String end_y_value = column[end_y];
 				String trip_id_value = column[trip_id];
 				Map<String, Object> tripvalues = (Map<String, Object>) persontrips.get(trip_id_value);
-				Assert.assertEquals("Departure time is not as expected", tripvalues.get("dep_time"), dep_time_value);
-				Assert.assertEquals("Travel time is not as expected", tripvalues.get("trav_time"), trav_time_value);
+				Assert.assertEquals("Departure time is not as expected", tripvalues.get("dep_time"), column[dep_time]);
+				Assert.assertEquals("Travel time is not as expected", tripvalues.get("trav_time"), column[trav_time]);
 				Assert.assertEquals("Travel distance is not as expected", tripvalues.get("traveled_distance"),
-						traveled_distance_value);
+						column[traveled_distance]);
 				Assert.assertEquals("Euclidean distance is not as expected", tripvalues.get("euclidean_distance"),
-						euclidean_distance_value);
+						Integer.parseInt(column[euclidean_distance]));
 				Assert.assertEquals("DLongest distance mode is not as expected",
-						tripvalues.get("longest_distance_mode"), longest_distance_mode_value);
-				Assert.assertEquals("Modes is not as expected", tripvalues.get("modes"), modes_value);
+						tripvalues.get("longest_distance_mode"), column[longest_distance_mode]);
+				Assert.assertEquals("Modes is not as expected", tripvalues.get("modes"), column[modes]);
 				Assert.assertEquals("Start activity type is not as expected", tripvalues.get("start_activity_type"),
-						start_activity_type_value);
+						column[start_activity_type]);
 				Assert.assertEquals("End activity type is not as expected", tripvalues.get("end_activity_type"),
-						end_activity_type_value);
+						column[end_activity_type]);
 				Assert.assertEquals("Start facility id is not as expected", tripvalues.get("start_facility_id"),
-						start_facility_id_value);
-				Assert.assertEquals("Start link is not as expected", tripvalues.get("start_link"), start_link_value);
-				Assert.assertEquals("Start x is not as expected", tripvalues.get("start_x"), start_x_value);
-				Assert.assertEquals("Start y is not as expected", tripvalues.get("start_y"), start_y_value);
+						column[start_facility_id]);
+				Assert.assertEquals("Start link is not as expected", tripvalues.get("start_link"), column[start_link]);
+				Assert.assertEquals("Start x is not as expected", tripvalues.get("start_x"), column[start_x]);
+				Assert.assertEquals("Start y is not as expected", tripvalues.get("start_y"), column[start_y]);
 				Assert.assertEquals("End facility id is not as expected", tripvalues.get("end_facility_id"),
-						end_facility_id_value);
-				Assert.assertEquals("End link is not as expected", tripvalues.get("end_link"), end_link_value);
-				Assert.assertEquals("End x is not as expected", tripvalues.get("end_x"), end_x_value);
-				Assert.assertEquals("End y is not as expected", tripvalues.get("end_y"), end_y_value);
+						column[end_facility_id]);
+				Assert.assertEquals("End link is not as expected", tripvalues.get("end_link"), column[end_link]);
+				Assert.assertEquals("End x is not as expected", tripvalues.get("end_x"), column[end_x]);
+				Assert.assertEquals("End y is not as expected", tripvalues.get("end_y"), column[end_y]);
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -380,7 +381,35 @@ public class TripsAndLegsCSVWriterTest {
 		}
 
 	}
+	
+	/*******************Reading and validating the legs file************************/
+	private void readAndValidateLegs(Map<String, Object> persontrips, ArrayList<Leg> legLists, String legFile) {
+		
+		BufferedReader br;
+		String line;
+		try {
+			br = new BufferedReader(new FileReader(legFile));
+			String firstRow = br.readLine();
+			String[] columnNames = firstRow.split(";");
+			Iterator<Leg> legItr = legList.iterator();
+			decideColumns(columnNames);
+			while ((line = br.readLine()) != null && legItr.hasNext()) {
+				String[] column = line.split(";");
+				Leg nextleg = legItr.next();
+				Assert.assertEquals("Distance is not as expected", String.valueOf((int) nextleg.getRoute().getDistance()) , column[distance]);
+				Assert.assertEquals("Mode is not as expected", String.valueOf(nextleg.getMode()) , column[mode]);
+				Assert.assertEquals("Start link is not as expected", String.valueOf(nextleg.getRoute().getStartLinkId()) , column[start_link]);
+				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.getRoute().getEndLinkId()) , column[end_link]);
+				
+			}
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+				
+	}
 
+	/*******************************Deciding the columns of the output files************************************/
 	private static void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
@@ -455,29 +484,35 @@ public class TripsAndLegsCSVWriterTest {
 			case "trip_id":
 				trip_id = i;
 				break;
+			
+			case "distance":
+				distance = i;
+				break;
+				
+			case "mode":
+				mode = i;
+				break;
 			}
 			i++;
 		}
 	}
 
+	/**************************Creating a network*********************************/
 	private void createNetwork() {
 
 		Network network = NetworkUtils.createNetwork();
 		NetworkFactory factory = network.getFactory();
+		
+		Node n0, n1, n2, n3;
+		network.addNode(n0 = factory.createNode(Id.createNodeId(0), new Coord(11, 22)));
+		network.addNode(n1 = factory.createNode(Id.createNodeId(1), new Coord(10, 20)));
+		network.addNode(n2 = factory.createNode(Id.createNodeId(2), new Coord(111, 213)));
+		network.addNode(n3 = factory.createNode(Id.createNodeId(3), new Coord(120, 150)));
 
-		Node n0 = factory.createNode(Id.createNodeId(0), new Coord(11, 22));
-		network.addNode(n0);
-		Node n1 = factory.createNode(Id.createNodeId(1), new Coord(10, 20));
-		network.addNode(n1);
-		Node n2 = factory.createNode(Id.createNodeId(2), new Coord(111, 213));
-		network.addNode(n2);
+		network.addLink(factory.createLink(link1, n0, n1));
+		network.addLink(factory.createLink(link2, n1, n2));
+		network.addLink(factory.createLink(link3, n2, n3));
 
-		Link link_1 = factory.createLink(link1, n0, n1);
-		network.addLink(link_1);
-		Link link_2 = factory.createLink(link2, n1, n2);
-		network.addLink(link_2);
-		Link link_3 = factory.createLink(link3, n2, n0);
-		network.addLink(link_3);
 		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "/network.xml");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getOutputDirectory() + "/network.xml");
 	}

@@ -422,10 +422,10 @@ public class PKMbyModeCalculatorTest {
 		controlerConfigGroup.setCreateGraphs(true);
 		controlerConfigGroup.setFirstIteration(0);
 		controlerConfigGroup.setLastIteration(10);
-		PKMbyModeCalculator travelDistanceStats = new PKMbyModeCalculator(controlerConfigGroup, controlerIO);
+		PKMbyModeCalculator pkmbyModeCalculator = new PKMbyModeCalculator(controlerConfigGroup, controlerIO);
 		// iteration 0
-		travelDistanceStats.addIteration(0, map);
-		travelDistanceStats.writeOutput();
+		pkmbyModeCalculator.addIteration(0, map);
+		pkmbyModeCalculator.writeOutput();
 		Double totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person2CarDist")
 				+ modeCalcDist.get("person3CarDist");
 		Double totalPtDist = modeCalcDist.get("person1PtDist") + modeCalcDist.get("person4PtDist");
@@ -437,8 +437,8 @@ public class PKMbyModeCalculatorTest {
 		// removing person 2
 		map.remove(person2.getId());
 		// iteration 1
-		travelDistanceStats.addIteration(1, map);
-		travelDistanceStats.writeOutput();
+		pkmbyModeCalculator.addIteration(1, map);
+		pkmbyModeCalculator.writeOutput();
 		totalCarDist = modeCalcDist.get("person1CarDist") + modeCalcDist.get("person3CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person3WalkDist") + modeCalcDist.get("person4WalkDist");
@@ -448,8 +448,8 @@ public class PKMbyModeCalculatorTest {
 		// removing person 3
 		map.remove(person3.getId());
 		// iteration 2
-		travelDistanceStats.addIteration(2, map);
-		travelDistanceStats.writeOutput();
+		pkmbyModeCalculator.addIteration(2, map);
+		pkmbyModeCalculator.writeOutput();
 		totalCarDist = modeCalcDist.get("person1CarDist");
 		totalPtDist = modeCalcDist.get("person1PtDist")  + modeCalcDist.get("person4PtDist");
 		totalWalkDist = modeCalcDist.get("person1WalkDist") + modeCalcDist.get("person4WalkDist");
