@@ -43,7 +43,7 @@ public final class ParallelEventsManager implements EventsManager {
 	private final static Logger log = Logger.getLogger(ParallelEventsManager.class);
 
 	private Distributor distributor;
-	private EventsManager[] eventsManagers = new EventsManager[0];
+	private ArrayList<EventsManager> eventsManagers = new ArrayList<>();
 	private final List<EventHandler> eventsHandlers;
 	private final boolean oneThreadPerHandler;
 	private final boolean syncOnTimeSteps;
@@ -80,29 +80,29 @@ public final class ParallelEventsManager implements EventsManager {
 
 	private void initialize() {
 		int numHandlers = oneThreadPerHandler ? this.eventsHandlers.size() : Math.min(this.numOfThreads, this.eventsHandlers.size());
-		this.distributor = new Distributor(new ProcessEventsRunnable[numHandlers], eventQueue);
-		this.eventsManagers = new EventsManager[numHandlers];
+		this.distributor = new Distributor(new ArrayList<ProcessEventsRunnable>(), eventQueue);
+		this.eventsManagers = new ArrayList<>(numHandlers);
 
 		// create event managers
 		if (this.oneThreadPerHandler) {
 			for (int i = 0; i < this.eventsHandlers.size(); i++) {
-				this.eventsManagers[i] = new SingleHandlerEventsManager(this.eventsHandlers.get(i));
+				this.eventsManagers.add(new SingleHandlerEventsManager(this.eventsHandlers.get(i)));
 			}
 		} else {
 			// TODO - check if this slow path is correct
 			for (int i = 0; i < this.numOfThreads; i++) {
-				this.eventsManagers[i] = new EventsManagerImpl();
+				this.eventsManagers.add(new EventsManagerImpl());
 			}
 			for (int i = 0; i < this.eventsHandlers.size(); i++) {
-				this.eventsManagers[this.eventsHandlers.size() % numOfThreads].addHandler(this.eventsHandlers.get(i));
+				this.eventsManagers.get(this.eventsHandlers.size() % numOfThreads).addHandler(this.eventsHandlers.get(i));
 			}
 		}
 
 		// initialize runnables (threads that will execute the event managers)
-		for (int i = 0; i < this.eventsManagers.length; i++) {
-			EventsManager eventsManager = this.eventsManagers[i];
+		for (int i = 0; i < this.eventsManagers.size(); i++) {
+			EventsManager eventsManager = this.eventsManagers.get(i);
 			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManager);
-			distributor.runnables[i] = processEventsRunnable;
+			distributor.runnables.add(processEventsRunnable);
 			processEventsRunnable.setDaemon(true);
 			processEventsRunnable.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 			if (oneThreadPerHandler) {
@@ -225,7 +225,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 	private class Distributor extends Thread {
 
-		private final ProcessEventsRunnable[] runnables;
+		private final ArrayList<ProcessEventsRunnable> runnables;
 		private final BlockingQueue<EventArray> eventQueue;
 
 		// When set to true, the distributor will process all events until all events in the event manager are processed.
@@ -233,7 +233,7 @@ public final class ParallelEventsManager implements EventsManager {
 		// events in the system.
 		private volatile boolean shouldFlush = false;
 
-		public Distributor(ProcessEventsRunnable[] runnables, BlockingQueue<EventArray> eventQueue) {
+		public Distributor(ArrayList<ProcessEventsRunnable> runnables, BlockingQueue<EventArray> eventQueue) {
 			this.runnables = runnables;
 			this.eventQueue = eventQueue;
 		}

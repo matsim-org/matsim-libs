@@ -205,7 +205,7 @@ public class QSimSignalTest implements
 		 * new version how to create a qsim without a controler and still be able to add
 		 * the SignalsModule. see comment above.
 		 */
-		ParallelEventsManager events = new ParallelEventsManager(false);
+		ParallelEventsManager events = new ParallelEventsManager(false, 1);
 		if (handleEvents){
 			events.addHandler(this);
 		}

@@ -29,7 +29,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 public final class EventsUtils {
 
     public static EventsManager createEventsManager() {
-		return new ParallelEventsManager(false);
+		return new ParallelEventsManager(false, 1);
     }
 
 	public static EventsManager createEventsManager(Config config) {

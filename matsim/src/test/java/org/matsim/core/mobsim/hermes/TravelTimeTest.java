@@ -61,7 +61,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
+		EventsManager events = new ParallelEventsManager(false, 1);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -97,7 +97,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
+		EventsManager events = new ParallelEventsManager(false, 1);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		// Travel time 359.9712023038
@@ -187,7 +187,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false);
+		EventsManager events = new ParallelEventsManager(false, 1);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
