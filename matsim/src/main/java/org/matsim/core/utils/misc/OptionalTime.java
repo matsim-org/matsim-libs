@@ -109,11 +109,7 @@ public final class OptionalTime {
 	}
 
 	public DoubleStream stream() {
-		if (seconds != Time.UNDEFINED_TIME) {
-			return DoubleStream.of(seconds);
-		} else {
-			return DoubleStream.empty();
-		}
+		return seconds != Time.UNDEFINED_TIME ? DoubleStream.of(seconds) : DoubleStream.empty();
 	}
 
 	public OptionalTime or(OptionalTime optionalTime) {
