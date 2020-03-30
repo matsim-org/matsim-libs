@@ -20,8 +20,7 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.NoSuchElementException;
 import java.util.function.Supplier;
@@ -34,11 +33,9 @@ import org.junit.Test;
  */
 public class OptionalTimeTest {
 	@Test
-	public void test_defined() {
+	public void test_defined_seconds() {
 		//defined
 		assertThat(OptionalTime.defined(0).seconds()).isEqualTo(0);
-		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));//cached, so the same
-
 		assertThat(OptionalTime.defined(1).seconds()).isEqualTo(1);
 		assertThat(OptionalTime.defined(-Double.MAX_VALUE).seconds()).isEqualTo(-Double.MAX_VALUE);
 		assertThat(OptionalTime.defined(Double.POSITIVE_INFINITY).seconds()).isEqualTo(Double.POSITIVE_INFINITY);
@@ -53,14 +50,18 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_undefined() {
+	public void test_undefined_seconds() {
 		assertThat(OptionalTime.undefined().isUndefined()).isTrue();
-
-		//undefined OptionalTime is cached
-		assertThat(OptionalTime.undefined()).isSameAs(OptionalTime.undefined());
 
 		assertThatThrownBy(() -> OptionalTime.undefined().seconds()).isExactlyInstanceOf(NoSuchElementException.class)
 				.hasMessage("Undefined time");
+	}
+
+	@Test
+	public void test_cachedValues() {
+		//currently 0 and undefined are cached
+		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));
+		assertThat(OptionalTime.undefined()).isSameAs(OptionalTime.undefined());
 	}
 
 	@Test
@@ -85,6 +86,16 @@ public class OptionalTimeTest {
 	public void test_orElseGet() {
 		assertThat(OptionalTime.undefined().orElseGet(() -> 0)).isEqualTo(0);
 		assertThat(OptionalTime.defined(1).orElseGet(() -> 0)).isEqualTo(1);
+	}
+
+	@Test
+	public void test_orElseThrow() {
+		assertThatThrownBy(() -> OptionalTime.undefined()
+				.orElseThrow(() -> new IllegalStateException("Undefined time error"))).isExactlyInstanceOf(
+				IllegalStateException.class).hasMessage("Undefined time error");
+
+		assertThatCode(() -> OptionalTime.defined(1)
+				.orElseThrow(() -> new IllegalStateException("Undefined time error"))).doesNotThrowAnyException();
 	}
 
 	@Test
