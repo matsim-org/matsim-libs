@@ -100,8 +100,6 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		if ( time.isUndefined() ) return time.seconds();
 
 		final double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
-		assert !Double.isNaN( t ) : t;
-		assert !Double.isInfinite( t ) : t;
 		return t < 0 ? 0 : t;
 	}
 

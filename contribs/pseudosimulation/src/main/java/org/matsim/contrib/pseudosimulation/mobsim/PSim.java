@@ -221,17 +221,6 @@ public class PSim implements Mobsim {
                          */
                         actEndTime = Math.max( arrivalTime + MIN_ACT_DURATION, actEndTime );
                         /*
-                         * If act end time is not specified...
-                         */
-                        if( Double.isInfinite( actEndTime ) ){
-                            // if(transitPerformance!=null){
-                            if( transitEmulator != null ){
-                                //this guy is stuck, will be caught in events handling outside the loop
-                                break;
-                            } else
-                                throw new RuntimeException( "I think this is discuraged." );
-                        }
-                        /*
                          * Send arrival and activity start events.
                          */
                         PersonArrivalEvent arrivalEvent = new PersonArrivalEvent( arrivalTime, personId, act.getLinkId(), prevLeg.getMode() );
