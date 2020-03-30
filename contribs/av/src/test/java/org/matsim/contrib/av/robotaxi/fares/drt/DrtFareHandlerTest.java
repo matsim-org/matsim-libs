@@ -62,7 +62,7 @@ public class DrtFareHandlerTest {
         tccg.setMode(TransportMode.drt);
 
         final MutableDouble fare = new MutableDouble(0);
-        ParallelEventsManager events = new ParallelEventsManager(false);
+        ParallelEventsManager events = new ParallelEventsManager(false, 1);
         DrtFareHandler tfh = new DrtFareHandler(tccg, events);
         events.addHandler(tfh);
         events.addHandler(new PersonMoneyEventHandler() {

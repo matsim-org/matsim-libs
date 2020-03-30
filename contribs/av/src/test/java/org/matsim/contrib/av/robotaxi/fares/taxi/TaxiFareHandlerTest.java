@@ -71,7 +71,7 @@ public class TaxiFareHandlerTest {
 		multiTaxiCfg.addParameterSet(taxiCfg);
 		config.addModule(multiTaxiCfg);
 		final MutableDouble fare = new MutableDouble(0);
-		ParallelEventsManager events = new ParallelEventsManager(false);
+		ParallelEventsManager events = new ParallelEventsManager(false, 1);
         TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
