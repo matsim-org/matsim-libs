@@ -1,4 +1,4 @@
-image: maven:3-jdk-8
+image: maven:3-jdk-11
 
 build:
   script: "mvn install -B --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true"
