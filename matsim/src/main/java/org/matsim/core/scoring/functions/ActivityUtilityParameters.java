@@ -75,12 +75,12 @@ public final class ActivityUtilityParameters implements MatsimParameters {
 	public final static class Builder {
 		private String type;
 		private double priority = 1. ;
-		private OptionalTime typicalDuration_s;
-		private OptionalTime closingTime;
-		private OptionalTime earliestEndTime;
-		private OptionalTime latestStartTime;
-		private OptionalTime minimalDuration;
-		private OptionalTime openingTime;
+		private OptionalTime typicalDuration_s = OptionalTime.undefined();
+		private OptionalTime closingTime = OptionalTime.undefined();
+		private OptionalTime earliestEndTime = OptionalTime.undefined();
+		private OptionalTime latestStartTime = OptionalTime.undefined();
+		private OptionalTime minimalDuration = OptionalTime.undefined();
+		private OptionalTime openingTime = OptionalTime.undefined();
 		private boolean scoreAtAll;
 		private ZeroUtilityComputation zeroUtilityComputation ;
 

@@ -186,13 +186,13 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
-							activityParams.getTypicalDuration().seconds());
+							activityParams.getTypicalDuration());
 					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(),
-							activityParams.getLatestStartTime().seconds());
+							activityParams.getLatestStartTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(),
-							activityParams.getEarliestEndTime().seconds());
+							activityParams.getEarliestEndTime());
 					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(),
-							activityParams.getMinimalDuration().seconds());
+							activityParams.getMinimalDuration());
 				}
 			}
 		}
