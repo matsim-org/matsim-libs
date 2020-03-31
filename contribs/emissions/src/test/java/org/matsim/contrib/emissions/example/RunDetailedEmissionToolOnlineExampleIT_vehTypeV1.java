@@ -46,20 +46,20 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 	 * This is by now (feb'20) the default. Setting it here for the tests explicitly
 	 *
 	 * */
-	@SuppressWarnings("static-method")
 //	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
 	@Test
 	public final void testDetailed_vehTypeV1() {
 		boolean gotAnException = false ;
 		try {
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
+			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
+			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
-			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+			Scenario scenario = onlineExample.prepareScenario( config ) ;
+			onlineExample.run( scenario ) ;
 		} catch (Exception ee ) {
 			gotAnException = true ;
 		}

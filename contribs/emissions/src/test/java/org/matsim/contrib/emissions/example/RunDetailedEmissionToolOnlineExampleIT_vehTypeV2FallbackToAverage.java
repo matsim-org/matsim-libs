@@ -38,18 +38,18 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV2FallbackToAverage {
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
-	@SuppressWarnings("static-method")
 	@Test
 	public final void testDetailed_vehTypeV2_FallbackToAverage() {
 		try {
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
+			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
+			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setDetailedVsAverageLookupBehavior(
 					EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ); //This is the previous behaviour -> Test only pass, if falling back to average table :(
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
-			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+			Scenario scenario = onlineExample.prepareScenario( config ) ;
+			onlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;
