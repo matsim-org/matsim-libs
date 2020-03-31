@@ -174,12 +174,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(END_TIME)
 	private void setEndTime(String value) {
-		setEndTime(Time.parseTime(value));
+		this.endTime = Time.parseOptionalTime(value);
 	}
 
 	@StringSetter(START_TIME)
 	private void setStartTime(String value) {
-		setStartTime(Time.parseTime(value));
+		this.startTime = Time.parseOptionalTime(value);
 	}
 
 	@StringGetter(MAIN_MODE)
