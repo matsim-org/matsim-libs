@@ -108,7 +108,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		double endTime = qSimCfg.getEndTime().orElseGet(()->
 			 trips.isEmpty() ? qSimCfg.getStartTime().seconds() : trips.get(trips.size() - 1).getDepartureTime());
 
-		DrtTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime().seconds(), endTime, 3600,
+		DrtTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime().orElse(0), endTime, 3600,
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);
 	}
 

@@ -930,7 +930,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	}
 
 	void computeFinalTimeIntervals() {
-		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime().seconds())) {
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime().orElse(0))) {
 			processTimeBin();			
 		}
 	}
