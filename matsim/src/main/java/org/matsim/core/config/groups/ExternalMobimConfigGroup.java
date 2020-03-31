@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
@@ -38,8 +39,8 @@ public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
 	private static final String EXTERNAL_EXE = "externalExe";
 	private static final String TIMEOUT = "timeout";
 
-	private double startTime = Time.getUndefinedTime();
-	private double endTime = Time.getUndefinedTime();
+	private OptionalTime startTime = OptionalTime.undefined();
+	private OptionalTime endTime = OptionalTime.undefined();
 	private String externalExe = null;
 	private int timeOut = 3600;
 
@@ -57,33 +58,33 @@ public final class ExternalMobimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(START_TIME)
 	public void setStartTime(final String startTime) {
-		this.setStartTime( Time.parseTime(startTime) ) ;
+		this.startTime = Time.parseOptionalTime(startTime);
 	}
 	public void setStartTime(final double startTime) {
-		this.startTime = startTime;
+		this.startTime = OptionalTime.defined(startTime);
 	}
 
 	@StringGetter(START_TIME)
 	String getStartTimeAsString() {
 		return Time.writeTime(this.startTime) ;
 	}
-	public double getStartTime() {
+	public OptionalTime getStartTime() {
 		return this.startTime;
 	}
 
 	@StringSetter(END_TIME)
-	public void setEndTime(final String startTime) {
-		this.setEndTime( Time.parseTime(startTime) );
+	public void setEndTime(final String endTime) {
+		this.setEndTime( Time.parseTime(endTime) );
 	}
 	public void setEndTime(final double endTime) {
-		this.endTime = endTime;
+		this.endTime = OptionalTime.defined(endTime);
 	}
 
 	@StringGetter(END_TIME)
 	String getEndTimeAsString() {
 		return Time.writeTime(this.endTime ) ;
 	}
-	public double getEndTime() {
+	public OptionalTime getEndTime() {
 		return this.endTime;
 	}
 
