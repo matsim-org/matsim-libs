@@ -1510,8 +1510,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				if (actType.isScoringThisActivityAtAll()) {
 					// (checking consistency only if activity is scored at all)
 
-					if (actType.getOpeningTime().isDefined()
-							&& actType.getClosingTime().isDefined()) {
+					if (actType.getOpeningTime().isDefined() && actType.getClosingTime().isDefined()) {
 						hasOpeningAndClosingTime = true;
 
 						if (actType.getOpeningTime().seconds() == 0. && actType.getClosingTime().seconds() > 24. * 3600 - 1) {
