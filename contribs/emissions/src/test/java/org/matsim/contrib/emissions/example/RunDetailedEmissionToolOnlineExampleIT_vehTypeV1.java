@@ -54,7 +54,6 @@ public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.global().setNumberOfThreads(1);
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
