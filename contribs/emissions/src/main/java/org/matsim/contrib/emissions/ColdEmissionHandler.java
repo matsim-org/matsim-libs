@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
@@ -112,13 +111,15 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
             } else{
 
                 if( (distance / 1000) > 1.0 ){
-                    this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
-                                    coldEmissionEventLinkId,
-                                    vehicle,
-                                    event.getTime(),
-                                    parkingDuration,
-                                    2
-                                                                                       );
+                    Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(
+                            coldEmissionEventLinkId,
+                            vehicle,
+                            event.getTime(),
+                            parkingDuration,
+                            2);
+
+                    coldEmissionAnalysisModule.throwColdEmissionEvent(linkId, vehicle, event.getTime(), coldEmissions);
+
                     this.vehicleId2accumulatedDistance.remove( vehicleId );
                 } else{
                     this.vehicleId2accumulatedDistance.put( vehicleId, distance );
@@ -191,13 +192,14 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
         if ( vehicle==null ) {
             handleNullVehicle( vehicleId, emissionsConfigGroup );
         } else{
-            this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
+            Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(
                             linkId,
                             vehicle,
                             startEngineTime,
                             parkingDuration,
-                            1
-                                                                               );
+                            1);
+
+            coldEmissionAnalysisModule.throwColdEmissionEvent(linkId, vehicle, startEngineTime, coldEmissions);
             // yyyy again, I do not know what the "distance" does.  kai, jan'20
         }
     }

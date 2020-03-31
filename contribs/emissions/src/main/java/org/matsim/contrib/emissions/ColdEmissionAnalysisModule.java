@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -97,7 +96,7 @@ final class ColdEmissionAnalysisModule {
 		vehAttributesNotSpecifiedCnt = 0;
 	}
 
-	void calculateColdEmissionsAndThrowEvent(
+	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(
 			Id<Link> coldEmissionEventLinkId,
 			Vehicle vehicle,
 			double eventTime,
@@ -145,9 +144,14 @@ final class ColdEmissionAnalysisModule {
 //			if(emissionEfficiencyFactor != null){
 //				coldEmissions = WarmEmissionAnalysisModule.rescaleWarmEmissions(coldEmissions, emissionEfficiencyFactor );
 //			}
-			Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
-			this.eventsManager.processEvent(coldEmissionEvent);
+			throwColdEmissionEvent(coldEmissionEventLinkId, vehicle, eventTime, coldEmissions);
 		}
+		return null;
+	}
+
+	/*package-private*/ void throwColdEmissionEvent(Id<Link> coldEmissionEventLinkId, Vehicle vehicle, double eventTime, Map<Pollutant, Double> coldEmissions) {
+		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
+		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
 	private Map<Pollutant, Double> getColdPollutantDoubleMap( Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
