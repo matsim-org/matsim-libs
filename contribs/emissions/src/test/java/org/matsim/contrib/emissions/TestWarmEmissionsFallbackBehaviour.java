@@ -26,11 +26,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.example.RunDetailedEmissionToolOnlineExample;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
@@ -242,7 +242,7 @@ public class TestWarmEmissionsFallbackBehaviour {
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "./scenarios/sampleScenario/sample_41_EFA_HOT_vehcat_2020average.txt" );
 		emissionsConfig.setDetailedWarmEmissionFactorsFile("./scenarios/sampleScenario/sample_41_EFA_HOT_SubSegm_2020detailed.txt");
 
-		Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config );
+		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 
