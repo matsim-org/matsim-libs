@@ -82,7 +82,7 @@ public class PSim implements Mobsim {
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
         Logger.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
-        this.endTime = sc.getConfig().qsim().getEndTime();
+        this.endTime = sc.getConfig().qsim().getEndTime().seconds();
         this.eventManager = eventsManager;
         int numThreads = sc.getConfig().global().getNumberOfThreads() ;
         threads = new SimThread[numThreads];

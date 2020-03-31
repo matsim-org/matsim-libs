@@ -83,7 +83,7 @@ public class WaitTimeCalculatorSerializable implements
 
 	//Constructors
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds()));
 	}
 
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
