@@ -57,7 +57,7 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
                 {true, true, true, false, true},
                 {true, true, true, true, false},
                 {false, false, false, false, false},
-                {true, false, false, false, false},};
+                {true, true, false, true, false},};
         return Arrays.asList(data);
     }
     //TODO Delete Parameter 1: SmallRoundabouts
@@ -150,37 +150,49 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         if (input2 & input3 & input4 & input5){
             Assert.assertEquals("Number of Links", 9778, noLinks);
             Assert.assertEquals("Number of Nodes", 4479, noNodes );
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,52);
         }
 
         if (!input2 & input3 & input4 & input5){
             Assert.assertEquals("Number of Links", 9862, noLinks);
             Assert.assertEquals("Number of Nodes", 4521, noNodes );
-
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,69);
         }
 
         if (input2 & !input3 & input4 & input5){
             Assert.assertEquals("Number of Links", 9778, noLinks);
             Assert.assertEquals("Number of Nodes", 4479, noNodes );
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,52);
 
         }
 
         if (input2 & input3 & !input4 & input5){
             Assert.assertEquals("Number of Links", 9778, noLinks);
             Assert.assertEquals("Number of Nodes", 4479, noNodes );
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,52);
 
         }
 
         if (input2 & input3 & input4 & !input5){
             Assert.assertEquals("Number of Links", 9778, noLinks);
             Assert.assertEquals("Number of Nodes", 4479, noNodes );
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,40);
 
         }
 
         if (!input2 & !input3 & !input4 & !input5){
             Assert.assertEquals("Number of Links", 9862, noLinks);
             Assert.assertEquals("Number of Nodes", 4521, noNodes );
-
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,58);
         }
+
+        //Setting that is fixed by default
+        if (input2 & !input3 & input4 & !input5){
+            Assert.assertEquals("Number of Links", 9778, noLinks);
+            Assert.assertEquals("Number of Nodes", 4479, noNodes );
+            Assert.assertEquals("Number of SignalSystems", noSignalSystems,40);
+        }
+
 
 
 
