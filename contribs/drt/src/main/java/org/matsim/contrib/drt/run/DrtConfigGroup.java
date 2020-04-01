@@ -256,11 +256,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
-
-		if(config.plans().getActivityDurationInterpretation().equals(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)){
-			log.warn("plans.ActivityDurationInterpretation should be set to 'minOfDurationAndEndTime' but it is not!!" +
-					"This has the consequence that the passenger agent lengthens the stage activity if it arrives early after a drt leg.");
-		}
 	}
 
 	@Override

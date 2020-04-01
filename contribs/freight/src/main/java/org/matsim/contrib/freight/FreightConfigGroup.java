@@ -21,7 +21,6 @@ package org.matsim.contrib.freight;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.net.URL;
 import java.util.Map;
@@ -49,6 +48,11 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private static final String TRAVELTIMESLICEWIDTHDESC = "time slice width used for calculation of travel times in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
+    
+    public enum UseDistanceConstraintForTourPlanning {noDistanceConstraint, basedOnEnergyConsumption};
+    private static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraintForTourPlanning";
+    private UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning = UseDistanceConstraintForTourPlanning.noDistanceConstraint;
+    private static final String USE_DISTANCE_CONSTRAINT_DESC = "Use distant constraint within the tour planning phase. This does NOT ensure that the tours in MATSim will respect this limitation";
 
     public FreightConfigGroup() {
         super(GROUPNAME);
@@ -151,13 +155,34 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     }
 
 
-    @Override
+    
+    //---
+    //---
+    /**
+	 * @return useDistanceConstraint
+	 */
+    @StringGetter(USE_DISTANCE_CONSTRAINT)
+	public UseDistanceConstraintForTourPlanning getUseDistanceConstraintForTourPlanning() {
+		return useDistanceConstraintForTourPlanning;
+	}
+	/**
+	 * @param useDistanceConstraintForTourPlanning {@value #USE_DISTANCE_CONSTRAINT_DESC}
+	 */
+    @StringSetter(USE_DISTANCE_CONSTRAINT)
+	public void setUseDistanceConstraintForTourPlanning(UseDistanceConstraintForTourPlanning useDistanceConstraintForTourPlanning) {
+		this.useDistanceConstraintForTourPlanning = useDistanceConstraintForTourPlanning;
+	}
+
+	//---
+	//---
+	@Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(CARRIERSFILEDE, CARRIERSFILEDESC);
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(VEHICLEROUTINGALGORITHM, VEHICLEROUTINGALGORITHMDESC);
         map.put(TRAVELTIMESLICEWIDTH, TRAVELTIMESLICEWIDTHDESC);
+        map.put(USE_DISTANCE_CONSTRAINT, USE_DISTANCE_CONSTRAINT_DESC);
         return map;
     }
 
