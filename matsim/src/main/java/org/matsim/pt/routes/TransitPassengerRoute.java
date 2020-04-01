@@ -1,8 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ExperimentalTransitRoute.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.etaxi.run;
+package org.matsim.pt.routes;
 
-import java.net.URL;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
+public interface TransitPassengerRoute extends Route {
+	Id<TransitStopFacility> getAccessStopId();
 
-/**
- * @author michalm
- */
-public class RunETaxiScenarioIT {
-	@Test
-	public void testOneTaxi() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
-	}
+	Id<TransitStopFacility> getEgressStopId();
 
-	@Test
-	public void testRuleBased() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
-	}
+	Id<TransitLine> getLineId();
 
-	@Test
-	@Ignore // temporarily ignore this test due to problems on the build server
-	public void testAssignment() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
-				"mielec_etaxi_config_assignment.xml");
-		RunETaxiScenario.run(configUrl, false);
-	}
+	Id<TransitRoute> getRouteId();
+
+	OptionalTime getBoardingTime();
 }

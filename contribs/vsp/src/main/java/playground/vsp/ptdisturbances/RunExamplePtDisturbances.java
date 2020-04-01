@@ -67,7 +67,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -309,7 +309,7 @@ public class RunExamplePtDisturbances {
 				} else if( pe instanceof Leg ){
 					Leg leg = (Leg) pe;
 					if( leg.getMode().equals( TransportMode.pt ) ){
-						ExperimentalTransitRoute transitRoute = (ExperimentalTransitRoute) leg.getRoute();
+						TransitPassengerRoute transitRoute = (TransitPassengerRoute) leg.getRoute();
 						if( transitRoute.getLineId().equals( disturbedLineId ) ){
 							TripStructureUtils.Trip affectedTrip = editTrips.findTripAtPlanElement( agent, pe );
 							if( currentTrip != null && currentTrip.getTripElements().contains( pe ) ){

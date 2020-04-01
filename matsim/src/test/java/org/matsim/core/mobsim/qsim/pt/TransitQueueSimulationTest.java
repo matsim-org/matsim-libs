@@ -69,9 +69,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -277,7 +279,7 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
+        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
@@ -350,7 +352,7 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
-        leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
+        leg.setRoute(new DefaultTransitPassengerRoute(stop1, line, null, stop2));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("1", Link.class));
         plan.addActivity(homeAct);
         plan.addLeg(leg);
@@ -455,7 +457,7 @@ public class TransitQueueSimulationTest {
         Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
         homeAct.setEndTime(departure.getDepartureTime() - 60.0);
         Leg leg1 = pb.createLeg(TransportMode.pt);
-        leg1.setRoute(new ExperimentalTransitRoute(stop1, line, tRoute, stop3));
+        leg1.setRoute(new DefaultTransitPassengerRoute(stop1, line, tRoute, stop3));
         Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));
         plan1.addActivity(homeAct);
         plan1.addLeg(leg1);
@@ -466,7 +468,7 @@ public class TransitQueueSimulationTest {
         Plan plan2 = pb.createPlan();
         person2.addPlan(plan2);
         Leg leg2 = pb.createLeg(TransportMode.pt);
-        leg2.setRoute(new ExperimentalTransitRoute(stop3, line, tRoute, stop4));
+        leg2.setRoute(new DefaultTransitPassengerRoute(stop3, line, tRoute, stop4));
         Activity homeActOnLink4 = pb.createActivityFromLinkId("home", Id.create("4", Link.class));
         homeActOnLink4.setEndTime(departure.getDepartureTime() - 60.0);
         plan2.addActivity(homeActOnLink4);
@@ -786,7 +788,7 @@ public class TransitQueueSimulationTest {
         Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act2.setEndTime(0.0);
         Leg leg2 = pb.createLeg(TransportMode.pt);
-        Route route2 = new ExperimentalTransitRoute(stopFacility1, tLine, tRoute, stopFacility2);
+        Route route2 = new DefaultTransitPassengerRoute(stopFacility1, tLine, tRoute, stopFacility2);
         route2.setTravelTime(100.0);
         leg2.setRoute(route2);
         TripStructureUtils.setRoutingMode(leg2, TransportMode.pt);

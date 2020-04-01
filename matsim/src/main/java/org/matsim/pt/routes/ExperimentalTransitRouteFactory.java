@@ -31,7 +31,7 @@ public class ExperimentalTransitRouteFactory implements RouteFactory {
 	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return new ExperimentalTransitRoute(startLinkId, endLinkId);
 	}
-	
+
 	@Override
 	public String getCreatedRouteType() {
 		return ExperimentalTransitRoute.ROUTE_TYPE;
