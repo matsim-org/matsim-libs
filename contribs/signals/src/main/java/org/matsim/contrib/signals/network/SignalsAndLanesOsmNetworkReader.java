@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_03_25_adp30m";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_01_";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -181,10 +181,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-		reader.setMergeOnewaySignalSystems(true);
+		reader.setMergeOnewaySignalSystems(true);       //TODO check was passiert
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
-		reader.setMakePedestrianSignals(false);
+		reader.setMakePedestrianSignals(false);         //TODO check was passiert
 //		reader.setMakePedestrianSignals(false);
 
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
@@ -1135,6 +1135,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							int topLayerNeg = -1;
 							int topLayerCounterPos = 0;
 							int topLayerCounterNeg = 0;
+
+
 							//Check the toplevel hierarchy (best is 1) and count how many ways are of that level
 							for (OsmWay wayJunPos :junctionNodePosDir.ways.values()){
 								if (wayJunPos.hierarchy< topLayerPos &&  wayJunPos.hierarchy!=-1){
@@ -1156,6 +1158,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							//if that is equal it takes the one junction with more ways
 							if (topLayerPos == -1 || topLayerNeg == -1) {
 								if (topLayerPos == -1 && topLayerNeg == -1) {
+								    //TODO stattdessen anzahl lanes
 									if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
 										junctionNode = junctionNodePosDir;
 									} else junctionNode = junctionNodeNegDir;

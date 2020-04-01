@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.Before;
 import org.junit.runners.Parameterized.Parameters;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -31,6 +32,13 @@ import java.util.*;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+/*
+This test is to fix the SignalsAndLanesNetworkReader version from 01.04.2020
+before cleaning up and transfer to Janeks new OSM Reader Version
+ */
+
+
+
 
 @RunWith(Parameterized.class)
 public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
@@ -38,18 +46,7 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
     public MatsimTestUtils testUtils = new MatsimTestUtils();
 
 
-    //TODO put this to the right directory
     String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
-
-    // creates the test data
-//    @Parameterized.Parameters()
-//    public static Collection<Object[]> data() {
-//        Object[][] data = new Object[][]{{1, 2, 2}, {5, 3, 15}, {121, 4, 484}};
-//        return Arrays.asList(data);
-//
-//
-//
-//    }
 
     @Parameters
     public static Collection<Object[]> data() {
@@ -63,7 +60,7 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
                 {true, false, false, false, false},};
         return Arrays.asList(data);
     }
-
+    //TODO Delete Parameter 1: SmallRoundabouts
     @Parameterized.Parameter            //Minimize small roundabouts
     public boolean input1;
     @Parameterized.Parameter(1)         //setMergeOnewaySignalSystems
@@ -79,11 +76,6 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
 
 
 
-
-    @Ignore
-    public void test(){
-        System.out.print(input1+" "+input2+" "+input3+" "+input4+" "+input5);
-    }
 
 
     @Test
@@ -102,47 +94,31 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
 
         // create a scenario
         Scenario scenario = ScenarioUtils.createScenario(config);
-        Scenario scenarioBenchmark = ScenarioUtils.createScenario(config);
 
 
         scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-        scenarioBenchmark.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
         // pick network, lanes and signals data from the scenario
 
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-        SignalsData signalsDataBenchmark = (SignalsData) scenarioBenchmark.getScenarioElement(SignalsData.ELEMENT_NAME);
 
         Lanes lanes = scenario.getLanes();
-        Lanes lanesBenchmark = scenarioBenchmark.getLanes();
 
         Network network = scenario.getNetwork();
-        Network networkBenchmark = scenarioBenchmark.getNetwork();
 
 
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
-        SignalsAndLanesOsmNetworkReaderBenchmark signalReaderBenchmark = new SignalsAndLanesOsmNetworkReaderBenchmark(networkBenchmark, ct, signalsDataBenchmark, lanesBenchmark);
 
         //TODO Parameterize - but than we have 2^5= 32 combinations
-//        signalReader.setMinimizeSmallRoundabouts(input1);
-//        signalReaderBenchmark.setMinimizeSmallRoundabouts(input1);
-
-        signalReaderBenchmark.setMinimizeSmallRoundabouts(false);
 
         signalReader.setMergeOnewaySignalSystems(input2);
-        signalReaderBenchmark.setMergeOnewaySignalSystems(input2);
 
         signalReader.setUseRadiusReduction(input3);
-        signalReaderBenchmark.setUseRadiusReduction(input3);
 
         signalReader.setAllowUTurnAtLeftLaneOnly(input4);
-        signalReaderBenchmark.setAllowUTurnAtLeftLaneOnly(input4);
 
         signalReader.setMakePedestrianSignals(input5);
-        signalReaderBenchmark.setMakePedestrianSignals(input5);
 
         signalReader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
-        // (south,west,north,east)
-        signalReaderBenchmark.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
         // (south,west,north,east)
 
 
@@ -150,63 +126,93 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         new NetworkCleaner().run(network);
         new LanesAndSignalsCleaner().run(scenario);
 
-        signalReaderBenchmark.parse(inputOSM);
-        new NetworkCleaner().run(networkBenchmark);
-        new LanesAndSignalsCleaner().run(scenarioBenchmark);
-
-
         int noNodes = network.getNodes().size();
-        int noNodesBenchmark = networkBenchmark.getNodes().size();
 
         int noLinks = network.getLinks().size();
-        int noLinksBenchmark = networkBenchmark.getLinks().size();
 
         int noSignalSystems = signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().size();
-        int noSignalSystemsBenchmark = signalsDataBenchmark.getSignalGroupsData().getSignalGroupDataBySignalSystemId().size();
 
         int noLinksWithLanes = scenario.getLanes().getLanesToLinkAssignments().size();
-        int noLinksWithLanesBenchmark = scenarioBenchmark.getLanes().getLanesToLinkAssignments().size();
 
         int NoSignalizedOsmNodes = signalReader.signalizedOsmNodes.size();
-        int NoSignalizedOsmNodesBenchmark = signalReaderBenchmark.signalizedOsmNodes.size();
 
         //Check in detail if all nodes are identical by coordinate
-        Set nodeCoordinatesBenchmark = new HashSet();
-        Set nodeCoordinates = new HashSet();
+        Set nodeCoordinates = new HashSet<Coord>();
 
-        for(Node node : networkBenchmark.getNodes().values()){
-            nodeCoordinatesBenchmark.add(node.getCoord());
-        }
-        boolean allNodesInWorkingVersionAreInBase = true;
-        for (Node node: network.getNodes().values()){
+        for(Node node : network.getNodes().values()){
             nodeCoordinates.add(node.getCoord());
-            if(!(nodeCoordinatesBenchmark.contains(node.getCoord()))){
-                allNodesInWorkingVersionAreInBase = false;
-                System.out.println("Node "+node.getId()+" is not in Benchmark");
-            }
-        }
-        boolean allNodesInBaseAreInWorkingVersion = true;
-        for (Node node: networkBenchmark.getNodes().values()){
-            if(!(nodeCoordinates.contains(node.getCoord()))){
-                allNodesInBaseAreInWorkingVersion = false;
-                System.out.println("Node "+node.getId()+"  from Benchmark is not in Working Version   coord:"+node.getCoord().toString());
-            }
         }
 
-        Assert.assertTrue("Not all nodes of working version where in network of Benchmark",allNodesInWorkingVersionAreInBase);
-        Assert.assertTrue("Not all nodes of benchmark version where in network of working version",allNodesInBaseAreInWorkingVersion);
+
+
+        System.out.print(" i2 "+String.valueOf(input2)+" i3 "+String.valueOf(input3)+" i4 "+String.valueOf(input4)+" i5 "+String.valueOf(input5));
+
+        if (input2 & input3 & input4 & input5){
+            Assert.assertEquals("Number of Links", 9778, noLinks);
+            Assert.assertEquals("Number of Nodes", 4479, noNodes );
+        }
+
+        if (!input2 & input3 & input4 & input5){
+            Assert.assertEquals("Number of Links", 9862, noLinks);
+            Assert.assertEquals("Number of Nodes", 4521, noNodes );
+
+        }
+
+        if (input2 & !input3 & input4 & input5){
+            Assert.assertEquals("Number of Links", 9778, noLinks);
+            Assert.assertEquals("Number of Nodes", 4479, noNodes );
+
+        }
+
+        if (input2 & input3 & !input4 & input5){
+            Assert.assertEquals("Number of Links", 9778, noLinks);
+            Assert.assertEquals("Number of Nodes", 4479, noNodes );
+
+        }
+
+        if (input2 & input3 & input4 & !input5){
+            Assert.assertEquals("Number of Links", 9778, noLinks);
+            Assert.assertEquals("Number of Nodes", 4479, noNodes );
+
+        }
+
+        if (!input2 & !input3 & !input4 & !input5){
+            Assert.assertEquals("Number of Links", 9862, noLinks);
+            Assert.assertEquals("Number of Nodes", 4521, noNodes );
+
+        }
 
 
 
+//        boolean allNodesInWorkingVersionAreInBase = true;
+//        for (Node node: network.getNodes().values()){
+//            nodeCoordinates.add(node.getCoord());
+//            if(!(nodeCoordinatesBenchmark.contains(node.getCoord()))){
+//                allNodesInWorkingVersionAreInBase = false;
+//                System.out.println("Node "+node.getId()+" is not in Benchmark");
+//            }
+//        }
+//        boolean allNodesInBaseAreInWorkingVersion = true;
+//        for (Node node: networkBenchmark.getNodes().values()){
+//            if(!(nodeCoordinates.contains(node.getCoord()))){
+//                allNodesInBaseAreInWorkingVersion = false;
+//                System.out.println("Node "+node.getId()+"  from Benchmark is not in Working Version   coord:"+node.getCoord().toString());
+//            }
+//        }
 
-        Assert.assertEquals("Number of Links", noLinks, noLinksBenchmark);
-        Assert.assertEquals("Number of Nodes", noNodes, noNodesBenchmark);
-        Assert.assertEquals("Number of SignalSystems",noSignalSystemsBenchmark, noSignalSystems);
-        Assert.assertEquals("Number of Links with Lanes",noLinksWithLanesBenchmark, noLinksWithLanes);
-        Assert.assertEquals("Number of Signalied Osm Nodes", NoSignalizedOsmNodesBenchmark,NoSignalizedOsmNodes);
+//        Assert.assertTrue("Not all nodes of working version where in network of Benchmark",allNodesInWorkingVersionAreInBase);
+//        Assert.assertTrue("Not all nodes of benchmark version where in network of working version",allNodesInBaseAreInWorkingVersion);
+//
+//
+//
+//
 
-        System.out.println("Number of Links: original: " + noLinks + " SignalReader: " + noLinksBenchmark);
-        System.out.println("Number of Nodes: original: " + noNodes + " SignalReader: " + noNodesBenchmark);
+//        Assert.assertEquals("Number of SignalSystems",noSignalSystemsBenchmark, noSignalSystems);
+//        Assert.assertEquals("Number of Links with Lanes",noLinksWithLanesBenchmark, noLinksWithLanes);
+//        Assert.assertEquals("Number of Signalied Osm Nodes", NoSignalizedOsmNodesBenchmark,NoSignalizedOsmNodes);
+//
+//        System.out.println("Number of Links: original: " + noLinks + " SignalReader: " + noLinksBenchmark);
+//        System.out.println("Number of Nodes: original: " + noNodes + " SignalReader: " + noNodesBenchmark);
 
 
 
