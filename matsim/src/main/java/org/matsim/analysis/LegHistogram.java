@@ -64,6 +64,12 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		eventsManager.addHandler(this);
 	}
 
+	public LegHistogram(Population population, EventsManager eventsManager, int binSize, int nofBins) {
+		this(binSize, nofBins);
+		this.population = population;
+		eventsManager.addHandler(this);
+	}
+
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
 	 *
