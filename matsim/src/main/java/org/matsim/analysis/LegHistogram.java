@@ -58,7 +58,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	private final Map<String, DataFrame> data = new TreeMap<>();
 
 	@Inject
-	LegHistogram(Population population, EventsManager eventsManager) {
+	public LegHistogram(Population population, EventsManager eventsManager) {
 		this(300);
 		this.population = population;
 		eventsManager.addHandler(this);
