@@ -20,13 +20,16 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 
-public class VehicleImpl implements Vehicle {
+final class VehicleImpl implements Vehicle {
 
 	private VehicleType type;
 	private Id<Vehicle> id;
 
-	public VehicleImpl(Id<Vehicle> id, VehicleType type) {
+	VehicleImpl( Id<Vehicle> id , VehicleType type ) {
+		Gbl.assertNotNull(id);
+		Gbl.assertNotNull(type);
 		this.id = id;
 		this.type = type;
 	}
@@ -39,6 +42,11 @@ public class VehicleImpl implements Vehicle {
 	@Override
 	public VehicleType getType() {
 		return this.type;
+	}
+
+	@Override
+	public String toString() {
+		return "[ID=" + id + " | type=" + type.toString() + "]" ;
 	}
 
 

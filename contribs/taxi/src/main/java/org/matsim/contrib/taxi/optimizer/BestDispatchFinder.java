@@ -89,7 +89,7 @@ public class BestDispatchFinder {
 					vehNode = departure.link.getToNode();
 
 					// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-					delay += 1 + toLink.getFreespeed(departure.time);
+					delay += 1 + toLink.getLength() / toLink.getFreespeed(departure.time);
 				}
 
 				InitialNode existingInitialNode = initialNodes.get(vehNode.getId());
@@ -111,7 +111,7 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node fromNode = path.nodes.get(0);
+		Node fromNode = path.getFromNode();
 		DvrpVehicle bestVehicle = nodeToVehicle.get(fromNode.getId());
 		LinkTimePair bestDeparture = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(bestVehicle);
 
@@ -144,7 +144,7 @@ public class BestDispatchFinder {
 
 			if (!initialNodes.containsKey(locNodeId)) {
 				// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-				double delayAtLastLink = link.getFreespeed(departure.time);
+				double delayAtLastLink = link.getLength() / link.getFreespeed(departure.time);
 
 				// works most fair (FIFO) if unplannedRequests (=destinations) are sorted by T0 (ascending)
 				InitialNode newInitialNode = new InitialNode(link.getFromNode(), delayAtLastLink, delayAtLastLink);
@@ -161,7 +161,7 @@ public class BestDispatchFinder {
 		// the calculated path contains real nodes (no imaginary/initial nodes),
 		// the time and cost are of real travel (between the first and last real node)
 		// (no initial times/costs for imaginary<->initial are included)
-		Node toNode = path.nodes.get(path.nodes.size() - 1);
+		Node toNode = path.getToNode();
 		D bestDestination = nodeToDestination.get(toNode.getId());
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(departure.link, destinationToLink.apply(bestDestination),
 				departure.time, path, travelTime);

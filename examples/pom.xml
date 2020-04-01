@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-examples</artifactId>
 	<packaging>jar</packaging>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<name>MATSim Examples</name>
 	<distributionManagement>
 		<repository>
@@ -14,7 +14,7 @@
 		<snapshotRepository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+			<url>https://oss.jfrog.org/oss-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
@@ -24,13 +24,20 @@
 				<targetPath>test/scenarios</targetPath>
 			</resource>
 		</resources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.1</version>
+			</plugin>
+		</plugins>
 	</build>
 
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 	</properties>
 
 </project>

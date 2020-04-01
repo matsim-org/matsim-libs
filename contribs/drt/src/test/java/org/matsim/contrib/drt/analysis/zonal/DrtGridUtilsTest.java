@@ -1,7 +1,5 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
@@ -12,6 +10,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+
+import java.util.Map;
 
 public class DrtGridUtilsTest {
 
@@ -24,8 +24,13 @@ public class DrtGridUtilsTest {
 		Point p = cell100.getCentroid();
 		Assert.assertEquals(950, p.getX(),0.00001);
 		Assert.assertEquals(950, p.getY(),0.00001);
+
+		DrtZonalSystem drtZonalSystem = new DrtZonalSystem(network, 100);
+		Assert.assertEquals("5", drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")));
+		DrtZonalSystem drtZonalSystem2 = new DrtZonalSystem(network, 700);
+		Assert.assertEquals("1", drtZonalSystem2.getZoneForLinkId(Id.createLinkId("ab")));
 	}
-	
+
 	private Network createNetwork(){
 		Network network = NetworkUtils.createNetwork();
 		Node a = network.getFactory().createNode(Id.createNodeId("a"), new Coord(0,0));
@@ -36,7 +41,7 @@ public class DrtGridUtilsTest {
 		network.addNode(b);
 		network.addNode(c);
 		network.addNode(d);
-		
+
 		Link ab = network.getFactory().createLink(Id.createLinkId("ab"), a, b);
 		Link bc = network.getFactory().createLink(Id.createLinkId("bc"), b, c);
 		Link cd = network.getFactory().createLink(Id.createLinkId("cd"), c, d);

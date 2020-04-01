@@ -21,6 +21,8 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,9 +34,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 
 /**
@@ -112,6 +115,60 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
+			
+			// for backward compatibility: add routingMode to legs if not present		
+			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
+				List<Leg> legs = trip.getLegsOnly();
+				if (legs.size() >= 1) {
+					String routingMode = TripStructureUtils.getRoutingMode(legs.get(0));
+
+					for (Leg leg : legs) {
+						// check all legs either have the same routing mode or all have routingMode==null
+						if (TripStructureUtils.getRoutingMode(leg) == null) {
+							if (routingMode == null) {
+								// outdated initial plan without routingMode
+							} else {
+								String errorMessage = "Found a mixed trip, some legs with routingMode and others without. "
+										+ "This is inconsistent. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
+						} else {
+							if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
+								TripStructureUtils.setRoutingMode(leg, routingMode);
+							} else {
+								String errorMessage = "Found a trip whose legs have different routingModes. "
+										+ "This is inconsistent. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
+						}
+					}
+
+					// add routing mode
+					if (routingMode == null) {
+						if (legs.size() == 1) {
+							// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module)
+							routingMode = legs.get(0).getMode();
+							if (routingMode.equals(TransportMode.transit_walk)) {
+								String errorMessage = "Found a trip of only one leg of mode transit_walk. "
+										+ "This should not happen during simulation since transit_walk was replaced by walk and "
+										+ "routingMode. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
+							TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+						} else {
+							String errorMessage = "Found a trip whose legs have no routingMode. "
+									+ "This is only allowed for (outdated) input plans, not during simulation (after PrepareForSim). Agent id: "
+									+ person.getId().toString();
+							log.error(errorMessage);
+							throw new RuntimeException(errorMessage);
+						}
+					}
+				}
+			}
+			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
@@ -129,6 +186,13 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
+					
+					if (TripStructureUtils.getRoutingMode(leg) == null) {
+						String errorMessage = "Routing mode not set for leg :" + leg.toString() + " of agent id " + person.getId().toString();
+						log.error( errorMessage );
+						throw new RuntimeException( errorMessage );
+					}
+					
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
 					} else if (Double.isNaN(leg.getRoute().getDistance())){
@@ -138,8 +202,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							 * This means that the end link is considered in route distance and the start link not.
 							 * tt feb'16
 							 */
-							double relativePositionStartLink = 1.0;
-							double relativePositionEndLink  = 1.0;
+							double relativePositionStartLink = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
+							double relativePositionEndLink  = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 							// using the full network for the distance calculation.  kai, jul'18

@@ -119,7 +119,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act1"));
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2"));
+		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2", null));
 		
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("07:00:00"));
@@ -127,7 +127,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act2"));
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3"));
+		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3", null));
 
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("31:12:00"));
@@ -135,7 +135,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act3"));
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4"));
+		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4", null));
 		
 		leg = PopulationUtils.createLeg(TransportMode.car);
 		leg.setDepartureTime(Time.parseTime("30:12:00"));
@@ -143,12 +143,12 @@ public class CalcLegTimesTest extends MatsimTestCase {
 		testee.handleEvent(new ActivityEndEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act4"));
 		testee.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
 		testee.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, leg.getMode()));
-		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act5"));
+		testee.handleEvent(new ActivityStartEvent(leg.getDepartureTime(), DEFAULT_PERSON_ID, DEFAULT_LINK_ID, null, "act5", null));
 
 		this.runTest(testee);
 	}
 
-	protected void runTest(CalcLegTimes calcLegTimes) {
+	private void runTest( CalcLegTimes calcLegTimes ) {
 
 		calcLegTimes.writeStats(this.getOutputDirectory() + CalcLegTimesTest.BASE_FILE_NAME);
 

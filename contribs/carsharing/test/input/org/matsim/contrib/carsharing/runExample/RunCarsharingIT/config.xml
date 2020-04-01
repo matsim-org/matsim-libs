@@ -34,6 +34,7 @@
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
 			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		</module>
 
     <module name="Carsharing" >
@@ -103,7 +104,9 @@
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />
+<!--		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />-->
+<!--		(is working without. kai, jun'19)-->
+
 		<param name="inputPlansFile" value="10persons.xml" />
 	</module>
 
@@ -192,21 +195,21 @@
 		<param name="activityMinimalDuration_7" value="06:00:00" />
 		<param name="activityOpeningTime_7" value="08:00:00" />
 		<param name="activityTypicalDuration_7" value="06:00:00" />
-		<param name="activityType_8" value="ff_interaction" />
+		<param name="activityType_8" value="freefloating interaction" />
 		<param name="activityClosingTime_8" value="00:00:00" />
 		<param name="activityEarliestEndTime_8" value="undefined" />
 		<param name="activityLatestStartTime_8" value="undefined" />
 		<param name="activityMinimalDuration_8" value="00:00:00" />
 		<param name="activityOpeningTime_8" value="08:00:00" />
 		<param name="activityTypicalDuration_8" value="00:02:00" />
-		<param name="activityType_9" value="ow_interaction" />
+		<param name="activityType_9" value="oneway interaction" />
 		<param name="activityClosingTime_9" value="00:00:00" />
 		<param name="activityEarliestEndTime_9" value="undefined" />
 		<param name="activityLatestStartTime_9" value="undefined" />
 		<param name="activityMinimalDuration_9" value="00:00:00" />
 		<param name="activityOpeningTime_9" value="08:00:00" />
 		<param name="activityTypicalDuration_9" value="00:02:00" />
-		<param name="activityType_10" value="tw_interaction" />
+		<param name="activityType_10" value="twoway interaction" />
 		<param name="activityClosingTime_10" value="00:00:00" />
 		<param name="activityEarliestEndTime_10" value="undefined" />
 		<param name="activityLatestStartTime_10" value="undefined" />

@@ -45,7 +45,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	private double firstActivityEndTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
+	private static final double INITIAL_FIRST_ACT_END_TIME = Time.getUndefinedTime();
 	private static final double INITIAL_SCORE = 0.0;
 
 	private static int firstLastActWarning = 0;
@@ -333,7 +333,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivityEndTime = act.getEndTime().seconds();
 		this.firstActivity = act;
 		this.firstAct = false;
 
@@ -341,12 +341,12 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+		this.score += calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act);
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime();
+		this.currentActivityStartTime = act.getStartTime().seconds();
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
 	}

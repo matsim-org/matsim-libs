@@ -1,4 +1,25 @@
-package org.matsim.pt.router;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TransitRouterCustomDataTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.pt.router;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +73,7 @@ public class TransitRouterCustomDataTest {
 
 		double x = -100;
 		List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(x, (double) 0)), new FakeFacility( new Coord((double) 3100, (double) 0)), 5.9*3600, null);
-		Assert.assertEquals(1, legs.size());
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
 		
 		/* the following is not really nice as a test, but I had to somehow
 		 * keep track of the internal state and have to replay this now

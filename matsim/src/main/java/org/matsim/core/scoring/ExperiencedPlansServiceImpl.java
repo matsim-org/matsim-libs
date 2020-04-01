@@ -1,16 +1,42 @@
-package org.matsim.core.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ExperiencedPlansServiceImpl.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.scoring;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PopulationUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
@@ -21,7 +47,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
-	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
+	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
 
 	@Inject
 	ExperiencedPlansServiceImpl(ControlerListenerManager controlerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
@@ -92,7 +118,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public Map<Id<Person>, Plan> getExperiencedPlans() {
+	public IdMap<Person, Plan> getExperiencedPlans() {
 		return this.agentRecords;
 	}
 

@@ -28,6 +28,8 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author michalm
  */
@@ -45,8 +47,6 @@ public class TaxiRequest implements PassengerRequest {
 	private final Id<Request> id;
 	private final double submissionTime;
 	private final double earliestStartTime;
-
-	private boolean rejected = false;
 
 	private final Id<Person> passengerId;
 	private final String mode;
@@ -103,16 +103,6 @@ public class TaxiRequest implements PassengerRequest {
 		return mode;
 	}
 
-	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	@Override
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
-	}
-
 	public TaxiPickupTask getPickupTask() {
 		return pickupTask;
 	}
@@ -160,6 +150,16 @@ public class TaxiRequest implements PassengerRequest {
 
 	@Override
 	public String toString() {
-		return Request.toString(this);
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("submissionTime", submissionTime)
+				.add("earliestStartTime", earliestStartTime)
+				.add("passengerId", passengerId)
+				.add("mode", mode)
+				.add("fromLink", fromLink)
+				.add("toLink", toLink)
+				.add("pickupTask", pickupTask)
+				.add("dropoffTask", dropoffTask)
+				.toString();
 	}
 }

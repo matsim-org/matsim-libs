@@ -30,7 +30,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author jbischoff
  * @author dgrether
  */
-public class SignalGroupDataImpl implements SignalGroupData {
+final class SignalGroupDataImpl implements SignalGroupData {
 
 	Set<Id<Signal>> signalIds = new TreeSet<>();
 	Id<SignalGroup> signalGroupId;

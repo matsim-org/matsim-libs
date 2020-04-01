@@ -19,16 +19,20 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Helps to work on plans with complex trips.
@@ -40,13 +44,16 @@ import org.matsim.core.gbl.Gbl;
  * Two versions of the methods are provided, working on {@link Plan}s
  * or lists of {@link PlanElement}s.
  * <br>
- * The methods require an instance of {@link StageActivityTypes} as a parameter,
- * which is used to identify the dummy activities pertaining to trips.
- * In almost all use-cases, it should come from {@link TripRouter#getStageActivityTypes()}.
+ * The methods require {@link StageActivityHandling} as a parameter,
+ * which is used to decide whether dummy activities such as pt interaction should be
+ * handled like normal activities or ignored.
  *
  * @author thibautd
  */
-public class TripStructureUtils {
+public final class TripStructureUtils {
+	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
+
+	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 
 	private TripStructureUtils() {}
 
@@ -69,23 +76,32 @@ public class TripStructureUtils {
 
 	public static List<Activity> getActivities(
 			final Plan plan,
-			final StageActivityTypes stageActivities) {
+			final StageActivityHandling stageActivityHandling) {
 		return getActivities(
 				plan.getPlanElements(),
-				stageActivities);
+				stageActivityHandling);
 	}
 
 	public static List<Activity> getActivities(
 			final List<? extends PlanElement> planElements,
-			final StageActivityTypes stageActivities) {
+			final StageActivityHandling stageActivityHandling) {
 		final List<Activity> activities = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if ( stageActivities == null || !stageActivities.isStageActivity( act.getType() ) ) {
-				activities.add( act );
+			switch (stageActivityHandling) {
+				case StagesAsNormalActivities:
+					activities.add(act);
+					break;
+				case ExcludeStageActivities:
+					if (!(StageActivityTypeIdentifier.isStageActivity(act.getType()))) {
+						activities.add(act);
+					}
+					break;
+				default:
+					throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
 			}
 		}
 
@@ -93,17 +109,23 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( activities );
 	}
 
-	public static List<Trip> getTrips(
-			final Plan plan,
-			final StageActivityTypes stageActivities) {
-		return getTrips(
-				plan.getPlanElements(),
-				stageActivities);
+	public static List<Trip> getTrips( final Plan plan) {
+		return getTrips( plan.getPlanElements());
 	}
+
+
+	public static List<Trip> getTrips( final Plan plan, final Predicate<String> isStageActivity) {
+		return getTrips( plan.getPlanElements(), isStageActivity);
+	}
+
+	public static List<Trip> getTrips( final List<? extends PlanElement> planElements) {
+		return getTrips(planElements, TripStructureUtils::isStageActivityType ) ;
+	}
+
 
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements,
-			final StageActivityTypes stageActivities) {
+			final Predicate<String> isStageActivity ) {
 		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
@@ -114,7 +136,14 @@ public class TripStructureUtils {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if (stageActivities.isStageActivity( act.getType() )) continue;
+//			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || stageActivityTypes.contains( act.getType() )) continue;
+//			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || isStageActivity.test( act.getType() )) continue;
+			// I I don't like the || (= "or").  If I want to identify subtrips, then I want to put in a reduced number of stage
+			// activities!!!!  kai, jan'20
+			if ( isStageActivity.test( act.getType() ) ) {
+				continue;
+			}
+
 			if ( currentIndex - originActivityIndex > 1 ) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
 				// a trip.  
@@ -139,13 +168,8 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( trips );
 	}
 
-	public static Collection<Subtour> getSubtours(
-            final Plan plan,
-            final StageActivityTypes stageActivityTypes) {
-		return getSubtours(
-				plan.getPlanElements(),
-				stageActivityTypes
-        );
+	public static Collection<Subtour> getSubtours( final Plan plan) {
+		return getSubtours( plan.getPlanElements() );
 	}
 
 	/**
@@ -176,68 +200,82 @@ public class TripStructureUtils {
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
+	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
+		return getSubtours(planElements, TripStructureUtils::isStageActivityType );
+	}
+
+	// for contrib socnetsim only
+	// I think now that we should actually keep this.  kai, jan'20
+	@Deprecated
+	public static Collection<Subtour> getSubtours( final Plan plan, final Predicate<String> isStageActivity) {
+		return getSubtours( plan.getPlanElements(), isStageActivity );
+	}
+
+	// for contrib socnetsim only
+	// I think now that we should actually keep this.  kai, jan'20
+	@Deprecated
 	public static Collection<Subtour> getSubtours(
-            final List<? extends PlanElement> planElements,
-            final StageActivityTypes stageActivityTypes) {
+			final List<? extends PlanElement> planElements,
+			final Predicate<String> isStageActivity ) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;
 		final List<Id<?>> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
+		final List<Trip> trips = getTrips( planElements, isStageActivity );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
-            final Id<?> originId;
-            //use facilities if available
-		    if (trip.getOriginActivity().getFacilityId()!=null ) {
-		        originId = trip.getOriginActivity().getFacilityId();
-            } else {
-		        originId = trip.getOriginActivity().getLinkId();
-            }
+			final Id<?> originId;
+			//use facilities if available
+			if (trip.getOriginActivity().getFacilityId()!=null ) {
+				originId = trip.getOriginActivity().getFacilityId();
+			} else {
+				originId = trip.getOriginActivity().getLinkId();
+			}
 
-					if ( originId == null ) {
-						throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
-								" are null!" );
-					}
-
-					if (destinationId != null && !originId.equals( destinationId )) {
-						throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
-					}
-
-            if (trip.getDestinationActivity().getFacilityId()!=null ) {
-                destinationId = trip.getDestinationActivity().getFacilityId();
-            } else {
-                destinationId = trip.getDestinationActivity().getLinkId();
-            }
-
-							if ( destinationId == null ) {
-								throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
+			if ( originId == null ) {
+				throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
 										" are null!" );
-							}
+			}
 
-							originIds.add( originId );
+			if (destinationId != null && !originId.equals( destinationId )) {
+				throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
+			}
 
-							if (originIds.contains( destinationId )) {
-								// end of a subtour
-								final int subtourStartIndex = originIds.lastIndexOf( destinationId );
-								final int subtourEndIndex = originIds.size();
+			if (trip.getDestinationActivity().getFacilityId()!=null ) {
+				destinationId = trip.getDestinationActivity().getFacilityId();
+			} else {
+				destinationId = trip.getDestinationActivity().getLinkId();
+			}
 
-								final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
-								nonAllocatedTrips.removeAll( subtour );
+			if ( destinationId == null ) {
+				throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
+										" are null!" );
+			}
 
-								// do not consider the locations visited in finished subtours
-								// as possible anchor points
-								for (int i=subtourStartIndex; i < subtourEndIndex; i++) {
-									originIds.set( i , null );
-								}
+			originIds.add( originId );
 
-								addSubtourAndUpdateParents(
-										subtours,
-										new Subtour(
-												subtourStartIndex,
-												subtourEndIndex,
-												subtour,
-												true) );
-							}
+			if (originIds.contains( destinationId )) {
+				// end of a subtour
+				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
+				final int subtourEndIndex = originIds.size();
+
+				final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
+				nonAllocatedTrips.removeAll( subtour );
+
+				// do not consider the locations visited in finished subtours
+				// as possible anchor points
+				for (int i=subtourStartIndex; i < subtourEndIndex; i++) {
+					originIds.set( i , null );
+				}
+
+				addSubtourAndUpdateParents(
+						subtours,
+						new Subtour(
+								subtourStartIndex,
+								subtourEndIndex,
+								subtour,
+								true) );
+			}
 		}
 
 		if (nonAllocatedTrips.size() != 0) {
@@ -275,7 +313,7 @@ public class TripStructureUtils {
 		}
 		subtours.add( newSubtour );
 	}
-	
+
 	/**
 	 * @param trip
 	 * @return the departure time of the first leg of the trip
@@ -285,7 +323,7 @@ public class TripStructureUtils {
 		Leg leg = (Leg) trip.getTripElements().get(0);
 		return leg.getDepartureTime();
 	}
-	
+
 	/**
 	 * Represents a trip, that is, the longest sequence of
 	 * {@link PlanElement}s consisting only of legs and "dummy"
@@ -302,8 +340,8 @@ public class TripStructureUtils {
 		private final List<Leg> legs;
 
 		Trip( 	final Activity originActivity,
-				final List<PlanElement> trip,
-				final Activity destinationActivity) {
+			     final List<PlanElement> trip,
+			     final Activity destinationActivity) {
 			this.originActivity = originActivity;
 			this.trip = trip;
 			this.legs = extractLegs( trip );
@@ -341,8 +379,8 @@ public class TripStructureUtils {
 		@Override
 		public String toString() {
 			return "{Trip: origin="+originActivity+"; "+
-					"trip="+trip+"; "+
-					"destination="+destinationActivity+"}";
+					       "trip="+trip+"; "+
+					       "destination="+destinationActivity+"}";
 		}
 
 		@Override
@@ -351,8 +389,8 @@ public class TripStructureUtils {
 
 			final Trip otherTrip = (Trip) other;
 			return otherTrip.originActivity.equals( originActivity ) &&
-					otherTrip.trip.equals( trip ) &&
-					otherTrip.destinationActivity.equals( destinationActivity );
+					       otherTrip.trip.equals( trip ) &&
+					       otherTrip.destinationActivity.equals( destinationActivity );
 		}
 
 		@Override
@@ -435,19 +473,16 @@ public class TripStructureUtils {
 			if ( !other.getClass().equals( getClass() ) ) return false;
 			final Subtour s = (Subtour) other;
 			return s.trips.equals( trips ) &&
-					areChildrenCompatible( children , s.children ) &&
-					(s.parent == null ? parent == null : s.parent.equals( parent )) &&
-					(s.isClosed == isClosed);
+					       areChildrenCompatible( children , s.children ) &&
+					       (s.parent == null ? parent == null : s.parent.equals( parent )) &&
+					       (s.isClosed == isClosed);
 		}
 
 		private static boolean areChildrenCompatible(
 				final List<Subtour> children2,
 				final List<Subtour> children3) {
-			if ( children2.size() != children3.size() ) return false;
+			return children2.size() == children3.size();// should check more, but risk of infinite recursion...
 
-			// should check more, but risk of infinite recursion...
-
-			return true;
 		}
 
 		@Override
@@ -460,11 +495,21 @@ public class TripStructureUtils {
 			return "Subtour: "+trips.toString();
 		}
 	}
-	public static Trip findCurrentTrip( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
+
+	@Deprecated // use findTripAtPlanElement(...) instead.
+	public static Trip findCurrentTrip( PlanElement pe, Plan plan ) {
+		return findTripAtPlanElement( pe, plan ) ;
+	}
+
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ){
+		return findTripAtPlanElement( currentPlanElement, plan, TripStructureUtils::isStageActivityType ) ;
+	}
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, Predicate<String> isStageActivity ) {
 		if ( currentPlanElement instanceof Activity ) {
-			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+//			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+			Gbl.assertIf( isStageActivity.test( ((Activity)currentPlanElement).getType() ) ) ;
 		}
-		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
+		List<Trip> trips = getTrips(plan.getPlanElements(), isStageActivity) ;
 		for ( Trip trip : trips ) {
 			int index = trip.getTripElements().indexOf( currentPlanElement ) ;
 			if ( index != -1 ) {
@@ -473,9 +518,10 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
-	public static Trip findTripEndingAtActivity(Activity activity, Plan plan, StageActivityTypes stageActivities ) {
-		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
+
+	public static Trip findTripEndingAtActivity(Activity activity, Plan plan) {
+		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
+		List<Trip> trips = getTrips(plan.getPlanElements()) ;
 		for ( Trip trip : trips ) {
 			if ( activity.equals( trip.getDestinationActivity() ) ) {
 				return trip;
@@ -483,9 +529,10 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
-	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan, StageActivityTypes stageActivities ) {
-		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips( plan, stageActivities ) ;
+
+	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan ) {
+		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
+		List<Trip> trips = getTrips( plan ) ;
 		for ( Trip trip : trips ) {
 			if ( trip.getOriginActivity().equals( activity ) ) {
 				return trip ;
@@ -494,6 +541,42 @@ public class TripStructureUtils {
 		return null ;
 	}
 
+	public static String getRoutingMode(Leg leg) {
+		return (String) leg.getAttributes().getAttribute("routingMode");
+	}
+
+	public static void setRoutingMode(Leg leg, String mode) {
+		if ( mode != null ){
+			leg.getAttributes().putAttribute( "routingMode", mode );
+		} else {
+			leg.getAttributes().removeAttribute(  "routingMode" ) ;
+		}
+	}
+
+	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
+	public static MainModeIdentifier getRoutingModeIdentifier() {
+		return new RoutingModeMainModeIdentifier();
+	}
+
+	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
+		// first try the routing mode:
+		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get( 0 )));
+		// else see if trip has only one leg, if so, use that mode (situation after initial demand generation)
+		if ( mode == null && tripElements.size()==1 ) {
+			mode = ((Leg) tripElements.get(0)).getMode() ;
+		}
+		if (mode == null) {
+			log.error("Could not find routing mode for trip " + tripElements);
+		}
+		return mode;
+	}
+
+	public static boolean isStageActivityType( String activityType ) {
+		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
+	}
+	public static String createStageActivityType( String mode ) {
+		return PlanCalcScoreConfigGroup.createStageActivityType( mode ) ;
+	}
 
 }
 

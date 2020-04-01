@@ -20,16 +20,19 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
 
 /**
  * @author nagel
@@ -69,13 +72,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	private double startTime = Time.getUndefinedTime();
 	private double endTime = Time.getUndefinedTime();
+	@Positive
 	private double timeStepSize = 1.0;
+	@PositiveOrZero
 	private double snapshotPeriod = 0; // off, no snapshots
+	@Positive
 	private double flowCapFactor = 1.0;
+	@Positive
 	private double storageCapFactor = 1.0;
+	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
+	@Positive
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
 	
@@ -447,7 +456,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES_CMT =
 			"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false";
-	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
+	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = true;
 	// (yyyyyy switch this default to true; false has really weird consequences sometimes (vehicles waiting for hours in driveway;
 	// and this is not included into decongestion approach. kai/ihab, aug'18)
 	/**

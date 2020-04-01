@@ -29,19 +29,27 @@ import org.matsim.vehicles.Vehicle;
 
 public interface LeastCostPathCalculator {
 
-	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle);
-	
-	public class Path {
-		public final List<Node> nodes;
+	Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, final Person person, final Vehicle vehicle);
+
+	class Path {
+		public List<Node> nodes;
 		public final List<Link> links;
 		public final double travelTime;
 		public final double travelCost;
-		
+
 		public Path(final List<Node> nodes, final List<Link> links, final double travelTime, final double travelCost) {
 			this.nodes = nodes;
 			this.links = links;
 			this.travelTime = travelTime;
 			this.travelCost = travelCost;
+		}
+
+		public Node getFromNode() {
+			return nodes.get(0);
+		}
+
+		public Node getToNode() {
+			return nodes.get(nodes.size() - 1);
 		}
 	}
 }

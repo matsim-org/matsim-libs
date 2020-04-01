@@ -1,0 +1,1301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+	<object id="1">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="2">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="3">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="4">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="5">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="6">
+		<attribute name="leisure" class="java.lang.Double">1.3380934150357522</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="7">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="8">
+		<attribute name="leisure" class="java.lang.Double">0.4898721464900301</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="9">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="10">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="11">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="12">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="13">
+		<attribute name="leisure" class="java.lang.Double">0.2675557938290651</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="14">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="15">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="16">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="17">
+		<attribute name="leisure" class="java.lang.Double">2.7732795351241024</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="18">
+		<attribute name="leisure" class="java.lang.Double">0.9553386408755541</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="19">
+		<attribute name="leisure" class="java.lang.Double">0.8730901895225008</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="20">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="21">
+		<attribute name="leisure" class="java.lang.Double">1.1611925841661324</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="22">
+		<attribute name="leisure" class="java.lang.Double">0.694307217593683</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="23">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="24">
+		<attribute name="leisure" class="java.lang.Double">0.8186475959941151</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="25">
+		<attribute name="leisure" class="java.lang.Double">0.33465351163005885</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="26">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="27">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="28">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="29">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="30">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="31">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="32">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="33">
+		<attribute name="leisure" class="java.lang.Double">1.40171549755654</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="34">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="35">
+		<attribute name="leisure" class="java.lang.Double">2.1907063449608093</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="36">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="37">
+		<attribute name="leisure" class="java.lang.Double">2.5929662132089186</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="38">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="39">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="40">
+		<attribute name="leisure" class="java.lang.Double">2.074616917284406</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="41">
+		<attribute name="leisure" class="java.lang.Double">0.6107506749067511</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="42">
+		<attribute name="leisure" class="java.lang.Double">1.486339950748362</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="43">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="44">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="45">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="46">
+		<attribute name="leisure" class="java.lang.Double">2.236003342711401</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="47">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="48">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="49">
+		<attribute name="leisure" class="java.lang.Double">1.2478555401036842</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="50">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="51">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="52">
+		<attribute name="leisure" class="java.lang.Double">0.41476821083074067</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="53">
+		<attribute name="leisure" class="java.lang.Double">2.899732629177364</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="54">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="55">
+		<attribute name="leisure" class="java.lang.Double">0.4127097191279537</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="56">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="57">
+		<attribute name="leisure" class="java.lang.Double">0.9882077837090599</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="58">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="59">
+		<attribute name="leisure" class="java.lang.Double">2.5409587336231994</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="60">
+		<attribute name="leisure" class="java.lang.Double">2.5695744868154216</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="61">
+		<attribute name="leisure" class="java.lang.Double">0.2850453249622272</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="62">
+		<attribute name="leisure" class="java.lang.Double">0.4592678500636898</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="63">
+		<attribute name="leisure" class="java.lang.Double">0.24729172382055647</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="64">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="65">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="66">
+		<attribute name="leisure" class="java.lang.Double">0.6346239096801117</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="67">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="68">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="69">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="70">
+		<attribute name="leisure" class="java.lang.Double">1.3493601933469273</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="71">
+		<attribute name="leisure" class="java.lang.Double">1.6296390982767333</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="72">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="73">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="74">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="75">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="76">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="77">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="78">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="79">
+		<attribute name="leisure" class="java.lang.Double">1.8602431515549396</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="80">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="81">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="82">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="83">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="84">
+		<attribute name="leisure" class="java.lang.Double">1.4445255886904198</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="85">
+		<attribute name="leisure" class="java.lang.Double">0.11842100741364085</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="86">
+		<attribute name="leisure" class="java.lang.Double">0.28674606040106265</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="87">
+		<attribute name="leisure" class="java.lang.Double">1.12038121072426</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="88">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="89">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="90">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="91">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="92">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="93">
+		<attribute name="leisure" class="java.lang.Double">0.043532721318665486</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="94">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="95">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="96">
+		<attribute name="leisure" class="java.lang.Double">0.7918284174023844</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="97">
+		<attribute name="leisure" class="java.lang.Double">1.4637389459232208</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="98">
+		<attribute name="leisure" class="java.lang.Double">2.930786011174238</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="99">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="100">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="101">
+		<attribute name="leisure" class="java.lang.Double">0.4312407458965466</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="102">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="103">
+		<attribute name="leisure" class="java.lang.Double">1.3032470094459092</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="104">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="105">
+		<attribute name="leisure" class="java.lang.Double">0.2899083563928849</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="106">
+		<attribute name="leisure" class="java.lang.Double">1.6786110908320473</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="107">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="108">
+		<attribute name="leisure" class="java.lang.Double">1.2732611484537086</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="109">
+		<attribute name="leisure" class="java.lang.Double">0.3876486313897799</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="110">
+		<attribute name="leisure" class="java.lang.Double">2.0005348922941923</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="111">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="112">
+		<attribute name="leisure" class="java.lang.Double">0.4484655406832861</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="113">
+		<attribute name="leisure" class="java.lang.Double">0.19527302987282044</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="114">
+		<attribute name="leisure" class="java.lang.Double">0.47157767152215313</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="115">
+		<attribute name="leisure" class="java.lang.Double">2.60303947099161</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="116">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="117">
+		<attribute name="leisure" class="java.lang.Double">1.3210842594717092</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="118">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="119">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="120">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="121">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="122">
+		<attribute name="leisure" class="java.lang.Double">0.9765763836273355</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="123">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="124">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="125">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="126">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="127">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="128">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="129">
+		<attribute name="leisure" class="java.lang.Double">0.7000357769785662</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="130">
+		<attribute name="leisure" class="java.lang.Double">0.03425920211348182</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="131">
+		<attribute name="leisure" class="java.lang.Double">1.279718145720812</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="132">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="133">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="134">
+		<attribute name="leisure" class="java.lang.Double">1.1743891459539963</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="135">
+		<attribute name="leisure" class="java.lang.Double">0.07900629990162532</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="136">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="137">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="138">
+		<attribute name="leisure" class="java.lang.Double">0.9832303076867308</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="139">
+		<attribute name="leisure" class="java.lang.Double">0.09542976579383841</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="140">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="141">
+		<attribute name="leisure" class="java.lang.Double">1.425675329642175</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="142">
+		<attribute name="leisure" class="java.lang.Double">1.917120531135146</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="143">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="144">
+		<attribute name="leisure" class="java.lang.Double">1.2753036778590658</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="145">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="146">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="147">
+		<attribute name="leisure" class="java.lang.Double">1.6890557268553434</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="148">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="149">
+		<attribute name="leisure" class="java.lang.Double">2.2638767006921974</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="150">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="151">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="152">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="153">
+		<attribute name="leisure" class="java.lang.Double">1.9097728644345433</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="154">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="155">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="156">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="157">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="158">
+		<attribute name="leisure" class="java.lang.Double">1.9185467362619535</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="159">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="160">
+		<attribute name="leisure" class="java.lang.Double">0.24874673501474867</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="161">
+		<attribute name="leisure" class="java.lang.Double">1.719581884255414</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="162">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="163">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="164">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="165">
+		<attribute name="leisure" class="java.lang.Double">0.7990337612075072</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="166">
+		<attribute name="leisure" class="java.lang.Double">1.9076168155365327</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="167">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="168">
+		<attribute name="leisure" class="java.lang.Double">2.772129290647001</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="169">
+		<attribute name="leisure" class="java.lang.Double">1.1509881495474372</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="170">
+		<attribute name="leisure" class="java.lang.Double">0.6163381785209036</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="171">
+		<attribute name="leisure" class="java.lang.Double">1.6081941591831703</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="172">
+		<attribute name="leisure" class="java.lang.Double">0.5410335593050852</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="173">
+		<attribute name="leisure" class="java.lang.Double">0.8563831225043288</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="174">
+		<attribute name="leisure" class="java.lang.Double">0.9043486851973044</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="175">
+		<attribute name="leisure" class="java.lang.Double">1.6431640711204571</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="176">
+		<attribute name="leisure" class="java.lang.Double">1.5247688518517193</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="177">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="178">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="179">
+		<attribute name="leisure" class="java.lang.Double">1.6630726965788059</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="180">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="181">
+		<attribute name="leisure" class="java.lang.Double">0.6210409344384954</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="182">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="183">
+		<attribute name="leisure" class="java.lang.Double">2.012590925201431</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="184">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="185">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="186">
+		<attribute name="leisure" class="java.lang.Double">1.618705354999542</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="187">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="188">
+		<attribute name="leisure" class="java.lang.Double">1.2217875566947327</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="189">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="190">
+		<attribute name="leisure" class="java.lang.Double">2.8026759289535206</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="191">
+		<attribute name="leisure" class="java.lang.Double">0.7531272341811445</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="192">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="193">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="194">
+		<attribute name="leisure" class="java.lang.Double">0.7900541326755898</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="195">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="196">
+		<attribute name="leisure" class="java.lang.Double">1.2037046142933205</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="197">
+		<attribute name="leisure" class="java.lang.Double">1.2009252123663592</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="198">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="199">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="200">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="201">
+		<attribute name="leisure" class="java.lang.Double">0.9947873335698726</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="202">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="203">
+		<attribute name="leisure" class="java.lang.Double">0.9098351929722971</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="204">
+		<attribute name="leisure" class="java.lang.Double">0.46140299967133663</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="205">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="206">
+		<attribute name="leisure" class="java.lang.Double">1.3866506569990786</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="207">
+		<attribute name="leisure" class="java.lang.Double">0.23208044047030965</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="208">
+		<attribute name="leisure" class="java.lang.Double">0.10144689819199368</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="209">
+		<attribute name="leisure" class="java.lang.Double">0.3791932852127337</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="210">
+		<attribute name="leisure" class="java.lang.Double">0.7404098536057594</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="211">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="212">
+		<attribute name="leisure" class="java.lang.Double">0.8607732730626861</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="213">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="214">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="215">
+		<attribute name="leisure" class="java.lang.Double">1.0419055949977858</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="216">
+		<attribute name="leisure" class="java.lang.Double">0.12923497670274187</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="217">
+		<attribute name="leisure" class="java.lang.Double">1.9186248311288812</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="218">
+		<attribute name="leisure" class="java.lang.Double">0.6032820536023513</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="219">
+		<attribute name="leisure" class="java.lang.Double">1.2161108999333683</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="220">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="221">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="222">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="223">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="224">
+		<attribute name="leisure" class="java.lang.Double">1.2258530976543258</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="225">
+		<attribute name="leisure" class="java.lang.Double">0.8153270323264052</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="226">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="227">
+		<attribute name="leisure" class="java.lang.Double">0.46693532402731774</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="228">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="229">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="230">
+		<attribute name="leisure" class="java.lang.Double">1.2172247787134254</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="231">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="232">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="233">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="234">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="235">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="236">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="237">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="238">
+		<attribute name="leisure" class="java.lang.Double">1.5029889942410353</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="239">
+		<attribute name="leisure" class="java.lang.Double">0.029600929160377192</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="240">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="241">
+		<attribute name="leisure" class="java.lang.Double">0.6793951846151169</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="242">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="243">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="244">
+		<attribute name="leisure" class="java.lang.Double">2.946175409740987</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="245">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="246">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="247">
+		<attribute name="leisure" class="java.lang.Double">1.7849492053600386</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="248">
+		<attribute name="leisure" class="java.lang.Double">4.003425203156456</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="249">
+		<attribute name="leisure" class="java.lang.Double">1.8137677160045829</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="250">
+		<attribute name="leisure" class="java.lang.Double">0.7029873860781971</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="251">
+		<attribute name="leisure" class="java.lang.Double">2.1892239401884073</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="252">
+		<attribute name="leisure" class="java.lang.Double">1.974006770075425</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="253">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="254">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="255">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="256">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="257">
+		<attribute name="leisure" class="java.lang.Double">5.250379704332776</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="258">
+		<attribute name="leisure" class="java.lang.Double">1.0510737514919657</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="259">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="260">
+		<attribute name="leisure" class="java.lang.Double">1.165372214064368</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="261">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="262">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="263">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="264">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="265">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="266">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="267">
+		<attribute name="leisure" class="java.lang.Double">1.8349518066504957</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="268">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="269">
+		<attribute name="leisure" class="java.lang.Double">0.2111122585182065</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="270">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="271">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="272">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="273">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="274">
+		<attribute name="leisure" class="java.lang.Double">1.211968933654168</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="275">
+		<attribute name="leisure" class="java.lang.Double">0.6805671248011668</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="276">
+		<attribute name="leisure" class="java.lang.Double">2.184494800764495</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="277">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="278">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="279">
+		<attribute name="leisure" class="java.lang.Double">1.2020220602630376</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="280">
+		<attribute name="leisure" class="java.lang.Double">2.5723588709119967</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="281">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="282">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="283">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="284">
+		<attribute name="leisure" class="java.lang.Double">0.3645460095088514</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="285">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="286">
+		<attribute name="leisure" class="java.lang.Double">2.324741309741818</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="287">
+		<attribute name="leisure" class="java.lang.Double">1.6753918431483616</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="288">
+		<attribute name="leisure" class="java.lang.Double">1.1233874188647917</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="289">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="290">
+		<attribute name="leisure" class="java.lang.Double">1.1589408983857075</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="291">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="292">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="293">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="294">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="295">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="296">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="297">
+		<attribute name="leisure" class="java.lang.Double">1.211149504314437</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="298">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="299">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="300">
+		<attribute name="leisure" class="java.lang.Double">0.21101614082015618</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="301">
+		<attribute name="leisure" class="java.lang.Double">0.39072879744263156</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="302">
+		<attribute name="leisure" class="java.lang.Double">0.08566029437649222</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="303">
+		<attribute name="leisure" class="java.lang.Double">2.070243084576406</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="304">
+		<attribute name="leisure" class="java.lang.Double">0.6960874198906514</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="305">
+		<attribute name="leisure" class="java.lang.Double">2.3435925119938266</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="306">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="307">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="308">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="309">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="310">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="311">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="312">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="313">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="314">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="315">
+		<attribute name="leisure" class="java.lang.Double">0.940122329252902</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="316">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="317">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="318">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="319">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="320">
+		<attribute name="leisure" class="java.lang.Double">0.5842868305949313</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="321">
+		<attribute name="leisure" class="java.lang.Double">0.0</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="322">
+		<attribute name="leisure" class="java.lang.Double">0.9558812974556568</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="323">
+		<attribute name="leisure" class="java.lang.Double">1.2863194205863022</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+	<object id="324">
+		<attribute name="leisure" class="java.lang.Double">1.8139786387640713</attribute>
+		<attribute name="shop" class="java.lang.Double">0.0</attribute>
+	</object>
+</objectAttributes>

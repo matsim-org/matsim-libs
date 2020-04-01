@@ -20,10 +20,23 @@
 
 package org.matsim.core.population.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+import static org.matsim.core.utils.io.XmlUtils.encodeContent;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -32,10 +45,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author thibautd
@@ -54,6 +63,7 @@ import java.util.Map;
 		this.coordinateTransformation = coordinateTransformation;
 	}
 
+	@Override
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
 		this.attributesWriter.putAttributeConverters( converters );
 	}
@@ -68,7 +78,7 @@ import java.util.Map;
 	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<population");
 		if (plans.getName() != null) {
-			out.write(" desc=\"" + plans.getName() + "\"");
+			out.write(" desc=\"" + encodeAttributeValue(plans.getName()) + "\"");
 		}
 		out.write(">\n\n");
 
@@ -114,7 +124,7 @@ import java.util.Map;
 
 	private void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(person.getId().toString());
+		out.write(encodeAttributeValue(person.getId().toString()));
 		out.write("\"");
 		out.write(">\n");
 		this.attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
@@ -137,7 +147,7 @@ import java.util.Map;
 			out.write(" selected=\"no\"");
 		if ((plan.getType() != null)) {
 			out.write(" type=\"");
-			out.write(plan.getType());
+			out.write(encodeAttributeValue(plan.getType()));
 			out.write("\"");
 		}
 		out.write(">\n");
@@ -152,16 +162,16 @@ import java.util.Map;
 
 	private void writeAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<activity type=\"");
-		out.write(act.getType());
+		out.write(encodeAttributeValue(act.getType()));
 		out.write("\"");
 		if (act.getLinkId() != null) {
 			out.write(" link=\"");
-			out.write(act.getLinkId().toString());
+			out.write(encodeAttributeValue(act.getLinkId().toString()));
 			out.write("\"");
 		}
 		if (act.getFacilityId() != null) {
 			out.write(" facility=\"");
-			out.write(act.getFacilityId().toString());
+			out.write(encodeAttributeValue(act.getFacilityId().toString()));
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
@@ -178,31 +188,31 @@ import java.util.Map;
 				out.write("\"");
 			}
 		}
-		if (!Time.isUndefinedTime(act.getStartTime())) {
+		if (act.getStartTime().isDefined()) {
 			out.write(" start_time=\"");
-			out.write(Time.writeTime(act.getStartTime()));
+			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+		if (act.getMaximumDuration().isDefined()) {
 			out.write(" max_dur=\"");
-			out.write(Time.writeTime(act.getMaximumDuration()));
+			out.write(Time.writeTime(act.getMaximumDuration().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getEndTime())) {
+		if (act.getEndTime().isDefined()) {
 			out.write(" end_time=\"");
-			out.write(Time.writeTime(act.getEndTime()));
+			out.write(Time.writeTime(act.getEndTime().seconds()));
 			out.write("\"");
 		}
 		out.write(" >\n");
 
-		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , act.getAttributes() );
+		this.attributesWriter.writeAttributes("\t\t\t\t", out, act.getAttributes());
 
 		out.write("\t\t\t</activity>\n");
 	}
 
 	private void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
-		out.write(leg.getMode());
+		out.write(encodeAttributeValue(leg.getMode()));
 		out.write("\"");
 		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
 			out.write(" dep_time=\"");
@@ -216,7 +226,7 @@ import java.util.Map;
 		}
 //		if (leg instanceof LegImpl) {
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime()) {
 //				out.write(" arr_time=\"");
 //				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
 //				out.write("\"");
@@ -236,13 +246,13 @@ import java.util.Map;
 	private static void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
-		out.write(route.getRouteType());
+		out.write(encodeAttributeValue(route.getRouteType()));
 		out.write("\"");
 		out.write(" start_link=\"");
-		out.write(route.getStartLinkId().toString());
+		out.write(encodeAttributeValue(route.getStartLinkId().toString()));
 		out.write("\"");
 		out.write(" end_link=\"");
-		out.write(route.getEndLinkId().toString());
+		out.write(encodeAttributeValue(route.getEndLinkId().toString()));
 		out.write("\"");
 		out.write(" trav_time=\"");
 		out.write(Time.writeTime(route.getTravelTime()));
@@ -256,14 +266,14 @@ import java.util.Map;
 			if ( vehicleId==null ) {
 				out.write("null");
 			} else {
-				out.write( vehicleId.toString() ) ;
+				out.write(encodeAttributeValue(vehicleId.toString()));
 			}
 			out.write("\"");
 		}
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
-			out.write(rd);
+			out.write(encodeContent(rd));
 		}
 	}
 

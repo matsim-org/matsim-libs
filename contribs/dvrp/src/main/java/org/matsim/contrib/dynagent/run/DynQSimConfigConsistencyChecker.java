@@ -20,7 +20,6 @@
 package org.matsim.contrib.dynagent.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.util.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
@@ -31,8 +30,6 @@ public class DynQSimConfigConsistencyChecker implements ConfigConsistencyChecker
 
 	@Override
 	public void checkConsistency(Config config) {
-		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
-
 		if (config.qsim().getStartTime() != 0 && !Time.isUndefinedTime(config.qsim().getStartTime())) {
 			// If properly handled this should not be a concern
 			log.warn("QSim.startTime should be 0:00:00 (or 0). This is what typically DynAgents assume");
@@ -42,8 +39,9 @@ public class DynQSimConfigConsistencyChecker implements ConfigConsistencyChecker
 			log.warn("QSim.timeStepSize should be 1. This is what typically DynAgents assume");
 		}
 		if (config.qsim().getSimStarttimeInterpretation() != StarttimeInterpretation.onlyUseStarttime) {
-			throw new RuntimeException("DynAgents require simulation to start from the very beginning"
-					+ " Set 'QSim.simStarttimeInterpretation' to " + StarttimeInterpretation.onlyUseStarttime);
+			throw new RuntimeException("DynAgents require simulation to start from the very beginning."
+					+ " Set 'QSim.simStarttimeInterpretation' to "
+					+ StarttimeInterpretation.onlyUseStarttime);
 		}
 	}
 }

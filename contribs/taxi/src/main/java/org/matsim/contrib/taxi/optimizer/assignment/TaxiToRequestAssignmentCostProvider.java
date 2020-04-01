@@ -20,13 +20,15 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
-import org.matsim.contrib.taxi.optimizer.VehicleData.Entry;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
+import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class TaxiToRequestAssignmentCostProvider {
+	// This paper used ARRIVAL_TIME: M. Maciejewski, J. Bischoff, K. Nagel: An assignment-based approach to efficient
+	// real-time city-scale taxi dispatching. IEEE Intelligent Systems, 2016.
+
 	public enum Mode {
 		PICKUP_TIME, //
 		// TTki
@@ -40,7 +42,7 @@ public class TaxiToRequestAssignmentCostProvider {
 
 		DSE;//
 		// balance between demand (ARRIVAL_TIME) and supply (PICKUP_TIME)
-	};
+	}
 
 	private final AssignmentTaxiOptimizerParams params;
 
@@ -50,34 +52,32 @@ public class TaxiToRequestAssignmentCostProvider {
 
 	public AssignmentCost<TaxiRequest> getCost(AssignmentRequestData rData, VehicleData vData) {
 		final Mode currentMode = getCurrentMode(rData, vData);
-		return new AssignmentCost<TaxiRequest>() {
-			public double calc(Entry departure, DestEntry<TaxiRequest> reqEntry, PathData pathData) {
-				double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
-				switch (currentMode) {
-					case PICKUP_TIME:
-						// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
-						return pickupBeginTime - departure.time;
+		return (departure, reqEntry, pathData) -> {
+			double pickupBeginTime = calcPickupBeginTime(departure, reqEntry, pathData);
+			switch (currentMode) {
+				case PICKUP_TIME:
+					// this will work different than ARRIVAL_TIME at oversupply -> will reduce T_P and fairness
+					return pickupBeginTime - departure.time;
 
-					case ARRIVAL_TIME:
-						// less fairness, higher throughput
-						return pickupBeginTime;
+				case ARRIVAL_TIME:
+					// less fairness, higher throughput
+					return pickupBeginTime;
 
-					case TOTAL_WAIT_TIME:
-						// more fairness, lower throughput
-						// this will work different than than ARRIVAL_TIME at undersupply -> will reduce unfairness and
-						// throughput
-						return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
+				case TOTAL_WAIT_TIME:
+					// more fairness, lower throughput
+					// this will work different than ARRIVAL_TIME at undersupply -> will reduce unfairness and
+					// throughput
+					return pickupBeginTime - reqEntry.destination.getEarliestStartTime();
 
-					default:
-						throw new IllegalStateException();
-				}
+				default:
+					throw new IllegalStateException();
 			}
 		};
 	}
 
 	private Mode getCurrentMode(AssignmentRequestData rData, VehicleData vData) {
-		if (params.mode != Mode.DSE) {
-			return params.mode;
+		if (params.getMode() != Mode.DSE) {
+			return params.getMode();
 		} else {
 			return rData.getUrgentReqCount() > vData.getIdleCount() ? Mode.PICKUP_TIME : // undersupply
 					Mode.ARRIVAL_TIME; // oversupply
@@ -86,9 +86,7 @@ public class TaxiToRequestAssignmentCostProvider {
 
 	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<TaxiRequest> reqEntry,
 			PathData pathData) {
-		double travelTime = pathData == null ? //
-				params.nullPathCost : // no path (too far away)
-				pathData.getTravelTime();
+		double travelTime = pathData == null ? params.getNullPathCost() : pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}
 }

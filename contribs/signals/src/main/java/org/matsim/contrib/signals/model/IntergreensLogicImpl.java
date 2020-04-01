@@ -36,9 +36,9 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreensForSignalSyste
  * @author dgrether
  *
  */
-public class IntergreensLogicImpl implements IntergreensLogic {
+public final class IntergreensLogicImpl implements IntergreensLogic {
 
-private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
+	private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 
 	private final IntergreenTimesData intergreensData;
 	private final SignalSystemsConfigGroup signalsConfig;

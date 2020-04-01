@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -35,11 +34,11 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -49,21 +48,9 @@ import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
 
-	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility) {
 		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
-	}
-
-	@Override
-	protected double calcNewEndTime(DvrpVehicle vehicle, TaxiTask task, double newBeginTime) {
-		if (task instanceof ETaxiChargingTask) {
-			// FIXME underestimated due to the ongoing AUX/drive consumption
-			double duration = task.getEndTime() - task.getBeginTime();
-			return newBeginTime + duration;
-		} else {
-			return super.calcNewEndTime(vehicle, task, newBeginTime);
-		}
 	}
 
 	// FIXME underestimated due to the ongoing AUX/drive consumption
@@ -105,7 +92,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	@Override
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (((TaxiTask)currentTask).getTaxiTaskType()) {
+		switch (((TaxiTaskType)currentTask.getTaskType())) {
 			case EMPTY_DRIVE:
 				Task nextTask = Schedules.getNextTask(schedule);
 				if (!(nextTask instanceof ETaxiChargingTask)) {
@@ -148,7 +135,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 			}
 
 			schedule.removeTask(task);
-			taskRemovedFromSchedule(vehicle, (TaxiTask)task);
+			taskRemovedFromSchedule(vehicle, task);
 		}
 
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
@@ -169,7 +156,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, TaxiTask task) {
+	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
 		if (task instanceof ETaxiChargingTask) {
 			ETaxiChargingTask chargingTask = ((ETaxiChargingTask)task);
 			chargingTask.getChargingLogic().unassignVehicle(chargingTask.getElectricVehicle());

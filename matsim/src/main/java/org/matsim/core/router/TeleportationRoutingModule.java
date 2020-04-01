@@ -22,14 +22,17 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 
@@ -40,20 +43,20 @@ import org.matsim.facilities.Facility;
 public class TeleportationRoutingModule implements RoutingModule {
 
 	private final String mode;
-	private final PopulationFactory populationFactory;
 
 	private final double beelineDistanceFactor;
 	private final double networkTravelSpeed;
+	private final Scenario scenario;
 
-	 public TeleportationRoutingModule(
+	public TeleportationRoutingModule(
 			final String mode,
-			final PopulationFactory populationFactory,
+			final Scenario scenario,
 			final double networkTravelSpeed,
 			final double beelineDistanceFactor) {
 		this.networkTravelSpeed = networkTravelSpeed;
 		this.beelineDistanceFactor = beelineDistanceFactor;
 		this.mode = mode;
-		this.populationFactory = populationFactory;
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -62,14 +65,14 @@ public class TeleportationRoutingModule implements RoutingModule {
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
-		Leg newLeg = this.populationFactory.createLeg( this.mode );
+		Leg newLeg = this.scenario.getPopulation().getFactory().createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 
 		double travTime = routeLeg(
 				person,
 				newLeg,
-				new FacilityWrapperActivity( fromFacility ),
-				new FacilityWrapperActivity( toFacility ),
+				fromFacility,
+				toFacility,
 				departureTime);
 
 		// otherwise, information may be lost
@@ -79,25 +82,36 @@ public class TeleportationRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
-
-	@Override
 	public String toString() {
 		return "[TeleportationRoutingModule: mode="+this.mode+"]";
 	}
 
 
-	/* package */ double routeLeg(Person person, Leg leg, Activity fromAct, Activity toAct, double depTime) {
+	/* package */ double routeLeg( Person person, Leg leg, Facility fromFacility, Facility toFacility, double depTime ) {
+		// yyyy there is a test that uses the above; todo: make that test use the official RoutingModule interface.  kai, nov'19
+
 		// make simple assumption about distance and walking speed
-		final Coord fromActCoord = fromAct.getCoord();
+
+		final Coord fromActCoord = 	FacilitiesUtils.decideOnCoord( fromFacility, scenario.getNetwork(), scenario.getConfig() ) ;
 		Gbl.assertNotNull( fromActCoord );
-		final Coord toActCoord = toAct.getCoord();
+		final Coord toActCoord = FacilitiesUtils.decideOnCoord( toFacility, scenario.getNetwork(), scenario.getConfig() ) ;
 		Gbl.assertNotNull( toActCoord );
 		double dist = CoordUtils.calcEuclideanDistance( fromActCoord, toActCoord );
 		// create an empty route, but with realistic travel time
-		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromAct.getLinkId(), toAct.getLinkId());
+
+		Id<Link> fromFacilityLinkId = fromFacility.getLinkId();
+		if ( fromFacilityLinkId==null ) {
+			// (yyyy there is a test that does not have a context, and thus the call below fails.  todo: adapt test.  kai, nov'19)
+			fromFacilityLinkId = FacilitiesUtils.decideOnLink( fromFacility, scenario.getNetwork() ).getId() ;
+		}
+
+		Id<Link> toFacilityLinkId = toFacility.getLinkId();
+		if ( toFacilityLinkId==null ) {
+			// (yyyy: same as above)
+			toFacilityLinkId = FacilitiesUtils.decideOnLink( toFacility, scenario.getNetwork() ).getId() ;
+		}
+
+		Route route = this.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, fromFacilityLinkId, toFacilityLinkId );
 		double estimatedNetworkDistance = dist * this.beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / this.networkTravelSpeed);
 		route.setTravelTime(travTime);

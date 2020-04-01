@@ -26,7 +26,9 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
 /**
@@ -37,6 +39,7 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  *
  */
 public class TransitRouterConfig implements MatsimParameters {
+	private static final Logger log = Logger.getLogger( TransitRouterConfig.class ) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -114,10 +117,14 @@ public class TransitRouterConfig implements MatsimParameters {
 		}
 		
 		// walk:
-		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ beelineDistanceFactor ;
+		{
+			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
+			Gbl.assertNotNull( params );
+			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
+			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;
+		}
+		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
+		// apr'19
 		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		

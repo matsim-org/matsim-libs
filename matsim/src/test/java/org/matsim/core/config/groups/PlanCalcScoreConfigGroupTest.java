@@ -1,21 +1,40 @@
-package org.matsim.core.config.groups;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PlanCalcScoreConfigGroupTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.Map;
 import java.util.Random;
+
+import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.*;
 
 public class PlanCalcScoreConfigGroupTest {
 	private static final Logger log =
@@ -24,24 +43,104 @@ public class PlanCalcScoreConfigGroupTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
+	private void testResultsBeforeCheckConsistency( Config config, boolean fullyHierarchical ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		if ( ! fullyHierarchical ){
+			// mode params are there for default modes:
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.car ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.walk ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.bike ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.ride ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.pt ) );
+			Assert.assertNotNull( scoringConfig.getModes().get( TransportMode.other ) );
+
+			// default stage/interaction params are there for pt and drt (as a service):
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.pt ) ) );
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( TransportMode.drt ) ) );
+		}
+		// default stage/interaction params for modes routed on the network are not yet there:
+//		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+//			Assert.assertNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+//		}
+	}
+	private void testResultsAfterCheckConsistency( Config config ) {
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+
+		// default stage/interaction params for modes routed on the network are now there:
+		for( String networkMode : config.plansCalcRoute().getNetworkModes() ){
+			Assert.assertNotNull( scoringConfig.getActivityParams( createStageActivityType( networkMode ) ) );
+		}
+	}
+
+	@Test
+	public void testFullyHierarchicalVersion() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_w_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, true ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
+	@Test
+	public void testVersionWoScoringparams() {
+		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config_v2_wo_scoringparams.xml" ) ;
+		PlanCalcScoreConfigGroup scoringConfig = config.planCalcScore() ;
+		testResultsBeforeCheckConsistency( config, false ) ;
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+		log.warn( "checking consistency ..." );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		scoringConfig.checkConsistency( config );
+		testResultsAfterCheckConsistency( config );
+		log.warn( "" );
+		for( ModeParams modeParams : scoringConfig.getModes().values() ){
+			log.warn(  modeParams );
+		}
+		log.warn( "" );
+		for( ActivityParams activityParams : scoringConfig.getActivityParams() ){
+			log.warn(  activityParams );
+		}
+		log.warn( "" );
+	}
+
 	@Test
 	public void testAddActivityParams() {
 		PlanCalcScoreConfigGroup c = new PlanCalcScoreConfigGroup();
+        int originalSize = c.getActivityParams().size();
 		Assert.assertNull(c.getActivityParams("type1"));
+        Assert.assertEquals(originalSize, c.getActivityParams().size());
 
-//		Assert.assertEquals(0, c.getActivityParams().size());
-		Assert.assertEquals(6, c.getActivityParams().size());
-		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding interaction activities hard-wired.  kai, feb'16
-		// yyyyyy and now also the "dummy" activity.  kai, jul'17
-		
 		ActivityParams ap = new ActivityParams("type1");
 		c.addActivityParams(ap);
 		Assert.assertEquals(ap, c.getActivityParams("type1"));
-
-		//		Assert.assertEquals(1, c.getActivityParams().size());
-		Assert.assertEquals(7, c.getActivityParams().size());
-		// yyyyyy see PlanCalcScoreConfigGroup, where I am currently adding  interaction activities hard-wired.  kai, feb'16
-		// yyyyyy and now also the "dummy" activity.  kai, jul'17
+        Assert.assertEquals(originalSize + 1, c.getActivityParams().size());
 	}
 
 	@Test

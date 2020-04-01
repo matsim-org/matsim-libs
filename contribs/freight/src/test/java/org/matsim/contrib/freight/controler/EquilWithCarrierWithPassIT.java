@@ -26,14 +26,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.Freight;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,6 +39,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class EquilWithCarrierWithPassIT {
 
@@ -79,19 +76,31 @@ public class EquilWithCarrierWithPassIT {
 		config.strategy().addStrategySettings(reRoute);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
-		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-		scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
+
+		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+		new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		final String idString = "foo";
+		addDummyVehicleType( carriers, idString );
 
 		controler = new Controler(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.getConfig().controler().setCreateGraphs(false);
 	}
 
+	static void addDummyVehicleType( Carriers carriers, String idString ){
+		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes() ;
+		Id<org.matsim.vehicles.VehicleType> id = Id.create( idString, org.matsim.vehicles.VehicleType.class ) ;
+		VehicleType builder = VehicleUtils.getFactory().createVehicleType( id );
+		VehicleType result = builder;
+		carrierVehicleTypes.getVehicleTypes().put( result.getId(), result ) ;
+		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( carrierVehicleTypes );
+	}
+
 	@Test
 	public void testScoringInMeters(){
+		// note setUp method!
 		//		controler.addOverridingModule(new CarrierModule(carriers));
-		Freight.configure( controler );
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

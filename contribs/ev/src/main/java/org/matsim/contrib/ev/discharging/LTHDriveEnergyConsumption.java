@@ -21,16 +21,15 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
-import com.google.inject.OutOfScopeException;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolatingFunction;
 import org.apache.commons.math3.analysis.interpolation.PiecewiseBicubicSplineInterpolator;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.EvUnits;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.vehicles.VehicleType;
+
+import com.google.common.primitives.Doubles;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
@@ -42,31 +41,53 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	private final double minSlope;
 	private final double maxSlope;
 
-	private boolean hasWarnedMaxSpeed = false;
-	private boolean hasWarnedMinSpeed = false;
+	private static boolean hasWarnedMaxSpeed = false;
+	private static boolean hasWarnedMinSpeed = false;
+	private static boolean hasWarnedMinSlope = false;
+	private static boolean hasWarnedMaxSlope = false;
 
-	private final Id<VehicleType> vehicleTypeId;
 	private final boolean crashIfOutOfBoundValue;
 
-	public LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
-			Id<VehicleType> vehicleTypeId, boolean crashIfOutOfBoundValue) {
+	public static class Factory implements DriveEnergyConsumption.Factory {
+
+		private final boolean crashIfOutOfBoundValue;
+		private final double[] speeds;
+		private final double[] slopes;
+		private final double[][] consumptionPerSpeedAndSlope;
+
+		public Factory(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
+				boolean crashIfOutOfBoundValue) {
+			this.speeds = speeds;
+			this.slopes = slopes;
+			this.consumptionPerSpeedAndSlope = consumptionPerSpeedAndSlope;
+			this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
+
+		}
+
+		@Override
+		public DriveEnergyConsumption create(ElectricVehicle electricVehicle) {
+			return new LTHDriveEnergyConsumption(speeds, slopes, consumptionPerSpeedAndSlope, crashIfOutOfBoundValue);
+		}
+	}
+
+	private LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
+			boolean crashIfOutOfBoundValue) {
 		this.function = splineInterpolater.interpolate(speeds, slopes, consumptionPerSpeedAndSlope);
 		this.minSpeed = Doubles.min(speeds);
 		this.maxSpeed = Doubles.max(speeds);
 		this.minSlope = Doubles.min(slopes);
 		this.maxSlope = Doubles.max(slopes);
-		this.vehicleTypeId = vehicleTypeId;
 		this.crashIfOutOfBoundValue = crashIfOutOfBoundValue;
 	}
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime) {
 		double length = link.getLength();
 		double speed = length / travelTime;
 
 		if (speed > maxSpeed) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Speed not covered" + speed);
+				throw new IllegalArgumentException("Speed greater than the supported maxSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMaxSpeed) {
 					Logger.getLogger(getClass())
@@ -80,7 +101,7 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 		if (speed < minSpeed) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Speed not covered" + speed);
+				throw new IllegalArgumentException("Speed less than the supported minSpeed; speed =" + speed);
 			} else {
 				if (!hasWarnedMinSpeed) {
 					Logger.getLogger(getClass())
@@ -111,19 +132,27 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 	private double checkSlope(double currentSlope) {
 		if (currentSlope < minSlope) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Slope not covered" + currentSlope);
+				throw new IllegalArgumentException("Slope less than the supported minSlope; slope =" + currentSlope);
 			} else {
-				Logger.getLogger(getClass())
-						.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+				if (!hasWarnedMinSlope) {
+					Logger.getLogger(getClass())
+							.warn("Assuming minSlope, as Slope not covered by consumption data" + currentSlope);
+					hasWarnedMinSlope = true;
+				}
 				currentSlope = minSlope;
+
 			}
 		} else if (currentSlope > maxSlope) {
 			if (crashIfOutOfBoundValue) {
-				throw new OutOfScopeException("Slope not covered" + currentSlope);
+				throw new IllegalArgumentException("Slope greater than the supported maxSlope; slope =" + currentSlope);
 			} else {
-				Logger.getLogger(getClass())
-						.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+				if (!hasWarnedMaxSlope) {
+					Logger.getLogger(getClass())
+							.warn("Assuming maxSlope, as Slope not covered by consumption data" + currentSlope);
+					hasWarnedMaxSlope = true;
+				}
 				currentSlope = maxSlope;
+
 			}
 		}
 		return currentSlope;

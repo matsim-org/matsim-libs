@@ -21,17 +21,23 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
 
-import javax.annotation.Nullable;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.misc.StringUtils;
 
-public class DvrpConfigGroup extends ReflectiveConfigGroup {
+import com.google.common.collect.ImmutableSet;
+
+public final class DvrpConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
 
@@ -40,18 +46,22 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	public static final String NETWORK_MODE = "networkMode";
-	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles. "
-			+ "Default is car, i.e. the car network is used. "
-			+ "'null' means no network filtering - the scenario.network is used";
+	private static final String NETWORK_MODES = "networkModes";
+	private static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
+			+ "estimation and routing DVRP vehicles. "
+			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
+			+ "travelling only along a specified links or serving a limited area). "
+			+ "Default is \"car\" (i.e. single-element set of modes), i.e. the car network is used. "
+			+ "Empty value \"\" (i.e. empty set of modes) means no network filtering, i.e. "
+			+ "the original scenario.network is used";
 
-	public static final String MOBSIM_MODE = "mobsimMode";
-	static final String MOBSIM_MODE_EXP =
+	private static final String MOBSIM_MODE = "mobsimMode";
+	private static final String MOBSIM_MODE_EXP =
 			"Mode of which the network will be used for throwing events and hence calculating travel times. "
 					+ "Default is car.";
 
-	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
-	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
 			"Used for OFFLINE estimation of travel times for VrpOptimizer"
 					+ " by means of the exponential moving average."
 					+ " The weighting decrease, alpha, must be in (0,1]."
@@ -59,8 +69,8 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 					+ " The averaging starts from the initial travel time estimates. If not provided,"
 					+ " the free-speed TTs is used as the initial estimates";
 
-	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
-	static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
+	private static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
+	private static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
 			+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
 			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
 			+ " or positive (mixed online-offline estimation)."
@@ -83,14 +93,15 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
-	@Nullable
-	private String networkMode = TransportMode.car; // used for building route; null ==> no filtering (routing network equals scenario.network)
+	// used for building route; empty ==> no filtering (routing network equals scenario.network)
+	@NotNull
+	private ImmutableSet<String> networkModes = ImmutableSet.of(TransportMode.car);
 
 	@NotBlank
 	private String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
 
 	@Positive
-	@Max(1)
+	@DecimalMax("1.0")
 	private double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only
 
 	@PositiveOrZero
@@ -101,9 +112,32 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		new DynQSimConfigConsistencyChecker().checkConsistency(config);
+
+		if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
+			// Typically, vrp paths are calculated from startLink to endLink
+			// (not from startNode to endNode). That requires making some assumptions
+			// on how much time travelling on the first and last links takes.
+			// The current implementation assumes:
+			// (a) free-flow travelling on the last link, which is actually the case in QSim, and
+			// (b) a 1-second stay on the first link (spent on moving over the first node).
+			// The latter expectation is assumes that departing vehicles must be inserted before driving ones
+			// (though that still does not guarantee 1-second stay since the vehicle may need to wait if the next
+			// link is fully congested)
+			log.warn(" 'QSim.insertingWaitingVehiclesBeforeDrivingVehicles' should be true in order to get"
+					+ " more precise travel time estimates. See comments in DvrpConfigGroup.checkConsistency()");
+		}
+		if (config.qsim().isRemoveStuckVehicles()) {
+			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
+		}
+	}
+
+	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
+		map.put(NETWORK_MODES, NETWORK_MODES_EXP);
 		map.put(MOBSIM_MODE, MOBSIM_MODE_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_BETA, TRAVEL_TIME_ESTIMATION_BETA_EXP);
@@ -111,19 +145,29 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return {@value #NETWORK_MODE_EXP}
+	 * @return {@value #NETWORK_MODES_EXP}
 	 */
-	@StringGetter(NETWORK_MODE)
-	public String getNetworkMode() {
-		return networkMode;
+	@StringGetter(NETWORK_MODES)
+	public String getNetworkModesAsString() {
+		return String.join(",", networkModes);
+	}
+
+	public ImmutableSet<String> getNetworkModes() {
+		return networkModes;
 	}
 
 	/**
-	 * @param networkMode {@value #NETWORK_MODE_EXP}
+	 * @param networkModesString {@value #NETWORK_MODES_EXP}
 	 */
-	@StringSetter(NETWORK_MODE)
-	public void setNetworkMode(String networkMode) {
-		this.networkMode = networkMode;
+	@StringSetter(NETWORK_MODES)
+	public DvrpConfigGroup setNetworkModesAsString(String networkModesString) {
+		this.networkModes = ImmutableSet.copyOf(StringUtils.explode(networkModesString, ','));
+		return this;
+	}
+
+	public DvrpConfigGroup setNetworkModes(ImmutableSet<String> networkModes) {
+		this.networkModes = networkModes;
+		return this;
 	}
 
 	/**
@@ -138,8 +182,9 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param networkMode {@value #MOBSIM_MODE_EXP}
 	 */
 	@StringSetter(MOBSIM_MODE)
-	public void setMobsimMode(String networkMode) {
+	public DvrpConfigGroup setMobsimMode(String networkMode) {
 		this.mobsimMode = networkMode;
+		return this;
 	}
 
 	/**
@@ -154,8 +199,9 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationAlpha {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
-	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
+	public DvrpConfigGroup setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
 		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
+		return this;
 	}
 
 	/**
@@ -170,7 +216,8 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationBeta {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
-	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
+	public DvrpConfigGroup setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
+		return this;
 	}
 }

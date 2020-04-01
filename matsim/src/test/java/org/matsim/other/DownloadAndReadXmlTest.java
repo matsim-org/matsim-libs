@@ -41,7 +41,11 @@ public class DownloadAndReadXmlTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Ignore
 	@Test
+	/**
+	 * Http downloads from the SVN server will be forbidden soon, according to jwilk.
+	 */
 	public final void testHttpFromSvn() {
 		
 		Config config = ConfigUtils.createConfig();

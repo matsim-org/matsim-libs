@@ -27,6 +27,8 @@ import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author michalm
  */
@@ -36,8 +38,6 @@ public class DrtRequest implements PassengerRequest {
 	private final double earliestStartTime;
 	private final double latestStartTime;
 	private final double latestArrivalTime;
-
-	private boolean rejected = false;
 
 	private final Id<Person> passengerId;
 	private final String mode;
@@ -86,16 +86,6 @@ public class DrtRequest implements PassengerRequest {
 	}
 
 	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	@Override
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
-	}
-
-	@Override
 	public Link getFromLink() {
 		return fromLink;
 	}
@@ -133,6 +123,18 @@ public class DrtRequest implements PassengerRequest {
 
 	@Override
 	public String toString() {
-		return Request.toString(this);
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("submissionTime", submissionTime)
+				.add("earliestStartTime", earliestStartTime)
+				.add("latestStartTime", latestStartTime)
+				.add("latestArrivalTime", latestArrivalTime)
+				.add("passengerId", passengerId)
+				.add("mode", mode)
+				.add("fromLink", fromLink)
+				.add("toLink", toLink)
+				.add("pickupTask", pickupTask)
+				.add("dropoffTask", dropoffTask)
+				.toString();
 	}
 }

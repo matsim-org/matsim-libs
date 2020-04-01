@@ -21,13 +21,13 @@ package org.matsim.contrib.av.robotaxi.fares.taxi;/*
  * created by jbischoff, 11.12.2018
  */
 
+import java.util.Collection;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.Collection;
-
-public class TaxiFaresConfigGroup extends ReflectiveConfigGroup {
+public final class TaxiFaresConfigGroup extends ReflectiveConfigGroup {
 
     public static final String GROUP_NAME = "taxifares";
 

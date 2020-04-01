@@ -24,9 +24,9 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -54,11 +54,11 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		return vEntries.stream()//
+		return vEntries.stream()
 				.map(v -> insertionProblem.findBestInsertion(drtRequest, v,
-						insertionGenerator.generateInsertions(drtRequest, v)))//
-				.filter(Optional::isPresent)//
-				.map(Optional::get)//
+						insertionGenerator.generateInsertions(drtRequest, v)))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
 				.min(Comparator.comparing(i -> i.cost));
 	}
 }

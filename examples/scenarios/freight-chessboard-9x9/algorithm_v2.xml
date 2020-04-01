@@ -7,7 +7,11 @@
 	<prematureBreak basedOn="iterations">
 		<iterations>100</iterations>
 	</prematureBreak>
-	
+
+	<construction>
+		<insertion name="bestInsertion"/>
+	</construction>
+
 	<strategy>
 		<memory>1</memory>
 		<searchStrategies>

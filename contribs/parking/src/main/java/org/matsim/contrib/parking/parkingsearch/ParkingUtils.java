@@ -131,4 +131,16 @@ public class ParkingUtils {
 		}
 	}
 
+	public static List<Link> getOutgoingLinksForMode(Link link, String mode) {
+		List<Link> outGoingModeLinks = new ArrayList();
+		for (Link outLink : link.getToNode().getOutLinks().values()) {
+			if (outLink.getAllowedModes().contains(mode)) outGoingModeLinks.add(outLink);
+		}
+		if (outGoingModeLinks.size() == 0) {
+			throw new RuntimeException("could not find an outgoing link for mode " + mode +
+					" from link " + link + ". Consequences are not checked. Please check the network. \n Aborting...");
+		}
+		return outGoingModeLinks;
+	}
+
 }

@@ -35,7 +35,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -110,20 +109,20 @@ public class ScoreStatsModuleTest {
 			if ( ! config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 				{
 					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.78368121099818, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.78366379257605, array[1], DELTA);
 				} {
 					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.84180132563583, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.81274997752806, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.81273255910591, array[1], DELTA);
 				}{
 					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-					Assert.assertEquals(64.75688384156044, array[0], DELTA);
-					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+					Assert.assertEquals(64.75686659291274, array[0], DELTA);
+					Assert.assertEquals(64.84180132563583, array[1], DELTA);
 				}
 				} else {
 					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16

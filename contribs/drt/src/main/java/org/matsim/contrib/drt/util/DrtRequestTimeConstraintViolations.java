@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.util;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 
 /**
  * Utility functions to help calculation of wait/travel time violations.
@@ -32,7 +32,7 @@ public class DrtRequestTimeConstraintViolations {
 	/**
 	 * @return wait time constraint violation at the moment of request insertion
 	 */
-	public static double getInitialWaitTimeViolation(DrtRequest request, DrtRequestScheduledEvent event) {
+	public static double getInitialWaitTimeViolation(DrtRequest request, PassengerRequestScheduledEvent event) {
 		return getTimeConstraintViolation(event.getPickupTime(), request.getLatestStartTime());
 	}
 
@@ -46,7 +46,7 @@ public class DrtRequestTimeConstraintViolations {
 	/**
 	 * @return travel time constraint violation at the moment of request insertion
 	 */
-	public static double getInitialTravelTimeViolation(DrtRequest request, DrtRequestScheduledEvent event) {
+	public static double getInitialTravelTimeViolation(DrtRequest request, PassengerRequestScheduledEvent event) {
 		return getTimeConstraintViolation(event.getDropoffTime(), request.getLatestArrivalTime());
 	}
 

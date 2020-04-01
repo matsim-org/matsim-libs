@@ -420,13 +420,13 @@ public final class ParallelEventsManager implements EventsManager {
 	
 	private static class ProcessedEventsChecker implements Runnable {
 
-		private final EventsManager evenentsManger;
+		private final EventsManager eventsManager;
 		private final Queue<Event> eventsQueue;
 		private boolean allEventsProcessed;
 		private double time;
 		
-		public ProcessedEventsChecker(EventsManager evenentsManger, Queue<Event> eventsQueue) {
-			this.evenentsManger = evenentsManger;
+		public ProcessedEventsChecker(EventsManager eventsManager, Queue<Event> eventsQueue) {
+			this.eventsManager = eventsManager;
 			this.eventsQueue = eventsQueue;
 			
 			this.allEventsProcessed = true;
@@ -455,7 +455,7 @@ public final class ParallelEventsManager implements EventsManager {
 			 */
 			if (!this.eventsQueue.isEmpty()) {
 				this.allEventsProcessed = false;
-				this.evenentsManger.processEvent(new LastEventOfSimStep(time));
+				this.eventsManager.processEvent(new LastEventOfSimStep(time));
 				return;
 			}
 			

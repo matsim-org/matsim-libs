@@ -1,13 +1,33 @@
-package org.matsim.core.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SumScoringFunction.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.scoring;
+
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.ArrayList;
 
 public final class SumScoringFunction implements ScoringFunction {
 
@@ -65,22 +85,21 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-		double startTime = activity.getStartTime();
-		double endTime = activity.getEndTime();
-		if (Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		if (activity.getStartTime().isUndefined() && activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		} else if (activity.getStartTime().isDefined() && activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && Time.isUndefinedTime(endTime)) {
+		} else if (activity.getStartTime().isDefined() && activity.getEndTime().isUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+			throw new RuntimeException(
+					"Trying to score an activity without start or end time. Should not happen. Activity=" + activity);
 		}
 	}
 

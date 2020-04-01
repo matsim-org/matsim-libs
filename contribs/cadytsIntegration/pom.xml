@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>0.11.0-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
@@ -24,12 +24,12 @@
   	<dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>analysis</artifactId>
-  		<version>0.11.0-SNAPSHOT</version>
+  		<version>12.0-SNAPSHOT</version>
   	</dependency>
     <dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim-examples</artifactId>
-      <version>0.11.0-SNAPSHOT</version>
+      <version>12.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 

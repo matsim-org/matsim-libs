@@ -1,4 +1,25 @@
-package org.matsim.core.config;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CommandLine.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.config;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 
 /**
  * <p>
@@ -25,7 +47,7 @@ import org.apache.log4j.Logger;
  * <h1>General usage</h1>
  * 
  * <p>
- * The command line interpreter is set up using the {@link CommandLine$Builder}:
+ * The command line interpreter is set up using the {@link CommandLine.Builder}:
  * </p>
  * 
  * <pre>
@@ -94,6 +116,7 @@ import org.apache.log4j.Logger;
  * <ul>
  * <li><code>--config:global.numberOfThreads 48</code></li>
  * <li><code>--config:strategy.strategysettings[strategyName=ReRoute].weight 0.0</code></li>
+ * <li><code>--config:planCalcScore.scoringParameters[subpopulation=null].modeParams[mode=car].constant -3.5</code></li>
  * </ul>
  * 
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
@@ -136,6 +159,11 @@ public class CommandLine {
 		 */
 		public Builder(String[] args) {
 			this.arguments = Arrays.asList(args);
+			for( String argument : this.arguments ){
+				if ( argument==null) {
+					throw new RuntimeException( "one of the entries in args is null; this will not work ..." ) ;
+				}
+			}
 		}
 
 		/**
@@ -221,7 +249,7 @@ public class CommandLine {
 		 * <li>An unnamed (positional) command line argument is passed, although it is
 		 * forbidden (see {{@link #allowPositionalArguments(boolean)})</li>
 		 * <li>A named command line argument is passed, but it is not allowed (see
-		 * {@link #allowOptions(Collec</li>tion)}. This can be disabled via
+		 * {@link #allowOptions(Collection)}. This can be disabled via
 		 * {@link #allowAnyOption}.</li>
 		 * <li>A named command line argument with a prefix is passed, but the prefix is
 		 * not allowed (see {@link #allowPrefixes(Collection)}. This can be disabled via
@@ -384,11 +412,11 @@ public class CommandLine {
 		List<String> flatArguments = new LinkedList<>();
 
 		for (String argument : args) {
-			int index = argument.indexOf("=");
-			int bracketIndex = argument.indexOf("]");
+			int index = argument.lastIndexOf('=');
+			int bracketIndex = argument.lastIndexOf(']');
 
 			if (bracketIndex > index) {
-				index = argument.indexOf("=", bracketIndex);
+				index = argument.indexOf('=', bracketIndex);
 			}
 
 			if (index > -1) {
@@ -481,7 +509,7 @@ public class CommandLine {
 		List<String> nonPrefixedOptions = new LinkedList<>();
 
 		for (String option : options.keySet()) {
-			int separatorIndex = option.indexOf(":");
+			int separatorIndex = option.indexOf(':');
 
 			if (separatorIndex > -1) {
 				String prefix = option.substring(0, separatorIndex);
@@ -518,7 +546,7 @@ public class CommandLine {
 	}
 
 	private void processConfigOption(Config config, String option, String remainder) throws ConfigurationException {
-		int separatorIndex = remainder.indexOf(".");
+		int separatorIndex = remainder.indexOf('.');
 
 		if (separatorIndex > -1) {
 			String module = remainder.substring(0, separatorIndex);
@@ -539,9 +567,9 @@ public class CommandLine {
 	private void processParameter(String option, String path, ConfigGroup configGroup, String remainder)
 			throws ConfigurationException {
 		if (remainder.contains("[")) {
-			int selectorStartIndex = remainder.indexOf("[");
-			int selectorEndIndex = remainder.indexOf("]");
-			int equalIndex = remainder.indexOf("=");
+			int selectorStartIndex = remainder.indexOf('[');
+			int selectorEndIndex = remainder.indexOf(']');
+			int equalIndex = remainder.indexOf('=');
 
 			if (selectorStartIndex > -1 && selectorEndIndex > -1 && equalIndex > -1) {
 				if (selectorStartIndex < equalIndex && equalIndex < selectorEndIndex) {
@@ -569,6 +597,13 @@ public class CommandLine {
 										processParameter(option, newPath, parameterSet, newRemainder);
 										return;
 									}
+									
+									// allow for the case subpopulation = 'null' in the scoring parameters
+									if (parameterSetType.equals(ScoringParameterSet.SET_TYPE) && selectionParameter.equals("subpopulation") && selectionValue.equals("null")) {
+										processParameter(option, newPath, parameterSet, newRemainder);
+										return;
+									}
+									
 								}
 							}
 
@@ -591,7 +626,7 @@ public class CommandLine {
 			if (configGroup.getParams().containsKey(remainder)) {
 				String value = options.get(option);
 				configGroup.addParam(remainder, value);
-				logger.info(String.format("Setting %s to %s", path, value));
+				logger.info(String.format("Setting %s to %s", option, value));
 			} else {
 				throw new ConfigurationException(String.format("Parameter %s in %s is not available", remainder, path));
 			}

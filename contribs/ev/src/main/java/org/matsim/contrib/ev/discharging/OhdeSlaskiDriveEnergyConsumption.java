@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
  * See:
  * Ohde, B., Ślaski, G., Maciejewski, M. (2016). Statistical analysis of real-world urban driving cycles for modelling
  * energy consumption of electric vehicles. Journal of Mechanical and Transport Engineering, 68.
- * 
+ * <p>
  * http://fwmt.put.poznan.pl/imgWYSIWYG/agill/File/2_68_2016/jmte_2016_68_2_03_ohde_b_slaski_g.pdf
  * TODO Add (dis-)charging efficiency relative to SOC, temperature, etc...
  */
@@ -44,34 +44,34 @@ public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption 
 	private static final double a2 = 0.99819;// [m/s^2]
 
 	// precomputed values
-	private static final int maxAvgSpeed = 40;
-	private static final int speedStepsPerUnit = 10;
-	private static final double zeroSpeed = 0.01;
-	private static final double[] power;
+	private static final int MAX_AVG_SPEED = 80;
+	private static final int SPEED_STEPS_PER_UNIT = 10;
+	private static final double ZERO_SPEED = 0.01;
+	private static final double[] POWER;
 
 	static {
-		power = new double[maxAvgSpeed * speedStepsPerUnit];
-		power[0] = calcPower(zeroSpeed);
-		for (int i = 1; i < power.length; i++) {
-			power[i] = calcPower((double)i / speedStepsPerUnit);
-			// System.out.println(((double)i / speedStepsPerUnit) + " -> " + power [i]);
+		POWER = new double[MAX_AVG_SPEED * SPEED_STEPS_PER_UNIT];
+		POWER[0] = calcPower(ZERO_SPEED);
+		for (int i = 1; i < POWER.length; i++) {
+			POWER[i] = calcPower((double)i / SPEED_STEPS_PER_UNIT);
+			// System.out.println(((double)i / SPEED_STEPS_PER_UNIT) + " -> " + POWER [i]);
 		}
 	}
 
 	// v - avg speed [m/s]
-	// power - avg power [W]
+	// POWER - avg POWER [W]
 	private static double calcPower(double v) {
 		return v * (ft * m_s * g + fa * v * v + cb * (a1 * Math.log(v) + a2) * m_s) / spr;
 	}
 
 	@Override
-	public double calcEnergyConsumption(Link link, double travelTime) {
+	public double calcEnergyConsumption(Link link, double travelTime, double linkEnterTime) {
 		if (travelTime == 0) {
 			return 0;
 		}
 
 		double avgSpeed = link.getLength() / travelTime;
-		int idx = (int)Math.round(avgSpeed * speedStepsPerUnit);
-		return power[idx] * travelTime;
+		int idx = (int)Math.round(avgSpeed * SPEED_STEPS_PER_UNIT);
+		return POWER[idx] * travelTime;
 	}
 }

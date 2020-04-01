@@ -50,6 +50,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
 	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
 
+
 	public static final String UNDEFINED = "undefined";
 	
 	// For config file backward compatibility.
@@ -71,10 +72,14 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private boolean insertingAccessEgressWalk = false ;
 	
 	// ---
-	
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
-	
+	// ---
+	private static final String CLEAR_MODE_ROUTING_PARAMS = "clearDefaultTeleportedModeParams";
+	private static final String CLEAR_MODE_ROUTING_PARAMS_CMT = "Some typical teleportation routing params are set by default, such as for walk and bike.  " +
+																		"Setting this switch to \"true\" will clear them.  Note that this will also clear " +
+																		"settings for helper modes such as for " + TransportMode.non_network_walk;
+	private boolean clearingDefaultModeRoutingParams = false ;
 	// ---
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
@@ -149,8 +154,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * 
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
 		 */
-		public final void setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
+		public final ModeRoutingParams setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
+			return this;
 		}
 
 		@StringGetter(MODE)
@@ -159,9 +165,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(MODE)
-		public void setMode(String mode) {
+		public ModeRoutingParams setMode(String mode) {
 			testForLocked() ;
 			this.mode = mode;
+			return this ;
 		}
 
 		@StringGetter( "teleportedModeSpeed" )
@@ -170,12 +177,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "teleportedModeSpeed" )
-		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
+		public ModeRoutingParams setTeleportedModeSpeed(Double teleportedModeSpeed) {
 			testForLocked() ;
 			if ( getTeleportedModeFreespeedFactor() != null && teleportedModeSpeed != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeSpeed = teleportedModeSpeed;
+			return this;
 		}
 		
 		/**
@@ -190,19 +198,21 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		 * @param teleportedModeFreespeedFactor -- {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
 		 */
 		@StringSetter(TELEPORTED_MODE_FREESPEED_FACTOR)
-		public void setTeleportedModeFreespeedFactor(
+		public ModeRoutingParams setTeleportedModeFreespeedFactor(
 				Double teleportedModeFreespeedFactor) {
 			testForLocked() ;
 			if ( getTeleportedModeSpeed() != null && teleportedModeFreespeedFactor != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
+			return this;
 		}
 		
 		@StringSetter("beelineDistanceFactor")
-		public void setBeelineDistanceFactor( Double val ) {
+		public ModeRoutingParams setBeelineDistanceFactor( Double val ) {
 			testForLocked() ;
 			this.beelineDistanceFactorForMode = val ;
+			return this ;
 		}
 		@StringGetter("beelineDistanceFactor")
 		public Double getBeelineDistanceFactor() {
@@ -230,15 +240,15 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
 		// will not. kai, dec'15
 		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.access_walk );
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.non_network_walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
-		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.egress_walk );
-			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
-			addParameterSet( walk );
-		}
+//		{
+//			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.egress_walk );
+//			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+//			addParameterSet( walk );
+//		}
 
 		// I'm not sure if anyone needs the "undefined" mode. In particular, it doesn't do anything for modes which are
 		// really unknown, it is just a mode called "undefined". michaz 02-2012
@@ -247,11 +257,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// for any modes, and the simulation would teleport all those modes it does not know anything about.
 		// With the travel times and travel distances given by the mode.  In practice, it seems that people can live better
 		// with the concept that mobsim figures it out by itself.  Although it is a much less flexible design.  kai, jun'2012
-		{
-			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
-			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
-			addParameterSet( undefined );
-		}
+//		{
+//			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
+//			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
+//			addParameterSet( undefined );
+//		}
 
 		{
 			final ModeRoutingParams ride = new ModeRoutingParams( TransportMode.ride );
@@ -297,13 +307,46 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 				throw new IllegalArgumentException( module.getName() );
 		}
 	}
+	/**
+	 * {@value CLEAR_MODE_ROUTING_PARAMS_CMT}
+	 */
+	public void setClearingDefaultModeRoutingParams( boolean val ) {
+		if ( val ) {
+			clearModeRoutingParams();
+		} else if ( clearingDefaultModeRoutingParams ) {
+			throw new RuntimeException( "you cannot set the clearing of the default mode routing params to false after you have already cleared once." ) ;
+		}
+	}
+	public void clearModeRoutingParams( ) {
+		// This is essentially a config switch, except that it cannot be set back to false once it was set to true.
+
+		// from now on, we will accept without clearing:
+		this.acceptModeParamsWithoutClearing = true;
+
+		// do the clearing:
+		clearParameterSetsForType( ModeRoutingParams.SET_TYPE );
+
+		// memorize that we have cleared; this is what will be written into the output config (once we have one):
+		this.clearingDefaultModeRoutingParams = true ;
+	}
 
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
-			
+			log.warn( "The first mode routing params that are explicitly defined clear the default mode routing params.  This functionality was removed for " );
+			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  If you want to avoid this " );
+			log.warn( "    warning, use clearModeRoutingParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
+			// A bit more info:
+			//
+			// (1) I wanted to keep the default teleportation routers ... since for novice users I find it better if they all use the same teleportation
+			// speeds.  kai, nov'19
+			//
+			// (2) The result of "add" and "remove" in code evidently depends on the sequence. In contrast, our "config" object
+			// is a state ... as one notices when we write it out, since there we cannot play back additions and removal.  So if
+			// we add to and remove from the default entries, and write the final result to file, then re-reading these entries
+			// needs to trigger removal of the defaults since otherwise they will exist in addition. kai, nov'19
 		}
 		ModeRoutingParams pars = (ModeRoutingParams) set ;
 		// for the time being pushing the "global" factor into the local ones if they are not initialized by
@@ -327,6 +370,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 				this.removeParameterSet(pars) ;
 				break ;
 			}
+		}
+		if ( getParameterSets( ModeRoutingParams.SET_TYPE ).isEmpty() ) {
+			log.warn( "You have removed the last mode routing parameter with the removeModeRoutingParams method.  If you wrote the resulting config to " ) ;
+			log.warn("    file, and read it back in, all default teleported modes would be resurrected.  The code will therefore also call  " );
+			log.warn( "    \"clearModeRoutingParams()\".  It would be better if you did this yourself." ) ;
+			this.clearModeRoutingParams();
 		}
 	}
 
@@ -384,8 +433,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
 			setTeleportedModeSpeed(key.substring(TELEPORTED_MODE_SPEEDS.length()), Double.parseDouble(value));
-		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)) {
-			setTeleportedModeFreespeedFactor(key.substring(TELEPORTED_MODE_FREESPEED_FACTORS.length()), Double.parseDouble(value));
+		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)){
+			setTeleportedModeFreespeedFactor( key.substring( TELEPORTED_MODE_FREESPEED_FACTORS.length() ), Double.parseDouble( value ) );
+		} else if ( CLEAR_MODE_ROUTING_PARAMS.equals( key ) ){
+			this.setClearingDefaultModeRoutingParams( Boolean.parseBoolean( value ) );
+		} else if (RANDOMNESS.equals( key ) ) {
+			this.setRoutingRandomness( Double.parseDouble( value ) );
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -394,7 +447,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> map = super.getParams();
-		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[this.networkModes.size()])));
+		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
+		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
+		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
 
 		//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 
@@ -417,9 +472,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
-	        map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
+		map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
+		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
 		return map;
 	}
 
@@ -469,20 +525,20 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 		return map ;
 	}
-	
-	@Deprecated // use mode-specific factors.  kai, apr'15
+
+	@Deprecated // rather use addModeRoutingParams(...), since that allows further params (e.g. beeline distance factor). kai, nov'19
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
 		testForLocked() ;
-		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
+		// re-create, to trigger erasing of defaults (see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeFreespeedFactor( freespeedFactor );
 		addParameterSet( pars );
 	}
 
-	@Deprecated // use mode-specific factors.  kai, apr'15
+	@Deprecated // rather use addModeRoutingParams(...), since that allows further params (e.g. beeline distance factor). kai, nov'19
 	public void setTeleportedModeSpeed(String mode, double speed) {
 		testForLocked() ;
-		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
+		// re-create, to trigger erasing of defaults (see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeSpeed( speed );
 		addParameterSet( pars );

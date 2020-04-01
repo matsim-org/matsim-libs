@@ -20,13 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,10 +34,16 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Parallel implementation of the PopulationReaderMatsimV4. The main thread only reads
@@ -280,11 +279,6 @@ import org.xml.sax.helpers.AttributesImpl;
 			return population.getFactory();
 		}
 
-		@Override
-		public ObjectAttributes getPersonAttributes() {
-			return population.getPersonAttributes();
-		}
-		
 		@Override
 		public String getName() {
 			throw new RuntimeException("Calls to this method are not expected to happen...");

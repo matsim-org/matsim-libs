@@ -28,15 +28,13 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author jbischoff
  * @author dgrether
  */
-public class AmberTimesDataImpl implements AmberTimesData {
+public final class AmberTimesDataImpl implements AmberTimesData {
 
 	private Map<Id<SignalSystem>, AmberTimeData> amberTimeData = new HashMap<>();
 	private Double defaultAmberTimeGreen;
 	private Integer globalDefaultAmberTime;
 	private Integer globalDefaultRedAmberTime;
 	private AmberTimesDataFactory factory = new AmberTimesDataFactoryImpl();
-
-	
 	
 	@Override
 	public void addAmberTimeData(AmberTimeData amberTimeData) {

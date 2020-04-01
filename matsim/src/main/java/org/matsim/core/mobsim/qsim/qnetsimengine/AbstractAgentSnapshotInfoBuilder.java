@@ -19,19 +19,31 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.Hole;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -75,6 +87,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				} else {
 					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
 				}
+				final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
+				if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
+					passengerPosition.setAgentState( AgentState.MARKER );
+				}
 				positions.add(passengerPosition);
 				first = false;
 			}
@@ -87,6 +103,13 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (MobsimAgent pa : agentsInActivities) {
 			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
+			final Person person = scenario.getPopulation().getPersons().get( pa.getId() );
+			if ( person != null ) {
+				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
+					agInfo.setAgentState( AgentState.MARKER );
+				}
+			}
+
 			positions.add(agInfo) ;
 			cnt2++ ;
 		}
@@ -145,8 +168,14 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		} else {
 			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		}
-		if ( scenario.getPopulation().getPersonAttributes().getAttribute( driverAgent.getId().toString(), "marker" ) != null ) { 
-			pos.setAgentState( AgentState.PERSON_OTHER_MODE ) ;
+		if ( driverAgent instanceof HasPerson ){
+			if( PopulationUtils.getPersonAttribute( ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker ) != null ){
+				pos.setAgentState( AgentState.MARKER );
+			}
+		}
+		final Person person = scenario.getPopulation().getPersons().get( driverAgent.getId() );
+		if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
+			pos.setAgentState( AgentState.MARKER );
 		}
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 

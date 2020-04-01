@@ -20,22 +20,22 @@
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -49,14 +49,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 	private static final Logger log =
 		Logger.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
 
-	private final StageActivityTypes stageTypes;
+	private final Set<String> stageTypes;
 
-	public SynchronizeCoTravelerPlansAlgorithm(
-			final StageActivityTypes externalTypes) {
-		final CompositeStageActivityTypes composite = new CompositeStageActivityTypes();
-		composite.addActivityTypes( externalTypes );
-		composite.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		this.stageTypes = composite;
+	public SynchronizeCoTravelerPlansAlgorithm() {
+		this.stageTypes = JointActingTypes.JOINT_STAGE_ACTS;
 	}
 
 	@Override
@@ -88,9 +84,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			final PlanElement pe = passengerElements.get( --ind );
 
 			// assume stage activities have 0 duration
-			if ( pe instanceof Activity &&
-					!stageTypes.isStageActivity( ((Activity) pe).getType() ) ) {
-				((Activity) pe).setMaximumDuration( Time.UNDEFINED_TIME );
+			if ( pe instanceof Activity && 
+					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
+					stageTypes.contains(((Activity) pe).getType())) ){
+				((Activity) pe).setMaximumDurationUndefined();
 				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
 			}
@@ -99,10 +96,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
+				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.UNDEFINED_TIME ) {
+				if ( !Time.isUndefinedTime(legDur) ) {
 					now -= legDur;
 				}
 				else {
@@ -130,20 +127,20 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			// assume stage activities have 0 duration
 			if ( pe instanceof Activity &&
-					!stageTypes.isStageActivity( ((Activity) pe).getType() ) ) {
-				final double endTime = ((Activity) pe).getEndTime();
-				if ( endTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined end time" );
-				return endTime + tt;
+					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
+					stageTypes.contains(((Activity) pe).getType())) ){
+				final OptionalTime endTime = ((Activity)pe).getEndTime();
+				return endTime.seconds() + tt;
 			}
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
+				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.UNDEFINED_TIME ) {
+				if ( !Time.isUndefinedTime(legDur) ) {
 					tt += legDur;
 				}
 				else {

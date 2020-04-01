@@ -1,7 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2007 by the members listed in the COPYING,        *
@@ -23,6 +21,7 @@ package org.matsim.core.network;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -31,15 +30,7 @@ import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Design thoughts:<ul>
@@ -58,9 +49,9 @@ import java.util.Queue;
 
 	private double capacityPeriod = 3600.0 ;
 
-	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<>();
+	private final IdMap<Node, Node> nodes = new IdMap<>(Node.class);
 
-	private final Map<Id<Link>, Link> links = new LinkedHashMap<>();
+	private final IdMap<Link, Link> links = new IdMap<>(Link.class);
 
 	private QuadTree<Node> nodeQuadTree = null;
 
@@ -117,16 +108,18 @@ import java.util.Queue;
 
 		/* Check if the link's nodes are in the network. */
 		Node fromNode = nodes.get( link.getFromNode().getId() );
-		if(fromNode == null){
+		if (fromNode == null) {
 			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its fromNode = " + link.getFromNode().getId() + " has not been added to the network.");
 		}
-		Node toNode = nodes.get( link.getToNode().getId() );
-		if(toNode == null){
+		Node toNode = nodes.get(link.getToNode().getId());
+		if (toNode == null) {
 			throw new IllegalArgumentException("Trying to add link = " + link.getId() + ", but its toNode = " + link.getToNode().getId() + " has not been added to the network.");
 		}
 
 		fromNode.addOutLink(link);
 		toNode.addInLink(link);
+		link.setFromNode(fromNode);
+		link.setToNode(toNode);
 
 		links.put(link.getId(), link);
 

@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 
 /**
  * @author michalm
@@ -30,9 +29,10 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 	private final ZonalDemandAggregator demandAggregator;
 	private final MinCostFlowRebalancingParams params;
 
-	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator, DrtConfigGroup drtCfg) {
+	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator,
+			MinCostFlowRebalancingParams params) {
 		this.demandAggregator = demandAggregator;
-		params = drtCfg.getMinCostFlowRebalancing();
+		this.params = params;
 	}
 
 	// FIXME targets should be calculated more intelligently

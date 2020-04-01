@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
@@ -31,13 +32,13 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> requests;
+	private final Map<Id<Request>, ? extends PassengerRequest> requests;
 	private final double expectedEndTime;
 
 	private int passengersPickedUp = 0;
 
 	public MultiPassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
-			Set<? extends PassengerRequest> requests, String activityType) {
+			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
 		super(activityType);
 
 		this.passengerEngine = passengerEngine;
@@ -53,7 +54,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 
 	@Override
 	protected void beforeFirstStep(double now) {
-		for (PassengerRequest request : requests) {
+		for (PassengerRequest request : requests.values()) {
 			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 				passengersPickedUp++;
 			}
@@ -71,7 +72,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	}
 
 	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
-		return requests.stream()
+		return requests.values().stream()
 				.filter(r -> passengerId.equals(r.getPassengerId()))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));

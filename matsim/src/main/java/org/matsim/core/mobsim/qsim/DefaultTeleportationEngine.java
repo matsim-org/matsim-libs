@@ -1,4 +1,33 @@
-package org.matsim.core.mobsim.qsim;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * DefaultTeleportationEngine.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim;
+
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -10,18 +39,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
-import org.matsim.vis.snapshotwriters.VisData;
-
-import javax.inject.Inject;
-import java.util.*;
 
 /**
  * Includes all agents that have transportation modes unknown to the
@@ -59,7 +82,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
+		if ( agent.getExpectedTravelTime()==null || Time.isUndefinedTime(agent.getExpectedTravelTime()) ) {
 			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
 					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
@@ -113,7 +136,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
 						.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
+				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance, personAgent.getMode()));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);

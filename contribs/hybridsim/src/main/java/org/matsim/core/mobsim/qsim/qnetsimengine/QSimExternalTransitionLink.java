@@ -30,8 +30,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -45,8 +46,8 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	private final QNodeI toQNode ;
 
 	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine,
-							   QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator) {
-		super(link, toQNode, context, netsimEngine, linkSpeedCalculator);
+							   QNodeI toQNode, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
+		super(link, toQNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
 		this.e = e;
 		this.em = e.getEventsManager();
 		this.context = context ;

@@ -23,8 +23,6 @@ package org.matsim.contrib.dvrp.fleet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.ScheduleImpl;
-import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.base.MoreObjects;
 
@@ -32,20 +30,25 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
-
-	public static DvrpVehicleImpl createWithLinkProvider(DvrpVehicleSpecification specification,
-			LinkProvider<Id<Link>> linkProvider) {
-		return new DvrpVehicleImpl(specification, linkProvider.apply(specification.getStartLinkId()));
-	}
-
 	private final DvrpVehicleSpecification specification;
 	private final Link startLink;
 	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+		if (startLink == null) {
+			throw new RuntimeException("Start link "
+					+ specification.getStartLinkId()
+					+ " of vehicle "
+					+ specification.getId()
+					+ " is null."
+					+ " Please make sure the link is part of the mode-filtered (and cleaned?) network! Aborting...");
+		}
+		if (!startLink.getId().equals(specification.getStartLinkId())) {
+			throw new IllegalArgumentException("startLink.id != specification.startLinkId");
+		}
 		this.specification = specification;
 		this.startLink = startLink;
-		schedule = new ScheduleImpl(specification);
+		schedule = Schedule.create(specification);
 	}
 
 	@Override

@@ -1,13 +1,36 @@
-package org.matsim.run.gui;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.zip.GZIPInputStream;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PopulationSampler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.run.gui;
+
+import com.github.luben.zstd.ZstdInputStream;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.algorithms.PersonAlgorithm;
+import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.io.UnicodeInputStream;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -20,16 +43,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SpinnerNumberModel;
-
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.algorithms.PersonAlgorithm;
-import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.population.io.StreamingDeprecated;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.UnicodeInputStream;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @author mrieser / Senozon AG
@@ -153,10 +174,11 @@ public final class PopulationSampler extends JFrame {
 			try {
 				createSample(srcFile, null, samplesize, destFile);
 			} catch (RuntimeException | IOException ex) {
+				ex.printStackTrace();
 				destFile.delete();
 				JOptionPane.showMessageDialog(null,
 				    "<html>It looks like the population file cannot be parsed without a network file.<br />Please select a matching network file in the next dialog.</html>",
-				    "Problems creating pouplation sample",
+				    "Problems creating population sample",
 				    JOptionPane.WARNING_MESSAGE);
 				
 				JFileChooser netChooser = new JFileChooser();
@@ -167,6 +189,7 @@ public final class PopulationSampler extends JFrame {
 					try {
 						createSample(srcFile, networkFile, samplesize, destFile);
 					} catch (RuntimeException | IOException ex2) {
+						ex.printStackTrace();
 						destFile.delete();
 						JOptionPane.showMessageDialog(null,
 						    "The population sample cannot be created, as not all necessary data is available.",
@@ -184,9 +207,7 @@ public final class PopulationSampler extends JFrame {
 		
 		if (networkFile != null) {
 			try (FileInputStream fis = new FileInputStream(networkFile);
-					BufferedInputStream is = (networkFile.getName().toLowerCase(Locale.ROOT).endsWith(".gz")) ? 
-							new BufferedInputStream(new UnicodeInputStream(new GZIPInputStream(fis))) :
-								new BufferedInputStream(new UnicodeInputStream(fis))
+					 BufferedInputStream is = getBufferedInputStream(inputPopulationFile.getName(), fis)
 					) {
 				AsyncFileInputProgressDialog gui = new AsyncFileInputProgressDialog(fis, "Loading Network…");
 				try {
@@ -199,21 +220,18 @@ public final class PopulationSampler extends JFrame {
 		
 //		Population pop = (Population) sc.getPopulation();
 		StreamingPopulationReader reader = new StreamingPopulationReader( sc ) ;
-		StreamingDeprecated.setIsStreaming(reader, true);
-		
+
 		StreamingPopulationWriter writer = null;
 		try {
 		
-			writer = new StreamingPopulationWriter(null, samplesize);
+			writer = new StreamingPopulationWriter(new IdentityTransformation(), samplesize);
 			writer.startStreaming(outputPopulationFile.getAbsolutePath());
 			final PersonAlgorithm algo = writer;
 			
 			reader.addAlgorithm(algo);
-			
+
 			try (FileInputStream fis = new FileInputStream(inputPopulationFile);
-				BufferedInputStream is = (inputPopulationFile.getName().toLowerCase(Locale.ROOT).endsWith(".gz")) ? 
-						new BufferedInputStream(new UnicodeInputStream(new GZIPInputStream(fis))) :
-						new BufferedInputStream(new UnicodeInputStream(fis))
+				BufferedInputStream is = getBufferedInputStream(inputPopulationFile.getName(), fis)
 				) {
 				AsyncFileInputProgressDialog gui = new AsyncFileInputProgressDialog(fis, "Creating Population Sample…");
 				try {
@@ -230,6 +248,17 @@ public final class PopulationSampler extends JFrame {
 				writer.closeStreaming();
 			}
 		}
-		
+
+	}
+
+	private static BufferedInputStream getBufferedInputStream(String filename, FileInputStream fis) throws IOException {
+		String lcFilename = filename.toLowerCase(Locale.ROOT);
+		if (lcFilename.endsWith(".gz")) {
+			return new BufferedInputStream(new UnicodeInputStream(new GZIPInputStream(fis)));
+		}
+		if (lcFilename.endsWith(".zst")) {
+			return new BufferedInputStream(new UnicodeInputStream(new ZstdInputStream(fis)));
+		}
+		return new BufferedInputStream(new UnicodeInputStream(fis));
 	}
 }

@@ -149,7 +149,7 @@ public final class CountsSimReal24Graph extends CountsGraph{
 
 		//regular values
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-		renderer.setLinesVisible(false);
+		renderer.setDefaultLinesVisible(false);
 		renderer.setURLGenerator(url_gen);
 		renderer.setSeriesPaint(0, Color.black);
 		renderer.setSeriesToolTipGenerator(0, tt_gen);
@@ -157,7 +157,7 @@ public final class CountsSimReal24Graph extends CountsGraph{
 		
 		//outliers
 		XYLineAndShapeRenderer renderer2 = new XYLineAndShapeRenderer();
-		renderer2.setLinesVisible(false);
+		renderer2.setDefaultLinesVisible(false);
 		renderer2.setSeriesPaint(0, Color.red);
 		renderer2.setSeriesShape(0, new Ellipse2D.Double(-3.0, -3.0, 6.0, 6.0));
 	
@@ -169,11 +169,11 @@ public final class CountsSimReal24Graph extends CountsGraph{
 		dataset1.addSeries("f05x", new double[][] {{200.0, maxCountValue},{100.0, 0.5*maxCountValue}});
 		
 		XYLineAndShapeRenderer renderer3 = new XYLineAndShapeRenderer();
-		renderer3.setShapesVisible(false);
+		renderer3.setDefaultShapesVisible(false);
 		renderer3.setSeriesPaint(0, Color.blue);
 		renderer3.setSeriesPaint(1, Color.blue);
 		renderer3.setSeriesPaint(2, Color.blue);
-		renderer3.setBaseSeriesVisibleInLegend(false);		
+		renderer3.setDefaultSeriesVisibleInLegend(false);		
 		renderer3.setSeriesItemLabelsVisible(0, true);
 		renderer3.setSeriesItemLabelsVisible(1, false);
 		renderer3.setSeriesItemLabelsVisible(2, false);

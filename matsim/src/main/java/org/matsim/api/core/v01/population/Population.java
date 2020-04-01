@@ -20,12 +20,11 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
+
+import java.util.Map;
 
 /**
  * Root class of the population description (previously also called "plans file")
@@ -44,7 +43,5 @@ public interface Population extends MatsimToplevelContainer, Attributable {
 	public void addPerson(final Person p);
 	
 	public Person removePerson( final Id<Person> personId ) ;
-	
-	public ObjectAttributes getPersonAttributes();
 
 }

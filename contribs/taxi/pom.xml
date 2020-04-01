@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
-		<version>0.11.0-SNAPSHOT</version>
+		<version>12.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.contrib</groupId>
@@ -16,6 +16,14 @@
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<forkCount>1</forkCount>
+					<reuseForks>false</reuseForks>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -23,17 +31,12 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>ev</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-configuration</groupId>
-			<artifactId>commons-configuration</artifactId>
-			<version>1.10</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

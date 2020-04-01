@@ -31,9 +31,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -208,8 +205,8 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	private static class TempStop {
 		protected final TransitStopFacility stop;
-		protected double departure = Time.UNDEFINED_TIME;
-		protected double arrival = Time.UNDEFINED_TIME;
+		protected double departure = Time.getUndefinedTime();
+		protected double arrival = Time.getUndefinedTime();
 		protected boolean awaitDeparture = false;
 
 		protected TempStop(final TransitStopFacility stop) {

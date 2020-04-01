@@ -44,6 +44,4 @@ public interface PassengerRequest extends Request {
 	Id<Person> getPassengerId();
 
 	String getMode();
-
-	void setRejected(boolean rejected);
 }

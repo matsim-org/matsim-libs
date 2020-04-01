@@ -37,10 +37,10 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "matsimObjectType")
-public class XMLMatsimObjectType {
+final class XMLMatsimObjectType {
 
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
 
     /**
      * Gets the value of the id property.

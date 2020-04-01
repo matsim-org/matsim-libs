@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -34,17 +35,16 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Subtour;
-import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.Vehicle;
-
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Subtour;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Optimizes vehicle allocation at the tour level, by minimizing the estimated
@@ -60,13 +60,13 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  */
 public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
-	private final StageActivityTypes stageActs;
+	private final Set<String> stageActs;
 	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
 	private final VehicleRessources vehicleRessources;
 
 	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
-			final StageActivityTypes stageActivitiesForSubtourDetection,
+			final Set<String> stageActivitiesForSubtourDetection,
 			final Random random,
 			final VehicleRessources vehicleRessources,
 			final Collection<String> modes,
@@ -185,7 +185,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			final Collection<Subtour> subtours =
 				TripStructureUtils.getSubtours(
 						p,
-						stageActs
+						stageActs::contains
                 );
 			for ( final Subtour s : subtours ) {
 				if ( s.getParent() != null ) continue; // is not a root tour
@@ -286,8 +286,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			this.subtour = subtour;
 			
 			final Trip firstTrip = subtour.getTrips().get( 0 );
-			this.startTime = firstTrip.getOriginActivity().getEndTime();
-			if ( startTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
+			this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
 			this.endTime = calcArrivalTime( lastTrip );
@@ -326,21 +325,19 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	}
 
 	private static double calcArrivalTime(final Trip trip) {
-		double now = trip.getOriginActivity().getEndTime();
+		double now = trip.getOriginActivity().getEndTime().seconds();
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
-				final double end = ((Activity) pe).getEndTime();
-				now = end != Time.UNDEFINED_TIME ? end : now + ((Activity) pe).getMaximumDuration();
-				// TODO: do not fail *that* badly, but just revert to random alloc
-				if ( now == Time.UNDEFINED_TIME ) throw new RuntimeException( "could not get time from "+pe );
+				final OptionalTime end = ((Activity)pe).getEndTime();
+				now = end.isDefined() ? end.seconds() : now + ((Activity)pe).getMaximumDuration().seconds();
 			}
 			else if ( pe instanceof Leg ) {
 				final Route r = ((Leg) pe).getRoute();
-				if ( r != null && r.getTravelTime() != Time.UNDEFINED_TIME ) {
+				if ( r != null && !Time.isUndefinedTime(r.getTravelTime()) ) {
 					now += r.getTravelTime();
 				}
 				else {
-					now += ((Leg) pe).getTravelTime() != Time.UNDEFINED_TIME ?
+					now += !Time.isUndefinedTime(((Leg) pe).getTravelTime()) ?
 							((Leg) pe).getTravelTime() :
 							0; // no info: just assume instantaneous. This will give poor results!
 				}

@@ -52,7 +52,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.testcases.utils.SelectiveEventsCollector;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
 import org.xml.sax.SAXException;
 
 /**
@@ -477,7 +477,7 @@ public class QSimIntegrationTest {
 			"	<vehicle id=\"tr_2\" type=\"1\"/>" +
 			"	<vehicle id=\"tr_3\" type=\"1\"/>" +
 			"</vehicleDefinitions>";
-			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(new ByteArrayInputStream(vehiclesXml.getBytes()));
+			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readStream(new ByteArrayInputStream(vehiclesXml.getBytes()) );
 		}
 
 		private void setDefaultLinkAttributes(final Link link) {

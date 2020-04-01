@@ -52,7 +52,7 @@ public class RunSignalSystemsExampleWithHoles {
 
 	static void run(boolean useOTFVis) {
 		// load a config (without signal information)
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		// use higher values if you want to iterate

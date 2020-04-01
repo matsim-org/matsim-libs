@@ -32,6 +32,8 @@ public interface OnlineDriveTaskTracker extends TaskTracker {
 
 	int getCurrentLinkIdx();
 
+	double getCurrentLinkEnterTime();
+
 	LinkTimePair getDiversionPoint();
 
 	void divertPath(VrpPathWithTravelData newSubPath);

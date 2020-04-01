@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.model.SignalGroup;
 
 
@@ -28,7 +27,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
  * @author dgrether
  *
  */
-public class SignalGroupSettingsDataImpl implements SignalGroupSettingsData {
+public final class SignalGroupSettingsDataImpl implements SignalGroupSettingsData {
 
 	private int dropping;
 	private int onset;

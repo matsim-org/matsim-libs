@@ -56,12 +56,14 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
 		boolean problem = false ;
-		if ( config.travelTimeCalculator().getSeparateModes() ) {
-			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
-				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
-				problem = true ;
-			}
-		}
+//		if ( config.travelTimeCalculator().getSeparateModes() ) {
+//			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
+//				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
+//				problem = true ;
+//			}
+//		}
+		// not sure if it ever worked like this, but now the analyzedModes are honoured only when separateModes is false and so the check does not make
+		// sense IMO.  kai, jun'19
 		return problem ;
 	}
 
@@ -90,7 +92,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 			
 		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
-//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
+//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.getUndefinedTime() ) {
 //				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
 //					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
 //					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
@@ -167,8 +169,9 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	private static void checkTransit(final Config config) {
-		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
-			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
-		}
+//		if ( config.transit().isUseTransit() && config.transit().getVehiclesFile()==null ) {
+//			log.warn("Your are using Transit but have not provided a transit vehicles file. This most likely won't work.");
+//		}
+		// The warning will also be logged when the vehicles are defined in code, which is perfectly acceptable.  kai, jun'19
 	}
 }

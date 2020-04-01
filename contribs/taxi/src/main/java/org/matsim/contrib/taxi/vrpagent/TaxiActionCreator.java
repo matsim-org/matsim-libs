@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -33,7 +34,7 @@ import org.matsim.contrib.dynagent.IdleDynActivity;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -62,8 +63,8 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		TaxiTask task = (TaxiTask)vehicle.getSchedule().getCurrentTask();
-		switch (task.getTaxiTaskType()) {
+		Task task = vehicle.getSchedule().getCurrentTask();
+		switch (((TaxiTaskType)task.getTaskType())) {
 			case EMPTY_DRIVE:
 			case OCCUPIED_DRIVE:
 				return legFactory.create(vehicle);

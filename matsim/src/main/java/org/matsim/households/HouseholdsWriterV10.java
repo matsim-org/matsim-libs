@@ -69,10 +69,6 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 		this.writeEndAndCloseFile();
 	}
 
-	public void writeV1(String filename) {
-
-	}
-
 	/*package*/ void openFileAndWritePreamble(String filename){
 		this.openFile(filename);
 		this.writeXmlHead();

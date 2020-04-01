@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.temperature;/*
- * created by jbischoff, 16.08.2018
- */
+package org.matsim.contrib.ev.temperature;
+
+import javax.inject.Inject;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,42 +35,49 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
-import javax.inject.Inject;
-
+/*
+ * created by jbischoff, 16.08.2018
+ */
 public class TemperatureChangeModuleIntegrationTest {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Test
-    public void testTemperatureChangeModule() {
-        Config config = ConfigUtils.loadConfig("test/input/org/matsim/vsp/ev/temperature/config.xml", new TemperatureChangeConfigGroup());
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new TemperatureChangeModule());
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addEventHandlerBinding().to(TemperatureTestEventHandler.class).asEagerSingleton();
-            }
-        });
-        controler.run();
-    }
+	@Test
+	public void testTemperatureChangeModule() {
 
-    static class TemperatureTestEventHandler implements PersonDepartureEventHandler {
-        @Inject
-        TemperatureService temperatureService;
+		Config config = ConfigUtils.loadConfig(utils.getClassInputDirectory() + "/config.xml",
+				new TemperatureChangeConfigGroup());
+		config.controler()
+				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new TemperatureChangeModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addEventHandlerBinding().to(TemperatureTestEventHandler.class).asEagerSingleton();
+			}
+		});
+		controler.run();
+	}
 
-        @Override
-        public void handleEvent(PersonDepartureEvent event) {
-            if (event.getLinkId().equals(Id.createLinkId("link1"))) {
-                Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
-            }
-            if (event.getLinkId().equals(Id.createLinkId("link2"))) {
-                Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
-            }
-        }
-    }
+	static class TemperatureTestEventHandler implements PersonDepartureEventHandler {
+		@Inject
+		TemperatureService temperatureService;
+
+		@Override
+		public void handleEvent(PersonDepartureEvent event) {
+			if (event.getLinkId().equals(Id.createLinkId("link1"))) {
+				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), -10.0, 0.001);
+			}
+			if (event.getLinkId().equals(Id.createLinkId("link2"))) {
+				Assert.assertEquals(temperatureService.getCurrentTemperature(event.getLinkId()), 30.0, 0.001);
+			}
+		}
+	}
 
 }
 

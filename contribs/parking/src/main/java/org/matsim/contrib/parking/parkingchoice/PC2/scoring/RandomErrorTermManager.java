@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 /**
  * This class is based on work by Andreas Horni related to location choice, located at:
- * org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring
+ * org.matsim.contrib.locationchoice.bestresponse.DestinationScoring
  * 
  * @author wrashid, ahorni
  *

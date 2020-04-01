@@ -66,9 +66,7 @@ public class FacilitiesWriter implements MatsimWriter {
      */
     @Override
     public final void write(final String filename) {
-        FacilitiesWriterV1 writer = new FacilitiesWriterV1(coordinateTransformation, facilities);
-        writer.putAttributeConverters(this.converters);
-        writer.write(filename);
+        writeV1(filename);
     }
 
     /**
@@ -85,8 +83,14 @@ public class FacilitiesWriter implements MatsimWriter {
         this.converters.putAll(converters);
     }
 
+    public void putAttributeConverter(Class<?> key, AttributeConverter<?> converter) {
+        this.converters.put(key, converter);
+    }
+
     public final void writeV1(final String filename) {
-        new FacilitiesWriterV1(coordinateTransformation, facilities).write(filename);
+		FacilitiesWriterV1 writer = new FacilitiesWriterV1(coordinateTransformation, facilities);
+        writer.putAttributeConverters(this.converters);
+        writer.write(filename);
     }
 
 

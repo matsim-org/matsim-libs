@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<name>MATSim Benchmark</name>
 	<distributionManagement>
 		<repository>
@@ -14,34 +14,14 @@
 		<snapshotRepository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+			<url>https://oss.jfrog.org/oss-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<showWarnings>false</showWarnings>
-					<showDeprecation>false</showDeprecation>
-					<encoding>UTF-8</encoding>
-					<!-- configure initial and maximal memory for compiling -->
-					<fork>true</fork>
-					<meminitial>128m</meminitial>
-					<maxmem>512m</maxmem>
-					<compilerArguments>
-						<Xmaxwarns>4000</Xmaxwarns>
-						<Xmaxerrs>100</Xmaxerrs>
-					</compilerArguments>
-				</configuration>
-			</plugin>
-			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -69,7 +49,11 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.1.1</version>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -77,19 +61,26 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>4.13</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
+	</properties>
 
 </project>

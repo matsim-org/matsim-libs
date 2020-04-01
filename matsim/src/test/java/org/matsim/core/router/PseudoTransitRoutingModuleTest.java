@@ -49,6 +49,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 public class PseudoTransitRoutingModuleTest {
@@ -110,8 +111,8 @@ public class PseudoTransitRoutingModuleTest {
 			
 			TripRouter tripRouter = injector.getInstance(TripRouter.class) ;
 			
-			Facility fromFacility = new ActivityWrapperFacility(fromAct) ;
-			Facility toFacility = new ActivityWrapperFacility(toAct) ;
+			Facility fromFacility = FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ) ;
+			Facility toFacility = FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() );
 			
 			List<? extends PlanElement> result = tripRouter.calcRoute("mode", fromFacility, toFacility, 7.0*3600., person) ;
 			Gbl.assertIf( result.size()==1);
@@ -128,6 +129,10 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			ModeRoutingParams walk = new ModeRoutingParams(TransportMode.walk);
+			walk.setBeelineDistanceFactor(1.3);
+			walk.setTeleportedModeSpeed(3.0 / 3.6);
+			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
 			
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

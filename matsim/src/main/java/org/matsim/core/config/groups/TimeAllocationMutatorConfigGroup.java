@@ -74,12 +74,16 @@ public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGrou
 	
 	private static final String USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS = "useIndividualSettingsForSubpopulations";
 	private boolean useIndividualSettingsForSubpopulations = false;
-	@StringGetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS)
+//	@StringGetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS) // I am disabling the xml usage for the time being, see comment below. kai, may'19
 	public boolean isUseIndividualSettingsForSubpopulations() {
+		// yyyy is it really so plausible to have this?  If we continue in this direction, we will eventually have the PTV behaviorally homogeneous
+		// groups.  I would find it more natural to have behavior that depends continuously on person type, and then use Java in order to define that
+		// behaviour.  Rather than to overload the config mechanism.  kai, may'19
 		return this.useIndividualSettingsForSubpopulations;
 	}
-	@StringSetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS)
+//	@StringSetter(USE_INDIVIDUAL_SETTINGS_FOR_SUBPOPULATIONS) // I am disabling the xml usage for the time being, see comments.  kai, may'19
 	public void setUseIndividualSettingsForSubpopulations(boolean useIndividualSettingsForSubpopulations) {
+		// yyyy see comment under isUseIndividualSettingsForSubpopulations. kai, may'10
 		this.useIndividualSettingsForSubpopulations = useIndividualSettingsForSubpopulations;
 	}
 	

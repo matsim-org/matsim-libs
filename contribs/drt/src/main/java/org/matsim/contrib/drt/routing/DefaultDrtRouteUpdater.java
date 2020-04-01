@@ -26,77 +26,61 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
+
+import one.util.streamex.StreamEx;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater {
-
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
-	private final TravelTime travelTime;
 	private final Population population;
-	private final ExecutorServiceWithResource<LeastCostPathCalculator> executorService;
+	private final ExecutorServiceWithResource<DrtRouteCreator> executorService;
 
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
 		this.drtCfg = drtCfg;
 		this.network = network;
-		this.travelTime = travelTime;
 		this.population = population;
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		// XXX uses the global.numberOfThreads, not drt.numberOfThreads as this is executed in the replanning phase
+		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
+		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new FastAStarEuclideanFactory().createPathCalculator(network,
-						travelDisutilityFactory.createTravelDisutility(travelTime), travelTime))
+				.mapToObj(i -> new DrtRouteCreator(drtCfg, network, factory, travelTime, travelDisutilityFactory))
 				.collect(Collectors.toList()));
 	}
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		Stream<Leg> drtLegs = population.getPersons()
-				.values()
-				.stream()
+		Stream<Leg> drtLegs = StreamEx.of(population.getPersons().values())
 				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(drtCfg.getMode()))
-				.map(e -> (Leg)e);
+				.select(Leg.class)
+				.filterBy(Leg::getMode, drtCfg.getMode());
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
 
-	private void updateDrtRoute(LeastCostPathCalculator router, Leg drtLeg) {
-		DrtRoute drtRoute = (DrtRoute)drtLeg.getRoute();
-		Link fromLink = network.getLinks().get(drtRoute.getStartLinkId());
-		Link toLink = network.getLinks().get(drtRoute.getEndLinkId());
-
-		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, drtLeg.getDepartureTime(),
-				router, travelTime);
-		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = DrtRoutingModule.getMaxTravelTime(drtCfg, unsharedRideTime);
-		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
-
-		drtRoute.setDistance(unsharedDistance);
-		drtRoute.setTravelTime(maxTravelTime);
-		drtRoute.setUnsharedRideTime(unsharedRideTime);
-		drtRoute.setMaxWaitTime(drtCfg.getMaxWaitTime());
+	private void updateDrtRoute(DrtRouteCreator drtRouteCreator, Leg drtLeg) {
+		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
+		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
+		RouteFactories routeFactories = population.getFactory().getRouteFactories();
+		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime(), fromLink, toLink, routeFactories));
 	}
 
 	@Override

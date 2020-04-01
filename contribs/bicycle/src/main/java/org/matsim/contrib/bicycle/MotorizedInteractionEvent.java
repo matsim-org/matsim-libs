@@ -26,7 +26,8 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
-public class MotorizedInteractionEvent extends Event {
+public final class MotorizedInteractionEvent extends Event {
+	// plausible to have this public
 
 	private Id<Link> linkId;
 	private Id<Vehicle> vehId;

@@ -47,6 +47,9 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	private volatile double localTime = -1;
 
 	private final Phaser stepDone = new Phaser(1);
+	// I think the way this works (e.g. for bdi-abm-integration; presumably for otfvis) is as follows:
+	// (1) Here, a phaser is constructed, with one participant that now needs to arrive.  Also, "pause" is called from code
+	// immediately after creation.
 
 	public PlayPauseSimulationControl(ObservableMobsim qSim) {
 		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
@@ -68,6 +71,8 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 			localTime = (int) event.getSimulationTime();
 			// yy I am not so sure about the "int".  kai, nov'17
 			stepDone.arriveAndAwaitAdvance();
+			// This is arrival by one party.  If "pause" has been pressed before, we have a second party, and thus do not
+			// advance.
 		}
 		@Override
 		public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
@@ -83,6 +88,8 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 		}
 		while (localTime < time) {
 			stepDone.arriveAndAwaitAdvance();
+			// as long as localTime < time, this acts as the second party, and thus the simulation progresses
+			// otherwise, the doStep method will return.
 		}
 	}
 
@@ -90,6 +97,7 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	public final void pause() {
 		if (status != Status.PAUSE) {
 			stepDone.register();
+			// so when "pause" was hit, there is now a second party registered to the the phaser
 			status = Status.PAUSE;
 		}
 	}
@@ -98,6 +106,8 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 	public final void play() {
 		if (status != Status.PLAY) {
 			stepDone.arriveAndDeregister();
+			// the second party is de-registered, and thus it will now just play
+
 			status = Status.PLAY;
 		}
 	}

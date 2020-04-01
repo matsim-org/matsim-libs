@@ -22,10 +22,10 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.DetourTimesProvider.DetourTimesSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
@@ -45,10 +45,10 @@ public class SingleVehicleInsertionFilter {
 		DetourTimesSet set = detourTimesProvider.getDetourTimesSet(drtRequest, vEntry);
 		int stopCount = vEntry.stops.size();
 
-		return insertions.stream()//
-				.map(i -> createInsertionWithDetourTimes(i, set, stopCount))//
-				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry,
-						iWithDetourTimes) < InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)//
+		return insertions.stream()
+				.map(i -> createInsertionWithDetourTimes(i, set, stopCount))
+				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry, iWithDetourTimes)
+						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
 				.collect(Collectors.toList());
 	}
 

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning;
 
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -26,15 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
  * Links plans with "joinable" activities, that is,
@@ -47,11 +42,6 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	private static final Logger log =
 		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
-	// XXX should be passed from outside, but not available at construction
-	private final StageActivityTypes stages =
-			new CompositeStageActivityTypes(
-					JointActingTypes.JOINT_STAGE_ACTS,
-					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
@@ -106,7 +96,10 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
 		int ind = 0;
-		for ( Activity act : TripStructureUtils.getActivities( plan , stages ) ) {
+		List<Activity> activities = TripStructureUtils.getActivities(plan,
+				StageActivityHandling.ExcludeStageActivities);
+		for ( int i = 0; i < activities.size(); i++) {
+			Activity act = activities.get(i);
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =
@@ -117,12 +110,12 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 						loc,
 						lastEnd );
 
-			// correct times if inconsistent
-			lastEnd = Math.max(
-				lastEnd,
-				act.getEndTime() != Time.UNDEFINED_TIME ?
-					act.getEndTime() :
-					lastEnd + act.getMaximumDuration() );
+			if (i < activities.size() - 1) { // skip the last activity
+				// correct times if inconsistent
+				lastEnd = Math.max(lastEnd, act.getEndTime().isDefined()
+						? act.getEndTime().seconds()
+						: lastEnd + act.getMaximumDuration().seconds());
+			}
 
 			if ( log.isTraceEnabled() ) {
 				log.trace( "add event "+event+" to queue" );

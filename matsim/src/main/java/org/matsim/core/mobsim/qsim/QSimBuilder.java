@@ -1,4 +1,25 @@
-package org.matsim.core.mobsim.qsim;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * QSimBuilder.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -117,6 +138,9 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * Resets the active QSim components to the standard ones defined by MATSim.
 	 */
 	public QSimBuilder useDefaultComponents() {
+		// yy As an outside user, I find both the naming of this method and its javadoc confusing.  I would say that it is, in fact, _not_ resetting to the
+		// standard ones.  Instead, it is resetting to those coming from the config, whatever they are.  kai, nov'19
+
 		components.clear();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		return this;

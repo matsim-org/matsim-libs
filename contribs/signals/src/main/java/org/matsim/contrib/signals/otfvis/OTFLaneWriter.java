@@ -41,7 +41,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dgrether
  *
  */
-public class OTFLaneWriter extends OTFDataWriter<Void> {
+class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private final transient VisNetwork network;
 
@@ -51,7 +51,7 @@ public class OTFLaneWriter extends OTFDataWriter<Void> {
 
 	private Config config;
 	
-	public OTFLaneWriter(VisNetwork visNetwork, Lanes laneDefinitions, Config config){
+	OTFLaneWriter(VisNetwork visNetwork, Lanes laneDefinitions, Config config){
 		this.network = visNetwork;
 		this.lanes = laneDefinitions;
 		this.config = config;

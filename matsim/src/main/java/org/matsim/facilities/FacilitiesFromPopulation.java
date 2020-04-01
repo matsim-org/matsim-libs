@@ -19,13 +19,11 @@
 
 package org.matsim.facilities;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,6 +36,15 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
+import static org.matsim.core.config.groups.FacilitiesConfigGroup.*;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -45,16 +52,17 @@ import org.matsim.core.network.NetworkUtils;
  * removing the old locations (coord and link) from the population.
  * If an activity already has an ActivityFacility assigned, the ActivityFacility is overwritten.
  * If an activity only has a coordinate, different behavior is possible, see
- * {@link #setAssignLinksToFacilitiesIfMissing(boolean, Network)}.
+ * {@link #setAssignLinksToFacilitiesIfMissing(Network)}.
  *
  * @author mrieser
  */
-public class FacilitiesFromPopulation {
+public final class FacilitiesFromPopulation {
 
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
-	private boolean oneFacilityPerLink ;
+	private Scenario scenario;
+	private FacilitiesSource facilitiesSource;
 	private String idPrefix = "";
 	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
@@ -62,32 +70,42 @@ public class FacilitiesFromPopulation {
 	private boolean addEmptyActivityOptions = false;
 
 	public FacilitiesFromPopulation(final ActivityFacilities facilities) {
+		// minimalistic constructor, to configure via external setters
 		this.facilities = facilities;
 	}
 
-	public FacilitiesFromPopulation(final ActivityFacilities facilities, final FacilitiesConfigGroup facilityConfigGroup) {
-		this(facilities);
+	public FacilitiesFromPopulation( Scenario scenario ) {
+		// "fat" constructor, to configure via config etc.
+		this(scenario.getActivityFacilities());
+		FacilitiesConfigGroup facilityConfigGroup = scenario.getConfig().facilities();;
 		this.idPrefix = facilityConfigGroup.getIdPrefix();
-		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
-		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
-		if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile ) {
-			oneFacilityPerLink = true;
-		} else if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile ) {
-			oneFacilityPerLink = false;
-		} else {
-			throw new RuntimeException( Gbl.INVALID );
-		}
+//		this.removeLinksAndCoordinates = facilityConfigGroup.isRemovingLinksAndCoordinates();
+		this.removeLinksAndCoordinates = false ;
+//		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
+		this.addEmptyActivityOptions = true ;
+		this.facilitiesSource = facilityConfigGroup.getFacilitiesSource();
+		this.network = scenario.getNetwork() ;
+		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scenario = scenario;
 	}
-
+	public void setFacilitiesSource( final FacilitiesSource facilitiesSource ) {
+		this.facilitiesSource = facilitiesSource;
+	}
 	/**
 	 * Sets whether all activities on a link should be collected within one ActivityFacility.
 	 * Default is <code>true</code>. If set to <code>false</code>, for each coordinate
 	 * found in the population's activities a separate ActivityFacility will be created.
 	 *
 	 * @param oneFacilityPerLink
+	 *
+	 * @deprecated -- better use {@link #setFacilitiesSource(FacilitiesSource)}
 	 */
 	public void setOneFacilityPerLink(final boolean oneFacilityPerLink) {
-		this.oneFacilityPerLink = oneFacilityPerLink;
+		if ( oneFacilityPerLink ) {
+			this.facilitiesSource = FacilitiesSource.onePerActivityLinkInPlansFile;
+		} else{
+			this.facilitiesSource = FacilitiesSource.onePerActivityLocationInPlansFile;
+		}
 	}
 
 	public void setIdPrefix(final String prefix) {
@@ -101,16 +119,11 @@ public class FacilitiesFromPopulation {
 	 * and the facility will not be assigned to a link, essentially breaking the contract of
 	 * {@link #setOneFacilityPerLink(boolean)}.
 	 *
-	 * @param doAssignment
 	 * @param network
 	 */
-	public void setAssignLinksToFacilitiesIfMissing(final boolean doAssignment, final Network network) {
-		// (yy not sure if the false setting makes sense at all. kai, jul'18)
-		
-		if (doAssignment && network == null) {
-			throw new IllegalArgumentException("Network cannot be null if assignment should be done.");
-		}
-		this.network = doAssignment ? network : null;
+	public void setAssignLinksToFacilitiesIfMissing( final Network network ) {
+		Gbl.assertNotNull( network );
+		this.network = network ;
 	}
 
 	/**
@@ -123,11 +136,9 @@ public class FacilitiesFromPopulation {
 		this.removeLinksAndCoordinates = doRemoval;
 	}
 
-	public void assignOpeningTimes(final boolean doAssignment, final PlanCalcScoreConfigGroup calcScoreConfigGroup) {
-		if (doAssignment && calcScoreConfigGroup == null) {
-			throw new IllegalArgumentException("Config must not be null if opening times should be assigned.");
-		}
-		this.planCalcScoreConfigGroup = doAssignment ? calcScoreConfigGroup : null;
+	public void assignOpeningTimes( final PlanCalcScoreConfigGroup calcScoreConfigGroup ) {
+		Gbl.assertNotNull( calcScoreConfigGroup );
+		this.planCalcScoreConfigGroup = calcScoreConfigGroup ;
 	}
 
 	public void run(final Population population) {
@@ -142,48 +153,98 @@ public class FacilitiesFromPopulation {
 	}
 
 	private void handleActivities(final Population population) {
+		Gbl.assertNotNull( network ) ;
+
 		int idxCounter = 0;
 		ActivityFacilitiesFactory factory = this.facilities.getFactory();
-		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
+		IdMap<Link, ActivityFacility> facilitiesPerLinkId = new IdMap<>(Link.class);
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<>();
 
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						Activity a = (Activity) pe;
+						Activity activity = (Activity) pe;
 
-						Coord c = a.getCoord();
-						Id<Link> linkId = a.getLinkId();
-						ActivityFacility facility = null;
+						Coord coord = activity.getCoord();
+						// (may be null, and we are not fixing it at this point)
 
-						if (linkId == null && this.network != null) {
-							linkId = NetworkUtils.getNearestLinkExactly(this.network, c).getId();
+						Id<Link> linkId = activity.getLinkId();
+						// (may be null, and we are not fixing it at this point)
+
+						Gbl.assertIf( coord!=null || linkId!=null );
+						// (need one of them non-null!)
+
+						ActivityFacility facility ;
+
+						if ( linkId == null ) {
+							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
+							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
+						}
+						if ( coord==null ) {
+							coord = PopulationUtils.decideOnCoordForActivity( activity, scenario );
 						}
 
-						if (this.oneFacilityPerLink && linkId != null) {
+						Gbl.assertNotNull( linkId );
+
+						if ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFile
+								     || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord==null )
+						) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
-								facility = factory.createActivityFacility(Id.create(this.idPrefix + linkId.toString(), ActivityFacility.class), c, linkId);
-								this.facilities.addActivityFacility(facility);
-								facilitiesPerLinkId.put(linkId, facility);
+								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
+								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
+								if ( preExistingFacilityIfAny == null ){
+									facility = factory.createActivityFacility( facilityId , coord , linkId );
+									facilitiesPerLinkId.put( linkId , facility );
+									this.facilities.addActivityFacility( facility );
+								} else {
+									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() ,
+										  linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
+										// do nothing; presumably, same auto-generation has been run before
+										facility = preExistingFacilityIfAny;
+									} else {
+										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
+									}
+								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
-						} else {
-							if (c == null)  {
-								throw new RuntimeException("Coordinate for the activity "+a+" is null, cannot collect facilities per coordinate. " +
-										"Probably, use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " instead and collect facilities per link.");
+						} else if ( this.facilitiesSource==FacilitiesSource.onePerActivityLocationInPlansFile
+															      || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord!=null )
+						) {
+							if (coord == null)  {
+								throw new RuntimeException("Coordinate for the activity "+activity+" is null, cannot collect facilities per coordinate. " +
+										"Possibly use " + FacilitiesSource.onePerActivityLinkInPlansFile + " " +
+													     "instead and collect facilities per link.");
 							}
 
-							facility = facilitiesPerCoordinate.get(c);
+							facility = facilitiesPerCoordinate.get(coord);
 							if (facility == null) {
-								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c, linkId);
-								this.facilities.addActivityFacility(facility);
-								facilitiesPerCoordinate.put(c, facility);
+								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + idxCounter++ , ActivityFacility.class );
+								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
+								if ( preExistingFacilityIfAny == null ){
+									facility = factory.createActivityFacility( facilityId , coord , linkId );
+									facilitiesPerCoordinate.put( coord , facility );
+									this.facilities.addActivityFacility( facility );
+								} else {
+									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() , linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
+										// do nothing; presumably, same auto-generation has been run before
+										facility = preExistingFacilityIfAny;
+									} else {
+										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
+									}
+								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
+						} else {
+							throw new RuntimeException( "should never get to this location; either class/method used with invalid" +
+												    " setting of facilitiesSource, or something there is " +
+												    "something that was not understood while implementing " +
+												    "this." );
 						}
 
 						if (this.addEmptyActivityOptions) {
-							String actType = a.getType();
+							String actType = activity.getType();
 							ActivityOption option = facility.getActivityOptions().get(actType);
 							if (option == null) {
 								option = factory.createActivityOption(actType);
@@ -191,10 +252,10 @@ public class FacilitiesFromPopulation {
 							}
 						}
 
-						a.setFacilityId(facility.getId());
+						activity.setFacilityId(facility.getId());
 						if (this.removeLinksAndCoordinates) {
-							a.setLinkId(null);
-							a.setCoord(null);
+							activity.setLinkId(null);
+							activity.setCoord(null);
 						}
 					}
 				}

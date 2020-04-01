@@ -1,4 +1,25 @@
-package org.matsim.run.gui;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Gui.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.run.gui;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -80,7 +101,7 @@ public class Gui extends JFrame {
 	private File configFile;
 	private File lastUsedDirectory;
 	private ConfigEditor editor = null;
-	
+	private ScheduleValidatorWindow transitValidator = null;
 	
 	private Gui(final String title, final Class<?> mainClass) {
 		setTitle( title );
@@ -405,6 +426,24 @@ public class Gui extends JFrame {
 				}
 				popSampler.setVisible(true);
 			}
+		});
+
+		JMenuItem mntmTransitValidator = new JMenuItem("Validate TransitSchedule…");
+		this.mnTools.add(mntmTransitValidator);
+		mntmTransitValidator.addActionListener(e -> {
+			if (this.transitValidator == null) {
+				this.transitValidator = new ScheduleValidatorWindow();
+			}
+			String configFilename = this.txtConfigfilename.getText();
+			if (!configFilename.isEmpty()) {
+				Config config = ConfigUtils.createConfig();
+				try {
+					ConfigUtils.loadConfig(config, configFilename);
+					this.transitValidator.loadFromConfig(config, new File(configFilename).getParentFile());
+				} catch (Exception ignore) {
+				}
+			}
+			this.transitValidator.setVisible(true);
 		});
 	}
 	
