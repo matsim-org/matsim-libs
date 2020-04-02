@@ -25,7 +25,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -37,6 +36,8 @@ import org.matsim.core.utils.collections.Tuple;
  *
  */
 class InitialLoadGenerator {
+	
+	private final static long RANDOMSEED = 8745962235l;
 	
 	private final Collection<? extends Person> population;
 	private final int scaleFactor;
@@ -51,7 +52,10 @@ class InitialLoadGenerator {
 	public InitialLoadGenerator(Collection<? extends Person> population, int scaleFactor) {
 		this.population = population;
 		this.scaleFactor = scaleFactor;
-		this.rnd = MatsimRandom.getLocalInstance();
+		this.rnd = new Random(RANDOMSEED);
+		for (int i = 0; i < 100; i++) {
+			this.rnd.nextInt();
+		}
 	}
 	
 	/**
