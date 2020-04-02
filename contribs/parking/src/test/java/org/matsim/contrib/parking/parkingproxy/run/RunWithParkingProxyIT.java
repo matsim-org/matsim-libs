@@ -18,7 +18,6 @@ public class RunWithParkingProxyIT {
         @Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
         @Test
-        @Ignore
         public void testMain(){
                 RunWithParkingProxy.main( new String []{ IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "chessboard" ), "config.xml" ).toString()
                                 , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
