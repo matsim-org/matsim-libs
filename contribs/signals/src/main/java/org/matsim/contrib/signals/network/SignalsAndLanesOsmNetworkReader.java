@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_01_";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_01_adp";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -1748,7 +1748,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					//TODO check if this is sensible. I added the if ToLinkList==null to make it work ---sbraun 20191024
 					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
 						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
-							//if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { TODO---> makes more sense???
+//							if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { //TODO---> makes more sense???
 							if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
 								break mergeCheck; // the lanes have not the same to-links
 							}
@@ -1920,13 +1920,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					.abs(toLinks.get(reverseLink).getRotation() - Math.PI))
 				reverseLink = i;
 		}
-		if (toLinks.get(straightLink).getRotation() < (1 - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
-				|| toLinks.get(straightLink).getRotation() > (1 + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI) {
+		if (toLinks.get(straightLink).getRotation() < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
+				|| toLinks.get(straightLink).getRotation() > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI) {
 			straightestLink = straightLink;
 			straightLink = -1;
 		}
 		if (toLinks.get(reverseLink).getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI
-				&& toLinks.get(reverseLink).getRotation() < (2 - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
+				&& toLinks.get(reverseLink).getRotation() < (2. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
 			reverseLink = -1;
 		if (toLinks.size() == 1) {
 			lanes.getLanesToLinkAssignments().remove(link.getId());
@@ -2102,7 +2102,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							lane.addToLinkId(lvec.getLink().getId());
 					}
 					if (tempDir == -2) { // lane direction: "slight_right"
-						if (tempLinks.get(0).dirTheta < Math.PI / 2)
+						if (tempLinks.get(0).dirTheta < Math.PI / 2.)
 							lane.addToLinkId(tempLinks.get(1).getLink().getId());
 						else
 							lane.addToLinkId(tempLinks.get(0).getLink().getId());
@@ -2120,7 +2120,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (alignmentAnte == 0 && it == 1)
 					alignmentAnte = -10;
 				for (LinkVector lvec : toLinks) {
-					if (lvec.dirTheta > (1 + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
+					if (lvec.dirTheta > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
 						tempLinks.add(lvec);
 				}
 				if (tempLinks.size() == 1) { // if there is just one "left"
@@ -2507,7 +2507,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			else
 				this.dirTheta = this.theta - linkVector.getAlpha() - Math.PI;
 			if (this.dirTheta < 0) {
-				this.dirTheta += 2 * Math.PI;
+				this.dirTheta += 2. * Math.PI;
 			}
 
 		}
@@ -2523,7 +2523,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		public double getRotationToOtherInLink(LinkVector linkVector) {
 			double rotation = linkVector.getAlpha() - this.theta;
 			if (rotation < 0) {
-				rotation += 2 * Math.PI;
+				rotation += 2. * Math.PI;
 			}
 			return rotation;
 		}
