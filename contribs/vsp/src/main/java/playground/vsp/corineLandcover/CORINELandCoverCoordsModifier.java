@@ -235,6 +235,7 @@ public class CORINELandCoverCoordsModifier {
             }
             personCounter++;
         }
+
         LOG.info("Finished processing.");
     }
 
