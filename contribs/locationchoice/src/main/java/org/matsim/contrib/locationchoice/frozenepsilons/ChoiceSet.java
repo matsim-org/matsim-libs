@@ -19,7 +19,14 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import java.util.*;
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,20 +37,22 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.*;
+import org.matsim.core.router.ImaginaryNode;
+import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
-
-import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
 
 class ChoiceSet {
 	private static final Logger log = Logger.getLogger( ChoiceSet.class ) ;
@@ -281,6 +290,8 @@ class ChoiceSet {
 			linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
 		}
 		linkNetworkRouteImpl.setDistance(distance);
+		linkNetworkRouteImpl.setTravelTime(result.travelTime);
+		linkNetworkRouteImpl.setTravelCost(result.travelCost);
 		return linkNetworkRouteImpl;
 	}
 

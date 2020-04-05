@@ -413,16 +413,16 @@ public class FrozenEpsilonLocaChoiceIT{
 						}
 						// Note that the following "check" method is deliberately a bit imprecise (see implementation), since we are only interested in the
 						// (approximate) distribution.  kai, mar'19
-						check( 410, cnt[0] );
-						check( 376, cnt[1] ) ;
-						check( 414, cnt[2] ) ;
-						check( 386, cnt[3] ) ;
-						check( 242, cnt[4] ) ;
-						check( 108, cnt[5] ) ;
-						check( 36, cnt[6] ) ;
-						check( 20, cnt[7] ) ;
-						check( 6, cnt[8] ) ;
-
+						check( 1104, cnt[0] );
+						check( 474, cnt[1] );
+						check( 264, cnt[2] );
+						check( 96, cnt[3] );
+						check( 34, cnt[4] );
+						check( 22, cnt[5] );
+						check( 4, cnt[6] );
+						check( 0, cnt[7] );
+						check( 0, cnt[8] );
+						check( 2, cnt[9] );
 					}
 
 					void check( double val, double actual ){

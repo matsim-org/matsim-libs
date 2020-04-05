@@ -219,17 +219,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 		}
 		else {
 //			// take travel time from route if possible
-//			Route route = ((Leg) pe).getRoute();
-//			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
-//
-//			// travel time from leg will override this
-//			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
-//
-//			// if still undefined, assume zero:
-//			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
-
-			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
-
 			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ).orElse(0);
 			return now + ttime;
 		}

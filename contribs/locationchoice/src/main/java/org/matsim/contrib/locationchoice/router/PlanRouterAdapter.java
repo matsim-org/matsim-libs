@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.RouteFactories;
@@ -76,9 +77,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		leg.setTravelTime(tripLeg.getTravelTime().seconds());
 		leg.setDepartureTime(tripLeg.getDepartureTime().seconds());
 
-		return tripLeg.getRoute() != null ?
-				tripLeg.getRoute().getTravelTime().or(tripLeg::getTravelTime).seconds() :
-				tripLeg.getTravelTime().seconds();
+		return PopulationUtils.decideOnTravelTimeForLeg(tripLeg).seconds();
 	}
 
     @Deprecated // use TripRouter instead. kai, dec'13

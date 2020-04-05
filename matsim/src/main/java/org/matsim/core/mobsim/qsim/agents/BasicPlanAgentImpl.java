@@ -257,8 +257,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		if (!(currentPlanElement instanceof Leg)) {//==> TODO turn into Precondition ???
 			return null;
 		}
-		Leg leg = (Leg)currentPlanElement;
-		final OptionalTime travelTime = leg.getRoute().getTravelTime().or(leg::getTravelTime);
+		final OptionalTime travelTime = PopulationUtils.decideOnTravelTimeForLeg((Leg)currentPlanElement);
 		return travelTime.isDefined() ? travelTime.seconds() : null;
 	}
 
