@@ -204,7 +204,7 @@ public class TransitLeastCostPathTree {
 	 *          the transitPassengerRoute between the fromNode and the toNode.
 	 *          Will be null if the route could not be found.
 	 */
-	public TransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
+	public InternalTransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
@@ -320,7 +320,7 @@ public class TransitLeastCostPathTree {
 
 		// if there is no connection found, getPath(...) return a path with nothing in it, however, I (and AN) think that it should throw null. Amit Sep'17
 		if (routeSegments.size()==0) return null;
-		else return new TransitPassengerRoute(cost, routeSegments);
+		else return new InternalTransitPassengerRoute(cost, routeSegments);
 	}
 
 	/**

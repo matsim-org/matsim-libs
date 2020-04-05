@@ -52,7 +52,7 @@ import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -274,7 +274,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 		}
 		else if (currentLeg.getMode().equals(TransportMode.pt)) {
-			if (currentLeg.getRoute() instanceof ExperimentalTransitRoute){
+			if (currentLeg.getRoute() instanceof TransitPassengerRoute){
 				throw new IllegalStateException ("not yet implemented");
 			}
 			else {

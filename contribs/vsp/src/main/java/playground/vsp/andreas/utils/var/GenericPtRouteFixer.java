@@ -7,13 +7,13 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
  * 
  * Old routed plans may contain pt routes of type generic.
- * This fix substitutes them by the proper {@link ExperimentalTransitRoute} route type.
- * Note that the current route type cannot be read from {@link ExperimentalTransitRoute}.
+ * This fix substitutes them by the proper {@link TransitPassengerRoute} route type.
+ * Note that the current route type cannot be read from {@link TransitPassengerRoute}.
  * Hence there are no automatic updates. 
  * 
  * @author aneumann
@@ -24,7 +24,7 @@ public class GenericPtRouteFixer {
 	private final static Logger log = Logger.getLogger(GenericPtRouteFixer.class);
 	
 	/**
-	 * The route type in {@link ExperimentalTransitRoute} is not visible. 
+	 * The route type in {@link TransitPassengerRoute} is not visible. 
 	 */
 	private static String newRouteType = "experimentalPt1";
 	private static String oldRouteType = "generic";
