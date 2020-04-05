@@ -104,10 +104,10 @@ public final class RaptorUtils {
                     if (pe instanceof Leg) {
                         Leg leg = (Leg) pe;
                         legs.add(leg);
-                        if (Time.isUndefinedTime(leg.getDepartureTime())) {
+                        if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
-                        lastArrivalTime = leg.getDepartureTime() + leg.getTravelTime();
+						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
                     }
                 }
             } else if (part.line != null) {

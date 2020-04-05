@@ -498,8 +498,8 @@ public final class EditTrips {
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
-			
-			double travelTime = currentLeg.getTravelTime();
+
+			double travelTime = currentLeg.getTravelTime().seconds();
 			if (Double.isInfinite(travelTime)) {
 				travelTime = currentLeg.getRoute().getTravelTime();
 				if (Double.isInfinite(travelTime)) {
@@ -516,7 +516,9 @@ public final class EditTrips {
 					previousActivity.getEndTime().seconds()) && previousActivity.getEndTime().seconds()
 					< now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
-				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + currentLeg.getTravelTime();
+				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + currentLeg
+						.getTravelTime()
+						.seconds();
 				// plausibility check: The agent can only arrive after the current time
 				if (departureTimeAccordingToPlannedActivityEnd > now) {
 					departureTime = departureTimeAccordingToPlannedActivityEnd;

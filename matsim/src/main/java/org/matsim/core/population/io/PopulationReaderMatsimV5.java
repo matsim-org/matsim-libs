@@ -278,7 +278,7 @@ import org.xml.sax.Attributes;
 			}
 		}
 		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			this.currRoute.setTravelTime(this.currleg.getTravelTime().orElse(Time.getUndefinedTime()));
 		}
 
 		this.routeDescription = null;
@@ -313,8 +313,10 @@ import org.xml.sax.Attributes;
 			mode = "undefined";
 		}
 		this.currleg = PopulationUtils.createAndAddLeg( this.currplan, mode.intern() );
-		this.currleg.setDepartureTime(Time.parseTime(atts.getValue(ATTR_LEG_DEPTIME)));
-		this.currleg.setTravelTime(Time.parseTime(atts.getValue(ATTR_LEG_TRAVTIME)));
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_DEPTIME))
+				.ifDefinedOrElse(currleg::setDepartureTime, currleg::setDepartureTimeUndefined);
+		Time.parseOptionalTime(atts.getValue(ATTR_LEG_TRAVTIME))
+				.ifDefinedOrElse(currleg::setTravelTime, currleg::setTravelTimeUndefined);
 //		LegImpl r = this.currleg;
 //		r.setTravelTime( Time.parseTime(atts.getValue(ATTR_LEG_ARRTIME)) - r.getDepartureTime() );
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16
@@ -382,7 +384,7 @@ import org.xml.sax.Attributes;
 			}
 		}
 		if (Time.isUndefinedTime(this.currRoute.getTravelTime())) {
-			this.currRoute.setTravelTime(this.currleg.getTravelTime());
+			this.currRoute.setTravelTime(this.currleg.getTravelTime().orElse(Time.getUndefinedTime()));
 		}
 
 		if (this.currRoute.getEndLinkId() != null) {

@@ -198,7 +198,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getDepartureTime() {
+		public OptionalTime getDepartureTime() {
 			return this.delegate.getDepartureTime() ;
 		}
 
@@ -208,7 +208,12 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getTravelTime() {
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime() ;
 		}
 
@@ -216,6 +221,12 @@ public final class PopulationUtils {
 		public void setTravelTime(double seconds) {
 			throw new UnsupportedOperationException() ;
 		}
+
+		@Override
+		public void setTravelTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
 		@Override
 		public String toString() {
 			return this.delegate.toString() ;
@@ -866,8 +877,8 @@ public final class PopulationUtils {
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
-		out.setDepartureTime(in.getDepartureTime());
-		out.setTravelTime(in.getTravelTime());
+		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
+		in.getTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
@@ -981,8 +992,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.getUndefinedTime());
-				next_leg.setTravelTime(Time.getUndefinedTime());
+				next_leg.setDepartureTimeUndefined();
+				next_leg.setTravelTimeUndefined();
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -1011,8 +1022,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.getUndefinedTime());
-				prev_leg.setTravelTime(Time.getUndefinedTime());
+				prev_leg.setDepartureTimeUndefined();
+				prev_leg.setTravelTimeUndefined();
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg
@@ -1108,7 +1119,7 @@ public final class PopulationUtils {
 		if ( leg.getRoute()!=null ) {
 			return leg.getRoute().getTravelTime() ;
 		} else {
-			return leg.getTravelTime() ;
+			return leg.getTravelTime().seconds();
 		}
 	}
 	public static void sampleDown( Population pop, double sample ) {

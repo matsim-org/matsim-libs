@@ -32,7 +32,6 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 
 /**
@@ -99,8 +98,7 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 	private static double updateTime(
 			final double currTime,
 			final Leg leg) {
-		double tt = leg.getTravelTime();
-		return !Time.isUndefinedTime(tt) ? currTime + tt : currTime;
+		return currTime + leg.getTravelTime().orElse(0);
 	}
 }
 

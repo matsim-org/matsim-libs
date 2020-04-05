@@ -175,7 +175,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		double tt = ((Leg) pe).getTravelTime();
+		double tt = ((Leg)pe).getTravelTime().seconds();
 		return now + (!Time.isUndefinedTime(tt) ? tt : 0);
 	}	
 }

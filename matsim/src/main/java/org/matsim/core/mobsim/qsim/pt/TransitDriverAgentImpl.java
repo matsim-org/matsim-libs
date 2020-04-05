@@ -19,6 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -44,9 +47,6 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Iterator;
-import java.util.ListIterator;
 
 /**
  * @author michaz
@@ -190,7 +190,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	
 	@Override
 	public Double getExpectedTravelTime() {
-		return ((Leg) this.currentPlanElement).getTravelTime() ;
+		return ((Leg) this.currentPlanElement).getTravelTime().seconds();
 	}
 
     @Override

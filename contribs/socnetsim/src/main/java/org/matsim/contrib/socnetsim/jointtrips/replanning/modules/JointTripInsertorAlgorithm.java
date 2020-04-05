@@ -53,7 +53,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -371,8 +370,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		double tt = ((Leg) pe).getTravelTime();
-		return now + (!Time.isUndefinedTime(tt) ? tt : 0);
+		return now + ((Leg) pe).getTravelTime().orElse(0);
+
 	}	
 
 	// /////////////////////////////////////////////////////////////////////////

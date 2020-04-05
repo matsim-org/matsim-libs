@@ -275,8 +275,9 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Leg leg = legs.get(event.getPersonId());
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
-		double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
+		double travelTime = leg.getDepartureTime().seconds()
+				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 		assert experiencedRoute.size() >= 1;
