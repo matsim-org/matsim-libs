@@ -84,7 +84,7 @@ public class StaticDriverDynLeg implements DriverDynLeg {
 	@Override
 	public Double getExpectedTravelTime() {
 		// TODO add travel time at the destination link??
-		return route.getTravelTime();
+		return route.getTravelTime().seconds();
 	}
 
 	public Double getExpectedTravelDistance() {

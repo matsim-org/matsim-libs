@@ -38,7 +38,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 
 /**
@@ -77,9 +76,9 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 		leg.setTravelTime(tripLeg.getTravelTime().seconds());
 		leg.setDepartureTime(tripLeg.getDepartureTime().seconds());
 
-		return tripLeg.getRoute() != null &&
-				!Time.isUndefinedTime(tripLeg.getRoute().getTravelTime()) ?
-				tripLeg.getRoute().getTravelTime() : tripLeg.getTravelTime().seconds();
+		return tripLeg.getRoute() != null ?
+				tripLeg.getRoute().getTravelTime().or(tripLeg::getTravelTime).seconds() :
+				tripLeg.getTravelTime().seconds();
 	}
 
     @Deprecated // use TripRouter instead. kai, dec'13

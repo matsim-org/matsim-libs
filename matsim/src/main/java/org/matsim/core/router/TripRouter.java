@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -39,9 +42,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -230,10 +230,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
 
-			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
-			if ( Time.isUndefinedTime( ttime ) ) {
-				ttime = 0. ;
-			}
+			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ).orElse(0);
 			return now + ttime;
 		}
 	}

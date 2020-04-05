@@ -43,7 +43,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -332,15 +331,10 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 				now = end.isDefined() ? end.seconds() : now + ((Activity)pe).getMaximumDuration().seconds();
 			}
 			else if ( pe instanceof Leg ) {
-				final Route r = ((Leg) pe).getRoute();
-				if ( r != null && !Time.isUndefinedTime(r.getTravelTime()) ) {
-					now += r.getTravelTime();
-				}
-				else {
-					// no info: just assume instantaneous (i.e. 0). This will give poor results!
-					now += ((Leg) pe).getTravelTime().orElse(0);
-
-				}
+				Leg leg = (Leg)pe;
+				final Route r = leg.getRoute();
+				OptionalTime tt = r != null ? r.getTravelTime().or(leg::getTravelTime) : leg.getTravelTime();
+				now += tt.orElse(0);// no info: just assume instantaneous (i.e. 0). This will give poor results!
 			}
 		}
 		return now;

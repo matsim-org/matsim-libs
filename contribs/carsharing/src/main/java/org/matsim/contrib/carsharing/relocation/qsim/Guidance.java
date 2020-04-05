@@ -52,9 +52,7 @@ public class Guidance {
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
 		Route route = ((Leg) trip.get(0)).getRoute();
 
-		double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
-
-		return travelTime;
+		return route != null ? route.getTravelTime().orElse(Time.getUndefinedTime()) : Time.getUndefinedTime();
     }
 
     public synchronized double getExpectedTravelDistance(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {

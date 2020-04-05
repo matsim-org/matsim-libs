@@ -105,7 +105,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 				getLineId(), getRouteId());
 
 		copy.setDistance(getDistance());
-		copy.setTravelTime(getTravelTime());
+		getTravelTime().ifDefined(copy::setTravelTime);
 		copy.setBoardingTime(getBoardingTime());
 
 		return copy;

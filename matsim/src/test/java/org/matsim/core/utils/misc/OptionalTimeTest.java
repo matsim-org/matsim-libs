@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Test;
@@ -116,6 +117,30 @@ public class OptionalTimeTest {
 		assertThat(OptionalTime.undefined().stream()).containsExactly();
 		assertThat(OptionalTime.defined(0).stream()).containsExactly(0.);
 		assertThat(OptionalTime.defined(10).stream()).containsExactly(10.);
+	}
+
+	@Test
+	public void test_or_OptionalTime() {
+		assertThat(OptionalTime.undefined().or(OptionalTime.undefined()).isUndefined()).isTrue();
+		assertThat(OptionalTime.undefined().or(OptionalTime.defined(3)).seconds()).isEqualTo(3);
+		assertThat(OptionalTime.defined(1).or(OptionalTime.undefined()).seconds()).isEqualTo(1);
+		assertThat(OptionalTime.defined(1).or(OptionalTime.defined(2)).seconds()).isEqualTo(1);
+
+		assertThatThrownBy(() -> OptionalTime.undefined().or((OptionalTime)null)).isExactlyInstanceOf(
+				NullPointerException.class);
+	}
+
+	@Test
+	public void test_or_OptionalTimeSupplier() {
+		assertThat(OptionalTime.undefined().or(OptionalTime::undefined).isUndefined()).isTrue();
+		assertThat(OptionalTime.undefined().or(() -> OptionalTime.defined(3)).seconds()).isEqualTo(3);
+		assertThat(OptionalTime.defined(1).or(OptionalTime::undefined).seconds()).isEqualTo(1);
+		assertThat(OptionalTime.defined(1).or(() -> OptionalTime.defined(2)).seconds()).isEqualTo(1);
+
+		assertThatThrownBy(() -> OptionalTime.undefined().or((Supplier<OptionalTime>)null)).isExactlyInstanceOf(
+				NullPointerException.class);
+		assertThatThrownBy(() -> OptionalTime.undefined().or(() -> null)).isExactlyInstanceOf(
+				NullPointerException.class);
 	}
 
 	@Test

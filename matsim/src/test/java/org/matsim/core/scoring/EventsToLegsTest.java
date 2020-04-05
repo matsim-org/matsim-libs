@@ -269,7 +269,7 @@ public class EventsToLegsTest {
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-9);
 		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime(), 1e-9);
+		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime().seconds(), 1e-9);
 		Assert.assertEquals(distance, lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
 		Assert.assertEquals(mode, lh.handledLeg.getLeg().getMode());
 	}

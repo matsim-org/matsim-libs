@@ -501,7 +501,7 @@ public final class EditTrips {
 
 			double travelTime = currentLeg.getTravelTime().seconds();
 			if (Double.isInfinite(travelTime)) {
-				travelTime = currentLeg.getRoute().getTravelTime();
+				travelTime = currentLeg.getRoute().getTravelTime().seconds();
 				if (Double.isInfinite(travelTime)) {
 					// we don't know how long the agent will be travelling on the current leg
 					log.error("Travel time of " + agent.getId().toString() + " on following leg is unknown " + currentLeg.toString());

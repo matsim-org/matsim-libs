@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -417,7 +418,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Deprecated
 		@Override
-		public double getTravelTime() {
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime();
 		}
 
@@ -428,6 +429,11 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Override
 		public void setTravelTime(final double travelTime) {
+			throw new UnsupportedOperationException("read only route.");
+		}
+
+		@Override
+		public void setTravelTimeUndefined() {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
