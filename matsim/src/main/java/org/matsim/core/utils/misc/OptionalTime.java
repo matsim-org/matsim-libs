@@ -87,6 +87,13 @@ public final class OptionalTime {
 		return seconds != Time.UNDEFINED_TIME ? seconds : supplier.getAsDouble();
 	}
 
+	public <X extends Throwable> double orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
+		if (seconds == Time.UNDEFINED_TIME) {
+			throw exceptionSupplier.get();
+		}
+		return seconds;
+	}
+
 	public void ifDefined(DoubleConsumer action) {
 		if (seconds != Time.UNDEFINED_TIME) {
 			action.accept(seconds);
