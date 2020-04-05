@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ExperimentalTransitRouteFactory.java
+ * ExperimentalTransitRoute.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,20 +21,20 @@
 package org.matsim.pt.routes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-public class ExperimentalTransitRouteFactory implements RouteFactory {
+public interface TransitPassengerRoute extends Route {
+	Id<TransitStopFacility> getAccessStopId();
 
-	@Override
-	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return new ExperimentalTransitRoute(startLinkId, endLinkId);
-	}
+	Id<TransitStopFacility> getEgressStopId();
 
-	@Override
-	public String getCreatedRouteType() {
-		return ExperimentalTransitRoute.ROUTE_TYPE;
-	}
+	Id<TransitLine> getLineId();
 
+	Id<TransitRoute> getRouteId();
+
+	OptionalTime getBoardingTime();
 }

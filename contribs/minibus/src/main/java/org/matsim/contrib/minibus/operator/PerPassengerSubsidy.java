@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 import com.google.inject.Inject;
 
@@ -117,7 +117,7 @@ public class PerPassengerSubsidy implements SubsidyI {
 					
 					if (leg.getMode().equals(TransportMode.pt)) {
 
-						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+						TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 						String planIdString = route.getRouteId().toString();
 						Id<PPlan> pId = Id.create(planIdString, PPlan.class);
 						
