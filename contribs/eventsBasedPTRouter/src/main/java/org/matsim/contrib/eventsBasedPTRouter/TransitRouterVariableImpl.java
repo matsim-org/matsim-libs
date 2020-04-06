@@ -49,7 +49,8 @@ import org.matsim.pt.router.MultiNodeDijkstra;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class TransitRouterVariableImpl implements TransitRouter {
@@ -182,7 +183,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			else if(l.fromNode.route!=null) {
 				//inside link
 				leg = PopulationUtils.createLeg(TransportMode.pt);
-				ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
+				TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(stop.getStopFacility(), l.fromNode.line, l.fromNode.route, l.fromNode.stop.getStopFacility());
 				leg.setRoute(ptRoute);
 				leg.setTravelTime(travelTime);
 				legs.add(leg);

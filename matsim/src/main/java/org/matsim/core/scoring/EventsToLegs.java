@@ -54,7 +54,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.core.utils.misc.OptionalTime;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -84,10 +86,12 @@ public final class EventsToLegs
 	private static class PendingTransitTravel {
 		final Id<Vehicle> vehicleId;
 		final Id<TransitStopFacility> accessStop;
+		final double boardingTime;
 
-		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
+		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop, double boardingTime) {
 			this.vehicleId = vehicleId;
 			this.accessStop = accessStop;
+			this.boardingTime = boardingTime;
 		}
 	}
 
@@ -210,7 +214,7 @@ public final class EventsToLegs
 			if (!event.getPersonId().equals(lineAndRoute.driverId)) {
 				// transit drivers are not considered to travel by transit
 				transitTravels.put(event.getPersonId(),
-						new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId));
+						new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId, event.getTime()));
 			}
 		} else {
 			VehicleRoute route = vehicle2route.computeIfAbsent(event.getVehicleId(), vehicleId -> new VehicleRoute());
@@ -318,13 +322,12 @@ public final class EventsToLegs
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
 			assert egressFacility != null;
-
-			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(accessFacility, line,
-					route, egressFacility);
-			experimentalTransitRoute.setTravelTime(travelTime);
-			experimentalTransitRoute.setDistance(
-					RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
-			leg.setRoute(experimentalTransitRoute);
+			
+			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
+			passengerRoute.setBoardingTime(OptionalTime.defined(pendingTransitTravel.boardingTime));
+			passengerRoute.setTravelTime(travelTime);
+			passengerRoute.setDistance(RouteUtils.calcDistance(passengerRoute, transitSchedule, network));
+			leg.setRoute(passengerRoute);
 		} else if ((pendingVehicleTravel = vehicleTravels.remove(event.getPersonId())) != null) {
 			VehicleRoute vehicleRoute = pendingVehicleTravel.route;
 			List<Id<Link>> traveledLinks = vehicleRoute.links.subList(pendingVehicleTravel.accessLinkIdx,

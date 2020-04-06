@@ -114,19 +114,37 @@ public final class VehicleUtils {
 	}
 
 	/**
+	 * Retrieves vehicleIds of all vehicles that are assigned to the person.
+	 *
+	 * @param person the person one wants to retrieve vehicles for
+	 * @return vehicle ids mapped to the mode the respective vehicle may be used for
+	 * @throws RuntimeException In case no vehicleIds were set
+	 */
+	public static Map<String, Id<Vehicle>> getVehicleIds(Person person) {
+		var vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		if (vehicleIds == null) {
+			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() +
+					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you.");
+		}
+		return vehicleIds;
+	}
+
+	/**
 	 * Retrieves a vehicleId from the person's attributes.
 	 *
 	 * @return the vehicleId of the person's vehicle for the specified mode
 	 * @throws RuntimeException In case no vehicleIds were set or in case no vehicleId was set for the specified mode
 	 */
 	public static Id<Vehicle> getVehicleId(Person person, String mode) {
-		Map<String, Id<Vehicle>> vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
-		if (vehicleIds == null || !vehicleIds.containsKey(mode)) {
+		Map<String, Id<Vehicle>> vehicleIds = getVehicleIds(person);
+		if (!vehicleIds.containsKey(mode)) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
-                    ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-                    "a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
-                    "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
-            );
+					". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+					"a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+					"\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
+			);
 		}
 		return vehicleIds.get(mode);
 	}
