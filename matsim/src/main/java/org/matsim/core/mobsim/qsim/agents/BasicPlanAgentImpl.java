@@ -252,13 +252,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return ((Leg) currentPlanElement).getMode() ;
 	}
 	@Override
-	public final Double getExpectedTravelTime() {//TODO candidate for OptionalTime
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {//==> TODO turn into Precondition ???
-			return null;
-		}
-		final OptionalTime travelTime = PopulationUtils.decideOnTravelTimeForLeg((Leg)currentPlanElement);
-		return travelTime.isDefined() ? travelTime.seconds() : null;
+	public final OptionalTime getExpectedTravelTime() {
+		return PopulationUtils.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
 	}
 
     @Override
