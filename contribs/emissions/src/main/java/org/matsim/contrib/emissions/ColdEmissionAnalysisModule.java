@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.NonScenarioVehicles;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
@@ -119,7 +118,7 @@ final class ColdEmissionAnalysisModule {
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
-		Map<Pollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
 
 		return coldEmissions;
 //		if (vehicle == null) {
@@ -173,7 +172,7 @@ final class ColdEmissionAnalysisModule {
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
-	private Map<Pollutant, Double> getColdPollutantDoubleMap( Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
+	private Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
 		final Map<Pollutant, Double> coldEmissionsOfEvent = new HashMap<>();
 
 		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
