@@ -81,8 +81,8 @@ final class ColdEmissionAnalysisModule {
 	private final Set<Pollutant> coldPollutants;
 	private int noVehWarnCnt = 0;
 	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-					   Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
-					   Set<Pollutant> coldPollutants, EventsManager eventsManager ){
+													Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
+													Set<Pollutant> coldPollutants, EventsManager eventsManager ){
 		this.avgHbefaColdTable = avgHbefaColdTable;
 		this.detailedHbefaColdTable = detailedHbefaColdTable;
 		this.eventsManager = eventsManager;
@@ -119,6 +119,8 @@ final class ColdEmissionAnalysisModule {
 		}
 
 		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+
+		throwColdEmissionEvent(coldEmissionEventLinkId, vehicle, eventTime, coldEmissions);
 
 		return coldEmissions;
 //		if (vehicle == null) {
@@ -183,8 +185,8 @@ final class ColdEmissionAnalysisModule {
 			if(vehInfoWarnHDVCnt < maxWarnCnt) {
 				vehInfoWarnHDVCnt++;
 				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-							    HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-							    ". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
 				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.NON_HBEFA_VEHICLE)) {
@@ -196,8 +198,8 @@ final class ColdEmissionAnalysisModule {
 			if(vehInfoWarnMotorCylceCnt == 0) {
 				vehInfoWarnMotorCylceCnt++;
 				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-							    HbefaVehicleCategory.MOTORCYCLE +
-							    ". Setting cold emissions to zero.");
+						HbefaVehicleCategory.MOTORCYCLE +
+						". Setting cold emissions to zero.");
 				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
 			}
 			for (Pollutant cp : coldPollutants){
