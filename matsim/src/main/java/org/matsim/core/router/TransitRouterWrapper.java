@@ -34,7 +34,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -108,7 +108,7 @@ public class TransitRouterWrapper implements RoutingModule {
 				// (access leg)
 				Facility firstToFacility;
 				if (baseTrip.size() > 1) { // at least one pt leg available
-					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(1).getRoute();
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(1).getRoute();
 					firstToFacility = this.transitSchedule.getFacilities().get(tRoute.getAccessStopId());
 				} else {
 					firstToFacility = toFacility;
@@ -118,8 +118,8 @@ public class TransitRouterWrapper implements RoutingModule {
 						leg.getTravelTime().seconds(), firstToFacility);
 				leg.setRoute(route);
 			} else {
-				if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-					ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) leg.getRoute();
+				if (leg.getRoute() instanceof TransitPassengerRoute) {
+					TransitPassengerRoute tRoute = (TransitPassengerRoute) leg.getRoute();
 					tRoute.setTravelTime(leg.getTravelTime().seconds());
 					tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
 					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId(), TransportMode.pt);
@@ -134,7 +134,7 @@ public class TransitRouterWrapper implements RoutingModule {
 					if (i == baseTrip.size() - 1) {
 						// if this is the last leg, we don't believe the leg from the TransitRouter.  Why?
 
-						ExperimentalTransitRoute tRoute = (ExperimentalTransitRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
+						TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
 						Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
 
 						Route route = createWalkRoute(lastFromFacility, departureTime, person,
