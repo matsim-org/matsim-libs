@@ -3,6 +3,7 @@ package org.matsim.contrib.analysis.spatial;
 import java.util.function.Supplier;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 
 /**
  * Square grid which holds values
@@ -19,6 +20,17 @@ public final class SquareGrid<T> extends Grid<T> {
      * @param bounds               outer bounds of the grid
      */
     public SquareGrid(final double centroidDistance, final Supplier<T> initialValueSupplier, final Geometry bounds) {
+        super(centroidDistance, initialValueSupplier, bounds);
+    }
+
+    /**
+     * New Instance of SquareGrid
+     *
+     * @param centroidDistance     distance between cell centroids
+     * @param initialValueSupplier function to deliver a initial value when cells are created
+     * @param bounds               outer bounds of the grid
+     */
+    public SquareGrid(final double centroidDistance, final Supplier<T> initialValueSupplier, final PreparedGeometry bounds) {
         super(centroidDistance, initialValueSupplier, bounds);
     }
 

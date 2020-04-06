@@ -45,7 +45,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -320,7 +320,7 @@ public class SwissRailRaptorModuleTest {
         
         // Check route: should return one of the added lines although the removed green line would be faster
         Leg ptLeg = (Leg) planElements.get(3);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) ptLeg.getRoute();
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) ptLeg.getRoute();
         Assert.assertEquals(Id.create("AddedLine" + 1, TransitLine.class), ptRoute.getLineId());        
     }
     

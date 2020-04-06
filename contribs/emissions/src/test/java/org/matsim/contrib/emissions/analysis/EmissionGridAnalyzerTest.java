@@ -1,5 +1,8 @@
 package org.matsim.contrib.emissions.analysis;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,8 +17,8 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.spatial.Grid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriter;
@@ -23,6 +26,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -367,5 +372,84 @@ public class EmissionGridAnalyzerTest {
         byte[] jsonFileData = Files.readAllBytes(jsonFile);
 
         assertTrue(jsonFileData.length > 0);
+    }
+
+    @Test
+    public void process_regression() throws IOException {
+
+        var network = NetworkUtils.readNetwork("./scenarios/sampleScenario/sample_network.xml");
+        var analyzer = new EmissionGridAnalyzer.Builder()
+                .withGridSize(10)
+                .withTimeBinSize(1000000) // aiming for single time bin
+                .withNetwork(network)
+                .withSmoothingRadius(50)
+                .withGridType(EmissionGridAnalyzer.GridType.Square)
+                .build();
+
+        var map = analyzer.process(testUtils.getInputDirectory() + "output_events.emissions.xml.gz");
+        writeGridToCSV(map, testUtils.getOutputDirectory() + "actual-pollution.csv");
+
+        // have this complicated comparison here, since due to rounding errors some values are not exactly the same, thus
+        // simply comparing the checksum of the file or the read in String is not sufficient
+        assertCsvValuesAreSame(Paths.get(testUtils.getInputDirectory() + "expected-pollution.csv"), Paths.get(testUtils.getOutputDirectory() + "actual-pollution.csv"));
+    }
+
+    private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, String outputPath) {
+
+        var pollutants = Pollutant.values();
+
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(outputPath), CSVFormat.TDF)) {
+
+            //print header with all possible pollutants
+            printer.print("timeBinStartTime");
+            printer.print("x");
+            printer.print("y");
+
+            for (var p : pollutants) {
+                printer.print(p.toString());
+            }
+            printer.println();
+
+            //print values if pollutant was not present just print 0 instead
+            for (TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin : bins.getTimeBins()) {
+                final double timeBinStartTime = bin.getStartTime();
+                for (Grid.Cell<Map<Pollutant, Double>> cell : bin.getValue().getCells()) {
+
+                    printer.print(timeBinStartTime);
+                    printer.print(cell.getCoordinate().x);
+                    printer.print(cell.getCoordinate().y);
+
+                    for (var p : pollutants) {
+                        if (cell.getValue().containsKey(p)) {
+                            printer.print(cell.getValue().get(p));
+                        } else {
+                            printer.print(0);
+                        }
+                    }
+                    printer.println();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void assertCsvValuesAreSame(Path expected, Path acutal) throws IOException {
+
+        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(acutal.toString())) {
+
+            var actualIterator = CSVFormat.TDF.withFirstRecordAsHeader().parse(actualReader).iterator();
+
+            for (CSVRecord expectedRecord : CSVFormat.TDF.withFirstRecordAsHeader().parse(expectedReader)) {
+                var actualRecord = actualIterator.next();
+                for (var i = 0; i < expectedRecord.size(); i++) {
+
+                    var expectedNumber = Double.parseDouble(expectedRecord.get(i));
+                    var actualNumber = Double.parseDouble(actualRecord.get(i));
+
+                    assertEquals(expectedNumber, actualNumber, 0.000001);
+                }
+            }
+        }
     }
 }
