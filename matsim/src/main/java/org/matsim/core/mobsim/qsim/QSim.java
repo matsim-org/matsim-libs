@@ -129,7 +129,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private WithinDayEngine withindayEngine = null;
 
 	private final Date realWorldStarttime = new Date();
-	private double stopTime = 100 * 3600;
+	private double stopTime; // initialised in initSimTimer()
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
@@ -141,7 +141,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	// for detailed run time analysis
 	public static boolean analyzeRunTimes = false;
-	private long startTime = 0;
+	private long startClockTime = 0;
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
 	private ActivityEngine activityEngine;
@@ -380,37 +380,37 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * @return true if the simulation needs to continue
 	 */
 	/*package*/ boolean doSimStep() {
-		if (analyzeRunTimes) this.startTime = System.nanoTime();
+		if (analyzeRunTimes) this.startClockTime = System.nanoTime();
 
 		final double now = this.getSimTimer().getTimeOfDay();
 
 		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(now);
 		
-		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
+		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
 		
 		/*
 		 * The WithinDayEngine has to perform its replannings before
 		 * the other engines simulate the sim step.
 		 */
 		if (this.withindayEngine != null) {
-			if (analyzeRunTimes) startTime = System.nanoTime();
+			if (analyzeRunTimes) startClockTime = System.nanoTime();
 			this.withindayEngine.doSimStep(now);
-			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(this.withindayEngine).addAndGet(System.nanoTime() - this.startTime);
+			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(this.withindayEngine).addAndGet(System.nanoTime() - this.startClockTime);
 		}
 
 		// "added" engines
 		for (MobsimEngine mobsimEngine : this.mobsimEngines) {
-			if (analyzeRunTimes) this.startTime = System.nanoTime();
+			if (analyzeRunTimes) this.startClockTime = System.nanoTime();
 			
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
 
 			mobsimEngine.doSimStep(now);
 			
-			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startTime);
+			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startClockTime);
 		}
 
-		if (analyzeRunTimes) this.startTime = System.nanoTime();
+		if (analyzeRunTimes) this.startClockTime = System.nanoTime();
 		
 		// console printout:
 		this.printSimLog(now);
@@ -420,18 +420,14 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
 		if ( qsimConfigGroup.getSimEndtimeInterpretation()==EndtimeInterpretation.onlyUseEndtime ) {
-			if ( now > qsimConfigGroup.getEndTime() ) {
-				doContinue = false ;
-			} else {
-				doContinue = true ;
-			}
+			doContinue = now <= qsimConfigGroup.getEndTime().seconds();
 		}
 
 		if (doContinue) {
 			this.simTimer.incrementTime();
 		}
 		
-		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startTime;
+		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
 
 		return doContinue;
 	}
@@ -509,12 +505,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private void initSimTimer() {
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
-		Double configuredStartTime = qSimConfigGroup.getStartTime();
-		this.stopTime = qSimConfigGroup.getEndTime();
-		if (Time.isUndefinedTime(configuredStartTime)) {
-			configuredStartTime = 0.0;
-		}
-		if ((Time.isUndefinedTime(this.stopTime)) || (this.stopTime == 0)) {
+		double configuredStartTime = qSimConfigGroup.getStartTime().orElse(0);
+		this.stopTime = qSimConfigGroup.getEndTime().orElse(Double.MAX_VALUE);
+		if (this.stopTime == 0) {
 			this.stopTime = Double.MAX_VALUE;
 		}
 

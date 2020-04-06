@@ -19,11 +19,23 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -40,10 +52,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.inject.Inject;
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -332,7 +341,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			// this functionality is no longer there.
 
 			if (this.calculateLinkToLinkTravelTimes
-					&& event.getTime() < qsimConfig.getEndTime()
+					&& event.getTime() < qsimConfig.getEndTime().seconds()
 				// (we think that this only makes problems when the abort is not just because of mobsim end time. kai & theresa, jan'17)
 			){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
