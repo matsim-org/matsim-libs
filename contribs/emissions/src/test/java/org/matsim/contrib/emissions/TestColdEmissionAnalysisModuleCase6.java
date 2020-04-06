@@ -102,7 +102,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Double averageAverageFactor = .1;
 	private static final Double averagePetrolFactor = .01;
 
-	private static final double fakeFactor = -1.;
+	private static final double heavyGoodsFaktor = -1.;
 	
 	private boolean excep = false;
 	
@@ -123,7 +123,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
 		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
+		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, heavyGoodsFaktor);
 		
 
 		testCases.add( testCase6 );
@@ -170,25 +170,19 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
 		// create all needed and one unneeded entry for the detailed table
-		
-		{
-			// add passenger car entry "petrol;<=1.4L;PC-P-Euro-1":
-			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept );
 
-			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedPetrolFactor ), PASSENGER_CAR );
-		}
 		{
 			// add passenger car entry "diesel;>=2L;PC-D-Euro-3":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
+
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedDieselFactor ), PASSENGER_CAR );
 		}
 		{
 			// add heavy goods vehicle entry "petrol;none;none":
-			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
+			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol; --> Should be used, since HGV shpuld be supported and not fallback to average any more, kmt apr'20.
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
 			
-			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
+			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFaktor), HEAVY_GOODS_VEHICLE );
 		}
 //		{
 //			// add passenger car entry "petrol;none;nullCase":
@@ -223,14 +217,14 @@ public class TestColdEmissionAnalysisModuleCase6 {
 			// this should not be used but is needed to assure that the detailed table is tried before the average table
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
 			
-			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), PASSENGER_CAR );
+			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFaktor), PASSENGER_CAR );
 		}
 		{
 			// add HGV entry "petrol;none;none".
 			// (pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
 			
-			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
+			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFaktor), HEAVY_GOODS_VEHICLE );
 		}
 	}
 	

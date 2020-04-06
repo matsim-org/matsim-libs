@@ -21,6 +21,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -174,43 +175,74 @@ final class ColdEmissionAnalysisModule {
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
+	private static int cnt =10;
 	private Map<Pollutant, Double> calculateColdEmissions(Id<Vehicle> vehicleId, double parkingDuration, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km ) {
-		final Map<Pollutant, Double> coldEmissionsOfEvent = new HashMap<>();
 
-		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
+		final Map<Pollutant, Double> coldEmissionsOfEvent = new EnumMap<>( Pollutant.class );
 
-		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
-			key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-			if(vehInfoWarnHDVCnt < maxWarnCnt) {
-				vehInfoWarnHDVCnt++;
-				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
+//			key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+//			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+//			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+//				vehInfoWarnHDVCnt++;
+//				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+//							    HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
+//							    ". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+//				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//			}
+//		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.NON_HBEFA_VEHICLE)) {
+//			for ( Pollutant cp : coldPollutants){
+//				coldEmissionsOfEvent.put( cp, 0.0 );
+//			}
+//			return coldEmissionsOfEvent;
+//		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
+//			if(vehInfoWarnMotorCylceCnt == 0) {
+//				vehInfoWarnMotorCylceCnt++;
+//				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+//							    HbefaVehicleCategory.MOTORCYCLE +
+//							    ". Setting cold emissions to zero.");
+//				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
+//			}
+//			for (Pollutant cp : coldPollutants){
+//				coldEmissionsOfEvent.put( cp, 0.0 );
+//			}
+//			return coldEmissionsOfEvent;
+//		} else {
+//			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+//		}
+//
+//		logger.warn( "the above needs to be fixed in the same way as in the warm table" );
+
+		logger.warn("VehId: " + vehicleId + " ; Tuple.first = " +vehicleInformationTuple.getFirst());
+		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
+		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
+			for ( Pollutant warmPollutant : coldPollutants) {
+				coldEmissionsOfEvent.put( warmPollutant, 0.0 );
+				// yyyyyy todo replace by something more meaningful. kai, jan'20
 			}
-		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.NON_HBEFA_VEHICLE)) {
-			for ( Pollutant cp : coldPollutants){
-				coldEmissionsOfEvent.put( cp, 0.0 );
+			if ( cnt >0 ) {
+				logger.warn( "Just encountered non hbefa vehicle; currently, this code is setting the emissions of such vehicles to zero.  " +
+						"Might be necessary to find a better solution for this.  kai, jan'20" );
+				cnt--;
+				if ( cnt ==0 ) {
+					logger.warn( Gbl.FUTURE_SUPPRESSED );
+				}
 			}
 			return coldEmissionsOfEvent;
-		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
-			if(vehInfoWarnMotorCylceCnt == 0) {
-				vehInfoWarnMotorCylceCnt++;
-				logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-						HbefaVehicleCategory.MOTORCYCLE +
-						". Setting cold emissions to zero.");
-				logger.warn(Gbl.ONLYONCE + "\t" + Gbl.FUTURE_SUPPRESSED);
-			}
-			for (Pollutant cp : coldPollutants){
-				coldEmissionsOfEvent.put( cp, 0.0 );
-			}
-			return coldEmissionsOfEvent;
-		} else {
-			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		}
 
-		logger.warn( "the above needs to be fixed in the same way as in the warm table" );
+		// translate vehicle information type into factor key.  yyyy maybe combine these two? kai, jan'20
+		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
+		key.setHbefaVehicleCategory( vehicleInformationTuple.getFirst() );
+		logger.warn("Road type is not set. Check if neccessary! (Was copied  from WarmEmissions.) KMT Apr 20");
+//		efkey.setHbefaRoadCategory( roadType );
+		if(this.detailedHbefaColdTable != null){
+			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+			key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+		}
 
 		int parkingDuration_h = Math.max(1, (int) (parkingDuration / 3600));
 		if (parkingDuration_h >= 12) parkingDuration_h = 13;
