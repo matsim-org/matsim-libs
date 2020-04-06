@@ -287,7 +287,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
 		Gbl.assertNotNull(drtTrip);
 
-		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() );
+		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() ).seconds();
 
 		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
 								 .setFromActivity( drtTrip.getOriginActivity() )

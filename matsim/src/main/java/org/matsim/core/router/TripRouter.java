@@ -215,10 +215,11 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			return PopulationUtils.decideOnActivityEndTime(act, now, config ) ;
+			return PopulationUtils.decideOnActivityEndTime(act, now, config ).seconds() ;
 		}
 		else {
-//			// take travel time from route if possible
+			// take travel time from route if possible
+			// TODO throw exception if undefined? (currently 0 is returned)
 			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ).orElse(0);
 			return now + ttime;
 		}

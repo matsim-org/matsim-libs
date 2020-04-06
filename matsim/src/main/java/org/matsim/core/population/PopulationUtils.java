@@ -71,7 +71,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -453,26 +452,34 @@ public final class PopulationUtils {
 	 */
 	@Deprecated // was renamed
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		return decideOnActivityEndTime( act, now, config ) ;
+		return decideOnActivityEndTime( act, now, config ).seconds() ;
 	}
 
 	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
+	public static OptionalTime decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 			case endTimeOnly:
-				return act.getEndTime().seconds();
+				return act.getEndTime();
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
-					return act.getEndTime().seconds();
-				} else if (act.getMaximumDuration().isDefined()) {
-					return now + act.getMaximumDuration().seconds();
+					return act.getEndTime();
+				} else if (act.getMaximumDuration().isDefined()){
+					return OptionalTime.defined(now + act.getMaximumDuration().seconds());
 				} else {
-					return Time.getUndefinedTime();
+					return OptionalTime.undefined();
 				}
 			case minOfDurationAndEndTime:
-				return Math.min(now + act.getMaximumDuration().seconds(), act.getEndTime().seconds());
+				if (act.getEndTime().isUndefined() || act.getMaximumDuration().isUndefined()) {
+					return OptionalTime.undefined();
+				} else {
+					double endTime = act.getEndTime().seconds();
+					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
+					return endTime <= durationBasedEndTime ?
+							act.getEndTime() :
+							OptionalTime.defined(durationBasedEndTime);
+				}
 			default:
 				throw new IllegalArgumentException(
 						"Unsupported 'activityDurationInterpretation' enum type: " + config.plans()
