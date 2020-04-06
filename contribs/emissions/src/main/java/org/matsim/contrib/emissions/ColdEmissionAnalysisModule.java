@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -103,50 +104,68 @@ final class ColdEmissionAnalysisModule {
 			double parkingDuration,
 			int distance_km ) {
 
-		if (vehicle == null) {
-			if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
-				throw new RuntimeException(
-						"Vehicle is null. " +
-								"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
-								+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
-								+ " Aborting...");
-			} else if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
-				if (noVehWarnCnt < 10) {
-					logger.warn(
-							"Vehicle will be ignored.");
-					noVehWarnCnt++;
-					if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
-				}
-			} else {
-				throw new RuntimeException("Not yet implemented. Aborting...");
-			}
-
-		} else {
-
-			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicle.getType(), this.ecg );
-
+		VehicleType vehicleType = vehicle.getType();
+		{
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
+			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
 			Gbl.assertNotNull( hbefaVehicleTypeDescription );
-
-			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
-					vehicle.getType() );
-
-			Gbl.assertNotNull( vehicleInformationTuple );
-
-			if (vehicleInformationTuple.getFirst() == null){
-				throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
-									   "Please make sure that requirements for emission vehicles in " +
-									   EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-			}
-
-			Map<Pollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
-
-			// a basic apporach to introduce emission reduced cars:
-//			if(emissionEfficiencyFactor != null){
-//				coldEmissions = WarmEmissionAnalysisModule.rescaleWarmEmissions(coldEmissions, emissionEfficiencyFactor );
-//			}
-			throwColdEmissionEvent(coldEmissionEventLinkId, vehicle, eventTime, coldEmissions);
 		}
-		return null;
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
+		Gbl.assertNotNull( vehicleInformationTuple );
+
+		if (vehicleInformationTuple.getFirst() == null){
+			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
+					"Please make sure that requirements for emission vehicles in " +
+					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+		}
+
+		Map<Pollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+
+		return coldEmissions;
+//		if (vehicle == null) {
+//			if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.abort)) {
+//				throw new RuntimeException(
+//						"Vehicle is null. " +
+//								"Please make sure that requirements for emission vehicles in " + EmissionsConfigGroup.GROUP_NAME + " config group are met."
+//								+ " Or set the parameter + 'nonScenarioVehicles' to 'ignore' in order to skip such vehicles."
+//								+ " Aborting...");
+//			} else if (ecg.getNonScenarioVehicles().equals(NonScenarioVehicles.ignore)) {
+//				if (noVehWarnCnt < 10) {
+//					logger.warn(
+//							"Vehicle will be ignored.");
+//					noVehWarnCnt++;
+//					if (noVehWarnCnt == 10) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//				}
+//			} else {
+//				throw new RuntimeException("Not yet implemented. Aborting...");
+//			}
+//
+//		} else {
+//
+//			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicle.getType(), this.ecg );
+//
+//			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+//
+//			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
+//					vehicle.getType() );
+//
+//			Gbl.assertNotNull( vehicleInformationTuple );
+//
+//			if (vehicleInformationTuple.getFirst() == null){
+//				throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
+//									   "Please make sure that requirements for emission vehicles in " +
+//									   EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+//			}
+//
+//			Map<Pollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+//
+//			// a basic apporach to introduce emission reduced cars:
+////			if(emissionEfficiencyFactor != null){
+////				coldEmissions = WarmEmissionAnalysisModule.rescaleWarmEmissions(coldEmissions, emissionEfficiencyFactor );
+////			}
+//			throwColdEmissionEvent(coldEmissionEventLinkId, vehicle, eventTime, coldEmissions);
+//		}
+//		return null;
 	}
 
 	/*package-private*/ void throwColdEmissionEvent(Id<Link> coldEmissionEventLinkId, Vehicle vehicle, double eventTime, Map<Pollutant, Double> coldEmissions) {
