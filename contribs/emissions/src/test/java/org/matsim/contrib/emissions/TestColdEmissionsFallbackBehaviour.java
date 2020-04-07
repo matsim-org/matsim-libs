@@ -81,10 +81,8 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
-//		double expectedValue = 0.667458725; // = 200m * 3.337293625 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed ;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -102,7 +100,6 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToTechnologyAverage, startTime, parkingDuration, distance);
-//				checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 	}
 
 	/**
@@ -119,7 +116,6 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToAverageTable, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 	}
 
 
@@ -137,9 +133,8 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -157,9 +152,8 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToTechnologyAverage, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage * link.getLength()/1000;
+		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage ;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -177,7 +171,6 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToAverageTable, startTime, parkingDuration, distance);
-//				checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 	}
 
 // ---------   DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable   -----------
@@ -192,12 +185,10 @@ public class TestColdEmissionsFallbackBehaviour {
 	public void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackNotNeeded() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed ;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -215,9 +206,8 @@ public class TestColdEmissionsFallbackBehaviour {
 
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToTechnologyAverage, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage * link.getLength()/1000;
+		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage ;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -234,12 +224,10 @@ public class TestColdEmissionsFallbackBehaviour {
 	public void testCold_DetailedThenTechnologyAverageThenAverageTable_FallbackToAverageTable() {
 		EmissionModule emissionModule = setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 
-		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
 		Map<Pollutant, Double> coldEmissions = emissionModule.getColdEmissionAnalysisModule()
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToAverageTable, startTime, parkingDuration, distance);
-//				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_AverageTable * link.getLength()/1000;
+		double expectedValue = emissionsFactorInGrammPerKilometer_AverageTable ;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -256,7 +244,6 @@ public class TestColdEmissionsFallbackBehaviour {
 	 */
 	private EmissionModule setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior lookupBehavior) {
 		Config config = ConfigUtils.createConfig();
-//		Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
 		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
