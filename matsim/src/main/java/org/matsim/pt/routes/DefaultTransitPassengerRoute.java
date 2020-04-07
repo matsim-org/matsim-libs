@@ -73,8 +73,8 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 		return routeDescription.boardingTime;
 	}
 
-	public void setBoardingTime(OptionalTime boardingTime) {
-		routeDescription.boardingTime = boardingTime;
+	public void setBoardingTime(double boardingTime) {
+		routeDescription.boardingTime = OptionalTime.defined(boardingTime);
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class DefaultTransitPassengerRoute extends AbstractRoute implements Trans
 
 		copy.setDistance(getDistance());
 		getTravelTime().ifDefined(copy::setTravelTime);
-		copy.setBoardingTime(getBoardingTime());
+		getBoardingTime().ifDefined(copy::setBoardingTime);
 
 		return copy;
 	}
