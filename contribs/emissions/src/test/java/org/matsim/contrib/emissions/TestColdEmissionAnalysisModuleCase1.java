@@ -60,8 +60,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * see test methods for details on the particular test cases
  */
 
-public class TestColdEmissionAnalysisModuleCase4 {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase4.class);
+public class TestColdEmissionAnalysisModuleCase1 {
+	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase1.class);
 	
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	
@@ -117,27 +117,14 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		setUp();
 		
 		List<ArrayList> testCases = new ArrayList<>();
-
-		ArrayList<Object> testCase4 = new ArrayList<>();
-
 		
-
-
-		// fourth case: no specifications for technology, size class or em concept
-		// -> falling back to average table
-		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
-
-//		// fifth case: cold emission factor not set - handled as 0.0
-//		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-//		// beim erstellen ueberpruefen dann test umschreiben
-//		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-		// this situation does not exist any more.  kai, jul'18
-
-		// sixth case: heavy goods vehicle
-		// -> throw warning -> use detailed or average table for passenger cars
-		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-
-		testCases.add( testCase4 );
+		ArrayList<Object> testCase1 = new ArrayList<>();
+		
+		// first case: complete data
+		// corresponding entry in average table
+		Collections.addAll( testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
+		
+		testCases.add( testCase1 );
 
 		
 		for ( List<Object> tc : testCases ) {
@@ -158,7 +145,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		}
 		
 	}
-	
+
 	private void setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
@@ -176,7 +163,8 @@ public class TestColdEmissionAnalysisModuleCase4 {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
-		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
+		//This test seems to refer to an direct lookup in average table??
+		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.directlyTryAverageTable);
 //		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 		

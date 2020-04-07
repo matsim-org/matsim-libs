@@ -60,8 +60,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * see test methods for details on the particular test cases
  */
 
-public class TestColdEmissionAnalysisModuleCase4 {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase4.class);
+public class TestColdEmissionAnalysisModuleCase2 {
+	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase2.class);
 	
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	
@@ -108,38 +108,18 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-		
-		/*
-		 * six test cases with complete input data
-		 * or input that should be assigned to average/default cases
-		 */
-		
 		setUp();
 		
 		List<ArrayList> testCases = new ArrayList<>();
-
-		ArrayList<Object> testCase4 = new ArrayList<>();
-
 		
+		ArrayList<Object> testCase2 = new ArrayList<>();
 
+		// second case: complete data
+		// corresponding entry in detailed table
+		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
 
-		// fourth case: no specifications for technology, size class or em concept
-		// -> falling back to average table
-		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
+		testCases.add( testCase2 );
 
-//		// fifth case: cold emission factor not set - handled as 0.0
-//		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-//		// beim erstellen ueberpruefen dann test umschreiben
-//		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-		// this situation does not exist any more.  kai, jul'18
-
-		// sixth case: heavy goods vehicle
-		// -> throw warning -> use detailed or average table for passenger cars
-		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-
-		testCases.add( testCase4 );
-
-		
 		for ( List<Object> tc : testCases ) {
 			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
 			HandlerToTestEmissionAnalysisModules.reset();
@@ -158,6 +138,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		}
 		
 	}
+
 	
 	private void setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
