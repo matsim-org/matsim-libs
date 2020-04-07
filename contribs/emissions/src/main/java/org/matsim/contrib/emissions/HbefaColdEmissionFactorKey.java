@@ -36,6 +36,15 @@ class HbefaColdEmissionFactorKey {
 	public HbefaColdEmissionFactorKey(){
 	}
 
+	public HbefaColdEmissionFactorKey(HbefaColdEmissionFactorKey key) {
+		this.hbefaVehicleCategory = key.getHbefaVehicleCategory();
+		this.hbefaComponent = key.getHbefaComponent();
+		this.hbefaParkingTime = key.getHbefaParkingTime();
+		this.hbefaDistance = key.getHbefaDistance();
+		this.hbefaVehicleAttributes = key.getHbefaVehicleAttributes();
+	}
+
+
 	HbefaVehicleCategory getHbefaVehicleCategory() {
 		return hbefaVehicleCategory;
 	}
