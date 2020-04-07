@@ -180,7 +180,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
-	@NotNull
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
 
 	@Nullable
@@ -461,7 +461,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #VEHICLES_FILE_EXP}
 	 */
 	public URL getVehiclesFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+		return vehiclesFile == null ? null : ConfigGroup.getInputFileURL(context, vehiclesFile);
 	}
 
 	/**
@@ -510,7 +510,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
 	public URL getTransitStopsFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.transitStopFile);
+		return ConfigGroup.getInputFileURL(context, transitStopFile);
 	}
 
 	/**
