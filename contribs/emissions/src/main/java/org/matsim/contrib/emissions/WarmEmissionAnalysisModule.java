@@ -415,7 +415,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						detailedTransformToHbefa4Cnt++;
 					}
 					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
 					// put this into a new key ...
 					efkey2.setHbefaVehicleAttributes(attribs2);
 					// ... and try to look up:
@@ -446,7 +446,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						detailedTransformToHbefa4Cnt++;
 					}
 					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
 					// put this into a new key ...
 					efkey2.setHbefaVehicleAttributes(attribs2);
 					// ... and try to look up:
@@ -498,7 +498,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						detailedTransformToHbefa4Cnt++;
 					}
 					HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
-					HbefaVehicleAttributes attribs2 = tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
+					HbefaVehicleAttributes attribs2 = EmissionUtils.tryRewriteHbefa3toHbefa4(vehicleInformationTuple);
 					// put this into a new key ...
 					efkey2.setHbefaVehicleAttributes(attribs2);
 					// ... and try to look up:
@@ -575,60 +575,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				"you should use another fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
-	/**
-	 *  try to re-write the key from hbefa3.x to hbefa4.x:
-	 */
-	private HbefaVehicleAttributes tryRewriteHbefa3toHbefa4(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
-		// try to re-write the key from hbefa3.x to hbefa4.x:
-		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
-
-		// technology is copied:
-		attribs2.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
-
-		// size class is "not specified":
-		attribs2.setHbefaSizeClass("not specified");
-
-		// em concept is re-written with different dashes:
-		switch (vehicleInformationTuple.getSecond().getHbefaEmConcept()) {
-			case "PC-P-Euro-1":
-				attribs2.setHbefaEmConcept("PC P Euro-1");
-				break;
-			case "PC-P-Euro-2":
-				attribs2.setHbefaEmConcept("PC P Euro-2");
-				break;
-			case "PC-P-Euro-3":
-				attribs2.setHbefaEmConcept("PC P Euro-3");
-				break;
-			case "PC-P-Euro-4":
-				attribs2.setHbefaEmConcept("PC P Euro-4");
-				break;
-			case "PC-P-Euro-5":
-				attribs2.setHbefaEmConcept("PC P Euro-5");
-				break;
-			case "PC-P-Euro-6":
-				attribs2.setHbefaEmConcept("PC P Euro-6");
-				break;
-			case "PC-D-Euro-1":
-				attribs2.setHbefaEmConcept("PC D Euro-1");
-				break;
-			case "PC-D-Euro-2":
-				attribs2.setHbefaEmConcept("PC D Euro-2");
-				break;
-			case "PC-D-Euro-3":
-				attribs2.setHbefaEmConcept("PC D Euro-3");
-				break;
-			case "PC-D-Euro-4":
-				attribs2.setHbefaEmConcept("PC D Euro-4");
-				break;
-			case "PC-D-Euro-5":
-				attribs2.setHbefaEmConcept("PC D Euro-5");
-				break;
-			case "PC-D-Euro-6":
-				attribs2.setHbefaEmConcept("PC D Euro-6");
-				break;
-		}
-		return attribs2;
-	}
 
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
 	private HbefaTrafficSituation getTrafficSituation(HbefaWarmEmissionFactorKey efkey, double averageSpeed_kmh, double freeFlowSpeed_kmh) {
