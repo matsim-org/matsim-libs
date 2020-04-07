@@ -59,6 +59,13 @@ public class TestColdEmissionsFallbackBehaviour {
 	private static final Double parkingDuration = 1.;
 	private static final int distance = 1;
 
+	//This are the expected values and extracted from  "./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.txt" and
+	// "./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.txt"
+	//Both for AmbientConditionPattern 0-1h, 0-1km
+	private final double emissionsFactorInGrammPerKilometer_Detailed = 3.337293625; 		//detailed table
+	private final double emissionsFactorInGrammPerKilometer_TechnologyAverage = 3.27173543;	//detailed table
+	private final double emissionsFactorInGrammPerKilometer_AverageTable = 5.043848991;		//average table
+
 
 // ---------   DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort)   -----------
 	/**
@@ -76,7 +83,8 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
+//		double expectedValue = 0.667458725; // = 200m * 3.337293625 g/km
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -131,7 +139,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -151,7 +159,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToTechnologyAverage, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
-		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage * link.getLength()/1000;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -189,7 +197,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFull, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = 30.34984742; // = 200m * 151.7492371 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed * link.getLength()/1000;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -209,7 +217,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToTechnologyAverage, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToTechnologyAverage, link, travelTimeOnLink);
 
-		double expectedValue = 31.53711548; // = 200m * 157.6855774 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage * link.getLength()/1000;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
@@ -231,7 +239,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(link.getId(), vehicleFallbackToAverageTable, startTime, parkingDuration, distance);
 //				.checkVehicleInfoAndCalculateWarmEmissions(vehicleFallbackToAverageTable, link, travelTimeOnLink);
 
-		double expectedValue = 31.1947174; // = 200m * 155.973587 g/km
+		double expectedValue = emissionsFactorInGrammPerKilometer_AverageTable * link.getLength()/1000;
 		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
