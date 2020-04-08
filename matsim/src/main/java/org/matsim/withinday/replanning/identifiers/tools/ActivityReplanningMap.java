@@ -46,7 +46,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -90,8 +89,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
 	
 	// package protected to be accessible for test case
-	/*package*/ double simStartTime = Time.getUndefinedTime();
-	/*package*/ double timeStepSize = Time.getUndefinedTime();
+	/*package*/ double simStartTime;
+	/*package*/ double timeStepSize;
 
 	@Inject
 	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
@@ -103,7 +102,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		this.startingAgents = new HashMap<>();
 		this.activityEndTimes = new HashMap<>();
 		
-		this.activityPerformingAgents = new ConcurrentHashMap<Integer, Map<Id<Person>, MobsimAgent>>();
+		this.activityPerformingAgents = new ConcurrentHashMap<>();
 	}
 
 	/*
