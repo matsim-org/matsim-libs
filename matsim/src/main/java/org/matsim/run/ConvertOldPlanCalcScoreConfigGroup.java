@@ -656,12 +656,12 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
 			testForLocked() ;
-			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt<1) ) {
+			this.minimalDuration = OptionalTime.defined(minimalDuration);
+			if (this.minimalDuration.isDefined() && minDurCnt < 1 ) {
 				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
 						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
 			}
-			this.minimalDuration = OptionalTime.defined(minimalDuration);
 		}
 
 		@StringGetter( "openingTime" )
