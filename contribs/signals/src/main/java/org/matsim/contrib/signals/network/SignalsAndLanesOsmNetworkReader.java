@@ -159,7 +159,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_01_adp";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_08";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -2089,7 +2089,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
 				// slight_right,sharp_right)
-				for (LinkVector lvec : tempLinks) {
+                //sbraun this is probably a bug, templink is always empty
+//				for (LinkVector lvec : tempLinks) {
+                for (LinkVector lvec : toLinks) {
 					if (lvec.dirTheta < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
 						tempLinks.add(lvec);
 				}
@@ -2485,8 +2487,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			this.calculateTheta();
 		}
 
-		//sbraun second constructor since we changed coordinates
-		public LinkVector(Link link, Coord oldToNode, Coord oldFromNode){
+		//sbraun second constructor since we changed coordinates //08042020 from and to node was mistakenly wrong order
+		public LinkVector(Link link, Coord oldFromNode, Coord oldToNode){
 			this.link = link;
 			this.x = oldToNode.getX() - oldFromNode.getX();
 			this.y = oldToNode.getY() - oldFromNode.getY();
