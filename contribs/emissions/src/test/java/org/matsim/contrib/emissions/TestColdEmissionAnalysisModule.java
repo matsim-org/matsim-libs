@@ -215,7 +215,7 @@ public class TestColdEmissionAnalysisModule {
 				Id<Link> linkId = Id.create( "linkId" + testCasesExceptions.indexOf( vehicleTypeId ), Link.class );
 				Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCasesExceptions.indexOf( vehicleTypeId ), Vehicle.class );
 				Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-				coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions( linkId, vehicle, startTime, parkingDuration, tableAccDistance );
+				coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
 			} catch ( Exception e ) {
 				excep = true;
 			}
@@ -240,7 +240,7 @@ public class TestColdEmissionAnalysisModule {
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId7, VehicleUtils.getFactory().createVehicleType( vehInfo11 ) );
 		
 		HandlerToTestEmissionAnalysisModules.reset();
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions( linkId11, vehicle, startTime, parkingDuration, tableAccDistance );
+		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId11, startTime, parkingDuration, tableAccDistance);
 		String message = "The expected emissions for an emissions event with vehicle information string '" + vehInfo11 + "' are " +
 						     numberOfColdEmissions * averageAverageFactor + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );

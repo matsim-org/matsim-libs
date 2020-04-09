@@ -112,14 +112,13 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
             } else{
 
                 if( (distance / 1000) > 1.0 ){
-                    Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(
+                    Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(),
+                            vehicleId,
                             coldEmissionEventLinkId,
-                            vehicle,
                             event.getTime(),
-                            parkingDuration,
-                            2);
+                            parkingDuration, 2);
 
-                    coldEmissionAnalysisModule.throwColdEmissionEvent(linkId, vehicle, event.getTime(), coldEmissions);
+                    coldEmissionAnalysisModule.throwColdEmissionEvent(vehicle.getId(), linkId, event.getTime(), coldEmissions);
 
                     this.vehicleId2accumulatedDistance.remove( vehicleId );
                 } else{
@@ -194,13 +193,9 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
             handleNullVehicle( vehicleId, emissionsConfigGroup );
         } else{
             Map<Pollutant, Double> coldEmissions = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(
-                            linkId,
-                            vehicle,
-                            startEngineTime,
-                            parkingDuration,
-                            1);
+                    vehicle.getType(), vehicleId, linkId, startEngineTime, parkingDuration, 1);
 
-            coldEmissionAnalysisModule.throwColdEmissionEvent(linkId, vehicle, startEngineTime, coldEmissions);
+            coldEmissionAnalysisModule.throwColdEmissionEvent(vehicleId, linkId, startEngineTime, coldEmissions);
             // yyyy again, I do not know what the "distance" does.  kai, jan'20
         }
     }

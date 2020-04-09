@@ -151,7 +151,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 			logger.info("VehicleId: " + vehicle.getId().toString());
 			logger.info("VehicleTypeId: " + vehicle.getType().getId());
 			
-			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions( linkId, vehicle, startTime, parkingDuration, tableAccDistance );
+			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
 			String message = "The expected emissions for " + tc.toString() + " are " +
 							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );

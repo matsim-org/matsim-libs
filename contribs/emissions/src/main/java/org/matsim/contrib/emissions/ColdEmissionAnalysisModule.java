@@ -91,13 +91,9 @@ final class ColdEmissionAnalysisModule {
 	}
 
 	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(
-			Id<Link> coldEmissionEventLinkId,
-			Vehicle vehicle,
-			double eventTime,
-			double parkingDuration,
-			int distance_km ) {
+			VehicleType vehicleType, Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId,
+			double eventTime, double parkingDuration, int distance_km) {
 
-		VehicleType vehicleType = vehicle.getType();
 		{
 			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
@@ -112,15 +108,15 @@ final class ColdEmissionAnalysisModule {
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
-		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
+		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicleId, parkingDuration, vehicleInformationTuple, distance_km );
 
-		throwColdEmissionEvent(coldEmissionEventLinkId, vehicle, eventTime, coldEmissions);
+		throwColdEmissionEvent(vehicleId, coldEmissionEventLinkId, eventTime, coldEmissions);
 
 		return coldEmissions;
 	}
 
-	/*package-private*/ void throwColdEmissionEvent(Id<Link> coldEmissionEventLinkId, Vehicle vehicle, double eventTime, Map<Pollutant, Double> coldEmissions) {
-		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
+	/*package-private*/ void throwColdEmissionEvent(Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId, double eventTime, Map<Pollutant, Double> coldEmissions) {
+		Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicleId, coldEmissions);
 		this.eventsManager.processEvent(coldEmissionEvent);
 	}
 
