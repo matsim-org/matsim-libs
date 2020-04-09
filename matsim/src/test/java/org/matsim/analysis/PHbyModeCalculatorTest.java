@@ -15,6 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -23,6 +24,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -35,6 +37,9 @@ public class PHbyModeCalculatorTest {
 	private static int car_travel;
 	private static int pt_travel;
 	private static int walk_travel;
+	private static int pt_wait;
+	private static int stageActivity_wait;
+	
 
 	Id<Person> person1 = Id.create("person1", Person.class);
 	Id<Person> person2 = Id.create("person2", Person.class);
@@ -120,6 +125,8 @@ public class PHbyModeCalculatorTest {
 		modeValues.put("car", 0.0);
 		modeValues.put("pt", 0.0);
 		modeValues.put("walk", 0.0);
+		modeValues.put("pt_wait", 0.0);
+		modeValues.put("stageActivity_wait", 0.0);
 
 		Iterator<Plan> pesronItr = map.iterator();
 		while (pesronItr.hasNext()) {
@@ -130,9 +137,23 @@ public class PHbyModeCalculatorTest {
 					String mode = ((Leg) elem).getMode();
 					Double value = modeValues.get(mode);
 					value += (mode != "pt") ? ((Leg) elem).getRoute().getTravelTime()
-							: (Double) elem.getAttributes()
-									.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
+							: ((Leg) elem).getRoute().getTravelTime() - ((Double) elem.getAttributes()
+									.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime()) ;
 					modeValues.put(mode, value);
+					if(mode == "pt") {
+						Double wait_value = modeValues.get("pt_wait");
+						wait_value += (Double) elem.getAttributes()
+								.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime();
+						modeValues.put("pt_wait", wait_value);
+					}
+						
+				}else if(elem instanceof Activity) {
+					Activity act = (Activity) elem;
+					if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
+						Double stageActivity_wait_value = modeValues.get("stageActivity_wait");
+						stageActivity_wait_value += act.getEndTime().orElse(0) - act.getStartTime().orElse(0);
+						modeValues.put("stageActivity_wait", stageActivity_wait_value);
+					}
 				}
 			}
 		}
@@ -145,7 +166,7 @@ public class PHbyModeCalculatorTest {
 			String firstRow = br.readLine();
 			String[] columnNames = firstRow.split("	");
 			decideColumns(columnNames);
-			int iteration = 0;
+			int iteration = 1;
 			while ((line = br.readLine()) != null) {
 				if (iteration == itr) {
 					String[] column = line.split("	");
@@ -154,6 +175,8 @@ public class PHbyModeCalculatorTest {
 					Double car_travel_value = Double.valueOf(column[car_travel]);
 					Double pt_travel_value = Double.valueOf(column[pt_travel]);
 					Double walk_travel_value = Double.valueOf(column[walk_travel]);
+					Double pt_wait_value = Double.valueOf(column[pt_wait]);
+					Double stageActivity_wait_value = Double.valueOf(column[stageActivity_wait]);
 
 					Assert.assertEquals("car_travel hour does not match", (modeValues.get("car") / 3600.0),
 							car_travel_value, 0);
@@ -161,9 +184,10 @@ public class PHbyModeCalculatorTest {
 							pt_travel_value, 0);
 					Assert.assertEquals("walk_travel hour does not match", (modeValues.get("walk") / 3600.0),
 							walk_travel_value, 0);
-					System.out.println("car "+modeValues.get("car"));
-					System.out.println("pt "+modeValues.get("pt"));
-					System.out.println("walk "+modeValues.get("walk"));
+					Assert.assertEquals("pt_wait hour does not match", (modeValues.get("pt_wait") / 3600.0),
+							pt_wait_value, 0);
+					Assert.assertEquals("stageActivity_wait hour does not match", (modeValues.get("stageActivity_wait") / 3600.0),
+							stageActivity_wait_value, 0);
 					
 					break;
 				}
@@ -194,6 +218,14 @@ public class PHbyModeCalculatorTest {
 
 			case "walk_travel":
 				walk_travel = i;
+				break;
+				
+			case "pt_wait":
+				pt_wait = i;
+				break;
+				
+			case "stageActivity_wait":
+				stageActivity_wait = i;
 				break;
 
 			}
