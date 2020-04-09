@@ -25,7 +25,6 @@ import java.util.Collections;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -93,7 +92,7 @@ public class DefaultTransitPassengerRouteTest extends TestCase {
 		TransitLine line = builder.createTransitLine(Id.create(5, TransitLine.class));
 		TransitRoute tRoute = builder.createTransitRoute(Id.create(6, TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), "bus");
 		DefaultTransitPassengerRoute route = new DefaultTransitPassengerRoute(stop1, line, tRoute, stop2);
-		route.setBoardingTime(OptionalTime.defined(123.0));
+		route.setBoardingTime(123.0);
 		assertEquals(stop1.getId(), route.getAccessStopId());
 		assertEquals(line.getId(), route.getLineId());
 		assertEquals(tRoute.getId(), route.getRouteId());
