@@ -417,7 +417,7 @@ public final class EmissionModule {
 		}
 
 		private Integer mapAmbientCondPattern2Distance( String string ) {
-			Integer distance;
+			int distance;
 			String distanceString = string.split(",")[2];
 			String upperbound = distanceString.split("-")[1];
 			distance = Integer.parseInt(upperbound.split("k")[0]);
