@@ -290,14 +290,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
-				fractionStopGo = getFractionStopAndGo( vehicleId, freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
+				fractionStopGo = getFractionStopAndGo(freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
 				logger.info("fractionStopGo is: " + fractionStopGo);
 
 				double efStopGo_gpkm = 0. ;
 				if ( fractionStopGo>0 ){
 					// compute emissions from stop-go fraction:
 					efkey.setHbefaTrafficSituation( STOPANDGO );
-					efStopGo_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
+					efStopGo_gpkm = getEf(vehicleInformationTuple, efkey ).getWarmEmissionFactor();
 					logger.warn( "pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm );
 				}
 
@@ -305,7 +305,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				if ( fractionStopGo<1.){
 					// compute emissions for free-flow fraction:
 					efkey.setHbefaTrafficSituation( FREEFLOW );
-					efFreeFlow_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
+					efFreeFlow_gpkm = getEf(vehicleInformationTuple, efkey ).getWarmEmissionFactor();
 					logger.warn( "pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm );
 				}
 
@@ -314,7 +314,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				ef_gpkm = (fractionFreeFlow * efFreeFlow_gpkm) + (fractionStopGo * efStopGo_gpkm);
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
-				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+				ef_gpkm = getEf(vehicleInformationTuple, efkey).getWarmEmissionFactor();
 			} else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}
@@ -337,13 +337,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return warmEmissionsOfEvent;
 	}
 
-	private double getFractionStopAndGo(Id<Vehicle> vehicleId,
-										double freeFlowSpeed_kmh, double averageSpeed_kmh,
+	private double getFractionStopAndGo(double freeFlowSpeed_kmh, double averageSpeed_kmh,
 										Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple,
 										HbefaWarmEmissionFactorKey efkey) {
 
 		efkey.setHbefaTrafficSituation(STOPANDGO);
-		double stopGoSpeedFromTable_kmh = getEf(vehicleId, vehicleInformationTuple, efkey).getSpeed();
+		double stopGoSpeedFromTable_kmh = getEf(vehicleInformationTuple, efkey).getSpeed();
 
 		double fractionStopGo;
 
@@ -358,7 +357,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return fractionStopGo;
 	}
 
-	private HbefaWarmEmissionFactor getEf(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
+	private HbefaWarmEmissionFactor getEf(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
 
 		switch (ecg.getDetailedVsAverageLookupBehavior()) {
 			case onlyTryDetailedElseAbort:
@@ -611,12 +610,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}
-	/*package-private*/ private int getHeavyOccurences() {
-		return heavyFlowCounter;
-	}
-	/*package-private*/ private int getSaturatedOccurences() {
-		return saturatedCounter;
-	}
+	/*package-private*/ private int getHeavyOccurences() { return heavyFlowCounter; }
+	/*package-private*/ private int getSaturatedOccurences() { return saturatedCounter; }
 	/*package-private*/ int getStopGoOccurences() {
 		return stopGoCounter;
 	}

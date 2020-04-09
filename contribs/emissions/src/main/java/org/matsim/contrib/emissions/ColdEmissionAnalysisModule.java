@@ -163,19 +163,18 @@ final class ColdEmissionAnalysisModule {
 		for ( Pollutant coldPollutant : coldPollutants) {
 			double generatedEmissions;
 			if (distance_km == 1) {
-				generatedEmissions = getEmissionsFactor(vehicleId, vehicleInformationTuple, 1, key, coldPollutant).getColdEmissionFactor();
+				generatedEmissions = getEmissionsFactor(vehicleInformationTuple, 1, key, coldPollutant).getColdEmissionFactor();
 			} else {
-				generatedEmissions = getEmissionsFactor(vehicleId, vehicleInformationTuple, 2, key, coldPollutant).getColdEmissionFactor() - getEmissionsFactor(vehicleId, vehicleInformationTuple, 1, key, coldPollutant).getColdEmissionFactor();
+				generatedEmissions = getEmissionsFactor(vehicleInformationTuple, 2, key, coldPollutant).getColdEmissionFactor() - getEmissionsFactor(vehicleInformationTuple, 1, key, coldPollutant).getColdEmissionFactor();
 			}
 			coldEmissionsOfEvent.put(coldPollutant, generatedEmissions);
 		}
 		return coldEmissionsOfEvent;
 	}
 
-	private HbefaColdEmissionFactor getEmissionsFactor(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant ) {
+	private HbefaColdEmissionFactor getEmissionsFactor(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, int distance_km, HbefaColdEmissionFactorKey efkey, Pollutant coldPollutant) {
 
 		efkey.setHbefaDistance(distance_km);
-		HbefaColdEmissionFactor hbefaColdEmissionFactor = null;
 
 		efkey.setHbefaComponent(coldPollutant);
 		efkey.setHbefaVehicleAttributes(vehicleInformationTuple.getSecond());
