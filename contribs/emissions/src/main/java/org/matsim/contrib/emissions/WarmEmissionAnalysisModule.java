@@ -56,8 +56,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup ecg;
 
-	private int vehAttributesNotSpecifiedCnt = 0;
-
 	private int detailedReadingInfoCnt = 0;
 	private int detailedTransformToHbefa4Cnt = 0;
 	private int detailedFallbackTechAverageWarnCnt = 0;
@@ -173,7 +171,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	void reset() {
 		logger.info("resetting counters...");
-		vehAttributesNotSpecifiedCnt = 0;
 
 		freeFlowCounter = 0;
 		saturatedCounter = 0;

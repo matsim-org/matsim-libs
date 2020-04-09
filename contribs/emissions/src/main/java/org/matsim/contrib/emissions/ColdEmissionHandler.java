@@ -73,12 +73,13 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
 
         @Override
     public void reset(int iteration) {
+        logger.info("resetting counters...");
         vehicleId2stopEngineTime.clear();
         vehicleId2accumulatedDistance.clear();
         vehicleId2parkingDuration.clear();
         vehicleId2coldEmissionEventLinkId.clear();
-        coldEmissionAnalysisModule.reset();
-    }
+
+        }
 
     private static int noVehWarnCnt=0;
 

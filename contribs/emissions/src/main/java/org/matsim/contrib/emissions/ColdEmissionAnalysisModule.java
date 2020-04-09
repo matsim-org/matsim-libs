@@ -72,12 +72,7 @@ final class ColdEmissionAnalysisModule {
 	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup ecg;
 
-	private int vehInfoWarnHDVCnt = 0;
-	private int vehAttributesNotSpecifiedCnt = 0;
-	private static final int maxWarnCnt = 3;
-	private int vehInfoWarnMotorCylceCnt = 0;
 	private final Set<Pollutant> coldPollutants;
-	private int noVehWarnCnt = 0;
 
 	private int detailedReadingInfoCnt = 0;
 	private int detailedTransformToHbefa4Cnt = 0;
@@ -93,12 +88,6 @@ final class ColdEmissionAnalysisModule {
 		this.eventsManager = eventsManager;
 		this.ecg = ecg;
 		this.coldPollutants = coldPollutants;
-	}
-
-	public void reset() {
-		logger.info("resetting counters...");
-		vehInfoWarnHDVCnt = 0;
-		vehAttributesNotSpecifiedCnt = 0;
 	}
 
 	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(
