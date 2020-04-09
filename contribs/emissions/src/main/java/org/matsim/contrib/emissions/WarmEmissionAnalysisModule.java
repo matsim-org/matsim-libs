@@ -29,7 +29,6 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -220,46 +219,15 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Map<Pollutant, Double> warmEmissions
 				= calculateWarmEmissions( vehicleId, travelTime, EmissionUtils.getHbefaRoadType( link ), freeVelocity, link.getLength(), vehicleInformationTuple );
 
-		// a basic apporach to introduce emission reduced cars:
-		// yy this should be deprecated. kai, jan'20
-//		if( ecg.getEmissionEfficiencyFactor()!=1. ) {
-//			warmEmissions = rescaleWarmEmissions(warmEmissions, ecg.getEmissionEfficiencyFactor();
-//		}
 		return warmEmissions;
 	}
 
-//	static Map<Pollutant, Double> rescaleWarmEmissions( Map<Pollutant, Double> warmEmissions, double emissionEfficiencyFactor ) {
-//		Map<Pollutant, Double> rescaledWarmEmissions = new HashMap<>();
-//		for( Pollutant wp : warmEmissions.keySet()){
-//			Double orgValue = warmEmissions.get(wp);
-//			Double rescaledValue = emissionEfficiencyFactor * orgValue;
-//			rescaledWarmEmissions.put(wp, rescaledValue);
-//		}
-//		return rescaledWarmEmissions;
-//	}
 
 	private static int cnt =10;
 	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
 														   double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
 
 		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>( Pollutant.class );
-
-//		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
-//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-//		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
-//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
-//		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-//			for (WarmPollutant warmPollutant : warmPollutants) {
-//				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
-//			}
-//			// I am doubtful that the above is useful ... e.g. tire emissions will also exist for electric vehicles.  kai, jan'20
-//			return warmEmissionsOfEvent;
-//		} else {
-//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-//		}
-
-		// the above had a fall-through to passenger car ... which for, e.g., bicycles would be totally wrong.  Thus new version follows, which
-		// should crash if enum not known:
 
 		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
 		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {

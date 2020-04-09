@@ -141,20 +141,6 @@ public final class EmissionModule {
 	private void createLookupTables( URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
 					 URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile ) {
 		logger.info("entering createLookupTables");
-		
-//		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
-//			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
-//					"However, no information is provided. Aborting...");
-//		} else {
-//			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-//				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
-//					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
-//					// However, this should be removed if not set intentionally. Amit May'17
-//					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
-//							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
-//				}
-//			}
-//		}
 
 		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
 			case onlyTryDetailedElseAbort:
@@ -175,18 +161,6 @@ public final class EmissionModule {
 				throw new IllegalStateException("Unexpected value: " + emissionConfigGroup.getDetailedVsAverageLookupBehavior());
 		}
 
-//		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
-//			avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-//			avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-//		}
-//
-//		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
-//			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
-//			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
-//		}
-//		else{
-//			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
-//		}
 		logger.info("leaving createLookupTables");
 
 		//create HBEFA Speed tables. try on detailed values first.
@@ -463,14 +437,6 @@ public final class EmissionModule {
 		}
 
 	}
-
-//	private SortedSet<String> getCombinedPollutantList() {
-//		SortedSet<String> distinct = new TreeSet<String>();
-//		distinct.addAll(warmPollutants);
-//		distinct.addAll(coldPollutants);
-//		return distinct;
-//
-//	}
 
     public LinkEmissionsCalculator getWarmEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
