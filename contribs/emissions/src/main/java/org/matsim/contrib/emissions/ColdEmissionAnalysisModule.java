@@ -217,7 +217,7 @@ final class ColdEmissionAnalysisModule {
 //
 //		logger.warn( "the above needs to be fixed in the same way as in the cold table" );
 
-		logger.warn("VehId: " + vehicleId + " ; Tuple.first = " +vehicleInformationTuple.getFirst());
+		logger.debug("VehId: " + vehicleId + " ; Tuple.first = " +vehicleInformationTuple.getFirst());
 		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
 		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
 			for ( Pollutant coldPollutant : coldPollutants) {
@@ -238,8 +238,7 @@ final class ColdEmissionAnalysisModule {
 		// translate vehicle information type into factor key.  yyyy maybe combine these two? kai, jan'20
 		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 		key.setHbefaVehicleCategory( vehicleInformationTuple.getFirst() );
-		logger.warn("Road type is not set. Check if neccessary! (Was copied  from ColdEmissions.) KMT Apr 20");
-//		efkey.setHbefaRoadCategory( roadType );
+
 		if(this.detailedHbefaColdTable != null){
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
