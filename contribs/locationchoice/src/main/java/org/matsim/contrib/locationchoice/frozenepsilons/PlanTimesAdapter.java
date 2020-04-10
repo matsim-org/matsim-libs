@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
 
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
@@ -58,7 +57,7 @@ class PlanTimesAdapter {
 		// yy The honest way of doing the following would be using the psim. kai, mar'19
 		boolean firstAct = true ;
 		Activity rememberedActivity = null ;
-		double now = Time.getUndefinedTime() ;
+		double now = Double.NaN ;
 		for( PlanElement pe : planTmp.getPlanElements() ){
 			if ( pe instanceof Activity ) {
 				rememberedActivity = (Activity) pe;
