@@ -190,9 +190,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 			// disutility if too late
 
-			double latestStartTime = actParams.getLatestStartTime();
-			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
+			OptionalTime latestStartTime = actParams.getLatestStartTime();
+			if ((latestStartTime.isDefined()) && (activityStart > latestStartTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
@@ -241,9 +241,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 			}
 
 			// disutility if stopping too early
-			double earliestEndTime = actParams.getEarliestEndTime();
-			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
+			if ((earliestEndTime.isDefined()) && (activityEnd < earliestEndTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
 			}
 
 			// disutility if going to away to late
@@ -252,9 +252,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 			}
 
 			// disutility if duration was too short
-			double minimalDuration = actParams.getMinimalDuration();
-			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+			OptionalTime minimalDuration = actParams.getMinimalDuration();
+			if ((minimalDuration.isDefined()) && (duration < minimalDuration.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
 			}
 		}
 		return tmpScore;
@@ -268,14 +268,14 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 					"(module name=\"planCalcScore\" in the config file).");
 		}
 
-		double openingTime = actParams.getOpeningTime();
-		double closingTime = actParams.getClosingTime();
+		OptionalTime openingTime = actParams.getOpeningTime();
+		OptionalTime closingTime = actParams.getClosingTime();
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
 
-		return new OptionalTime[]{OptionalTime.defined(openingTime), OptionalTime.defined(closingTime)};
+		return new OptionalTime[]{openingTime, closingTime};
 	}
 
 	private final void handleOvernightActivity(Activity lastActivity) {

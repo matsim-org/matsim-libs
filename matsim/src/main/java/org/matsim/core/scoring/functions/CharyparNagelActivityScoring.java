@@ -150,9 +150,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 			// disutility if too late
 
-			double latestStartTime = actParams.getLatestStartTime();
-			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
+			OptionalTime latestStartTime = actParams.getLatestStartTime();
+			if (latestStartTime.isDefined() && (activityStart > latestStartTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
 			}
 
 			// utility of performing an action, duration is >= 1, thus log is no problem
@@ -201,9 +201,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			// disutility if stopping too early
-			double earliestEndTime = actParams.getEarliestEndTime();
-			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
+			OptionalTime earliestEndTime = actParams.getEarliestEndTime();
+			if ((earliestEndTime.isDefined()) && (activityEnd < earliestEndTime.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
 			}
 
 			// disutility if going to away to late
@@ -212,9 +212,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			}
 
 			// disutility if duration was too short
-			double minimalDuration = actParams.getMinimalDuration();
-			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
+			OptionalTime minimalDuration = actParams.getMinimalDuration();
+			if ((minimalDuration.isDefined()) && (duration < minimalDuration.seconds())) {
+				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
 			}
 		}
 		return tmpScore;

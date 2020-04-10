@@ -40,13 +40,13 @@ public class ActivityTypeOpeningIntervalCalculator implements OpeningIntervalCal
 					"(module name=\"planCalcScore\" in the config file).");
 		}
 
-		double openingTime = actParams.getOpeningTime();
-		double closingTime = actParams.getClosingTime();
+		OptionalTime openingTime = actParams.getOpeningTime();
+		OptionalTime closingTime = actParams.getClosingTime();
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
 
-		return new OptionalTime[]{OptionalTime.defined(openingTime), OptionalTime.defined(closingTime)};
+		return new OptionalTime[]{openingTime, closingTime};
 	}
 }
