@@ -22,6 +22,7 @@ package org.matsim.core.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -120,21 +121,21 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = openingIntervalCalculator.getOpeningInterval(act);
-			double openingTime = openingInterval[0];
-			double closingTime = openingInterval[1];
+			OptionalTime[] openingInterval = openingIntervalCalculator.getOpeningInterval(act);
+			OptionalTime openingTime = openingInterval[0];
+			OptionalTime closingTime = openingInterval[1];
 
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-				activityStart = openingTime;
+			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
+				activityStart = openingTime.seconds();
 			}
-			if ((closingTime >= 0) && (closingTime < departureTime)) {
-				activityEnd = closingTime;
+			if (closingTime.isDefined() && closingTime.seconds() < departureTime) {
+				activityEnd = closingTime.seconds();
 			}
-			if ((openingTime >= 0) && (closingTime >= 0)
-					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			if (openingTime.isDefined() && closingTime.isDefined()
+					&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 				// agent could not perform action
 				activityStart = departureTime;
 				activityEnd = departureTime;
@@ -230,8 +231,8 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 			
 			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
-				double[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
-				if (openInterval[0] >= 0 || openInterval[1] >= 0){
+				OptionalTime[] openInterval = openingIntervalCalculator.getOpeningInterval(lastActivity);
+				if (openInterval[0].isDefined() || openInterval[1].isDefined()){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
