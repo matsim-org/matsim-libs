@@ -174,7 +174,7 @@ public class Time {
 	 * @throws IllegalArgumentException when the string cannot be interpreted as a valid time.
 	 */
 	public static final double parseTime(final String time) {
-		return parseTime(time, ':').orElse(UNDEFINED_TIME);
+		return parseTime(time, ':').seconds();
 	}
 
 	public static final OptionalTime parseOptionalTime(final String time) {
