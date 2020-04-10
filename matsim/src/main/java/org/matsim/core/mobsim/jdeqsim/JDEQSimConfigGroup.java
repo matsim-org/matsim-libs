@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -59,7 +60,7 @@ public class JDEQSimConfigGroup extends ReflectiveConfigGroup {
 	public final static String END_TIME = "endTime";
 
 	// INPUT
-	private double simulationEndTime = Double.MAX_VALUE; // in s
+	private OptionalTime simulationEndTime = OptionalTime.undefined();
 	private double gapTravelSpeed = 15.0; // in m/s
 	private double flowCapacityFactor = 1.0;
 	private double storageCapacityFactor = 1.0;
@@ -89,23 +90,15 @@ public class JDEQSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(END_TIME)
 	public String getSimulationEndTimeAsString() {
-		if (simulationEndTime != Double.MAX_VALUE) {
-			return Time.writeTime(simulationEndTime);
-		}
-		else {
-			return Time.writeTime(Time.getUndefinedTime());
-		}
+		return Time.writeTime(simulationEndTime);
 	}
 
 	@StringSetter(END_TIME)
 	public void setSimulationEndTime(String simulationEndTime) {
-		double parsedTime = Time.parseTime(simulationEndTime);
-		if (!Time.isUndefinedTime(parsedTime)) {
-			this.simulationEndTime = parsedTime;
-		}
+		this.simulationEndTime = Time.parseOptionalTime(simulationEndTime);
 	}
 
-	public double getSimulationEndTime() {
+	public OptionalTime getSimulationEndTime() {
 		return simulationEndTime;
 	}
 
