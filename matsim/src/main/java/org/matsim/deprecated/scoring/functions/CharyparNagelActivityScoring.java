@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 
@@ -160,21 +161,21 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = this.getOpeningInterval(act);
-			double openingTime = openingInterval[0];
-			double closingTime = openingInterval[1];
+			OptionalTime[] openingInterval = this.getOpeningInterval(act);
+			OptionalTime openingTime = openingInterval[0];
+			OptionalTime closingTime = openingInterval[1];
 
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-				activityStart = openingTime;
+			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
+				activityStart = openingTime.seconds();
 			}
-			if ((closingTime >= 0) && (closingTime < departureTime)) {
-				activityEnd = closingTime;
+			if (closingTime.isDefined() && closingTime.seconds() < departureTime) {
+				activityEnd = closingTime.seconds();
 			}
-			if ((openingTime >= 0) && (closingTime >= 0)
-					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			if (openingTime.isDefined() && closingTime.isDefined()
+					&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 				// agent could not perform action
 				activityStart = departureTime;
 				activityEnd = departureTime;
@@ -259,7 +260,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 		return tmpScore;
 	}
 
-	protected double[] getOpeningInterval(final Activity act) {
+	protected OptionalTime[] getOpeningInterval(final Activity act) {
 
 		ActivityUtilityParameters actParams = this.params.utilParams.get(act.getType());
 		if (actParams == null) {
@@ -273,9 +274,8 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{openingTime, closingTime};
 
-		return openInterval;
+		return new OptionalTime[]{OptionalTime.defined(openingTime), OptionalTime.defined(closingTime)};
 	}
 
 	private final void handleOvernightActivity(Activity lastActivity) {
@@ -286,8 +286,8 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
 			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
-				double[] openInterval = this.getOpeningInterval(lastActivity);
-				if (openInterval[0] >= 0 || openInterval[1] >= 0){
+				OptionalTime[] openInterval = this.getOpeningInterval(lastActivity);
+				if (openInterval[0].isDefined() || openInterval[1].isDefined()){
 					log.warn("There are opening or closing times defined for the first and last activity. The correctness of the scoring function can thus not be guaranteed.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;

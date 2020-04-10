@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -128,21 +127,21 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = this.getOpeningInterval(act);
-			double openingTime = openingInterval[0];
-			double closingTime = openingInterval[1];
+			OptionalTime[] openingInterval = this.getOpeningInterval(act);
+			OptionalTime openingTime = openingInterval[0];
+			OptionalTime closingTime = openingInterval[1];
 
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-				activityStart = openingTime;
+			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
+				activityStart = openingTime.seconds();
 			}
-			if ((closingTime >= 0) && (closingTime < departureTime)) {
-				activityEnd = closingTime;
+			if (closingTime.isDefined() && closingTime.seconds() < departureTime) {
+				activityEnd = closingTime.seconds();
 			}
-			if ((openingTime >= 0) && (closingTime >= 0)
-					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			if (openingTime.isDefined() && closingTime.isDefined()
+					&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 				// agent could not perform action
 				activityStart = departureTime;
 				activityEnd = departureTime;
@@ -226,11 +225,11 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 	
 	@Override
 	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-	protected double[] getOpeningInterval(Activity act) {
+	protected OptionalTime[] getOpeningInterval(Activity act) {
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.getUndefinedTime(), Time.getUndefinedTime()};
+		OptionalTime[] openInterval = {OptionalTime.undefined(), OptionalTime.undefined()};
 		boolean foundAct = false;
 
 		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16
@@ -255,12 +254,16 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday/wk open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Double.MAX_VALUE;
-					openInterval[1] = Double.MIN_VALUE;
+					double opening = Double.MAX_VALUE;
+					double closing = Double.MIN_VALUE;
+
 					for (OpeningTime opentime : opentimes) {
-						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+						opening = Math.min(opening, opentime.getStartTime());
+						closing = Math.max(closing, opentime.getEndTime());
 					}
+
+					openInterval[0] = OptionalTime.defined(opening);
+					openInterval[1] = OptionalTime.defined(closing);
 				}
 			}
 		}
