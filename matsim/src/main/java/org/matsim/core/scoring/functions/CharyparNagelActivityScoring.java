@@ -23,7 +23,6 @@ package org.matsim.core.scoring.functions;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -32,14 +31,10 @@ import org.matsim.core.utils.misc.Time;
  * @author rashid_waraich
  */
 public final class CharyparNagelActivityScoring implements org.matsim.core.scoring.SumScoringFunction.ActivityScoring {
-
-	private double score;
-	private double currentActivityStartTime;
-	private double firstActivityEndTime;
-
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.getUndefinedTime();
 	private static final double INITIAL_SCORE = 0.0;
+
+	private double score = INITIAL_SCORE;
+
 
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
@@ -57,9 +52,6 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	public CharyparNagelActivityScoring(final ScoringParameters params, final OpeningIntervalCalculator openingIntervalCalculator) {
 		this.params = params;
-		this.currentActivityStartTime = INITIAL_LAST_TIME;
-		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
-		this.score = INITIAL_SCORE;
 
 //		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
@@ -242,8 +234,9 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 					firstLastActOpeningTimesWarning++;
 				}
 			}
-			
-			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
+
+			double calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
+					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
 			// the first Act and the last Act have NOT the same type:
@@ -263,9 +256,10 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 				}
 
 				// score first activity
-				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+				this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 				// score last activity
-				this.score += calcActScore(this.currentActivityStartTime, this.params.simulationPeriodInDays * 24*3600, lastActivity);
+				this.score += calcActScore(lastActivity.getStartTime().seconds(),
+						this.params.simulationPeriodInDays * 24 * 3600, lastActivity);
 			}
 		}
 	}
@@ -273,13 +267,12 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	private void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
-		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+		this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 	}
 
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime().seconds();
 		this.firstActivity = act;
 	}
 
@@ -290,7 +283,6 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime().seconds();
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
 	}
