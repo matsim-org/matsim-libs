@@ -11,6 +11,16 @@ import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+/**
+ * Network reader which adds bicycle specific properties to the generated matsim-network. These include:
+ * - {@link TransportMode#bike} is added as allowed transport mode
+ * - Surface, smoothness are stored as link attributes
+ * - Cycleway and restriction attributes are set as link attributes as well
+ * - sets bicycleInfrastructureSpeedFactor to 0.5 on each link which has allowed mode {@link TransportMode#bike}
+ * <p>
+ * Additionally the osm-highway-tags cycleway, service, track, footway, pedestrian, path, steps are parsed from the
+ * original osm-network.
+ */
 public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";

@@ -382,6 +382,9 @@ public class SupersonicOsmNetworkReader {
          * original osm-network within the output matsim-network for e.g. counts the filter can prevent the removal of
          * the node with the supplied id
          * <p>
+         * Setting the filter to '() -> true' will omit network simplification entirely and is equivalent to the 'keepPath'
+         * option of the previous OsmNetworkReader
+         * <p>
          * Note: The supplied function is invoked concurrently
          *
          * @param preserveNodeWithId Predicate which returns true if the node corresponding to the supplied id must not
