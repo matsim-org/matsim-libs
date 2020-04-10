@@ -26,7 +26,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 
 /**
@@ -40,14 +39,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	// yy should be final.  kai, oct'14
 	// yyyy "implements SumScoringFunction.ActivityScoring" is needed somewhere in location choice ... where this
 	// really should be changed to delegation.  kai, aug'18
-
-	protected double score;
-	private double currentActivityStartTime;
-	private double firstActivityEndTime;
-
-	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.getUndefinedTime();
 	private static final double INITIAL_SCORE = 0.0;
+
+	protected double score = INITIAL_SCORE;
 
 	private static int firstLastActWarning = 0;
 	private static short firstLastActOpeningTimesWarning = 0;
@@ -69,10 +63,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	@Override
 	public void reset() {
 		this.firstAct = true;
-		this.currentActivityStartTime = INITIAL_LAST_TIME;
-		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
-		this.score = INITIAL_SCORE;
-		
+
 		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
 	}
@@ -82,7 +73,6 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	public void startActivity(final double time, final Activity act) {
 		assert act != null;
 		this.currentActivity = act;
-		this.currentActivityStartTime = time;
 	}
 
 	@Override
@@ -91,11 +81,10 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 		assert act != null;
 		assert currentActivity == null || currentActivity.getType().equals(act.getType());
 		if (this.firstAct) {
-			this.firstActivityEndTime = time;
 			this.firstActivity = act;
 			this.firstAct = false;
 		} else {
-			this.score += calcActScore(this.currentActivityStartTime, time, act);
+			this.score += calcActScore(this.currentActivity.getStartTime().seconds(), time, act);
 		}
 		currentActivity = null;
 	}
@@ -297,8 +286,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 					firstLastActOpeningTimesWarning++;
 				}
 			}
-			
-			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
+
+			double calcActScore = calcActScore(lastActivity.getStartTime().seconds(),
+					this.firstActivity.getEndTime().seconds() + 24 * 3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
 			// the first Act and the last Act have NOT the same type:
@@ -317,9 +307,10 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 				}
 
 				// score first activity
-				this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+				this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 				// score last activity
-				this.score += calcActScore(this.currentActivityStartTime, this.params.simulationPeriodInDays * 24*3600, lastActivity);
+				this.score += calcActScore(lastActivity.getStartTime().seconds(),
+						this.params.simulationPeriodInDays * 24 * 3600, lastActivity);
 			}
 		}
 	}
@@ -327,13 +318,12 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	private final void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
-		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);
+		this.score += calcActScore(0.0, this.firstActivity.getEndTime().seconds(), firstActivity);
 	}
 
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime().seconds();
 		this.firstActivity = act;
 		this.firstAct = false;
 
@@ -346,7 +336,6 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime().seconds();
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
 	}
