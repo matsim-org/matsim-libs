@@ -17,16 +17,15 @@
  * *********************************************************************** */
 package org.matsim.contrib.roadpricing;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A road pricing scheme that is subject to person-specific avoidance. Those
@@ -74,7 +73,7 @@ public class RoadPricingSchemeWithTollAvoidance implements RoadPricingScheme {
 		} else {
 			boolean tollEvader = (boolean) attr;
 			if (tollEvader) {
-				return new RoadPricingSchemeImpl.Cost(0.0, Time.getUndefinedTime(), 0.0);
+				return new RoadPricingSchemeImpl.Cost(0.0, Double.NEGATIVE_INFINITY, 0.0);
 			} else {
 				return delegate.getLinkCostInfo(linkId, time, personId, vehicleId);
 			}
