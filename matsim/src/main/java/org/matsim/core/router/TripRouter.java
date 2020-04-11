@@ -40,8 +40,9 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -208,10 +209,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static double calcEndOfPlanElement(
 			final double now,
 			final PlanElement pe, Config config) {
-
-		if (Time.isUndefinedTime(now)) {
-			throw new RuntimeException("got undefined now to update with plan element" + pe);
-		}
+		Preconditions.checkArgument(Double.isFinite(now));//probably unnecessary after switching to OptionalTime
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
