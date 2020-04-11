@@ -114,6 +114,7 @@ final class FixedIntervalTimeVariantAttribute implements TimeVariantAttribute {
 
 	@Override
 	public double getValue(final double time) {
+		Preconditions.checkArgument(!Double.isNaN(time), "NaN time is not supported");
 		if (eventsCount == 0) {
 			return baseValue;
 		}
