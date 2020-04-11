@@ -58,11 +58,6 @@ public class Time {
 
 	private final static String[] timeElements;
 	
-	public static boolean isUndefinedTime( final double time ) {
-
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return time==UNDEFINED_TIME ;
-	}
 	public static double getUndefinedTime() {
 		// give the option to change the convention at some point in time.  kai, nov'17
 		return UNDEFINED_TIME ;
