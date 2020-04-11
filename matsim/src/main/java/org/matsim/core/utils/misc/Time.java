@@ -40,7 +40,6 @@ public class Time {
 	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
 	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime}
 	 * is independent of the start time. */
-	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
 	// of the convention.  kai, nov'17
 	final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
@@ -58,15 +57,6 @@ public class Time {
 
 	private final static String[] timeElements;
 	
-	public static double getUndefinedTime() {
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return UNDEFINED_TIME ;
-	}
-	public static double getVeryLargeTime() {
-		// give the option to change the convention at some point in time.  kai, nov'17
-		return Long.MAX_VALUE ;
-	}
-
 	static {
 		timeElements = new String[60];
 		for (int i = 0; i < 10; i++) {
