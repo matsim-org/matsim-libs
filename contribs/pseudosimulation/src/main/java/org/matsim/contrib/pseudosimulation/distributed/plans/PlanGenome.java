@@ -19,7 +19,6 @@ import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentTyp
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -149,8 +148,8 @@ public class PlanGenome implements Plan {
             } else {
                 // remove an in-between act
                 Leg prev_leg = (Leg) getPlanElements().get(index - 1); // prev leg;
-                prev_leg.setDepartureTime(Time.getUndefinedTime());
-                prev_leg.setTravelTime(Time.getUndefinedTime());
+                prev_leg.setDepartureTimeUndefined();
+                prev_leg.setTravelTimeUndefined();
                 prev_leg.setRoute(null);
 
                 getPlanElements().remove(index + 1); // following leg
@@ -176,8 +175,8 @@ public class PlanGenome implements Plan {
             if (index != getPlanElements().size() - 2) {
                 // not the last leg
                 Leg next_leg = (Leg) getPlanElements().get(index + 2);
-                next_leg.setDepartureTime(Time.getUndefinedTime());
-                next_leg.setTravelTime(Time.getUndefinedTime());
+                next_leg.setDepartureTimeUndefined();
+                next_leg.setTravelTimeUndefined();
                 next_leg.setRoute(null);
             }
             getPlanElements().remove(index + 1); // following act
@@ -277,13 +276,14 @@ public class PlanGenome implements Plan {
             } else if (pe instanceof Leg) {
                 Leg l = (Leg) pe;
                 Leg l2 = createAndAddLeg(l.getMode());
-                l2.setDepartureTime(l.getDepartureTime());
-                l2.setTravelTime(l.getTravelTime());
+				l2.setDepartureTime(l.getDepartureTime().seconds());
+				l2.setTravelTime(l.getTravelTime().seconds());
                 TripStructureUtils.setRoutingMode(l2, TripStructureUtils.getRoutingMode(l));
                 if (pe instanceof Leg) {
                     // get the arrival time information only if available
                     Leg r = ((Leg) pe);
-			l2.setTravelTime( r.getDepartureTime() + r.getTravelTime() - l2.getDepartureTime() );
+					l2.setTravelTime( r.getDepartureTime().seconds()
+							+ r.getTravelTime().seconds() - l2.getDepartureTime().seconds());
                 }
                 if (l.getRoute() != null) {
                     l2.setRoute(l.getRoute().clone());

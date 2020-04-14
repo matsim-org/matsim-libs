@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.RouteFactories;
@@ -38,7 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 
 /**
@@ -74,13 +74,10 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	
 		Leg tripLeg = (Leg) trip.get( 0 );
 		leg.setRoute( tripLeg.getRoute() );
-		leg.setTravelTime( tripLeg.getTravelTime() );
-		leg.setDepartureTime( tripLeg.getDepartureTime() );
-		
-		return tripLeg.getRoute() != null &&
-				!Time.isUndefinedTime(tripLeg.getRoute().getTravelTime()) ?
-				tripLeg.getRoute().getTravelTime() :
-				tripLeg.getTravelTime();
+		leg.setTravelTime(tripLeg.getTravelTime().seconds());
+		leg.setDepartureTime(tripLeg.getDepartureTime().seconds());
+
+		return PopulationUtils.decideOnTravelTimeForLeg(tripLeg).seconds();
 	}
 
     @Deprecated // use TripRouter instead. kai, dec'13

@@ -80,7 +80,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
 		RouteFactories routeFactories = population.getFactory().getRouteFactories();
-		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime(), fromLink, toLink, routeFactories));
+		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime().seconds(), fromLink, toLink, routeFactories));
 	}
 
 	@Override

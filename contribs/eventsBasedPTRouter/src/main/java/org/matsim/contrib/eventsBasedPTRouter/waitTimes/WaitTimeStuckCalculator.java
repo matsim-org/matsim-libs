@@ -71,7 +71,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	//Constructors
 	@Inject
 	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config, final EventsManager eventsManager) {
-		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 		eventsManager.addHandler(this);
 	}
 	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {

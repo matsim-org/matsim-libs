@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -98,9 +99,9 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		// since the class does not tell what it is supposed to do I do not know what is a reasonable answer here.  kai, jun'11
-		return null;
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
     @Override

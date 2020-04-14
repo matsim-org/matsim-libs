@@ -498,17 +498,9 @@ public final class EditTrips {
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
-			
-			double travelTime = currentLeg.getTravelTime();
-			if (Double.isInfinite(travelTime)) {
-				travelTime = currentLeg.getRoute().getTravelTime();
-				if (Double.isInfinite(travelTime)) {
-					// we don't know how long the agent will be travelling on the current leg
-					log.error("Travel time of " + agent.getId().toString() + " on following leg is unknown " + currentLeg.toString());
-					throw new RuntimeException();
-				}
-			}
-			
+
+			double travelTime = PopulationUtils.decideOnTravelTimeForLeg(currentLeg).seconds();
+
 			double departureTime = now + 0.5 * travelTime;
 			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
 			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
@@ -516,7 +508,7 @@ public final class EditTrips {
 					previousActivity.getEndTime().seconds()) && previousActivity.getEndTime().seconds()
 					< now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
-				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + currentLeg.getTravelTime();
+				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime().seconds() + travelTime;
 				// plausibility check: The agent can only arrive after the current time
 				if (departureTimeAccordingToPlannedActivityEnd > now) {
 					departureTime = departureTimeAccordingToPlannedActivityEnd;

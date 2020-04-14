@@ -1,6 +1,5 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,8 +17,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -181,11 +180,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         if (this.config.transit().isUseTransit()) {
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
-                    (int) (this.config.qsim().getEndTime() - this.config.qsim().getStartTime()));
+                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
             stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
                     this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
-                    .getEndTime() - this.config.qsim().getStartTime()));
+                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
@@ -405,7 +404,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         waitForSlaveThreads();
         linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
                 config.travelTimeCalculator().getTraveltimeBinSize(),
-                config.qsim().getEndTime(),
+                config.qsim().getEndTime().seconds(),
                 scenario.getNetwork().getLinks().values());
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {

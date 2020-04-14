@@ -54,9 +54,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -275,8 +273,9 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Leg leg = legs.get(event.getPersonId());
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
-		double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
+		double travelTime = leg.getDepartureTime().seconds()
+				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 		assert experiencedRoute.size() >= 1;
@@ -323,7 +322,7 @@ public final class EventsToLegs
 			assert egressFacility != null;
 			
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
-			passengerRoute.setBoardingTime(OptionalTime.defined(pendingTransitTravel.boardingTime));
+			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);
 			passengerRoute.setTravelTime(travelTime);
 			passengerRoute.setDistance(RouteUtils.calcDistance(passengerRoute, transitSchedule, network));
 			leg.setRoute(passengerRoute);

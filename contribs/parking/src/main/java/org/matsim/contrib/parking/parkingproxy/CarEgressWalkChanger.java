@@ -107,9 +107,10 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 		int sign = reverse ? -1 : 1;
 		for (Person p : population) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
-				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime(), walkActPair.act.getCoord());
-				walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime() + penalty);
-				walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime() + penalty);
+				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(
+						walkActPair.leg.getDepartureTime().seconds(), walkActPair.act.getCoord());
+				walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime().seconds() + penalty);
+				walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime().seconds() + penalty);
 				walkActPair.act.setStartTime(walkActPair.act.getStartTime().seconds() + penalty);
 			}
 		}

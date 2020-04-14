@@ -27,7 +27,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -38,7 +44,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -223,8 +228,8 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(100.0, passengerId, transitVehiceId));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(1000.0, passengerId, accessLinkId, "pt"));
 		
-		Assert.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime(), 1e-3);
-		Assert.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime(), 1e-3);
+		Assert.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-3);
+		Assert.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-3);
 		Assert.assertTrue(lh.handledLeg.getLeg().getRoute() instanceof TransitPassengerRoute);
 		
 		TransitPassengerRoute route = (TransitPassengerRoute) lh.handledLeg.getLeg().getRoute();
@@ -262,9 +267,9 @@ public class EventsToLegsTest {
 	private void assertLeg(RememberingLegHandler lh, double departureTime, double travelTime, double distance,
 			String mode) {
 		Assert.assertNotNull(lh.handledLeg);
-		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime(), 1e-9);
+		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-9);
+		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-9);
+		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime().seconds(), 1e-9);
 		Assert.assertEquals(distance, lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
 		Assert.assertEquals(mode, lh.handledLeg.getLeg().getMode());
 	}

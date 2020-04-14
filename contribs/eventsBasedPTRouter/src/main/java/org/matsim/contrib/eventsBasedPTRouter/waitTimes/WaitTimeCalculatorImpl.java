@@ -70,7 +70,7 @@ public class WaitTimeCalculatorImpl implements WaitTimeCalculator, PersonDepartu
 	//Constructors
 	@Inject
 	public WaitTimeCalculatorImpl(final TransitSchedule transitSchedule, final Config config, EventsManager eventsManager) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 		eventsManager.addHandler(this);
 	}
 	public WaitTimeCalculatorImpl(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {

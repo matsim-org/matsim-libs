@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -251,19 +252,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return ((Leg) currentPlanElement).getMode() ;
 	}
 	@Override
-	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
-		if (  !Time.isUndefinedTime(travelTimeFromRoute ) ) {
-			return travelTimeFromRoute ;
-		} else if ( !Time.isUndefinedTime(((Leg) currentPlanElement).getTravelTime() ) ) {
-			return ((Leg) currentPlanElement).getTravelTime()  ;
-		} else {
-			return null ;
-		}
+	public final OptionalTime getExpectedTravelTime() {
+		return PopulationUtils.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
 	}
 
     @Override

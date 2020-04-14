@@ -20,6 +20,10 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.HashMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,10 +33,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
-
-import javax.inject.Inject;
-
-import java.util.HashMap;
 
 
 /**
@@ -66,7 +66,7 @@ public class JDEQSimulation implements Mobsim {
 		Timer t = new Timer();
 		t.startTimer();
 
-		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime());
+		Scheduler scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime().orElse(Double.MAX_VALUE));
 		Road.setAllRoads(new HashMap<Id<Link>, Road>());
 
 		// initialize network

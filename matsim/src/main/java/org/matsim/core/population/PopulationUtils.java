@@ -71,7 +71,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
@@ -198,7 +197,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getDepartureTime() {
+		public OptionalTime getDepartureTime() {
 			return this.delegate.getDepartureTime() ;
 		}
 
@@ -208,7 +207,12 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getTravelTime() {
+		public void setDepartureTimeUndefined() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime() ;
 		}
 
@@ -216,6 +220,12 @@ public final class PopulationUtils {
 		public void setTravelTime(double seconds) {
 			throw new UnsupportedOperationException() ;
 		}
+
+		@Override
+		public void setTravelTimeUndefined() {
+			throw new UnsupportedOperationException() ;
+		}
+
 		@Override
 		public String toString() {
 			return this.delegate.toString() ;
@@ -442,30 +452,39 @@ public final class PopulationUtils {
 	 */
 	@Deprecated // was renamed
 	public static double getActivityEndTime( Activity act, double now, Config config ) {
-		return decideOnActivityEndTime( act, now, config ) ;
+		return decideOnActivityEndTime( act, now, config ).seconds() ;
 	}
 
 	/**
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
-	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
+	public static OptionalTime decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 			case endTimeOnly:
-				return act.getEndTime().seconds();
+				return act.getEndTime();
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
-					return act.getEndTime().seconds();
-				} else if (act.getMaximumDuration().isDefined()) {
-					return now + act.getMaximumDuration().seconds();
+					return act.getEndTime();
+				} else if (act.getMaximumDuration().isDefined()){
+					return OptionalTime.defined(now + act.getMaximumDuration().seconds());
 				} else {
-					return Time.getUndefinedTime();
+					return OptionalTime.undefined();
 				}
 			case minOfDurationAndEndTime:
-				return Math.min(now + act.getMaximumDuration().seconds(), act.getEndTime().seconds());
+				if (act.getEndTime().isUndefined() || act.getMaximumDuration().isUndefined()) {
+					return OptionalTime.undefined();
+				} else {
+					double endTime = act.getEndTime().seconds();
+					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
+					return endTime <= durationBasedEndTime ?
+							act.getEndTime() :
+							OptionalTime.defined(durationBasedEndTime);
+				}
 			default:
-				break;
+				throw new IllegalArgumentException(
+						"Unsupported 'activityDurationInterpretation' enum type: " + config.plans()
+								.getActivityDurationInterpretation());
 		}
-		return Time.getUndefinedTime();
 	}
 
 	private static int missingFacilityCnt = 0 ;
@@ -866,8 +885,8 @@ public final class PopulationUtils {
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
 		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
-		out.setDepartureTime(in.getDepartureTime());
-		out.setTravelTime(in.getTravelTime());
+		in.getDepartureTime().ifDefinedOrElse(out::setDepartureTime, out::setDepartureTimeUndefined);
+		in.getTravelTime().ifDefinedOrElse(out::setTravelTime, out::setTravelTimeUndefined);
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
@@ -981,8 +1000,8 @@ public final class PopulationUtils {
 			if (index != plan.getPlanElements().size()-2) {
 				// not the last leg
 				Leg next_leg = (Leg)plan.getPlanElements().get(index+2);
-				next_leg.setDepartureTime(Time.getUndefinedTime());
-				next_leg.setTravelTime(Time.getUndefinedTime());
+				next_leg.setDepartureTimeUndefined();
+				next_leg.setTravelTimeUndefined();
 				next_leg.setRoute(null);
 			}
 			plan.getPlanElements().remove(index+1); // following act
@@ -1011,8 +1030,8 @@ public final class PopulationUtils {
 			else {
 				// remove an in-between act
 				Leg prev_leg = (Leg)plan.getPlanElements().get(index-1); // prev leg;
-				prev_leg.setDepartureTime(Time.getUndefinedTime());
-				prev_leg.setTravelTime(Time.getUndefinedTime());
+				prev_leg.setDepartureTimeUndefined();
+				prev_leg.setTravelTimeUndefined();
 				prev_leg.setRoute(null);
 
 				plan.getPlanElements().remove(index+1); // following leg
@@ -1104,12 +1123,8 @@ public final class PopulationUtils {
 		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
-	public static double decideOnTravelTimeForLeg( Leg leg ) {
-		if ( leg.getRoute()!=null ) {
-			return leg.getRoute().getTravelTime() ;
-		} else {
-			return leg.getTravelTime() ;
-		}
+	public static OptionalTime decideOnTravelTimeForLeg( Leg leg ) {
+		return leg.getRoute() != null ? leg.getRoute().getTravelTime().or(leg::getTravelTime) : leg.getTravelTime();
 	}
 	public static void sampleDown( Population pop, double sample ) {
 		final Random rnd = MatsimRandom.getLocalInstance();;

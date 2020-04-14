@@ -249,7 +249,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi } ) {
 			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode )) {
-				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
+				final double prebookingTime = drtLeg.getDepartureTime().seconds() - prebookingOffset_s;
 				if (prebookingTime < agent.getActivityEndTime()) {
 					// yyyy and here one sees that having this in the activity engine is not very practical
 					log.info("adding agent to wakeup list");
@@ -287,7 +287,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
 		Gbl.assertNotNull(drtTrip);
 
-		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() );
+		final double expectedEndTimeOfOriginActivity = PopulationUtils.decideOnActivityEndTime( drtTrip.getOriginActivity(), now, this.scenario.getConfig() ).seconds();
 
 		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
 								 .setFromActivity( drtTrip.getOriginActivity() )
