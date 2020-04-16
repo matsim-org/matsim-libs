@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.noise;
 
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -32,32 +32,28 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	private double sigma = 0. ;
-	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
+	private TravelDisutilityFactory travelDisutilityFactoryDelegate;
 	
-	@Inject
-	private NoiseContext noiseContext;
-	
-	public NoiseTollTimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
+	@Inject private NoiseContext noiseContext;
+	@Inject private PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+
+	public NoiseTollTimeDistanceTravelDisutilityFactory( TravelDisutilityFactory travelDisutilityFactoryDelegate ) {
+		this.travelDisutilityFactoryDelegate = travelDisutilityFactoryDelegate;
 	}
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		
-		randomizedTimeDistanceTravelDisutilityFactory.setSigma(sigma);
+
+		if ( travelDisutilityFactoryDelegate instanceof RandomizingTimeDistanceTravelDisutilityFactory ){
+                }
 		
 		return new NoiseTollTimeDistanceTravelDisutility(
-				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
-				this.noiseContext,
-				this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-				this.sigma
+				travelDisutilityFactoryDelegate.createTravelDisutility(timeCalculator ),
+				new NoiseTollCalculator(noiseContext), this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				plansCalcRouteConfigGroup.getRoutingRandomness()!=0.
 			);
 	}
 	
-	public void setSigma ( double val ) {
-		this.sigma = val;
-	}
 }

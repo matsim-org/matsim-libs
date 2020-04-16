@@ -65,7 +65,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYScatterChart;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -447,26 +447,26 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
 					// invalidate previous activity times because durations will change
-					act.setStartTime(Time.getUndefinedTime());
+					act.setStartTimeUndefined();
 
 					// handle first activity
 					if (i == 0) {
 						act.setStartTime(now); // set start to midnight
 						act.setEndTime(mutateTime(act.getEndTime())); // mutate the end time of the first activity
-						act.setMaximumDuration(act.getEndTime() - act.getStartTime()); // calculate resulting duration
-						now += act.getEndTime(); // move now pointer
+						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds()); // calculate resulting duration
+						now += act.getEndTime().seconds(); // move now pointer
 					} else if (i < (max - 1)) {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						act.setMaximumDuration(6*3600); // <-- This line differs from the original PlanMutateTimeAllocation, use a fix time to minimize effect of act-duration on score
-						act.setEndTime(Time.getUndefinedTime()); // <-- This line differs from the original PlanMutateTimeAllocation
+						act.setEndTimeUndefined(); // <-- This line differs from the original PlanMutateTimeAllocation
 						now += 6*3600.0;
 					} else {
 						// handle last activity
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time
 						// invalidate duration and end time because the plan will be interpreted 24 hour wrap-around
-						act.setMaximumDuration(Time.getUndefinedTime());
-						act.setEndTime(Time.getUndefinedTime());
+						act.setMaximumDurationUndefined();
+						act.setEndTimeUndefined();
 					}
 
 				}
@@ -477,27 +477,26 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 					// assume that there will be no delay between end time of previous activity and departure time
 					leg.setDepartureTime(now);
 					// let duration untouched. if defined add it to now
-					if (!Time.isUndefinedTime(leg.getTravelTime())) {
-						now += leg.getTravelTime();
+					if (leg.getTravelTime().isDefined()) {
+						now += leg.getTravelTime().seconds();
 					}
 					// set planned arrival time accordingly
 					final double arrTime = now;
-					leg.setTravelTime( arrTime - leg.getDepartureTime() );
+					leg.setTravelTime( arrTime - leg.getDepartureTime().seconds());
 
 				}
 			}
 		}
 
-		private double mutateTime(final double time) {
-			double t = time;
-			if (!Time.isUndefinedTime(t)) {
-				t = t + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
+		private double mutateTime(final OptionalTime time) {
+			if (time.isDefined()) {
+				double t = time.seconds() + (int)((MatsimRandom.getRandom().nextDouble() * 2.0 - 1.0) * this.mutationRange);
 				if (t < 0) t = 0;
 				if (t > 24*3600) t = 24*3600;
+				return t;
 			} else {
-				t = MatsimRandom.getRandom().nextInt(24*3600);
+				return MatsimRandom.getRandom().nextInt(24*3600);
 			}
-			return t;
 		}
 	}
 

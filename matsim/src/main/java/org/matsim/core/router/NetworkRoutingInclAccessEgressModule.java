@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -63,7 +62,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
-	private final String stageActivityType;
 	private final Scenario scenario;
 	private final RoutingModule accessEgressToNetworkRouter;
 	private final Config config;
@@ -81,7 +79,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.config = scenario.getConfig();
 		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-		this.stageActivityType = PlanCalcScoreConfigGroup.createStageActivityType( mode );
 		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
@@ -110,7 +107,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === access:
 		{
-			now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, stageActivityType,
+			now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, mode,
 					scenario.getConfig() );
 		}
 
@@ -126,7 +123,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === egress:
 		{
-			addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, stageActivityType,
+			addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, mode,
 					scenario.getConfig() );
 		}
 
@@ -226,8 +223,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return now;
 	}
 	
-	private static Activity createInteractionActivity( final Coord interactionCoord, final Id<Link> interactionLink, final String stageActivityType ) {
-		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType, interactionCoord, interactionLink);
+	private static Activity createInteractionActivity( final Coord interactionCoord, final Id<Link> interactionLink, final String mode ) {
+		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
 		act.setMaximumDuration(0.0);
 		return act;
 	}

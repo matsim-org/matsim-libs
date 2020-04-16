@@ -5,14 +5,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
 
-	private Activity act;
+	private final Activity act;
 	
-	private TimeWindow timeWindow;
+	private final TimeWindow timeWindow;
 	
 	public FreightActivity(Activity act, TimeWindow timeWindow) {
 		super();
@@ -25,13 +26,18 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getEndTime() {
+	public OptionalTime getEndTime() {
 		return act.getEndTime();
 	}
 
 	@Override
 	public void setEndTime(double seconds) {
 		act.setEndTime(seconds);
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		act.setEndTimeUndefined();
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getStartTime() {
+	public OptionalTime getStartTime() {
 		return act.getStartTime();
 	}
 
@@ -60,13 +66,23 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public void setStartTimeUndefined() {
+		act.setStartTimeUndefined();
+	}
+
+	@Override
+	public OptionalTime getMaximumDuration() {
 		return act.getMaximumDuration();
 	}
 
 	@Override
 	public void setMaximumDuration(double seconds) {
 		act.setMaximumDuration(seconds);
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
+		act.setMaximumDurationUndefined();
 	}
 
 	@Override

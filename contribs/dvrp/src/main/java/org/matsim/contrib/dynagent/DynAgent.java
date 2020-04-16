@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -206,7 +207,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// MobsimAgent
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return dynLeg.getExpectedTravelTime();
 	}
 

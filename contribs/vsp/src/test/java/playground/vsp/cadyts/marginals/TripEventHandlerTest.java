@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -43,6 +44,7 @@ public class TripEventHandlerTest {
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();
 		Config config = ConfigUtils.loadConfig(ptTutorial);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 
 		// use the config and run only one iteration
 		config.controler().setFirstIteration(0);

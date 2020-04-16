@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -37,9 +39,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
-
-import javax.inject.Inject;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -160,16 +161,16 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 		
 		Set<Id<Person>> set = new HashSet<>();
 		
-		Set<Entry<Double, Set<Id<Person>>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
+		Set<Entry<OptionalTime, Set<Id<Person>>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
 		
-		for (Entry<Double, Set<Id<Person>>> entry : entries) {
-			double earliestLinkExitTime = entry.getKey();
+		for (Entry<OptionalTime, Set<Id<Person>>> entry : entries) {
+			OptionalTime earliestLinkExitTime = entry.getKey();
 			
 			// check time
 			if (timeMode == TimeFilterMode.RESTRICTED) {
-				if (time <= earliestLinkExitTime) continue;
+				if (time <= earliestLinkExitTime.seconds()) continue;
 			} else if (timeMode == TimeFilterMode.UNRESTRICTED) {
-				if (time > earliestLinkExitTime) continue;
+				if (time > earliestLinkExitTime.seconds()) continue;
 			} else {
 				throw new RuntimeException("Unexpected TimeFilterMode was found: " + timeMode.toString());
 			}

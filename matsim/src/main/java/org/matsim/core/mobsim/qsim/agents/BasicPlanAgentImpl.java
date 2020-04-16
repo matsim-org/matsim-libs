@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -67,7 +68,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private final EventsManager events;
 	private final MobsimTimer simTimer;
 	private MobsimVehicle vehicle ;
-	private double activityEndTime = Time.UNDEFINED_TIME;
+	private double activityEndTime = Time.getUndefinedTime();
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 	/**
@@ -162,7 +163,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private void initializeActivity(Activity act, double now) {
 		this.setState(MobsimAgent.State.ACTIVITY) ;
-		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+				act.getCoord() ) );
 		calculateAndSetDepartureTime(act);
 		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);
@@ -250,19 +252,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return ((Leg) currentPlanElement).getMode() ;
 	}
 	@Override
-	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
-		if (  travelTimeFromRoute != Time.UNDEFINED_TIME ) {
-			return travelTimeFromRoute ;
-		} else if ( ((Leg) currentPlanElement).getTravelTime() != Time.UNDEFINED_TIME ) {
-			return ((Leg) currentPlanElement).getTravelTime()  ;
-		} else {
-			return null ;
-		}
+	public final OptionalTime getExpectedTravelTime() {
+		return PopulationUtils.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
 	}
 
     @Override

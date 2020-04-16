@@ -93,7 +93,7 @@ public class BayAreaMain {
 			}
 
 			@Override
-			public void release() {
+			public void close() {
 
 			}
 

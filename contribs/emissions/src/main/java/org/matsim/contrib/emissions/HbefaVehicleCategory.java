@@ -23,4 +23,12 @@ package org.matsim.contrib.emissions;
  * @author benjamin
  *
  */
-public enum HbefaVehicleCategory { PASSENGER_CAR, HEAVY_GOODS_VEHICLE, ZERO_EMISSION_VEHICLE, MOTORCYCLE; }
+public enum HbefaVehicleCategory {
+        PASSENGER_CAR,
+        LIGHT_COMMERCIAL_VEHICLE,
+        HEAVY_GOODS_VEHICLE,
+        URBAN_BUS,
+        COACH,
+        MOTORCYCLE,
+        NON_HBEFA_VEHICLE
+}

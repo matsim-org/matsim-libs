@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -106,7 +106,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			}
 
 			// interaction activity:
-			trip.add(createDrtStageActivity(accessFacility));
+			trip.add(createDrtStageActivity(accessFacility, now));
 			now++;
 		}
 
@@ -121,7 +121,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
-			trip.add(createDrtStageActivity(egressFacility));
+			trip.add(createDrtStageActivity(egressFacility, now));
 
 			// egress (sub-)trip:
 			trip.addAll(egressTrip);
@@ -130,13 +130,9 @@ public class DvrpRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	private Activity createDrtStageActivity(Facility stopFacility) {
-		Activity activity = scenario.getPopulation()
-				.getFactory()
-				.createActivityFromCoord(PlanCalcScoreConfigGroup.createStageActivityType(mode),
-						stopFacility.getCoord());
-		activity.setMaximumDuration(0);
-		activity.setLinkId(stopFacility.getLinkId());
+	private Activity createDrtStageActivity(Facility stopFacility, double now) {
+		Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stopFacility.getCoord(),
+				stopFacility.getLinkId(), mode);
 		return activity;
 	}
 }

@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -142,7 +143,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
-	@NotBlank
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String taxisFile = null;
 
 	private boolean timeProfiles = false;
@@ -462,6 +463,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	}
 
 	public URL getTaxisFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.taxisFile);
+		return taxisFile == null ? null : ConfigGroup.getInputFileURL(context, taxisFile);
 	}
 }

@@ -4,7 +4,13 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,7 +40,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -45,12 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -80,8 +81,8 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.blueLine.getId(), ptRoute.getLineId());
@@ -90,7 +91,7 @@ public class SwissRailRaptorTest {
         double distance = 0.0;
         for (Leg leg : legs) {
             System.out.println(leg+" "+leg.getRoute().getDistance());
-            actualTravelTime += leg.getTravelTime();
+			actualTravelTime += leg.getTravelTime().seconds();
             distance += leg.getRoute().getDistance();
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
@@ -116,15 +117,15 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(toLinkId, legs.get(2).getRoute().getEndLinkId());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.blueLine.getId(), ptRoute.getLineId());
         assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
         double actualTravelTime = 0.0;
         for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
+			actualTravelTime += leg.getTravelTime().seconds();
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
@@ -146,9 +147,9 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, legs.get(2).getMode());
 
         double expectedAccessWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord(), fromCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime(), MatsimTestUtils.EPSILON);
+		assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
         double expectedEgressWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedEgressWalkTime), legs.get(2).getTravelTime(), MatsimTestUtils.EPSILON);
+		assertEquals(Math.ceil(expectedEgressWalkTime), legs.get(2).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
     }
 
     @Test
@@ -167,9 +168,9 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, legs.get(2).getMode());
 
         double expectedAccessWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord(), fromCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime(), MatsimTestUtils.EPSILON);
+		assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
         double expectedEgressWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(Math.ceil(expectedEgressWalkTime), legs.get(2).getTravelTime(), MatsimTestUtils.EPSILON);
+		assertEquals(Math.ceil(expectedEgressWalkTime), legs.get(2).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
     }
 
 
@@ -209,7 +210,7 @@ public class SwissRailRaptorTest {
         assertEquals(1, legs.size());
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(4000*1.3, legs.get(0).getRoute().getDistance(), 0.0);
-        double actualTravelTime = legs.get(0).getTravelTime();
+		double actualTravelTime = legs.get(0).getTravelTime().seconds();
         double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
     }
@@ -232,15 +233,15 @@ public class SwissRailRaptorTest {
         // check individual legs
         Coord ptStop0 = f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord();
         double expectedAccessWalkTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, ptStop0) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedAccessWalkTravelTime, legs.get(0).getTravelTime(), 1.0);
+		assertEquals(expectedAccessWalkTravelTime, legs.get(0).getTravelTime().seconds(), 1.0);
         assertEquals((5002-3000)*1.3, legs.get(0).getRoute().getDistance(), 0.0);
 
         double expectedPtTravelTime = 6.0*3600 + 6.0*60 - (5.0*3600 + expectedAccessWalkTravelTime) + 7*60; // next departure blue line is at 6.0*3600 + 6.0*60, 7*60 travel time
-        assertEquals(expectedPtTravelTime, legs.get(1).getTravelTime(), 1.0);
+		assertEquals(expectedPtTravelTime, legs.get(1).getTravelTime().seconds(), 1.0);
         
         Coord ptStop2 = f.schedule.getFacilities().get(Id.create("2", TransitStopFacility.class)).getCoord();
         double expectedEgressWalkTravelTime = CoordUtils.calcEuclideanDistance(ptStop2, toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedEgressWalkTravelTime, legs.get(2).getTravelTime(), 1.0);
+		assertEquals(expectedEgressWalkTravelTime, legs.get(2).getTravelTime().seconds(), 1.0);
         assertEquals((5002-3000)*1.3, legs.get(2).getRoute().getDistance(), 0.0);
     }
 
@@ -258,7 +259,7 @@ public class SwissRailRaptorTest {
             assertEquals(3, legs.size()); // walk-pt-walk
             double actualTravelTime = 0.0;
             for (Leg leg : legs) {
-                actualTravelTime += leg.getTravelTime();
+				actualTravelTime += leg.getTravelTime().seconds();
             }
             double waitingTime = ((46 - min) % 20) * 60; // departures at *:06 and *:26 and *:46
             assertEquals("expected different waiting time at 05:"+min, waitingTime, actualTravelTime - inVehicleTime, MatsimTestCase.EPSILON);
@@ -279,21 +280,21 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
         assertEquals(TransportMode.walk, legs.get(4).getMode());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.blueLine.getId(), ptRoute.getLineId());
         assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
-        assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof ExperimentalTransitRoute);
-        ptRoute = (ExperimentalTransitRoute) legs.get(3).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof TransitPassengerRoute);
+        ptRoute = (TransitPassengerRoute) legs.get(3).getRoute();
         assertEquals(Id.create("18", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("19", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.greenLine.getId(), ptRoute.getLineId());
         assertEquals(Id.create("green clockwise", TransitRoute.class), ptRoute.getRouteId());
         double actualTravelTime = 0.0;
         for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
+			actualTravelTime += leg.getTravelTime().seconds();
         }
         double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
@@ -319,21 +320,21 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.pt, legs.get(2).getMode());
         assertEquals(TransportMode.walk, legs.get(3).getMode());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.blueLine.getId(), ptRoute.getLineId());
         assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
-        assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof ExperimentalTransitRoute);
-        ptRoute = (ExperimentalTransitRoute) legs.get(2).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof TransitPassengerRoute);
+        ptRoute = (TransitPassengerRoute) legs.get(2).getRoute();
         assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.redLine.getId(), ptRoute.getLineId());
         assertEquals(Id.create("red C > G", TransitRoute.class), ptRoute.getRouteId());
         double actualTravelTime = 0.0;
         for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
+			actualTravelTime += leg.getTravelTime().seconds();
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
@@ -359,10 +360,10 @@ public class SwissRailRaptorTest {
         assertEquals("wrong number of legs", 5, legs.size());
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+        assertEquals(f.redLine.getId(), ((TransitPassengerRoute) legs.get(1).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
-        assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
+        assertEquals(f.blueLine.getId(), ((TransitPassengerRoute) legs.get(3).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(4).getMode());
 
         Config config = ConfigUtils.createConfig();
@@ -375,7 +376,7 @@ public class SwissRailRaptorTest {
         assertEquals(3, legs.size());
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+        assertEquals(f.blueLine.getId(), ((TransitPassengerRoute) legs.get(1).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
     }
 
@@ -398,10 +399,10 @@ public class SwissRailRaptorTest {
         assertEquals("wrong number of legs",5, legs.size());
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+        assertEquals(f.redLine.getId(), ((TransitPassengerRoute) legs.get(1).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
-        assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
+        assertEquals(f.blueLine.getId(), ((TransitPassengerRoute) legs.get(3).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(4).getMode());
 
         Config config = ConfigUtils.createConfig();
@@ -411,7 +412,7 @@ public class SwissRailRaptorTest {
         assertEquals("wrong number of legs",3, legs.size());
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
+        assertEquals(f.blueLine.getId(), ((TransitPassengerRoute) legs.get(1).getRoute()).getLineId());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
     }
 
@@ -443,8 +444,8 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.walk, legs.get(2).getMode());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
         assertEquals(Id.create("16", TransitStopFacility.class), ptRoute.getEgressStopId());
         assertEquals(f.blueLine.getId(), ptRoute.getLineId());
@@ -497,11 +498,11 @@ public class SwissRailRaptorTest {
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
             double legDuration = calcTripDuration(new ArrayList<>(legs));
             Assert.assertEquals(5, legs.size());
-            Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-            Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-            Assert.assertEquals(300, legs.get(2).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-            Assert.assertEquals(600, legs.get(3).getTravelTime(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-            Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(100, legs.get(0).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, legs.get(1).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(300, legs.get(2).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
+			Assert.assertEquals(600, legs.get(3).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+			Assert.assertEquals(100, legs.get(4).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
             Assert.assertEquals(1900.0, legDuration, 0.0);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
@@ -516,11 +517,11 @@ public class SwissRailRaptorTest {
             List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
             double tripDuration = calcTripDuration(planElements);
             Assert.assertEquals(9, planElements.size());
-            Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-            Assert.assertEquals(800, ((Leg) planElements.get(2)).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-            Assert.assertEquals(300, ((Leg) planElements.get(4)).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-            Assert.assertEquals(600, ((Leg) planElements.get(6)).getTravelTime(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-            Assert.assertEquals(100, ((Leg) planElements.get(8)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(100, ((Leg)planElements.get(0)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, ((Leg)planElements.get(2)).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(300, ((Leg)planElements.get(4)).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
+			Assert.assertEquals(600, ((Leg)planElements.get(6)).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+			Assert.assertEquals(100, ((Leg)planElements.get(8)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
             Assert.assertEquals(1900.0, tripDuration, 0.0);
         }
 
@@ -533,11 +534,11 @@ public class SwissRailRaptorTest {
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
             double legDuration = calcTripDuration(new ArrayList<>(legs));
             Assert.assertEquals(5, legs.size());
-            Assert.assertEquals(100, legs.get(0).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-            Assert.assertEquals(800, legs.get(1).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-            Assert.assertEquals(3900, legs.get(2).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-            Assert.assertEquals(600, legs.get(3).getTravelTime(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-            Assert.assertEquals(100, legs.get(4).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(100, legs.get(0).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, legs.get(1).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(3900, legs.get(2).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
+			Assert.assertEquals(600, legs.get(3).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+			Assert.assertEquals(100, legs.get(4).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
             Assert.assertEquals(5500.0, legDuration, 0.0);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
@@ -552,11 +553,11 @@ public class SwissRailRaptorTest {
             List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
             double tripDuration = calcTripDuration(planElements);
             Assert.assertEquals(9, planElements.size());
-            Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-            Assert.assertEquals(800, ((Leg) planElements.get(2)).getTravelTime(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-            Assert.assertEquals(3900, ((Leg) planElements.get(4)).getTravelTime(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-            Assert.assertEquals(600, ((Leg) planElements.get(6)).getTravelTime(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-            Assert.assertEquals(100, ((Leg) planElements.get(8)).getTravelTime(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
+			Assert.assertEquals(100, ((Leg)planElements.get(0)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+			Assert.assertEquals(800, ((Leg)planElements.get(2)).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+			Assert.assertEquals(3900, ((Leg)planElements.get(4)).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
+			Assert.assertEquals(600, ((Leg)planElements.get(6)).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+			Assert.assertEquals(100, ((Leg)planElements.get(8)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
             Assert.assertEquals(5500.0, tripDuration, 0.0);
         }
 
@@ -588,15 +589,15 @@ public class SwissRailRaptorTest {
         double duration = 0.0;
         for (PlanElement pe : planElements) {
             if (pe instanceof Activity) {
-                Activity act = (Activity) pe;
-                double endTime = act.getEndTime();
-                double startTime = act.getStartTime();
-                if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+                Activity act = (Activity)pe;
+				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
+                    double startTime = act.getStartTime().seconds();
+					double endTime = act.getEndTime().seconds();
                     duration += (endTime - startTime);
                 }
             } else if (pe instanceof Leg) {
                 Leg leg = (Leg) pe;
-                duration += leg.getTravelTime();
+				duration += leg.getTravelTime().seconds();
             }
         }
         return duration;
@@ -618,18 +619,18 @@ public class SwissRailRaptorTest {
         assertEquals(TransportMode.pt, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
         assertEquals(TransportMode.walk, legs.get(4).getMode());
-        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
-        ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof TransitPassengerRoute);
+        TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
         assertEquals(f.stop0.getId(), ptRoute.getAccessStopId());
         assertEquals(f.stop1.getId(), ptRoute.getEgressStopId());
         assertEquals(f.lineId0, ptRoute.getLineId());
-        assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof ExperimentalTransitRoute);
-        ptRoute = (ExperimentalTransitRoute) legs.get(2).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof TransitPassengerRoute);
+        ptRoute = (TransitPassengerRoute) legs.get(2).getRoute();
         assertEquals(f.stop1.getId(), ptRoute.getAccessStopId());
         assertEquals(f.stop2.getId(), ptRoute.getEgressStopId());
         assertEquals(f.lineId1, ptRoute.getLineId());
-        assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof ExperimentalTransitRoute);
-        ptRoute = (ExperimentalTransitRoute) legs.get(3).getRoute();
+        assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof TransitPassengerRoute);
+        ptRoute = (TransitPassengerRoute) legs.get(3).getRoute();
         assertEquals(f.stop2.getId(), ptRoute.getAccessStopId());
         assertEquals(f.stop3.getId(), ptRoute.getEgressStopId());
         assertEquals(f.lineId3, ptRoute.getLineId());
@@ -657,10 +658,10 @@ public class SwissRailRaptorTest {
         Assert.assertEquals(TransportMode.pt, legs.get(2).getMode());
         Assert.assertEquals(TransportMode.walk, legs.get(3).getMode());
 
-        Assert.assertEquals(f.greenLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-        Assert.assertEquals(Id.create(23, TransitStopFacility.class), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getAccessStopId());
-        Assert.assertEquals(f.greenLine.getId(), ((ExperimentalTransitRoute) legs.get(2).getRoute()).getLineId());
-        Assert.assertEquals(Id.create(20, TransitStopFacility.class), ((ExperimentalTransitRoute) legs.get(2).getRoute()).getEgressStopId());
+        Assert.assertEquals(f.greenLine.getId(), ((TransitPassengerRoute) legs.get(1).getRoute()).getLineId());
+        Assert.assertEquals(Id.create(23, TransitStopFacility.class), ((TransitPassengerRoute) legs.get(1).getRoute()).getAccessStopId());
+        Assert.assertEquals(f.greenLine.getId(), ((TransitPassengerRoute) legs.get(2).getRoute()).getLineId());
+        Assert.assertEquals(Id.create(20, TransitStopFacility.class), ((TransitPassengerRoute) legs.get(2).getRoute()).getEgressStopId());
     }
 
     @Test
@@ -884,7 +885,7 @@ public class SwissRailRaptorTest {
             assertEquals("pt", legs.get(1).getMode());
             assertEquals(TransportMode.walk, legs.get(2).getMode());
 
-            ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+            TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
             assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
             assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
             assertEquals(f.redLine.getId(), ptRoute.getLineId());
@@ -928,7 +929,7 @@ public class SwissRailRaptorTest {
             assertEquals("rail", legs.get(1).getMode());
             assertEquals(TransportMode.walk, legs.get(2).getMode());
 
-            ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+            TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
             assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
             assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
             assertEquals(f.redLine.getId(), ptRoute.getLineId());
@@ -954,7 +955,7 @@ public class SwissRailRaptorTest {
             assertEquals("road", legs.get(1).getMode());
             assertEquals(TransportMode.walk, legs.get(2).getMode());
 
-            ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
+            TransitPassengerRoute ptRoute = (TransitPassengerRoute) legs.get(1).getRoute();
             assertEquals(Id.create("18", TransitStopFacility.class), ptRoute.getAccessStopId());
             assertEquals(Id.create("21", TransitStopFacility.class), ptRoute.getEgressStopId());
             assertEquals(f.greenLine.getId(), ptRoute.getLineId());

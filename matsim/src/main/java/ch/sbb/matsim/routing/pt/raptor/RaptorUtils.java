@@ -4,7 +4,10 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -19,12 +22,9 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * @author mrieser / SBB
@@ -103,10 +103,10 @@ public final class RaptorUtils {
                     if (pe instanceof Leg) {
                         Leg leg = (Leg) pe;
                         legs.add(leg);
-                        if (Time.isUndefinedTime(leg.getDepartureTime())) {
+                        if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
-                        lastArrivalTime = leg.getDepartureTime() + leg.getTravelTime();
+						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
                     }
                 }
             } else if (part.line != null) {
@@ -114,7 +114,8 @@ public final class RaptorUtils {
                 Leg ptLeg = PopulationUtils.createLeg(part.mode);
                 ptLeg.setDepartureTime(part.depTime);
                 ptLeg.setTravelTime(part.arrivalTime - part.depTime);
-                ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(part.fromStop, part.line, part.route, part.toStop);
+                DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop);
+                ptRoute.setBoardingTime(part.boardingTime);
                 ptRoute.setTravelTime(part.arrivalTime - part.depTime);
                 ptRoute.setDistance(part.distance);
                 ptLeg.setRoute(ptRoute);

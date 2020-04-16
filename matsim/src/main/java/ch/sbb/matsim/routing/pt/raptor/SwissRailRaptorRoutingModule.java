@@ -4,8 +4,12 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -15,13 +19,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.PtConstants;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This replicates the functionality of {@link org.matsim.core.router.TransitRouterWrapper},
@@ -66,8 +66,7 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
             if (prevLeg != null) {
                 Coord coord = findCoordinate(prevLeg, leg);
                 Id<Link> linkId = leg.getRoute().getStartLinkId();
-                Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, coord, linkId);
-                act.setMaximumDuration(0.0);
+                Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(coord, linkId, TransportMode.pt);
                 planElements.add(act);
             }
             planElements.add(leg);
@@ -77,12 +76,12 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
     }
 
     private Coord findCoordinate(Leg prevLeg, Leg nextLeg) {
-        if (prevLeg.getRoute() instanceof ExperimentalTransitRoute) {
-            Id<TransitStopFacility> stopId = ((ExperimentalTransitRoute) prevLeg.getRoute()).getEgressStopId();
+        if (prevLeg.getRoute() instanceof TransitPassengerRoute) {
+            Id<TransitStopFacility> stopId = ((TransitPassengerRoute) prevLeg.getRoute()).getEgressStopId();
             return this.transitSchedule.getFacilities().get(stopId).getCoord();
         }
-        if (nextLeg.getRoute() instanceof ExperimentalTransitRoute) {
-            Id<TransitStopFacility> stopId = ((ExperimentalTransitRoute) nextLeg.getRoute()).getAccessStopId();
+        if (nextLeg.getRoute() instanceof TransitPassengerRoute) {
+            Id<TransitStopFacility> stopId = ((TransitPassengerRoute) nextLeg.getRoute()).getAccessStopId();
             return this.transitSchedule.getFacilities().get(stopId).getCoord();
         }
         // fallback: prevLeg and nextLeg are not pt routes, so we have to guess the coordinate based on the link id

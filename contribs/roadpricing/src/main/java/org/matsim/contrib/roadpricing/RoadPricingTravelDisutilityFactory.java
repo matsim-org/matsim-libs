@@ -57,8 +57,7 @@ public final class RoadPricingTravelDisutilityFactory implements TravelDisutilit
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		if ( this.sigma != 0. ) {
 			if ( previousTravelDisutilityFactory instanceof RandomizingTimeDistanceTravelDisutilityFactory) {
-				((RandomizingTimeDistanceTravelDisutilityFactory) previousTravelDisutilityFactory).setSigma( this.sigma );
-			} else {
+                        } else {
 				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
 			}
 		}

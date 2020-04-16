@@ -914,7 +914,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 			StringBuilder buffer = new StringBuilder(200);
 			buffer.append("hour \t mean relative error \t mean bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -923,7 +923,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {
@@ -970,7 +970,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 			StringBuilder buffer = new StringBuilder(200);
 			buffer.append("hour \t mean normalized relative error \t mean bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -979,7 +979,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {

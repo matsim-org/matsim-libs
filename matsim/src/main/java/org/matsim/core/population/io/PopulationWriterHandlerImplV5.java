@@ -20,6 +20,11 @@
 
 package org.matsim.core.population.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,11 +41,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 /**
  * @author mrieser
@@ -187,19 +187,19 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getStartTime())) {
+		if (act.getStartTime().isDefined()) {
 			out.write(" start_time=\"");
-			out.write(Time.writeTime(act.getStartTime()));
+			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+		if (act.getMaximumDuration().isDefined()) {
 			out.write(" max_dur=\"");
-			out.write(Time.writeTime(act.getMaximumDuration()));
+			out.write(Time.writeTime(act.getMaximumDuration().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getEndTime())) {
+		if (act.getEndTime().isDefined()) {
 			out.write(" end_time=\"");
-			out.write(Time.writeTime(act.getEndTime()));
+			out.write(Time.writeTime(act.getEndTime().seconds()));
 			out.write("\"");
 		}
 		out.write(" />\n");
@@ -209,19 +209,19 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(encodeAttributeValue(leg.getMode()));
 		out.write("\"");
-		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
+		if (leg.getDepartureTime().isDefined()) {
 			out.write(" dep_time=\"");
-			out.write(Time.writeTime(leg.getDepartureTime()));
+			out.write(Time.writeTime(leg.getDepartureTime().seconds()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(leg.getTravelTime())) {
+		if (leg.getTravelTime().isDefined()) {
 			out.write(" trav_time=\"");
-			out.write(Time.writeTime(leg.getTravelTime()));
+			out.write(Time.writeTime(leg.getTravelTime().seconds()));
 			out.write("\"");
 		}
 //		if (leg instanceof LegImpl) {
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime()) {
 //				out.write(" arr_time=\"");
 //				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
 //				out.write("\"");

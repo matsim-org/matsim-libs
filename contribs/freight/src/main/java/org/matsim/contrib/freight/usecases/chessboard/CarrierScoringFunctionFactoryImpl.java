@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -13,14 +12,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightActivity;
+import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+
+import com.google.inject.Inject;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -69,7 +75,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         @Override
         public void handleActivity(Activity act) {
             if(act instanceof FreightActivity) {
-                double actStartTime = act.getStartTime();
+				double actStartTime = act.getStartTime().seconds();
 
 //                log.info(act + " start: " + Time.writeTime(actStartTime));
                 TimeWindow tw = ((FreightActivity) act).getTimeWindow();
@@ -80,7 +86,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                     score += penalty_score;
 
                 }
-                double actTimeCosts = (act.getEndTime()-actStartTime)*timeParameter;
+				double actTimeCosts = (act.getEndTime().seconds() -actStartTime)*timeParameter;
 //                log.info("actCosts " + actTimeCosts);
                 assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
                 score += actTimeCosts*(-1);
@@ -203,7 +209,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 double distanceCosts = distance*getDistanceParameter(vehicle);
                 assert distanceCosts >= 0.0 : "distanceCosts must be positive";
                 score += (-1) * distanceCosts;
-                double timeCosts = leg.getTravelTime()*getTimeParameter(vehicle);
+				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
                 assert timeCosts >= 0.0 : "timeCosts must be positive";
                 score += (-1) * timeCosts;
 

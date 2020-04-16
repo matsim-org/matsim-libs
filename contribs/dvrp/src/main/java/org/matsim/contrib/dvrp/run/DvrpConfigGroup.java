@@ -46,8 +46,8 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	public static final String NETWORK_MODES = "networkModes";
-	static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
+	private static final String NETWORK_MODES = "networkModes";
+	private static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
 			+ "estimation and routing DVRP vehicles. "
 			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
 			+ "travelling only along a specified links or serving a limited area). "
@@ -55,13 +55,13 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 			+ "Empty value \"\" (i.e. empty set of modes) means no network filtering, i.e. "
 			+ "the original scenario.network is used";
 
-	public static final String MOBSIM_MODE = "mobsimMode";
-	static final String MOBSIM_MODE_EXP =
+	private static final String MOBSIM_MODE = "mobsimMode";
+	private static final String MOBSIM_MODE_EXP =
 			"Mode of which the network will be used for throwing events and hence calculating travel times. "
 					+ "Default is car.";
 
-	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
-	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
+	private static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP =
 			"Used for OFFLINE estimation of travel times for VrpOptimizer"
 					+ " by means of the exponential moving average."
 					+ " The weighting decrease, alpha, must be in (0,1]."
@@ -69,8 +69,8 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 					+ " The averaging starts from the initial travel time estimates. If not provided,"
 					+ " the free-speed TTs is used as the initial estimates";
 
-	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
-	static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
+	private static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
+	private static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
 			+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
 			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
 			+ " or positive (mixed online-offline estimation)."

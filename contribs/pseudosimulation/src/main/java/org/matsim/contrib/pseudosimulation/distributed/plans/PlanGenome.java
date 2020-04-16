@@ -1,22 +1,25 @@
 package org.matsim.contrib.pseudosimulation.distributed.plans;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
+import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentType;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
-import org.matsim.contrib.pseudosimulation.distributed.scoring.ScoreComponentType;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by fouriep on 1/28/15.
@@ -145,9 +148,8 @@ public class PlanGenome implements Plan {
             } else {
                 // remove an in-between act
                 Leg prev_leg = (Leg) getPlanElements().get(index - 1); // prev leg;
-                prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
-                prev_leg.setTravelTime(Time.UNDEFINED_TIME);
-                prev_leg.setTravelTime( Time.UNDEFINED_TIME - prev_leg.getDepartureTime() );
+                prev_leg.setDepartureTimeUndefined();
+                prev_leg.setTravelTimeUndefined();
                 prev_leg.setRoute(null);
 
                 getPlanElements().remove(index + 1); // following leg
@@ -173,9 +175,8 @@ public class PlanGenome implements Plan {
             if (index != getPlanElements().size() - 2) {
                 // not the last leg
                 Leg next_leg = (Leg) getPlanElements().get(index + 2);
-                next_leg.setDepartureTime(Time.UNDEFINED_TIME);
-                next_leg.setTravelTime(Time.UNDEFINED_TIME);
-                next_leg.setTravelTime( Time.UNDEFINED_TIME - next_leg.getDepartureTime() );
+                next_leg.setDepartureTimeUndefined();
+                next_leg.setTravelTimeUndefined();
                 next_leg.setRoute(null);
             }
             getPlanElements().remove(index + 1); // following act
@@ -275,13 +276,14 @@ public class PlanGenome implements Plan {
             } else if (pe instanceof Leg) {
                 Leg l = (Leg) pe;
                 Leg l2 = createAndAddLeg(l.getMode());
-                l2.setDepartureTime(l.getDepartureTime());
-                l2.setTravelTime(l.getTravelTime());
+				l2.setDepartureTime(l.getDepartureTime().seconds());
+				l2.setTravelTime(l.getTravelTime().seconds());
                 TripStructureUtils.setRoutingMode(l2, TripStructureUtils.getRoutingMode(l));
                 if (pe instanceof Leg) {
                     // get the arrival time information only if available
                     Leg r = ((Leg) pe);
-			l2.setTravelTime( r.getDepartureTime() + r.getTravelTime() - l2.getDepartureTime() );
+					l2.setTravelTime( r.getDepartureTime().seconds()
+							+ r.getTravelTime().seconds() - l2.getDepartureTime().seconds());
                 }
                 if (l.getRoute() != null) {
                     l2.setRoute(l.getRoute().clone());

@@ -20,6 +20,10 @@
 
 package org.matsim.core.scoring.functions;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -32,10 +36,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -172,12 +172,15 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleLeg(Leg leg) {
-		Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
-		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+		Gbl.assertIf( leg.getDepartureTime().isDefined() ) ;
+		Gbl.assertIf( leg.getTravelTime().isDefined() );
 
-		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		double legScore = calcLegScore(
+				leg.getDepartureTime().seconds(), leg.getDepartureTime().seconds() + leg.getTravelTime()
+						.seconds(), leg);
 		if ( Double.isNaN( legScore )) {
-			log.error( "dpTime=" + leg.getDepartureTime() + "; ttime=" + leg.getTravelTime() + "; leg=" + leg ) ;
+			log.error( "dpTime=" + leg.getDepartureTime().seconds()
+					+ "; ttime=" + leg.getTravelTime().seconds() + "; leg=" + leg ) ;
 			throw new RuntimeException("score is NaN") ;
 		}
 		this.score += legScore;

@@ -42,11 +42,11 @@ import javax.xml.bind.annotation.XmlType;
     "controllerIdentifier",
     "signalPlan"
 })
-public class XMLSignalSystemControllerType {
+public final class XMLSignalSystemControllerType {
 
     @XmlElement(required = true)
-    protected String controllerIdentifier;
-    protected List<XMLSignalPlanType> signalPlan;
+    private String controllerIdentifier;
+    private List<XMLSignalPlanType> signalPlan;
 
     /**
      * Gets the value of the controllerIdentifier property.

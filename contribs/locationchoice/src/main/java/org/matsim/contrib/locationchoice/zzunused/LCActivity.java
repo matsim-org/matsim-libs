@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -43,13 +44,19 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final double getEndTime() {
+	public final OptionalTime getEndTime() {
+		//consider having an array of OptionalDoubles instead...
 		return this.plan.endTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setEndTime(double seconds) {
-		this.plan.endTimes[this.arrayIndex] = seconds;
+		this.plan.endTimes[this.arrayIndex] = OptionalTime.defined(seconds);
+	}
+
+	@Override
+	public void setEndTimeUndefined() {
+		this.plan.endTimes[this.arrayIndex] = OptionalTime.undefined();
 	}
 
 	@Override
@@ -72,23 +79,33 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final double getStartTime() {
+	public final OptionalTime getStartTime() {
 		return this.plan.startTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setStartTime(double seconds) {
-		this.plan.startTimes[this.arrayIndex] = seconds;
+		this.plan.startTimes[this.arrayIndex] = OptionalTime.defined(seconds);
 	}
 
 	@Override
-	public final double getMaximumDuration() {
+	public void setStartTimeUndefined() {
+		this.plan.startTimes[this.arrayIndex] = OptionalTime.undefined();
+	}
+
+	@Override
+	public final OptionalTime getMaximumDuration() {
 		return this.plan.durations[this.arrayIndex];
 	}
 
 	@Override
 	public final void setMaximumDuration(double seconds) {
-		this.plan.durations[this.arrayIndex] = seconds;
+		this.plan.durations[this.arrayIndex] = OptionalTime.defined(seconds);
+	}
+
+	@Override
+	public void setMaximumDurationUndefined() {
+		this.plan.durations[this.arrayIndex] = OptionalTime.undefined();
 	}
 
 	@Override
@@ -110,11 +127,11 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 
 	public final double getArrivalTime() {
-		return this.plan.arrTimes[this.arrayIndex];
+		return this.plan.arrTimes[this.arrayIndex].seconds();
 	}
 
 	public final void setArrivalTime(final double arrTime) {
-		this.plan.arrTimes[this.arrayIndex] = arrTime;
+		this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
 	}
 	
 	@Override

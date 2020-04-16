@@ -38,7 +38,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -258,7 +259,7 @@ public class CreateSelectedPlansTables {
 		double travelTime=0.0;
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 			if (pe instanceof Leg) {
-				travelTime+=((Leg) pe).getTravelTime();
+				travelTime+= ((Leg)pe).getTravelTime().seconds();
 			}
 		}
 		return travelTime;

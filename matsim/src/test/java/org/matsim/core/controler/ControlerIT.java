@@ -20,15 +20,15 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import static org.matsim.core.config.groups.ControlerConfigGroup.SnapshotFormat;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
@@ -53,7 +53,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -231,7 +230,7 @@ public class ControlerIT {
 		// test that the plans have the correct travel times 
 		// (travel time of the plan does not contain first and last link)
 		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
-				((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), MatsimTestUtils.EPSILON);
+				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -494,7 +493,7 @@ public class ControlerIT {
 	public void testCompressionType() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
-		config.controler().setCompressionType(ControlerConfigGroup.CompressionType.zst);
+		config.controler().setCompressionType( CompressionType.zst );
 
 		final Controler controler = new Controler(config);
 
@@ -895,12 +894,12 @@ public class ControlerIT {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.googleearth ) );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
@@ -933,12 +932,13 @@ public class ControlerIT {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("transims"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 

@@ -63,4 +63,15 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 		offlineExample.run();
 	}
 
+	@Test
+	public final void testAverage_vehTypeV2_HBEFA4() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
+		emissionsConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.txt");
+		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
 }

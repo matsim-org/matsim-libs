@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.DriverDynLeg;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 public class RandomDynLeg implements DriverDynLeg {
@@ -93,8 +94,8 @@ public class RandomDynLeg implements DriverDynLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
-		return null;// teleportation unsupported
+	public OptionalTime getExpectedTravelTime() {
+		return OptionalTime.undefined();// teleportation unsupported
 	}
 
 	@Override

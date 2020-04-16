@@ -23,7 +23,7 @@ package org.matsim.core.population.routes;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Default, abstract implementation of the {@link Route}-interface.
@@ -39,7 +39,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 
 	private double dist = Double.NaN;
 
-	private double travTime = Time.getUndefinedTime();
+	private OptionalTime travTime = OptionalTime.undefined();
 
 	private Id<Link> startLinkId = null;
 	private Id<Link> endLinkId = null;
@@ -60,13 +60,18 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	}
 
 	@Override
-	public final double getTravelTime() {
+	public final OptionalTime getTravelTime() {
 		return this.travTime;
 	}
 
 	@Override
 	public final void setTravelTime(final double travTime) {
-		this.travTime = travTime;
+		this.travTime = OptionalTime.defined(travTime);
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travTime = OptionalTime.undefined();
 	}
 
 	@Override
@@ -124,7 +129,7 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		String str = "";
 		str +=  " startLinkId=" + startLinkId ;
 		str += " endLinkId=" + endLinkId ;
-		str += " travTime=" + travTime ;
+		str += " travTime=" + travTime;
 		str += " dist=" + dist ;
 		return str ;
 	}

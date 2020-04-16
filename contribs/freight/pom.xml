@@ -82,6 +82,14 @@
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-io</artifactId>
 			<version>1.7.2</version>
+			<exclusions>
+				<!-- needed to compile in IntelliJ with Eclipse compiler -->
+				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
+				<exclusion>
+					<artifactId>xml-apis</artifactId>
+					<groupId>xml-apis</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

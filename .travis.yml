@@ -72,8 +72,6 @@ cache:
   - $HOME/.m2
 
 env:
-  global:
-    - MAVEN_OPTS="-Xmx2g"
   matrix:
     - MODULE=matsim                        
     # sorted from longest to shortest (to minimise the overall test stage duration)
@@ -85,6 +83,7 @@ env:
     - MODULE=contribs/bicycle
     - MODULE=contribs/cadytsIntegration
     - MODULE=contribs/carsharing
+    - MODULE=contribs/commercialTrafficApplications
     - MODULE=contribs/drt
     - MODULE=contribs/locationchoice
     - MODULE=contribs/av
@@ -109,4 +108,6 @@ env:
     - MODULE=contribs/hybridsim
     - MODULE=contribs/otfvis
     - MODULE=contribs/osm
+  global:
+    - MAVEN_OPTS="-Xmx2g"
 

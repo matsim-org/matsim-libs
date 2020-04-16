@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -14,11 +15,22 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
-public final class SupersonicOsmNetworkReader {
+/**
+ * Class for converting osm-networks into matsim-networks. This class uses the binary osm.pbf format as an input. Suitable
+ * input files can be found at https://download.geofabrik.de
+ * <p>
+ * Examples on how to use the reader can be found in {@link org.matsim.contrib.osm.examples}
+ * <p>
+ * For the most common highway tags the {@link LinkProperties} class contains default properties for the
+ * corresponding links in the matsim-nework (e.g. speed, number of lanes). Those default properties may be overridden
+ * with custom link properties using the {@link SupersonicOsmNetworkReader.Builder#addOverridingLinkProperties(String, LinkProperties)}
+ * method of the Builder.
+ */
+public class SupersonicOsmNetworkReader {
 
     private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
 
@@ -26,25 +38,21 @@ public final class SupersonicOsmNetworkReader {
     private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
     private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
-    private final ConcurrentMap<String, LinkProperties> linkProperties;
-    private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
     private final Predicate<Long> preserveNodeWithId;
     private final AfterLinkCreated afterLinkCreated;
-    private final CoordinateTransformation coordinateTransformation;
+    private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
+    final OsmNetworkParser parser;
 
     private Network network;
 
-    private SupersonicOsmNetworkReader(CoordinateTransformation coordinateTransformation,
-                                       ConcurrentMap<String, LinkProperties> linkPropertiesMap,
-                                       BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
-                                       AfterLinkCreated afterLinkCreated) {
-
-        this.coordinateTransformation = coordinateTransformation;
+    SupersonicOsmNetworkReader(OsmNetworkParser parser,
+                               Predicate<Long> preserveNodeWithId,
+                               BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
+                               AfterLinkCreated afterLinkCreated) {
         this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
         this.afterLinkCreated = afterLinkCreated;
         this.preserveNodeWithId = preserveNodeWithId;
-
-        this.linkProperties = linkPropertiesMap;
+        this.parser = parser;
     }
 
     public Network read(String inputFile) {
@@ -53,11 +61,11 @@ public final class SupersonicOsmNetworkReader {
 
     public Network read(Path inputFile) {
 
-        NodesAndWays nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
+        parser.parse(inputFile);
         this.network = NetworkUtils.createNetwork();
 
         log.info("starting convertion \uD83D\uDE80");
-        convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
+        convert(parser.getWays(), parser.getNodes());
 
         log.info("finished convertion");
         return network;
@@ -66,12 +74,12 @@ public final class SupersonicOsmNetworkReader {
     private void convert(Map<Long, ProcessedOsmWay> ways, Map<Long, ProcessedOsmNode> nodes) {
 
         ways.values().parallelStream()
-                .flatMap(way -> this.createWaySegments(nodes, way))
-                .flatMap(this::createLinks)
+                .flatMap(way -> this.createWaySegments(nodes, way).stream())
+                .flatMap(segment -> this.createLinks(segment, network.getFactory()).stream())
                 .forEach(this::addLinkToNetwork);
     }
 
-    private Stream<WaySegment> createWaySegments(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmWay way) {
+    Collection<WaySegment> createWaySegments(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmWay way) {
 
         List<WaySegment> segments = new ArrayList<>();
         double segmentLength = 0;
@@ -109,7 +117,7 @@ public final class SupersonicOsmNetworkReader {
                 fromNodeForSegment = toOsmNode;
             }
         }
-        return segments.stream();
+        return segments;
     }
 
     private boolean isCreateSegment(ProcessedOsmNode from, ProcessedOsmNode to, ProcessedOsmWay way) {
@@ -152,7 +160,7 @@ public final class SupersonicOsmNetworkReader {
         return result;
     }
 
-    private Stream<Link> createLinks(WaySegment segment) {
+    Collection<Link> createLinks(WaySegment segment, NetworkFactory factory) {
 
         LinkProperties properties = segment.getLinkProperties();
         List<Link> result = new ArrayList<>();
@@ -161,16 +169,16 @@ public final class SupersonicOsmNetworkReader {
         Node toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
         if (!isOnewayReverse(segment.tags)) {
-            Link forwardLink = createLink(fromNode, toNode, segment, Direction.Forward);
+            Link forwardLink = createLink(fromNode, toNode, segment, Direction.Forward, factory);
             result.add(forwardLink);
         }
 
         if (!isOneway(segment.getTags(), properties)) {
-            Link reverseLink = createLink(toNode, fromNode, segment, Direction.Reverse);
+            Link reverseLink = createLink(toNode, fromNode, segment, Direction.Reverse, factory);
             result.add(reverseLink);
         }
 
-        return result.stream();
+        return result;
     }
 
     private Node createNode(Coord coord, long nodeId) {
@@ -178,13 +186,13 @@ public final class SupersonicOsmNetworkReader {
         return network.getFactory().createNode(id, coord);
     }
 
-    private Link createLink(Node fromNode, Node toNode, WaySegment segment, Direction direction) {
+    Link createLink(Node fromNode, Node toNode, WaySegment segment, Direction direction, NetworkFactory factory) {
 
         String highwayType = segment.getTags().get(OsmTags.HIGHWAY);
-        LinkProperties properties = linkProperties.get(highwayType);
+        LinkProperties properties = segment.getLinkProperties();
 
         String linkId = direction == Direction.Forward ? segment.getSegmentId() + "f" : segment.getSegmentId() + "r";
-        Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
+        Link link = factory.createLink(Id.createLinkId(linkId), fromNode, toNode);
         link.setLength(segment.getLength());
         link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
         link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), direction, properties));
@@ -196,7 +204,7 @@ public final class SupersonicOsmNetworkReader {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean isOneway(Map<String, String> tags, LinkProperties properties) {
+    boolean isOneway(Map<String, String> tags, LinkProperties properties) {
 
         if (tags.containsKey(OsmTags.ONEWAY)) {
             String tag = tags.get(OsmTags.ONEWAY);
@@ -211,7 +219,7 @@ public final class SupersonicOsmNetworkReader {
         return properties.oneway;
     }
 
-    private boolean isOnewayReverse(Map<String, String> tags) {
+    boolean isOnewayReverse(Map<String, String> tags) {
 
         if (tags.containsKey(OsmTags.ONEWAY)) {
             String tag = tags.get(OsmTags.ONEWAY);
@@ -314,58 +322,136 @@ public final class SupersonicOsmNetworkReader {
         void accept(Link link, Map<String, String> osmTags, Direction direction);
     }
 
-	public static Builder builder() {
-		return new Builder();
-	}
+    public static abstract class AbstractBuilder<T> {
 
-	public static class Builder {
-
-        private ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
-        private BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
-        private Predicate<Long> preserveNodeWithId = id -> false;
-        private AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
+        ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+        BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
+        Predicate<Long> preserveNodeWithId = id -> false;
+        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
         };
-        private CoordinateTransformation coordinateTransformation;
+        CoordinateTransformation coordinateTransformation;
 
-        public Builder coordinateTransformation(CoordinateTransformation coordinateTransformation) {
-            this.coordinateTransformation = coordinateTransformation;
+        /**
+         * Replace all Link-Properties at once. Link properties describe how an osm-highway-tag is translated into a
+         * matsim-link. E.g. which freespeed is set on the link, whether it is one-way, etc.
+         * <p>
+         * The reader only reads osm-ways which have a corresponding entry in the linkProperties map.
+         *
+         * @param linkProperties The link properties to be included in the matsim-network.
+         */
+        public AbstractBuilder<T> setLinkProperties(ConcurrentMap<String, LinkProperties> linkProperties) {
+            this.linkProperties = linkProperties;
             return this;
         }
 
-        public Builder includeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> predicate) {
-            this.includeLinkAtCoordWithHierarchy = predicate;
-            return this;
-        }
-
-        public Builder preserveNodeWithId(Predicate<Long> predicate) {
-            this.preserveNodeWithId = predicate;
-            return this;
-        }
-
-        public Builder afterLinkCreated(AfterLinkCreated consumer) {
-            this.afterLinkCreated = consumer;
-            return this;
-        }
-
-        public Builder addOverridingLinkProperties(String highwayType, LinkProperties properties) {
+        /**
+         * The reader has a default set of osm-highway-tags which are parsed. The following are included by default:
+         * motorway, motorway_link, trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link,
+         * unclassified, residential, living_street
+         * <p>
+         * By invoking this method one can override the assigned {@link LinkProperties} by supplying the desired highway
+         * tag with a new {@link LinkProperties} object.
+         *
+         * @param highwayType the highway type which receives new properties
+         * @param properties  the properties the corresponding matsim-links will receive
+         */
+        public AbstractBuilder<T> addOverridingLinkProperties(String highwayType, LinkProperties properties) {
             linkProperties.put(highwayType, properties);
             return this;
         }
 
-        public SupersonicOsmNetworkReader build() {
+        /**
+         * This sets a filter to in- or exclude links depending on its hierarchy level and location. The filter is invoked
+         * for each to and from node of a link.
+         * <p>
+         * The hierarchy levels reach from {@link LinkProperties#LEVEL_MOTORWAY} = 1 to {@link LinkProperties#LEVEL_LIVING_STREET} = 8
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param includeLinkAtCoordWithHierarchy Bi-Predicate which takes a node's coordinate and its hierarchy level
+         */
+        public AbstractBuilder<T> setIncludeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy) {
+            this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
+            return this;
+        }
+
+        /**
+         * This sets a filter to prevent certain nodes from being removed.
+         * <p>
+         * The reader tries to simplify the network as much as possible. If it is essential to keep certain nodes of the
+         * original osm-network within the output matsim-network for e.g. counts the filter can prevent the removal of
+         * the node with the supplied id
+         * <p>
+         * Setting the filter to '() -> true' will omit network simplification entirely and is equivalent to the 'keepPath'
+         * option of the previous OsmNetworkReader
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param preserveNodeWithId Predicate which returns true if the node corresponding to the supplied id must not
+         *                           be removed.
+         */
+        public AbstractBuilder<T> setPreserveNodeWithId(Predicate<Long> preserveNodeWithId) {
+            this.preserveNodeWithId = preserveNodeWithId;
+            return this;
+        }
+
+        /**
+         * This sets a hook to alter a link right before it is inserted into the result-network.
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param afterLinkCreated Basically a tri-consumer which accepts the created link, the original osm-tags
+         *                         as a map and the direction enum which describes whether it is the forward or backward
+         *                         link for an osm-way
+         */
+        public AbstractBuilder<T> setAfterLinkCreated(AfterLinkCreated afterLinkCreated) {
+            this.afterLinkCreated = afterLinkCreated;
+            return this;
+        }
+
+        /**
+         * Coordinate transformation to transform spherical-osm-coordinates into euclidean-coordinates suited for matsim
+         * simulations
+         *
+         * @param coordinateTransformation The supplied transformation should have {@link org.matsim.core.utils.geometry.transformations.TransformationFactory#WGS84} as
+         *                                 input coordinate-system. And something like "EPSG:25832" as output sytem
+         */
+        public AbstractBuilder<T> setCoordinateTransformation(CoordinateTransformation coordinateTransformation) {
+            this.coordinateTransformation = coordinateTransformation;
+            return this;
+        }
+
+        /**
+         * Builds a reader
+         */
+        public T build() {
+            return createInstance();
+        }
+
+        abstract T createInstance();
+    }
+
+    public static class Builder extends AbstractBuilder<SupersonicOsmNetworkReader> {
+
+        SupersonicOsmNetworkReader createInstance() {
 
             if (coordinateTransformation == null) {
                 throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
             }
 
-            return new SupersonicOsmNetworkReader(
+            OsmNetworkParser parser = new OsmNetworkParser(
                     coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy,
-                    preserveNodeWithId, afterLinkCreated
+                    Executors.newWorkStealingPool());
+
+            return new SupersonicOsmNetworkReader(
+                    parser, preserveNodeWithId,
+                    includeLinkAtCoordWithHierarchy,
+                    afterLinkCreated
             );
         }
     }
 
-    private static class WaySegment {
+    static class WaySegment {
         private final ProcessedOsmNode fromNode;
         private final ProcessedOsmNode toNode;
         private final double length;

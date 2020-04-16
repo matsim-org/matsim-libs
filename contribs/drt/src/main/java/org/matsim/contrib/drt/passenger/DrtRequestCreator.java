@@ -51,7 +51,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 			double departureTime, double submissionTime) {
 		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
-		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
+		double latestArrivalTime = departureTime + drtRoute.getTravelTime().seconds();
 
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),

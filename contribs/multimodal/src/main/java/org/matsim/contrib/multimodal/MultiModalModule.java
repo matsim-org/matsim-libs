@@ -71,7 +71,7 @@ public class MultiModalModule extends AbstractModule {
                 case TransportMode.walk:{
                     Provider<TravelTime> factory = new WalkTravelTimeFactory( plansCalcRouteConfigGroup, linkSlopes );
                     addTravelTimeBinding( mode ).toProvider( factory );
-                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
                     addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
                     break;
                 }
@@ -84,7 +84,7 @@ public class MultiModalModule extends AbstractModule {
                 case TransportMode.bike:{
                     Provider<TravelTime> factory = new BikeTravelTimeFactory( plansCalcRouteConfigGroup, linkSlopes );
                     addTravelTimeBinding( mode ).toProvider( factory );
-                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
                     addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
                     break;
                 }
@@ -101,7 +101,7 @@ public class MultiModalModule extends AbstractModule {
                                                   " for mode " + mode + "." );
                     }
                     addTravelTimeBinding( mode ).toProvider( factory );
-                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, cnScoringGroup ) );
+                    addTravelDisutilityFactoryBinding( mode ).toInstance( new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig() ) );
                     addRoutingModuleBinding( mode ).toProvider( new NetworkRoutingProvider( mode ) );
                     break;
                 }

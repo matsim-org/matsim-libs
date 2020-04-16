@@ -28,19 +28,12 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.signalcontrol20.XMLSignalControl;
 import org.matsim.jaxb.signalcontrol20.XMLSignalGroupSettingsType;
@@ -55,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class SignalControlReader20 extends AbstractSignalsReader{
+public final class SignalControlReader20 extends AbstractSignalsReader{
 
 	private SignalControlData signalControlData;
 

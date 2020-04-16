@@ -23,17 +23,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -41,7 +38,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
@@ -58,7 +54,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -83,13 +79,17 @@ public final class EventsToLegs
 		TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 		VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
+	public static final String ENTER_VEHICLE_TIME_ATTRIBUTE_NAME = "enterVehicleTime";
+
 	private static class PendingTransitTravel {
 		final Id<Vehicle> vehicleId;
 		final Id<TransitStopFacility> accessStop;
+		final double boardingTime;
 
-		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
+		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop, double boardingTime) {
 			this.vehicleId = vehicleId;
 			this.accessStop = accessStop;
+			this.boardingTime = boardingTime;
 		}
 	}
 
@@ -205,12 +205,14 @@ public final class EventsToLegs
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		Leg leg = legs.get(event.getPersonId());
+		leg.getAttributes().putAttribute(ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, event.getTime());
 		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
 		if (lineAndRoute != null) {
 			if (!event.getPersonId().equals(lineAndRoute.driverId)) {
 				// transit drivers are not considered to travel by transit
 				transitTravels.put(event.getPersonId(),
-						new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId));
+						new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId, event.getTime()));
 			}
 		} else {
 			VehicleRoute route = vehicle2route.computeIfAbsent(event.getVehicleId(), vehicleId -> new VehicleRoute());
@@ -271,8 +273,9 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Leg leg = legs.get(event.getPersonId());
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
-		double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
+		double travelTime = leg.getDepartureTime().seconds()
+				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 		assert experiencedRoute.size() >= 1;
@@ -317,13 +320,12 @@ public final class EventsToLegs
 
 			final TransitStopFacility egressFacility = transitSchedule.getFacilities().get(lastFacilityId);
 			assert egressFacility != null;
-
-			ExperimentalTransitRoute experimentalTransitRoute = new ExperimentalTransitRoute(accessFacility, line,
-					route, egressFacility);
-			experimentalTransitRoute.setTravelTime(travelTime);
-			experimentalTransitRoute.setDistance(
-					RouteUtils.calcDistance(experimentalTransitRoute, transitSchedule, network));
-			leg.setRoute(experimentalTransitRoute);
+			
+			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
+			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);
+			passengerRoute.setTravelTime(travelTime);
+			passengerRoute.setDistance(RouteUtils.calcDistance(passengerRoute, transitSchedule, network));
+			leg.setRoute(passengerRoute);
 		} else if ((pendingVehicleTravel = vehicleTravels.remove(event.getPersonId())) != null) {
 			VehicleRoute vehicleRoute = pendingVehicleTravel.route;
 			List<Id<Link>> traveledLinks = vehicleRoute.links.subList(pendingVehicleTravel.accessLinkIdx,

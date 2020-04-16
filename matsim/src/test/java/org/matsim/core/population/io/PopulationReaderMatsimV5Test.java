@@ -40,7 +40,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.utils.AttributesBuilder;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -298,7 +298,7 @@ public class PopulationReaderMatsimV5Test {
 		
 		Assert.assertTrue(route1 instanceof NetworkRoute);
 //		Assert.assertTrue(route2 instanceof GenericRouteImpl);
-		Assert.assertTrue(route3 instanceof ExperimentalTransitRoute);
+		Assert.assertTrue(route3 instanceof TransitPassengerRoute);
 	}
 
 	
