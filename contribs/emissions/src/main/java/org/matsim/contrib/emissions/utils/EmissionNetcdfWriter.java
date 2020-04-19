@@ -150,6 +150,7 @@ public class EmissionNetcdfWriter implements AutoCloseable {
 
                     var cell = bin.getValue().getCell(xi, yi);
 
+                    //this doesn´t work like this. these must somehow referenze the index of x and y coordibnates
                     yValues.set(yi, cell.getCoord().getY());
                     xValues.set(xi, cell.getCoord().getX());
 
