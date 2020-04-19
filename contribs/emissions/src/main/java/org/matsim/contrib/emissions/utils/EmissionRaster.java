@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
@@ -12,10 +13,12 @@ import java.util.stream.Collectors;
 
 public class EmissionRaster {
 
-	private final int cellSize;
 	private final Map<Id<Link>, List<Cell>> linkMap = new HashMap<>();
-	private final QuadTree<Cell> spatialIndex;
 	private final Map<Coord, Cell> coordMap = new HashMap<>();
+
+	private QuadTree<Cell> spatialIndex;
+	private int cellSize;
+	private Map<Coord, Cell> cells = new HashMap<>();
 
 	public EmissionRaster(int cellSize, Network network) {
 		this.cellSize = cellSize;
@@ -27,6 +30,10 @@ public class EmissionRaster {
 		for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
 			spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
 		}
+	}
+
+	public EmissionRaster() {
+		// no args constructor for recreating the file structure
 	}
 
 	public int getCellSize() {
@@ -41,12 +48,19 @@ public class EmissionRaster {
 		return spatialIndex.values();
 	}
 
-	public void addEmissions(Id<Link> linkId, Map<String, Double> emissions) {
+	public void addEmissions(Id<Link> linkId, Map<Pollutant, Double> emissions) {
 
 		List<Cell> cells = linkMap.get(linkId);
 		for (Cell cell : cells) {
 			cell.addEmissions(emissions, cells.size());
 		}
+	}
+
+	public void addCell(Coord coord, Map<Pollutant, Double> pollution) {
+
+		var cell = new Cell(coord);
+		cell.addEmissions(pollution, 1);
+		cells.put(coord, cell);
 	}
 
 	private Map<Coord, Cell> rasterizeNetwork(Network network) {
@@ -107,7 +121,7 @@ public class EmissionRaster {
 	public static class Cell {
 
 		private final Coord coord;
-		private Map<String, Double> emissions = new HashMap<>();
+		private Map<Pollutant, Double> emissions = new HashMap<>();
 
 		private Cell(Coord coord) {
 			this.coord = coord;
@@ -117,12 +131,12 @@ public class EmissionRaster {
 			return coord;
 		}
 
-		public Map<String, Double> getEmissions() {
+		public Map<Pollutant, Double> getEmissions() {
 			return emissions;
 		}
 
-		private void addEmissions(Map<String, Double> pollution, int divideBy) {
-			for (Map.Entry<String, Double> pollutant : pollution.entrySet()) {
+		private void addEmissions(Map<Pollutant, Double> pollution, int divideBy) {
+			for (var pollutant : pollution.entrySet()) {
 				emissions.merge(pollutant.getKey(), pollutant.getValue() / divideBy, Double::sum);
 			}
 		}

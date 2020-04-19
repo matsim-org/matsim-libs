@@ -20,8 +20,8 @@ public class EmissionRasterTest {
 		URL equil = URI.create(ExamplesUtils.getTestScenarioURL("equil").toString() + "network.xml").toURL();
 		Network network = NetworkUtils.readNetwork(equil.toString());
 
-		EmissionRaster emissionRaster = new EmissionRaster(100, network);
-		//displayOnPanel(emissionRaster, network);
+		EmissionRaster emissionRaster = new EmissionRaster(1000, network);
+		displayOnPanel(emissionRaster, network);
 
 		Thread.sleep(20000);
 	}
@@ -55,7 +55,7 @@ public class EmissionRasterTest {
 			super.paintComponent(g);
 
 			int divideBy = 20;
-			int offset = 20 * divideBy;
+			int offset = 50 * divideBy;
 
 			g.setColor(Color.BLACK);
 			for (EmissionRaster.Cell cell : emissionRaster.getCells()) {
