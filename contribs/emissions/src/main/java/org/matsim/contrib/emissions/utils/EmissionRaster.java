@@ -13,22 +13,26 @@ import java.util.stream.Collectors;
 
 public class EmissionRaster {
 
-	private final Map<Id<Link>, List<Cell>> linkMap = new HashMap<>();
-	private final Map<Coord, Cell> coordMap = new HashMap<>();
+    private final Map<Id<Link>, List<Cell>> linkMap = new HashMap<>();
+    private final Map<Coord, Cell> coordMap = new HashMap<>();
 
-	private QuadTree<Cell> spatialIndex;
-	private int cellSize;
-	private Map<Coord, Cell> cells = new HashMap<>();
+    private QuadTree<Cell> spatialIndex;
+    private int cellSize;
+    private Map<Coord, Cell> cells = new HashMap<>();
+    private double minX = Double.MAX_VALUE;
+    private double maxX = Double.MIN_VALUE;
+    private double minY = Double.MAX_VALUE;
+    private double maxY = Double.MIN_VALUE;
 
-	public EmissionRaster(int cellSize, Network network) {
-		this.cellSize = cellSize;
-		Map<Coord, Cell> cells = rasterizeNetwork(network);
+    public EmissionRaster(int cellSize, Network network) {
+        this.cellSize = cellSize;
+        Map<Coord, Cell> cells = rasterizeNetwork(network);
 
-		// create a spatial index of cells so the raster can be queried later
-		double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
-		spatialIndex = new QuadTree<>(bounds[0] - cellSize, bounds[1] - cellSize, bounds[2] + cellSize, bounds[3] + cellSize); //ugh
-		for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
-			spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
+        // create a spatial index of cells so the raster can be queried later
+        double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        spatialIndex = new QuadTree<>(bounds[0] - cellSize, bounds[1] - cellSize, bounds[2] + cellSize, bounds[3] + cellSize); //ugh
+        for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
+            spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
 		}
 	}
 
@@ -41,8 +45,11 @@ public class EmissionRaster {
 	}
 
 	public Cell getCell(double x, double y) {
-		return spatialIndex.getClosest(x, y);
-	}
+        if (spatialIndex == null) {
+            buildSpatialIndex();
+        }
+        return spatialIndex.getClosest(x, y);
+    }
 
 	public Collection<Cell> getCells() {
 		return spatialIndex.values();
@@ -58,10 +65,15 @@ public class EmissionRaster {
 
 	public void addCell(Coord coord, Map<Pollutant, Double> pollution) {
 
-		var cell = new Cell(coord);
-		cell.addEmissions(pollution, 1);
-		cells.put(coord, cell);
-	}
+        if (coord.getX() < maxX) maxX = coord.getX();
+        if (coord.getX() > minX) minX = coord.getX();
+        if (coord.getY() < maxY) maxY = coord.getY();
+        if (coord.getY() > minY) minY = coord.getY();
+
+        var cell = new Cell(coord);
+        cell.addEmissions(pollution, 1);
+        cells.put(coord, cell);
+    }
 
 	private Map<Coord, Cell> rasterizeNetwork(Network network) {
 
@@ -107,25 +119,35 @@ public class EmissionRaster {
 			e2 = err + err;
 			if (e2 >= dy) {
 				err += dy;
-				x0 += sx;
-			}
-			if (e2 <= dx) {
-				err += dx;
-				y0 += sy;
-			}
-		} while (x0 != x1 || y0 != y1);
+                x0 += sx;
+            }
+            if (e2 <= dx) {
+                err += dx;
+                y0 += sy;
+            }
+        } while (x0 != x1 || y0 != y1);
 
-		return result;
-	}
+        return result;
+    }
 
-	public static class Cell {
+    private void buildSpatialIndex() {
+        // create a spatial index of cells so the raster can be queried later
+        //double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        //spatialIndex = new QuadTree<>(bounds[0] - cellSize, bounds[1] - cellSize, bounds[2] + cellSize, bounds[3] + cellSize); //ugh
+        spatialIndex = new QuadTree<>(minX, minY, maxX, maxY);
+        for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
+            spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
+        }
+    }
 
-		private final Coord coord;
-		private Map<Pollutant, Double> emissions = new HashMap<>();
+    public static class Cell {
 
-		private Cell(Coord coord) {
-			this.coord = coord;
-		}
+        private final Coord coord;
+        private Map<Pollutant, Double> emissions = new HashMap<>();
+
+        private Cell(Coord coord) {
+            this.coord = coord;
+        }
 
 		public Coord getCoord() {
 			return coord;

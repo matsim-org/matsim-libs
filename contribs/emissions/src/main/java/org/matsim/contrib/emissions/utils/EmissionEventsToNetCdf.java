@@ -37,8 +37,8 @@ public class EmissionEventsToNetCdf {
 	public static void main(String[] args) {
 
 		Path path = Paths.get("C:\\Users\\Janekdererste\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
-		//var timeGrid = readEmissionsFromNetCdf(path);
-		writeToNetCdf(Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc"), null);
+		var timeGrid = readEmissionsFromNetCdf(path);
+		writeToNetCdf(Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc"), timeGrid);
 	}
 
 	public static TimeBinMap<EmissionRaster> readEmissionsFromNetCdf(Path netCdfFile) {
@@ -96,7 +96,8 @@ public class EmissionEventsToNetCdf {
 
 		try (var writer = new EmissionNetcdfWriter(outputFile)) {
 
-		} catch (IOException e) {
+			writer.write(data);
+		} catch (IOException | InvalidRangeException e) {
 			e.printStackTrace();
 		}
 	}
