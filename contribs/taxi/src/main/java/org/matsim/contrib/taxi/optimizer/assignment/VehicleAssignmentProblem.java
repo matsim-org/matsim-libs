@@ -76,10 +76,12 @@ public class VehicleAssignmentProblem<D> {
 		backwardPathSearch = OneToManyPathSearch.create(backwardMultiNodeRouter);
 
 		// TODO this kNN is slow
-		destinationFinder = nearestDestinationLimit < 0 ? null
-				: new StraightLineKnnFinder<>(nearestDestinationLimit, veh -> veh.link, dest -> dest.link);
-		vehicleFinder = nearestVehicleLimit < 0 ? null
-				: new StraightLineKnnFinder<>(nearestVehicleLimit, dest -> dest.link, veh -> veh.link);
+		destinationFinder = nearestDestinationLimit < 0 ?
+				null :
+				new StraightLineKnnFinder<>(nearestDestinationLimit, veh -> veh.link, dest -> dest.link);
+		vehicleFinder = nearestVehicleLimit < 0 ?
+				null :
+				new StraightLineKnnFinder<>(nearestVehicleLimit, dest -> dest.link, veh -> veh.link);
 	}
 
 	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
@@ -122,8 +124,9 @@ public class VehicleAssignmentProblem<D> {
 		for (int v = 0; v < vData.getSize(); v++) {
 			VehicleData.Entry departure = vData.getEntry(v);
 
-			List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
-					: destinationFinder.findNearest(departure, dData.getEntries().stream());
+			List<DestEntry<D>> filteredDests = destinationFinder == null ?
+					dData.getEntries() :
+					destinationFinder.findNearest(departure, dData.getEntries().stream());
 			List<Link> toLinks = Lists.transform(filteredDests, dest -> dest.link);
 			PathData[] paths = forwardPathSearch.calcPathDataArray(departure.link, toLinks, departure.time);
 
@@ -139,8 +142,9 @@ public class VehicleAssignmentProblem<D> {
 		for (int d = 0; d < dData.getSize(); d++) {
 			DestEntry<D> dest = dData.getEntry(d);
 
-			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
-					: vehicleFinder.findNearest(dest, vData.getEntries().stream());
+			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ?
+					vData.getEntries() :
+					vehicleFinder.findNearest(dest, vData.getEntries().stream());
 			List<Link> toLinks = Lists.transform(filteredVehs, veh -> veh.link);
 			PathData[] paths = backwardPathSearch.calcPathDataArray(dest.link, toLinks, dest.time);
 
@@ -179,9 +183,9 @@ public class VehicleAssignmentProblem<D> {
 			PathData pathData = pathDataMatrix[v][d];
 
 			// TODO if null is frequent we may be more efficient by increasing the neighbourhood
-			VrpPathWithTravelData vrpPath = pathData == null ? //
-					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, router, travelTime)
-					: VrpPaths.createPath(departure.link, dest.link, departure.time, pathData, travelTime);
+			VrpPathWithTravelData vrpPath = pathData == null ?
+					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, router, travelTime) :
+					VrpPaths.createPath(departure.link, dest.link, departure.time, pathData, travelTime);
 
 			dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));
 		}

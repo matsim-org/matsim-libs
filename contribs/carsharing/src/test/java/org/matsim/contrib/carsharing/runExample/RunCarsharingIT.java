@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -43,6 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Inject;
+
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author nagel
@@ -68,13 +71,17 @@ public class RunCarsharingIT {
 		config.network().setInputFile("network.xml" );
 
 		config.plans().setInputFile("10persons.xml");
-		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
+//		config.plans().setInputPersonAttributeFile("1000desiresAttributes.xml");
+//		config.plans().setInputPersonAttributeFile( null );
+		// (Not needed.  I removed this from config.xml, so setting to null is not needed here.. kai, jun'19)
 
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
-
+		config.plansCalcRoute().setRoutingRandomness(0.);
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
 		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 		csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
@@ -90,11 +97,27 @@ public class RunCarsharingIT {
 		
 //		config.global().setNumberOfThreads(1);
 //		config.qsim().setNumberOfThreads(1);
-		
+
+		{
+			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
+			params.setTeleportedModeSpeed( 0.83333333333 );
+//			params.setTeleportedModeSpeed( 2.0 );
+			params.setBeelineDistanceFactor( 1.3 );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
+		{
+			config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
+			ModeRoutingParams params = new ModeRoutingParams( TransportMode.walk );
+			params.setTeleportedModeSpeed( 0.83333333333 );
+//			params.setTeleportedModeSpeed( 2.0 );
+			params.setBeelineDistanceFactor( 1.3 );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// ---
 
@@ -135,7 +158,9 @@ public class RunCarsharingIT {
 				}
 				if ( iteration==0 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(0, nOfModeLegs );
+						// walk is used for access+egress to car 
+						// -> number of walk legs for access+egress equals twice the number of car legs = 44
+						Assert.assertEquals(44, nOfModeLegs );
 					} else if ( "oneway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {
@@ -150,6 +175,8 @@ public class RunCarsharingIT {
 				else if (iteration == 10) {
 					
 					if ( TransportMode.walk.equals(legMode) ) {
+						// walk is used for access+egress to car 
+						// -> number of walk legs for access+egress equals twice the number of car legs = 0
 						Assert.assertEquals(0, nOfModeLegs );
 //						Assert.assertEquals(8, nOfModeLegs );
 					} else if ( "bike".equals(legMode) ) {
@@ -184,20 +211,25 @@ public class RunCarsharingIT {
 							
 				else if ( iteration==20 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(2, nOfModeLegs );
+//						Assert.assertEquals(2, nOfModeLegs );
+						Assert.assertEquals(6, nOfModeLegs );
+						// (The above was changed because the two car trips have two access/egress walks each, which now have changed
+						// to true "walk". kai, nov'19)
 					} else if ( "twoway_vehicle".equals(legMode) ) {
-
-						Assert.assertEquals( 8, nOfModeLegs ) ;
-
+//						Assert.assertEquals( 8, nOfModeLegs ) ;
+						Assert.assertEquals( 6, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
 					} else if ( TransportMode.car.equals(legMode) ) {
 						Assert.assertEquals( 2, nOfModeLegs ) ;
 					} else if ( "egress_walk_tw".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
-					}
-					else if ( "access_walk_tw".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
-					}
-					else if ( "access_walk_ff".equals(legMode) ) {
+//						Assert.assertEquals( 4, nOfModeLegs ) ;
+						Assert.assertEquals( 3, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
+					} else if ( "access_walk_tw".equals(legMode) ) {
+//						Assert.assertEquals( 4, nOfModeLegs ) ;
+						Assert.assertEquals( 3, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
+					} else if ( "access_walk_ff".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
 					}
 				}

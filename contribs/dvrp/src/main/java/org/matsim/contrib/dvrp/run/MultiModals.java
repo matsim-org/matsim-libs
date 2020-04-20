@@ -24,20 +24,18 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
+import com.google.common.base.Verify;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class MultiModals {
 	public static void requireAllModesUnique(MultiModal<?> multiModal) {
-		if (!isAllModesUnique(multiModal.modes())) {
-			throw new RuntimeException("There are non-unique modes in: " + multiModal);
-		}
+		Verify.verify(isAllModesUnique(multiModal.modes()), "There are non-unique modes in: %s", multiModal);
 	}
 
 	public static void requireAllModesUnique(String... modes) {
-		if (!isAllModesUnique(Arrays.stream(modes))) {
-			throw new RuntimeException("There are non-unique modes in: " + modes);
-		}
+		Verify.verify(isAllModesUnique(Arrays.stream(modes)), "There are non-unique modes in: %s", modes);
 	}
 
 	public static boolean isAllModesUnique(Stream<String> modes) {

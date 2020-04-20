@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -41,10 +41,10 @@ import com.google.inject.name.Named;
 /**
  * Used for offline estimation of travel times for VrpOptimizer by means of the exponential moving average. The
  * weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05.
- * 
+ * <p>
  * The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the
  * initial estimates
- * 
+ *
  * @author michalm
  */
 public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
@@ -59,8 +59,8 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
-			DvrpConfigGroup dvrpConfig) {
+			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
+			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 

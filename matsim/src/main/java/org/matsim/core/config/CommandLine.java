@@ -1,4 +1,25 @@
-package org.matsim.core.config;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CommandLine.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.config;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -391,11 +412,11 @@ public class CommandLine {
 		List<String> flatArguments = new LinkedList<>();
 
 		for (String argument : args) {
-			int index = argument.lastIndexOf("=");
-			int bracketIndex = argument.lastIndexOf("]");
+			int index = argument.lastIndexOf('=');
+			int bracketIndex = argument.lastIndexOf(']');
 
 			if (bracketIndex > index) {
-				index = argument.indexOf("=", bracketIndex);
+				index = argument.indexOf('=', bracketIndex);
 			}
 
 			if (index > -1) {
@@ -488,7 +509,7 @@ public class CommandLine {
 		List<String> nonPrefixedOptions = new LinkedList<>();
 
 		for (String option : options.keySet()) {
-			int separatorIndex = option.indexOf(":");
+			int separatorIndex = option.indexOf(':');
 
 			if (separatorIndex > -1) {
 				String prefix = option.substring(0, separatorIndex);
@@ -525,7 +546,7 @@ public class CommandLine {
 	}
 
 	private void processConfigOption(Config config, String option, String remainder) throws ConfigurationException {
-		int separatorIndex = remainder.indexOf(".");
+		int separatorIndex = remainder.indexOf('.');
 
 		if (separatorIndex > -1) {
 			String module = remainder.substring(0, separatorIndex);
@@ -546,9 +567,9 @@ public class CommandLine {
 	private void processParameter(String option, String path, ConfigGroup configGroup, String remainder)
 			throws ConfigurationException {
 		if (remainder.contains("[")) {
-			int selectorStartIndex = remainder.indexOf("[");
-			int selectorEndIndex = remainder.indexOf("]");
-			int equalIndex = remainder.indexOf("=");
+			int selectorStartIndex = remainder.indexOf('[');
+			int selectorEndIndex = remainder.indexOf(']');
+			int equalIndex = remainder.indexOf('=');
 
 			if (selectorStartIndex > -1 && selectorEndIndex > -1 && equalIndex > -1) {
 				if (selectorStartIndex < equalIndex && equalIndex < selectorEndIndex) {

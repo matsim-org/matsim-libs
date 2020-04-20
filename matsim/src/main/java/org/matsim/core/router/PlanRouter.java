@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -32,7 +33,6 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
@@ -45,6 +45,8 @@ import org.matsim.vehicles.Vehicle;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
+	private static final Logger log = Logger.getLogger( PlanRouter.class ) ;
+	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 
@@ -83,12 +85,14 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for (Trip oldTrip : trips) {
+			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
+			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
-							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
+							routingMode,
 						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
 						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
@@ -146,8 +150,11 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final Activity activity,
 			final Plan plan,
 			final Config config ) {
-		
-		if (!Time.isUndefinedTime(activity.getEndTime())) return activity.getEndTime();
+		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
+		// method in PopulationUtils directly would probably be faster.  kai, jul'19
+
+		if (activity.getEndTime().isDefined())
+			return activity.getEndTime().seconds();
 
 		// no sufficient information in the activity...
 		// do it the long way.
@@ -157,7 +164,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double now = 0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			now = TripRouter.calcEndOfPlanElement( now, pe, config );
+			now = TripRouter.calcEndOfPlanElement(now, pe, config);
 			if (pe == activity) return now;
 		}
 

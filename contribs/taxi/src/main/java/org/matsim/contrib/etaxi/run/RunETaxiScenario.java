@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -31,10 +32,12 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,24 +49,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile,
-				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
+	public static void run(URL configUrl, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, otfvis).run();
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new ETaxiModule());
+		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
+		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
@@ -72,7 +75,7 @@ public class RunETaxiScenario {
 			}
 		});
 
-		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(mode));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -90,12 +93,5 @@ public class RunETaxiScenario {
 		}
 
 		return controler;
-	}
-
-	public static void main(String[] args) {
-		// String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
-		// String configFile =
-		// "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
-		RunETaxiScenario.run("mielec_2014_02/mielec_etaxi_config.xml", false);
 	}
 }

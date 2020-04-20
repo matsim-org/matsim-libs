@@ -115,9 +115,8 @@ public class DecongestionPricingTestIT {
 		// toll-adjusted routing
 		
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
-		controler.addOverridingModule(new AbstractModule(){
+
+                controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
@@ -183,9 +182,8 @@ public class DecongestionPricingTestIT {
 		// toll-adjusted routing
 		
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
-		controler.addOverridingModule(new AbstractModule(){
+
+                controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
@@ -266,9 +264,8 @@ public class DecongestionPricingTestIT {
 		// toll-adjusted routing
 		
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
-		controler.addOverridingModule(new AbstractModule(){
+
+                controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
@@ -333,9 +330,8 @@ public class DecongestionPricingTestIT {
 		// toll-adjusted routing
 		
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
-		controler.addOverridingModule(new AbstractModule(){
+
+                controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );
@@ -408,9 +404,8 @@ public class DecongestionPricingTestIT {
 		// toll-adjusted routing
 		
 		final TollTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new TollTimeDistanceTravelDisutilityFactory();
-		travelDisutilityFactory.setSigma(0.);
-		
-		controler.addOverridingModule(new AbstractModule(){
+
+                controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
 				this.bindCarTravelDisutilityFactory().toInstance( travelDisutilityFactory );

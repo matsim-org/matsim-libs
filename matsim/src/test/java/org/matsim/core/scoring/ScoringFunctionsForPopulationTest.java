@@ -1,10 +1,32 @@
-package org.matsim.core.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ScoringFunctionsForPopulationTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.scoring;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -15,6 +37,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -55,10 +78,10 @@ public class ScoringFunctionsForPopulationTest {
 		Assert.assertEquals("walk", ((Leg) rs.lastTrip.getTripElements().get(0)).getMode());
 
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("transit_walk")));
-		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("pt_interaction", new Coord(1000, 200))));
+		sf.handleActivity(new PersonExperiencedActivity(personId, PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(1000, 200), null, TransportMode.pt)));
 		Assert.assertEquals(1, rs.tripCounter);
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("pt")));
-		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("pt_interaction", new Coord(1000, 200))));
+		sf.handleActivity(new PersonExperiencedActivity(personId, PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(new Coord(1000, 200), null, TransportMode.pt)));
 		Assert.assertEquals(1, rs.tripCounter);
 		sf.handleLeg(new PersonExperiencedLeg(personId, pf.createLeg("transit_walk")));
 		sf.handleActivity(new PersonExperiencedActivity(personId, pf.createActivityFromCoord("leisure", new Coord(1000, 200))));

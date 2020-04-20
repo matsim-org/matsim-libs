@@ -48,12 +48,12 @@ import com.google.inject.Inject;
 public class DriveDischargingHandler
 		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
 		MobsimScopeEventHandler {
-	private static class EVDrive {
+	private static class EvDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
 		private double movedOverNodeTime;
 
-		public EVDrive(Id<Vehicle> vehicleId, ElectricVehicle ev) {
+		public EvDrive(Id<Vehicle> vehicleId, ElectricVehicle ev) {
 			this.vehicleId = vehicleId;
 			this.ev = ev;
 			movedOverNodeTime = Double.NaN;
@@ -66,7 +66,7 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
-	private final Map<Id<Vehicle>, EVDrive> evDrives;
+	private final Map<Id<Vehicle>, EvDrive> evDrives;
 	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
@@ -83,13 +83,13 @@ public class DriveDischargingHandler
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		ElectricVehicle ev = eVehicles.get(vehicleId);
 		if (ev != null) {// handle only our EVs
-			evDrives.put(vehicleId, new EVDrive(vehicleId, ev));
+			evDrives.put(vehicleId, new EvDrive(vehicleId, ev));
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		EVDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
 		if (evDrive != null) {
 			evDrive.movedOverNodeTime = event.getTime();
 		}
@@ -97,7 +97,7 @@ public class DriveDischargingHandler
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		EVDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
+		EvDrive evDrive = dischargeVehicle(event.getVehicleId(), event.getLinkId(), event.getTime());
 		if (evDrive != null) {
 			evDrives.remove(evDrive.vehicleId);
 		}
@@ -107,8 +107,8 @@ public class DriveDischargingHandler
 	// (for instance, AUX discharging and battery charging modifies SOC outside event handling
 	// (as MobsimAfterSimStepListeners)
 	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
-	private EVDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
-		EVDrive evDrive = evDrives.get(vehicleId);
+	private EvDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
+		EvDrive evDrive = evDrives.get(vehicleId);
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
@@ -116,12 +116,7 @@ public class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
 					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
-			//XXX or maybe we should allow a negative energy in the discharge() method??
-			if (energy < 0) {
-				ev.getBattery().charge(Math.abs(energy));
-			} else {
-				ev.getBattery().discharge(energy);
-			}
+			ev.getBattery().changeSoc(-energy);
 
 			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);

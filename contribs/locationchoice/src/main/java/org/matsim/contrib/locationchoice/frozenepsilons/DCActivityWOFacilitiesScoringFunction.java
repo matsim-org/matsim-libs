@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.SumScoringFunction;
 
-public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
+class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityWOFacilitiesScoringFunction.class);	
 	private DestinationScoring destinationChoiceScoring;	
 	private double score = 0. ;
@@ -50,18 +50,18 @@ public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction
 	@Override
 	public void handleFirstActivity(Activity act) {
 		activityIndex = 0 ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
 		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
 		activityIndex++ ;
-		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategyModule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyLocationChoiceStrategymodule.useScaleEpsilonFromConfig, activityIndex, person.getId() );
 	}
 }

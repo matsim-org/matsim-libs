@@ -259,8 +259,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 
 	private static class TempStop {
 		protected final TransitStopFacility stop;
-		protected double departure = Time.UNDEFINED_TIME;
-		protected double arrival = Time.UNDEFINED_TIME;
+		protected double departure = Time.getUndefinedTime();
+		protected double arrival = Time.getUndefinedTime();
 		protected boolean awaitDeparture = false;
 
 		protected TempStop(final TransitStopFacility stop) {

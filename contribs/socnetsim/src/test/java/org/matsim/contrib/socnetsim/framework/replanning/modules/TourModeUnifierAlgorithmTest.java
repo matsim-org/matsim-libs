@@ -19,28 +19,29 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
  * @author thibautd
  */
 public class TourModeUnifierAlgorithmTest {
+	private static final Logger log = Logger.getLogger( TourModeUnifierAlgorithmTest.class );
 
 	@Test
 	public void testPlanWithOneSingleTour() throws Exception {
@@ -50,7 +51,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode = "the_mode";
 
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
@@ -109,12 +110,12 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
-		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
+//		final Set<String> types = new HashSet<>(); // formerly new StageActivityTypesImpl();
+		final int nActs = TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ).size();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm(
-					types,
+					TripStructureUtils::isStageActivityType,
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
@@ -122,7 +123,7 @@ public class TourModeUnifierAlgorithmTest {
 				"unexpected plan size",
 				2 * nActs - 1,
 				plan.getPlanElements().size() );
-		for ( Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType ) ) {
 			Assert.assertEquals(
 					"unexpected size of trip "+trip,
 					1,
@@ -145,7 +146,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode1 = "first_mode";
 		final String mode2 = "second_mode";
 		final String modeOfOpenTour = "space_shuttle";
@@ -183,11 +184,11 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("s", exitLink) );
 
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+//		final Set<String> types = new HashSet<>();// formerly new StageActivityTypesImpl();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 
-					types,
+					TripStructureUtils::isStageActivityType,
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
@@ -196,7 +197,7 @@ public class TourModeUnifierAlgorithmTest {
 				31,
 				plan.getPlanElements().size() );
 
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType );
 
 		Assert.assertEquals(
 				"unexpected number of trips",
@@ -242,7 +243,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode1 = "first_mode";
 		final String mode2 = "second_mode";
 
@@ -266,12 +267,14 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
-		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
+		final List<Activity> activities = TripStructureUtils.getActivities( plan, StageActivityHandling.ExcludeStageActivities );
+		final int nActs = activities.size();
+
+		Assert.assertEquals( 9, nActs );
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 
-					types,
+					TripStructureUtils::isStageActivityType,
 					new MainModeIdentifierImpl() );
 		testee.run( plan );
 
@@ -280,7 +283,7 @@ public class TourModeUnifierAlgorithmTest {
 				2 * nActs - 1,
 				plan.getPlanElements().size() );
 
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , TripStructureUtils::isStageActivityType );
 
 		Assert.assertEquals(
 				"unexpected number of trips",
@@ -310,6 +313,17 @@ public class TourModeUnifierAlgorithmTest {
 					mode2,
 					trips.get( tripNr ).getLegsOnly().get( 0 ).getMode() );
 		}
+	}
+	private static void printPlan( Plan plan ){
+		StringBuilder msg = new StringBuilder();
+		for( PlanElement planElement : plan.getPlanElements() ){
+			if ( planElement instanceof Activity ) {
+				msg.append( "| " ).append( ((Activity) planElement).getType() ).append( " |" );
+			} else if ( planElement instanceof Leg ) {
+				msg.append( "| " ).append( ((Leg) planElement).getMode() ).append( " |" );
+			}
+		}
+		log.info( msg.toString() );
 	}
 }
 

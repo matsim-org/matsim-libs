@@ -40,14 +40,13 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.lanes.Lane;
 import org.matsim.contrib.signals.data.MatsimSignalSystemsReader;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
+public final class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 	
 	private static final Logger log = Logger.getLogger(SignalSystemsWriter20.class);
 	

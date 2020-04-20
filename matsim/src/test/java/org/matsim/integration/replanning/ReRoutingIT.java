@@ -45,9 +45,9 @@ public class ReRoutingIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Scenario loadScenario() {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
-		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
-		config.plans().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
+		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
 		config.qsim().setTimeStepSize(10.0);
 		config.qsim().setStuckTime(100.0);
 		config.qsim().setRemoveStuckVehicles(true);
@@ -118,9 +118,9 @@ public class ReRoutingIT {
 	}
 	
 	private void evaluate() throws MalformedURLException {
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
-		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
-		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans.xml.gz").toString());
+		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans.xml.gz").toString());
 		Scenario referenceScenario = ScenarioUtils.loadScenario(config);
 
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").toURI().toURL().toString());

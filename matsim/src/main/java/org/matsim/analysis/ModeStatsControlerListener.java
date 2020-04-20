@@ -31,7 +31,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -46,9 +45,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -78,8 +76,6 @@ ShutdownListener {
 
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
-	private final Provider<TripRouter> tripRouterFactory;
-	private StageActivityTypes stageActivities;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
 	
@@ -89,7 +85,7 @@ ShutdownListener {
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, Provider<TripRouter> tripRouterFactory ) {
+			PlanCalcScoreConfigGroup scoreConfig, AnalysisMainModeIdentifier mainModeIdentifier) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
@@ -106,15 +102,12 @@ ShutdownListener {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.tripRouterFactory = tripRouterFactory;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		this.minIteration = controlerConfigGroup.getFirstIteration();
-		TripRouter tripRouter = tripRouterFactory.get();
-		this.stageActivities = tripRouter.getStageActivityTypes() ;
-		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 	}
 
 	@Override
@@ -125,7 +118,7 @@ ShutdownListener {
 	private void collectModeShareInfo(final IterationEndsEvent event) {
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan() ;
-			List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivities) ;
+			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
 			for ( Trip trip : trips ) {
 				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning" 
@@ -146,6 +139,7 @@ ShutdownListener {
 		
 		try {
 			this.modeOut.write( String.valueOf(event.getIteration()) ) ;
+			log.info("Mode shares over all " + sum + " trips found. MainModeIdentifier: " + mainModeIdentifier.getClass());
 			for ( String mode : modes ) {
 				Double cnt = this.modeCnt.get(mode) ;
 				double share = 0. ;

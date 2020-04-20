@@ -19,6 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,6 +39,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -43,9 +47,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
-import java.util.ListIterator;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
@@ -248,7 +249,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
+		if ((this.nextStop.isAwaitDepartureTime()) && (!Time.isUndefinedTime(this.nextStop.getDepartureOffset() ))) {
 			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;
@@ -417,7 +418,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Deprecated
 		@Override
-		public double getTravelTime() {
+		public OptionalTime getTravelTime() {
 			return this.delegate.getTravelTime();
 		}
 
@@ -428,6 +429,11 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 		@Override
 		public void setTravelTime(final double travelTime) {
+			throw new UnsupportedOperationException("read only route.");
+		}
+
+		@Override
+		public void setTravelTimeUndefined() {
 			throw new UnsupportedOperationException("read only route.");
 		}
 

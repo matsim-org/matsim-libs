@@ -51,8 +51,9 @@ public class OneToManyPathSearch {
 
 	public static OneToManyPathSearch createBackwardSearch(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility) {
-		return create((BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true)
-				.createPathCalculator(network, travelDisutility, travelTime));
+		return create(
+				(BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true).createPathCalculator(
+						network, travelDisutility, travelTime));
 	}
 
 	public static OneToManyPathSearch create(MultiNodePathCalculator multiNodeDijkstra) {
@@ -170,8 +171,9 @@ public class OneToManyPathSearch {
 	}
 
 	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, Path path, double time) {
-		double lastLinkTT = forward ? //
-				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) : VrpPaths.getLastLinkTT(fromLink, time);
+		double lastLinkTT = forward ?
+				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) :
+				VrpPaths.getLastLinkTT(fromLink, time);
 		return VrpPaths.FIRST_LINK_TT + lastLinkTT;
 	}
 }

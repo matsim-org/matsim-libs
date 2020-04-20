@@ -1,10 +1,27 @@
-package org.matsim.core.mobsim.qsim.components;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * QSimComponentsConfigGroup.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim.components;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.matsim.core.config.ConfigGroup;
@@ -19,7 +36,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 public class QSimComponentsConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "qsim_components";
 
-	public static final String ACTIVE_COMPONENTS = "activeComponents";
+	private static final String ACTIVE_COMPONENTS = "activeComponents";
 
 	public static final List<String> DEFAULT_COMPONENTS = Arrays.asList(ActivityEngineModule.COMPONENT_NAME,
 			QNetsimEngineModule.COMPONENT_NAME, TeleportationModule.COMPONENT_NAME, PopulationModule.COMPONENT_NAME,
@@ -47,7 +64,11 @@ public class QSimComponentsConfigGroup extends ConfigGroup {
 	}
 
 	public void setActiveComponents(List<String> activeComponents) {
-		this.activeComponents = activeComponents;
+		// the original design uses "List" here.  But it fails later when keys exist twice.
+		// yyyy possibly, we should rather accept "Set" instead of "List".  But I don't want to do the refactoring before we have clarified what we want.
+		// kai, nov'19
+		Set<String> activeComponentsAsSet = new LinkedHashSet<>( activeComponents ) ;
+		this.activeComponents = new ArrayList<>( activeComponentsAsSet ) ;
 	}
 
 	@StringGetter(ACTIVE_COMPONENTS)

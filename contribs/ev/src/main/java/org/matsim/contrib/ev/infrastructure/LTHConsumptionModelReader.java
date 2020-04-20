@@ -23,9 +23,7 @@ package org.matsim.contrib.ev.infrastructure;/*
  * created by jbischoff, 23.08.2018
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.common.primitives.Doubles;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.LTHDriveEnergyConsumption;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -33,7 +31,9 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.vehicles.VehicleType;
 
-import com.google.common.primitives.Doubles;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class reads Energy consumption files from CSV as used in the IDEAS project between TU Berlin and LTH Lund.
@@ -48,12 +48,12 @@ public class LTHConsumptionModelReader {
 		this.vehicleTypeId = vehicleTypeId;
 	}
 
-	public LTHDriveEnergyConsumption.Factory readFile(String filename) {
+	public LTHDriveEnergyConsumption.Factory readURL(URL fileUrl) {
 		List<Double> speeds = new ArrayList<>();
 		List<Double> slopes = new ArrayList<>();
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
 		tabularFileParserConfig.setDelimiterTags(new String[] { "," });
-		tabularFileParserConfig.setFileName(filename);
+		tabularFileParserConfig.setUrl(fileUrl);
 
 		new TabularFileParser().parse(tabularFileParserConfig, row -> {
 			if (speeds.isEmpty()) {

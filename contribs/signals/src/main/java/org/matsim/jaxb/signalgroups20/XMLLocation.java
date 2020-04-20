@@ -40,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
     "actLocation"
 })
 @XmlRootElement(name = "location")
-public class XMLLocation {
+final class XMLLocation {
 
-    protected XMLCoordinateType coordinate;
-    protected XMLActLocationType actLocation;
+    private XMLCoordinateType coordinate;
+    private XMLActLocationType actLocation;
 
     /**
      * Gets the value of the coordinate property.

@@ -44,7 +44,7 @@ public class OhdeSlaskiDriveEnergyConsumption implements DriveEnergyConsumption 
 	private static final double a2 = 0.99819;// [m/s^2]
 
 	// precomputed values
-	private static final int MAX_AVG_SPEED = 40;
+	private static final int MAX_AVG_SPEED = 80;
 	private static final int SPEED_STEPS_PER_UNIT = 10;
 	private static final double ZERO_SPEED = 0.01;
 	private static final double[] POWER;

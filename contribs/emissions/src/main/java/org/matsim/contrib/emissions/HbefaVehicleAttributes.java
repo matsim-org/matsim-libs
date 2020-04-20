@@ -23,7 +23,7 @@ package org.matsim.contrib.emissions;
  * @author benjamin
  *
  */
-public final class HbefaVehicleAttributes {
+final class HbefaVehicleAttributes {
 	// yy I can see what this is good for.  I am at this point not totally sure if it makes a lot of sense to use this outside the emissions contrib.  kai, jan'19
 
 	private String hbefaTechnology = "average";
@@ -37,7 +37,7 @@ public final class HbefaVehicleAttributes {
 	/**
 	 * @return {@value #TECHNOLOGY_CMT}
 	 */
-	public String getHbefaTechnology(){
+	String getHbefaTechnology(){
 		return this.hbefaTechnology;
 	}
 	/**
@@ -109,6 +109,6 @@ public final class HbefaVehicleAttributes {
 	}
 
 	public boolean isDetailed() {
-		return !hbefaEmConcept.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
+		return !hbefaTechnology.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
 	}
 }

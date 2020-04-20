@@ -19,8 +19,8 @@ import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
@@ -112,11 +112,11 @@ class PlanSerializable implements Serializable {
 
         public ActivitySerializable(Activity act) {
             coord = new CoordSerializable(act.getCoord());
-            endTime = act.getEndTime();
+			endTime = act.getEndTime().seconds();
             facIdString = act.getFacilityId() == null ? null : act.getFacilityId().toString();
             linkIdString = act.getLinkId() == null ? null : act.getLinkId().toString();
-            maximumDuration = act.getMaximumDuration();
-            startTime = act.getStartTime();
+            maximumDuration = act.getMaximumDuration().seconds();
+			startTime = act.getStartTime().seconds();
             type = act.getType();
         }
 
@@ -133,13 +133,15 @@ class PlanSerializable implements Serializable {
     class LegSerializable implements PlanElementSerializable {
         private final double departureTime;
         private final String mode;
+        private final String routingMode;
         private final double travelTime;
         private RouteSerializable route;
 
         public LegSerializable(Leg leg) {
-            departureTime = leg.getDepartureTime();
+			departureTime = leg.getDepartureTime().seconds();
             mode = leg.getMode();
-            travelTime = leg.getTravelTime();
+            routingMode = TripStructureUtils.getRoutingMode(leg);
+			travelTime = leg.getTravelTime().seconds();
 
             if (leg.getRoute() != null) {
                 if (leg.getMode().equals(TransportMode.car))
@@ -154,6 +156,7 @@ class PlanSerializable implements Serializable {
 
         public Leg getLeg() {
             Leg leg = PopulationUtils.createLeg(mode);
+            TripStructureUtils.setRoutingMode(leg, routingMode);
             leg.setDepartureTime(departureTime);
             leg.setTravelTime(travelTime);
             leg.setRoute(route == null ? null : route.getRoute(mode));
@@ -191,7 +194,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             startLinkIdString = route.getStartLinkId().toString();
             travelCost = route.getTravelCost();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
             vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
             List<Id<Link>> linkIds = route.getLinkIds();
             linkIdStrings = new ArrayList<>();
@@ -230,7 +233,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             routeDescription = route.getRouteDescription();
             startLinkIdString = route.getStartLinkId().toString();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
         }
 
         @Override

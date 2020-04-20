@@ -35,13 +35,14 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-public class Worker extends Thread implements BasicEventHandler{
+class Worker extends Thread implements BasicEventHandler{
 
 	private static final Logger log = Logger.getLogger(Worker.class);
 
 	private final EventsManager eventsManager;
 	private final String eFile;
 	private final CyclicBarrier doComparison;
+	private final boolean ignoringCoordinates;
 
 	private final Map<String,Counter> events = new HashMap<String,Counter>();
 
@@ -49,12 +50,14 @@ public class Worker extends Thread implements BasicEventHandler{
 	private volatile boolean finished = false;
 	private volatile int numEvents = 0;
 
-	public Worker(String eFile1, final CyclicBarrier doComparison) {
+	Worker( String eFile1, final CyclicBarrier doComparison, boolean ignoringCoordinates ) {
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
+		this.ignoringCoordinates = ignoringCoordinates;
 
 		this.eventsManager = EventsUtils.createEventsManager();
 		this.eventsManager.addHandler(this);
+
 	}
 
 	/*package*/ String getEventsFile() {
@@ -133,7 +136,18 @@ public class Worker extends Thread implements BasicEventHandler{
 		List<String> strings = new ArrayList<String>();
 		for (Entry<String, String> e : event.getAttributes().entrySet()) {
 			StringBuilder tmp = new StringBuilder();
-			tmp.append(e.getKey());
+			final String key = e.getKey();
+
+			// don't look at coordinates if configured as such:
+			if ( ignoringCoordinates ){
+				switch( key ){
+					case Event.ATTRIBUTE_X:
+					case Event.ATTRIBUTE_Y:
+						continue;
+				}
+			}
+
+			tmp.append( key );
 			tmp.append("=");
 			tmp.append(e.getValue());
 			strings.add(tmp.toString());
@@ -141,9 +155,10 @@ public class Worker extends Thread implements BasicEventHandler{
 		Collections.sort(strings);
 		StringBuilder eventStr = new StringBuilder();
 		for (String str : strings) {
-			eventStr.append("|");
+			eventStr.append(" | ");
 			eventStr.append(str);
 		}
+		eventStr.append(" | ") ;
 		return eventStr.toString();
 	}
 

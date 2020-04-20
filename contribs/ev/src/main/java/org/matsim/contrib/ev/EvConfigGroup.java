@@ -19,13 +19,12 @@
 
 package org.matsim.contrib.ev;
 
-import java.util.Map;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import java.util.Map;
 
 public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "ev";
@@ -41,6 +40,9 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String AUX_DISCHARGE_TIME_STEP = "auxDischargeTimeStep";
 	static final String AUX_DISCHARGE_TIME_STEP_EXP = "AUX discharging will be simulated every 'auxDischargeTimeStep'-th time step";
 
+	public static final String MINCHARGETIME = "minChargingTime";
+	static final String MINCHARGETIME_EXP = "Miinum activity duration for charging. Used in EvNetwork Routing.";
+
 	// input
 	public static final String CHARGERS_FILE = "chargersFile";
 	static final String CHARGERS_FILE_EXP = "Location of the chargers file";
@@ -52,9 +54,12 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public static final String TIME_PROFILES = "timeProfiles";
 	static final String TIME_PROFILES_EXP = "If true, SOC time profile plots will be created";
 
+
 	// no need to simulate with 1-second time step
 	@Positive
 	private int chargeTimeStep = 5; // 5 s ==> 0.35% SOC (fast charging, 50 kW)
+
+	private int minimumChargeTime = 1200;
 
 	// only used if SeparateAuxDischargingHandler is used, otherwise ignored
 	@Positive
@@ -80,6 +85,7 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 		map.put(CHARGERS_FILE, CHARGERS_FILE_EXP);
 		map.put(VEHICLES_FILE, VEHICLES_FILE_EXP);
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
+		map.put(MINCHARGETIME, MINCHARGETIME_EXP);
 		return map;
 	}
 
@@ -132,4 +138,16 @@ public final class EvConfigGroup extends ReflectiveConfigGroup {
 	public void setTimeProfiles(boolean timeProfiles) {
 		this.timeProfiles = timeProfiles;
 	}
+
+	@StringSetter(MINCHARGETIME)
+	public void setMinimumChargeTime(int minimumChargeTime) {
+		this.minimumChargeTime = minimumChargeTime;
+	}
+
+	@StringGetter(MINCHARGETIME)
+	public int getMinimumChargeTime() {
+		return minimumChargeTime;
+	}
 }
+
+

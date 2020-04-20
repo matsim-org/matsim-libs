@@ -2,6 +2,8 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
@@ -12,7 +14,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author sschroeder
  *
  */
-public final class CarrierShipment {
+public final class CarrierShipment implements Attributable {
 
 	/**
 	 * A builder that builds shipments.
@@ -125,6 +127,8 @@ public final class CarrierShipment {
 
 	private double deliveryServiceTime;
 
+	private Attributes attributes = new Attributes();
+
 //	public CarrierShipment(final Id from, final Id to, final int size, final TimeWindow pickupTimeWindow, final TimeWindow deliveryTimeWindow) {
 //		super();
 //		this.from = from;
@@ -182,6 +186,11 @@ public final class CarrierShipment {
 
 	public TimeWindow getDeliveryTimeWindow() {
 		return deliveryTimeWindow;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
 	}
 
 	@Override

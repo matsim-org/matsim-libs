@@ -1,4 +1,25 @@
-package org.matsim.core.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ScoringFunctionsForPopulationStressIT.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.scoring;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -52,7 +73,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				throwingScoringFunctionFactory
 		);
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
-		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4));
+		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
 		scoringFunctionsForPopulation.finishScoringFunctions();
 	}
 
@@ -195,7 +216,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		controlerListenerManager.fireControlerIterationStartsEvent(0);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
@@ -334,7 +355,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
-			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
+			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
 			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));

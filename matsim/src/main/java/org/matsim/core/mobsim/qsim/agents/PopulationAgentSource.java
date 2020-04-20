@@ -19,25 +19,28 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.*;
-import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.PrepareForSimImpl;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class PopulationAgentSource implements AgentSource {
 	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
@@ -48,6 +51,7 @@ public final class PopulationAgentSource implements AgentSource {
 	private final QSim qsim;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
+    private int warnCnt = 0;
 
 	@Inject
 	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, QSim qsim ) {
@@ -68,7 +72,7 @@ public final class PopulationAgentSource implements AgentSource {
 			insertVehicles(p);
 		}
 	}
-	
+	private static int cnt = 5 ;
 	private void insertVehicles(Person person) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
@@ -88,7 +92,7 @@ public final class PopulationAgentSource implements AgentSource {
 				vehicleId = route.getVehicleId();
 			}
 			if (vehicleId == null) {
-				vehicleId = PrepareForSimImpl.obtainAutomaticVehicleId(person.getId(), leg.getMode(), qsim.getScenario().getConfig().qsim() );
+				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
 				if(route!=null) {
 					route.setVehicleId( vehicleId );
 				}
@@ -96,14 +100,32 @@ public final class PopulationAgentSource implements AgentSource {
 			
 			// determine the vehicle (not the same as just its ID):
 
-			// we have seen the mode before in the plan:
-			if ( seenModes.keySet().contains( leg.getMode() ) ) {
-				if (vehicleId == null && route != null) {
-					vehicleId = seenModes.get(leg.getMode());
-					route.setVehicleId(vehicleId);
-					// yyyy what is the meaning of route==null? kai, jun'18
+			final QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
+
+			if ( vehiclesSource!= QSimConfigGroup.VehiclesSource.fromVehiclesData ){
+				// without this condition, it is surely wrong when the vehicles come from the vehicles data ... because a second vehicle for
+				// the same mode is not placed.  kai, nov'19
+
+				// yyyy I am not sure if at this point vehicleId actually can be null ... because the above VehicleUtils.getVehicleId(...,
+				// mode) already should contain a map of all the vehicles per person.   ???  kai, nov'19
+
+				// we have seen the mode before in the plan:
+				if( seenModes.keySet().contains( leg.getMode() ) ){
+					if( vehicleId == null && route != null ){
+						vehicleId = seenModes.get( leg.getMode() );
+						route.setVehicleId( vehicleId );
+						// yyyy what is the meaning of route==null? kai, jun'18
+
+						if ( cnt > 0 ) {
+							log.warn( "encountered vehicleId=null where I am not sure how and why this should happen ..." );
+							cnt-- ;
+							if ( cnt==0 ) {
+								log.warn(  Gbl.FUTURE_SUPPRESSED );
+							}
+						}
+					}
+					continue;
 				}
-				continue;
 			}
 			
 			// if we are here, we haven't seen the mode before in this plan
@@ -113,7 +135,23 @@ public final class PopulationAgentSource implements AgentSource {
 			
 			// find the vehicle from the vehicles container.  It should be there, see automatic vehicle creation in PrepareForSim.
 			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
-			Gbl.assertNotNull(vehicle);
+			if ( vehicle==null ) {
+				String msg = "Could not get the requested vehicle with ID=" + vehicleId + " from the vehicles container. " ;
+				switch ( vehiclesSource ) {
+					case defaultVehicle:
+					case modeVehicleTypesFromVehiclesData:
+						msg += "You are using the config switch qsim.vehiclesSource=" + vehiclesSource.name() + "; this should have worked so " +
+								   "please report under matsim.org/faq ." ;
+						break;
+					case fromVehiclesData:
+						msg += "You are using the config switch qsim.vehiclesSource=" + vehiclesSource.name() + "; with that setting, you have to" +
+								   " provide all needed vehicles yourself." ;
+						break;
+					default:
+						throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
+				}
+				throw new RuntimeException( msg ) ;
+			}
 				
 			// find the link ID of where to place the vehicle:
 			Id<Link> vehicleLinkId = findVehicleLink(person);
@@ -121,7 +159,13 @@ public final class PopulationAgentSource implements AgentSource {
 			// Checking if the vehicle has been seen before:
 			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
 			if ( result != null ) {
-				log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
+                if (warnCnt <= 5) {
+                    log.info("have seen vehicle with id " + vehicleId + " before; not placing it again.");
+                }
+                if (warnCnt == 5) {
+                    log.warn(Gbl.FUTURE_SUPPRESSED);
+                }
+                warnCnt++;
 				if ( result != vehicleLinkId ) {
 					throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId +
 											   "; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ;

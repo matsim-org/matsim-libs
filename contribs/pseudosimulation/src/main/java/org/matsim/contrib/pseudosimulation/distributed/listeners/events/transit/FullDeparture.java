@@ -6,8 +6,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.Serializable;
-
 /**
  * Created by fouriep on 12/15/14.
  */
@@ -18,7 +16,7 @@ class FullDeparture{
     private final Id<Vehicle> vehicleId;
     private final Id<Departure> departureId;
 
-    public FullDeparture(Id lineId, Id routeId, Id vehicleId, Id departureId) {
+    public FullDeparture(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<Vehicle> vehicleId, Id<Departure> departureId) {
         super();
         this.lineId = lineId;
         this.routeId = routeId;

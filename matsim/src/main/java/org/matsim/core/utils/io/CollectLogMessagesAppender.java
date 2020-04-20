@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.utils.io;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.filter.ThresholdFilter;
+import org.matsim.core.controler.Controler;
+
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
 
 
 /**
@@ -31,36 +35,25 @@ import org.apache.log4j.spi.LoggingEvent;
  * @author dgrether
  *
  */
-public class CollectLogMessagesAppender extends AppenderSkeleton {
+public class CollectLogMessagesAppender extends AbstractAppender {
 
-	private List<LoggingEvent> logEvents = new LinkedList<LoggingEvent>();
+	private List<LogEvent> logEvents = new LinkedList<>();
 
-	/**
-	 * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
-	 */
-	@Override
-	protected void append(LoggingEvent e) {
-		logEvents.add(e);
+	public CollectLogMessagesAppender() {
+		super("collector",
+				ThresholdFilter.createFilter(Level.ALL, null, null),
+				Controler.DEFAULTLOG4JLAYOUT,
+				false,
+				new Property[0]);
+		this.logEvents = logEvents;
 	}
 
-	/**
-	 * @see org.apache.log4j.Appender#close()
-	 */
 	@Override
-	public void close() {
-		this.logEvents.clear();
-		this.closed = true;
+	public void append(LogEvent e) {
+		this.logEvents.add(e);
 	}
 
-	/**
-	 * @see org.apache.log4j.Appender#requiresLayout()
-	 */
-	@Override
-	public boolean requiresLayout() {
-		return false;
-	}
-
-	public List<LoggingEvent> getLogEvents() {
+	public List<LogEvent> getLogEvents() {
 		return this.logEvents;
 	}
 

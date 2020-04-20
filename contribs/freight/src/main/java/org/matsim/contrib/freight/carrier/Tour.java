@@ -276,6 +276,7 @@ public class Tour {
 	};
 
 	public static abstract class TourActivity extends TourElement {
+		// yy why does it make sense to not implement them at this level? kai, oct'19
 
 		public abstract String getActivityType();
 
@@ -288,6 +289,10 @@ public class Tour {
 		public abstract void setExpectedArrival(double arrivalTime);
 
 		public abstract double getExpectedArrival();
+
+		@Override public String toString() {
+			return "";
+		}
 	}
 
 	public static abstract class ShipmentBasedActivity extends TourActivity {
@@ -301,6 +306,10 @@ public class Tour {
 		private double expTransportTime;
 
 		private double departureTime;
+
+		@Override public String toString() {
+			return "leg=[ dpTime=" + departureTime + " | expTTime=" + expTransportTime + " | route=" + route + "]" ;
+		}
 
 		public Leg() {
 		}
@@ -346,6 +355,10 @@ public class Tour {
 		private CarrierService service;
 		
 		private double arrTime;
+
+		@Override public String toString() {
+			return "serviceActivity=" + super.toString() + "[arrTime=" + arrTime + "][service=" + service + "]" ;
+		}
 		
 		public ServiceActivity(CarrierService service) {
 			super();
@@ -670,7 +683,7 @@ public class Tour {
 	
 	@Override
 	public String toString() {
-		return "[startLinkId="+getStartLinkId()+"][endLinkId="+getEndLinkId()+"[#tourElements=" + tourElements.size() + "]";
+		return "[ startLinkId="+getStartLinkId()+" ][ endLinkId="+getEndLinkId()+" ][ #tourElements=" + tourElements.size() + "]";
 	}
 
 }

@@ -3,6 +3,7 @@ package org.matsim.contrib.analysis.spatial;
 import java.util.function.Supplier;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 
 /**
  * Hexagonal Grid which holds values
@@ -19,6 +20,17 @@ public final class HexagonalGrid<T> extends Grid<T> {
      * @param bounds                     outer bounds of the grid
      */
     public HexagonalGrid(double horizontalCentroidDistance, Supplier<T> initialValueSupplier, Geometry bounds) {
+        super(horizontalCentroidDistance, initialValueSupplier, bounds);
+    }
+
+    /**
+     * New Instance of HexagonalGrid
+     *
+     * @param horizontalCentroidDistance horizontal distance between cell centroids
+     * @param initialValueSupplier       function to deliver a initial value when cells are created
+     * @param bounds                     outer bounds of the grid
+     */
+    public HexagonalGrid(double horizontalCentroidDistance, Supplier<T> initialValueSupplier, PreparedGeometry bounds) {
         super(horizontalCentroidDistance, initialValueSupplier, bounds);
     }
 

@@ -21,7 +21,7 @@ package org.matsim.contrib.ev.temperature;/*
  * created by jbischoff, 15.08.2018
  */
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -34,7 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 public class TemperatureServiceImpl implements TemperatureService, TemperatureChangeEventHandler {
 	private final Network network;
-	private final Map<Link, Double> temperatures = new HashMap<>();
+	private final Map<Link, Double> temperatures = new LinkedHashMap<>();
 
 	@Inject
 	TemperatureServiceImpl(EventsManager events, Network network) {

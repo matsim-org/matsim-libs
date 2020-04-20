@@ -37,16 +37,11 @@ public interface Battery {
 	void setSoc(double soc);
 
 	/**
-	 * @param energy Energy to charge[J]
+	 * Changes SOC, making sure the charge level does not increase above the battery capacity or decrease below 0.
+	 *
+	 * @param energy change in energy [J], can be negative or positive
 	 */
-	default void charge(double energy) {
-		setSoc(Math.min(getSoc() + energy, getCapacity()));
-	}
-
-	/**
-	 * @param energy Energy to discharge [J]
-	 */
-	default void discharge(double energy) {
-		setSoc(Math.max(getSoc() - energy, 0));
+	default void changeSoc(double energy) {
+		setSoc(Math.max(0, Math.min(getSoc() + energy, getCapacity())));
 	}
 }

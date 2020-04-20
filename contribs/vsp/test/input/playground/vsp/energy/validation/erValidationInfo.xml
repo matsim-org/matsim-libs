@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:validation_information xmlns:ns2="http://www.matsim.org/files/dtd">
+    <poi_info>
+        <poi_id>test1</poi_id>
+        <maximum_capacity>5.0</maximum_capacity>
+        <occupancy_information>
+            <start_time>2012-05-16T06:00:00Z</start_time>
+            <end_time>2012-05-16T07:00:00Z</end_time>
+            <occupancy>6.0</occupancy>
+        </occupancy_information>
+        <occupancy_information>
+            <start_time>2012-05-16T07:00:00Z</start_time>
+            <end_time>2012-05-16T08:00:00Z</end_time>
+            <occupancy>4.0</occupancy>
+        </occupancy_information>
+    </poi_info>
+</ns2:validation_information>

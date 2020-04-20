@@ -45,7 +45,7 @@ public class ConfigUtilsTest {
 
 	@Test
 	public void testLoadConfig_filenameOnly() throws IOException {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertNotNull(config);
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
@@ -54,7 +54,7 @@ public class ConfigUtilsTest {
 	public void testLoadConfig_emptyConfig() throws IOException {
 		Config config = new Config();
 		Assert.assertNull(config.network());
-		ConfigUtils.loadConfig(config, IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		ConfigUtils.loadConfig(config, IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertNotNull(config.network());
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
@@ -65,13 +65,13 @@ public class ConfigUtilsTest {
 		config.addCoreModules();
 		Assert.assertNotNull(config.network());
 		Assert.assertNull(config.network().getInputFile());
-		ConfigUtils.loadConfig(config, IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		ConfigUtils.loadConfig(config, IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 	}
 
 	@Test
 	public void testModifyPaths_missingSeparator() throws IOException {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim");
 		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
@@ -80,7 +80,7 @@ public class ConfigUtilsTest {
 
 	@Test
 	public void testModifyPaths_withSeparator() throws IOException {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim/");
 		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
@@ -88,7 +88,7 @@ public class ConfigUtilsTest {
 
 	@Test
 	public void loadConfigWithTypedArgs(){
-		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		final String [] typedArgs = {"--config:controler.outputDirectory=abc"} ;
 		Config config = ConfigUtils.loadConfig( url, typedArgs );
 		Assert.assertEquals("abc", config.controler().getOutputDirectory());
@@ -97,7 +97,7 @@ public class ConfigUtilsTest {
 	public void loadConfigWithTypedArgsWithTypo(){
 		boolean hasFailed = false ;
 		try{
-			final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+			final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 			final String[] typedArgs = {"--config:controler.outputDirector=abc"};
 			Config config = ConfigUtils.loadConfig( url, typedArgs );
 			//		Assert.assertEquals("abc", config.controler().getOutputDirectory());

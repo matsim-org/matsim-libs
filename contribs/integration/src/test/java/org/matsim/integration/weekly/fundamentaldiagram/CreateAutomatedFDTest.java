@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
@@ -76,6 +76,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -106,6 +107,8 @@ public class CreateAutomatedFDTest {
 	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1};")
+	// the convention is that the output of the method marked by "@Parameters" is taken as input to the constructor
+	// before running each test. kai, jul'16
 	public static Collection<Object[]> createFds() {
 		int combos = LinkDynamics.values().length * TrafficDynamics.values().length ;
 		Object [][] combos2run = new Object [combos][2]; // #ld x #td x #params
@@ -118,8 +121,6 @@ public class CreateAutomatedFDTest {
 		}
 		return Arrays.asList(combos2run);
 		
-		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
-		// before running each test. kai, jul'16
 	}
 
 	@Test
@@ -439,7 +440,7 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Double getExpectedTravelTime() {
+		public OptionalTime getExpectedTravelTime() {
 			throw new RuntimeException("not implemented");
 		}
 
@@ -595,7 +596,7 @@ public class CreateAutomatedFDTest {
 		JFreeChart chart = new JFreeChart("Fundamental diagrams", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
 		try {
-			ChartUtilities.saveChartAsPNG(new File(outFile), chart, 800, 600);
+			ChartUtils.saveChartAsPNG(new File(outFile), chart, 800, 600);
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not plotted. Reason "+e);
 		}

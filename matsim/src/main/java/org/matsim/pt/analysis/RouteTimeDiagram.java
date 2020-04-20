@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
@@ -151,7 +151,7 @@ public class RouteTimeDiagram implements VehicleArrivesAtFacilityEventHandler, V
 		}
 
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), c, 1024, 768, null, true, 9);
+			ChartUtils.saveChartAsPNG(new File(filename), c, 1024, 768, null, true, 9);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

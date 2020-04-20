@@ -75,20 +75,21 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 	}
 
 	private void appendToMultiDayStats(TaxiStats s, int iteration) {
-		multiDayWriter.writeNext(new CSVLineBuilder().add(iteration + "") //
-				.addEmpty() //
-				.addf("%.1f", s.passengerWaitTime.getMean()).addf("%.1f", s.passengerWaitTime.getStandardDeviation()) //
-				.addf("%.0f", s.passengerWaitTime.getPercentile(95)) //
-				.addf("%.0f", s.passengerWaitTime.getMax()) //
-				.addEmpty() //
-				.addf("%.4f", s.getFleetEmptyDriveRatio()) //
-				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean()) //
-				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation()) //
-				.addEmpty() //
-				.addf("%.4f", s.getFleetStayRatio()) //
-				.addf("%.4f", s.vehicleStayRatio.getMean()) //
-				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation()) //
-				.addEmpty() //
+		multiDayWriter.writeNext(new CSVLineBuilder().add(iteration + "")
+				.addEmpty()
+				.addf("%.1f", s.passengerWaitTime.getMean())
+				.addf("%.1f", s.passengerWaitTime.getStandardDeviation())
+				.addf("%.0f", s.passengerWaitTime.getPercentile(95))
+				.addf("%.0f", s.passengerWaitTime.getMax())
+				.addEmpty()
+				.addf("%.4f", s.getFleetEmptyDriveRatio())
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean())
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation())
+				.addEmpty()
+				.addf("%.4f", s.getFleetStayRatio())
+				.addf("%.4f", s.vehicleStayRatio.getMean())
+				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation())
+				.addEmpty()
 				.addf("%.4f", s.getOccupiedDriveRatio()));
 		multiDayWriter.flush();
 	}

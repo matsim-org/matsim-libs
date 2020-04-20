@@ -28,14 +28,13 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
+//import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -44,7 +43,6 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.router.TransitRouter;
 
 /**
@@ -54,16 +52,10 @@ import org.matsim.pt.router.TransitRouter;
  * Run this class with no arguments to get printed help listing current command line options.
  */
 public class RunPSim {
-	private Config config;
 	private Scenario scenario;
-	private TransitPerformanceRecorder transitPerformanceRecorder;
 	private Controler matsimControler;
 
-	private PlanCatcher plancatcher;
-	private PSimProvider pSimProvider;
-
 	public RunPSim(Config config, PSimConfigGroup pSimConfigGroup) {
-		this.config = config;
 		this.scenario = ScenarioUtils.loadScenario(config);;
 
 		//The following line will make the controler use the events manager that doesn't check for event order.
@@ -100,12 +92,11 @@ public class RunPSim {
 			}
 		});
 
-		if (config.transit().isUseTransit()) {
-			if (pSimConfigGroup.isFullTransitPerformanceTransmission()) {
-				transitPerformanceRecorder = new TransitPerformanceRecorder(matsimControler.getScenario(), matsimControler.getEvents(), mobSimSwitcher);
-			}
-
-		}
+//		if (config.transit().isUseTransit()) {
+//			if (pSimConfigGroup.isFullTransitPerformanceTransmission()) {
+//				transitPerformanceRecorder = new TransitPerformanceRecorder(matsimControler.getScenario(), matsimControler.getEvents(), mobSimSwitcher);
+//			}
+//		}
 
 
 

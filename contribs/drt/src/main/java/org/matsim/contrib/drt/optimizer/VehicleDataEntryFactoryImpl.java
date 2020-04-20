@@ -28,11 +28,11 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -58,14 +58,11 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		Schedule schedule = vehicle.getSchedule();
-		@SuppressWarnings("unchecked")
-		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
-
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-			switch (currentTask.getDrtTaskType()) {
+			Task currentTask = schedule.getCurrentTask();
+			switch (((DrtTaskType)currentTask.getTaskType())) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
 					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
@@ -94,9 +91,10 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			nextTaskIdx = 0;
 		}
 
+		List<Task> tasks = (List<Task>)schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
-		for (DrtTask task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getDrtTaskType() == DrtTaskType.STOP) {
+		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
+			if (task.getTaskType() == DrtTaskType.STOP) {
 				stopTasks.add((DrtStopTask)task);
 			}
 		}
@@ -112,7 +110,6 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 	}
 
 	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return !(currentTime + lookAhead < vehicle.getServiceBeginTime()//
-				|| currentTime >= vehicle.getServiceEndTime());
+		return !(currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime());
 	}
 }

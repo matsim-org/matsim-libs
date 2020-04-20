@@ -24,17 +24,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -42,6 +40,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,24 +49,24 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
+
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
-	private final ActTypeConverter actTypeConverter;
+//	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private final DestinationChoiceContext lcContext;
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
-	private final DestinationChoiceConfigGroup dccg;
+	private final FrozenTastesConfigGroup dccg;
 	private final Scenario scenario;
 
 	public BestReplyLocationChoicePlanAlgorithm(
@@ -79,24 +78,19 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
-		this.actTypeConverter = lcContext.getConverter();
+//		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.lcContext = lcContext;
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
-		this.nearestLinks = nearestLinks;
-		
-		// Cache maps since otherwise they would be created on the fly every time when accessing them via the config object.
-		this.teleportedModeSpeeds = this.lcContext.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
-		
+
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
 
 		scenario = this.lcContext.getScenario();
-		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
+		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ;
 	}
 
 	@Override
@@ -117,53 +111,55 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 	private void handleActivities( final Plan plan, final int personIndex ) {
 
-		int actlegIndex = -1;
-		for (PlanElement pe : plan.getPlanElements()) {
-			actlegIndex++;
-			if (pe instanceof Activity) {
-				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
-				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
+		List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
 
-					List<? extends PlanElement> actslegs = plan.getPlanElements();
-					final Activity actToMove = (Activity) pe;
-					final Activity actPre = (Activity) actslegs.get(actlegIndex - 2);
-
-					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
-					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
-					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
-					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
-					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
-							this.actTypeConverter.convertType(actToMove.getType()));
-
-					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
-
-					double x = (coordPre.getX() + coordPost.getX()) / 2.0;
-					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
-					Coord center = new Coord(x, y);
-
-					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
-
-					// === this is where the work is done:
-					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
-							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
-					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
-					// ===
-
-					this.setLocationOfActivityToFacilityId(actToMove, choice );
-
+		int actLegIndex = -1;
+		for (Activity activity : activities) {
+			actLegIndex++;
+			if (this.scaleEpsilon.isFlexibleType(activity.getType())) {
+				final Activity actToMove = activity;
+				if (actLegIndex < 1) {
+					throw new RuntimeException("can't get the previous activity from the first activity in the plan");
 				}
+				final Activity actPre = activities.get(actLegIndex - 1);
+				if (activities.size() <= actLegIndex + 1) {
+					throw new RuntimeException("can't get the post activity from the last activity in the plan");
+				}
+				final Activity actPost = activities.get(actLegIndex + 1);
+				final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
+				final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
+
+				double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
+				double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
+						actToMove.getType() );
+
+				double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
+
+				double x = (coordPre.getX() + coordPost.getX()) / 2.0;
+				double y = (coordPre.getY() + coordPost.getY()) / 2.0;
+				Coord center = new Coord(x, y);
+
+				ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
+
+				// === this is where the work is done:
+				final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+						actLegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
+						this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+				// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
+				// ===
+
+				this.setLocationOfActivityToFacilityId(actToMove, choice );
 			}
-		}		
+		}
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
-			final ApproximationLevel travelTimeApproximationLevel,
+			final FrozenTastesConfigGroup.ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );
 
-		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
+		final String convertedType = actToMove.getType();
 		Gbl.assertNotNull(convertedType);
 		final QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get( convertedType );
 		Gbl.assertNotNull( quadTree );
@@ -202,8 +198,12 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
 		act2.setFacilityId( facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
-		act2.setLinkId( FacilitiesUtils.decideOnLink( facility, scenario.getNetwork() ).getId() );
-		act2.setCoord( facility.getCoord() );
+		if ( facility != null ){
+			// (null can happen when the activity initially was located without a facility, and it did not find an alternative facility in the choice
+			// set. kai, jul'19)
+			act2.setLinkId( FacilitiesUtils.decideOnLink( facility, scenario.getNetwork() ).getId() );
+			act2.setCoord( facility.getCoord() );
+		}
 	}
 
 	/**
@@ -211,9 +211,13 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	 */
 	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxDCScore = 0.0;
-		double scale = this.scaleEpsilon.getEpsilonFactor(type);		
-		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
-		maxDCScore *= scale; // apply the scale factors given in the config file
+		double scale = this.scaleEpsilon.getEpsilonFactor(type);
+		if(person.getAttributes().getAttribute(type) != null) {
+			maxDCScore = (Double) person.getAttributes().getAttribute(type);
+			maxDCScore *= scale;
+		}
+
+//		maxDCScore *= scale; // apply the scale factors given in the config file
 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)

@@ -1,9 +1,11 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -19,11 +21,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.inject.Inject;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 @Singleton
 public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, StopStopTimeCalculator {
 	
@@ -37,7 +37,7 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 	//Constructors
 	@Inject
 	public StopStopTimeCalculatorImpl(final TransitSchedule transitSchedule, final Config config, EventsManager eventsManager) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 		eventsManager.addHandler(this);
 	}
 	public StopStopTimeCalculatorImpl(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {

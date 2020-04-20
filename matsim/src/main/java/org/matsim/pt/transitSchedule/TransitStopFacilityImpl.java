@@ -95,7 +95,13 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 
 	@Override
 	public String toString() {
-		return "TransitStopFacilityImpl_" + this.id;
+		StringBuilder strb = new StringBuilder(  ) ;
+		strb.append( "[ facility id=" ).append( id ) ;
+		strb.append ( " | coord=").append( coord ) ;
+		strb.append( " | linkId=" ).append( linkId ) ;
+
+		strb.append(" ] ") ;
+		return strb.toString() ;
 	}
 
 	@Override

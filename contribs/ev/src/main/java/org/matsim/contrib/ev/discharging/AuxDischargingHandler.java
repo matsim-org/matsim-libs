@@ -89,7 +89,7 @@ public class AuxDischargingHandler
 				ElectricVehicle ev = vehicleAndLink.vehicle;
 				double energy = ev.getAuxEnergyConsumption()
 						.calcEnergyConsumption(e.getSimulationTime(), auxDischargeTimeStep, vehicleAndLink.linkId);
-				ev.getBattery().discharge(energy);
+				ev.getBattery().changeSoc(-energy);
 			}
 		}
 	}

@@ -138,8 +138,6 @@ public abstract class AbstractModule implements Module {
 	}
 	
 	/**
-	 * See {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample} for an example.
-	 * 
 	 * @see ControlerListener
 	 */
 	protected final LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
@@ -147,8 +145,6 @@ public abstract class AbstractModule implements Module {
 	}
 
 	/**
-	 * See {@link tutorial.programming.planStrategyForRemoval.RunPlanSelectorForRemovalExample} for an example.
-	 * 
 	 * @see StrategyManagerModule
 	 */
 	protected final com.google.inject.binder.LinkedBindingBuilder<PlanSelector<Plan, Person>> bindPlanSelectorForRemoval() {
@@ -178,9 +174,12 @@ public abstract class AbstractModule implements Module {
 	protected final LinkedBindingBuilder<AttributeConverter<?>> addAttributeConverterBinding(final Class<?> clazz ) {
 		return attributeConverterMapBinder.addBinding( clazz );
 	}
-
+	/**
+	 * @deprecated better use {@link #addTravelDisutilityFactoryBinding(String)}.
+	 */
+	@Deprecated
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
-		return bind(carTravelDisutilityFactoryKey());
+		return addTravelDisutilityFactoryBinding( TransportMode.car );
 	}
 
 	@SuppressWarnings("static-method")
@@ -208,6 +207,10 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(EventsManager.class);
 	}
 
+	/**
+	 * @deprecated besser use {@link #addTravelTimeBinding(String)}.
+	 */
+	@Deprecated
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
 		return bind(networkTravelTime());
 	}

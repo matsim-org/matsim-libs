@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 
 /**
@@ -52,8 +53,16 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 		return DvrpModes.key(type, mode);
 	}
 
+	protected final <T> Key<T> modalKey(TypeLiteral<T> typeLiteral) {
+		return DvrpModes.key(typeLiteral, mode);
+	}
+
 	protected final <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
 		return bind(modalKey(type));
+	}
+
+	protected final <T> LinkedBindingBuilder<T> bindModal(TypeLiteral<T> typeLiteral) {
+		return bind(modalKey(typeLiteral));
 	}
 
 	/**

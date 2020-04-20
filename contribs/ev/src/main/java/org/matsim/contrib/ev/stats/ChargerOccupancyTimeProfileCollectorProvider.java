@@ -49,7 +49,11 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 		ProfileCalculator calc = createChargerOccupancyCalculator(chargingInfrastructure);
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles",
 				matsimServices);
-		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		if (matsimServices.getConfig().controler().isCreateGraphs()) {
+		  collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		} else {
+		  collector.setChartTypes();
+		}
 		return collector;
 	}
 

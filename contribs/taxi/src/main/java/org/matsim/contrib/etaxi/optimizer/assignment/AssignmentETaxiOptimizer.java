@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
@@ -78,7 +79,7 @@ import com.google.common.collect.Maps;
 public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public static AssignmentETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure) {
+			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, ChargingInfrastructure chargingInfrastructure) {
 		MultiNodePathCalculator multiNodeRouter = (MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(
 				true).createPathCalculator(network, travelDisutility, travelTime);
 		BackwardMultiNodePathCalculator backwardMultiNodeRouter = (BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(
@@ -86,6 +87,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility,
 				travelTime);
 		return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, travelTime, eScheduler,
+				scheduleTimingUpdater,
 				chargingInfrastructure, multiNodeRouter, backwardMultiNodeRouter, router);
 	}
 
@@ -100,10 +102,10 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging;
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			MobsimTimer timer, TravelTime travelTime, ETaxiScheduler eScheduler,
+			MobsimTimer timer, TravelTime travelTime, ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
 			ChargingInfrastructure chargingInfrastructure, MultiNodePathCalculator multiNodeRouter,
 			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
-		super(eventsManager, taxiCfg, fleet, eScheduler,
+		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
 				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler,
 						((AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getAssignmentTaxiOptimizerParams(),
 						multiNodeRouter, backwardMultiNodeRouter, router));
@@ -202,15 +204,13 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		// TODO move it to AssignmentETaxiOptimizerParams
 		double chargingPlanningHorizon = 10 * 60;// 10 minutes (should be longer than socCheckTimeStep)
 		double maxDepartureTime = timer.getTimeOfDay() + chargingPlanningHorizon;
-		@SuppressWarnings("unchecked")
-		Stream<EvDvrpVehicle> vehiclesBelowMinSocLevel = ((Stream<EvDvrpVehicle>)fleet.getVehicles()
-				.values()
-				.stream()).filter(v -> isChargingSchedulable(v, eScheduler, maxDepartureTime));
+		Stream<DvrpVehicle> vehiclesBelowMinSocLevel = fleet.getVehicles()
+				.values().stream().filter(v -> isChargingSchedulable((EvDvrpVehicle)v, eScheduler, maxDepartureTime));
 
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
-		List<EvDvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
-				vehiclesBelowMinSocLevel, v -> v.getElectricVehicle().getBattery().getSoc());
+		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
+				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler, leastChargedVehicles.stream());
 	}

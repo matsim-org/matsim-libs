@@ -39,8 +39,6 @@ import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -62,7 +60,6 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	private static final String[] CHAIN_BASED_MODES = new String[]{TransportMode.car};
 
 	private static final String STAGE = PtConstants.TRANSIT_ACTIVITY_TYPE;
-	private final StageActivityTypes stagesActivities = new StageActivityTypesImpl( STAGE );
 	private final double probaForRandomSingleTripMode;
 	
 	// /////////////////////////////////////////////////////////////////////////
@@ -466,7 +463,6 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	public void testMutatedTrips() {
 		final ChooseRandomLegModeForSubtour testee =
 			new ChooseRandomLegModeForSubtour(
-					stagesActivities,
 					new MainModeIdentifierImpl(),
 					new PermissibleModesCalculatorImpl( MODES , false ),
 					MODES,
@@ -477,18 +473,18 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 		for ( Fixture f : createFixtures() ) {
 			for (int i = 0; i < 5; i++) {
 				final Plan plan = f.createNewPlanInstance();
-				final int initNTrips = TripStructureUtils.getTrips( plan , stagesActivities ).size();
-				final Collection<Subtour> initSubtours = TripStructureUtils.getSubtours( plan , stagesActivities );
+				final int initNTrips = TripStructureUtils.getTrips( plan ).size();
+				final Collection<Subtour> initSubtours = TripStructureUtils.getSubtours( plan );
 				testee.run( plan );
 
-				final List<Trip> newTrips = TripStructureUtils.getTrips( plan , stagesActivities );
+				final List<Trip> newTrips = TripStructureUtils.getTrips( plan );
 				
 				Assert.assertEquals(
 						"number of trips changed with mode mutation!?",
 						initNTrips,
 						newTrips.size());
 
-				final Collection<Subtour> newSubtours = TripStructureUtils.getSubtours( plan , stagesActivities );
+				final Collection<Subtour> newSubtours = TripStructureUtils.getSubtours( plan );
 
 				Assert.assertEquals(
 						"number of subtours changed with mode mutation!?",

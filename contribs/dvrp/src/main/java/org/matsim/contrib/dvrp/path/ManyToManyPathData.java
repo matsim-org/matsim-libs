@@ -69,9 +69,8 @@ public class ManyToManyPathData {
 
 	private void updateTable(List<Link> links, int threads, Supplier<OneToManyPathSearch> oneToManyPathSearchProvider) {
 		log.info("Matrix calculation started");
-		ExecutorServiceWithResource<OneToManyPathSearch> executorService = new ExecutorServiceWithResource<>(//
-				IntStream.range(0, threads)//
-						.mapToObj(i -> oneToManyPathSearchProvider.get())//
+		ExecutorServiceWithResource<OneToManyPathSearch> executorService = new ExecutorServiceWithResource<>(
+				IntStream.range(0, threads).mapToObj(i -> oneToManyPathSearchProvider.get())
 						.collect(Collectors.toList()));
 
 		executorService.submitRunnablesAndWait(//

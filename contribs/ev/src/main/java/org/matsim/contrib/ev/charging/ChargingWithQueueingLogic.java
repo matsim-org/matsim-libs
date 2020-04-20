@@ -21,7 +21,6 @@ package org.matsim.contrib.ev.charging;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,7 +40,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
 	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
 		this.chargingStrategy = Objects.requireNonNull(chargingStrategy);
@@ -56,7 +55,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			ev.getBattery().charge(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
+			ev.getBattery().changeSoc(ev.getChargingPower().calcChargingPower(charger) * chargePeriod);
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
@@ -65,7 +64,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
-		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugs() - pluggedVehicles.size());
+		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
 		for (int i = 0; i < queuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
 		}
@@ -79,7 +78,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
 		listeners.put(ev.getId(), chargingListener);
-		if (pluggedVehicles.size() < charger.getPlugs()) {
+		if (pluggedVehicles.size() < charger.getPlugCount()) {
 			plugVehicle(ev, now);
 		} else {
 			queueVehicle(ev, now);

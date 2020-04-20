@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -70,8 +71,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private static final String NODE_OFFSET = "nodeOffset";
 
 
-	private double startTime = Time.getUndefinedTime();
-	private double endTime = Time.getUndefinedTime();
+	private OptionalTime startTime = OptionalTime.undefined();
+	private OptionalTime endTime = OptionalTime.undefined();
 	@Positive
 	private double timeStepSize = 1.0;
 	@PositiveOrZero
@@ -173,12 +174,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter(END_TIME)
 	private void setEndTime(String value) {
-		setEndTime(Time.parseTime(value));
+		this.endTime = Time.parseOptionalTime(value);
 	}
 
 	@StringSetter(START_TIME)
 	private void setStartTime(String value) {
-		setStartTime(Time.parseTime(value));
+		this.startTime = Time.parseOptionalTime(value);
 	}
 
 	@StringGetter(MAIN_MODE)
@@ -302,18 +303,18 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	public void setStartTime(final double startTime) {
-		this.startTime = startTime;
+		this.startTime = OptionalTime.defined(startTime);
 	}
 
-	public double getStartTime() {
+	public OptionalTime getStartTime() {
 		return this.startTime;
 	}
 
 	public void setEndTime(final double endTime) {
-		this.endTime = endTime;
+		this.endTime = OptionalTime.defined(endTime);
 	}
 
-	public double getEndTime() {
+	public OptionalTime getEndTime() {
 		return this.endTime;
 	}
 

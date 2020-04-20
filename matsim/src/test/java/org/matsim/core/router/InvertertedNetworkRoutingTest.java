@@ -31,7 +31,7 @@ import org.matsim.core.router.costcalculators.*;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
-
+import org.matsim.vehicles.Vehicle;
 import org.junit.Assert;
 
 
@@ -47,7 +47,7 @@ public class InvertertedNetworkRoutingTest {
 	public void testInvertedNetworkLegRouter() {
 		Fixture f = new Fixture();
 		LinkToLinkTravelTimeStub tt = new LinkToLinkTravelTimeStub();
-		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() );
+		TravelDisutilityFactory tc = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig() );
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -121,7 +121,7 @@ public class InvertertedNetworkRoutingTest {
 		}
 
 		@Override
-		public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
+		public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle) {
 			double tt = fromLink.getLength() / fromLink.getFreespeed(time);
 			if (Id.create("34", Link.class).equals(toLink.getId())){
 				tt = tt + this.turningMoveCosts34;

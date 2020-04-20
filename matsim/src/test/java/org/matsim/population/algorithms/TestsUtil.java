@@ -22,16 +22,14 @@ package org.matsim.population.algorithms;
 import java.util.List;
 
 import org.junit.Ignore;
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -78,13 +76,13 @@ public class TestsUtil {
 			if (o2 instanceof Leg) {
 				Leg leg1 = (Leg) o1;
 				Leg leg2 = (Leg) o2;
-				if (leg1.getDepartureTime() != leg2.getDepartureTime()) {
+				if (!leg1.getDepartureTime().equals(leg2.getDepartureTime())) {
 					return false;
 				}
 				if (!leg1.getMode().equals(leg2.getMode())) {
 					return false;
 				}
-				if (leg1.getTravelTime() != leg2.getTravelTime()) {
+				if (!leg1.getTravelTime().equals(leg2.getTravelTime())) {
 					return false;
 				}
 			} else {
@@ -94,10 +92,18 @@ public class TestsUtil {
 			if (o2 instanceof Activity) {
 				Activity activity1 = (Activity) o1;
 				Activity activity2 = (Activity) o2;
-				if (activity1.getEndTime() != activity2.getEndTime()) {
+				if (activity1.getEndTime().isUndefined() ^ activity2.getEndTime().isUndefined()) {
 					return false;
 				}
-				if (activity1.getStartTime() != activity2.getStartTime()) {
+				if (activity1.getEndTime().isDefined() && activity1.getEndTime().seconds()
+						!= activity2.getEndTime().seconds()) {
+					return false;
+				}
+				if (activity1.getStartTime().isUndefined() ^ activity2.getStartTime().isUndefined()) {
+					return false;
+				}
+				if (activity1.getStartTime().isDefined() && activity1.getStartTime().seconds()
+						!= activity2.getStartTime().seconds()) {
 					return false;
 				}
 			} else {

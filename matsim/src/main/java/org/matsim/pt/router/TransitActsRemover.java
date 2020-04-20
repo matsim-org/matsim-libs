@@ -43,7 +43,8 @@ import java.util.List;
  */
 
 /**
- * Consider using TripsToLegsAlgorithm instead to circumvene problems with different types of access / egress legs and stage activities.
+ * @deprecated -- use {@link org.matsim.core.population.algorithms.TripsToLegsAlgorithm} instead to circumvene problems with different types of access /
+ * egress legs and stage activities.
  */
 @Deprecated
 public class TransitActsRemover implements PlanAlgorithm {
@@ -56,8 +57,8 @@ public class TransitActsRemover implements PlanAlgorithm {
 		List<String> accessModes = new ArrayList<>();
 		accessModes.add(TransportMode.transit_walk);
 		if (treatAccessEgressAsTransit){
-			accessModes.add(TransportMode.access_walk);
-			accessModes.add(TransportMode.egress_walk);
+			accessModes.add(TransportMode.non_network_walk );
+			accessModes.add(TransportMode.non_network_walk );
 		}
 		List<PlanElement> planElements = plan.getPlanElements();
 		for (int i = 0, n = planElements.size(); i < n; i++) {

@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 
 /**
@@ -78,8 +79,16 @@ public class ModalProviders {
 			return injector.getInstance(DvrpModes.key(type, mode));
 		}
 
+		public <T> T getModal(TypeLiteral<T> typeLiteral) {
+			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+		}
+
 		public <T> T getNamed(Class<T> type, String name) {
 			return injector.getInstance(Key.get(type, Names.named(name)));
+		}
+
+		public <T> T getNamed(TypeLiteral<T> typeLiteral, String name) {
+			return injector.getInstance(Key.get(typeLiteral, Names.named(name)));
 		}
 	}
 
@@ -95,6 +104,14 @@ public class ModalProviders {
 
 		protected <I> I getModalInstance(Class<I> type) {
 			return injector.getInstance(DvrpModes.key(type, mode));
+		}
+
+		protected <I> I getModalInstance(TypeLiteral<I> typeLiteral) {
+			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
+		}
+
+		protected String getMode() {
+			return mode;
 		}
 	}
 }

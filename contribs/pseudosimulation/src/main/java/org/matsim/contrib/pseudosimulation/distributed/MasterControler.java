@@ -1,6 +1,5 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,8 +17,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
-import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -181,11 +180,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
 
         if (this.config.transit().isUseTransit()) {
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), this.config.travelTimeCalculator().getTraveltimeBinSize(),
-                    (int) (this.config.qsim().getEndTime() - this.config.qsim().getStartTime()));
+                    (int) (this.config.qsim().getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
             stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
                     this.config.travelTimeCalculator().getTraveltimeBinSize(), (int) (this.config.qsim()
-                    .getEndTime() - this.config.qsim().getStartTime()));
+                    .getEndTime().seconds() - this.config.qsim().getStartTime().seconds()));
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
             //tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
@@ -373,10 +372,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         //wait for previous transmissions to complete, if necessary
         waitForSlaveThreads();
         //start receiving plans from slaveHandlerTreeMap as the QSim runs
-        int firstIteration = config.controler().getFirstIteration();
         if (SelectedSimulationMode.equals(SimulationMode.PARALLEL))
             startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_PLANS_TO_MASTER);
-        IterationStopWatch stopwatch = event.getServices().getStopwatch();
 
     }
 
@@ -407,7 +404,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         waitForSlaveThreads();
         linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(),
                 config.travelTimeCalculator().getTraveltimeBinSize(),
-                config.qsim().getEndTime(),
+                config.qsim().getEndTime().seconds(),
                 scenario.getNetwork().getLinks().values());
         startSlaveHandlersInMode(CommunicationsMode.TRANSMIT_TRAVEL_TIMES);
         if (SelectedSimulationMode.equals(SimulationMode.SERIAL)) {
@@ -545,7 +542,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             output.put(i, ((int) Math.ceil(popSize / timesPerPlan[i] / sumOfReciprocals)));
             total += output.get(i);
         }
-        int j = 0;
+        int j = 0; // TODO ??????
         while (total > popSize) {
             for (int i : validSlaveIndices) {
                 output.put(i, output.get(i) - 1);
@@ -621,7 +618,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         for (int i : newSlaves)
             timesPerPlan[i] = fastestTimePerPlan;
 //        adjust numbers taking account of memory avail on slaveHandlerTreeMap
-        boolean allGood = false;
         int remainder = popSize;
         while (remainder > 0 && validSlaveIndices.size() > 0) {
             Set<Integer> valid = new HashSet<>();
@@ -740,7 +736,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         List<PersonSerializable> slavePersonPool;
         int targetPopulationSize = 0;
         CommunicationsMode communicationsMode = CommunicationsMode.TRANSMIT_SCENARIO;
-        Collection<String> idStrings;
         private int myNumber;
         private int currentPopulationSize;
         private long usedMemory;

@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.run;
 
 import com.google.inject.Binder;
 import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 
 /**
@@ -34,6 +35,10 @@ public class DvrpModes {
 
 	public static <T> Key<T> key(Class<T> type, String mode) {
 		return Key.get(type, mode(mode));
+	}
+
+	public static <T> Key<T> key(TypeLiteral<T> typeLiteral, String mode) {
+		return Key.get(typeLiteral, mode(mode));
 	}
 
 	public static void registerDvrpMode(Binder binder, String mode) {

@@ -111,7 +111,7 @@ public class TaxiFareHandler
             if (fare < minFarePerTrip) {
             	fare = minFarePerTrip;
             }
-			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare));
+			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare, "taxiFare", mode));
 		}
 	}
 
@@ -121,7 +121,7 @@ public class TaxiFareHandler
 			waitingPax.add(event.getPersonId());
 			if (!dailyFeeCharged.contains(event.getPersonId())) {
 				dailyFeeCharged.add(event.getPersonId());
-				events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee));
+				events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "taxiFare", mode));
 			}
 		}
 	}

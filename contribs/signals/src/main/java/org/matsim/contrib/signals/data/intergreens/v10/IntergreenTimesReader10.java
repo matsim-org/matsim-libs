@@ -19,22 +19,16 @@
 
 package org.matsim.contrib.signals.data.intergreens.v10;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.AbstractSignalsReader;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
@@ -45,16 +39,13 @@ import org.xml.sax.SAXException;
 /**
  * @author dgrether
  */
-public class IntergreenTimesReader10 extends AbstractSignalsReader{
-
-	private static final Logger log = Logger.getLogger(IntergreenTimesReader10.class);
+public final class IntergreenTimesReader10 extends AbstractSignalsReader{
 	
 	private IntergreenTimesData intergreensData;
 
 	public IntergreenTimesReader10(IntergreenTimesData intergreenTimesData) {
 		this.intergreensData = intergreenTimesData;
 	}
-	
 	
 		public void read(InputSource stream) throws UncheckedIOException {
 		try {

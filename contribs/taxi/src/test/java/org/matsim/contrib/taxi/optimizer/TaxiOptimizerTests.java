@@ -19,16 +19,20 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 public class TaxiOptimizerTests {
 	public static class TaxiConfigVariant {
@@ -84,11 +88,11 @@ public class TaxiOptimizerTests {
 		private final Controler controler;
 
 		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			String dir = "./src/main/resources/mielec_2014_02/";
-			String configFile = dir + "mielec_taxi_benchmark_config.xml";
+			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+					"mielec_taxi_benchmark_config.xml");
 
-			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-			config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup());
+			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
+			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
 			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
@@ -99,7 +103,7 @@ public class TaxiOptimizerTests {
 
 	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 

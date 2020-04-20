@@ -27,7 +27,7 @@ import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParam
 import org.matsim.core.config.ConfigGroup;
 
 public final class AssignmentETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
-	public static final String SET_NAME = "AssignmentETaxiOptimizer";
+	public static final String SET_NAME = AssignmentETaxiOptimizer.class.getName();
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
 	static final String MIN_RELATIVE_SOC_EXP = "Taxis with SOC below this level are considered undercharged"

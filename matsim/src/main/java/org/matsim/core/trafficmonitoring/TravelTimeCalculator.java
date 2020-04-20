@@ -19,11 +19,23 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -40,10 +52,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.inject.Inject;
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -102,7 +111,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return calculator;
 	}
 
-	@Deprecated // user builder instead.  kai, feb'19
 	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
@@ -217,9 +225,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 	}
 
-
-
-	@Deprecated // user builder instead.  kai, feb'19
 	private TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 				   boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
@@ -336,7 +341,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			// this functionality is no longer there.
 
 			if (this.calculateLinkToLinkTravelTimes
-					&& event.getTime() < qsimConfig.getEndTime()
+					&& event.getTime() < qsimConfig.getEndTime().seconds()
 				// (we think that this only makes problems when the abort is not just because of mobsim end time. kai & theresa, jan'17)
 			){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
@@ -363,7 +368,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	 * increases the router performance by 20-30%!
 	 * cdobler, aug'17
 	 */
-	@Deprecated // should become non-public; use getLinkTravelTimes().... instead ...
 	private double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 
@@ -405,7 +409,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 								    "if calculation is switched off by config option!");
 	}
 
-	@Deprecated // should become non-public; use getLinkToLinkTravelTimes()... instead.
 	private double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
@@ -488,27 +491,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		}
 	}
 
-//	public int getNumSlots() {
-//		return this.numSlots;
-//	}
-
-//	/**
-//	 * @return the size of a time bin in seconds.
-//	 */
-//	public int getTimeSlice() {
-//		return this.timeSlice;
-//	}
-
-//	/*package*/ static class DataContainer {
-//		/*package*/ private final TravelTimeData ttData;
-//		/*package*/ private volatile boolean needsConsolidation = false;
-//
-//		/*package*/ DataContainer(final TravelTimeData data) {
-//			this.ttData = data;
-//		}
-//
-//	}
-
 	private static int cnt = 0 ;
 
 	public TravelTime getLinkTravelTimes() {
@@ -534,6 +516,10 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 				}
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
+				// yyyyyy should this not be min?  kai/janek, may'19
+				// No, it is correct. It is preventing the router to route with an empirical speed from
+				// the previous iteration that exceeds the maximum vehicle speed.
+				// Thus, the lowest speed (highest travel time) of the two should be used.    Mads, Nov'19
 			}
 
 		};
@@ -544,9 +530,23 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return new LinkToLinkTravelTime() {
 
 			@Override
-			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-				return TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
-				// todo yyyy fix the above with maximum vehicle speeds as for plain links above.  kai, feb'19
+			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle) {
+				double linkTtimeFromVehicle = 0. ;
+				if ( vehicle!=null ){
+					final VehicleType vehicleType = vehicle.getType();
+					if ( vehicleType==null ){
+						if( cnt < 1 ){
+							cnt++;
+							log.warn( "encountered vehicle where vehicle.getType() returns null.  That should be repaired (whereever it comes from)." );
+							log.warn( Gbl.ONLYONCE );
+						}
+					} else{
+						linkTtimeFromVehicle = fromLink.getLength() / vehicleType.getMaximumVelocity();
+					}
+				}
+				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+				
+				return Math.max(linkTTimeFromObservation, linkTtimeFromVehicle);
 			}
 		};
 	}

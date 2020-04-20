@@ -84,8 +84,8 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	private void writeVehicles(Carrier carrier, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t\t<vehicles>\n");
-		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
-			writer.write("\t\t\t\t<vehicle id=\"" + v.getVehicleId()
+		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
+			writer.write("\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" linkId=\"" + v.getLocation() + "\"" + "\" typeId=\""
 					+ v.getVehicleTypeId().toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
@@ -98,7 +98,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	private void writeShipments(Carrier carrier, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t\t<shipments>\n");
-		for (CarrierShipment s : carrier.getShipments()) {
+		for (CarrierShipment s : carrier.getShipments().values()) {
 			// CarrierShipment s = contract.getShipment();
 			Id<Shipment> shipmentId = Id.create(++idCounter, Shipment.class);
 			registeredShipments.put(s, shipmentId);
@@ -153,7 +153,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 					
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
-				writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId()
+				writer.write("vehicleId=\"" + tour.getVehicle().getId()
 						+ "\">\n");
 				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())

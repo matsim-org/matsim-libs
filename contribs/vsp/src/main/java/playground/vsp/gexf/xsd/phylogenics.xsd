@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.gexf.net/1.2draft" xmlns:ns1="http://www.gexf.net/1.2draft" xmlns:viz="http://www.gexf.net/1.2draft/viz">
+  <xs:import namespace="http://www.gexf.net/1.2draft/viz" schemaLocation="viz.xsd"/>
+  <!-- extension point -->
+  <!-- new point -->
+  <xs:complexType name="parents-content">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:parent"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="parent">
+    <xs:complexType>
+      <xs:attributeGroup ref="ns1:parent-content"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- new point -->
+  <xs:attributeGroup name="parent-content">
+    <xs:attribute name="for" use="required" type="ns1:id-type"/>
+  </xs:attributeGroup>
+</xs:schema>

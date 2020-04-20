@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -765,7 +765,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 	private void writeChartToKmz(final String filename, final JFreeChart chart)
 			throws IOException {
 		byte[] img;
-		img = ChartUtilities.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH,
+		img = ChartUtils.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH,
 				CHARTHEIGHT));
 		this.writer.addNonKMLFile(img, filename);
 	}
@@ -822,7 +822,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 			StringBuilder buffer = new StringBuilder(100);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -831,7 +831,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {

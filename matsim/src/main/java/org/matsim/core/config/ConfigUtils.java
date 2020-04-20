@@ -41,10 +41,11 @@ import java.util.Iterator;
  * @author nagel
  *
  */
-public abstract class ConfigUtils implements MatsimExtensionPoint {
+public class ConfigUtils implements MatsimExtensionPoint {
+	private ConfigUtils() {} // do not instantiate
 
 	public static Config createConfig(final String context) {
-		URL url = IOUtils.getUrlFromFileOrResource(context) ;
+		URL url = IOUtils.resolveFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -69,7 +70,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
-		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+		return loadConfig(IOUtils.resolveFileOrResource(filename), customModules);
 	}
 
 	/**
@@ -83,11 +84,49 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 */
 	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
-		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+		return loadConfig( IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( config, IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	/**
+	 * A standard version, where we ignore the 1st argument (which should be the config file), and take everything afterwards.  Standard usage should be
+	 * something like
+	 * <pre>
+	 *     Config config = ConfigUtils.loadConfig( args ) ; // note that this already sets the config-related arguments from the command line
+	 *     CommandLine cmd = ConfigUtils.getCommandLine( args ) ;
+	 *     ... = cmd.getOption( "abc" )... ;
+	 * </pre>
+	 *
+	 * @param args
+	 * @return
+	 */
+	public static CommandLine getCommandLine( String[] args ){
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		try{
+			return new CommandLine.Builder( typedArgs )
+					.allowPositionalArguments( false )
+					.allowAnyOption( true )
+					.build() ;
+		} catch( CommandLine.ConfigurationException e ){
+			throw new RuntimeException( e ) ;
+		}
 	}
 
 	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
 		Config config = loadConfig( url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config loadConfig( Config config, final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		loadConfig( config, url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config applyCommandline( Config config, String[] typedArgs ){
 		try{
 			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
 			bld.allowAnyOption( true  );
@@ -152,9 +191,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		}
 	}
 
-	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+	public static void loadConfig(final Config config, final URL url, ConfigGroup... customModules ) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
+		}
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
 		}
 		new ConfigReader(config).parse(url);
 	}
@@ -218,12 +260,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		String absolutePath = prefix + path;
 		return absolutePath;
 	}
-
+	@Deprecated // using this vs not using this can change results, presumably because strategies may be used in a different sequence from the registry.
+	// (Had the problem in RandomizingTransitRotuerIT.) kai, dec'19
 	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
-		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while(iterator.hasNext()){
-			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
+		for( StrategySettings strategySettings : config.strategy().getStrategySettings() ){
+			maxStrategyId = Math.max( maxStrategyId , Long.parseLong( strategySettings.getId().toString() ) );
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}

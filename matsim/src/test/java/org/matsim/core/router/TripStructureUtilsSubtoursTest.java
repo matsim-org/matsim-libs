@@ -51,8 +51,7 @@ import org.matsim.facilities.ActivityFacility;
  */
 @RunWith( Parameterized.class )
 public class TripStructureUtilsSubtoursTest {
-	private static final String STAGE = "stage_activity";
-	private static final StageActivityTypes CHECKER = new StageActivityTypesImpl( STAGE );
+	private static final String STAGE = "stage_activity interaction";
 	private final boolean useFacilitiesAsAnchorPoint;
 
 	@Parameters
@@ -792,10 +791,7 @@ public class TripStructureUtilsSubtoursTest {
 
 	private static void performTest(final Fixture fixture) {
 		final Collection<Subtour> subtours =
-			TripStructureUtils.getSubtours(
-					fixture.plan,
-					CHECKER
-            );
+			TripStructureUtils.getSubtours( fixture.plan );
 
 		assertEquals(
 				"[anchorAtFacilities="+fixture.useFacilitiesAsAnchorPoint+"] "+
@@ -817,10 +813,7 @@ public class TripStructureUtilsSubtoursTest {
 		final Fixture fixture = createInconsistentTrips( useFacilitiesAsAnchorPoint );
 		boolean hadException = false;
 		try {
-			TripStructureUtils.getSubtours(
-					fixture.plan,
-					CHECKER
-            );
+			TripStructureUtils.getSubtours( fixture.plan );
 		}
 		catch (RuntimeException e) {
 			hadException = true;
@@ -835,12 +828,9 @@ public class TripStructureUtilsSubtoursTest {
 	@Test
 	public void testGetTripsWithoutSubSubtours() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
-			final int nTrips = TripStructureUtils.getTrips( f.plan , CHECKER ).size();
+			final int nTrips = TripStructureUtils.getTrips( f.plan ).size();
 			final Collection<Subtour> subtours =
-				TripStructureUtils.getSubtours(
-						f.plan,
-						CHECKER
-                );
+				TripStructureUtils.getSubtours(	f.plan );
 			int countTrips = 0;
 
 			for (Subtour s : subtours) {
@@ -858,7 +848,7 @@ public class TripStructureUtilsSubtoursTest {
 	@Test
 	public void testFatherhood() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
-			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan , CHECKER);
+			final Collection<Subtour> subtours = TripStructureUtils.getSubtours( f.plan );
 
 			for (Subtour s : subtours) {
 				for ( Subtour child : s.getChildren() ) {

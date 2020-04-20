@@ -19,32 +19,31 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.config.Config;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
+import static org.matsim.core.router.TripStructureUtils.Trip;
+import static org.matsim.core.router.TripStructureUtils.getTrips;
 
 import java.util.Objects;
 
-import static org.matsim.core.router.TripStructureUtils.Trip;
-import static org.matsim.core.router.TripStructureUtils.getTrips;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.utils.misc.Time;
 
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
 	private final Config config;
-	private final StageActivityTypes stageActivityTypes;
 
-	/* package */ PlanTimesAdapter(
-		  final StageActivityTypes stageActivityTypes,
-		  final Scenario scenario ) {
-		this.stageActivityTypes = stageActivityTypes;
+	/* package */ PlanTimesAdapter( final Scenario scenario ) {
 		this.config = scenario.getConfig();
 	}
 
@@ -77,11 +76,8 @@ class PlanTimesAdapter {
 				final Leg leg = (Leg) pe;
 				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
 				leg.setDepartureTime( now ) ;
-				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ) ;
-				if ( Time.isUndefinedTime( travelTime ) ) {
-					travelTime = 0. ;
-				}
-				leg.setTravelTime( travelTime );
+				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ).orElse(0) ;
+				leg.setTravelTime( travelTime);
 				scoringFunction.handleLeg( leg );
 				now += travelTime ;
 			} else {
@@ -92,7 +88,7 @@ class PlanTimesAdapter {
 		lastAct.setStartTime( now );
 		scoringFunction.handleActivity( lastAct );
 		// the following is hedging against the newer tripscoring; not clear if this will work out-of-sequence.
-		for( Trip trip : getTrips( planTmp, stageActivityTypes ) ){
+		for( Trip trip : getTrips( planTmp ) ){
 			scoringFunction.handleTrip( trip );
 		}
 

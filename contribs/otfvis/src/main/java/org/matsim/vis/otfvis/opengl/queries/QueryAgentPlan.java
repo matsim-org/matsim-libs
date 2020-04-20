@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -129,7 +130,12 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						continue ; // skip
 					}
 					Coord c2 = getCoord(act);
-					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
+
+
+					if ( StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
+						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "interaction", "i" ) ) ;
+					}
 					result.acts.add(activityInfo);
 				}
 			}
@@ -146,13 +152,21 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		Activity act = simulationView.getCurrentActivity(agent);
 		if (act != null) {
 			Coord c2 = getCoord(act);
-			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
-				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
-				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
+			if ( act.getStartTime().isDefined() && simulationView.getTime() > act.getStartTime().seconds()
+					     && act.getEndTime().isDefined() && simulationView.getTime() <= act.getEndTime().seconds()) {
+				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
+				activityInfo.finished = (simulationView.getTime() - act.getStartTime().seconds()) / (act.getEndTime().seconds() - act.getStartTime().seconds());
 				result.acts.add(activityInfo);
 			}
 		}
 		return result;
+	}
+	private static String getSubstring( Activity act ){
+		String substring = act.getType();
+		if ( substring.length() >3 ){
+			substring = act.getType().substring( 0, 3 );
+		}
+		return substring;
 	}
 
 	private Coord getCoord( Activity act) {
@@ -203,11 +217,6 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		    if (planElements.isEmpty()) {
 		        return;//non-plan agents may do not have a meaningful plan to be shown
 		    }
-			Color carColor = Color.ORANGE;
-			Color actColor = Color.BLUE;
-			Color ptColor = Color.YELLOW;
-			Color walkColor = Color.MAGENTA;
-			Color otherColor = Color.PINK;
 			for (PlanElement planElement : planElements) {
 				if (planElement instanceof Activity) {
 					Activity act = (Activity) planElement;
@@ -219,22 +228,35 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						AgentSnapshotInfo pi = snapshotInfoFactory.createAgentSnapshotInfo(agentId, link, 0.9*link.getLength(), 0);
 						coord = new Coord(pi.getEasting(), pi.getNorthing());
 					}
-					addCoord(coord, actColor);
+					addCoord(coord, Color.BLUE );
 				} else if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
+					Color color = Color.lightGray;
+					String mode = leg.getMode();
+					if( mode.contains( TransportMode.car ) ){
+						color = Color.ORANGE;
+					} else if( mode.contains( TransportMode.pt ) ){
+						color = Color.YELLOW;
+					} else if( mode.contains( TransportMode.walk ) ){
+						color = Color.GREEN;
+					} else if( mode.contains( TransportMode.drt ) ){
+						color = Color.RED;
+					} else if( mode.equals( TransportMode.non_network_walk ) ){
+						color = Color.GREEN;
+					}
 					if ( leg.getRoute() instanceof NetworkRoute && level==Level.ROUTES) {
 						Link startLink = net.getLinks().get(leg.getRoute().getStartLinkId());
 						Coord from = startLink.getToNode().getCoord();
-						addCoord(from, carColor);
+						addCoord(from, color);
 						for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							Link driven = net.getLinks().get(linkId);
 							Node node = driven.getToNode();
 							Coord coord = node.getCoord();
-							addCoord(coord, carColor);
+							addCoord(coord, color);
 						}
 						Link endLink = net.getLinks().get(leg.getRoute().getEndLinkId());
 						Coord to = endLink.getToNode().getCoord();
-						addCoord(to, carColor);
+						addCoord(to, color);
 					} else {
 						Link fromLink = net.getLinks().get(leg.getRoute().getStartLinkId());
 						Coord from;
@@ -252,23 +274,9 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						}
 												
 						Coord coord = CoordUtils.getCenter(from, to);
-						if (leg.getMode().equals(TransportMode.car)) {
-							addCoord(from, carColor);
-							addCoord(coord, carColor);
-							addCoord(to, carColor);
-						} else if (leg.getMode().equals(TransportMode.pt)) {
-							addCoord(from, ptColor);
-							addCoord(coord, ptColor);
-							addCoord(to, ptColor);
-						} else if (leg.getMode().equals(TransportMode.walk)) {
-							addCoord(from, walkColor);
-							addCoord(coord, walkColor);
-							addCoord(to, walkColor);
-						} else {
-							addCoord(from, otherColor); 
-							addCoord(coord, otherColor);
-							addCoord(to, otherColor);
-						}
+						addCoord(from, color);
+						addCoord(coord, color);
+						addCoord(to, color);
 					}
 				}
 			}

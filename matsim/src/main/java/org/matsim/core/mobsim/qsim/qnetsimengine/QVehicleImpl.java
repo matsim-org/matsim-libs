@@ -20,6 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -27,13 +31,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * The ``Q'' implementation of the MobsimVehicle.
@@ -175,10 +174,6 @@ public class QVehicleImpl implements QVehicle {
     @Override
     public double getSizeInEquivalents() {
         return vehicle.getType().getPcuEquivalents();
-    }
-
-    public double getFlowCapacityConsumptionInEquivalents() {
-        return vehicle.getType().getPcuEquivalents() / vehicle.getType().getFlowEfficiencyFactor();
     }
 
 	@Override

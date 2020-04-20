@@ -1,4 +1,25 @@
-package org.matsim.utils.objectattributes;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * ObjectAttributesConverter.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.utils.objectattributes;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -11,6 +32,7 @@ import java.util.Set;
 
 /**
  * Object that converts arbitrary objects to and from strings based on the logic defined by {@AttributeConverter}s
+ *
  * @author thibautd
  */
 public class ObjectAttributesConverter {
@@ -26,13 +48,14 @@ public class ObjectAttributesConverter {
 	}
 
 	public ObjectAttributesConverter() {
-		this.converters.put(String.class.getCanonicalName(), new StringConverter() );
-		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter() );
-		this.converters.put(Float.class.getCanonicalName(), new FloatConverter() );
-		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter() );
-		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter() );
-		this.converters.put(Long.class.getCanonicalName(), new LongConverter() );
-		this.converters.put(double[].class.getCanonicalName(), new DoubleArrayConverter());
+		this.converters.put(String.class.getName(), new StringConverter());
+		this.converters.put(Integer.class.getName(), new IntegerConverter());
+		this.converters.put(Float.class.getName(), new FloatConverter());
+		this.converters.put(Double.class.getName(), new DoubleConverter());
+		this.converters.put(Boolean.class.getName(), new BooleanConverter());
+		this.converters.put(Long.class.getName(), new LongConverter());
+		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
+		this.converters.put(Map.class.getName(), new StringStringMapConverter());
 	}
 
 	public Object convert(String className, String value) {
@@ -64,7 +87,10 @@ public class ObjectAttributesConverter {
 	}
 
 	public String convertToString(Object o) {
-		AttributeConverter converter = getConverter(o.getClass().getCanonicalName());
+
+		// obviously this will not work this way if we have more generic conversion, but good for now, janek (Mar, 2020)
+		var className = isStringStringMap(o) ? Map.class.getName() : o.getClass().getName();
+		AttributeConverter converter = getConverter(className);
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
@@ -77,7 +103,7 @@ public class ObjectAttributesConverter {
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
 	public AttributeConverter putAttributeConverter(final Class<?> clazz, final AttributeConverter converter) {
-		return this.converters.put(clazz.getCanonicalName(), converter);
+		return this.converters.put(clazz.getName(), converter);
 	}
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
@@ -93,6 +119,16 @@ public class ObjectAttributesConverter {
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
 	public AttributeConverter removeAttributeConverter(final Class<?> clazz) {
-		return this.converters.remove(clazz.getCanonicalName());
+		return this.converters.remove(clazz.getName());
+	}
+
+	private boolean isStringStringMap(Object o) {
+
+		// very ugly test for maps
+		if (o instanceof Map && ((Map) o).size() > 0) {
+			Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
+			return firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String;
+		}
+		return false;
 	}
 }

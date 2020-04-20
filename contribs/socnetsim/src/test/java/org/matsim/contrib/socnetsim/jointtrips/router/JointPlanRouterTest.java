@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.router;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,19 +35,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.Facility;
-
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.Facility;
 
 /**
  * @author thibautd
@@ -78,6 +75,7 @@ public class JointPlanRouterTest {
 		act1.setEndTime( 1035 );
 		plan.addActivity( act1 );
 		final Leg leg = populationFactory.createLeg( JointActingTypes.PASSENGER );
+		TripStructureUtils.setRoutingMode( leg, JointActingTypes.PASSENGER );
 		plan.addLeg( leg );
 		plan.addActivity(
 				populationFactory.createActivityFromLinkId(
@@ -130,6 +128,7 @@ public class JointPlanRouterTest {
 		act1.setEndTime( 1035 );
 		plan.addActivity( act1 );
 		final Leg leg = populationFactory.createLeg( JointActingTypes.DRIVER );
+		TripStructureUtils.setRoutingMode( leg, JointActingTypes.DRIVER );
 		plan.addLeg( leg );
 		plan.addActivity(
 				populationFactory.createActivityFromLinkId(
@@ -184,13 +183,13 @@ public class JointPlanRouterTest {
 								final Facility toFacility,
 								final double departureTime,
 								final Person person) {
-							return Arrays.asList( PopulationUtils.createLeg(TransportMode.car) );
+							NetworkRoute route = RouteUtils.createNetworkRoute(List.of(fromFacility.getLinkId(), toFacility.getLinkId()), null);
+							route.setTravelTime(10);
+							Leg leg =  PopulationUtils.createLeg(TransportMode.car);
+							leg.setRoute(route);
+							return List.of(leg);
 						}
 
-						@Override
-						public StageActivityTypes getStageActivityTypes() {
-							return EmptyStageActivityTypes.INSTANCE;
-						}
 					}));
 		
 		builder.setRoutingModule(

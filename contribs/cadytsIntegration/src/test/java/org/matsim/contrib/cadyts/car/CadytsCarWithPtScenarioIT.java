@@ -27,7 +27,7 @@ public class CadytsCarWithPtScenarioIT {
 
     @Test @Ignore
     public void testCadytsWithPtVehicles() {
-        final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
+        final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("siouxfalls-2014"), "config_default.xml"));
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         config.controler().setLastIteration(0);
         final Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -21,7 +21,7 @@
 package org.matsim.counts.algorithms.graphs.helper;
 
 import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.core.gbl.MatsimResource;
@@ -114,7 +114,7 @@ public class OutputDelegate {
 			if (!indexFile){
 				 info = new ChartRenderingInfo(new StandardEntityCollection());
 				 file1 = new File(iter_path+"/png/"+fileName+".png");
-				ChartUtilities.saveChartAsPNG(file1, chart, width, height, info);
+				 ChartUtils.saveChartAsPNG(file1, chart, width, height, info);
 			}
 
 			writer = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file2)));
@@ -171,7 +171,7 @@ public class OutputDelegate {
 			writer.println("<div id=\"contents\">");
 			writer.println("<p>");
 			if (!indexFile) {
-				ChartUtilities.writeImageMap(writer, "chart", info, true);
+				ChartUtils.writeImageMap(writer, "chart", info, true);
 
 				/*
 	        	chart=cg.getChart();

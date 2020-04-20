@@ -98,8 +98,9 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
 		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler::isIdle).count();
-		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
-				params.getVehPlanningHorizonUndersupply() : params.getVehPlanningHorizonOversupply();
+		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ?
+				params.getVehPlanningHorizonUndersupply() :
+				params.getVehPlanningHorizonOversupply();
 		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values().stream(),
 				vehPlanningHorizon);
 	}

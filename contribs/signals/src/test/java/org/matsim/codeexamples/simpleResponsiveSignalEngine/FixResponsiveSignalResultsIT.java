@@ -29,9 +29,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
@@ -65,10 +65,10 @@ public class FixResponsiveSignalResultsIT {
 		
 		LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 		LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
-		Assert.assertEquals(group1Setting.getOnset(), 0);
-		Assert.assertEquals(group1Setting.getDropping(), 25);
-		Assert.assertEquals(group2Setting.getOnset(), 30);
-		Assert.assertEquals(group2Setting.getDropping(), 55);
+		Assert.assertEquals(0, group1Setting.getOnset());
+		Assert.assertEquals(25, group1Setting.getDropping());
+		Assert.assertEquals(30, group2Setting.getOnset());
+		Assert.assertEquals(55, group2Setting.getDropping());
 	}
 	
 }

@@ -38,7 +38,7 @@ public class FixedSpeedCharging implements BatteryCharging {
 
 	@Override
 	public double calcChargingPower(Charger charger) {
-		return Math.min(maxPower, charger.getPower());
+		return Math.min(maxPower, charger.getPlugPower());
 	}
 
 	@Override
