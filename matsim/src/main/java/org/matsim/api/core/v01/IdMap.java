@@ -15,17 +15,22 @@ import java.util.function.BiConsumer;
  */
 public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
+	private static final int DEFAULT_SIZE = 100_000;
+	
 	private Class<T> idClass;
+	private final int sizeIncrement;
 	private int size = 0;
 	private Object[] data;
 
+
 	public IdMap(Class<T> idClass) {
-		this(idClass, Math.max(Id.getNumberOfIds(idClass), 100));
+		this(idClass, Math.max(Id.getNumberOfIds(idClass), DEFAULT_SIZE));
 	}
 
 	public IdMap(Class<T> idClass, int size) {
 		this.idClass = idClass;
 		this.data = new Object[size];
+		this.sizeIncrement = size;
 	}
 
 	@Override
@@ -151,7 +156,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
 	private void ensureCapacity(int index) {
 		if (index >= this.data.length) {
-			Object[] tmp = new Object[index + 100];
+			Object[] tmp = new Object[index + sizeIncrement];
 			System.arraycopy(this.data, 0, tmp, 0, this.data.length);
 			this.data = tmp;
 		}
