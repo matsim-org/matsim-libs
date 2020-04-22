@@ -34,10 +34,13 @@ public class PalmChemistryInput {
     private double maxY = Double.NEGATIVE_INFINITY;
     private Set<Pollutant> observedPollutants = new HashSet<>();
 
-
     public PalmChemistryInput(double timeIntervalInSeconds, double cellSize) {
         this.cellSize = cellSize;
         this.data = new TimeBinMap<>(timeIntervalInSeconds);
+    }
+
+    public TimeBinMap<EmissionRaster> getData() {
+        return data;
     }
 
     public void addCell(double time, Coord coord, Map<Pollutant, Double> valuesByPollutant) {
@@ -135,7 +138,7 @@ public class PalmChemistryInput {
     private ArrayDouble.D1 writeDoubleArray(double min, double max, double intervallSize, int size) {
         var result = new ArrayDouble.D1(size);
         var i = 0;
-        for (var v = min; v < max; v += intervallSize) {
+        for (var v = min; v <= max; v += intervallSize) {
             result.set(i, v);
             i++;
         }

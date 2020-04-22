@@ -45,12 +45,15 @@ public class EmissionRaster {
 	}
 
 	public Cell getCell(double x, double y) {
+		return getCell(new Coord(x, y));
+	}
 
-		return cells.get(new Coord(x, y));
+	public Cell getCell(Coord coord) {
+		return cells.get(coord);
 	}
 
 	public Collection<Cell> getCells() {
-		return spatialIndex.values();
+		return cells.values();
 	}
 
 	public void addEmissions(Id<Link> linkId, Map<Pollutant, Double> emissions) {
@@ -128,24 +131,24 @@ public class EmissionRaster {
         return result;
     }
 
-    private void buildSpatialIndex() {
-        // create a spatial index of cells so the raster can be queried later
-        //double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
-        //spatialIndex = new QuadTree<>(bounds[0] - cellSize, bounds[1] - cellSize, bounds[2] + cellSize, bounds[3] + cellSize); //ugh
-        spatialIndex = new QuadTree<>(minX, minY, maxX, maxY);
-        for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
-            spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
-        }
-    }
+	private void buildSpatialIndex() {
+		// create a spatial index of cells so the raster can be queried later
+		//double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+		//spatialIndex = new QuadTree<>(bounds[0] - cellSize, bounds[1] - cellSize, bounds[2] + cellSize, bounds[3] + cellSize); //ugh
+		spatialIndex = new QuadTree<>(minX, minY, maxX, maxY);
+		for (Map.Entry<Coord, Cell> entry : cells.entrySet()) {
+			spatialIndex.put(entry.getKey().getX(), entry.getKey().getY(), entry.getValue());
+		}
+	}
 
-    public static class Cell {
+	public static class Cell {
 
-        private final Coord coord;
-        private Map<Pollutant, Double> emissions = new HashMap<>();
+		private final Coord coord;
+		private Map<Pollutant, Double> emissions = new HashMap<>();
 
-        private Cell(Coord coord) {
-            this.coord = coord;
-        }
+		private Cell(Coord coord) {
+			this.coord = coord;
+		}
 
 		public Coord getCoord() {
 			return coord;
