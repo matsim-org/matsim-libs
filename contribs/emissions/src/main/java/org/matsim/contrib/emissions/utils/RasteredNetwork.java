@@ -14,17 +14,20 @@ import java.util.stream.Collectors;
 public class RasteredNetwork {
 
     private final Map<Id<Link>, List<Coord>> linkMap;
+    private final double cellSize;
 
     RasteredNetwork(Network network, double cellSize) {
-        linkMap = rasterizeNetwork(network, cellSize);
-    }
 
-    Map<Id<Link>, List<Coord>> getLinks() {
-        return linkMap;
+        this.cellSize = cellSize;
+        linkMap = rasterizeNetwork(network, cellSize);
     }
 
     List<Coord> getCellCoords(Id<Link> forLink) {
         return linkMap.get(forLink);
+    }
+
+    double getCellSize() {
+        return cellSize;
     }
 
     private Map<Id<Link>, List<Coord>> rasterizeNetwork(Network network, final double cellSize) {

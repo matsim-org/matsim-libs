@@ -16,8 +16,8 @@ public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmE
     private final PalmChemistryInput palmChemistryInput;
     private final RasteredNetwork network;
 
-    public EmissionsToRasterHandler(RasteredNetwork network, double timeBinSize, double cellSize) {
-        this.palmChemistryInput = new PalmChemistryInput(timeBinSize, cellSize);
+    public EmissionsToRasterHandler(RasteredNetwork network, double timeBinSize) {
+        this.palmChemistryInput = new PalmChemistryInput(timeBinSize, network.getCellSize());
         this.network = network;
     }
 
