@@ -45,11 +45,9 @@ public class EmissionRaster {
 	}
 
 	public Cell getCell(double x, double y) {
-        if (spatialIndex == null) {
-            buildSpatialIndex();
-        }
-        return spatialIndex.getClosest(x, y);
-    }
+
+		return cells.get(new Coord(x, y));
+	}
 
 	public Collection<Cell> getCells() {
 		return spatialIndex.values();

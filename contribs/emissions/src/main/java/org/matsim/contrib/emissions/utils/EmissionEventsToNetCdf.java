@@ -2,7 +2,6 @@ package org.matsim.contrib.emissions.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayChar;
@@ -37,11 +36,11 @@ public class EmissionEventsToNetCdf {
 	public static void main(String[] args) {
 
 		Path path = Paths.get("C:\\Users\\Janekdererste\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
-		var timeGrid = readEmissionsFromNetCdf(path);
-		writeToNetCdf(Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc"), timeGrid);
+		var chemistryInput = readEmissionsFromNetCdf(path);
+		chemistryInput.writeTofile(Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc"));
 	}
 
-	public static TimeBinMap<EmissionRaster> readEmissionsFromNetCdf(Path netCdfFile) {
+	public static PalmChemistryInput readEmissionsFromNetCdf(Path netCdfFile) {
 
 		try (NetcdfFile file = NetcdfFile.open(netCdfFile.toString())) {
 
@@ -57,20 +56,18 @@ public class EmissionEventsToNetCdf {
 			emissionValues = emissionValues.reduce(Collections.singletonList(zDimension)); // remove z dimension, since it is not used
 
 			// use one second as time bin size
-			TimeBinMap<EmissionRaster> timeBins = new TimeBinMap<>(1, 1);
+			var chemistryInput = new PalmChemistryInput(1, 10);
 
 			for (int ti = 0; ti < times.size(); ti++) {
 
 				logger.info("writing things for timestep: " + timestamps.get(ti));
-				var raster = new EmissionRaster();
 				var currentTimeStep = times.get(ti);
-				timeBins.getTimeBin(currentTimeStep).setValue(raster);
 
 				for (int xi = 0; xi < x.size(); xi++) {
 					for (int yi = 0; yi < y.size(); yi++) {
 
 						Map<Pollutant, Double> pollutionMap = new HashMap<>();
-						Array pollution = emissionValues.read(new int[]{ti, xi, yi, 0}, new int[]{1, 1, 1, emissionNames.size()});
+						Array pollution = emissionValues.read(new int[]{ti, yi, xi, 0}, new int[]{1, 1, 1, emissionNames.size()});
 						float[] values = (float[]) pollution.copyTo1DJavaArray();
 
 						// write the different pollutants into a map
@@ -81,24 +78,14 @@ public class EmissionEventsToNetCdf {
 							}
 						}
 						var coord = new Coord(x.get(xi), y.get(yi));
-						raster.addCell(coord, pollutionMap);
+						chemistryInput.addCell(currentTimeStep, coord, pollutionMap);
 					}
 				}
 			}
-			return timeBins;
+			return chemistryInput;
 		} catch (IOException | InvalidRangeException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
-		}
-	}
-
-	public static void writeToNetCdf(Path outputFile, TimeBinMap<EmissionRaster> data) {
-
-		try (var writer = new EmissionNetcdfWriter(outputFile)) {
-
-			writer.write(data);
-		} catch (IOException | InvalidRangeException e) {
-			e.printStackTrace();
 		}
 	}
 
