@@ -2,7 +2,6 @@ package org.matsim.contrib.emissions.utils;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.emissions.Pollutant;
@@ -86,7 +85,7 @@ public class PalmChemistryInputTest {
                             }
                         }
                         var coord = new Coord(x.get(xi), y.get(yi));
-                        chemistryInput.addCell(currentTimeStep, coord, pollutionMap);
+                        chemistryInput.addPollution(currentTimeStep, coord, pollutionMap);
                     }
                 }
             }
@@ -129,7 +128,6 @@ public class PalmChemistryInputTest {
     }
 
     @Test
-    @Ignore
     public void testWritingLogic() {
 
         Path path = Paths.get("C:\\Users\\Janekdererste\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
@@ -137,7 +135,7 @@ public class PalmChemistryInputTest {
 
         var filePath = Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc");
         // actually test the writing to a file
-        expectedChemistryInput.writeTofile(filePath);
+        expectedChemistryInput.writeToFile(filePath);
 
         // now read it in again and compare the two chemistry inputs
         var actualChemistryInput = readFromFile(filePath);
@@ -154,9 +152,10 @@ public class PalmChemistryInputTest {
             logger.info("Testing equality of time bin: " + expectedBin.getStartTime());
             assertEquals(expectedBin.getStartTime(), actualBin.getStartTime(), 0.00001);
 
-            for (var expectedCell : expectedBin.getValue().getCells()) {
+            for (var entry : expectedBin.getValue().entrySet()) {
 
-                var actualCell = actualBin.getValue().getCell(expectedCell.getCoord());
+                var expectedCell = entry.getValue();
+                var actualCell = actualBin.getValue().get(entry.getKey());
 
                 for (var expectedPollution : expectedCell.getEmissions().entrySet()) {
                     assertTrue(expectedPollution.getKey().toString() + "was not in the actual cell",

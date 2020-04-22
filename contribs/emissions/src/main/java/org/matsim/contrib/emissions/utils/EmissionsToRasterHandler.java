@@ -1,9 +1,8 @@
 package org.matsim.contrib.emissions.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
@@ -14,11 +13,11 @@ import java.util.Map;
 
 public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler {
 
-    private final TimeBinMap<EmissionRaster> timeBins;
-    private final Network network;
+    private final PalmChemistryInput palmChemistryInput;
+    private final RasteredNetwork network;
 
-    public EmissionsToRasterHandler(double timeBinSize, Network network) {
-        this.timeBins = new TimeBinMap<>(timeBinSize);
+    public EmissionsToRasterHandler(RasteredNetwork network, double timeBinSize, double cellSize) {
+        this.palmChemistryInput = new PalmChemistryInput(timeBinSize, cellSize);
         this.network = network;
     }
 
@@ -34,14 +33,15 @@ public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmE
 
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<Pollutant, Double> emissions) {
 
-        var currentBin = timeBins.getTimeBin(time);
+        var cellCoords = network.getCellCoords(linkId);
 
-        if (!currentBin.hasValue()) {
-            currentBin.setValue(new EmissionRaster(500, network));
+        // distribute emissions onto the covered cells evenly
+        for (Map.Entry<Pollutant, Double> entry : emissions.entrySet()) {
+            entry.setValue(entry.getValue() / cellCoords.size());
         }
 
-        var raster = currentBin.getValue();
-
-        raster.addEmissions(linkId, emissions);
+        for (Coord cellCoord : network.getCellCoords(linkId)) {
+            palmChemistryInput.addPollution(time, cellCoord, emissions);
+        }
     }
 }

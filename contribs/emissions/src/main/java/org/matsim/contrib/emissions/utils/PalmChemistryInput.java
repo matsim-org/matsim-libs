@@ -26,38 +26,41 @@ public class PalmChemistryInput {
     private static final String EMISSION_INDEX = "emission_index";
     private static final String TIMESTAMP = "timestamp";
     private static final String EMISSION_VALUES = "emission_values";
-    private final double cellSize;
-    private TimeBinMap<EmissionRaster> data;
+
+    private final TimeBinMap<Map<Coord, Cell>> data;
+    // some housekeeping for creating indices when writing to netcdf file
     private double minX = Double.POSITIVE_INFINITY;
     private double maxX = Double.NEGATIVE_INFINITY;
     private double minY = Double.POSITIVE_INFINITY;
     private double maxY = Double.NEGATIVE_INFINITY;
+
+    private final double cellSize;
     private Set<Pollutant> observedPollutants = new HashSet<>();
+
 
     public PalmChemistryInput(double timeIntervalInSeconds, double cellSize) {
         this.cellSize = cellSize;
         this.data = new TimeBinMap<>(timeIntervalInSeconds);
     }
 
-    public TimeBinMap<EmissionRaster> getData() {
+    public TimeBinMap<Map<Coord, Cell>> getData() {
         return data;
     }
 
-    public void addCell(double time, Coord coord, Map<Pollutant, Double> valuesByPollutant) {
+    public void addPollution(double time, Coord coord, Map<Pollutant, Double> valuesByPollutant) {
 
         updateBounds(coord);
         updateObservedPollutants(valuesByPollutant.keySet());
 
-
         var timeBin = data.getTimeBin(time);
 
-        if (!timeBin.hasValue()) timeBin.setValue(new EmissionRaster());
+        if (!timeBin.hasValue()) timeBin.setValue(new HashMap<>());
 
-        var raster = timeBin.getValue();
-        raster.addCell(coord, valuesByPollutant);
+        var cells = timeBin.getValue();
+        cells.merge(coord, new Cell(valuesByPollutant), Cell::merge);
     }
 
-    public void writeTofile(Path file) {
+    public void writeToFile(Path file) {
 
         try (var writer = NetcdfFileWriter.createNew(NetcdfFileWriter.Version.netcdf3, file.toString())) {
 
@@ -111,8 +114,9 @@ public class PalmChemistryInput {
                     var x = xValues.get(xi);
                     var y = yValues.get(yi);
 
-                    var cell = bin.getValue().getCell(x, y);
+                    var cell = bin.getValue().get(new Coord(x, y));
 
+                    // TODO change this to iterate over pollutantToIndex and put zeros for all non-present emission values. This becomes important if not all cells have the same emission values
                     for (var entry : cell.getEmissions().entrySet()) {
                         var pollutantIndex = pollutantToIndex.indexOf(entry.getKey());
                         emissionValues.set(i, 0, yi, xi, pollutantIndex, entry.getValue().floatValue());
@@ -217,5 +221,33 @@ public class PalmChemistryInput {
 
     private int getNumberOfCellsInYDirection() {
         return (int) ((maxY - minY) / cellSize + 1);
+    }
+
+    static class Cell {
+
+        private final Map<Pollutant, Double> emissions;
+
+        private Cell(Map<Pollutant, Double> emissions) {
+            this.emissions = emissions;
+        }
+
+        private static Cell merge(Cell c1, Cell c2) {
+
+            for (var valueByPollutant : c2.getEmissions().entrySet()) {
+                c1.emissions.merge(valueByPollutant.getKey(), valueByPollutant.getValue(), Double::sum);
+            }
+            // I guess this is not pure at all, but will do the job...
+            return c1;
+        }
+
+        public Map<Pollutant, Double> getEmissions() {
+            return emissions;
+        }
+
+        private void addEmissions(Map<Pollutant, Double> pollution, int divideBy) {
+            for (var pollutant : pollution.entrySet()) {
+                emissions.merge(pollutant.getKey(), pollutant.getValue() / divideBy, Double::sum);
+            }
+        }
     }
 }
