@@ -108,11 +108,8 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-
 		setUp();
-
-		List<ArrayList> testCases = new ArrayList<>();
-
+		//List<ArrayList> testCases = new ArrayList<>();
 		ArrayList<Object> testCase1 = new ArrayList<>();
 
 		// first case: complete data
