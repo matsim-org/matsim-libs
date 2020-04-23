@@ -60,10 +60,9 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  */
 
 public class TestColdEmissionAnalysisModuleCase1 {
+
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase1.class);
-
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-
 	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.0;
@@ -104,12 +103,10 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 	private static final double fakeFactor = -1.;
 
-	private boolean excep = false;
-
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		setUp();
-		//List<ArrayList> testCases = new ArrayList<>();
+		// List<ArrayList> testCases = new ArrayList<>();
 		ArrayList<Object> testCase1 = new ArrayList<>();
 
 		// first case: complete data
@@ -117,7 +114,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		Collections.addAll(testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept,
 				averagePetrolFactor);
 
-		logger.info("Running testcase: " + testCase1 + " " + testCase1.toString());
+		logger.info("Running testcase:" + testCase1.toString());
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);
 		Id<VehicleType> vehicleTypeId = Id.create(
@@ -151,7 +148,9 @@ public class TestColdEmissionAnalysisModuleCase1 {
 					EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes);
 		} else if (true) {
 			ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
-		} else {
+		}
+		// Why is this here???
+		else {
 			ecg.setHbefaVehicleDescriptionSource(
 					EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
 		}
