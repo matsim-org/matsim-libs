@@ -16,6 +16,8 @@ public class RasteredNetwork {
     private final Map<Id<Link>, List<Coord>> linkMap;
     private final double cellSize;
 
+    private int bla = 0;
+
     RasteredNetwork(Network network, double cellSize) {
 
         this.cellSize = cellSize;
@@ -24,6 +26,10 @@ public class RasteredNetwork {
 
     List<Coord> getCellCoords(Id<Link> forLink) {
         return linkMap.get(forLink);
+    }
+
+    public boolean hasLink(Id<Link> linkId) {
+        return linkMap.containsKey(linkId);
     }
 
     double getCellSize() {
@@ -60,6 +66,7 @@ public class RasteredNetwork {
         List<Coord> result = new ArrayList<>();
 
         do {
+            bla++;
             result.add(new Coord(x0 * cellSize - (cellSize / 2), y0 * cellSize - cellSize / 2));
             e2 = err + err;
             if (e2 >= dy) {
@@ -72,6 +79,9 @@ public class RasteredNetwork {
             }
         } while (x0 != x1 || y0 != y1);
 
+        if (bla % 1000 == 0) {
+            System.out.println(bla);
+        }
         return result;
     }
 }

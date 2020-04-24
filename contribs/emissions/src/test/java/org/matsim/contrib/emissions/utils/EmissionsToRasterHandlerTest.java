@@ -4,6 +4,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -12,9 +14,12 @@ import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -159,5 +164,44 @@ public class EmissionsToRasterHandlerTest {
         // do something with the output
         writeToCsv(Paths.get("C:/Users/Janekdererste/Desktop/debug-2.csv"), chemistryInput);
 
+    }
+
+    @Test
+    public void testWithBerlinEmissions() throws MalformedURLException {
+
+        var bounds = new GeometryFactory().createPolygon(new Coordinate[]{
+                new Coordinate(4588789.5991483666002750, 5820179.6808353941887617),
+                new Coordinate(4590888.1844554375857115, 5820179.6808353941887617),
+                new Coordinate(4590888.1844554375857115, 5821326.1153511889278889), // bottom right
+                new Coordinate(4588789.5991483666002750, 5821326.1153511889278889),
+                new Coordinate(4588789.5991483666002750, 5820179.6808353941887617),
+        });
+        var preparedGeom = ShpGeometryUtils.loadPreparedGeometries(Paths.get("C:\\Users\\Janekdererste\\Desktop\\shape-thing.shp").toUri().toURL());
+        var network = NetworkUtils.readNetwork("C:\\Users\\Janekdererste\\repos\\public-svn\\matsim\\scenarios\\countries\\de\\berlin\\berlin-v5.4-1pct\\output-berlin-v5.4-1pct\\berlin-v5.4-1pct.output_network.xml.gz");
+
+        var filteredNetwork = NetworkUtils.createNetwork();
+
+        network.getLinks().values().stream()
+                .filter(link -> bounds.contains(MGC.coord2Point(link.getFromNode().getCoord())) ||
+                        bounds.contains(MGC.coord2Point(link.getToNode().getCoord())))
+                .forEach(link -> {
+                    if (!filteredNetwork.getNodes().containsKey(link.getFromNode().getId()))
+                        filteredNetwork.addNode(link.getFromNode());
+                    if (!filteredNetwork.getNodes().containsKey(link.getToNode().getId()))
+                        filteredNetwork.addNode(link.getToNode());
+
+                    filteredNetwork.addLink(link);
+                });
+
+        var rasteredNetwork = new RasteredNetwork(filteredNetwork, 1000);
+
+        var handler = new EmissionsToRasterHandler(rasteredNetwork, 3600);
+        var manager = EventsUtils.createEventsManager();
+        manager.addHandler(handler);
+
+        new EmissionEventsReader(manager).readFile("C:\\Users\\Janekdererste\\repos\\public-svn\\matsim\\scenarios\\countries\\de\\berlin\\berlin-v5.4-1pct\\output-berlin-v5.4-1pct\\berlin-v5.4-1pct.emission.events.offline.xml.gz");
+
+        var result = handler.getPalmChemistryInput();
+        PalmChemistryInput.writeToCsv(Paths.get("C:\\Users\\Janekdererste\\Desktop\\berlin-emissions-test.csv"), result);
     }
 }

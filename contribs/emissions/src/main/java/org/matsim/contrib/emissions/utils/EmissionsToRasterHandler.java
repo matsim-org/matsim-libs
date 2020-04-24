@@ -39,6 +39,7 @@ public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmE
 
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<Pollutant, Double> emissions) {
 
+        if (!network.hasLink(linkId)) return;
         var cellCoords = network.getCellCoords(linkId);
 
         // distribute emissions onto the covered cells evenly
