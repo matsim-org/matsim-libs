@@ -133,6 +133,8 @@ public class PalmChemistryInputTest {
         Path path = Paths.get("C:\\Users\\Janekdererste\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
         var expectedChemistryInput = readFromFile(path);
 
+        PalmChemistryInput.writeToCsv(Paths.get("C:/Users/Janekdererste/Desktop/erp_itm_chemistry.csv"), expectedChemistryInput);
+
         var filePath = Paths.get("C:\\Users\\Janekdererste\\Desktop\\test-netcdf.nc");
         // actually test the writing to a file
         expectedChemistryInput.writeToFile(filePath);
@@ -162,7 +164,7 @@ public class PalmChemistryInputTest {
                             actualCell.getEmissions().containsKey(expectedPollution.getKey()));
 
                     var actualPollution = actualCell.getEmissions().get(expectedPollution.getKey());
-                    assertEquals(expectedPollution.getValue(), actualPollution, 0.00001);
+                    assertEquals(expectedPollution.getValue(), actualPollution, 0.0001);
                 }
             }
         }

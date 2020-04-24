@@ -9,12 +9,18 @@ import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 
+import java.util.AbstractMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler {
 
     private final PalmChemistryInput palmChemistryInput;
     private final RasteredNetwork network;
+
+    public PalmChemistryInput getPalmChemistryInput() {
+        return palmChemistryInput;
+    }
 
     public EmissionsToRasterHandler(RasteredNetwork network, double timeBinSize) {
         this.palmChemistryInput = new PalmChemistryInput(timeBinSize, network.getCellSize());
@@ -36,12 +42,13 @@ public class EmissionsToRasterHandler implements ColdEmissionEventHandler, WarmE
         var cellCoords = network.getCellCoords(linkId);
 
         // distribute emissions onto the covered cells evenly
-        for (Map.Entry<Pollutant, Double> entry : emissions.entrySet()) {
-            entry.setValue(entry.getValue() / cellCoords.size());
-        }
+        // use stream instead of in place assignment since we don't know whether the incoming map is immutable or not
+        var dividedEmissions = emissions.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue() / cellCoords.size()))
+                .collect(Collectors.toUnmodifiableMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
 
         for (Coord cellCoord : network.getCellCoords(linkId)) {
-            palmChemistryInput.addPollution(time, cellCoord, emissions);
+            palmChemistryInput.addPollution(time, cellCoord, dividedEmissions);
         }
     }
 }

@@ -1,5 +1,7 @@
 package org.matsim.contrib.emissions.utils;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.analysis.time.TimeBinMap;
@@ -9,6 +11,7 @@ import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFileWriter;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -47,17 +50,50 @@ public class PalmChemistryInput {
         return data;
     }
 
-    public void addPollution(double time, Coord coord, Map<Pollutant, Double> valuesByPollutant) {
+    static void writeToCsv(Path file, PalmChemistryInput chemistryInput) {
 
-        updateBounds(coord);
-        updateObservedPollutants(valuesByPollutant.keySet());
+        try (var writer = Files.newBufferedWriter(file)) {
+            try (var printer = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 
-        var timeBin = data.getTimeBin(time);
+                // print header
+                printer.print("x");
+                printer.print("y");
+                printer.print("time");
 
-        if (!timeBin.hasValue()) timeBin.setValue(new HashMap<>());
+                for (Pollutant observedPollutant : chemistryInput.getObservedPollutants()) {
+                    printer.print(observedPollutant);
+                }
+                printer.println();
 
-        var cells = timeBin.getValue();
-        cells.merge(coord, new Cell(valuesByPollutant), Cell::merge);
+                for (var bin : chemistryInput.getData().getTimeBins()) {
+
+                    var time = bin.getStartTime();
+
+                    for (var coordCellEntry : bin.getValue().entrySet()) {
+
+                        var coord = coordCellEntry.getKey();
+                        printer.print(coord.getX());
+                        printer.print(coord.getY());
+                        printer.print(time);
+
+                        for (Pollutant observedPollutant : chemistryInput.getObservedPollutants()) {
+                            var value = coordCellEntry.getValue().getEmissions().get(observedPollutant);
+                            if (value == null)
+                                value = 0.0;
+
+                            printer.print(value);
+                        }
+                        printer.println();
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Set<Pollutant> getObservedPollutants() {
+        return observedPollutants;
     }
 
     public void writeToFile(Path file) {
@@ -249,5 +285,20 @@ public class PalmChemistryInput {
                 emissions.merge(pollutant.getKey(), pollutant.getValue() / divideBy, Double::sum);
             }
         }
+    }
+
+    public void addPollution(double time, Coord coord, Map<Pollutant, Double> valuesByPollutant) {
+
+        updateBounds(coord);
+        updateObservedPollutants(valuesByPollutant.keySet());
+
+        var timeBin = data.getTimeBin(time);
+
+        if (!timeBin.hasValue()) timeBin.setValue(new HashMap<>());
+
+        var cells = timeBin.getValue();
+
+        // make a defensive copy and feed an individual hash map into each cell.
+        cells.merge(coord, new Cell(new HashMap<>(valuesByPollutant)), Cell::merge);
     }
 }
