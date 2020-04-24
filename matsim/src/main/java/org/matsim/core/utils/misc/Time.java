@@ -105,8 +105,10 @@ public class Time {
 		if (TIMEFORMAT_SSSS.equals(timeformat)) {
 			return Long.toString((long)seconds);
 		}
+		if (seconds == UNDEFINED_TIME) {
+			return "undefined";
+		}
 		if (seconds < 0) {
-			if (seconds == UNDEFINED_TIME) return "undefined";
 			return "-" + writeTime(Math.abs(seconds), timeformat, separator);
 		}
 		double s = seconds;
