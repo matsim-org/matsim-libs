@@ -90,7 +90,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
-			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
+//			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
 							routingMode,
