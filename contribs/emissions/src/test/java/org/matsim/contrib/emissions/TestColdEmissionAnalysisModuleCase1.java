@@ -57,10 +57,15 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  *         <p>
  *         in all cases the needed tables are created manually by the setUp()
  *         method see test methods for details on the particular test cases
+ *         <p>
+ *         TestColdEmissionsCase1 looks for Passenger_car, petrol the average
+ *         
  */
 
 public class TestColdEmissionAnalysisModuleCase1 {
 
+	
+	
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase1.class);
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	private final String passengercar = "PASSENGER_CAR";
@@ -106,20 +111,19 @@ public class TestColdEmissionAnalysisModuleCase1 {
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		setUp();
-		// List<ArrayList> testCases = new ArrayList<>();
-		ArrayList<Object> testCase1 = new ArrayList<>();
-
+		ArrayList<Object> testCase1 = new ArrayList<Object>();
 		// first case: complete data
 		// corresponding entry in average table
 		Collections.addAll(testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept,
 				averagePetrolFactor);
-
 		logger.info("Running testcase:" + testCase1.toString());
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
+		System.out.println(linkId);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);
 		Id<VehicleType> vehicleTypeId = Id.create(
 				testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3),
 				VehicleType.class);
+		
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,
 				VehicleUtils.getFactory().createVehicleType(vehicleTypeId));
 		logger.info("VehicleId: " + vehicle.getId().toString());
@@ -132,6 +136,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 				+ HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4),
 				HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+		
 	}
 
 	private void setUp() {
@@ -149,14 +154,16 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		} else if (true) {
 			ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
 		}
-		// Why is this here???
-		else {
-			ecg.setHbefaVehicleDescriptionSource(
-					EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
-		}
+		// Why is this here code, it is unreachable??? Should all option be tried??
+//		else if (false){
+//			ecg.setHbefaVehicleDescriptionSource(
+//					EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
+//		}
+		
+		
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
-		// This test seems to refer to an direct lookup in average table??
+		// This test seems to refer to an direct lookup in average table?? //gr first cold emissions test seems to refer to the average table 
 		ecg.setDetailedVsAverageLookupBehavior(
 				EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		// coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new
@@ -210,14 +217,11 @@ public class TestColdEmissionAnalysisModuleCase1 {
 	}
 
 	private static void fillAveragesTable(Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable) {
-
 		// create all needed and one unneeded entry for the average table
-
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes("average",
 					"average", "average");
-
 			putIntoHbefaColdTable(avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor),
 					PASSENGER_CAR);
 		}
@@ -257,5 +261,5 @@ public class TestColdEmissionAnalysisModuleCase1 {
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
-
+	
 }
