@@ -1,10 +1,12 @@
 package org.matsim.contrib.emissions.utils;
 
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +18,16 @@ public class RasteredNetwork {
     private final Map<Id<Link>, List<Coord>> linkMap;
     private final double cellSize;
 
-    private int bla = 0;
+    private final int bla = 0;
 
-    RasteredNetwork(Network network, double cellSize) {
+    RasteredNetwork(Network network, Geometry bounds, double cellSize) {
 
         this.cellSize = cellSize;
-        linkMap = rasterizeNetwork(network, cellSize);
+        linkMap = rasterizeNetwork(network, bounds, cellSize);
+    }
+
+    RasteredNetwork(Network network, double cellSize) {
+        this(network, null, cellSize);
     }
 
     List<Coord> getCellCoords(Id<Link> forLink) {
@@ -36,9 +42,23 @@ public class RasteredNetwork {
         return cellSize;
     }
 
-    private Map<Id<Link>, List<Coord>> rasterizeNetwork(Network network, final double cellSize) {
+    private static Coord createCoord(int x, int y, double cellSize) {
+        return new Coord(x * cellSize - (cellSize / 2), y * cellSize - cellSize / 2);
+    }
 
-        return network.getLinks().values().stream()
+    private static boolean containsLink(Link link, Geometry geometry) {
+        return geometry.contains(MGC.coord2Point(link.getFromNode().getCoord())) || geometry.contains(MGC.coord2Point(link.getToNode().getCoord()));
+    }
+
+    private Map<Id<Link>, List<Coord>> rasterizeNetwork(Network network, final Geometry bounds, final double cellSize) {
+
+        var networkStream = network.getLinks().values().parallelStream();
+
+        if (bounds != null) {
+            networkStream = networkStream.filter(link -> containsLink(link, bounds));
+        }
+
+        return networkStream
                 .map(link -> Tuple.of(link.getId(), rasterizeLink(link, cellSize)))
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
     }
@@ -65,9 +85,15 @@ public class RasteredNetwork {
 
         List<Coord> result = new ArrayList<>();
 
+        if (dx == 0 && dy == 0) {
+            // the algorithm doesn't really support lines shorter than the cell size.
+            // do avoid complicated computation within the loop, catch this case here
+            result.add(createCoord(x0, y0, cellSize));
+            return result;
+        }
+
         do {
-            bla++;
-            result.add(new Coord(x0 * cellSize - (cellSize / 2), y0 * cellSize - cellSize / 2));
+            result.add(createCoord(x0, y0, cellSize));
             e2 = err + err;
             if (e2 >= dy) {
                 err += dy;
@@ -79,9 +105,6 @@ public class RasteredNetwork {
             }
         } while (x0 != x1 || y0 != y1);
 
-        if (bla % 1000 == 0) {
-            System.out.println(bla);
-        }
         return result;
     }
 }
