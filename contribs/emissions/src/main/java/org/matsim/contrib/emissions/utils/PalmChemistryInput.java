@@ -45,7 +45,6 @@ public class PalmChemistryInput {
 
     private Cell defaultCell = null;
 
-
     public PalmChemistryInput(double timeIntervalInSeconds, double cellSize) {
         this.cellSize = cellSize;
         this.data = new TimeBinMap<>(timeIntervalInSeconds);
@@ -55,6 +54,14 @@ public class PalmChemistryInput {
         return data;
     }
 
+    /**
+     * Writes the data into a csv format is: x,y,time,pollutant1,pollutant2,....
+     * <p>
+     * This is meant for debugging. One can display rastered pollution in via for example
+     *
+     * @param file           output file path
+     * @param chemistryInput dat which is written to the file
+     */
     static void writeToCsv(Path file, PalmChemistryInput chemistryInput) {
 
         try (var writer = Files.newBufferedWriter(file)) {
@@ -70,6 +77,7 @@ public class PalmChemistryInput {
                 }
                 printer.println();
 
+                // print data
                 for (var bin : chemistryInput.getData().getTimeBins()) {
 
                     var time = bin.getStartTime();
@@ -93,7 +101,7 @@ public class PalmChemistryInput {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -320,6 +328,7 @@ public class PalmChemistryInput {
         var cells = timeBin.getValue();
 
         // make a defensive copy and feed an individual hash map into each cell.
+        // probably this could be programmed faster, but I guess this does for now.
         cells.merge(coord, new Cell(new HashMap<>(valuesByPollutant)), Cell::merge);
     }
 }

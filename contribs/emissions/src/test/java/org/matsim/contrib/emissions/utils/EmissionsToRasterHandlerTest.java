@@ -1,7 +1,5 @@
 package org.matsim.contrib.emissions.utils;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,9 +15,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -30,47 +25,6 @@ public class EmissionsToRasterHandlerTest {
 
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-    private static void writeToCsv(Path file, PalmChemistryInput chemistryInput) {
-
-        try (var writer = Files.newBufferedWriter(file)) {
-            try (var printer = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
-
-                // print header
-                printer.print("x");
-                printer.print("y");
-                printer.print("time");
-                for (Pollutant observedPollutant : chemistryInput.getObservedPollutants()) {
-                    printer.print(observedPollutant);
-                }
-                printer.println();
-
-                for (var bin : chemistryInput.getData().getTimeBins()) {
-
-                    var time = bin.getStartTime();
-
-                    for (var coordCellEntry : bin.getValue().entrySet()) {
-
-                        var coord = coordCellEntry.getKey();
-                        printer.print(coord.getX());
-                        printer.print(coord.getY());
-                        printer.print(time);
-
-                        for (Pollutant observedPollutant : chemistryInput.getObservedPollutants()) {
-                            var value = coordCellEntry.getValue().getEmissions().get(observedPollutant);
-                            if (value == null)
-                                value = 0.0;
-
-                            printer.print(value);
-                        }
-                        printer.println();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     @Test
     public void singleLinkWithSingleEmissionEvent() {
@@ -162,7 +116,7 @@ public class EmissionsToRasterHandlerTest {
         assertNotNull(chemistryInput);
 
         // do something with the output
-        writeToCsv(Paths.get(testUtils.getOutputDirectory() + "rastered-emissions.csv"), chemistryInput);
+        PalmChemistryInput.writeToCsv(Paths.get(testUtils.getOutputDirectory() + "rastered-emissions.csv"), chemistryInput);
     }
 
     /**
