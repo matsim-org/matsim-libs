@@ -86,6 +86,9 @@ public class TripsAndLegsCSVWriterTest {
 	private static int egress_stop_id;
 	private static int transit_line;
 	private static int transit_route;
+	private static int first_pt_boarding_stop;
+	private static int last_pt_egress_stop;
+	
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	ArrayList<Object> legsfromplan = new ArrayList<Object>();
@@ -200,6 +203,9 @@ public class TripsAndLegsCSVWriterTest {
 	            modeDistance.put(TransportMode.walk, 0.0);
 	            modeDistance.put(TransportMode.pt, 0.0);
 	            modeDistance.put(TransportMode.car, 0.0);
+	            int count = 1;
+	            String first_pt_boarding_stop = null;
+				String last_pt_egress_stop = null;
 				for (Leg leg : trip.getLegsOnly()) {
 					double dis = leg.getRoute().getDistance();
 					traveled_distance += dis;
@@ -212,13 +218,19 @@ public class TripsAndLegsCSVWriterTest {
 					if(boardingTime != null) {
 						waiting_time += boardingTime - leg.getDepartureTime();
 					}
+					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+						first_pt_boarding_stop =  first_pt_boarding_stop != null ? first_pt_boarding_stop : route.getAccessStopId().toString();		
+				        last_pt_egress_stop = route.getEgressStopId().toString();
+					}
+					count++;
 				}
 				Set<String> keyset = modeDistance.keySet();
 				Iterator<String> keysetitr = keyset.iterator();
 				String longest_distance_mode="";
 				double highest = 0.0;
 				/***********************************************************
-				 * Identifying the mode which has highest distance travelled.
+				 * Identifying the mode which has highest distance traveled.
 				 ***********************************************************/
 				while(keysetitr.hasNext()) {
 					String key = keysetitr.next();
@@ -247,6 +259,8 @@ public class TripsAndLegsCSVWriterTest {
 				tripvalues.put("modes", modestrim);
 				tripvalues.put("waiting_time", Time.writeTime(waiting_time));
 				tripvalues.put("longest_distance_mode", longest_distance_mode);
+				tripvalues.put("first_pt_boarding_stop", first_pt_boarding_stop);
+				tripvalues.put("last_pt_egress_stop", last_pt_egress_stop);
 				
 				persontrips.put(entry.getKey()+"_"+tripno, tripvalues);
 				tripno++;
@@ -336,22 +350,22 @@ public class TripsAndLegsCSVWriterTest {
 			while ((line = br.readLine()) != null && legItr.hasNext()) {
 				String[] column = line.split(";");
 				Map<String, Object> nextleg = (Map<String, Object>) legItr.next();
-				Assert.assertEquals("Distance is not as expected", String.valueOf(nextleg.get("dep_time")) , column[dep_time]);
-				Assert.assertEquals("Mode is not as expected", String.valueOf(nextleg.get("trav_time")) , column[trav_time]);
-				Assert.assertEquals("Start link is not as expected", String.valueOf(nextleg.get("wait_time")) , column[wait_time]);
+				Assert.assertEquals("dep_time is not as expected", String.valueOf(nextleg.get("dep_time")) , column[dep_time]);
+				Assert.assertEquals("trav_time is not as expected", String.valueOf(nextleg.get("trav_time")) , column[trav_time]);
+				Assert.assertEquals("wait_time is not as expected", String.valueOf(nextleg.get("wait_time")) , column[wait_time]);
 				Assert.assertEquals("Distance is not as expected", String.valueOf(nextleg.get("distance")) , column[distance]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("mode")) , column[mode]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("start_link")) , column[start_link]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("start_x")) , column[start_x]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("start_y")) , column[start_y]);
+				Assert.assertEquals("mode is not as expected", String.valueOf(nextleg.get("mode")) , column[mode]);
+				Assert.assertEquals("start_link is not as expected", String.valueOf(nextleg.get("start_link")) , column[start_link]);
+				Assert.assertEquals("start_x is not as expected", String.valueOf(nextleg.get("start_x")) , column[start_x]);
+				Assert.assertEquals("start_y is not as expected", String.valueOf(nextleg.get("start_y")) , column[start_y]);
 				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("end_link")) , column[end_link]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("end_x")) , column[end_x]);
-				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("end_y")) , column[end_y]);
+				Assert.assertEquals("end_x is not as expected", String.valueOf(nextleg.get("end_x")) , column[end_x]);
+				Assert.assertEquals("end_y is not as expected", String.valueOf(nextleg.get("end_y")) , column[end_y]);
 				if(column.length > 13) {
-					Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("access_stop_id")) , column[access_stop_id]);
-					Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id]);
-					Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line]);
-					Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route]);
+					Assert.assertEquals("access_stop_id is not as expected", String.valueOf(nextleg.get("access_stop_id")) , column[access_stop_id]);
+					Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id]);
+					Assert.assertEquals("transit_line is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line]);
+					Assert.assertEquals("transit_route is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route]);
 				}
 			}
 		}catch (IOException e) {
@@ -399,8 +413,11 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("End link is not as expected", String.valueOf(tripvalues.get("end_link")), column[end_link]);
 				Assert.assertEquals("End x is not as expected", String.valueOf(tripvalues.get("end_x")), column[end_x]);
 				Assert.assertEquals("End y is not as expected", String.valueOf(tripvalues.get("end_y")), column[end_y]);
-				Assert.assertEquals("End y is not as expected", String.valueOf(tripvalues.get("waiting_time")), column[wait_time]);
-			
+				Assert.assertEquals("waiting_time is not as expected", String.valueOf(tripvalues.get("waiting_time")), column[wait_time]);
+				if(column.length > 20) {
+					Assert.assertEquals("first_pt_boarding_stop is not as expected", String.valueOf(tripvalues.get("first_pt_boarding_stop")), column[first_pt_boarding_stop]);
+					Assert.assertEquals("last_pt_egress_stop is not as expected", String.valueOf(tripvalues.get("last_pt_egress_stop")), column[last_pt_egress_stop]);
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -510,6 +527,14 @@ public class TripsAndLegsCSVWriterTest {
 				
 			case "transit_route":
 				transit_route = i;
+				break;
+				
+			case "first_pt_boarding_stop":
+				first_pt_boarding_stop = i;
+				break;
+				
+			case "last_pt_egress_stop":
+				last_pt_egress_stop = i;
 				break;
 				
 			}
