@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.core.utils.collections.Tuple;
 import ucar.ma2.*;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFileWriter;
@@ -13,7 +14,9 @@ import ucar.nc2.NetcdfFileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PalmChemistryInput {
 
@@ -31,14 +34,16 @@ public class PalmChemistryInput {
     private static final String EMISSION_VALUES = "emission_values";
 
     private final TimeBinMap<Map<Coord, Cell>> data;
+    private final double cellSize;
+
     // some housekeeping for creating indices when writing to netcdf file
+    private final Set<Pollutant> observedPollutants = new HashSet<>();
     private double minX = Double.POSITIVE_INFINITY;
     private double maxX = Double.NEGATIVE_INFINITY;
     private double minY = Double.POSITIVE_INFINITY;
     private double maxY = Double.NEGATIVE_INFINITY;
 
-    private final double cellSize;
-    private Set<Pollutant> observedPollutants = new HashSet<>();
+    private Cell defaultCell = null;
 
 
     public PalmChemistryInput(double timeIntervalInSeconds, double cellSize) {
@@ -139,23 +144,22 @@ public class PalmChemistryInput {
 
         for (var bin : data.getTimeBins()) {
 
-            logger.info("writing timestep: " + bin.getStartTime());
+            var timestamp = getTimestamp(bin.getStartTime());
+            logger.info("writing timestep: " + timestamp);
 
             times.set(i, (int) bin.getStartTime());
-            timestamps.setString(i, String.valueOf(bin.getStartTime())); // maybe get a nice timestamp here. For now just print seconds
+            timestamps.setString(i, timestamp);
 
             for (var yi = 0; yi < yValues.getSize(); yi++) {
                 for (var xi = 0; xi < xValues.getSize(); xi++) {
 
                     var x = xValues.get(xi);
                     var y = yValues.get(yi);
+                    var cell = bin.getValue().getOrDefault(new Coord(x, y), getDefaultCell());
 
-                    var cell = bin.getValue().get(new Coord(x, y));
-
-                    // TODO change this to iterate over pollutantToIndex and put zeros for all non-present emission values. This becomes important if not all cells have the same emission values
-                    for (var entry : cell.getEmissions().entrySet()) {
-                        var pollutantIndex = pollutantToIndex.indexOf(entry.getKey());
-                        emissionValues.set(i, 0, yi, xi, pollutantIndex, entry.getValue().floatValue());
+                    for (var p = 0; p < pollutantToIndex.size(); p++) {
+                        var value = cell.getEmissions().getOrDefault(pollutantToIndex.get(p), 0.0).floatValue();
+                        emissionValues.set(i, 0, yi, xi, p, value);
                     }
                 }
             }
@@ -173,6 +177,23 @@ public class PalmChemistryInput {
         writer.write(writer.findVariable(Y), yValues);
         writer.write(writer.findVariable(X), xValues);
         writer.write(writer.findVariable(EMISSION_VALUES), emissionValues);
+    }
+
+    private Cell getDefaultCell() {
+
+        if (defaultCell == null) {
+            var zeroEmissions = observedPollutants.stream()
+                    .map(pollutant -> Tuple.of(pollutant, 0.0))
+                    .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+
+            defaultCell = new Cell(zeroEmissions);
+        }
+        return defaultCell;
+    }
+
+    private String getTimestamp(double time) {
+        var startTimeDuration = Duration.ofSeconds((long) time);
+        return String.format("%02d:%02d:%02d", startTimeDuration.toHours(), startTimeDuration.toMinutesPart(), startTimeDuration.toSecondsPart());
     }
 
     private ArrayDouble.D1 writeDoubleArray(double min, double max, double intervallSize, int size) {
