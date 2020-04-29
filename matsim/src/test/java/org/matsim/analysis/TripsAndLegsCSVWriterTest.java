@@ -203,7 +203,6 @@ public class TripsAndLegsCSVWriterTest {
 	            modeDistance.put(TransportMode.walk, 0.0);
 	            modeDistance.put(TransportMode.pt, 0.0);
 	            modeDistance.put(TransportMode.car, 0.0);
-	            int count = 1;
 	            String first_pt_boarding_stop = null;
 				String last_pt_egress_stop = null;
 				for (Leg leg : trip.getLegsOnly()) {
@@ -223,7 +222,6 @@ public class TripsAndLegsCSVWriterTest {
 						first_pt_boarding_stop =  first_pt_boarding_stop != null ? first_pt_boarding_stop : route.getAccessStopId().toString();		
 				        last_pt_egress_stop = route.getEgressStopId().toString();
 					}
-					count++;
 				}
 				Set<String> keyset = modeDistance.keySet();
 				Iterator<String> keysetitr = keyset.iterator();
