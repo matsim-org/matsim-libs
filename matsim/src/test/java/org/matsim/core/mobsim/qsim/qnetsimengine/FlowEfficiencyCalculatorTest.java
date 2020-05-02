@@ -50,7 +50,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Provides;
@@ -125,7 +124,7 @@ public class FlowEfficiencyCalculatorTest {
 	}
 
 	private class LatestArrivalHandler implements PersonArrivalEventHandler {
-		double latestArrivalTime = Time.getUndefinedTime();
+		Double latestArrivalTime = null;
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
