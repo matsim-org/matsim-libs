@@ -57,8 +57,17 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		DrtRequest request = new DrtRequest(id, passengerId, mode, fromLink, toLink, departureTime, latestDepartureTime,
-				latestArrivalTime, submissionTime);
+		DrtRequest request = DrtRequest.newBuilder()
+				.id(id)
+				.passengerId(passengerId)
+				.mode(mode)
+				.fromLink(fromLink)
+				.toLink(toLink)
+				.earliestStartTime(departureTime)
+				.latestStartTime(latestDepartureTime)
+				.latestArrivalTime(latestArrivalTime)
+				.submissionTime(submissionTime)
+				.build();
 
 		log.debug(route);
 		log.debug(request);
