@@ -25,11 +25,17 @@ import org.matsim.core.api.internal.MatsimFacilitiesObject;
  * @author dgrether
  */
 public interface OpeningTime extends Comparable<OpeningTime>, MatsimFacilitiesObject {
-	
+
+	/**
+	 * @return start time; Double.NEGATIVE_INFINITY if open start
+	 */
 	public double getStartTime();
 	
 	public void setStartTime(double starttime);
-	
+
+	/**
+	 * @return end time; Double.POSITIVE_INFINITY if open end
+	 */
 	public double getEndTime();
 	
 	public void setEndTime(double endtime);
