@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -93,7 +92,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
 							endTime-=24*3600;
-						cacheWaitTimes[i] = Time.getUndefinedTime();
+						cacheWaitTimes[i] = Double.NaN;
 						SORTED_DEPARTURES:
 						for(double departure:sortedDepartures) {
 							double arrivalTime = departure+stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
@@ -102,7 +101,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 								break SORTED_DEPARTURES;
 							}
 						}
-						if(Time.isUndefinedTime(cacheWaitTimes[i]))
+						if(Double.isNaN(cacheWaitTimes[i]))
 							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+stop.getArrivalOffset().or(stop::getDepartureOffset).seconds()-endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
