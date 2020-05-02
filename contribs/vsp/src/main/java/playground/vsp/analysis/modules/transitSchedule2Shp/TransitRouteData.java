@@ -108,7 +108,7 @@ public class TransitRouteData {
 		this.distance = distance;
 		this.freeSpeedTravelTime = freeSpeedTravelTime;
 
-		this.travelTime = transitRoute.getStops().get(transitRoute.getStops().size() - 1).getArrivalOffset();
+		this.travelTime = transitRoute.getStops().get(transitRoute.getStops().size() - 1).getArrivalOffset().seconds();
 
 		this.avgSpeed = this.distance / this.travelTime;
 	}

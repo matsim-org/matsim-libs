@@ -40,8 +40,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -96,14 +96,14 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 						cacheWaitTimes[i] = Time.getUndefinedTime();
 						SORTED_DEPARTURES:
 						for(double departure:sortedDepartures) {
-							double arrivalTime = departure+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset());
+							double arrivalTime = departure+stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
 							if(arrivalTime>=endTime) {
 								cacheWaitTimes[i] = arrivalTime-endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
 						if(Time.isUndefinedTime(cacheWaitTimes[i]))
-							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
+							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+stop.getArrivalOffset().or(stop::getDepartureOffset).seconds()-endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}

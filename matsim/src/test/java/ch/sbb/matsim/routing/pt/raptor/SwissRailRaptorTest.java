@@ -1234,8 +1234,8 @@ public class SwissRailRaptorTest {
                 List<Id<Link>> routeLinks = new ArrayList<>();
                 netRoute.setLinkIds(link0.getId(), routeLinks, link0.getId());
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop0, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop0).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop1).arrivalOffset(5*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("0to1", TransitRoute.class), netRoute, stops, "train");
                 line0to1.addRoute(route);
 
@@ -1254,8 +1254,8 @@ public class SwissRailRaptorTest {
                 List<Id<Link>> routeLinks = new ArrayList<>();
                 netRoute.setLinkIds(link1.getId(), routeLinks, link1.getId());
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop2, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop2).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop3).arrivalOffset(5*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("2to3", TransitRoute.class), netRoute, stops, "train");
                 line2to3.addRoute(route);
 
@@ -1370,8 +1370,8 @@ public class SwissRailRaptorTest {
                 this.schedule.addTransitLine(line0);
                 NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(linkId0, linkId10);
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop0, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop0).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop1).arrivalOffset(5*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("0to1", TransitRoute.class), netRoute, stops, "train");
                 line0.addRoute(route);
 
@@ -1382,8 +1382,8 @@ public class SwissRailRaptorTest {
                 this.schedule.addTransitLine(line1);
                 NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(linkId10, linkId20);
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop1, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop2, 5*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop1).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop2).arrivalOffset(5*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("1to2", TransitRoute.class), netRoute, stops, "train");
                 line1.addRoute(route);
 
@@ -1394,8 +1394,8 @@ public class SwissRailRaptorTest {
                 this.schedule.addTransitLine(line2);
                 NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(linkId0, linkId30);
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop0, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop0).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop3).arrivalOffset(5*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("0to3", TransitRoute.class), netRoute, stops, "train");
                 line2.addRoute(route);
 
@@ -1406,9 +1406,9 @@ public class SwissRailRaptorTest {
                 this.schedule.addTransitLine(line3);
                 NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(linkId20, linkId40);
                 List<TransitRouteStop> stops = new ArrayList<>();
-                stops.add(sb.createTransitRouteStop(this.stop2, Time.getUndefinedTime(), 0.0));
-                stops.add(sb.createTransitRouteStop(this.stop3, Time.getUndefinedTime(), 5*60.0));
-                stops.add(sb.createTransitRouteStop(this.stop4, 10*60.0, Time.getUndefinedTime()));
+                stops.add(sb.createTransitRouteStopBuilder(this.stop2).departureOffset(0.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop3).departureOffset(5*60.0).build());
+                stops.add(sb.createTransitRouteStopBuilder(this.stop4).arrivalOffset(10*60.0).build());
                 TransitRoute route = sb.createTransitRoute(Id.create("2to4", TransitRoute.class), netRoute, stops, "train");
                 line3.addRoute(route);
 
@@ -1495,8 +1495,8 @@ public class SwissRailRaptorTest {
             TransitLine blueLine = f.createTransitLine(Id.create("Blue", TransitLine.class));
             NetworkRoute blueNetRoute = RouteUtils.createLinkNetworkRouteImpl(linkId0, linkId0);
             List<TransitRouteStop> blueStops = new ArrayList<>();
-            TransitRouteStop rStop0 = f.createTransitRouteStop(this.stops[0], Time.getUndefinedTime(), 0);
-            TransitRouteStop rStop1 = f.createTransitRouteStop(this.stops[1], 900, Time.getUndefinedTime());
+            TransitRouteStop rStop0 = f.createTransitRouteStopBuilder(this.stops[0]).departureOffset(0).build();
+            TransitRouteStop rStop1 = f.createTransitRouteStopBuilder(this.stops[1]).arrivalOffset(900).build();
             blueStops.add(rStop0);
             blueStops.add(rStop1);
             TransitRoute blueRoute = f.createTransitRoute(Id.create("Blue", TransitRoute.class), blueNetRoute, blueStops, "train");
@@ -1509,10 +1509,10 @@ public class SwissRailRaptorTest {
             TransitLine redLine = f.createTransitLine(Id.create("Red", TransitLine.class));
             NetworkRoute redNetRoute = RouteUtils.createLinkNetworkRouteImpl(linkId1, Collections.singletonList(linkId2), linkId3);
             List<TransitRouteStop> redStops = new ArrayList<>();
-            TransitRouteStop rStop2 = f.createTransitRouteStop(this.stops[2], Time.getUndefinedTime(), 0);
+            TransitRouteStop rStop2 = f.createTransitRouteStopBuilder(this.stops[2]).departureOffset(0).build();
             TransitRouteStop rStop3 = f.createTransitRouteStop(this.stops[3], 900, 930);
             TransitRouteStop rStop4 = f.createTransitRouteStop(this.stops[4], 1800, 1830);
-            TransitRouteStop rStop5 = f.createTransitRouteStop(this.stops[5], 2700, Time.getUndefinedTime());
+            TransitRouteStop rStop5 = f.createTransitRouteStopBuilder(this.stops[5]).arrivalOffset(2700).build();
             redStops.add(rStop2);
             redStops.add(rStop3);
             redStops.add(rStop4);
