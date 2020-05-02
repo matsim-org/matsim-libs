@@ -25,12 +25,8 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -50,18 +46,29 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
 
 	@Inject
-	ExperiencedPlansServiceImpl(ControlerListenerManager controlerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
-		controlerListenerManager.addControlerListener(new IterationStartsListener() {
-			@Override
-			public void notifyIterationStarts(IterationStartsEvent event) {
-				for (Person person : population.getPersons().values()) {
-					agentRecords.put(person.getId(), PopulationUtils.createPlan());
-				}
-			}
-		});
-		eventsToActivities.addActivityHandler(this);
-		eventsToLegs.addLegHandler(this);
-	}
+    ExperiencedPlansServiceImpl(ControlerListenerManager controlerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+        controlerListenerManager.addControlerListener(new IterationStartsListener() {
+            @Override
+            public void notifyIterationStarts(IterationStartsEvent event) {
+                for (Person person : population.getPersons().values()) {
+                    agentRecords.put(person.getId(), PopulationUtils.createPlan());
+                }
+            }
+        });
+        eventsToActivities.addActivityHandler(this);
+        eventsToLegs.addLegHandler(this);
+    }
+
+    ExperiencedPlansServiceImpl(EventsToActivities eventsToActivities, EventsToLegs eventsToLegs, Scenario scenario) {
+        this.population = scenario.getPopulation();
+
+        for (Person person : population.getPersons().values()) {
+            agentRecords.put(person.getId(), PopulationUtils.createPlan());
+        }
+        eventsToActivities.addActivityHandler(this);
+        eventsToLegs.addLegHandler(this);
+        this.config = scenario.getConfig();
+    }
 
 	@Override
 	synchronized public void handleLeg(PersonExperiencedLeg o) {
