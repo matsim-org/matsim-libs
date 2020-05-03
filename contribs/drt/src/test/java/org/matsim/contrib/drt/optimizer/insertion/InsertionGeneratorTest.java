@@ -46,11 +46,11 @@ import com.google.common.collect.ImmutableList;
 public class InsertionGeneratorTest {
 	private static final int CAPACITY = 4;
 
-	private final Link fromLink = fakeLink("from");
-	private final Link toLink = fakeLink("to");
+	private final Link fromLink = link("from");
+	private final Link toLink = link("to");
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 
-	private final Link depotLink = fakeLink("depot");
+	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
 			.id(Id.create("v1", DvrpVehicle.class))
 			.capacity(CAPACITY)
@@ -62,7 +62,7 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startEmpty_noStops() {
-		LinkTimePair start = new LinkTimePair(fakeLink("0"), 0);
+		LinkTimePair start = new LinkTimePair(link("0"), 0);
 		int startOccupancy = 0; //no stops => must be empty
 		VehicleData.Entry entry = entry(start, startOccupancy);
 		assertThatInsertions(drtRequest, entry).containsExactly(
@@ -72,9 +72,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startNotFull_oneStop() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 1; // 1 pax aboard
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 0);//drop off 1 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 0);//drop off 1 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
@@ -85,9 +85,9 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startFull_oneStop() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = CAPACITY; //full
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 0);//drop off 4 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 0);//drop off 4 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after stop
@@ -97,10 +97,10 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startEmpty_twoStops_notFullBetweenStops() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 0; //empty
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 1);//pick up 1 pax
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), 0);//drop off 1 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 1);//pick up 1 pax
+		VehicleData.Stop stop1 = stop(link("stop1"), 0);//drop off 1 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
@@ -113,10 +113,10 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startEmpty_twoStops_fullBetweenStops() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 0; //empty
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), CAPACITY);//pick up 4 pax (full)
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), 0);//drop off 4 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), CAPACITY);//pick up 4 pax (full)
+		VehicleData.Stop stop1 = stop(link("stop1"), 0);//drop off 4 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
@@ -128,10 +128,10 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startFull_twoStops_notFullBetweenStops() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = CAPACITY; //full
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 2);//drop off 2 pax
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), 0);//drop off 2 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 2);//drop off 2 pax
+		VehicleData.Stop stop1 = stop(link("stop1"), 0);//drop off 2 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start
@@ -143,10 +143,10 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startFull_twoStops_fullBetweenStops() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = CAPACITY; //full
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), CAPACITY);//drop off 1 pax, pickup 1 pax (full)
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), 0);//drop off 4 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), CAPACITY);//drop off 1 pax, pickup 1 pax (full)
+		VehicleData.Stop stop1 = stop(link("stop1"), 0);//drop off 4 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start
@@ -157,11 +157,11 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startNotFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 1; //empty
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 0);// dropoff 1 pax
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), CAPACITY);// pickup 4 pax
-		VehicleData.Stop stop2 = stop(fakeLink("stop2"), 0);// dropoff 4 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 0);// dropoff 1 pax
+		VehicleData.Stop stop1 = stop(link("stop1"), CAPACITY);// pickup 4 pax
+		VehicleData.Stop stop2 = stop(link("stop2"), 0);// dropoff 4 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1, stop2);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
@@ -175,11 +175,11 @@ public class InsertionGeneratorTest {
 
 	@Test
 	public void generateInsertions_startFull_threeStops_emptyBetweenStops01_fullBetweenStops12() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = CAPACITY; //full
-		VehicleData.Stop stop0 = stop(fakeLink("stop0"), 0);// dropoff 4 pax
-		VehicleData.Stop stop1 = stop(fakeLink("stop1"), CAPACITY);// pickup 4 pax
-		VehicleData.Stop stop2 = stop(fakeLink("stop2"), 0);// dropoff 4 pax
+		VehicleData.Stop stop0 = stop(link("stop0"), 0);// dropoff 4 pax
+		VehicleData.Stop stop1 = stop(link("stop1"), CAPACITY);// pickup 4 pax
+		VehicleData.Stop stop2 = stop(link("stop2"), 0);// dropoff 4 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1, stop2);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start
@@ -191,8 +191,8 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void generateInsertions_noDetourWhenPickup_noDuplicatedInsertions() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+	public void generateInsertions_noDetourForPickup_noDuplicatedInsertions() {
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 1; // 1 pax
 		VehicleData.Stop stop0 = stop(fromLink, 0);//dropoff 1 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0);
@@ -203,19 +203,19 @@ public class InsertionGeneratorTest {
 	}
 
 	@Test
-	public void generateInsertions_noDetourWhenDropoff_noDuplicatedInsertions() {
-		LinkTimePair start = new LinkTimePair(fakeLink("start"), 0);
+	public void generateInsertions_noDetourForDropoff_noDuplicatedInsertions() {
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
 		int startOccupancy = 1; // 1 pax
 		VehicleData.Stop stop0 = stop(toLink, 0);//dropoff 1 pax
 		VehicleData.Entry entry = entry(start, startOccupancy, stop0);
 		assertThatInsertions(drtRequest, entry).containsExactly(
-				//pickup after start: insertion(0, 0) is duplicate to insertion(0, 1)
+				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
 				insertion(0, 1),
 				//pickup after stop 0
 				insertion(1, 1));
 	}
 
-	private Link fakeLink(String id) {
+	private Link link(String id) {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
