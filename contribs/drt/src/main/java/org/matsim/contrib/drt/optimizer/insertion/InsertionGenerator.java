@@ -93,15 +93,16 @@ public class InsertionGenerator {
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.startOccupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
-			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
+			VehicleData.Stop nextStop = nextStop(vEntry, i);
 
-				if (drtRequest.getFromLink() != nextStop(vEntry, i).task.getLink()) {// next stop at different link
+			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
+				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
 					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
 				}
 				// else: do not evaluate insertion _before_stop i, evaluate only insertion _after_ stop i
 			}
 
-			occupancy = nextStop(vEntry, i).outgoingOccupancy;
+			occupancy = nextStop.outgoingOccupancy;
 		}
 
 		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// last stop
@@ -113,9 +114,17 @@ public class InsertionGenerator {
 		int stopCount = vEntry.stops.size();
 		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
-			if (j > i // no need to check the capacity constraints if i == j (already validated for `i`)
-					&& currentStop(vEntry, j).outgoingOccupancy == vEntry.vehicle.getCapacity()) {
-				return;// stop iterating -- cannot insert dropoff after node j
+
+			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
+				VehicleData.Stop currentStop = currentStop(vEntry, j);
+				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+					if (drtRequest.getToLink() == currentStop.task.getLink()) {
+						//special case -- we can insert dropoff exactly at node j
+						insertions.add(new Insertion(i, j));
+					}
+
+					return;// stop iterating -- cannot insert dropoff after node j
+				}
 			}
 
 			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
