@@ -215,6 +215,22 @@ public class InsertionGeneratorTest {
 				insertion(1, 1));
 	}
 
+	@Test
+	public void generateInsertions_noDetourForDropoff_vehicleOutgoingFullAfterDropoff_insertionPossible() {
+		// a special case where we allow inserting the dropoff after a stop despite outgoingOccupancy == maxCapacity
+		// this is only because the the dropoff happens exactly at (not after) the stop
+		LinkTimePair start = new LinkTimePair(link("start"), 0);
+		int startOccupancy = 1; // 1 pax
+		VehicleData.Stop stop0 = stop(toLink, CAPACITY);//dropoff 1 pax
+		VehicleData.Stop stop1 = stop(link("stop1"), 0);//dropoff 1 pax
+		VehicleData.Entry entry = entry(start, startOccupancy, stop0, stop1);
+		assertThatInsertions(drtRequest, entry).containsExactly(
+				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
+				insertion(0, 1),
+				//pickup after stop 0
+				insertion(2, 2));
+	}
+
 	private Link link(String id) {
 		return new FakeLink(Id.createLinkId(id));
 	}
