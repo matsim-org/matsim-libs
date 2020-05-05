@@ -50,7 +50,7 @@ class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	private Pollutant getHbefaComponent(){
+	/* package-private */ Pollutant getHbefaComponent(){
 		return this.hbefaComponent;
 	}
 
@@ -79,7 +79,7 @@ class HbefaWarmEmissionFactorKey {
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 
-	private HbefaVehicleAttributes getHbefaVehicleAttributes(){
+	/*package-private*/ HbefaVehicleAttributes getHbefaVehicleAttributes(){
 		return this.hbefaVehicleAttributes;
 	}
 	

@@ -60,8 +60,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  * see test methods for details on the particular test cases
  */
 
-public class TestColdEmissionAnalysisModule {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModule.class);
+public class TestColdEmissionAnalysisModuleCase2 {
+	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase2.class);
 	
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	
@@ -105,189 +105,40 @@ public class TestColdEmissionAnalysisModule {
 	private static final double fakeFactor = -1.;
 	
 	private boolean excep = false;
-
-	// This used to be one large test class, which had separate table entries for each test, but put them all into the same table.  The result was
-	// difficult if not impossible to debug, and the resulting detailed table was inconsistent in the sense that it did not contain all combinations of
-	// entries. -- I have now pulled this apart into 6 different test classes, this one here plus "Case1" to "Case4" and "Case6".
-	// The other tests are remaining in this class.  Things look ok, but given that the
-	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
-	// this will help to sort things out.  kai (for warm emissions) / kmt, apr'20
-
-//	@Test
-//	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-//
-//		/*
-//		 * six test cases with complete input data
-//		 * or input that should be assigned to average/default cases
-//		 */
-//
-//		setUp();
-//
-//		List<ArrayList> testCases = new ArrayList<>();
-//
-//		ArrayList<Object> testCase2 = new ArrayList<>();
-////		ArrayList<Object> testCase1 = new ArrayList<>(), testCase2 = new ArrayList<>();
-//		ArrayList<Object> testCase3 = new ArrayList<>(), testCase4 = new ArrayList<>();
-////		ArrayList<Object> testCase6 = new ArrayList<>();
-//
-////		// first case: complete data
-////		// corresponding entry in average table
-////		Collections.addAll( testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
-//
-//		// second case: complete data
-//		// corresponding entry in detailed table
-//		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
-//
-//		// third case: complete data
-//		// corresponding entries in average and detailed table; should use the detailed entry; thus
-//		// error when using the average entry.
-//		Collections.addAll( testCase3, passengercar, diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
-//
-//		//fourth case is moved out to own test class.
-////		// fourth case: no specifications for technology, size class or em concept
-////		// -> falling back to average table
-////		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
-//
-////		// fifth case: cold emission factor not set - handled as 0.0
-////		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-////		// beim erstellen ueberpruefen dann test umschreiben
-////		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-//		// this situation does not exist any more.  kai, jul'18
-//
-//		// sixth case is moved out to own test class.
-//		// sixth case: heavy goods vehicle
-//		// -> throw warning -> use detailed or average table for passenger cars
-////		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-////		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
-//
-////		testCases.add( testCase1 );
-////		testCases.add( testCase2 );
-////		testCases.add( testCase3 );
-////		testCases.add( testCase4 );
-////		testCases.add( testCase5 );
-////		testCases.add( testCase6 );
-//
-//		for ( List<Object> tc : testCases ) {
-//			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
-//			HandlerToTestEmissionAnalysisModules.reset();
-//			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-//			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-//			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
-//
-//			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-//			logger.info("VehicleId: " + vehicle.getId().toString());
-//			logger.info("VehicleTypeId: " + vehicle.getType().getId());
-//
-//			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions( linkId, vehicle, startTime, parkingDuration, tableAccDistance );
-//			String message = "The expected emissions for " + tc.toString() + " are " +
-//							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-//			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-//		}
-//	}
 	
 	@Test
-	public void calculateColdEmissionsAndThrowEventTest_Exceptions() {
-		
-		/*
-		 * four test cases
-		 * all of them should throw exceptions
-		 */
-		
+	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		setUp();
-		List<Id<VehicleType>> testCasesExceptions = new ArrayList<>();
-		excep = false;
 		
-		// seventh case: no corresponding entry either in the detailed nor the average table
-		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;PC diesel;;>=2L", VehicleType.class );
-//		Id<VehicleType> vehicleInfoForNoCase = Id.create( "PASSENGER_CAR;"+diesel_technology+";" + geq2l_sizeClass + ";", VehicleType.class );
-//		testCasesExceptions.add( vehicleInfoForNoCase ); //this will return the average passenger car value
-		// eighth case: vehicle category not specified
-		testCasesExceptions.add( Id.create( ";;;", VehicleType.class ) );
-		// ninth case: empty string as id
-		testCasesExceptions.add( Id.create( "", VehicleType.class ) );
-		// tenth case: null id
-		testCasesExceptions.add( null );
+		List<ArrayList> testCases = new ArrayList<>();
 		
-		for ( Id<VehicleType> vehicleTypeId : testCasesExceptions ) {
-			String message = "'" + vehicleTypeId + "'" + " was used to calculate cold emissions and generate an emissions event."
-							     + "It should instead throw an exception because it is not a valid vehicle information string.";
-			try {
-				Id<Link> linkId = Id.create( "linkId" + testCasesExceptions.indexOf( vehicleTypeId ), Link.class );
-				Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCasesExceptions.indexOf( vehicleTypeId ), Vehicle.class );
-				Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-				coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-			} catch ( Exception e ) {
-				excep = true;
-			}
-			Assert.assertTrue( message, excep );
-			excep = false;
+		ArrayList<Object> testCase2 = new ArrayList<>();
+
+		// second case: complete data
+		// corresponding entry in detailed table
+		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
+
+		testCases.add( testCase2 );
+
+		for ( List<Object> tc : testCases ) {
+			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
+			HandlerToTestEmissionAnalysisModules.reset();
+			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
+			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
+			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+			
+			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
+			logger.info("VehicleId: " + vehicle.getId().toString());
+			logger.info("VehicleTypeId: " + vehicle.getType().getId());
+			
+			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+			String message = "The expected emissions for " + tc.toString() + " are " +
+							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 		}
 		
 	}
-	
-	@Test
-	public void calculateColdEmissionsAndThrowEventTest_minimalVehicleInformation() {
-		
-		setUp();
-		excep = false;
-		
-		// eleventh case: no specifications for technology, size, class, em concept
-		// string has no semicolons as seperators - use average values
-		Id<VehicleType> vehInfo11 = Id.create( passengercar, VehicleType.class );
-		Id<Link> linkId11 = Id.create( "link id 11", Link.class );
-		Id<Vehicle> vehicleId7 = Id.create( "vehicle 11", Vehicle.class );
-		
-		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId7, VehicleUtils.getFactory().createVehicleType( vehInfo11 ) );
-		
-		HandlerToTestEmissionAnalysisModules.reset();
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId11, startTime, parkingDuration, tableAccDistance);
-		String message = "The expected emissions for an emissions event with vehicle information string '" + vehInfo11 + "' are " +
-						     numberOfColdEmissions * averageAverageFactor + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		
-	}
-	
-//	@Test
-//	public void rescaleColdEmissionsTest() {
-//
-//		// can not use the setUp method here because the efficiency factor is not null
-//		// (yy I don't know what this means.  kai, jul'18)
-//		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
-//		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
-//		fillAveragesTable( avgHbefaColdTable );
-//		fillDetailedTable( detailedHbefaColdTable );
-//
-//		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-//		Double rescaleFactor = -.001;
-//
-//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-//		if ( (Boolean) true ==null ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-//		} else if ( true ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-//		} else {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-//		}
-//
-////		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
-//		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants,
-//				emissionEventManager );
-//		HandlerToTestEmissionAnalysisModules.reset();
-//
-//		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
-//		Id<Vehicle> vehicleIdForAvgTable = Id.create( "vehicle avg", Vehicle.class );
-//		Id<VehicleType> vehicleInfoForAvgCase = Id.create( "PASSENGER_CAR;"+ petrol_technology +";"+ none_sizeClass +";" + none_emConcept, VehicleType.class );
-//
-//		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleIdForAvgTable, VehicleUtils.getFactory().createVehicleType( vehicleInfoForAvgCase ) );
-//
-//		ceam.calculateColdEmissionsAndThrowEvent( idForAvgTable, vehicle, startTime, parkingDuration, tableAccDistance );
-//		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
-//						     + ( numberOfColdEmissions * averagePetrolFactor ) + " * " + rescaleFactor + " = " +
-//						     ( numberOfColdEmissions * averagePetrolFactor * rescaleFactor ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-//		Assert.assertEquals( message, rescaleFactor * numberOfColdEmissions * averagePetrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-//
-//	}
-	// rescale is no longer available. I had no idea what this was good for.  kai, jan'20
+
 	
 	private void setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
