@@ -79,4 +79,21 @@ class TravelTimeDataArray extends TravelTimeData {
 		return freespeed;
 	}
 
+	/* package-private for debugging */ String cntToString(){
+		StringBuilder strb = new StringBuilder().append( "cnt=[ " );
+		for( int ii = 0 ; ii < this.timeCnt.length ; ii++ ){
+			strb.append( this.timeCnt[ii] ).append( "      " );
+		}
+		strb.append( "]" );
+		return strb.toString();
+	}
+	/* package-private for debugging */ String ttToString() {
+		StringBuilder strb = new StringBuilder().append( "tt=[ " );
+		for ( int ii=0 ; ii<this.travelTimes.length ; ii++ ) {
+			strb.append( this.travelTimes[ii] ).append( " " );
+		}
+		strb.append( "]" );
+		return strb.toString();
+	}
+
 }
