@@ -94,14 +94,14 @@ public final class ParallelEventsManager implements EventsManager {
 				this.eventsManagers.add(new EventsManagerImpl());
 			}
 			for (int i = 0; i < this.eventsHandlers.size(); i++) {
-				this.eventsManagers.get(this.eventsHandlers.size() % numOfThreads).addHandler(this.eventsHandlers.get(i));
+				this.eventsManagers.get(i % numOfThreads).addHandler(this.eventsHandlers.get(i));
 			}
 		}
 
 		// initialize runnables (threads that will execute the event managers)
 		for (int i = 0; i < this.eventsManagers.size(); i++) {
 			EventsManager eventsManager = this.eventsManagers.get(i);
-			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManager);
+			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManager, distributor);
 			distributor.runnables.add(processEventsRunnable);
 			processEventsRunnable.setDaemon(true);
 			processEventsRunnable.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
@@ -269,10 +269,21 @@ public final class ParallelEventsManager implements EventsManager {
 									distribute(events);
 									events = new EventArray(eventsArraySize);
 								}
-								// flush all runnables
-								for (ProcessEventsRunnable runnable : this.runnables) {
+
+								// We'll ask the ProcessEventsRunnables to flush
+								for (ProcessEventsRunnable runnable : this.runnables)
 									runnable.flush();
+
+								// Wait until all the ProcessEventsRunnables have finished flushing
+								boolean stillFlushing = true;
+								while (stillFlushing) {
+									this.wait(1);
+
+									stillFlushing = false;
+									for (ProcessEventsRunnable runnable : this.runnables)
+										stillFlushing |= runnable.isFlushing();
 								}
+
 								// termination criteria for the flush
 								if (eventQueue.isEmpty()) {
 									shouldFlush = false;
@@ -315,30 +326,47 @@ public final class ParallelEventsManager implements EventsManager {
 
 	private class ProcessEventsRunnable extends Thread {
 
+		private final Distributor distributor;
 		private final EventsManager eventsManager;
 		private final BlockingQueue<EventArray> eventsQueue;
-		private volatile boolean processing = false;
+		private boolean flush = false;
 
-		public ProcessEventsRunnable(EventsManager eventsManager) {
+		public ProcessEventsRunnable(EventsManager eventsManager, Distributor distributor) {
 			this.eventsManager = eventsManager;
 			this.eventsQueue = new LinkedBlockingQueue<>();
+			this.distributor = distributor;
 		}
 
-		public void flush() throws InterruptedException {
-			while (this.isAlive() && (!this.eventsQueue.isEmpty() || processing)) ;
+		public synchronized void flush() {
+			flush = true;
+		}
+
+		public boolean isFlushing() {
+			return flush && this.isAlive();
 		}
 
 		@Override
 		public void run() {
 			try {
 				while (true) {
-					EventArray events = this.eventsQueue.take();
+					EventArray events = this.eventsQueue.poll(10, TimeUnit.MILLISECONDS);
 
-					processing = true;
-					for (int i = 0; i < events.size(); i++) {
-						this.eventsManager.processEvent(events.get(i));
+					if (events != null) {
+						for (int i = 0; i < events.size(); i++) {
+							this.eventsManager.processEvent(events.get(i));
+						}
 					}
-					processing = false;
+
+					// If flush is over, then try to wake up distributor
+					if (flush && this.eventsQueue.isEmpty()) {
+						synchronized (this) {
+							flush = false;
+						}
+
+						synchronized (this.distributor) {
+							this.distributor.notify();
+						}
+					}
 				}
 			} catch (InterruptedException e) {
 				return;
