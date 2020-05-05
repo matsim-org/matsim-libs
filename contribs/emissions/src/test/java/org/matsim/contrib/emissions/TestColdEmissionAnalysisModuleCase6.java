@@ -102,7 +102,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Double averageAverageFactor = .1;
 	private static final Double averagePetrolFactor = .01;
 
-	private static final double heavyGoodsFaktor = -1.;
+	private static final double heavyGoodsFaktor = -1.; //should not be used since HGV is not in HBEFA 3 or 4.1. KMT May 2020
 	
 	private boolean excep = false;
 	
@@ -123,7 +123,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
 		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, heavyGoodsFaktor);
+		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, detailedPetrolFactor);
 		
 
 		testCases.add( testCase6 );
@@ -184,17 +184,15 @@ public class TestColdEmissionAnalysisModuleCase6 {
 			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFaktor), HEAVY_GOODS_VEHICLE );
 		}
-//		{
-//			// add passenger car entry "petrol;none;nullCase":
-//			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
-//			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, nullcase_emConcept );
-//
-//			final HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-//			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
-//			// when the now deprecated execution path goes away.  kai, jul'18)
-//
-//			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, detColdFactor, PASSENGER_CAR );
-//		}
+		{
+			// add passenger car entry "petrol;none;nullCase":
+			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
+			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
+			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
+			// when the now deprecated execution path goes away.  kai, jul'18)
+
+			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedPetrolFactor ), PASSENGER_CAR );
+		}
 	}
 	
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {
@@ -204,19 +202,16 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( "average", "average", "average" ) ;
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor), PASSENGER_CAR );
 		}
 		{
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( averagePetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// duplicate from detailed table, but with different emission factor.
 			// this should not be used but is needed to assure that the detailed table is tried before the average table
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(heavyGoodsFaktor), PASSENGER_CAR );
 		}
 		{
