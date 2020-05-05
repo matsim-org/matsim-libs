@@ -459,31 +459,43 @@ public final class PopulationUtils {
 	 * Computes the (expected or planned) activity end time, depending on the configured time interpretation.
 	 */
 	public static OptionalTime decideOnActivityEndTime( Activity act, double now, Config config ) {
-		switch ( config.plans().getActivityDurationInterpretation() ) {
+		return decideOnActivityEndTime(act,now, config.plans().getActivityDurationInterpretation());
+	}
+
+	public static OptionalTime decideOnActivityEndTime( Activity act, double now,
+			PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ) {
+
+		switch (activityDurationInterpretation) {
 			case endTimeOnly:
 				return act.getEndTime();
+
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
 					return act.getEndTime();
-				} else if (act.getMaximumDuration().isDefined()){
+				} else if (act.getMaximumDuration().isDefined()) {
 					return OptionalTime.defined(now + act.getMaximumDuration().seconds());
 				} else {
 					return OptionalTime.undefined();
 				}
+
 			case minOfDurationAndEndTime:
-				if (act.getEndTime().isUndefined() || act.getMaximumDuration().isUndefined()) {
+				if (act.getEndTime().isUndefined() && act.getMaximumDuration().isUndefined()) {
 					return OptionalTime.undefined();
-				} else {
-					double endTime = act.getEndTime().seconds();
+				} else if (act.getMaximumDuration().isUndefined()) {
+					return act.getEndTime();
+				} else if (act.getEndTime().isUndefined()) {
 					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
-					return endTime <= durationBasedEndTime ?
+					return OptionalTime.defined(durationBasedEndTime);
+				} else {
+					double durationBasedEndTime = now + act.getMaximumDuration().seconds();
+					return act.getEndTime().seconds() <= durationBasedEndTime ?
 							act.getEndTime() :
 							OptionalTime.defined(durationBasedEndTime);
 				}
+
 			default:
 				throw new IllegalArgumentException(
-						"Unsupported 'activityDurationInterpretation' enum type: " + config.plans()
-								.getActivityDurationInterpretation());
+						"Unsupported 'activityDurationInterpretation' enum type: " + activityDurationInterpretation);
 		}
 	}
 
@@ -517,7 +529,7 @@ public final class PopulationUtils {
 			// yy sorry about this mess, I am just trying to make explicit which seems to have been the logic so far implicitly.  kai, feb'16
 		}
 	}
-	
+
 	@Deprecated // use "decideOnCoord..."
 	public static Coord computeCoordFromActivity( Activity act, ActivityFacilities facs, Config config ) {
 		return computeCoordFromActivity( act, facs, null, config ) ;
@@ -564,7 +576,7 @@ public final class PopulationUtils {
 	 * </ul>
 	 *
 	 */
-	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
+	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network,
 			double sameModeReward, double sameRouteReward ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
@@ -619,7 +631,7 @@ public final class PopulationUtils {
 	 * <li> not normalized (for the time being?)
 	 * </ul>
 	 */
-	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
+	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty,
 			double sameActivityLocationPenalty, double actTimeParameter ) {
 		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
@@ -644,7 +656,7 @@ public final class PopulationUtils {
 			}
 
 			// activity location
-			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
+			if ( act1.getCoord().equals( act2.getCoord() ) ){
 				simil += sameActivityLocationPenalty ;
 			}
 
@@ -688,7 +700,7 @@ public final class PopulationUtils {
 	/**
 	 * The InputStream which comes from this method must be properly
 	 * resource-managed, i.e. always be closed.
-	 * 
+	 *
 	 * Otherwise, the Thread which is opened here may stay alive.
 	 */
 	@SuppressWarnings("resource")
@@ -862,9 +874,9 @@ public final class PopulationUtils {
 	// --- static copy methods:
 
 	/** loads a copy of an existing plan, but keeps the person reference
-	 * 
+	 *
 	 * @param in a plan who's data will be loaded into this plan
-	 * @param out 
+	 * @param out
 	 **/
 	public static void copyFromTo(final Plan in, Plan out) {
 		out.getPlanElements().clear();
@@ -921,7 +933,7 @@ public final class PopulationUtils {
 
 	/**
 	 * Makes a deep copy of this leg, however only when the Leg has a route which is
-	 * instance of Route or BasicRoute. Other route instances are not considered. 
+	 * instance of Route or BasicRoute. Other route instances are not considered.
 	 * </p>
 	 * <ul>
 	 * <li> Is the statement about the route still correct?  kai, jun'16
@@ -1078,11 +1090,11 @@ public final class PopulationUtils {
 	public static void printPlansCount(StreamingPopulationReader reader) {
 		reader.printPlansCount() ;
 	}
-	
+
 	public static void writePopulation( Population population, String filename ) {
-		new PopulationWriter( population).write( filename ); 
+		new PopulationWriter( population).write( filename );
 	}
-	
+
 	public static Id<Link> decideOnLinkIdForActivity( Activity act, Scenario sc ) {
 		if ( act.getFacilityId() !=null ) {
 			final ActivityFacility facility = sc.getActivityFacilities().getFacilities().get( act.getFacilityId() );;

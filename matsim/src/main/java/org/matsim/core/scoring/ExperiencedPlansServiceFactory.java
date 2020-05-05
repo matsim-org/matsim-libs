@@ -1,10 +1,11 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
- * TimeVariantLinkFactory.java
+ * ExperiencedPlansServiceImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,31 +19,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.network;
+package org.matsim.core.scoring;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.Scenario;
 
-/**
- * A link that is able to store time-dependent information, using a fixed interval (i.e. array) data structure underneath.
- *
- * @author (of documentation) nagel
- */
-public final class FixedIntervalTimeVariantLinkFactory implements LinkFactory {
-	private final int interval;
-	private final int maxTime;
+public class ExperiencedPlansServiceFactory {
 
-	public FixedIntervalTimeVariantLinkFactory(int interval, int maxTime) {
-		this.interval = interval;
-		this.maxTime = maxTime;
-	}
+    /*
+     This should only be needed in Postprocessing. The way to access Experienced Plans during a simulation is via dependency injection.
+     */
+    public static ExperiencedPlansService create(Scenario scenario, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+        return new ExperiencedPlansServiceImpl(eventsToActivities, eventsToLegs, scenario);
 
-	@Override
-	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
-			double capacity, double nOfLanes) {
-		return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network, length, freespeed,
-				capacity, nOfLanes, interval, maxTime);
-	}
+    }
 }

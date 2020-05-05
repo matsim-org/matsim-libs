@@ -4,18 +4,6 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -24,6 +12,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
 
 /**
  * The actual RAPTOR implementation, based on Delling et al, Round-Based Public Transit Routing.
@@ -175,7 +175,7 @@ public class SwissRailRaptorCore {
                 } else if (isIntermodalAccess) {
                     // there is no more departure, but we start here by intermodal access, so still register to allow transfers to other (non-)intermodal stops.
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, Double.NaN, Time.getUndefinedTime(), arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, Double.NaN, Double.NaN, arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
 
                     /* okay, the following is not very nice...
                      * ... see long comment above, it's the same

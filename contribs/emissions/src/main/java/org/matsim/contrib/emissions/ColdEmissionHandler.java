@@ -68,7 +68,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                         ConfigUtils.addOrGetModule( scenario.getConfig(), EmissionsConfigGroup.class ), coldPollutants, eventsManager );
         this.scenario = scenario;
         this.emissionsConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), EmissionsConfigGroup.class );
-
+        eventsManager.addHandler( this );
     }
 
         @Override

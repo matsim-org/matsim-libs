@@ -30,15 +30,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
 
 /**
  * @author cdobler
@@ -342,7 +341,7 @@ public final class ParallelEventsManager implements EventsManager {
 		private final Phaser simStepEndBarrier;
 		private final Phaser iterationEndBarrier;
 		private final BlockingQueue<Event[]> eventsQueue;
-		private double lastEventTime = Time.getUndefinedTime();
+		private double lastEventTime = Double.NEGATIVE_INFINITY;
 
 		public ProcessEventsRunnable(EventsManager eventsManager, ProcessedEventsChecker processedEventsChecker, 
 				Phaser waitForEmptyQueuesBarrier, Phaser simStepEndBarrier, Phaser iterationEndBarrier) {

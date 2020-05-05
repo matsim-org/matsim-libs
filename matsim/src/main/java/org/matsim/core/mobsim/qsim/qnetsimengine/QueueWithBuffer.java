@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -154,7 +153,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
 
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	private double bufferLastMovedTime = Time.getUndefinedTime() ;
+	private double bufferLastMovedTime = Double.NEGATIVE_INFINITY ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
