@@ -24,7 +24,6 @@ import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.utils.collections.Tuple;
 
 import java.io.File;
@@ -189,28 +188,6 @@ public class EmissionGridAnalyzer {
         eventsManager.addHandler(handler);
         eventsReader.readFile(eventsFile);
         return handler.getTimeBins();
-    }
-
-    private Grid<Map<Pollutant, Double>> writeAllLinksToGridIterateOverCells(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
-
-        final var grid = createGrid();
-        final var counter = new AtomicInteger();
-
-        // var quad = new QuadTree<>()
-
-        final var searchableNetwork = (SearchableNetwork) network;
-
-        grid.getCells().parallelStream()
-                .forEach(cell -> {
-
-                    // get all the links surrounding the cell
-                    // create a clipping area to speed up calculation time
-                    // use 5*smoothing radius as longer distances result in a weighting of effectively 0
-                    //Geometry clip = factory.createPoint(new Coordinate(link.getCoord().getX(), link.getCoord().getY())).buffer(smoothingRadius * 5);
-                    var clip = factory.createPoint(cell.getCoordinate()).buffer(smoothingRadius * 5);
-                    // searchableNetwork.getNodeQuadTree().getRectangle()
-                });
-        return null;
     }
 
     private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
