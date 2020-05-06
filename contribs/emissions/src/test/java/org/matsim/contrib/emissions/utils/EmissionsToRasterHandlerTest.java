@@ -123,7 +123,7 @@ public class EmissionsToRasterHandlerTest {
      * The following test was used during development for visually analyzing the output of the rastered emissions
      */
     @Test
-    //@Ignore
+    @Ignore
     public void testWithBerlinEmissions() {
 
         var bounds = new GeometryFactory().createPolygon(new Coordinate[]{
