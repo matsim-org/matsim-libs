@@ -46,7 +46,7 @@ public class EmissionGridAnalyzer {
     private final double smoothingRadius;
     private final double countScaleFactor;
 
-    private static GeometryFactory factory = new GeometryFactory();
+    private static final GeometryFactory factory = new GeometryFactory();
     private final GridType gridType;
     private final double gridSize;
     private final Network network;
