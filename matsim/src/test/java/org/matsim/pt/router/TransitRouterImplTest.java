@@ -54,7 +54,6 @@ import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
@@ -832,8 +831,8 @@ public class TransitRouterImplTest {
 				List<Id<Link>> routeLinks = new ArrayList<>();
 				netRoute.setLinkIds(link0.getId(), routeLinks, link0.getId());
 				List<TransitRouteStop> stops = new ArrayList<>();
-				stops.add(sb.createTransitRouteStop(this.stop0, Time.getUndefinedTime(), 0.0));
-				stops.add(sb.createTransitRouteStop(this.stop1, 5*60.0, Time.getUndefinedTime()));
+				stops.add(sb.createTransitRouteStopBuilder(this.stop0).departureOffset(0.0).build());
+				stops.add(sb.createTransitRouteStopBuilder(this.stop1).arrivalOffset(5*60.0).build());
 				TransitRoute route = sb.createTransitRoute(Id.create("0to1", TransitRoute.class), netRoute, stops, "train");
 				line0to1.addRoute(route);
 
@@ -852,8 +851,8 @@ public class TransitRouterImplTest {
 				List<Id<Link>> routeLinks = new ArrayList<>();
 				netRoute.setLinkIds(link1.getId(), routeLinks, link1.getId());
 				List<TransitRouteStop> stops = new ArrayList<>();
-				stops.add(sb.createTransitRouteStop(this.stop2, Time.getUndefinedTime(), 0.0));
-				stops.add(sb.createTransitRouteStop(this.stop3, 5*60.0, Time.getUndefinedTime()));
+				stops.add(sb.createTransitRouteStopBuilder(this.stop2).departureOffset(0.0).build());
+				stops.add(sb.createTransitRouteStopBuilder(this.stop3).arrivalOffset(5*60.0).build());
 				TransitRoute route = sb.createTransitRoute(Id.create("2to3", TransitRoute.class), netRoute, stops, "train");
 				line2to3.addRoute(route);
 

@@ -65,24 +65,19 @@ public final class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
 		} else if (TAG_LINK.equals(name)) {
 			this.currentLinkId = Id.create(atts.getValue(ATTR_ID), Link.class);
-		} else {
-			final String endTimeString = atts.getValue(ATTR_END_TIME);
-			double endTime = Time.parseTime(endTimeString);
-			if (endTimeString == null || endTimeString.length() == 0 || endTimeString.equals("undefined")) {
-				// (the above is the "undefined" definition from Time.parseTime...)
-				endTime = Double.POSITIVE_INFINITY ;
-				// (interpretation: an undefined toll end time very presumably means that it should last until +infty. kai, jan'14)
-			}
-			if (TAG_COST.equals(name) && this.currentLinkId == null) {
-				this.scheme.createAndAddCost(Time.parseTime(atts.getValue(ATTR_START_TIME)),
-						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
-			} else if (TAG_COST.equals(name) && this.currentLinkId != null){
-				this.scheme.addLinkCost(this.currentLinkId, Time.parseTime(atts.getValue(ATTR_START_TIME)),
-						endTime, Double.parseDouble(atts.getValue(ATTR_AMOUNT)));
+		} else if (TAG_COST.equals(name)) {
+			// an undefined toll start time == -Inf
+			double startTime = Time.parseOptionalTime(atts.getValue(ATTR_START_TIME)).orElse(Double.NEGATIVE_INFINITY);
+			// an undefined toll end time == +Inf
+			double endTime = Time.parseOptionalTime(atts.getValue(ATTR_END_TIME)).orElse(Double.POSITIVE_INFINITY);
+			double amount = Double.parseDouble(atts.getValue(ATTR_AMOUNT));
+			if (this.currentLinkId == null) {
+				this.scheme.createAndAddCost(startTime, endTime, amount);
+			} else {
+				this.scheme.addLinkCost(this.currentLinkId, startTime, endTime, amount);
 				this.hasLinkCosts = true;
 			}
 		}
-
 	}
 
 	@Override

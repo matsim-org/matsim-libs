@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -56,7 +55,7 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 	private boolean nextEnterVehicleIsFirstOfTrip = true;
 	private boolean nextStartPtLegIsFirstOfTrip = true;
 	private boolean currentLegIsPtLeg = false;
-	private double lastActivityEndTime = Time.getUndefinedTime();
+	private double lastActivityEndTime = Double.NaN;
 	private final Set<String> ptModes;
 	
 	private Set<String> modesAlreadyConsideredForDailyConstants;

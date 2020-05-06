@@ -118,6 +118,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
+		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort); //declare using detailed values
 
 		weam = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
@@ -125,7 +126,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	}
 
 
-	//Test to check that vehicles not found in the detailed table revert back to average table - ie det (pet 1,2,3), avg (pet), search pet 4
+	//Test to check that vehicles not found in the detailed table revert back to average table - ie detailed (petrol, 1,2,3), average (petrol), search pet 4
 	@Test
 	public void testFallBackToAverageTable() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
@@ -137,6 +138,9 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
+
+		//allow fallback to average table
+		weam.getEcg().setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		// should be ok
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);

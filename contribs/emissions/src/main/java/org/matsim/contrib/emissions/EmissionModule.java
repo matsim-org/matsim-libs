@@ -81,17 +81,53 @@ public final class EmissionModule {
 
 		URL context = scenario.getConfig().getContext();
 
-		URL averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
-		URL averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
+		URL averageFleetWarmEmissionFactorsFile = null;
+		URL averageFleetColdEmissionFactorsFile = null;
+		URL detailedWarmEmissionFactorsFile = null;
+		URL detailedColdEmissionFactorsFile = null;
 
-		URL detailedWarmEmissionFactorsFile;
-		URL detailedColdEmissionFactorsFile;
-		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
-			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
-			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
-		} else {
-			detailedWarmEmissionFactorsFile = null ;
-			detailedColdEmissionFactorsFile = null ;
+		switch( this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() ){
+			case directlyTryAverageTable:
+				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
+				break;
+			case tryDetailedThenTechnologyAverageThenAverageTable:
+				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
+				// fall-through
+			case onlyTryDetailedElseAbort:
+				// fall-through
+			case tryDetailedThenTechnologyAverageElseAbort:
+				//Check if value was loaded
+				if ( this.emissionConfigGroup.getDetailedColdEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
+				detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() );
 		}
 
 		//TODO: create roadtype mapping here from config
@@ -105,33 +141,36 @@ public final class EmissionModule {
 	private void createLookupTables( URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
 					 URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile ) {
 		logger.info("entering createLookupTables");
-		
-//		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
-//			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
-//					"However, no information is provided. Aborting...");
-//		} else {
-//			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-//				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
-//					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
-//					// However, this should be removed if not set intentionally. Amit May'17
-//					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
-//							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
-//				}
-//			}
-//		}
 
-		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
+			case onlyTryDetailedElseAbort:
+				//fall-through
+			case tryDetailedThenTechnologyAverageElseAbort:
+				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+				break;
+			case tryDetailedThenTechnologyAverageThenAverageTable:
+				detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
+				detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+				//fall-trough and create additionally average tables
+			case directlyTryAverageTable:
+				avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+				avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + emissionConfigGroup.getDetailedVsAverageLookupBehavior());
+		}
 
-		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
-			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
-			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
-		}
-		else{
-			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
-		}
 		logger.info("leaving createLookupTables");
+
+		//create HBEFA Speed tables. try on detailed values first.
+		if (detailedHbefaWarmTable != null){
+			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedHbefaWarmTable);
+		} else if (avgHbefaWarmTable != null){
+			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+		} else {
+			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");		//Is table mandatory? -> If yes throw exception
+		}
 	}
 
 	private void createEmissionHandler() {
@@ -257,7 +296,7 @@ public final class EmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("entering createDetailedHbefaWarmTable ...");
+		logger.info("leaving createDetailedHbefaWarmTable ...");
 		return hbefaWarmTableDetailed;
 	}
 
@@ -378,7 +417,7 @@ public final class EmissionModule {
 		}
 
 		private Integer mapAmbientCondPattern2Distance( String string ) {
-			Integer distance;
+			int distance;
 			String distanceString = string.split(",")[2];
 			String upperbound = distanceString.split("-")[1];
 			distance = Integer.parseInt(upperbound.split("k")[0]);
@@ -398,14 +437,6 @@ public final class EmissionModule {
 		}
 
 	}
-
-//	private SortedSet<String> getCombinedPollutantList() {
-//		SortedSet<String> distinct = new TreeSet<String>();
-//		distinct.addAll(warmPollutants);
-//		distinct.addAll(coldPollutants);
-//		return distinct;
-//
-//	}
 
     public LinkEmissionsCalculator getWarmEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20

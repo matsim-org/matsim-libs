@@ -20,6 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -69,7 +77,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -82,15 +89,11 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 
 
 /**
@@ -661,7 +664,7 @@ public class TransitQueueSimulationTest {
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
-        TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.getUndefinedTime(), 0.0);
+        TransitRouteStop stop1 = sb.createTransitRouteStopBuilder(stopFacility1).departureOffset(0.0).build();
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);
         stops.add(stop1);
@@ -758,7 +761,7 @@ public class TransitQueueSimulationTest {
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
         NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
-        TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.getUndefinedTime(), 0.0);
+        TransitRouteStop stop1 = sb.createTransitRouteStopBuilder(stopFacility1).departureOffset(0.0).build();
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);
         stops.add(stop1);
