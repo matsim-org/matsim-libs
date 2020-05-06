@@ -145,12 +145,14 @@ public class PalmChemistryInput {
         var xValues = writeDoubleArray(minX, maxX, cellSize, getNumberOfCellsInXDirection());
         var yValues = writeDoubleArray(minY, maxY, cellSize, getNumberOfCellsInYDirection());
 
-        var times = new ArrayInt.D1(data.getTimeBins().size(), false);
-        var timestamps = new ArrayChar.D2(data.getTimeBins().size(), 64);
-        var emissionValues = new ArrayFloat.D5(data.getTimeBins().size(), 1, getNumberOfCellsInYDirection(), getNumberOfCellsInXDirection(), pollutantToIndex.size());
-        var i = 0;
+        int numberOfConsecutiveTimeBins = (int) ((data.getEndTimeOfLastBin() - data.getStartTime()) / data.getBinSize());
+        var times = new ArrayInt.D1(numberOfConsecutiveTimeBins, false);
+        var timestamps = new ArrayChar.D2(numberOfConsecutiveTimeBins, 64);
+        var emissionValues = new ArrayFloat.D5(numberOfConsecutiveTimeBins, 1, getNumberOfCellsInYDirection(), getNumberOfCellsInXDirection(), pollutantToIndex.size());
 
-        for (var bin : data.getTimeBins()) {
+        for (var i = 0; i < numberOfConsecutiveTimeBins; i++) {
+
+            var bin = getTimeBin(i, data.getBinSize());
 
             var timestamp = getTimestamp(bin.getStartTime());
             logger.info("writing timestep: " + timestamp);
@@ -171,7 +173,6 @@ public class PalmChemistryInput {
                     }
                 }
             }
-            i++; //next timestep. Can't do in for header since getTimeBins is a collection not a list
         }
 
         // still don't know why we need two of these indices
@@ -185,6 +186,17 @@ public class PalmChemistryInput {
         writer.write(writer.findVariable(Y), yValues);
         writer.write(writer.findVariable(X), xValues);
         writer.write(writer.findVariable(EMISSION_VALUES), emissionValues);
+    }
+
+    private TimeBinMap.TimeBin<Map<Coord, Cell>> getTimeBin(int index, double timeBinSize) {
+
+        var bin = data.getTimeBin(index * timeBinSize);
+
+        if (!bin.hasValue()) {
+            bin.setValue(Map.of());
+        }
+
+        return bin;
     }
 
     private Cell getDefaultCell() {
@@ -320,6 +332,10 @@ public class PalmChemistryInput {
 
         updateBounds(coord);
         updateObservedPollutants(valuesByPollutant.keySet());
+
+        if (time > 3600) {
+            var stopHere = 0;
+        }
 
         var timeBin = data.getTimeBin(time);
 

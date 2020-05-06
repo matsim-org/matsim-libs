@@ -123,7 +123,7 @@ public class EmissionsToRasterHandlerTest {
      * The following test was used during development for visually analyzing the output of the rastered emissions
      */
     @Test
-    @Ignore
+    //@Ignore
     public void testWithBerlinEmissions() {
 
         var bounds = new GeometryFactory().createPolygon(new Coordinate[]{
@@ -136,7 +136,7 @@ public class EmissionsToRasterHandlerTest {
 
         var network = NetworkUtils.readNetwork("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct/output-berlin-v5.4-1pct/berlin-v5.4-1pct.output_network.xml.gz");
 
-        var rasteredNetwork = new RasteredNetwork(network, bounds, 5);
+        var rasteredNetwork = new RasteredNetwork(network, bounds, 10);
 
         var handler = new EmissionsToRasterHandler(rasteredNetwork, 3600);
         var manager = EventsUtils.createEventsManager();
@@ -145,6 +145,7 @@ public class EmissionsToRasterHandlerTest {
         new EmissionEventsReader(manager).readFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.4-1pct/output-berlin-v5.4-1pct/berlin-v5.4-1pct.emission.events.offline.xml.gz");
 
         var result = handler.getPalmChemistryInput();
+        result.writeToFile(Paths.get(testUtils.getOutputDirectory() + "ernst-reuter_chemistry.nc"));
         PalmChemistryInput.writeToCsv(Paths.get(testUtils.getOutputDirectory() + "rastered-emissions.csv"), result);
     }
 }
