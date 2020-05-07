@@ -1,9 +1,11 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ExperiencedPlansServiceImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +19,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.router;
+package org.matsim.core.scoring;
 
-import java.util.List;
+import org.matsim.api.core.v01.Scenario;
 
-/**
- * 
- * @author aneumann
- *
- */
-public class TransitPassengerRoute {
+public class ExperiencedPlansServiceFactory {
 
-	private final double cost;
-	private final List<RouteSegment> route;
+    /*
+     This should only be needed in Postprocessing. The way to access Experienced Plans during a simulation is via dependency injection.
+     */
+    public static ExperiencedPlansService create(Scenario scenario, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
+        return new ExperiencedPlansServiceImpl(eventsToActivities, eventsToLegs, scenario);
 
-	public TransitPassengerRoute(double cost, List<RouteSegment> leastCostRoute) {
-		this.cost = cost;
-		this.route = leastCostRoute;
-		
-	}
-
-	public double getTravelCost() {
-		return this.cost;
-	}
-	
-	public List<RouteSegment> getRoute() {
-		return this.route;
-	}
-
-	@Override
-	public String toString() {
-		return "Cost: " + this.cost + " via " + this.route;
-	}
+    }
 }

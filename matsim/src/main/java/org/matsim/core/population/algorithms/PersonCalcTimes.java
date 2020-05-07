@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Calculates all time informations in all plans of a person<br>
@@ -77,7 +77,7 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setStartTime(0);
 						act.setMaximumDuration(act.getEndTime().seconds());
 					} else if (cnt == max) {
-						double time = leg.getDepartureTime() + leg.getTravelTime();
+						double time = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
 						act.setStartTime(time);
 						if (time < 24*3600) {
 							time = 24*3600;
@@ -86,7 +86,7 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 						act.setMaximumDuration(time - act.getStartTime().seconds());
 					}
 					else {
-						act.setStartTime(leg.getDepartureTime() + leg.getTravelTime());
+						act.setStartTime(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
 						act.setEndTime(act.getStartTime().seconds() + act.getMaximumDuration().seconds());
 					}
 				}
@@ -94,11 +94,9 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 					leg = (Leg) pe;
 
 					leg.setDepartureTime(act.getEndTime().seconds());
-					double ttime = leg.getTravelTime();
-					if (Time.isUndefinedTime(ttime)) {
-						ttime = 0;
-					}
-					leg.setTravelTime( leg.getDepartureTime() + ttime - leg.getDepartureTime() );
+					OptionalTime ttime = leg.getTravelTime();
+					leg.setTravelTime( leg.getDepartureTime().seconds() + ttime.orElse(0) - leg.getDepartureTime()
+							.seconds());
 				}
 			}
 		}

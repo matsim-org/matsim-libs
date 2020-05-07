@@ -39,7 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -204,7 +203,7 @@ public class TransitLeastCostPathTree {
 	 *          the transitPassengerRoute between the fromNode and the toNode.
 	 *          Will be null if the route could not be found.
 	 */
-	public TransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
+	public InternalTransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
@@ -299,7 +298,7 @@ public class TransitLeastCostPathTree {
 				}
 
 				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
-						Time.getUndefinedTime(),null,null);
+						Double.NEGATIVE_INFINITY,null,null);
 
 				downstreamLink = null;
 			} else {
@@ -320,7 +319,7 @@ public class TransitLeastCostPathTree {
 
 		// if there is no connection found, getPath(...) return a path with nothing in it, however, I (and AN) think that it should throw null. Amit Sep'17
 		if (routeSegments.size()==0) return null;
-		else return new TransitPassengerRoute(cost, routeSegments);
+		else return new InternalTransitPassengerRoute(cost, routeSegments);
 	}
 
 	/**

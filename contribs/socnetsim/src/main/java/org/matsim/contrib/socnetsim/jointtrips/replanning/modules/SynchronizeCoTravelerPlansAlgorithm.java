@@ -26,16 +26,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -94,13 +93,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final Route route = leg.getRoute();
+				final OptionalTime legDur = PopulationUtils.decideOnTravelTimeForLeg(leg);
 
-				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					route.getTravelTime() : leg.getTravelTime();
-
-				if ( !Time.isUndefinedTime(legDur) ) {
-					now -= legDur;
+				if ( legDur.isDefined()) {
+					now -= legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );
@@ -135,13 +131,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			if ( pe instanceof Leg ) {
 				final Leg leg = (Leg) pe;
-				final Route route = leg.getRoute();
+				final OptionalTime legDur = PopulationUtils.decideOnTravelTimeForLeg(leg);
 
-				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
-					route.getTravelTime() : leg.getTravelTime();
-
-				if ( !Time.isUndefinedTime(legDur) ) {
-					tt += legDur;
+				if ( legDur.isDefined()) {
+					tt += legDur.seconds();
 				}
 				else {
 					log.warn( "no time in leg "+leg );

@@ -22,14 +22,16 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.passenger.DrtRequest;
+
+import com.google.common.base.Objects;
 
 /**
  * Generates all possible pickup and dropoff insertion point pairs that do not violate the vehicle capacity. In order to
  * generate insertion points for a given vehicle, a {@code VehicleData.Entry} must be prepared. It contains the
  * information about the vehicle current state (location, time and occupancy; additionally, the vehicle can be queried
- * about the current task etc. ) and the sequence of planned stops (of lenght {@code N}.
+ * about the current task etc. ) and the sequence of planned stops (of length {@code N}.
  * <p>
  * Pickup insertion points are indexed in the following way:
  * <ul>
@@ -52,7 +54,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
  * <p>
  * If a pickup/dropoff is inserted at stop {@code i} (pickup/dropoff is on the same link as the stop), insertion after
  * stop {@code i-1} will not be generated (as that would be equivalent to/duplicate of the former one).
- * 
+ *
  * @author michalm
  */
 public class InsertionGenerator {
@@ -69,6 +71,21 @@ public class InsertionGenerator {
 		public String toString() {
 			return "[pickupIdx=" + pickupIdx + "][dropoffIdx=" + dropoffIdx + "]";
 		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			Insertion insertion = (Insertion)o;
+			return pickupIdx == insertion.pickupIdx && dropoffIdx == insertion.dropoffIdx;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(pickupIdx, dropoffIdx);
+		}
 	}
 
 	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
@@ -76,13 +93,16 @@ public class InsertionGenerator {
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.startOccupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
-			if (occupancy < vEntry.vehicle.getCapacity() // only not fully loaded arcs
-					&& drtRequest.getFromLink() != vEntry.stops.get(i).task.getLink()) {// next stop at different link
-				generateDropoffInsertions(drtRequest, vEntry, i, insertions);
-			}
-			// else: skip this stop and evaluate only insertion _after_ stop i
+			VehicleData.Stop nextStop = nextStop(vEntry, i);
 
-			occupancy = vEntry.stops.get(i).outgoingOccupancy;
+			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
+				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
+					generateDropoffInsertions(drtRequest, vEntry, i, insertions);
+				}
+				// else: do not evaluate insertion _before_stop i, evaluate only insertion _after_ stop i
+			}
+
+			occupancy = nextStop.outgoingOccupancy;
 		}
 
 		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// last stop
@@ -93,18 +113,34 @@ public class InsertionGenerator {
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();
 		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
-			// no need to check the capacity constraints if i == j
-			if (j > i && // i -> pickup -> i+1 && j -> dropoff -> j+1
-					vEntry.stops.get(j - 1).outgoingOccupancy == vEntry.vehicle.getCapacity()) {
-				return;// stop iterating -- cannot insert dropoff after node j
+			// i -> pickup -> i+1 && j -> dropoff -> j+1
+
+			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
+				VehicleData.Stop currentStop = currentStop(vEntry, j);
+				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
+					if (drtRequest.getToLink() == currentStop.task.getLink()) {
+						//special case -- we can insert dropoff exactly at node j
+						insertions.add(new Insertion(i, j));
+					}
+
+					return;// stop iterating -- cannot insert dropoff after node j
+				}
 			}
 
-			if (drtRequest.getToLink() != vEntry.stops.get(j).task.getLink()) {// next stop at different link
+			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
 				insertions.add(new Insertion(i, j));
 			}
-			// else: skip this stop and evaluate only insertion _after_ stop i
+			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
 		insertions.add(new Insertion(i, stopCount));// insertion after last stop
+	}
+
+	private VehicleData.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
+		return entry.stops.get(insertionIdx - 1);
+	}
+
+	private VehicleData.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
+		return entry.stops.get(insertionIdx);
 	}
 }

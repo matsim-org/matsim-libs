@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,6 +22,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import com.google.inject.Inject;
 
 public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	private static final Logger log = Logger.getLogger( GreedyUmlaufBuilderImpl.class );
@@ -144,7 +145,7 @@ public final class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	private static double getLastArrivalTime( Umlauf umlauf ) {
 		TransitRouteStop previousStop = getLastStop(umlauf);
 		double previousDepartureTime = getLastDeparture(umlauf).getDepartureTime();
-		double arrivalOffset = previousStop.getArrivalOffset();
+		double arrivalOffset = previousStop.getArrivalOffset().seconds();
 		double previousArrivalTime = previousDepartureTime + arrivalOffset;			
 		return previousArrivalTime;
 	}

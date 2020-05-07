@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelDuringLegReplanner;
 import org.matsim.withinday.replanning.parallel.ParallelInitialReplanner;
@@ -164,7 +163,7 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 		 * that point in time. 
 		 */
 		if (!initialReplanningPerformed && isInitialReplanning()) {
-			initialReplanningModule.doReplanning(Time.getUndefinedTime());
+			initialReplanningModule.doReplanning(Double.NEGATIVE_INFINITY);//-Inf == before any feasible time step
 			initialReplanningPerformed = true;
 		}
 		

@@ -47,8 +47,8 @@ public abstract class ScoringFunctionAdapter implements ScoringFunction {
     }
 
     public final void handleLeg(Leg leg) {
-        startLeg(leg.getDepartureTime(), leg);
-        endLeg(leg.getDepartureTime() + leg.getTravelTime());
+		startLeg(leg.getDepartureTime().seconds(), leg);
+		endLeg(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
     }
 
     /**

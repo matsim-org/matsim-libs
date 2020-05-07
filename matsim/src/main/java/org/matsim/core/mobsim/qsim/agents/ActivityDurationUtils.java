@@ -21,6 +21,8 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public class ActivityDurationUtils {
 
@@ -36,48 +38,14 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.getMaximumDuration().isUndefined() && act.getEndTime().isUndefined()) {
+		OptionalTime endTime = PopulationUtils.decideOnActivityEndTime(act, now, activityDurationInterpretation);
+		if (endTime.isUndefined()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
-			double departure = 0;
-			if (activityDurationInterpretation.equals(
-					PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
-				// person stays at the activity either until its duration is over or until its end time, whatever comes first
-				if (act.getMaximumDuration().isUndefined()) {
-					departure = act.getEndTime().seconds();
-				} else if (act.getEndTime().isUndefined()) {
-					departure = now + act.getMaximumDuration().seconds();
-				} else {
-					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration().seconds());
-				}
-			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
-				if (act.getEndTime().isDefined()) {
-					departure = act.getEndTime().seconds();
-				} else {
-					throw new IllegalStateException("activity end time not set and using something else not allowed.");
-				}
-			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
-				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if (act.getEndTime().isDefined()) {
-					departure = act.getEndTime().seconds();
-				} else if (act.getMaximumDuration().isDefined()) {
-					departure = now + act.getMaximumDuration().seconds();
-				} else {
-					throw new IllegalStateException(
-							"neither activity end time nor activity duration defined; don't know what to do.");
-				}
-			} else {
-				throw new IllegalStateException("should not happen") ;
-			}
-	
-			if (departure < now) {
-				// we cannot depart before we arrived, thus change the time so the time stamp in events will be right
-				//			[[how can events not use the simulation time?  kai, aug'10]]
-				departure = now;
-				// actually, we will depart in (now+1) because we already missed the departing in this time step
-			}
-			return departure;
+			// we cannot depart before we arrived, thus change the time so the time stamp in events will be right
+			//			[[how can events not use the simulation time?  kai, aug'10]]
+			// actually, we will depart in (now+1) because we already missed the departing in this time step
+			return Math.max(endTime.seconds(), now);
 		}
 	}
-
 }

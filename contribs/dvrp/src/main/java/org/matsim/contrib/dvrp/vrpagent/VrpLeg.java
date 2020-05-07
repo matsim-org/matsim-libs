@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.DivertedVrpPath;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
@@ -114,8 +115,8 @@ public class VrpLeg implements DivertibleLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
-		return null;// teleportation is not handled
+	public OptionalTime getExpectedTravelTime() {
+		return OptionalTime.undefined();// teleportation is not handled
 	}
 
 	@Override

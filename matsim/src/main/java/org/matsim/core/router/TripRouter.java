@@ -27,6 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,11 +40,9 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import com.google.common.base.Preconditions;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -208,32 +209,16 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static double calcEndOfPlanElement(
 			final double now,
 			final PlanElement pe, Config config) {
-
-		if (Time.isUndefinedTime(now)) {
-			throw new RuntimeException("got undefined now to update with plan element" + pe);
-		}
+		Preconditions.checkArgument(Double.isFinite(now));//probably unnecessary after switching to OptionalTime
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			return PopulationUtils.decideOnActivityEndTime(act, now, config ) ;
+			return PopulationUtils.decideOnActivityEndTime(act, now, config ).seconds() ;
 		}
 		else {
-//			// take travel time from route if possible
-//			Route route = ((Leg) pe).getRoute();
-//			double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
-//
-//			// travel time from leg will override this
-//			travelTime = Time.isUndefinedTime(travelTime) ? ((Leg) pe).getTravelTime() : travelTime;
-//
-//			// if still undefined, assume zero:
-//			return now + (Time.isUndefinedTime(travelTime) ? 0 : travelTime);
-
-			// replace above by already existing centralized method.  Which, however, does less hedging, and prioritizes route ttime over leg ttime.  Let's run the tests ...
-
-			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe );
-			if ( Time.isUndefinedTime( ttime ) ) {
-				ttime = 0. ;
-			}
+			// take travel time from route if possible
+			// TODO throw exception if undefined? (currently 0 is returned)
+			double ttime = PopulationUtils.decideOnTravelTimeForLeg( (Leg) pe ).orElse(0);
 			return now + ttime;
 		}
 	}

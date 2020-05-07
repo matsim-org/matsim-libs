@@ -34,6 +34,8 @@
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
 		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.txt" />
 
+		<param name="detailedVsAverageLookupBehavior" value="directlyTryAverageTable"/>
+
 		<!-- following should eventually become default but currently is not: -->
 		<param name="hbefaRoadTypeSource" value="fromLinkAttributes" />
 

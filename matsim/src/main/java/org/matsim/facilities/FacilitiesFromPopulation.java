@@ -19,6 +19,14 @@
 
 package org.matsim.facilities;
 
+import static org.matsim.core.config.groups.FacilitiesConfigGroup.FacilitiesSource;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,14 +45,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
-import static org.matsim.core.config.groups.FacilitiesConfigGroup.*;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -274,7 +274,8 @@ public final class FacilitiesFromPopulation {
 						log.error("No information for activity type " + actType + " found in given configuration.");
 					}
 				} else {
-					ao.addOpeningTime(new OpeningTimeImpl(params.getOpeningTime(), params.getClosingTime()));
+					ao.addOpeningTime(OpeningTimeImpl.createFromOptionalTimes(params.getOpeningTime(),
+							params.getClosingTime()));
 				}
 			}
 		}
