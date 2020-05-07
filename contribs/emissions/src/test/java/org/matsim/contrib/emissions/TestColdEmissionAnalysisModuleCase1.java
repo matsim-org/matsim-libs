@@ -123,7 +123,6 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		Id<VehicleType> vehicleTypeId = Id.create(
 				testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3),
 				VehicleType.class);
-		
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,
 				VehicleUtils.getFactory().createVehicleType(vehicleTypeId));
 		logger.info("VehicleId: " + vehicle.getId().toString());
@@ -131,12 +130,14 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(),
 				linkId, startTime, parkingDuration, tableAccDistance);
+		
+		
+		//Find a better way of doing this. Delete getSum()
 		String message = "The expected emissions for " + testCase1.toString() + " are "
 				+ numberOfColdEmissions * (Double) testCase1.get(4) + " but were "
 				+ HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4),
 				HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
-		
 	}
 
 	private void setUp() {
@@ -154,21 +155,14 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		} else if (true) {
 			ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
 		}
-		// Why is this here code, it is unreachable??? Should all option be tried??
-//		else if (false){
-//			ecg.setHbefaVehicleDescriptionSource(
-//					EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
-//		}
+
 		
 		
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
-		// This test seems to refer to an direct lookup in average table?? //gr first cold emissions test seems to refer to the average table 
+		// This test seems to refer to an direct lookup in average table 
 		ecg.setDetailedVsAverageLookupBehavior(
 				EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		// coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new
-		// ColdEmissionAnalysisModuleParameter( avgHbefaColdTable,
-		// detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg,
 				pollutants, emissionEventManager);
 
