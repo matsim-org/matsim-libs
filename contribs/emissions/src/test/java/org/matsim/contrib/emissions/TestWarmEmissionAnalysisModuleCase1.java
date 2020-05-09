@@ -139,8 +139,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	}
 
-
-
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
 		//-- set up tables, event handler, parameters, module
