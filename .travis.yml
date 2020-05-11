@@ -7,7 +7,7 @@ script:
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
-cache:
-  directories:
-  - $HOME/.m2
+#cache:
+#  directories:
+#  - $HOME/.m2
 

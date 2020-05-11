@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
 
@@ -11,8 +12,9 @@ import lsp.resources.Resource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/* package-private */ class LSPImpl implements LSP {
+/* package-private */class LSPImpl implements LSP {
 
 	private Id<LSP> id;
 	private Collection<LSPShipment> shipments;
@@ -188,6 +190,11 @@ import lsp.shipment.LSPShipment;
 	@Override
 	public Collection<LSPShipment> getShipments() {
 		return this.shipments ;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		throw new NotImplementedException();
 	}
 
 }
