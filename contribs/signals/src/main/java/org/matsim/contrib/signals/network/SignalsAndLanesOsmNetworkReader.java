@@ -51,6 +51,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -63,7 +64,6 @@ import org.matsim.lanes.data.LanesFactory;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.lanes.data.LanesWriter;
 import org.xml.sax.Attributes;
-
 /**
  * Osm reader that extends the basic OSMNetworkReader and in addition reads in signals and lanes information.
  * This tool is based on the master thesis of Nils Schirrmacher from 2017 at VSP.
@@ -133,7 +133,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// Node stuff
 	Set<Long> signalizedOsmNodes = new HashSet<>();
 	Set<Long> crossingOsmNodes = new HashSet<>();
-	Map<Long, OsmNode> oldToSimplifiedJunctionNodeMap = new HashMap<>();
+	Map<Long, OsmNode> oldToMergedJunctionNodeMap = new HashMap<>();
 	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
 	// we change a few Nodes in setOrModifyLinkAttributes -> idea: save old Links as key and the old coordinates of 1. FromNode, 2. ToNode
 	Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap();
@@ -158,8 +158,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
-		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_04_08";
+		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_05_11";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -187,7 +187,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.setMakePedestrianSignals(false);         //TODO check was passiert
 //		reader.setMakePedestrianSignals(false);
 
-		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
+		//spree neisse
+		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
+		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
+		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
+		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 4);
+		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 5);
+		//cottbus innenstadt
+		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 6);
+		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 7);
+		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 8);
+
+
+		//reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
 		reader.parse(inputOSM);
 		reader.stats();
@@ -198,11 +210,37 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		 * be the case in the initial network converted from OpenStreetMap.
 		 */
 
+
+
+
+
+		Set<Long> signalizedNodes = new HashSet<>();
+		for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()){
+			for (SignalData signaldata:signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()){
+				Node signalNode = network.getLinks().get(signaldata.getLinkId()).getToNode();
+
+
+				for(Link outlink : signalNode.getOutLinks().values()){
+					Long temp3 = new Long(outlink.getToNode().getId().toString());
+					signalizedNodes.add(temp3);
+				}
+				Long temp1 = new Long(signalNode.getId().toString());
+				Long temp2 = new Long(network.getLinks().get(signaldata.getLinkId()).getFromNode().getId().toString());
+				signalizedNodes.add(temp1);
+				signalizedNodes.add(temp2);
+
+			}
+
+
+			//.create("System" + Long.valueOf(node.getId().toString()), SignalSystem.class);
+		}
+
+		NetworkSimplifier netsimplify = new NetworkSimplifier();
+		netsimplify.setNodesNotToMerge(signalizedNodes);
+		netsimplify.run(network);
+
 		new NetworkCleaner().run(network);
 		new LanesAndSignalsCleaner().run(scenario);
-
-
-
 		/*
 		 * Write the files out: network, lanes, signalSystems, signalGroups,
 		 * signalControl
@@ -352,6 +390,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		super.createMatsimData();
 
 		for (Id<Link> linkId : loopLinks){
+			Link a = network.getLinks().get(linkId);
 			network.removeLink(linkId);
 		}
 
@@ -396,6 +435,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 
+
+		//sbraun 07052020 add Network Cleaner here to create plans on the precleaned network
+		new NetworkCleaner().run(network);
+
 		for (Link link : network.getLinks().values()) {
 			if (lanes.getLanesToLinkAssignments().get(link.getId()) != null) {
 				simplifyLanesAndAddOrigLane(link);
@@ -433,6 +476,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		int badCounter = 0;
+
+
 		for (Node node : network.getNodes().values()) {
 
 			Id<SignalSystem> systemId = Id.create("System" + Long.valueOf(node.getId().toString()), SignalSystem.class);
@@ -534,19 +579,59 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			this.systems.getSignalSystemData().remove(badData);
 		}
 		LOG.warn(a);
+
+		//sbraun 09042020 ideas to resolve the problem that there are to many small links in the network.
+		//1. delete Lanes on Link if there ite through link
+		//2. explicity delete ToLink which would be the U turn on those lanes
+
+//		for (Link link: network.getLinks().values()){
+//			Node toNode = link.getToNode();
+//			if (toNode.getOutLinks().size()==2){
+//				LinkVector lvecFromLink = new LinkVector(link);
+//				double degreeFromLink = lvecFromLink.theta;
+//				for (Link outlink: toNode.getOutLinks().values()){
+//					LinkVector lvecToLink = new LinkVector(outlink);
+//					double degreeToLink = lvecToLink.theta;
+//					double degreeToLinkRev = (degreeToLink+Math.PI)%(2.*Math.PI);
+//					if ((Math.abs(degreeToLinkRev-degreeFromLink)/(2.*Math.PI))<0.1){
+//						link.setNumberOfLanes(1);
+//						lanes.getLanesToLinkAssignments().remove(link.getId());
+////						lanes.getLanesToLinkAssignments().get(link.getId()).getLanes();
+////						HashSet<Lane> laneset = new HashSet<Lane>();
+////						if (lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
+////							for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()) {
+////								if (lane.getToLinkIds().contains(outlink.getId())) {
+////									laneset.add(lane);
+////
+////								}
+////							}
+////							for (Lane lane : laneset) {
+////								lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(lane.getId());
+////								link.setNumberOfLanes(link.getNumberOfLanes() - 1);
+////							}
+////							//lane.getToLinkIds().remove(outlink.getId());
+////						}
+////						break;
+//					}
+//
+//				}
+//			}
+//
+//		}
+
 	}
 
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
 			List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
 			if (signalizedOsmNodes.contains(node.id) && isNodeAtJunction(node) 
-					&& !oldToSimplifiedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
+					&& !oldToMergedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
 				junctionNodes.add(node);
 				for (OsmNode otherNode : this.nodes.values()) {
                     if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
 							&& NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
                             otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
-							&& !oldToSimplifiedJunctionNodeMap.containsKey(otherNode.id)
+							&& !oldToMergedJunctionNodeMap.containsKey(otherNode.id)
 							&& hasNodeOneway(otherNode)) {
 						junctionNodes.add(otherNode);
 					}
@@ -582,7 +667,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				junctionNode.used = true;
 				for (OsmNode tempNode : junctionNodes) {
 					// TODO tempNode.used = false; node in way ersetzen -> repJunNode nicht noetig?!
-					oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+					oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
 					if (osmNodeRestrictions.containsKey(tempNode.id)) {
 						osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
 					}
@@ -705,7 +790,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						signalizedOsmNodes.add(junctionNode.id);
 					junctionNode.used = true;
 					for (OsmNode tempNode : junctionNodes) {
-						oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+						oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
 						if (osmNodeRestrictions.containsKey(tempNode.id)) {
 							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
 						}
@@ -783,8 +868,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 											//if (!(origWay.id == tempWay.id)) {
 											if (!passedWays.contains(tempWay.id)){
 												tempNodes.add(otherNode);
-												//sbraun05032020 try tempWay instead of Origway
+												//sbraun05032020 try tempWay instead of Origway -> fix bug at junction 8
 												OsmNode tempNode = nodes.get(tempWay.nodes.get(0));
+												//check if there are better candiates on the same way if not take the last node
+												for (Long potentialCandidate : tempWay.nodes){
+													OsmNode candidate = nodes.get(potentialCandidate);
+													if (isNodeAtJunction(candidate)){
+														tempNode = candidate;
+													}
+													if (potentialCandidate.longValue()==otherNode.id) break;
+												}
+
 												//sbraun 05032020 wenn kleine Mittelwege keine Onewways sind ist die Reihenfolge manchmal anders rum
 												/*if (tempNodes.contains(tempNode)){
 													tempNode = nodes.get(origWay.nodes.get(origWay.nodes.size()-1));
@@ -792,6 +886,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 												distance += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
 														otherNode.coord.getX(), otherNode.coord.getY());
+												//sbraun 07052020 add distance checker:
+												if (distance > SIGNAL_MERGE_DISTANCE){
+													break;
+												}
 
 												otherNodeSignalized = signalizedOsmNodes.contains(tempNode.id);
 												otherNode = tempNode;
@@ -826,12 +924,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						if (signalizedOsmNodes.contains(node.id) || signalizedOsmNodes.contains(otherNode.id))
 							signalizedOsmNodes.add(junctionNode.id);
 						junctionNode.used = true;
-						oldToSimplifiedJunctionNodeMap.put(node.id, junctionNode);
+						oldToMergedJunctionNodeMap.put(node.id, junctionNode);
 						if (osmNodeRestrictions.containsKey(node.id)) {
 							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(node.id));						
 						}
 						checkedNodes.add(node);
-						oldToSimplifiedJunctionNodeMap.put(otherNode.id, junctionNode);
+						oldToMergedJunctionNodeMap.put(otherNode.id, junctionNode);
 						if (osmNodeRestrictions.containsKey(otherNode.id)) {
 							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(otherNode.id));						
 						}
@@ -841,7 +939,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						//otherNode.used = false;
 						if (tempNodes.size()!=0) {
 							for (OsmNode tempNode: tempNodes){
-								oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+								oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
 								if (osmNodeRestrictions.containsKey(tempNode.id)) {
 									osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));
 								}
@@ -888,7 +986,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					signalizedOsmNodes.add(junctionNode.id);
 					junctionNode.used = true;
 					for (OsmNode tempNode : junctionNodes) {
-						oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+						oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
 						if (osmNodeRestrictions.containsKey(tempNode.id)) {
 							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
 						}
@@ -1156,37 +1254,48 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							//rather complicated but it compares firstly the hierarchies of the ways the junction node is on
 							//if that is equal than it has a count of the number of ways in the same hierarchy
 							//if that is equal it takes the one junction with more ways
-							if (topLayerPos == -1 || topLayerNeg == -1) {
-								if (topLayerPos == -1 && topLayerNeg == -1) {
-								    //TODO stattdessen anzahl lanes
-									if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
-										junctionNode = junctionNodePosDir;
-									} else junctionNode = junctionNodeNegDir;
-								} else {
-									if (topLayerPos == -1){
-										junctionNode = junctionNodeNegDir;
-									}else junctionNode = junctionNodePosDir;
+							//sbraun 30.04.20 check closest Junction
+
+
+							if(Math.abs(distanceNeg-distancePos)>SIGNAL_MERGE_DISTANCE*0.2){
+								if (distancePos<distanceNeg){
+									junctionNode = junctionNodePosDir;
+								}else{
+									junctionNode = junctionNodeNegDir;
 								}
-							}else{
-								if (topLayerPos==topLayerNeg){
-									if (topLayerCounterPos==topLayerCounterNeg){
-										//same hierarchy and same number of ways on that node with the same hierarchy
+
+							} else {
+								if (topLayerPos == -1 || topLayerNeg == -1) {
+									if (topLayerPos == -1 && topLayerNeg == -1) {
+										//TODO stattdessen anzahl lanes
 										if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
 											junctionNode = junctionNodePosDir;
 										} else junctionNode = junctionNodeNegDir;
 									} else {
-										if (topLayerCounterPos>topLayerCounterNeg){
+										if (topLayerPos == -1) {
+											junctionNode = junctionNodeNegDir;
+										} else junctionNode = junctionNodePosDir;
+									}
+								} else {
+									if (topLayerPos == topLayerNeg) {
+										if (topLayerCounterPos == topLayerCounterNeg) {
+											//same hierarchy and same number of ways on that node with the same hierarchy
+											if (junctionNodePosDir.ways.size() >= junctionNodeNegDir.ways.size()) {
+												junctionNode = junctionNodePosDir;
+											} else junctionNode = junctionNodeNegDir;
+										} else {
+											if (topLayerCounterPos > topLayerCounterNeg) {
+												junctionNode = junctionNodePosDir;
+											} else junctionNode = junctionNodeNegDir;
+										}
+
+									} else {
+										if (topLayerPos < topLayerNeg) {
 											junctionNode = junctionNodePosDir;
 										} else junctionNode = junctionNodeNegDir;
 									}
-
-								}else{
-									if (topLayerPos < topLayerNeg){
-										junctionNode = junctionNodePosDir;
-									} else junctionNode = junctionNodeNegDir;
 								}
 							}
-
 						} else{
 							if (junctionNodePosDir != null) {
 								junctionNode = junctionNodePosDir;
@@ -2296,19 +2405,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// modify to/from nodes if they have been simplified (earlier in simplifyOsmData)
 		long toNodeOsmId = Long.valueOf(l.getToNode().getId().toString());
 		long fromNodeOsmId = Long.valueOf(l.getFromNode().getId().toString());
-		if (oldToSimplifiedJunctionNodeMap.containsKey(toNodeOsmId)) {
+		if (oldToMergedJunctionNodeMap.containsKey(toNodeOsmId)) {
 			//remember old toNode for LinkVector calculation
 			linkToOrigToNodeCoord.put(l.getId(), l.getToNode().getCoord());
 			//change toNode
-			long simplifiedOsmNodeId = oldToSimplifiedJunctionNodeMap.get(toNodeOsmId).id;
+			long simplifiedOsmNodeId = oldToMergedJunctionNodeMap.get(toNodeOsmId).id;
 			l.setToNode(network.getNodes().get(Id.createNodeId(simplifiedOsmNodeId)));
 			l.setLength(NetworkUtils.getEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
 		}
-		if (oldToSimplifiedJunctionNodeMap.containsKey(fromNodeOsmId)) {
+		if (oldToMergedJunctionNodeMap.containsKey(fromNodeOsmId)) {
 			//remember old fromNode for LinkVector calculation
 			linkToOrigFromNodeCoord.put(l.getId(), l.getFromNode().getCoord());
 			//change fromNode
-			long simplifiedOsmNodeId = oldToSimplifiedJunctionNodeMap.get(fromNodeOsmId).id;
+			long simplifiedOsmNodeId = oldToMergedJunctionNodeMap.get(fromNodeOsmId).id;
 			l.setFromNode(network.getNodes().get(Id.createNodeId(simplifiedOsmNodeId)));
 			l.setLength(NetworkUtils.getEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
 		}
@@ -2570,7 +2679,5 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			else
 				return false;
 		}
-
 	}
-
 }
