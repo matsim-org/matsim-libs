@@ -1,6 +1,11 @@
-image: maven:3-jdk-11
+image: maven:3.6.3-openjdk-11
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
 
 build:
   script: "mvn install -B --fail-at-end -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true"
-
-# see http://stackoverflow.com/questions/33430487/how-to-use-gitlab-ci-to-build-a-java-maven-project
