@@ -88,6 +88,9 @@ public class TripsAndLegsCSVWriterTest {
 	private static int transit_route;
 	private static int first_pt_boarding_stop;
 	private static int last_pt_egress_stop;
+	private static int trip_number;
+	private static int person;
+	
 	
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
@@ -160,8 +163,10 @@ public class TripsAndLegsCSVWriterTest {
 		for (Map.Entry<Id<Person>, Plan> entry : map.entrySet()) {
 			int tripno = 1;
 			Plan plan = entry.getValue();
+			Id<Person> personId = entry.getKey();
 			List<Trip> trips = TripStructureUtils.getTrips(plan);
 			Iterator<Trip> tripItr = trips.iterator();
+			int tripNo = 1;
 			while(tripItr.hasNext()) {
 				Map<String, Object> tripvalues = new HashMap<String, Object>();
 				String modes = "";
@@ -259,7 +264,10 @@ public class TripsAndLegsCSVWriterTest {
 				tripvalues.put("longest_distance_mode", longest_distance_mode);
 				tripvalues.put("first_pt_boarding_stop", first_pt_boarding_stop);
 				tripvalues.put("last_pt_egress_stop", last_pt_egress_stop);
-				
+				tripvalues.put("person", personId);
+				tripvalues.put("trip_number", tripNo);
+				tripvalues.put("trip_id", personId+"_"+tripNo);
+				tripNo++;
 				persontrips.put(entry.getKey()+"_"+tripno, tripvalues);
 				tripno++;
 			}
@@ -273,8 +281,10 @@ public class TripsAndLegsCSVWriterTest {
 
 		for (Map.Entry<Id<Person>, Plan> entry : map.entrySet()) {
 			Plan plan = entry.getValue();
+			Id<Person> personId = entry.getKey();
 			List<Trip> trips = TripStructureUtils.getTrips(plan);
 			Iterator<Trip> tripItr = trips.iterator();
+			int tripNo = 1;
 			while(tripItr.hasNext()) {
 				Trip trip = tripItr.next();
 				List<Leg> legs = trip.getLegsOnly();
@@ -328,8 +338,11 @@ public class TripsAndLegsCSVWriterTest {
 					legvalues.put("end_x", end_x_value);
 					legvalues.put("end_y", end_y_value);
 					legvalues.put("wait_time", Time.writeTime(waitingTime));
+					legvalues.put("person", personId);
+					legvalues.put("trip_id", personId+"_"+tripNo);
 					legsfromplan.add(legvalues);
 				}
+				tripNo++;
 			}
 		}
 	}
@@ -359,6 +372,8 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("End link is not as expected", String.valueOf(nextleg.get("end_link")) , column[end_link]);
 				Assert.assertEquals("end_x is not as expected", String.valueOf(nextleg.get("end_x")) , column[end_x]);
 				Assert.assertEquals("end_y is not as expected", String.valueOf(nextleg.get("end_y")) , column[end_y]);
+				Assert.assertEquals("person is not as expected", String.valueOf(nextleg.get("person")) , column[person]);
+				Assert.assertEquals("trip_id is not as expected", String.valueOf(nextleg.get("trip_id")) , column[trip_id]);
 				if(column.length > 13) {
 					Assert.assertEquals("access_stop_id is not as expected", String.valueOf(nextleg.get("access_stop_id")) , column[access_stop_id]);
 					Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id]);
@@ -412,6 +427,9 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("End x is not as expected", String.valueOf(tripvalues.get("end_x")), column[end_x]);
 				Assert.assertEquals("End y is not as expected", String.valueOf(tripvalues.get("end_y")), column[end_y]);
 				Assert.assertEquals("waiting_time is not as expected", String.valueOf(tripvalues.get("waiting_time")), column[wait_time]);
+				Assert.assertEquals("person is not as expected", String.valueOf(tripvalues.get("person")), column[person]);
+				Assert.assertEquals("trip_number is not as expected", String.valueOf(tripvalues.get("trip_number")), column[trip_number]);
+				Assert.assertEquals("trip_id is not as expected", String.valueOf(tripvalues.get("trip_id")), column[trip_id]);
 				if(column.length > 20) {
 					Assert.assertEquals("first_pt_boarding_stop is not as expected", String.valueOf(tripvalues.get("first_pt_boarding_stop")), column[first_pt_boarding_stop]);
 					Assert.assertEquals("last_pt_egress_stop is not as expected", String.valueOf(tripvalues.get("last_pt_egress_stop")), column[last_pt_egress_stop]);
@@ -533,6 +551,14 @@ public class TripsAndLegsCSVWriterTest {
 				
 			case "last_pt_egress_stop":
 				last_pt_egress_stop = i;
+				break;
+				
+			case "trip_number":
+				trip_number = i;
+				break;
+				
+			case "person":
+				person = i;
 				break;
 				
 			}
