@@ -47,6 +47,16 @@
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>${matsim.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jai_core</artifactId>
+					<groupId>javax.media</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jgridshift</artifactId>
+					<groupId>jgridshift</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<dependency>
@@ -67,6 +77,16 @@
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<type>test-jar</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>jai_core</artifactId>
+					<groupId>javax.media</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jgridshift</artifactId>
+					<groupId>jgridshift</groupId>
+				</exclusion>
+			</exclusions>
 			<version>${matsim.version}</version>
 			<scope>test</scope>
 		</dependency>
