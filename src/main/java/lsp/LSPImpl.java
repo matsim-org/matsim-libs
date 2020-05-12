@@ -24,6 +24,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private Collection<Resource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
+	private Attributes attributes = new Attributes();
 
 
 	LSPImpl( LSPUtils.LSPBuilder builder ){
@@ -194,7 +195,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public Attributes getAttributes() {
-		throw new NotImplementedException();
+		return attributes;
 	}
 
 }
