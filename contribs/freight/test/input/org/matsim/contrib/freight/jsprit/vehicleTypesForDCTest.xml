@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+
+	<vehicleType id="LargeBattery_V1">
+
+		<description>Carrier_Version1</description>
+		<capacity seats="1" standingRoomInPersons="0" other="80.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">450.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.015</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="100.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	
+	<vehicleType id="SmallBattery_V1">
+
+		<description>Carrier_Version1</description>
+		<capacity seats="1" standingRoomInPersons="0" other="80.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">300.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.01</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="70.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="LargeBattery_V2">
+
+		<description>Carrier_Version2</description>
+		<capacity seats="1" standingRoomInPersons="0" other="80.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">450.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.015</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="100.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="SmallBattery_V2">
+
+		<description>Carrier_Version2</description>
+		<capacity seats="1" standingRoomInPersons="0" other="80.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">150.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.01</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="70.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="LargeBattery_V3">
+
+		<description>Carrier_Version3</description>
+		<capacity seats="1" standingRoomInPersons="0" other="80.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">450.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.015</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="100.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+	
+	<vehicleType id="SmallBattery_V3">
+
+		<description>Carrier_Version3</description>
+		<capacity seats="1" standingRoomInPersons="0" other="40.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">300.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.01</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="40.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="LargeBattery_V4">
+
+		<description>Carrier_Version4</description>
+		<capacity seats="1" standingRoomInPersons="0" other="120.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">450.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.015</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="100.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="SmallBattery_V4">
+
+		<description>Carrier_Version4</description>
+		<capacity seats="1" standingRoomInPersons="0" other="120.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">electricity</attribute>
+				<attribute name="energyCapacityInKWhOrLiters" class="java.lang.Double">300.0</attribute>
+				<attribute name="energyConsumptionKWhPerMeter" class="java.lang.Double">0.01</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="70.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
+	<vehicleType id="DieselVehicle">
+
+		<description>Carrier_Version4</description>
+		<capacity seats="1" standingRoomInPersons="0" other="40.0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="fuelConsumptionLitersPerMeter" class="java.lang.Double">1.625E-4</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="400.0" costsPerMeter="5.5E-4" costsPerSecond="0.008">
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+		
+</vehicleDefinitions>

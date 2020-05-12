@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Copy/Paste of PlanMutateTimeAllocation, but with special handling
@@ -154,12 +153,12 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 				// assume that there will be no delay between end time of previous activity and departure time
 				leg.setDepartureTime(now);
 				// let duration untouched. if defined add it to now
-				if (!Time.isUndefinedTime(leg.getTravelTime())) {
-					now += leg.getTravelTime();
+				if (leg.getTravelTime().isDefined()) {
+					now += leg.getTravelTime().seconds();
 				}
 				final double arrTime = now;
 				// set planned arrival time accordingly
-				leg.setTravelTime( arrTime - leg.getDepartureTime() );
+				leg.setTravelTime( arrTime - leg.getDepartureTime().seconds());
 			}
 		}
 	}

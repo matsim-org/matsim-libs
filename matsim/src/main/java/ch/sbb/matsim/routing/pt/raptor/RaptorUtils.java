@@ -20,8 +20,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 
@@ -97,17 +95,17 @@ public final class RaptorUtils {
 
     public static List<Leg> convertRouteToLegs(RaptorRoute route) {
         List<Leg> legs = new ArrayList<>(route.parts.size());
-        double lastArrivalTime = Time.getUndefinedTime();
+        double lastArrivalTime = Double.NaN;
         for (RaptorRoute.RoutePart part : route.parts) {
             if (part.planElements != null) {
                 for (PlanElement pe : part.planElements) {
                     if (pe instanceof Leg) {
                         Leg leg = (Leg) pe;
                         legs.add(leg);
-                        if (Time.isUndefinedTime(leg.getDepartureTime())) {
+                        if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
-                        lastArrivalTime = leg.getDepartureTime() + leg.getTravelTime();
+						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
                     }
                 }
             } else if (part.line != null) {
@@ -116,7 +114,7 @@ public final class RaptorUtils {
                 ptLeg.setDepartureTime(part.depTime);
                 ptLeg.setTravelTime(part.arrivalTime - part.depTime);
                 DefaultTransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(part.fromStop, part.line, part.route, part.toStop);
-                ptRoute.setBoardingTime(OptionalTime.defined(part.boardingTime));
+                ptRoute.setBoardingTime(part.boardingTime);
                 ptRoute.setTravelTime(part.arrivalTime - part.depTime);
                 ptRoute.setDistance(part.distance);
                 ptLeg.setRoute(ptRoute);

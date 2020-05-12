@@ -68,7 +68,7 @@ public class DefaultMainLegRouter implements RoutingModule {
 
 		Leg leg = populationFactory.createLeg(mode);
 		leg.setDepartureTime(departureTime);
-		leg.setTravelTime(route.getTravelTime());
+		leg.setTravelTime(route.getTravelTime().seconds());
 		leg.setRoute(route);
 		return ImmutableList.of(leg);
 	}

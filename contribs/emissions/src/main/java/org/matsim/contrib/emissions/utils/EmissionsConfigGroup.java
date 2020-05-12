@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.emissions.utils;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -27,9 +28,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class EmissionsConfigGroup
-	  extends ReflectiveConfigGroup
-{
+public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger( EmissionsConfigGroup.class );
+
 	public static final String GROUP_NAME = "emissions";
 
 	@Deprecated // See elsewhere in this class.  kai, oct'18
@@ -43,8 +44,12 @@ public final class EmissionsConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
 	private String averageFleetColdEmissionFactorsFile = null;
 
+	/**
+	 * @deprecated -- use {{@link #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR}}
+	 */
+	@Deprecated
 	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
-	private boolean isUsingDetailedEmissionCalculation = false;
+//	private boolean isUsingDetailedEmissionCalculation = false;
 
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
@@ -91,13 +96,27 @@ public final class EmissionsConfigGroup
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
 	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
+	public enum DetailedVsAverageLookupBehavior{onlyTryDetailedElseAbort, tryDetailedThenTechnologyAverageElseAbort, tryDetailedThenTechnologyAverageThenAverageTable, directlyTryAverageTable}
+	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR = "detailedVsAverageLookupBehavior";
+	private DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort;
+
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
-	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
-	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
-	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
-	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
-	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
+	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average cold emission factors";
+	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
+	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
+	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emission factors? " + "\n\t\t" +
+			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name() + " : try detailed values. Abort if values are not found. Requires DETAILED" +
+											      " emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort.name() + " : try detailed values first, if not found try to use " +
+											      "semi-detailed values for 'vehicleType,technology,average,average', if then not found abort. Requires DETAILED emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable.name() + "try detailed values first, if not found try to " +
+											      "use semi-detailed values for 'vehicleType,technology,average,average', if then not found try lookup in average table. Requires DETAILED and AVERAGE emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.directlyTryAverageTable.name() + "only calculate from average table. Requires AVERAGE emission factors. " +
+			"Default is " + DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name();
+	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "file with HBEFA detailed warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "file with HBEFA detailed cold emission factors";
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
 															   "The definition of emission specifications:" +  "\n\t\t" +
@@ -155,7 +174,8 @@ public final class EmissionsConfigGroup
 
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT);
 
-		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);
+//		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);	//is deprecated now. This functionality is integrated in DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR.
+		map.put(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR, DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT);
 
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, EMISSION_FACTORS_WARM_FILE_DETAILED_CMT) ;
 
@@ -184,6 +204,7 @@ public final class EmissionsConfigGroup
 
 	/**
 	 * @param roadTypeMappingFile -- {@value #EMISSION_ROADTYPE_MAPPING_FILE_CMT}
+	 * @noinspection JavadocReference
 	 */
 	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
 	@Deprecated // See elsewhere in this class.  kai, oct'18
@@ -232,18 +253,63 @@ public final class EmissionsConfigGroup
 	public URL getAverageColdEmissionFactorsFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.averageFleetColdEmissionFactorsFile);
 	}
-
+	// ===============
+	private static final String message = "The " + USING_DETAILED_EMISSION_CALCULATION + " switch is deprecated and will eventually be disabled.  Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead.";
+	/** @noinspection MethodMayBeStatic*/ // ---
 	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
-	public boolean isUsingDetailedEmissionCalculation(){
-		return this.isUsingDetailedEmissionCalculation;
+	@Deprecated
+	public Boolean isUsingDetailedEmissionCalculationStringGetter(){
+		log.warn( message + " Returning null here so that the code does not abort.");
+		return null ;
 	}
 	/**
-	 * @param isUsingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
+	 * @param usingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
 	 */
 	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
-	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
-		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
+	public void setUsingDetailedEmissionCalculationStringSetter(final Boolean usingDetailedEmissionCalculation) {
+		log.warn( message + " Will try to retrofit ...");
+		if ( usingDetailedEmissionCalculation==null ){
+			log.warn( "null as entry in " + USING_DETAILED_EMISSION_CALCULATION + " has no meaning; ignoring it." );
+		} else if ( usingDetailedEmissionCalculation ) {
+			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable;
+		} else {
+			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.directlyTryAverageTable;
+		}
 	}
+	// ---
+	/**
+	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #getDetailedVsAverageLookupBehavior()}
+	 * instead.
+	 * @noinspection MethodMayBeStatic
+	 */
+	@Deprecated
+	public boolean isUsingDetailedEmissionCalculation() {
+		throw new RuntimeException( message );
+	}
+	/**
+	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #setHbefaVehicleDescriptionSource(HbefaVehicleDescriptionSource)}
+	 * instead.
+	 * @noinspection MethodMayBeStatic
+	 */
+	@Deprecated
+	public boolean setUsingDetailedEmissionCalculation( boolean val ) {
+		throw new RuntimeException( message );
+	}
+	// ---
+	/**
+	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
+	 * @noinspection JavadocReference
+	 */
+	@StringSetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
+	public void setDetailedVsAverageLookupBehavior(DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior) {
+		this.detailedVsAverageLookupBehavior = detailedVsAverageLookupBehavior;
+	}
+
+	@StringGetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
+	public DetailedVsAverageLookupBehavior getDetailedVsAverageLookupBehavior() {
+		return this.detailedVsAverageLookupBehavior;
+	}
+	// ===============
 	/**
 	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}
 	 */

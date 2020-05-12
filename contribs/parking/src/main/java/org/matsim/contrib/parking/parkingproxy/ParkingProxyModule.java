@@ -22,11 +22,10 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
 
 /**
  * <p>
@@ -58,7 +57,7 @@ public class ParkingProxyModule extends AbstractModule {
 		InitialLoadGenerator loadGenerator = new InitialLoadGenerator(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor());
 //		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
 		Collection<Tuple<Coord, Integer>> initialLoad = loadGenerator.calculateInitialCarPositions(parkingConfig.getCarsPer1000Persons());
-		int qsimEndTime = Time.isUndefinedTime(getConfig().qsim().getEndTime()) ? 30*3600 : (int)getConfig().qsim().getEndTime();
+		int qsimEndTime = (int) getConfig().qsim().getEndTime().orElse(30*3600);
 		MovingEntityCounter carCounter = new MovingEntityCounter(
 				initialLoad, 
 				parkingConfig.getTimeBinSize(), 

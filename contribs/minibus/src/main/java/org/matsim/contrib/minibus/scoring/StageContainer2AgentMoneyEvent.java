@@ -51,7 +51,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
-		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime();
+		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime().seconds();
 		this.ticketMachine = ticketMachine;
 	}
 

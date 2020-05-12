@@ -1,6 +1,10 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -21,14 +25,16 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * @author rehmann / VSP
@@ -1993,8 +1999,8 @@ public class RaptorStopFinderTest {
 
             NetworkRoute networkRouteBX = RouteUtils.createLinkNetworkRouteImpl(linkBB.getId(), new Id[]{linkBX.getId()}, linkBB.getId());
             List<TransitRouteStop> stopsBX = new ArrayList<>(2);
-            stopsBX.add(sf.createTransitRouteStop(stopB, Time.getUndefinedTime(), 0.0));
-            stopsBX.add(sf.createTransitRouteStop(stopX, offsetB, Time.getUndefinedTime()));
+            stopsBX.add(sf.createTransitRouteStopBuilder(stopB).departureOffset(0.0).build());
+            stopsBX.add(sf.createTransitRouteStopBuilder(stopX).arrivalOffset(offsetB).build());
             TransitRoute BXRoute = sf.createTransitRoute(Id.create("lineBX", TransitRoute.class), networkRouteBX, stopsBX, "train");
             BXRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8. * 3600));
             BLine.addRoute(BXRoute);
@@ -2006,8 +2012,8 @@ public class RaptorStopFinderTest {
 
             NetworkRoute networkRouteCX = RouteUtils.createLinkNetworkRouteImpl(linkCC.getId(), new Id[]{linkCX.getId()}, linkCC.getId());
             List<TransitRouteStop> stopsCX = new ArrayList<>(3);
-            stopsCX.add(sf.createTransitRouteStop(stopC, Time.getUndefinedTime(), 0.0));
-            stopsCX.add(sf.createTransitRouteStop(stopX, offsetC, Time.getUndefinedTime()));
+            stopsCX.add(sf.createTransitRouteStopBuilder(stopC).departureOffset(0.0).build());
+            stopsCX.add(sf.createTransitRouteStopBuilder(stopX).arrivalOffset(offsetC).build());
             TransitRoute CXRoute = sf.createTransitRoute(Id.create("lineCX", TransitRoute.class), networkRouteCX, stopsCX, "train");
             CXRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8. * 3600));
             CLine.addRoute(CXRoute);
@@ -2019,8 +2025,8 @@ public class RaptorStopFinderTest {
 
             NetworkRoute networkRouteDX = RouteUtils.createLinkNetworkRouteImpl(linkDD.getId(), new Id[]{linkDX.getId()}, linkDD.getId());
             List<TransitRouteStop> stopsDX = new ArrayList<>(2);
-            stopsDX.add(sf.createTransitRouteStop(stopD, Time.getUndefinedTime(), 0.0));
-            stopsDX.add(sf.createTransitRouteStop(stopX, offsetD, Time.getUndefinedTime()));
+            stopsDX.add(sf.createTransitRouteStopBuilder(stopD).departureOffset(0.0).build());
+            stopsDX.add(sf.createTransitRouteStopBuilder(stopX).arrivalOffset(offsetD).build());
             TransitRoute DXRoute = sf.createTransitRoute(Id.create("lineDX", TransitRoute.class), networkRouteDX, stopsDX, "train");
             DXRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8. * 3600));
             DLine.addRoute(DXRoute);
@@ -2033,8 +2039,8 @@ public class RaptorStopFinderTest {
 
             NetworkRoute networkRouteEX = RouteUtils.createLinkNetworkRouteImpl(linkEE.getId(), new Id[]{linkEX.getId()}, linkEE.getId());
             List<TransitRouteStop> stopsEX = new ArrayList<>(2);
-            stopsEX.add(sf.createTransitRouteStop(stopE, Time.getUndefinedTime(), 0.0));
-            stopsEX.add(sf.createTransitRouteStop(stopX, offsetE, Time.getUndefinedTime()));
+            stopsEX.add(sf.createTransitRouteStopBuilder(stopE).departureOffset(0.0).build());
+            stopsEX.add(sf.createTransitRouteStopBuilder(stopX).arrivalOffset(offsetE).build());
             TransitRoute EXRoute = sf.createTransitRoute(Id.create("lineEX", TransitRoute.class), networkRouteEX, stopsEX, "train");
             EXRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8. * 3600));
             ELine.addRoute(EXRoute);

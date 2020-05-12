@@ -19,28 +19,12 @@
 
 package org.matsim.core.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -54,16 +38,17 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Converts a stream of Events into a stream of Legs. Passes Legs to a single LegHandler which must be registered with this class.
@@ -166,7 +151,7 @@ public final class EventsToLegs
 
 	private List<LegHandler> legHandlers = new ArrayList<>();
 
-	EventsToLegs(Scenario scenario) {
+	public EventsToLegs(Scenario scenario) {
 		this.network = scenario.getNetwork();
 		if (scenario.getConfig().transit().isUseTransit()) {
 			this.transitSchedule = scenario.getTransitSchedule();
@@ -275,8 +260,9 @@ public final class EventsToLegs
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		Leg leg = legs.get(event.getPersonId());
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
-		double travelTime = leg.getDepartureTime() + leg.getTravelTime() - leg.getDepartureTime();
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
+		double travelTime = leg.getDepartureTime().seconds()
+				+ leg.getTravelTime().seconds() - leg.getDepartureTime().seconds();
 		leg.setTravelTime(travelTime);
 		List<Id<Link>> experiencedRoute = experiencedRoutes.get(event.getPersonId());
 		assert experiencedRoute.size() >= 1;
@@ -323,7 +309,7 @@ public final class EventsToLegs
 			assert egressFacility != null;
 			
 			DefaultTransitPassengerRoute passengerRoute = new DefaultTransitPassengerRoute(accessFacility, line, route, egressFacility);
-			passengerRoute.setBoardingTime(OptionalTime.defined(pendingTransitTravel.boardingTime));
+			passengerRoute.setBoardingTime(pendingTransitTravel.boardingTime);
 			passengerRoute.setTravelTime(travelTime);
 			passengerRoute.setDistance(RouteUtils.calcDistance(passengerRoute, transitSchedule, network));
 			leg.setRoute(passengerRoute);

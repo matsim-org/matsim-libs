@@ -19,6 +19,17 @@ import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
+/**
+ * Class for converting osm-networks into matsim-networks. This class uses the binary osm.pbf format as an input. Suitable
+ * input files can be found at https://download.geofabrik.de
+ * <p>
+ * Examples on how to use the reader can be found in {@link org.matsim.contrib.osm.examples}
+ * <p>
+ * For the most common highway tags the {@link LinkProperties} class contains default properties for the
+ * corresponding links in the matsim-nework (e.g. speed, number of lanes). Those default properties may be overridden
+ * with custom link properties using the {@link SupersonicOsmNetworkReader.Builder#addOverridingLinkProperties(String, LinkProperties)}
+ * method of the Builder.
+ */
 public class SupersonicOsmNetworkReader {
 
     private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
@@ -320,36 +331,99 @@ public class SupersonicOsmNetworkReader {
         };
         CoordinateTransformation coordinateTransformation;
 
+        /**
+         * Replace all Link-Properties at once. Link properties describe how an osm-highway-tag is translated into a
+         * matsim-link. E.g. which freespeed is set on the link, whether it is one-way, etc.
+         * <p>
+         * The reader only reads osm-ways which have a corresponding entry in the linkProperties map.
+         *
+         * @param linkProperties The link properties to be included in the matsim-network.
+         */
         public AbstractBuilder<T> setLinkProperties(ConcurrentMap<String, LinkProperties> linkProperties) {
             this.linkProperties = linkProperties;
             return this;
         }
 
+        /**
+         * The reader has a default set of osm-highway-tags which are parsed. The following are included by default:
+         * motorway, motorway_link, trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link,
+         * unclassified, residential, living_street
+         * <p>
+         * By invoking this method one can override the assigned {@link LinkProperties} by supplying the desired highway
+         * tag with a new {@link LinkProperties} object.
+         *
+         * @param highwayType the highway type which receives new properties
+         * @param properties  the properties the corresponding matsim-links will receive
+         */
         public AbstractBuilder<T> addOverridingLinkProperties(String highwayType, LinkProperties properties) {
             linkProperties.put(highwayType, properties);
             return this;
         }
 
+        /**
+         * This sets a filter to in- or exclude links depending on its hierarchy level and location. The filter is invoked
+         * for each to and from node of a link.
+         * <p>
+         * The hierarchy levels reach from {@link LinkProperties#LEVEL_MOTORWAY} = 1 to {@link LinkProperties#LEVEL_LIVING_STREET} = 8
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param includeLinkAtCoordWithHierarchy Bi-Predicate which takes a node's coordinate and its hierarchy level
+         */
         public AbstractBuilder<T> setIncludeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy) {
             this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
             return this;
         }
 
+        /**
+         * This sets a filter to prevent certain nodes from being removed.
+         * <p>
+         * The reader tries to simplify the network as much as possible. If it is essential to keep certain nodes of the
+         * original osm-network within the output matsim-network for e.g. counts the filter can prevent the removal of
+         * the node with the supplied id
+         * <p>
+         * Setting the filter to '() -> true' will omit network simplification entirely and is equivalent to the 'keepPath'
+         * option of the previous OsmNetworkReader
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param preserveNodeWithId Predicate which returns true if the node corresponding to the supplied id must not
+         *                           be removed.
+         */
         public AbstractBuilder<T> setPreserveNodeWithId(Predicate<Long> preserveNodeWithId) {
             this.preserveNodeWithId = preserveNodeWithId;
             return this;
         }
 
+        /**
+         * This sets a hook to alter a link right before it is inserted into the result-network.
+         * <p>
+         * Note: The supplied function is invoked concurrently
+         *
+         * @param afterLinkCreated Basically a tri-consumer which accepts the created link, the original osm-tags
+         *                         as a map and the direction enum which describes whether it is the forward or backward
+         *                         link for an osm-way
+         */
         public AbstractBuilder<T> setAfterLinkCreated(AfterLinkCreated afterLinkCreated) {
             this.afterLinkCreated = afterLinkCreated;
             return this;
         }
 
+        /**
+         * Coordinate transformation to transform spherical-osm-coordinates into euclidean-coordinates suited for matsim
+         * simulations
+         *
+         * @param coordinateTransformation The supplied transformation should have {@link org.matsim.core.utils.geometry.transformations.TransformationFactory#WGS84} as
+         *                                 input coordinate-system. And something like "EPSG:25832" as output sytem
+         */
         public AbstractBuilder<T> setCoordinateTransformation(CoordinateTransformation coordinateTransformation) {
             this.coordinateTransformation = coordinateTransformation;
             return this;
         }
 
+        /**
+         * Builds a reader
+         */
         public T build() {
             return createInstance();
         }

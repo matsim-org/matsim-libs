@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -70,7 +70,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 		// initial activity
 		dynActivity = this.agentLogic.computeInitialActivity(this);
-		state = Time.isUndefinedTime(dynActivity.getEndTime()) ? MobsimAgent.State.ABORT : MobsimAgent.State.ACTIVITY;
+		state = MobsimAgent.State.ACTIVITY;
 	}
 
 	private void computeNextAction(DynAction oldDynAction, double now) {
@@ -206,7 +206,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// MobsimAgent
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return dynLeg.getExpectedTravelTime();
 	}
 

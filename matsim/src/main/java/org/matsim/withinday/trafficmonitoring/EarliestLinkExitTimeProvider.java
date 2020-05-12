@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,7 +53,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Returns the time when an agent could leave a link if he can travel
@@ -78,8 +79,8 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<String, TravelTime> multiModalTravelTimes;
 	private final TravelTime freeSpeedTravelTime;
 
-	private final Map<Id<Person>, Double> earliestLinkExitTimes = new ConcurrentHashMap<>();
-	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Id<Person>, OptionalTime> earliestLinkExitTimes = new ConcurrentHashMap<>();
+	private final ConcurrentMap<OptionalTime, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
@@ -102,13 +103,11 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		return this.transportModeProvider;
 	}
 
-	public double getEarliestLinkExitTime(Id<Person> agentId) {
-		Double earliestExitTime = this.earliestLinkExitTimes.get(agentId);
-		if (earliestExitTime == null) return Time.getUndefinedTime();
-		else return earliestExitTime;
+	public OptionalTime getEarliestLinkExitTime(Id<Person> agentId) {
+		return this.earliestLinkExitTimes.getOrDefault(agentId, OptionalTime.undefined());
 	}
 
-	public Map<Id<Person>, Double> getEarliestLinkExitTimes() {
+	public Map<Id<Person>, OptionalTime> getEarliestLinkExitTimes() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimes);
 	}
 
@@ -118,7 +117,7 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		else return null;
 	}
 
-	public Map<Double, Set<Id<Person>>> getEarliestLinkExitTimesPerTimeStep() {
+	public Map<OptionalTime, Set<Id<Person>>> getEarliestLinkExitTimesPerTimeStep() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
 	}
 
@@ -181,20 +180,16 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	}
 
 	private void handleAddEarliestLinkExitTime(Id<Person> agentId, double earliestExitTime) {
-
-		this.earliestLinkExitTimes.put(agentId, earliestExitTime);
-
-		Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
-		if (earliestLinkExitTimesAtTime == null) {
-			earliestLinkExitTimesAtTime = new HashSet<>();
-			this.earliestLinkExitTimesPerTimeStep.put(earliestExitTime, earliestLinkExitTimesAtTime);
-		}
+		OptionalTime optionalEarliestExitTime = OptionalTime.defined(earliestExitTime);
+		this.earliestLinkExitTimes.put(agentId, optionalEarliestExitTime);
+		//why the value set is not concurrent while the enclosing map is concurrent??
+		Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.computeIfAbsent(
+				optionalEarliestExitTime, k -> new HashSet<>());
 		earliestLinkExitTimesAtTime.add(agentId);
 	}
 
 	private void removeEarliestLinkExitTimesAtTime(Id<Person> agentId) {
-
-		Double earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
+		OptionalTime earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
 
 		if (earliestExitTime != null) {
 			Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);

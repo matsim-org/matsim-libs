@@ -19,20 +19,23 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import static org.matsim.core.router.TripStructureUtils.Trip;
+import static org.matsim.core.router.TripStructureUtils.getTrips;
+
+import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.utils.misc.Time;
-
-import java.util.Objects;
-
-import static org.matsim.core.router.TripStructureUtils.Trip;
-import static org.matsim.core.router.TripStructureUtils.getTrips;
 
 class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
@@ -54,7 +57,7 @@ class PlanTimesAdapter {
 		// yy The honest way of doing the following would be using the psim. kai, mar'19
 		boolean firstAct = true ;
 		Activity rememberedActivity = null ;
-		double now = Time.getUndefinedTime() ;
+		double now = Double.NaN ;
 		for( PlanElement pe : planTmp.getPlanElements() ){
 			if ( pe instanceof Activity ) {
 				rememberedActivity = (Activity) pe;
@@ -72,11 +75,8 @@ class PlanTimesAdapter {
 				final Leg leg = (Leg) pe;
 				// the scoring needs dpTime and tTime filled out, even if qsim input does not require that:
 				leg.setDepartureTime( now ) ;
-				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ) ;
-				if ( Time.isUndefinedTime( travelTime ) ) {
-					travelTime = 0. ;
-				}
-				leg.setTravelTime( travelTime );
+				double travelTime = PopulationUtils.decideOnTravelTimeForLeg( leg ).orElse(0) ;
+				leg.setTravelTime( travelTime);
 				scoringFunction.handleLeg( leg );
 				now += travelTime ;
 			} else {

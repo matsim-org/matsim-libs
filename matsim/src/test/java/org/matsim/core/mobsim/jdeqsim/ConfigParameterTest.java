@@ -28,7 +28,7 @@ public class ConfigParameterTest extends MatsimTestCase {
 	public void testParametersSetCorrectly() {
 		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
 		JDEQSimConfigGroup jdeqSimConfigGroup = ConfigUtils.addOrGetModule(config, JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class);
-		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime(), EPSILON);
+		assertEquals(360.0, jdeqSimConfigGroup.getSimulationEndTime().seconds(), EPSILON);
 		assertEquals(2.0, jdeqSimConfigGroup.getFlowCapacityFactor(), EPSILON);
 		assertEquals(3.0, jdeqSimConfigGroup.getStorageCapacityFactor(), EPSILON);
 		assertEquals(3600.0, jdeqSimConfigGroup.getMinimumInFlowCapacity(), EPSILON);

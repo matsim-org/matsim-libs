@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -33,9 +36,6 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Wraps a {@link TransitRouter}.
@@ -114,12 +114,13 @@ public class TransitRouterWrapper implements RoutingModule {
 					firstToFacility = toFacility;
 				}
 				// (*)
-				Route route = createWalkRoute(fromFacility, departureTime, person, leg.getTravelTime(), firstToFacility);
+				Route route = createWalkRoute(fromFacility, departureTime, person,
+						leg.getTravelTime().seconds(), firstToFacility);
 				leg.setRoute(route);
 			} else {
 				if (leg.getRoute() instanceof TransitPassengerRoute) {
 					TransitPassengerRoute tRoute = (TransitPassengerRoute) leg.getRoute();
-					tRoute.setTravelTime(leg.getTravelTime());
+					tRoute.setTravelTime(leg.getTravelTime().seconds());
 					tRoute.setDistance(RouteUtils.calcDistance(tRoute, transitSchedule, network));
 					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(this.transitSchedule.getFacilities().get(tRoute.getAccessStopId()).getCoord(), tRoute.getStartLinkId(), TransportMode.pt);
 					trip.add(act);
@@ -135,8 +136,9 @@ public class TransitRouterWrapper implements RoutingModule {
 
 						TransitPassengerRoute tRoute = (TransitPassengerRoute) baseTrip.get(baseTrip.size() - 2).getRoute();
 						Facility lastFromFacility = this.transitSchedule.getFacilities().get(tRoute.getEgressStopId());
-						
-						Route route = createWalkRoute(lastFromFacility, departureTime, person, leg.getTravelTime(), toFacility);
+
+						Route route = createWalkRoute(lastFromFacility, departureTime, person,
+								leg.getTravelTime().seconds(), toFacility);
 						leg.setRoute(route);
 					}
 					Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(nextCoord, leg.getRoute().getStartLinkId(), TransportMode.pt);

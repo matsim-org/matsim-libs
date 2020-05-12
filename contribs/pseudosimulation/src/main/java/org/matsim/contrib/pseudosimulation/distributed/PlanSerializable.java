@@ -138,10 +138,10 @@ class PlanSerializable implements Serializable {
         private RouteSerializable route;
 
         public LegSerializable(Leg leg) {
-            departureTime = leg.getDepartureTime();
+			departureTime = leg.getDepartureTime().seconds();
             mode = leg.getMode();
             routingMode = TripStructureUtils.getRoutingMode(leg);
-            travelTime = leg.getTravelTime();
+			travelTime = leg.getTravelTime().seconds();
 
             if (leg.getRoute() != null) {
                 if (leg.getMode().equals(TransportMode.car))
@@ -194,7 +194,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             startLinkIdString = route.getStartLinkId().toString();
             travelCost = route.getTravelCost();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
             vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
             List<Id<Link>> linkIds = route.getLinkIds();
             linkIdStrings = new ArrayList<>();
@@ -233,7 +233,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             routeDescription = route.getRouteDescription();
             startLinkIdString = route.getStartLinkId().toString();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
         }
 
         @Override

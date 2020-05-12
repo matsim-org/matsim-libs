@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.run;
 
+import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -40,9 +42,6 @@ import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -181,7 +180,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
-	@NotNull
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
 
 	@Nullable
@@ -211,9 +210,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (Time.isUndefinedTime(config.qsim().getEndTime())
-				&& config.qsim().getSimEndtimeInterpretation()
-				!= QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime) {
+		if (config.qsim().getEndTime().isUndefined()
+				|| config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
@@ -225,25 +223,25 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
 
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),
-				DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
 
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
-				DrtConfigGroup.TRANSIT_STOP_FILE
+				TRANSIT_STOP_FILE
 						+ " must not be null when "
-						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ OPERATIONAL_SCHEME
 						+ " is "
-						+ DrtConfigGroup.OperationalScheme.stopbased);
+						+ OperationalScheme.stopbased);
 
 		Verify.verify(
 				getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
-				DrtConfigGroup.DRT_SERVICE_AREA_SHAPE_FILE
+				DRT_SERVICE_AREA_SHAPE_FILE
 						+ " must not be null when "
-						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ OPERATIONAL_SCHEME
 						+ " is "
-						+ DrtConfigGroup.OperationalScheme.serviceAreaBased);
+						+ OperationalScheme.serviceAreaBased);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
-				DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+				NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
 
 		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
@@ -463,7 +461,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #VEHICLES_FILE_EXP}
 	 */
 	public URL getVehiclesFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+		return vehiclesFile == null ? null : ConfigGroup.getInputFileURL(context, vehiclesFile);
 	}
 
 	/**
@@ -512,7 +510,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
 	public URL getTransitStopsFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.transitStopFile);
+		return ConfigGroup.getInputFileURL(context, transitStopFile);
 	}
 
 	/**

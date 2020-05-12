@@ -49,7 +49,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.analysis.RouteOccupancy;
 import org.matsim.pt.analysis.VehicleTracker;
@@ -207,7 +206,7 @@ public class TwoLinesDemo {
 		stopList.add(builder.createTransitRouteStop(stop1, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
 		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
-		stopList.add(builder.createTransitRouteStop(stop5, 390, Time.getUndefinedTime()));
+		stopList.add(builder.createTransitRouteStopBuilder(stop5).arrivalOffset(390).build());
 		TransitRoute tRoute1 = builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
 		tLine1.addRoute(tRoute1);
 
@@ -229,7 +228,7 @@ public class TwoLinesDemo {
 		stopList.add(builder.createTransitRouteStop(stop2, 0, 0));
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
 		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
-		stopList.add(builder.createTransitRouteStop(stop6, 390, Time.getUndefinedTime()));
+		stopList.add(builder.createTransitRouteStopBuilder(stop6).arrivalOffset(390).build());
 		TransitRoute tRoute2 = builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
 		tLine2.addRoute(tRoute2);
 

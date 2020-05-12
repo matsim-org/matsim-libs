@@ -20,6 +20,15 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -27,10 +36,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-
-import java.util.*;
 
 /**
  * Design decisions:
@@ -172,6 +180,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	
 	@Override
 	public void addParam(final String key, final String value) {
+		testForLocked();
 		if (key.startsWith("monetaryDistanceCostRate")) {
 			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
 					+ "mode-parameters (see output of any recent run), and mode-specific monetary " + "distance rate.");
@@ -198,32 +207,32 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityTypicalDuration_".length()));
-			actParams.setTypicalDuration(Time.parseTime(value));
+			actParams.typicalDuration = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityMinimalDuration_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityMinimalDuration_".length()));
-			actParams.setMinimalDuration(Time.parseTime(value));
+			actParams.minimalDuration = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityOpeningTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityOpeningTime_".length()));
-			actParams.setOpeningTime(Time.parseTime(value));
+			actParams.openingTime=Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityLatestStartTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityLatestStartTime_".length()));
-			actParams.setLatestStartTime(Time.parseTime(value));
+			actParams.latestStartTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityEarliestEndTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityEarliestEndTime_".length()));
-			actParams.setEarliestEndTime(Time.parseTime(value));
+			actParams.earliestEndTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("activityClosingTime_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
 			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityClosingTime_".length()));
-			actParams.setClosingTime(Time.parseTime(value));
+			actParams.closingTime = Time.parseOptionalTime(value);
 		} else if (key.startsWith("scoringThisActivityAtAll_")) {
 			log.warn( key + msg );
 			usesDeprecatedSyntax = true ;
@@ -626,7 +635,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		for (ActivityParams params : this.getActivityParams()) {
-			if (params.isScoringThisActivityAtAll() && Time.isUndefinedTime(params.getTypicalDuration())) {
+			if (params.isScoringThisActivityAtAll() && params.getTypicalDuration().isUndefined()) {
 				throw new RuntimeException("In activity type=" + params.getActivityType()
 						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
 						+ "so rather aborting here.");
@@ -812,7 +821,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		/**
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
-		public double getTypicalDuration() {
+		public OptionalTime getTypicalDuration() {
 			return this.typicalDuration;
 		}
 
@@ -822,7 +831,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter(TYPICAL_DURATION)
 		private ActivityParams setTypicalDuration(final String typicalDuration) {
 			testForLocked();
-			return setTypicalDuration(Time.parseTime(typicalDuration));
+			this.typicalDuration = Time.parseOptionalTime(typicalDuration);
+			return this;
 		}
 
 		/**
@@ -830,7 +840,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 */
 		public ActivityParams setTypicalDuration(final double typicalDuration) {
 			testForLocked();
-			this.typicalDuration = typicalDuration;
+			this.typicalDuration = OptionalTime.defined(typicalDuration);
 			return this ;
 		}
 
@@ -860,12 +870,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		// ---
 
 		private double priority = 1.0;
-		private double typicalDuration = Time.getUndefinedTime();
-		private double minimalDuration = Time.getUndefinedTime();
-		private double openingTime = Time.getUndefinedTime();
-		private double latestStartTime = Time.getUndefinedTime();
-		private double earliestEndTime = Time.getUndefinedTime();
-		private double closingTime = Time.getUndefinedTime();
+		private OptionalTime typicalDuration = OptionalTime.undefined();
+		private OptionalTime minimalDuration = OptionalTime.undefined();
+		private OptionalTime openingTime =     OptionalTime.undefined();
+		private OptionalTime latestStartTime = OptionalTime.undefined();
+		private OptionalTime earliestEndTime = OptionalTime.undefined();
+		private OptionalTime closingTime =     OptionalTime.undefined();
 
 		public ActivityParams() {
 			super(SET_TYPE);
@@ -922,119 +932,120 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringGetter("minimalDuration")
 		private String getMinimalDurationString() {
-			return Time.writeTime(getMinimalDuration());
+			return Time.writeTime(minimalDuration);
 		}
 
-		public double getMinimalDuration() {
-			return this.minimalDuration;
+		public OptionalTime getMinimalDuration() {
+			return minimalDuration;
 		}
 
 		@StringSetter("minimalDuration")
 		private ActivityParams setMinimalDuration(final String minimalDuration) {
 			testForLocked();
-			return setMinimalDuration(Time.parseTime(minimalDuration));
+			this.minimalDuration = Time.parseOptionalTime(minimalDuration);
+			return this;
 		}
 
 		private static int minDurCnt = 0;
 
 		public ActivityParams setMinimalDuration(final double minimalDuration) {
 			testForLocked();
-			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt < 1)) {
+			if (minDurCnt < 1) {
 				minDurCnt++;
 				log.warn(
 						"Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, "
 								+ "but there is as of now no indication that it makes the results more realistic.  KN, Sep'08"
 								+ Gbl.ONLYONCE);
 			}
-			this.minimalDuration = minimalDuration;
+			this.minimalDuration = OptionalTime.defined(minimalDuration);
 			return this ;
 		}
 
 		@StringGetter("openingTime")
 		private String getOpeningTimeString() {
-			return Time.writeTime(getOpeningTime());
+			return Time.writeTime(this.openingTime);
 		}
 
-		public double getOpeningTime() {
-			return this.openingTime;
+		public OptionalTime getOpeningTime() {
+			return openingTime;
 		}
 
 		@StringSetter("openingTime")
 		private ActivityParams setOpeningTime(final String openingTime) {
 			testForLocked();
-			setOpeningTime(Time.parseTime(openingTime));
+			this.openingTime =Time.parseOptionalTime(openingTime);
 			return this ;
 		}
 
 		public ActivityParams setOpeningTime(final double openingTime) {
 			testForLocked();
-			this.openingTime = openingTime;
+			this.openingTime = OptionalTime.defined(openingTime);
 			return this ;
 		}
 
 		@StringGetter("latestStartTime")
 		private String getLatestStartTimeString() {
-			return Time.writeTime(getLatestStartTime());
+			return Time.writeTime(latestStartTime);
 		}
 
-		public double getLatestStartTime() {
+		public OptionalTime getLatestStartTime() {
 			return this.latestStartTime;
 		}
 
 		@StringSetter("latestStartTime")
 		private ActivityParams setLatestStartTime(final String latestStartTime) {
 			testForLocked();
-			setLatestStartTime(Time.parseTime(latestStartTime));
+			this.latestStartTime = Time.parseOptionalTime(latestStartTime);
 			return this ;
 		}
 
 		public ActivityParams setLatestStartTime(final double latestStartTime) {
 			testForLocked();
-			this.latestStartTime = latestStartTime;
+			this.latestStartTime = OptionalTime.defined(latestStartTime);
 			return this ;
 		}
 
 		@StringGetter("earliestEndTime")
 		private String getEarliestEndTimeString() {
-			return Time.writeTime(getEarliestEndTime());
+			return Time.writeTime(earliestEndTime);
 		}
 
-		public double getEarliestEndTime() {
-			return this.earliestEndTime;
+		public OptionalTime getEarliestEndTime() {
+			return earliestEndTime;
 		}
 
 		@StringSetter("earliestEndTime")
 		private ActivityParams setEarliestEndTime(final String earliestEndTime) {
 			testForLocked();
-			setEarliestEndTime(Time.parseTime(earliestEndTime));
+			this.earliestEndTime = Time.parseOptionalTime(earliestEndTime);
 			return this ;
 		}
 
 		public ActivityParams setEarliestEndTime(final double earliestEndTime) {
 			testForLocked();
-			this.earliestEndTime = earliestEndTime;
+			this.earliestEndTime = OptionalTime.defined(earliestEndTime);
 			return this ;
 		}
 
 		@StringGetter("closingTime")
 		private String getClosingTimeString() {
-			return Time.writeTime(getClosingTime());
+			return Time.writeTime(closingTime);
 		}
 
-		public double getClosingTime() {
-			return this.closingTime;
+		public OptionalTime getClosingTime() {
+			return closingTime;
 		}
 
 		@StringSetter("closingTime")
 		private ActivityParams setClosingTime(final String closingTime) {
 			testForLocked();
-			setClosingTime(Time.parseTime(closingTime));
+			this.closingTime = (Time.parseOptionalTime(closingTime));
 			return this ;
 		}
 
 		public ActivityParams setClosingTime(final double closingTime) {
 			testForLocked();
-			this.closingTime = closingTime;
+			this.closingTime = OptionalTime.defined(closingTime);
 			return this ;
 		}
 
@@ -1499,17 +1510,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				if (actType.isScoringThisActivityAtAll()) {
 					// (checking consistency only if activity is scored at all)
 
-					if ((!Time.isUndefinedTime(actType.getOpeningTime()))
-							&& (!Time.isUndefinedTime(actType.getClosingTime()))) {
+					if (actType.getOpeningTime().isDefined() && actType.getClosingTime().isDefined()) {
 						hasOpeningAndClosingTime = true;
+
+						if (actType.getOpeningTime().seconds() == 0. && actType.getClosingTime().seconds() > 24. * 3600 - 1) {
+							log.error("it looks like you have an activity type with opening time set to 0:00 and closing "
+									+ "time set to 24:00. This is most probably not the same as not setting them at all.  "
+									+ "In particular, activities which extend past midnight may not accumulate scores.");
+						}
 					}
-					if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
+					if (actType.getOpeningTime().isDefined() && (getLateArrival_utils_hr() < -0.001)) {
 						hasOpeningTimeAndLatePenalty = true;
-					}
-					if (actType.getOpeningTime() == 0. && actType.getClosingTime() > 24. * 3600 - 1) {
-						log.error("it looks like you have an activity type with opening time set to 0:00 and closing "
-								+ "time set to 24:00. This is most probably not the same as not setting them at all.  "
-								+ "In particular, activities which extend past midnight may not accumulate scores.");
 					}
 				}
 			}

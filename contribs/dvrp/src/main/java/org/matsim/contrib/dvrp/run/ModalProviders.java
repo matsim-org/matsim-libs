@@ -75,6 +75,10 @@ public class ModalProviders {
 			return injector.getInstance(key);
 		}
 
+		public <T> T get(TypeLiteral<T> typeLiteral) {
+			return injector.getInstance(Key.get(typeLiteral));
+		}
+
 		public <T> T getModal(Class<T> type) {
 			return injector.getInstance(DvrpModes.key(type, mode));
 		}
