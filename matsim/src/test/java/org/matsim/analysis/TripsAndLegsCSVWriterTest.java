@@ -90,8 +90,8 @@ public class TripsAndLegsCSVWriterTest {
 	private static int last_pt_egress_stop;
 	private static int trip_number;
 	private static int person;
-	
-	
+	private static int transitStopsVisited;
+	private static int isIntermodalWalkPt;
 	
 	final IdMap<Person, Plan> map = new IdMap<>(Person.class);
 	ArrayList<Object> legsfromplan = new ArrayList<Object>();
@@ -144,6 +144,8 @@ public class TripsAndLegsCSVWriterTest {
 
 		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
 		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
+		TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension = new CustomTripsWriterExtesion();
+		TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension = new CustomLegsWriterExtesion();
 		createNetwork();
 		TripsAndLegsCSVWriter tripsAndLegsWriter = new TripsAndLegsCSVWriter(scenario, tripsWriterExtension,
 				legWriterExtension);
@@ -152,6 +154,9 @@ public class TripsAndLegsCSVWriterTest {
 		readAndValidateTrips(persontrips, tripsFilename);
 		readLegsFromPlansFile(map);
 		readAndValidateLegs(legsfromplan, legsFilename);
+		TripsAndLegsCSVWriter tripsAndLegsWriterTest = new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension,
+				customLegsWriterExtension);
+		tripsAndLegsWriterTest.write(map, tripsFilename, legsFilename);
 	}
 	
 	/***********************************************************
@@ -243,6 +248,17 @@ public class TripsAndLegsCSVWriterTest {
 						longest_distance_mode = key;
 					}
 				}
+				String transitStopsVisited = null;
+				for (Leg leg: trip.getLegsOnly()) {
+					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+						ExperimentalTransitRoute expTransitRoute = (ExperimentalTransitRoute) leg.getRoute();
+						transitStopsVisited = expTransitRoute.getAccessStopId().toString() + "-" + expTransitRoute.getEgressStopId().toString() + "-";
+					}
+				}
+				if(transitStopsVisited != null) {
+					transitStopsVisited = transitStopsVisited.substring(0, transitStopsVisited.length() - 1);
+				}
+				
 				StringBuffer modestrim = new StringBuffer(modes);
 				modestrim.deleteCharAt(modestrim.length()-1);
 				tripvalues.put("start_link", start_link);
@@ -267,6 +283,7 @@ public class TripsAndLegsCSVWriterTest {
 				tripvalues.put("person", personId);
 				tripvalues.put("trip_number", tripNo);
 				tripvalues.put("trip_id", personId+"_"+tripNo);
+				tripvalues.put("transitStopsVisited", transitStopsVisited);
 				tripNo++;
 				persontrips.put(entry.getKey()+"_"+tripno, tripvalues);
 				tripno++;
@@ -327,6 +344,14 @@ public class TripsAndLegsCSVWriterTest {
 				         legvalues.put("transit_line", transitLine);
 				         legvalues.put("transit_route", transitRoute);
 					 }
+					boolean containsWalk = false;
+					boolean containsPt = false;
+					if (leg.getMode().equals(TransportMode.walk) || leg.getMode().equals("walk_teleportation")) {
+						containsWalk = true;
+					} else if (leg.getMode().equals(TransportMode.pt)) {
+						containsPt = true;
+					}
+					String isIntermodalWalkPt = (containsWalk && containsPt) ? "true" : "false";
 					legvalues.put("dep_time", Time.writeTime(departure_time));
 					legvalues.put("trav_time", Time.writeTime(travel_time));
 					legvalues.put("distance", leg_distance);
@@ -340,6 +365,7 @@ public class TripsAndLegsCSVWriterTest {
 					legvalues.put("wait_time", Time.writeTime(waitingTime));
 					legvalues.put("person", personId);
 					legvalues.put("trip_id", personId+"_"+tripNo);
+					legvalues.put("isIntermodalWalkPt", isIntermodalWalkPt);
 					legsfromplan.add(legvalues);
 				}
 				tripNo++;
@@ -379,6 +405,9 @@ public class TripsAndLegsCSVWriterTest {
 					Assert.assertEquals("egress_stop_id is not as expected", String.valueOf(nextleg.get("egress_stop_id")) , column[egress_stop_id]);
 					Assert.assertEquals("transit_line is not as expected", String.valueOf(nextleg.get("transit_line")) , column[transit_line]);
 					Assert.assertEquals("transit_route is not as expected", String.valueOf(nextleg.get("transit_route")) , column[transit_route]);
+				}
+				if(column.length > 17) {
+					Assert.assertEquals("isIntermodalWalkPt is not as expected", String.valueOf(nextleg.get("isIntermodalWalkPt")) , column[isIntermodalWalkPt]);
 				}
 			}
 		}catch (IOException e) {
@@ -433,6 +462,9 @@ public class TripsAndLegsCSVWriterTest {
 				if(column.length > 20) {
 					Assert.assertEquals("first_pt_boarding_stop is not as expected", String.valueOf(tripvalues.get("first_pt_boarding_stop")), column[first_pt_boarding_stop]);
 					Assert.assertEquals("last_pt_egress_stop is not as expected", String.valueOf(tripvalues.get("last_pt_egress_stop")), column[last_pt_egress_stop]);
+				}
+				if(column.length > 22) {
+					Assert.assertEquals("transitStopsVisited is not as expected", String.valueOf(tripvalues.get("transitStopsVisited")), column[transitStopsVisited]);
 				}
 			}
 		} catch (IOException e) {
@@ -561,6 +593,14 @@ public class TripsAndLegsCSVWriterTest {
 				person = i;
 				break;
 				
+			case "transitStopsVisited":
+				transitStopsVisited = i;
+				break;
+				
+			case "isIntermodalWalkPt":
+				isIntermodalWalkPt = i;
+				break;			
+				
 			}
 			i++;
 		}
@@ -584,4 +624,62 @@ public class TripsAndLegsCSVWriterTest {
 		NetworkUtils.writeNetwork(network, utils.getOutputDirectory() + "/network.xml");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getOutputDirectory() + "/network.xml");
 	}
+	private class CustomTripsWriterExtesion implements TripsAndLegsCSVWriter.CustomTripsWriterExtension{
+
+		@Override
+		public String[] getAdditionalTripHeader() {
+			List<String> header = new ArrayList<>();
+			header.add("transitStopsVisited");
+			return header.toArray(new String[0]);
+		}
+
+		@Override
+		public List<String> getAdditionalTripColumns(Trip trip) {
+
+			List<String> values = new ArrayList<>();
+
+			String transitStopsVisited = null;
+			for (Leg leg: trip.getLegsOnly()) {
+				if (leg.getRoute() instanceof ExperimentalTransitRoute) {
+					ExperimentalTransitRoute expTransitRoute = (ExperimentalTransitRoute) leg.getRoute();
+					transitStopsVisited = expTransitRoute.getAccessStopId().toString() + "-" + expTransitRoute.getEgressStopId().toString() + "-";
+				}
+			}
+			if(transitStopsVisited != null) {
+				transitStopsVisited = transitStopsVisited.substring(0, transitStopsVisited.length() - 1);
+			}
+			values.add(transitStopsVisited);
+			return values;
+		}
+		
+	}
+	
+	static class CustomLegsWriterExtesion implements TripsAndLegsCSVWriter.CustomLegsWriterExtension {
+		@Override
+		public String[] getAdditionalLegHeader() {
+			String[] legHeader = new String[]{"isIntermodalWalkPt"};
+			return legHeader;
+		}
+
+		@Override
+		public List<String> getAdditionalLegColumns(TripStructureUtils.Trip experiencedTrip, Leg experiencedLeg) {
+			List<String> legColumn = new ArrayList<>();
+
+			boolean containsWalk = false;
+			boolean containsPt = false;
+
+			for (Leg leg: experiencedTrip.getLegsOnly()) {
+				if (leg.getMode().equals(TransportMode.walk) || leg.getMode().equals("walk_teleportation")) {
+					containsWalk = true;
+				} else if (leg.getMode().equals(TransportMode.pt)) {
+					containsPt = true;
+				}
+			}
+			String isIntermodalWalkPt = (containsWalk && containsPt) ? "true" : "false";
+			legColumn.add(isIntermodalWalkPt);
+			return legColumn;
+		}
+	}
 }
+
+
