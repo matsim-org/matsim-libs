@@ -29,12 +29,14 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 import com.google.common.collect.ImmutableList;
+import com.sun.istack.Nullable;
 
 /**
  * @author michalm
@@ -42,15 +44,28 @@ import com.google.common.collect.ImmutableList;
 public class VehicleData {
 	public static class Entry {
 		public final DvrpVehicle vehicle;
-		public final LinkTimePair start;
-		public final int startOccupancy;
+		public final Start start;
 		public final ImmutableList<Stop> stops;
 
-		public Entry(DvrpVehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
+		public Entry(DvrpVehicle vehicle, Start start, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
-			this.startOccupancy = startOccupancy;
 			this.stops = stops;
+		}
+	}
+
+	public static class Start {
+		@Nullable // if schedule status is PLANNED
+		public final Task task;
+		public final Link link;
+		public final double time;
+		public final int occupancy;
+
+		public Start(Task task, Link link, double time, int occupancy) {
+			this.task = task;
+			this.link = link;
+			this.time = time;
+			this.occupancy = occupancy;
 		}
 	}
 
