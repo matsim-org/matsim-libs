@@ -32,7 +32,6 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -986,16 +985,16 @@ public class SwissRailRaptorIntermodalTest {
 
             NetworkRoute networkRouteAB = RouteUtils.createLinkNetworkRouteImpl(linkAA.getId(), new Id[] { linkAB.getId() }, linkBB.getId());
             List<TransitRouteStop> stopsRedAB = new ArrayList<>(2);
-            stopsRedAB.add(sf.createTransitRouteStop(stopA, Time.getUndefinedTime(), 0.0));
-            stopsRedAB.add(sf.createTransitRouteStop(stopB, 600, Time.getUndefinedTime()));
+            stopsRedAB.add(sf.createTransitRouteStopBuilder(stopA).departureOffset(0.0).build());
+            stopsRedAB.add(sf.createTransitRouteStopBuilder(stopB).arrivalOffset(600).build());
             TransitRoute redABRoute = sf.createTransitRoute(Id.create("redAB", TransitRoute.class), networkRouteAB, stopsRedAB, "train");
             redABRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 7.5*3600));
             redLine.addRoute(redABRoute);
 
             NetworkRoute networkRouteBA = RouteUtils.createLinkNetworkRouteImpl(linkBB.getId(), new Id[] { linkBA.getId() }, linkAA.getId());
             List<TransitRouteStop> stopsRedBA = new ArrayList<>(2);
-            stopsRedBA.add(sf.createTransitRouteStop(stopB, Time.getUndefinedTime(), 0.0));
-            stopsRedBA.add(sf.createTransitRouteStop(stopA, 600, Time.getUndefinedTime()));
+            stopsRedBA.add(sf.createTransitRouteStopBuilder(stopB).departureOffset(0.0).build());
+            stopsRedBA.add(sf.createTransitRouteStopBuilder(stopA).arrivalOffset(600).build());
             TransitRoute redBARoute = sf.createTransitRoute(Id.create("redBA", TransitRoute.class), networkRouteBA, stopsRedBA, "train");
             redBARoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8.5*3600));
             redLine.addRoute(redBARoute);
@@ -1008,16 +1007,16 @@ public class SwissRailRaptorIntermodalTest {
 
             NetworkRoute networkRouteCD = RouteUtils.createLinkNetworkRouteImpl(linkCC.getId(), new Id[] { linkCD.getId() }, linkDD.getId());
             List<TransitRouteStop> stopsBlueCD = new ArrayList<>(2);
-            stopsBlueCD.add(sf.createTransitRouteStop(stopC, Time.getUndefinedTime(), 0.0));
-            stopsBlueCD.add(sf.createTransitRouteStop(stopD, 600, Time.getUndefinedTime()));
+            stopsBlueCD.add(sf.createTransitRouteStopBuilder(stopC).departureOffset(0.0).build());
+            stopsBlueCD.add(sf.createTransitRouteStopBuilder(stopD).arrivalOffset(600).build());
             TransitRoute blueCDRoute = sf.createTransitRoute(Id.create("blueCD", TransitRoute.class), networkRouteCD, stopsBlueCD, "train");
             blueCDRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8*3600));
             blueLine.addRoute(blueCDRoute);
 
             NetworkRoute networkRouteDC = RouteUtils.createLinkNetworkRouteImpl(linkDD.getId(), new Id[] { linkDC.getId() }, linkCC.getId());
             List<TransitRouteStop> stopsBlueDC = new ArrayList<>(2);
-            stopsBlueDC.add(sf.createTransitRouteStop(stopD, Time.getUndefinedTime(), 0.0));
-            stopsBlueDC.add(sf.createTransitRouteStop(stopC, 600, Time.getUndefinedTime()));
+            stopsBlueDC.add(sf.createTransitRouteStopBuilder(stopD).departureOffset(0.0).build());
+            stopsBlueDC.add(sf.createTransitRouteStopBuilder(stopC).arrivalOffset(600).build());
             TransitRoute blueDCRoute = sf.createTransitRoute(Id.create("blueDC", TransitRoute.class), networkRouteDC, stopsBlueDC, "train");
             blueDCRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8*3600));
             blueLine.addRoute(blueDCRoute);
@@ -1030,16 +1029,16 @@ public class SwissRailRaptorIntermodalTest {
 
             NetworkRoute networkRouteEF = RouteUtils.createLinkNetworkRouteImpl(linkEE.getId(), new Id[] { linkEF.getId() }, linkFF.getId());
             List<TransitRouteStop> stopsGreenEF = new ArrayList<>(2);
-            stopsGreenEF.add(sf.createTransitRouteStop(stopE, Time.getUndefinedTime(), 0.0));
-            stopsGreenEF.add(sf.createTransitRouteStop(stopF, 600, Time.getUndefinedTime()));
+            stopsGreenEF.add(sf.createTransitRouteStopBuilder(stopE).departureOffset(0.0).build());
+            stopsGreenEF.add(sf.createTransitRouteStopBuilder(stopF).arrivalOffset(600).build());
             TransitRoute greenEFRoute = sf.createTransitRoute(Id.create("greenEF", TransitRoute.class), networkRouteEF, stopsGreenEF, "train");
             greenEFRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8*3600));
             greenLine.addRoute(greenEFRoute);
 
             NetworkRoute networkRouteFE = RouteUtils.createLinkNetworkRouteImpl(linkDD.getId(), new Id[] { linkDC.getId() }, linkCC.getId());
             List<TransitRouteStop> stopsGreenFE = new ArrayList<>(2);
-            stopsGreenFE.add(sf.createTransitRouteStop(stopF, Time.getUndefinedTime(), 0.0));
-            stopsGreenFE.add(sf.createTransitRouteStop(stopE, 600, Time.getUndefinedTime()));
+            stopsGreenFE.add(sf.createTransitRouteStopBuilder(stopF).departureOffset(0.0).build());
+            stopsGreenFE.add(sf.createTransitRouteStopBuilder(stopE).arrivalOffset(600).build());
             TransitRoute greenFERoute = sf.createTransitRoute(Id.create("greenFE", TransitRoute.class), networkRouteFE, stopsGreenFE, "train");
             greenFERoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 8*3600));
             greenLine.addRoute(greenFERoute);

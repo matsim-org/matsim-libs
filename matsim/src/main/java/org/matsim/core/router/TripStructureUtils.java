@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Predicate;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,12 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Helps to work on plans with complex trips.
@@ -318,7 +319,7 @@ public final class TripStructureUtils {
 	 * @param trip
 	 * @return the departure time of the first leg of the trip
 	 */
-	public static double getDepartureTime(Trip trip) {
+	public static OptionalTime getDepartureTime(Trip trip) {
 		// does this always make sense?
 		Leg leg = (Leg) trip.getTripElements().get(0);
 		return leg.getDepartureTime();

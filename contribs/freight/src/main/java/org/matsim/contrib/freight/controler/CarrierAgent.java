@@ -85,8 +85,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		 * @param event
 		 */
 		public void handleEvent(PersonArrivalEvent event) {
-			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime() );
-			double travelTime = currentLeg.getDepartureTime() + currentLeg.getTravelTime() - currentLeg.getDepartureTime();
+			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds());
+			double travelTime = currentLeg.getDepartureTime().seconds()
+					+ currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
@@ -263,7 +264,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					leg.setRoute(route);
 					leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
-					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime() );
+					leg.setTravelTime( tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime()
+							.seconds());
 					plan.addLeg(leg);
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;

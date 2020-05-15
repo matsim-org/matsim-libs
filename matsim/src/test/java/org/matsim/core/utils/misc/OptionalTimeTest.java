@@ -20,10 +20,10 @@
 
 package org.matsim.core.utils.misc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.NoSuchElementException;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Test;
@@ -33,11 +33,9 @@ import org.junit.Test;
  */
 public class OptionalTimeTest {
 	@Test
-	public void test_defined() {
+	public void test_defined_seconds() {
 		//defined
 		assertThat(OptionalTime.defined(0).seconds()).isEqualTo(0);
-		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));//cached, so the same
-
 		assertThat(OptionalTime.defined(1).seconds()).isEqualTo(1);
 		assertThat(OptionalTime.defined(-Double.MAX_VALUE).seconds()).isEqualTo(-Double.MAX_VALUE);
 		assertThat(OptionalTime.defined(Double.POSITIVE_INFINITY).seconds()).isEqualTo(Double.POSITIVE_INFINITY);
@@ -52,14 +50,18 @@ public class OptionalTimeTest {
 	}
 
 	@Test
-	public void test_undefined() {
+	public void test_undefined_seconds() {
 		assertThat(OptionalTime.undefined().isUndefined()).isTrue();
-
-		//undefined OptionalTime is cached
-		assertThat(OptionalTime.undefined()).isSameAs(OptionalTime.undefined());
 
 		assertThatThrownBy(() -> OptionalTime.undefined().seconds()).isExactlyInstanceOf(NoSuchElementException.class)
 				.hasMessage("Undefined time");
+	}
+
+	@Test
+	public void test_cachedValues() {
+		//currently 0 and undefined are cached
+		assertThat(OptionalTime.defined(0)).isSameAs(OptionalTime.defined(0));
+		assertThat(OptionalTime.undefined()).isSameAs(OptionalTime.undefined());
 	}
 
 	@Test
@@ -84,6 +86,16 @@ public class OptionalTimeTest {
 	public void test_orElseGet() {
 		assertThat(OptionalTime.undefined().orElseGet(() -> 0)).isEqualTo(0);
 		assertThat(OptionalTime.defined(1).orElseGet(() -> 0)).isEqualTo(1);
+	}
+
+	@Test
+	public void test_orElseThrow() {
+		assertThatThrownBy(() -> OptionalTime.undefined()
+				.orElseThrow(() -> new IllegalStateException("Undefined time error"))).isExactlyInstanceOf(
+				IllegalStateException.class).hasMessage("Undefined time error");
+
+		assertThatCode(() -> OptionalTime.defined(1)
+				.orElseThrow(() -> new IllegalStateException("Undefined time error"))).doesNotThrowAnyException();
 	}
 
 	@Test
@@ -116,6 +128,30 @@ public class OptionalTimeTest {
 		assertThat(OptionalTime.undefined().stream()).containsExactly();
 		assertThat(OptionalTime.defined(0).stream()).containsExactly(0.);
 		assertThat(OptionalTime.defined(10).stream()).containsExactly(10.);
+	}
+
+	@Test
+	public void test_or_OptionalTime() {
+		assertThat(OptionalTime.undefined().or(OptionalTime.undefined()).isUndefined()).isTrue();
+		assertThat(OptionalTime.undefined().or(OptionalTime.defined(3)).seconds()).isEqualTo(3);
+		assertThat(OptionalTime.defined(1).or(OptionalTime.undefined()).seconds()).isEqualTo(1);
+		assertThat(OptionalTime.defined(1).or(OptionalTime.defined(2)).seconds()).isEqualTo(1);
+
+		assertThatThrownBy(() -> OptionalTime.undefined().or((OptionalTime)null)).isExactlyInstanceOf(
+				NullPointerException.class);
+	}
+
+	@Test
+	public void test_or_OptionalTimeSupplier() {
+		assertThat(OptionalTime.undefined().or(OptionalTime::undefined).isUndefined()).isTrue();
+		assertThat(OptionalTime.undefined().or(() -> OptionalTime.defined(3)).seconds()).isEqualTo(3);
+		assertThat(OptionalTime.defined(1).or(OptionalTime::undefined).seconds()).isEqualTo(1);
+		assertThat(OptionalTime.defined(1).or(() -> OptionalTime.defined(2)).seconds()).isEqualTo(1);
+
+		assertThatThrownBy(() -> OptionalTime.undefined().or((Supplier<OptionalTime>)null)).isExactlyInstanceOf(
+				NullPointerException.class);
+		assertThatThrownBy(() -> OptionalTime.undefined().or(() -> null)).isExactlyInstanceOf(
+				NullPointerException.class);
 	}
 
 	@Test

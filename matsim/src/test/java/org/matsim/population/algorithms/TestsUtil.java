@@ -76,13 +76,13 @@ public class TestsUtil {
 			if (o2 instanceof Leg) {
 				Leg leg1 = (Leg) o1;
 				Leg leg2 = (Leg) o2;
-				if (leg1.getDepartureTime() != leg2.getDepartureTime()) {
+				if (!leg1.getDepartureTime().equals(leg2.getDepartureTime())) {
 					return false;
 				}
 				if (!leg1.getMode().equals(leg2.getMode())) {
 					return false;
 				}
-				if (leg1.getTravelTime() != leg2.getTravelTime()) {
+				if (!leg1.getTravelTime().equals(leg2.getTravelTime())) {
 					return false;
 				}
 			} else {

@@ -21,7 +21,7 @@ package org.matsim.api.core.v01.population;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimPopulationObject;
-import org.matsim.core.scenario.Lockable;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * @author nagel
@@ -33,9 +33,11 @@ public interface Route extends MatsimPopulationObject {
 
 	public void setDistance(final double distance);
 
-	public double getTravelTime();
+	public OptionalTime getTravelTime();
 
 	public void setTravelTime(final double travelTime);
+
+	public void setTravelTimeUndefined();
 
 	public Id<Link> getStartLinkId();
 

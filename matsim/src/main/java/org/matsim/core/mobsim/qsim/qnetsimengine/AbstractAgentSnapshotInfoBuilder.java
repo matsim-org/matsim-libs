@@ -326,6 +326,11 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					distanceOnLink, lanePos, lengthOfCurve);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
+			final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
+			if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
+				passengerPosition.setAgentState( AgentState.MARKER );
+			}
+
 			positions.add(passengerPosition);
 			cnt-- ;
 		}

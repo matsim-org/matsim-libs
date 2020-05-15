@@ -122,7 +122,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
                 toFacility.getCoord(),
                 departureTime);
 
-        TransitPassengerRoute transitPassengerRoute = null;
+        InternalTransitPassengerRoute transitPassengerRoute = null;
 
         if (cacheTree) {
         	if ((fromFacility != previousFromFacility) && (departureTime != previousDepartureTime)) { // Compute tree only if fromFacility and departure time are different from previous request.

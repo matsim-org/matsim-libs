@@ -1,11 +1,13 @@
 package org.matsim.integration.drtAndPt;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import static java.util.stream.Collectors.toList;
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -14,7 +16,13 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -45,10 +53,13 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-import static java.util.stream.Collectors.toList;
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 //@RunWith(Parameterized.class)
 public class PtAlongALine2Test{
@@ -184,17 +195,13 @@ public class PtAlongALine2Test{
 		if ( drtMode== DrtMode.full || drtMode== DrtMode.withPrebooking ){
 			// (configure full drt if applicable)
 
-			String drtVehiclesFile = "drt_vehicles.xml";
-			String drt2VehiclesFile = "drt2_vehicles.xml";
-			String drt3VehiclesFile = "drt3_vehicles.xml";
-
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 			dvrpConfig.setNetworkModes( ImmutableSet.copyOf( Arrays.asList( TransportMode.drt, "drt2", "drt3" ) ) ) ;
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
 				mm.addParameterSet(
-						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 ).setVehiclesFile( drtVehiclesFile )
+						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
 								    .setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
@@ -202,13 +209,13 @@ public class PtAlongALine2Test{
 			}
 			if ( drt2 ) {
 				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt2" ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drt2VehiclesFile )
+						new DrtConfigGroup().setMode( "drt2" ).setMaxTravelTimeAlpha( 1.3 )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
 			if ( drt3 ) {
 				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drt3VehiclesFile )
+						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
@@ -216,17 +223,6 @@ public class PtAlongALine2Test{
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
 				DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore(), config.plansCalcRoute() );
 			}
-
-			// TODO: avoid really writing out these files. However so far it is unclear how
-			// to configure DRT and load the vehicles otherwise
-			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 30, Id.createLinkId("0-1" ), 1);
-			if ( drt2 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "999-1000" ), 4);
-			}
-			if ( drt3 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt3VehiclesFile, "DRT3-", 10, Id.createLinkId( "500-501" ), 4);
-			}
-
 		}
 
 		if ( drtMode== DrtMode.withPrebooking ) {
@@ -336,6 +332,26 @@ public class PtAlongALine2Test{
 			} ) ;
 		}
 
+		// TODO: avoid really writing out these files. However so far it is unclear how
+		// to configure DRT and load the vehicles otherwise
+		controler.addOverridingModule(
+				PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
+						Id.createLinkId("0-1"), 1));
+		if ( drt2 ){
+			controler.addOverridingModule(
+					PtAlongALineTest.createGeneratedFleetSpecificationModule("drt2", "DRT2-", 10,
+							Id.createLinkId("999-1000"), 4));
+		}
+		if ( drt3 ){
+			controler.addOverridingModule(
+					PtAlongALineTest.createGeneratedFleetSpecificationModule("drt3", "DRT3-", 10,
+							Id.createLinkId("500-501"), 4));
+		}
+
+		controler.addOverridingModule(
+				PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 30,
+						Id.createLinkId("0-1"), 1));
+
 		if ( "true".equals( System.getProperty( "runOTFVis" ) ) ){
 			// This will start otfvis
 			controler.addOverridingModule( new OTFVisLiveModule() );
@@ -343,22 +359,22 @@ public class PtAlongALine2Test{
 		}
 
 		controler.run();
-		
+
 		/*
 		 * TODO: Asserts:
 		 * All agents go from some randomly chosen link to the transit stop at the far right.
-		 * 
+		 *
 		 * Nobody should use DRT2, because it only connects to that transit stop at the right.
-		 * 
+		 *
 		 * People on the left should use DRT to go to the left stop or towards the middle stop (and walk the distance
 		 * between the end of the DRT service area and the middle stop).
-		 * 
+		 *
 		 * People between the middle stop and the right stop should use DRT3 or even walk into the DRT3 service area
 		 * (=walk in the wrong direction to access the fast drt mode to access a fast pt trip instead of slowly walking
 		 * the whole distance to the destination). At some point walking towards the DRT3 area becomes less attractive
 		 * thanh walking directly to the right transit stop, so agents start to walk directly (as the pt router found no
 		 * route at all including a pt leg, it returned instead a direct walk).
-		 * 
+		 *
 		 */
 		for (String agent : testAgents) {
 			System.out.println("\n\n**** AGENT : " + agent);
@@ -453,7 +469,7 @@ public class PtAlongALine2Test{
 		//            handleTransfers(true, parameters);
 		//        }
 		// makes it pass.  I have no idea why, or if this would be a good direction to go for a fix.  kai, jul'19
-		
+
 		// does now work with these lines of code in SwissRailRaptorCore (which solve problems in other tests) gleich, aug'19
 
 		Config config = PtAlongALineTest.createConfig( utils.getOutputDirectory() );

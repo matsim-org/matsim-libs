@@ -18,13 +18,9 @@
   
 package org.matsim.contrib.freight.utils;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
+import java.net.URL;
+import java.util.Collection;
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,18 +46,21 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
-import org.matsim.vehicles.EngineInformation.FuelType;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Solutions;
 
+import org.junit.Assert;
 import javax.management.InvalidAttributeValueException;
-import java.net.URL;
-import java.util.Collection;
 
-public class TestFreightUtils {
+public class FreightUtilsTest {
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
+	private static final Logger log = Logger.getLogger(FreightUtilsTest.class);
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -100,9 +99,8 @@ public class TestFreightUtils {
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
 		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
-		final EngineInformation engineInfo = carrierVehType.getEngineInformation() ;
-		engineInfo.setFuelType( FuelType.diesel );
-		engineInfo.setFuelConsumption( 0.015 );
+		VehicleUtils.setHbefaTechnology(carrierVehType.getEngineInformation(), "diesel");
+		VehicleUtils.setFuelConsumption(carrierVehType, 0.015);
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
 		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
@@ -225,8 +223,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals( EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType() );
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
+			Assert.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
+			Assert.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);
 		}
 		
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
@@ -237,9 +235,8 @@ public class TestFreightUtils {
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
 			Assert.assertEquals(10, carrierVehicleType.getMaximumVelocity(), 0.0);
-			Assert.assertEquals( EngineInformation.FuelType.diesel, carrierVehicleType.getEngineInformation().getFuelType() );
-			Assert.assertEquals(0.015, carrierVehicleType.getEngineInformation().getFuelConsumption(), 0.0);
-		}
+			Assert.assertEquals("diesel", VehicleUtils.getHbefaTechnology(carrierVehicleType.getEngineInformation()));
+			Assert.assertEquals(0.015, VehicleUtils.getFuelConsumption(carrierVehicleType), 0.0);		}
 	}
 
 	@Test
@@ -247,7 +244,8 @@ public class TestFreightUtils {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
 		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
-			if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
+		assert carrierShipment1 != null;
+		if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				System.out.println("Found Shipment1");
 				foundShipment1 = true;
 				Assert.assertEquals(Id.createLinkId("i(1,0)"), carrierShipment1.getFrom());
@@ -261,7 +259,8 @@ public class TestFreightUtils {
 				Assert.assertEquals(7200.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
 		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
-			if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
+		assert carrierShipment2 != null;
+		if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
 				foundShipment2 = true;
 				Assert.assertEquals(Id.createLinkId("i(3,0)"), carrierShipment2.getFrom());
@@ -284,7 +283,8 @@ public class TestFreightUtils {
 		boolean foundSercice1 = false;
 		boolean foundService2 = false;
 		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
-			if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
+		assert carrierShipment1 != null;
+		if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundSercice1 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
 				Assert.assertEquals(Id.createLinkId("i(3,9)"), carrierShipment1.getTo());
@@ -297,7 +297,8 @@ public class TestFreightUtils {
 				Assert.assertEquals(36001.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
 		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
-			if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
+		assert carrierShipment2 != null;
+		if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
 				Assert.assertEquals(Id.createLinkId("i(4,9)"), carrierShipment2.getTo());
@@ -364,7 +365,7 @@ public class TestFreightUtils {
 	 * @return String location of the packageInputDirectory
 	 */
 	private static String getPackageInputDirectory() {
-		String classInputDirectory = "test/input/" + TestFreightUtils.class.getCanonicalName().replace('.', '/') + "/";
+		String classInputDirectory = "test/input/" + FreightUtilsTest.class.getCanonicalName().replace('.', '/') + "/";
 		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
 		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
 		return packageInputDirectory;
@@ -478,7 +479,7 @@ public class TestFreightUtils {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		Assert.assertEquals(null, ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Check that is is still null in config.
+		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgortihmFile());
 	}
 
 	private Config prepareConfig(){

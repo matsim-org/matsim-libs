@@ -20,6 +20,7 @@ package org.matsim.contrib.etaxi.run;
 
 import java.net.URL;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -41,6 +42,7 @@ public class RunETaxiScenarioIT {
 	}
 
 	@Test
+	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_etaxi_config_assignment.xml");

@@ -33,7 +33,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -175,8 +174,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);
 			}
 		}
-		double tt = ((Leg) pe).getTravelTime();
-		return now + (!Time.isUndefinedTime(tt) ? tt : 0);
+		return now + ((Leg)pe).getTravelTime().orElse(0);
 	}	
 }
 

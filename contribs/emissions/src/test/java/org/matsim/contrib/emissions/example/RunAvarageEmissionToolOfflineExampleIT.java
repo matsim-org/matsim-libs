@@ -46,7 +46,7 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 	public final void testAverage_vehTypeV2() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
@@ -56,7 +56,7 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 	public final void testAverage_vehTypeV2b() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		// (should also be the default)
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -67,7 +67,7 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 	public final void testAverage_vehTypeV2_HBEFA4() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
-		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfig.setAverageWarmEmissionFactorsFile("../sample_41_EFA_HOT_vehcat_2020average.txt");
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );

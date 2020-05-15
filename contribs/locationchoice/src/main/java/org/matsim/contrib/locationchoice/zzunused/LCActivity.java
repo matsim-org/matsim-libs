@@ -127,11 +127,11 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 
 	public final double getArrivalTime() {
-		return this.plan.arrTimes[this.arrayIndex];
+		return this.plan.arrTimes[this.arrayIndex].seconds();
 	}
 
 	public final void setArrivalTime(final double arrTime) {
-		this.plan.arrTimes[this.arrayIndex] = arrTime;
+		this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
 	}
 	
 	@Override

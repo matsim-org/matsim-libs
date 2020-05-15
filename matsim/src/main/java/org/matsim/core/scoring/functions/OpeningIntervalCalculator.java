@@ -22,9 +22,10 @@
  package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public interface OpeningIntervalCalculator {
 
-	double[] getOpeningInterval(final Activity act);
+	OptionalTime[] getOpeningInterval(final Activity act);
 
 }

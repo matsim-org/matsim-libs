@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import static org.junit.Assert.*;
-
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -28,49 +28,44 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import static org.junit.Assert.fail;
+
 /**
  * @author nagel
  *
  */
-public class RunDetailedEmissionToolOnlineExampleIT {
+public class RunDetailedEmissionToolOnlineExampleIT_vehTypeV1 {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
-	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
+	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(String[])}.
 	 */
-	@SuppressWarnings("static-method")
+
+	/*
+	 *
+	 * Abort if values are not found in detailed table
+	 * This is by now (feb'20) the default. Setting it here for the tests explicitly
+	 *
+	 * */
+//	@Test(expected=RuntimeException.class) // Expecting RuntimeException, because requested values are only in average file. Without fallback it has to fail!
+	@Ignore //Ignore this test, because the thrown exception during events handling does not always leads to an abort of the Simulation ->> Maybe a problem in @link{ParallelEventsManagerImpl.class}?
 	@Test
 	public final void testDetailed_vehTypeV1() {
+		boolean gotAnException = false ;
 		try {
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
+			RunDetailedEmissionToolOnlineExample onlineExample = new RunDetailedEmissionToolOnlineExample();
+			Config config = onlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
-			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
+			emissionsConfig.setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
+			Scenario scenario = onlineExample.prepareScenario( config ) ;
+			onlineExample.run( scenario ) ;
+		} catch (Exception ee ) {
+			gotAnException = true ;
 		}
-	}
-
-	/**
-	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testDetailed_vehTypeV2() {
-		try {
-			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			config.controler().setLastIteration( 1 );
-			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
-			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
+		Assert.assertTrue( gotAnException );
 	}
 
 }

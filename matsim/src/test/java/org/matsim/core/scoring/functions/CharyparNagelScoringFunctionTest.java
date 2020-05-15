@@ -337,7 +337,7 @@ public class CharyparNagelScoringFunctionTest {
 		// not longer true, since not doing a scheduled activity now carries a penalty.  kai, nov'13
 		double score_home = perf_hrs * 15.0 * Math.log(14.75 / getZeroUtilDuration_hrs(15.0, 1.0)) ;
 
-		final double typicalDuration_work_sec = wParams.getTypicalDuration();
+		final double typicalDuration_work_sec = wParams.getTypicalDuration().seconds();
 		final double zeroUtilityDuration_work_sec = 3600. * getZeroUtilDuration_hrs(typicalDuration_work_sec/3600., 1. );
 		double slope_work_at_zero_utility_h = perf_hrs * typicalDuration_work_sec / zeroUtilityDuration_work_sec ;
 		double score_work = - zeroUtilityDuration_work_sec * slope_work_at_zero_utility_h / 3600. ;

@@ -1,7 +1,12 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
-import com.google.inject.Provider;
-import com.google.inject.Provides;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -15,12 +20,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 
 public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculator, VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable, Provider<StopStopTime> {
 
@@ -40,7 +41,7 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 
 	//Constructors
 	public StopStopTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds()-config.qsim().getStartTime().seconds()));
 	}
 	public static void printCallStatisticsAndReset(){
 		org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(StopStopTimeCalculatorSerializable.class);
@@ -82,7 +83,7 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 							num = 0;
 						}
 					}
-					map2.put(route.getStops().get(s+1).getStopFacility().getId().toString(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					map2.put(route.getStops().get(s+1).getStopFacility().getId().toString(), stopStopTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds());
 					map3.put(route.getStops().get(s+1).getStopFacility().getId().toString(), ++num);
 				}
 				for(Departure departure:route.getDepartures().values())
