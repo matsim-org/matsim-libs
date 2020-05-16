@@ -22,29 +22,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
-public class DetourTimesProvider {
-	class DetourTimesSet {
-		// times[0] is a special entry; times[i] corresponds to stop i-1, for 1 <= i <= stopCount
-		public final Double[] timesToPickup;// times[0] start->pickup
-		public final Double[] timesFromPickup;// times[0] pickup->dropoff
-		public final Double[] timesToDropoff;// times[0] NaN
-		public final Double[] timesFromDropoff;// times[0] NaN
-
-		public DetourTimesSet(Double[] timesToPickup, Double[] timesFromPickup, Double[] timesToDropoff,
-				Double[] timesFromDropoff) {
-			this.timesToPickup = timesToPickup;
-			this.timesFromPickup = timesFromPickup;
-			this.timesToDropoff = timesToDropoff;
-			this.timesFromDropoff = timesFromDropoff;
-		}
-	}
+public class DetourTimesProvider implements DetourDataProvider<Double> {
 
 	private final double stopDuration;
 	private final DetourTimeEstimator detourTimeEstimator;
@@ -54,7 +39,7 @@ public class DetourTimesProvider {
 		this.stopDuration = stopDuration;
 	}
 
-	public DetourTimesSet getDetourTimesSet(DrtRequest drtRequest, Entry vEntry) {
+	public DetourDataSet<Double> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
 		ArrayList<Link> links = new ArrayList<>(vEntry.stops.size() + 1);
 		links.add(null);// special link
 		for (Stop s : vEntry.stops) {
@@ -84,7 +69,7 @@ public class DetourTimesProvider {
 		Double[] timesFromDropoff = estimateTimesForwards(drtRequest.getToLink(), links, earliestDropoffTime);
 		timesFromDropoff[0] = null;
 
-		return new DetourTimesSet(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff);
+		return new DetourDataSet<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff);
 	}
 
 	private Double[] estimateTimesBackwards(Link fromLink, List<Link> toLinks, double startTime) {

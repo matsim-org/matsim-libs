@@ -61,7 +61,9 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 		stopDuration = drtCfg.getStopDuration();
 
 		List<Link> stopLinks = schedule.getFacilities()
-				.values().stream().map(tsf -> network.getLinks().get(tsf.getLinkId()))
+				.values()
+				.stream()
+				.map(tsf -> network.getLinks().get(tsf.getLinkId()))
 				.distinct()// more than one stop can be located on a link
 				.collect(ImmutableList.toImmutableList());
 		manyToManyPathData = new ManyToManyPathData(network, travelTime, travelDisutility, stopLinks,
@@ -85,7 +87,7 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	}
 
 	@Override
-	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
+	public DetourDataSet<PathData> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
 		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
 				pathsToDropoffMap, pathsFromDropoffMap);
 	}

@@ -124,7 +124,7 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
+	public DetourDataSet<PathData> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
 		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
 				pathsToDropoffMap, pathsFromDropoffMap);
 	}

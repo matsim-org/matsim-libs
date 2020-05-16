@@ -28,6 +28,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -46,7 +47,7 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 				penaltyCalculator);
 	}
 
-	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+	public SequentialMultiVehicleInsertionProblem(DetourDataProvider<PathData> pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider,
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));

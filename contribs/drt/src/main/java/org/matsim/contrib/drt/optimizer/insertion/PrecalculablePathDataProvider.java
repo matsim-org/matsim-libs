@@ -22,21 +22,21 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
  */
-public interface PrecalculablePathDataProvider extends PathDataProvider {
+public interface PrecalculablePathDataProvider extends DetourDataProvider<PathData> {
 	void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinkSet);
 
-	static PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry, Map<Id<Link>, PathData> pathsToPickupMap,
-			Map<Id<Link>, PathData> pathsFromPickupMap, Map<Id<Link>, PathData> pathsToDropoffMap,
-			Map<Id<Link>, PathData> pathsFromDropoffMap) {
+	static DetourDataSet<PathData> getPathDataSet(DrtRequest drtRequest, Entry vEntry,
+			Map<Id<Link>, PathData> pathsToPickupMap, Map<Id<Link>, PathData> pathsFromPickupMap,
+			Map<Id<Link>, PathData> pathsToDropoffMap, Map<Id<Link>, PathData> pathsFromDropoffMap) {
 
 		int length = vEntry.stops.size() + 1;
 		PathData[] pathsToPickup = new PathData[length];
@@ -44,6 +44,7 @@ public interface PrecalculablePathDataProvider extends PathDataProvider {
 		PathData[] pathsToDropoff = new PathData[length];
 		PathData[] pathsFromDropoff = new PathData[length];
 
+		//FIXME update to follow changes in DetourDataSet
 		pathsToPickup[0] = pathsToPickupMap.get(vEntry.start.link.getId());// start->pickup
 		pathsFromPickup[0] = pathsFromPickupMap.get(drtRequest.getToLink().getId());// pickup->dropoff
 
@@ -57,6 +58,6 @@ public interface PrecalculablePathDataProvider extends PathDataProvider {
 			i++;
 		}
 
-		return new PathDataSet(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
+		return new DetourDataSet<>(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
 	}
 }

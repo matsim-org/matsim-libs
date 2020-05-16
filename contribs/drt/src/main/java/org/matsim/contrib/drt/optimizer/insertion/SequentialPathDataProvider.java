@@ -22,9 +22,9 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -34,7 +34,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public class SequentialPathDataProvider implements PathDataProvider {
+public class SequentialPathDataProvider implements DetourDataProvider<PathData> {
 	private final OneToManyPathSearch forwardPathSearch;
 	private final OneToManyPathSearch backwardPathSearch;
 	private final double stopDuration;
@@ -47,7 +47,7 @@ public class SequentialPathDataProvider implements PathDataProvider {
 	}
 
 	@Override
-	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
+	public DetourDataSet<PathData> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
 		ArrayList<Link> links = new ArrayList<>(vEntry.stops.size() + 1);
 		links.add(null);// special link
 		for (Stop s : vEntry.stops) {
@@ -85,6 +85,6 @@ public class SequentialPathDataProvider implements PathDataProvider {
 				earliestDropoffTime);
 		pathsFromDropoff[0] = null;
 
-		return new PathDataSet(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
+		return new DetourDataSet<>(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
 	}
 }
