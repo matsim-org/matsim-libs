@@ -36,8 +36,8 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
-	private final SingleVehicleInsertionProblem insertionProblem;
+public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
+	private final SingleVehicleInsertionProblem<PathData> insertionProblem;
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 
 	public SequentialMultiVehicleInsertionProblem(Network network, TravelTime travelTime,
@@ -47,14 +47,14 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 				penaltyCalculator);
 	}
 
-	public SequentialMultiVehicleInsertionProblem(DetourDataProvider<PathData> pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
-		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider,
+	public SequentialMultiVehicleInsertionProblem(DetourDataProvider<PathData> detourDataProvider,
+			DrtConfigGroup drtCfg, MobsimTimer timer, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+		this.insertionProblem = SingleVehicleInsertionProblem.createWithDetourPathProvider(detourDataProvider,
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	@Override
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		return vEntries.stream()
 				.map(v -> insertionProblem.findBestInsertion(drtRequest, v,
 						insertionGenerator.generateInsertions(drtRequest, v)))

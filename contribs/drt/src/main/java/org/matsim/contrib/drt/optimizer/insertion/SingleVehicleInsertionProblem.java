@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourDataSet;
@@ -31,13 +32,23 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 /**
  * @author michalm
  */
-public class SingleVehicleInsertionProblem {
-	public static class BestInsertion {
-		public final InsertionWithDetourData<PathData> insertion;
+public class SingleVehicleInsertionProblem<D> {
+	public static SingleVehicleInsertionProblem<PathData> createWithDetourPathProvider(
+			DetourDataProvider<PathData> pathDataProvider, InsertionCostCalculator costCalculator) {
+		return new SingleVehicleInsertionProblem<>(pathDataProvider, PathData::getTravelTime, costCalculator);
+	}
+
+	public static SingleVehicleInsertionProblem<Double> createWithDetourTimeProvider(
+			DetourDataProvider<Double> detourTimeProvider, InsertionCostCalculator costCalculator) {
+		return new SingleVehicleInsertionProblem<>(detourTimeProvider, Double::doubleValue, costCalculator);
+	}
+
+	public static class BestInsertion<D> {
+		public final InsertionWithDetourData<D> insertion;
 		public final VehicleData.Entry vehicleEntry;
 		public final double cost;
 
-		public BestInsertion(InsertionWithDetourData<PathData> insertion, VehicleData.Entry vehicleEntry, double cost) {
+		public BestInsertion(InsertionWithDetourData<D> insertion, VehicleData.Entry vehicleEntry, double cost) {
 			this.insertion = insertion;
 			this.vehicleEntry = vehicleEntry;
 			this.cost = cost;
@@ -45,23 +56,25 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private final InsertionCostCalculator costCalculator;
-	private final DetourDataProvider<PathData> pathDataProvider;
+	private final DetourDataProvider<D> pathDataProvider;
+	private final ToDoubleFunction<D> detourTime;
 
-	public SingleVehicleInsertionProblem(DetourDataProvider<PathData> pathDataProvider,
+	SingleVehicleInsertionProblem(DetourDataProvider<D> pathDataProvider, ToDoubleFunction<D> detourTime,
 			InsertionCostCalculator costCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.costCalculator = costCalculator;
+		this.detourTime = detourTime;
 	}
 
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
+	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
-		DetourDataSet<PathData> set = pathDataProvider.getDetourDataSet(drtRequest, vEntry);
+		DetourDataSet<D> set = pathDataProvider.getDetourDataSet(drtRequest, vEntry);
 
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-		InsertionWithDetourData<PathData> bestInsertion = null;
+		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithDetourData<PathData> insertion = set.createInsertionDetourData(i);
-			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, PathData::getTravelTime);
+			InsertionWithDetourData<D> insertion = set.createInsertionDetourData(i);
+			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;
@@ -70,6 +83,6 @@ public class SingleVehicleInsertionProblem {
 
 		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ?
 				Optional.empty() :
-				Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
+				Optional.of(new BestInsertion<>(bestInsertion, vEntry, minCost));
 	}
 }

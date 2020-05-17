@@ -31,10 +31,10 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author michalm
  */
 public class SingleVehicleInsertionFilter {
-	private final DetourTimesProvider detourTimesProvider;
+	private final DetourDataProvider<Double> detourTimesProvider;
 	private final InsertionCostCalculator costCalculator;
 
-	public SingleVehicleInsertionFilter(DetourTimesProvider detourTimesProvider,
+	public SingleVehicleInsertionFilter(DetourDataProvider<Double> detourTimesProvider,
 			InsertionCostCalculator costCalculator) {
 		this.detourTimesProvider = detourTimesProvider;
 		this.costCalculator = costCalculator;
@@ -43,7 +43,6 @@ public class SingleVehicleInsertionFilter {
 	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
 		DetourDataSet<Double> set = detourTimesProvider.getDetourDataSet(drtRequest, vEntry);
-		int stopCount = vEntry.stops.size();
 
 		return insertions.stream()
 				.map(set::createInsertionDetourData)
