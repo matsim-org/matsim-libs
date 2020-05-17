@@ -106,8 +106,8 @@ class DetourLinksProvider {
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
 		insertionFilter = new SingleVehicleInsertionFilter(new DetourTimesProvider(
-				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
-				drtCfg.getStopDuration()), new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
+				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed),
+				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {

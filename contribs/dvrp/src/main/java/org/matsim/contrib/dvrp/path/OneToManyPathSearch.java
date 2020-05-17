@@ -97,7 +97,7 @@ public class OneToManyPathSearch {
 		return createPathDataArray(fromLink, toLinks, startTime, toNodes);
 	}
 
-	public Map<Id<Link>, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime) {
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime) {
 		Node fromNode = getStartNode(fromLink);
 		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
 		calculatePaths(fromNode, toNodes, startTime);
@@ -138,11 +138,11 @@ public class OneToManyPathSearch {
 		return pathDataArray;
 	}
 
-	private Map<Id<Link>, PathData> createPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+	private Map<Link, PathData> createPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			Map<Id<Node>, ToNode> toNodes) {
-		Map<Id<Link>, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
+		Map<Link, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
-			pathDataMap.put(toLink.getId(), createPathData(fromLink, toLink, startTime, toNodes));
+			pathDataMap.put(toLink, createPathData(fromLink, toLink, startTime, toNodes));
 		}
 		return pathDataMap;
 	}

@@ -18,73 +18,31 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
 public class DetourTimesProvider implements DetourDataProvider<Double> {
-
-	private final double stopDuration;
 	private final DetourTimeEstimator detourTimeEstimator;
 
-	public DetourTimesProvider(DetourTimeEstimator detourTimeEstimator, double stopDuration) {
+	public DetourTimesProvider(DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
-		this.stopDuration = stopDuration;
 	}
 
 	public DetourDataSet<Double> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
-		ArrayList<Link> links = new ArrayList<>(vEntry.stops.size() + 1);
-		links.add(null);// special link
-		for (Stop s : vEntry.stops) {
-			links.add(s.task.getLink());
-		}
-
-		double earliestPickupTime = drtRequest.getEarliestStartTime();// over-optimistic
-
-		// calc backward TTs from pickup to ends of all stop + start
-		links.set(0, vEntry.start.link);
-		Double[] timesToPickup = estimateTimesBackwards(drtRequest.getFromLink(), links, earliestPickupTime);
-
-		// calc forward TTs from pickup to beginnings of all stops + dropoff
-		links.set(0, drtRequest.getToLink());
-		Double[] timesFromPickup = estimateTimesForwards(drtRequest.getFromLink(), links, earliestPickupTime);
-
-		double pickupToDropoffTime = timesFromPickup[0];// only if no other passengers on board (optimistic)
-		double minTravelTime = pickupToDropoffTime;
-		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration; // over-optimistic
-
-		// calc backward TTs from dropoff to ends of all stops
-		links.set(0, drtRequest.getToLink());// TODO change to null (after nulls are supported by OneToManyPathSearch)
-		Double[] timesToDropoff = estimateTimesBackwards(drtRequest.getToLink(), links, earliestDropoffTime);
-		timesToDropoff[0] = null;
-
-		// calc forward TTs from dropoff to beginnings of all stops
-		Double[] timesFromDropoff = estimateTimesForwards(drtRequest.getToLink(), links, earliestDropoffTime);
-		timesFromDropoff[0] = null;
-
-		return new DetourDataSet<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff);
-	}
-
-	private Double[] estimateTimesBackwards(Link fromLink, List<Link> toLinks, double startTime) {
-		Double[] times = new Double[toLinks.size()];
-		for (int i = 0; i < times.length; i++) {
-			times[i] = detourTimeEstimator.estimateTime(toLinks.get(i), fromLink);
-		}
-		return times;
-	}
-
-	private Double[] estimateTimesForwards(Link fromLink, List<Link> toLinks, double startTime) {
-		Double[] times = new Double[toLinks.size()];
-		for (int i = 0; i < times.length; i++) {
-			times[i] = detourTimeEstimator.estimateTime(fromLink, toLinks.get(i));
-		}
-		return times;
+		//TODO add departure/arrival times to improve estimation
+		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
+		Function<Link, Double> timesFromPickup = link -> detourTimeEstimator.estimateTime(drtRequest.getFromLink(),
+				link);
+		Function<Link, Double> timesToDropoff = link -> detourTimeEstimator.estimateTime(link, drtRequest.getToLink());
+		Function<Link, Double> timesFromDropoff = link -> detourTimeEstimator.estimateTime(drtRequest.getToLink(),
+				link);
+		return DetourDataProvider.getDetourDataSet(drtRequest, vEntry, timesToPickup, timesFromPickup, timesToDropoff,
+				timesFromDropoff);
 	}
 }
