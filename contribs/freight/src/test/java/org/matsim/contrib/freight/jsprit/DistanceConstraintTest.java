@@ -342,7 +342,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
+	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
