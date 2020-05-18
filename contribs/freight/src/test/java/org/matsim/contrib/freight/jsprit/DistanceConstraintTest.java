@@ -334,7 +334,7 @@ public class DistanceConstraintTest {
 	}
 
 	/**
-	 * Option 4: An additional shipment outside the range of both BEVtypes.
+	 * Option 4: An additional service outside the range of both BEV types.
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
