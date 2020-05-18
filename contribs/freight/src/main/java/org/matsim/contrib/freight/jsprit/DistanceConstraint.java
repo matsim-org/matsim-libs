@@ -21,6 +21,8 @@
 
 package org.matsim.contrib.freight.jsprit;
 
+import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -108,7 +110,7 @@ import org.matsim.vehicles.VehicleUtils;
 			} else {
 				routeConsumption = routeDistance * (consumptionPerMeter);
 			}
-			if (newAct.getName().contains("pickupShipment")) {
+			if (newAct instanceof PickupShipment) {
 				additionalDistance = getDistance(prevAct, newAct, newVehicle, departureTime)
 						+ getDistance(newAct, nextAct, newVehicle, departureTime)
 						- getDistance(prevAct, nextAct, newVehicle, departureTime)
@@ -151,7 +153,7 @@ import org.matsim.vehicles.VehicleUtils;
 			double departureTime) {
 		double minimalAdditionalDistance = 0;
 
-		if (context.getAssociatedActivities().get(1).getName().contains("deliverShipment")) {
+		if (context.getAssociatedActivities().get(1) instanceof DeliverShipment) {
 			TourActivity assignedDelivery = context.getAssociatedActivities().get(1);
 			minimalAdditionalDistance = 0;
 			int indexNextActicity = nextAct.getIndex();
