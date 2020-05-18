@@ -32,13 +32,11 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.testcases.MatsimTestUtils;
@@ -205,7 +203,7 @@ public class QSimSignalTest implements
 		 * new version how to create a qsim without a controler and still be able to add
 		 * the SignalsModule. see comment above.
 		 */
-		ParallelEventsManager events = new ParallelEventsManager(false, 1);
+		ParallelEventsManager events = new ParallelEventsManager(false);
 		if (handleEvents){
 			events.addHandler(this);
 		}

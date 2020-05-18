@@ -81,8 +81,6 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
-                     <forkCount>1</forkCount>
-                     <reuseForks>false</reuseForks>
 					<!-- avoid out of memory errors: -->
 					<argLine>-Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.

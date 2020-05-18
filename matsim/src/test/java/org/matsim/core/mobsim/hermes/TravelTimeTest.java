@@ -35,10 +35,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -61,7 +59,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false, 1);
+		EventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -97,7 +95,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false, 1);
+		EventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		// Travel time 359.9712023038
@@ -187,7 +185,7 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = new ParallelEventsManager(false, 1);
+		EventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();

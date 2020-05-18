@@ -104,7 +104,7 @@ public class GroupCompositionPenalizerTest {
 
 		final SocialNetwork sn = createSocialNetwork( sc );
 
-		final EventsManager events = new ParallelEventsManager(true, 1);
+		final EventsManager events = new ParallelEventsManager(true);
 
 		final GroupCompositionPenalizer penalizer = new GroupCompositionPenalizer(
 				"leisure",

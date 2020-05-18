@@ -34,10 +34,8 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
 
 /**
@@ -62,7 +60,7 @@ public class DrtFareHandlerTest {
         tccg.setMode(TransportMode.drt);
 
         final MutableDouble fare = new MutableDouble(0);
-        ParallelEventsManager events = new ParallelEventsManager(false, 1);
+        ParallelEventsManager events = new ParallelEventsManager(false);
         DrtFareHandler tfh = new DrtFareHandler(tccg, events);
         events.addHandler(tfh);
         events.addHandler(new PersonMoneyEventHandler() {
@@ -91,8 +89,8 @@ public class DrtFareHandlerTest {
         events.processEvent(new DrtRequestSubmittedEvent(0.0, TransportMode.drt, Id.create(0, Request.class), p1, Id.createLinkId("45"), Id.createLinkId("56"), 24, 100));
         events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("56"), TransportMode.drt));
         events.finishProcessing();
-        
-        /* 
+
+        /*
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
          * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
          */

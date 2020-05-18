@@ -38,10 +38,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -71,7 +69,7 @@ public class TaxiFareHandlerTest {
 		multiTaxiCfg.addParameterSet(taxiCfg);
 		config.addModule(multiTaxiCfg);
 		final MutableDouble fare = new MutableDouble(0);
-		ParallelEventsManager events = new ParallelEventsManager(false, 1);
+		ParallelEventsManager events = new ParallelEventsManager(false);
         TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
