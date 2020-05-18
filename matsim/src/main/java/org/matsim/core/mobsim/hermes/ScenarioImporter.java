@@ -283,11 +283,11 @@ public class ScenarioImporter {
             eventid = 0;
         }
 
-        if (Double.isFinite(act.getEndTime())) {
-            time = (int) Math.round(act.getEndTime());
+        if (act.getEndTime().isDefined()) {
+            time = (int) Math.round(act.getEndTime().seconds());
             flatplan.add(Agent.prepareSleepUntilEntry(eventid, time));
-        } else if (Double.isFinite(act.getMaximumDuration())) {
-            time = (int) Math.round(act.getMaximumDuration());
+        } else if (act.getMaximumDuration().isDefined()) {
+            time = (int) Math.round(act.getMaximumDuration().seconds());
             flatplan.add(Agent.prepareSleepForEntry(eventid, time));
         } else {
             // TODO - better way to handle this?
@@ -404,9 +404,14 @@ public class ScenarioImporter {
                 case "bike":
                 case "bicycle":
                 case "other":
-                    int time = (int) Math.round(Math.max(route.getTravelTime(), ((Leg)element ).getTravelTime()));
+                    double routeTravelTime = route.getTravelTime().isDefined() ?
+                            route.getTravelTime().seconds() : 0.0;
+                    double legTravelTime = ((Leg)element ).getTravelTime().isDefined() ?
+                            ((Leg)element ).getTravelTime().seconds() : 0.0;
+
+                    int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
                     flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
-                    events.add(new TeleportationArrivalEvent(0, id, route.getDistance()));
+                    events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
                     break;
                 default:
                     throw new RuntimeException ("Unknown leg mode " + leg.toString());
@@ -450,12 +455,12 @@ public class ScenarioImporter {
 
     private double arrivalOffsetHelper(Departure depart, TransitRouteStop trs) {
         return delay_helper(
-            depart.getDepartureTime(), trs.getArrivalOffset(), trs.getDepartureOffset());
+            depart.getDepartureTime(), trs.getArrivalOffset().seconds(), trs.getDepartureOffset().seconds());
     }
 
     private double departureOffsetHelper(Departure depart, TransitRouteStop trs) {
         return delay_helper(
-            depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
+            depart.getDepartureTime(), trs.getDepartureOffset().seconds(), trs.getArrivalOffset().seconds());
     }
 
     private void generateVehicleTrip(

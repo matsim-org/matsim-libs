@@ -20,8 +20,9 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,7 +61,7 @@ import java.util.*;
 
 public class HermesTest {
 
-	private final static Logger log = Logger.getLogger(HermesTest.class);
+	private final static Logger log = LogManager.getLogger(HermesTest.class);
 
 	protected static Hermes createHermes(MutableScenario scenario, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -732,13 +733,13 @@ public class HermesTest {
 		Node node6 = NetworkUtils.createAndAddNode(f.network, Id.create("6", Node.class), new Coord(3200, 0));
 		Node node7 = NetworkUtils.createAndAddNode(f.network, Id.create("7", Node.class), new Coord(3300, 0));
 		final Node toNode = node5;
-		NetworkUtils.createAndAddLink(f.network,Id.create("4", Link.class), f.node4, toNode, 1000, 10, 6000, 2 );
+		NetworkUtils.createAndAddLink(f.network, Id.create("4", Link.class), f.node4, toNode, 1000, 10, 6000, 2);
 		final Node fromNode = node5;
 		final Node toNode1 = node6;
-		Link link5 = NetworkUtils.createAndAddLink(f.network,Id.create("5", Link.class), fromNode, toNode1, 100, 10, 60000, 9 );
+		Link link5 = NetworkUtils.createAndAddLink(f.network, Id.create("5", Link.class), fromNode, toNode1, 100, 10, 60000, 9);
 		final Node fromNode1 = node6;
 		final Node toNode2 = node7;
-		Link link6 = NetworkUtils.createAndAddLink(f.network,Id.create("6", Link.class), fromNode1, toNode2, 100, 10, 60000, 9 );
+		Link link6 = NetworkUtils.createAndAddLink(f.network, Id.create("6", Link.class), fromNode1, toNode2, 100, 10, 60000, 9);
 
 		f.scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(NetworkRoute.class, new LinkNetworkRouteFactory());
 
@@ -746,16 +747,16 @@ public class HermesTest {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-		a1.setEndTime(8*3600);
-		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a1.setEndTime(8 * 3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), link5.getId());
 		route.setLinkIds(Id.create(startLinkId, Link.class), NetworkUtils.getLinkIds(linkIds), Id.create(endLinkId, Link.class));
 		leg.setRoute(route);
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
-		a2.setEndTime(9*3600);
-		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+		a2.setEndTime(9 * 3600);
+		leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 		route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, link5.getId(), link6.getId());
 		route.setLinkIds(link5.getId(), null, link6.getId());
 		leg.setRoute(route);
@@ -764,9 +765,9 @@ public class HermesTest {
 
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter(Level.WARN);
-		Logger.getRootLogger().addAppender(logger);
+		logger.activate();
 		createHermes(f, events).run();
-		Logger.getRootLogger().removeAppender(logger);
+		logger.deactivate();
 
 		return logger;
 	}

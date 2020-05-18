@@ -84,7 +84,7 @@
                      <forkCount>1</forkCount>
                      <reuseForks>false</reuseForks>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx1g -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.
 					     Property value seems to magically default to false -->
 					<!--<skipTests>${skip.surefire.tests}</skipTests>-->
