@@ -12,45 +12,10 @@ To learn more about these applications (and how you can implement "frozen random
 
 For more customized applications and set-ups, have a look at [Customizing the framework](docs/Customizing.md).
 
-## Available versions
+When referencing the contrib, please use the following papers:
+- Hörl, S., M. Balac and K.W. Axhausen (2018) [A first look at bridging discrete choice modeling and agent-based microsimulation in MATSim](https://www.sciencedirect.com/science/article/pii/S1877050918304496?via%3Dihub), *Procedia Computer Science*, **130**, 900-907.
+- Hörl, S., M. Balac and K.W. Axhausen (2019) [Pairing discrete mode choice models and agent-based transport simulation with MATSim](https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/303667/ab1373.pdf), paper presented at the *98th Annual Meeting of the Transportation Research Board*, Washington D.C., January, 2019.
 
-The DMC extension is currently kept compatible with the following MATSim versions:
-
-|MATSim              |DMC version      |               |
-|--------------------|-----------------|---------------|
-| Weekly SNAPSHOT `12.0-2019w49`            | `1.0.9`           | [![Build Status](https://travis-ci.org/matsim-eth/discrete-mode-choice.svg?branch=master)](https://travis-ci.org/matsim-eth/discrete-mode-choice) |
-| Release `11.0`       | `1.0.9-matsim11`  | [![Build Status](https://travis-ci.org/matsim-eth/discrete-mode-choice.svg?branch=master-11)](https://travis-ci.org/matsim-eth/discrete-mode-choice) |
-| Release `0.10.1`     | `1.0.9-matsim10`  | [![Build Status](https://travis-ci.org/matsim-eth/discrete-mode-choice.svg?branch=master-10)](https://travis-ci.org/matsim-eth/discrete-mode-choice) |
-
-Alternatively, you can clone this repository and use the current development
-version from the `develop` branch. Currently, it is `1.0.10-dev` and compatible
-with MATSim `12.0-2020w08`. However, we
-recommend using the DMC extension with a stable version of MATSim.
-
-To use the Discrete Mode Choice extension you first need to add the ETH MATSim Bintray repository to your `pom.xml`:
-
-```xml
-<repository>
-    <id>matsim-eth</id>
-    <url>https://dl.bintray.com/matsim-eth/matsim</url>
-</repository>
-```
-
-Add the following to your `pom.xml` dependencies to use the extension with version `1.0.9` and MATSim 11, for instance:
-
-```xml
-<dependency>
-    <groupId>ch.ethz.matsim</groupId>
-    <artifactId>discrete_mode_choice</artifactId>
-    <version>1.0.9-matsim11</version>
-</dependency>
-```
-
-## Repository structure
-
-This repository makes use of the [GitFlow](https://nvie.com/posts/a-successful-git-branching-model/) repository model. This means that development is taking place in the `develop` branch, while the current production version can be found in the `master` branch. Note that, contrary to the basic model, we use multiple `master` branches to maintain versions of the code that are compatible with different releases of MATSim. For instance, `master-11` is compatible with MATSim 11. The `master` branch is kept compatible with the `master` branch of the [MATSim main repository](https://github.com/matsim-org/matsim). Backports are always derived from the `master` branch into the specific backport branches.
-
-For creating the backports, the recommended workflow is as follows: Branch `backport-X` from master, add changes for compatibility, merge back `backport-X` into `master-X`.
 
 ## Literature
 
