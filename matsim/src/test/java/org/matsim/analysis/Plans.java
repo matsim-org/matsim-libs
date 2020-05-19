@@ -67,6 +67,7 @@ public class Plans {
 		route.setDistance(100);
 		route.setTravelTime(100.0);
 		leg1.setRoute(route);
+		leg1.setTravelTime(100.0);
 		plan.addLeg(leg1);
 		Activity act2 = PopulationUtils.createActivityFromLinkId("leisure", link1);// main mode walk
 		act2.setCoord(CoordUtils.createCoord(100.0, 120.0));
@@ -83,6 +84,7 @@ public class Plans {
 		route2.setDistance(150);
 		route2.setTravelTime(150.0);
 		leg2.setRoute(route2);
+		leg2.setTravelTime(150.0);
 		plan.addLeg(leg2);
 		Activity act3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		act3.setCoord(CoordUtils.createCoord(206.0, 226.0));
@@ -100,6 +102,7 @@ public class Plans {
 		route3.setDistance(5000);
 		route3.setTravelTime(1250.0);
 		leg3.setRoute(route3);
+		leg3.setTravelTime(1250.0);
 		plan.addLeg(leg3);
 		Activity act4 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		act4.setCoord(CoordUtils.createCoord(3529.0, 3309.0));
@@ -116,6 +119,7 @@ public class Plans {
 		route4.setDistance(300);
 		route4.setTravelTime(300.0);
 		leg4.setRoute(route4);
+		leg4.setTravelTime(300.0);
 		plan.addLeg(leg4);
 		Activity act5 = PopulationUtils.createActivityFromLinkId("work", link2);// main mode car
 		act5.setCoord(CoordUtils.createCoord(3741.0, 3521.0));
@@ -132,6 +136,7 @@ public class Plans {
 		route5.setDistance(300);
 		route5.setTravelTime(300.0);
 		leg5.setRoute(route5);
+		leg5.setTravelTime(300.0);
 		plan.addLeg(leg5);
 		Activity act6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		act6.setCoord(CoordUtils.createCoord(3529.0, 3309.0));
@@ -149,6 +154,7 @@ public class Plans {
 		route6.setDistance(7000);
 		route6.setTravelTime(1750.0);
 		leg6.setRoute(route6);
+		leg6.setTravelTime(1750.0);
 		plan.addLeg(leg6);
 		Activity act7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		act7.setCoord(CoordUtils.createCoord(8478.0, 8258.0));
@@ -165,6 +171,7 @@ public class Plans {
 		route7.setDistance(150);
 		route7.setTravelTime(150.0);
 		leg7.setRoute(route7);
+		leg7.setTravelTime(150.0);
 		plan.addLeg(leg7);
 		Activity act8 = PopulationUtils.createActivityFromLinkId("leisure", link3);// main mode car
 		act8.setCoord(CoordUtils.createCoord(8584.0, 8364.0));
@@ -178,6 +185,7 @@ public class Plans {
 		leg8.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(8478.0, 8258.0));
 		leg8.setDepartureTime(47204.0);
 		leg8.setRoute(route7);
+		leg8.setTravelTime(150.0);
 		plan.addLeg(leg8);
 		Activity act9 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		act9.setCoord(CoordUtils.createCoord(8478.0, 8258.0));
@@ -195,6 +203,7 @@ public class Plans {
 		route9.setDistance(6000);
 		route9.setTravelTime(1500.0);
 		leg9.setRoute(route9);
+		leg9.setTravelTime(1500.0);
 		plan.addLeg(leg9);
 		Activity act10 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
@@ -212,6 +221,7 @@ public class Plans {
 		route10.setDistance(400);
 		route10.setTravelTime(400.0);
 		leg10.setRoute(route10);
+		leg10.setTravelTime(400.0);
 		plan.addLeg(leg10);
 		Activity act11 = PopulationUtils.createActivityFromLinkId("shopping", link4);// main mode car
 		act11.setCoord(CoordUtils.createCoord(13002.0, 12782.0));
@@ -228,6 +238,7 @@ public class Plans {
 		route11.setDistance(300);
 		route11.setTravelTime(300.0);
 		leg11.setRoute(route11);
+		leg11.setTravelTime(300.0);
 		plan.addLeg(leg11);
 		Activity act12 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		act12.setCoord(CoordUtils.createCoord(13214.0, 12994.0));
@@ -251,6 +262,7 @@ public class Plans {
 		ptRoute.setStartLinkId(link4);
 		ptRoute.setEndLinkId(link5);
 		leg12.setRoute(ptRoute);
+		leg12.setTravelTime(250.0);
 		plan.addLeg(leg12);
 		Activity act13 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		act13.setCoord(CoordUtils.createCoord(13916.0, 13696.0));
@@ -267,6 +279,7 @@ public class Plans {
 		route13.setDistance(200);
 		route13.setTravelTime(200.0);
 		leg13.setRoute(route13);
+		leg13.setTravelTime(200.0);
 		plan.addLeg(leg13);
 		Activity act14 = PopulationUtils.createActivityFromLinkId("shopping", link5);// main mode pt
 		act14.setCoord(CoordUtils.createCoord(14057.0, 13837.0));
@@ -280,6 +293,7 @@ public class Plans {
 		leg14.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(13916.0, 13696.0));
 		leg14.setDepartureTime(53618.0);
 		leg14.setRoute(route13);
+		leg14.setTravelTime(200.0);
 		plan.addLeg(leg14);
 		Activity act15 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		act15.setCoord(CoordUtils.createCoord(13916.0, 13696.0));
@@ -294,6 +308,7 @@ public class Plans {
 		leg15.setDepartureTime(53819.0);
 		leg15.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 53829.0);
 		leg15.setRoute(ptRoute);
+		leg15.setTravelTime(250.0);
 		plan.addLeg(leg15);
 		Activity act16 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		act16.setCoord(CoordUtils.createCoord(13214.0, 12994.0));
@@ -310,6 +325,7 @@ public class Plans {
 		route16.setDistance(700);
 		route16.setTravelTime(700.0);
 		leg16.setRoute(route16);
+		leg16.setTravelTime(700.0);
 		plan.addLeg(leg16);
 		Activity act17 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
@@ -328,6 +344,7 @@ public class Plans {
 		route17.setDistance(18000);
 		route17.setTravelTime(4500.0);
 		leg17.setRoute(route17);
+		leg17.setTravelTime(4500.0);
 		plan.addLeg(leg17);
 		Activity act18 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
@@ -345,6 +362,7 @@ public class Plans {
 		route18.setDistance(250);
 		route18.setTravelTime(250.0);
 		leg18.setRoute(route18);
+		leg18.setTravelTime(250.0);
 		plan.addLeg(leg18);
 		Activity act19 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		act19.setCoord(CoordUtils.createCoord(30.0, 50.0));
@@ -380,6 +398,7 @@ public class Plans {
 		route2_1.setDistance(100);
 		route2_1.setTravelTime(100.0);
 		legp2_1.setRoute(route2_1);
+		legp2_1.setTravelTime(100.0);
 		plan2.addLeg(legp2_1);
 		Activity actp2_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
@@ -398,6 +417,7 @@ public class Plans {
 		route2_2.setDistance(6000);
 		route2_2.setTravelTime(1500.0);
 		legp2_2.setRoute(route2_2);
+		legp2_2.setTravelTime(1500.0);
 		plan2.addLeg(legp2_2);
 		Activity actp2_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
@@ -415,6 +435,7 @@ public class Plans {
 		route2_3.setDistance(200);
 		route2_3.setTravelTime(200.0);
 		legp2_3.setRoute(route2_3);
+		legp2_3.setTravelTime(200.0);
 		plan2.addLeg(legp2_3);
 		Activity actp2_4 = PopulationUtils.createActivityFromLinkId("work", link4);// main mode car
 		actp2_4.setCoord(CoordUtils.createCoord(4483.0, 4503.0));
@@ -431,6 +452,7 @@ public class Plans {
 		route2_4.setDistance(250);
 		route2_4.setTravelTime(250.0);
 		legp2_4.setRoute(route2_4);
+		legp2_4.setTravelTime(250.0);
 		plan2.addLeg(legp2_4);
 		Activity actp2_5 = PopulationUtils.createActivityFromLinkId("leisure", link4);// main mode walk
 		actp2_5.setCoord(CoordUtils.createCoord(4659.0, 4679.0));
@@ -444,6 +466,7 @@ public class Plans {
 		legp2_5.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(4483.0, 4503.0));
 		legp2_5.setDepartureTime(43452.0);
 		legp2_5.setRoute(route2_4);
+		legp2_5.setTravelTime(250.0);
 		plan2.addLeg(legp2_5);
 		Activity actp2_6 = PopulationUtils.createActivityFromLinkId("work", link4);// main mode walk
 		actp2_6.setCoord(CoordUtils.createCoord(4483.0, 4503.0));
@@ -457,6 +480,7 @@ public class Plans {
 		legp2_6.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(4342.0, 4362.0));
 		legp2_6.setDepartureTime(54502.0);
 		legp2_6.setRoute(route2_3);
+		legp2_6.setTravelTime(200.0);
 		plan2.addLeg(legp2_6);
 		Activity actp2_7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4,
 				TransportMode.car);
@@ -472,6 +496,7 @@ public class Plans {
 		legp2_7.setDepartureTime(54703.0);
 		legp2_7.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 54703.0);
 		legp2_7.setRoute(route2_2);
+		legp2_7.setTravelTime(1500.0);
 		plan2.addLeg(legp2_7);
 		Activity actp2_8 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
@@ -486,6 +511,7 @@ public class Plans {
 		legp2_8.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(30.0, 50.0));
 		legp2_8.setDepartureTime(56204.0);
 		legp2_8.setRoute(route2_1);
+		legp2_8.setTravelTime(100.0);
 		plan2.addLeg(legp2_8);
 		Activity actp2_9 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		actp2_9.setCoord(CoordUtils.createCoord(30.0, 50.0));
@@ -521,6 +547,7 @@ public class Plans {
 		route3_1.setDistance(100);
 		route3_1.setTravelTime(100.0);
 		legp3_1.setRoute(route3_1);
+		legp3_1.setTravelTime(100.0);
 		plan3.addLeg(legp3_1);
 		Activity actp3_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
@@ -539,6 +566,7 @@ public class Plans {
 		route3_2.setDistance(8000);
 		route3_2.setTravelTime(2000.0);
 		legp3_2.setRoute(route3_2);
+		legp3_2.setTravelTime(2000.0);
 		plan3.addLeg(legp3_2);
 		Activity actp3_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5,
 				TransportMode.car);
@@ -556,6 +584,7 @@ public class Plans {
 		route3_3.setDistance(300);
 		route3_3.setTravelTime(300.0);
 		legp3_3.setRoute(route3_3);
+		legp3_3.setTravelTime(300.0);
 		plan3.addLeg(legp3_3);
 		Activity actp3_4 = PopulationUtils.createActivityFromLinkId("shopping", link5);// main mode car
 		actp3_4.setCoord(CoordUtils.createCoord(5968.0, 5988.0));
@@ -569,6 +598,7 @@ public class Plans {
 		legp3_4.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(5756.0, 5776.0));
 		legp3_4.setDepartureTime(25802.0);
 		legp3_4.setRoute(route3_3);
+		legp3_4.setTravelTime(300.0);
 		plan3.addLeg(legp3_4);
 		Activity actp3_5 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5,
 				TransportMode.car);
@@ -584,6 +614,7 @@ public class Plans {
 		legp3_5.setDepartureTime(26103.0);
 		legp3_5.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 26103.0);
 		legp3_5.setRoute(route3_2);
+		legp3_5.setTravelTime(2000.0);
 		plan3.addLeg(legp3_5);
 		Activity actp3_6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.car);
@@ -598,6 +629,7 @@ public class Plans {
 		legp3_6.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(30.0, 50.0));
 		legp3_6.setDepartureTime(28104.0);
 		legp3_6.setRoute(route3_1);
+		legp3_6.setTravelTime(100.0);
 		plan3.addLeg(legp3_6);
 		Activity actp3_8 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		actp3_8.setCoord(CoordUtils.createCoord(30.0, 50.0));
@@ -633,6 +665,7 @@ public class Plans {
 		route4_1.setDistance(350);
 		route4_1.setTravelTime(350.0);
 		legp4_1.setRoute(route4_1);
+		legp4_1.setTravelTime(350.0);
 		plan4.addLeg(legp4_1);
 		Activity actp4_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.pt);
@@ -657,6 +690,7 @@ public class Plans {
 		ptRoute.setStartLinkId(link1);
 		ptRoute.setEndLinkId(link3);
 		legp4_2.setRoute(ptRoute);
+		legp4_2.setTravelTime(1625.0);
 		plan4.addLeg(legp4_2);
 		Activity actp4_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3,
 				TransportMode.pt);
@@ -674,6 +708,7 @@ public class Plans {
 		route4_3.setDistance(250);
 		route4_3.setTravelTime(250.0);
 		legp4_3.setRoute(route4_3);
+		legp4_3.setTravelTime(250.0);
 		plan4.addLeg(legp4_3);
 		Activity actp4_4 = PopulationUtils.createActivityFromLinkId("shopping", link3);// main mode pt
 		actp4_4.setCoord(CoordUtils.createCoord(5049.0, 5069.0));
@@ -687,6 +722,7 @@ public class Plans {
 		legp4_4.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(4873.0, 4893.0));
 		legp4_4.setDepartureTime(25637.0);
 		legp4_4.setRoute(route4_3);
+		legp4_4.setTravelTime(250.0);
 		plan4.addLeg(legp4_4);
 		Activity actp4_5 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3,
 				TransportMode.pt);
@@ -702,6 +738,7 @@ public class Plans {
 		legp4_5.setDepartureTime(25888.0);
 		legp4_5.getAttributes().putAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME, 25898.0);
 		legp4_5.setRoute(ptRoute);
+		legp4_5.setTravelTime(1625.0);
 		plan4.addLeg(legp4_5);
 		Activity actp4_6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1,
 				TransportMode.pt);
@@ -716,6 +753,7 @@ public class Plans {
 		legp4_6.getAttributes().putAttribute("endcoord", CoordUtils.createCoord(30.0, 50.0));
 		legp4_6.setDepartureTime(27524.0);
 		legp4_6.setRoute(route4_1);
+		legp4_6.setTravelTime(350.0);
 		plan4.addLeg(legp4_6);
 		Activity actp4_8 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode pt
 		actp4_8.setCoord(CoordUtils.createCoord(30.0, 50.0));
@@ -751,6 +789,7 @@ public class Plans {
 		route.setDistance(100);
 		route.setTravelTime(100.0);
 		leg1.setRoute(route);
+		leg1.setTravelTime(100.0);
 		plan.addLeg(leg1);
 		Activity act2 = PopulationUtils.createActivityFromLinkId("leisure", link1);// main mode walk
 		//act2.setCoord(CoordUtils.createCoord(100.0, 120.0));
@@ -768,6 +807,7 @@ public class Plans {
 		route2.setDistance(150);
 		route2.setTravelTime(150.0);
 		leg2.setRoute(route2);
+		leg2.setTravelTime(150.0);
 		plan.addLeg(leg2);
 		Activity act3 = PopulationUtils.createActivityFromLinkId("home", link1);
 		act3.setCoord(CoordUtils.createCoord(30.0, 50.0));

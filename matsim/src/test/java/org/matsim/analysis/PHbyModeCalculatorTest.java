@@ -136,14 +136,14 @@ public class PHbyModeCalculatorTest {
 				if (elem instanceof Leg) {
 					String mode = ((Leg) elem).getMode();
 					Double value = modeValues.get(mode);
-					value += (mode != "pt") ? ((Leg) elem).getRoute().getTravelTime()
-							: ((Leg) elem).getRoute().getTravelTime() - ((Double) elem.getAttributes()
-									.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime()) ;
+					value += (mode != "pt") ? ((Leg) elem).getRoute().getTravelTime().seconds()
+							: ((Leg) elem).getRoute().getTravelTime().seconds() - ((Double) elem.getAttributes()
+									.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime().seconds()) ;
 					modeValues.put(mode, value);
 					if(mode == "pt") {
 						Double wait_value = modeValues.get("pt_wait");
 						wait_value += (Double) elem.getAttributes()
-								.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime();
+								.getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME) - ((Leg) elem).getDepartureTime().seconds();
 						modeValues.put("pt_wait", wait_value);
 					}
 						

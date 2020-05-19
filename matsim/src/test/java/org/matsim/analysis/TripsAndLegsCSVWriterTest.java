@@ -39,6 +39,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -225,7 +226,7 @@ public class TripsAndLegsCSVWriterTest {
 					//trav_time += leg.getTravelTime();
 					Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
 					if(boardingTime != null) {
-						waiting_time += boardingTime - leg.getDepartureTime();
+						waiting_time += boardingTime - leg.getDepartureTime().seconds();
 					}
 					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
 						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
@@ -307,8 +308,8 @@ public class TripsAndLegsCSVWriterTest {
 				List<Leg> legs = trip.getLegsOnly();
 				for(Leg leg : legs) {
 					Map<String, Object> legvalues = new HashMap<String, Object>();
-					double travel_time = leg.getTravelTime();
-					double departure_time = leg.getDepartureTime();
+					OptionalTime travel_time = leg.getTravelTime();
+					OptionalTime departure_time = leg.getDepartureTime();
 					int leg_distance = (int) leg.getRoute().getDistance();
 					String leg_mode = leg.getMode();
 					String leg_start_link = leg.getRoute().getStartLinkId().toString();
@@ -327,10 +328,10 @@ public class TripsAndLegsCSVWriterTest {
 					}
 					double end_x_value = end_coord.getX();
 					double end_y_value = end_coord.getY();
-					double waitingTime = 0.0;
+					double waitingTime = 0;
 					Double boardingTime = (Double) leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
 					if (boardingTime != null) {
-			            waitingTime = boardingTime - leg.getDepartureTime();
+			            waitingTime = boardingTime - leg.getDepartureTime().seconds();
 			        }
 					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
 						 ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
