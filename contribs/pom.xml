@@ -152,6 +152,7 @@
 		<module>commercialTrafficApplications</module>
 		<module>common</module>
 		<module>decongestion</module>
+		<module>discrete_mode_choice</module>
 		<module>drt</module>
 		<module>dvrp</module>
 		<module>ev</module>
