@@ -3,6 +3,7 @@ package org.matsim.contrib.emissions.analysis;
 import org.matsim.api.core.v01.Coord;
 
 import java.util.Set;
+import java.util.stream.IntStream;
 
 public class Raster {
 
@@ -19,6 +20,18 @@ public class Raster {
         this.xLength = getXIndex(bounds.maxX) + 1;
         this.yLength = getYIndex(bounds.maxY) + 1;
         this.data = new double[xLength * yLength];
+    }
+
+    void forEachIndex(IndexFunction valueSupplier) {
+
+        IntStream.range(0, xLength)
+                .forEach(xi ->
+                        IntStream.range(0, yLength)
+                                .forEach(yi -> {
+                                    var value = valueSupplier.supply(xi, yi);
+                                    var index = yi * xLength + xi;
+                                    data[index] = value;
+                                }));
     }
 
     Bounds getBounds() {
@@ -45,21 +58,36 @@ public class Raster {
         return (int) ((y - bounds.minY) / cellSize);
     }
 
-    int getIndex(double x, double y) {
-        var xIndex = getXIndex(x);
-        var yIndex = getYIndex(y);
+    int getIndexForCoord(double x, double y) {
+        var xi = getXIndex(x);
+        var yi = getYIndex(y);
 
-        return yIndex * xLength + xIndex;
+        return getIndex(xi, yi);
     }
 
-    double getValue(double x, double y) {
-        var index = getIndex(x, y);
+    int getIndex(int xi, int yi) {
+        return yi * xLength + xi;
+    }
+
+    double getValueByIndex(int xi, int yi) {
+
+        var index = getIndex(xi, yi);
         return data[index];
     }
 
-    double adjustValue(double x, double y, double value) {
+    double getValue(double x, double y) {
+        var index = getIndexForCoord(x, y);
+        return data[index];
+    }
 
-        var index = getIndex(x, y);
+    double adjustValueForCoord(double x, double y, double value) {
+
+        var index = getIndexForCoord(x, y);
+        return data[index] += value;
+    }
+
+    double adjustValueForIndex(int xi, int yi, double value) {
+        var index = getIndex(xi, yi);
         return data[index] += value;
     }
 
@@ -100,5 +128,11 @@ public class Raster {
         public double getMaxY() {
             return maxY;
         }
+    }
+
+    @FunctionalInterface
+    interface IndexFunction {
+
+        double supply(int xi, int yi);
     }
 }

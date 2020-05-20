@@ -13,22 +13,26 @@ public class DisplayRasterOnPanel {
     public static void main(String[] arsg) {
 
         var network = NetworkUtils.createNetwork();
-        var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(50, 0));
-        var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(100, 0));
-        var node3 = network.getFactory().createNode(Id.createNodeId("node3"), new Coord(0, 100));
+        var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 0));
+        var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(200, 100));
+        var node3 = network.getFactory().createNode(Id.createNodeId("node3"), new Coord(0, 300));
+        var node4 = network.getFactory().createNode(Id.createNodeId("node4"), new Coord(300, 300));
         var link1 = network.getFactory().createLink(Id.createLinkId("link1"), node1, node2);
-        var link2 = network.getFactory().createLink(Id.createLinkId("link2"), node1, node3);
+        var link2 = network.getFactory().createLink(Id.createLinkId("link2"), node2, node3);
+        var link3 = network.getFactory().createLink(Id.createLinkId("link3"), node1, node4);
         network.addNode(node1);
         network.addNode(node2);
         network.addNode(node3);
+        network.addNode(node4);
         network.addLink(link1);
         network.addLink(link2);
+        network.addLink(link3);
 
-        var emissions = Map.of(link1.getId(), 20., link2.getId(), 10.);
+        var emissions = Map.of(link1.getId(), 20., link2.getId(), 100., link3.getId(), 100.);
 
-        var raster = FastEmissionGridAnalyzer.rasterNetwork(network, emissions, 10);
+        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 10);
 
-        displayOnPanel(raster);
+        displayOnPanel(smoothedRaster);
     }
 
     // little hack to visualize the network and the raster. This will go away, or move somewhere else
@@ -63,7 +67,7 @@ public class DisplayRasterOnPanel {
                     g.drawRect((int) x, (int) y, 10, 10);
 
                     var value = raster.getValue(x, y);
-                    g.setColor(new Color(255 - (int) value * 30, 255 - (int) value * 30, 255 - (int) value * 30));
+                    g.setColor(new Color(255 - (int) (value * 100), 255 - (int) (value * 100), 255 - (int) (value * 100)));
                     g.fillRect((int) x, (int) y, 10, 10);
                 }
             }

@@ -13,39 +13,50 @@ public class FastEmissionGridAnalyzer {
 
     static Raster calculate(Network network, Map<Id<Link>, Double> emissions, double cellSize) {
 
-
         // create a kernel
         // this is a kernel for sigma = 1. TODO calculate kernel based on smoothing radius
         var kernel = new double[]{0.006, 0.061, 0.242, 0.383, 0.242, 0.061, 0.006};
+        var halfKernelLength = kernel.length / 2;
         var originalRaster = rasterNetwork(network, emissions, cellSize);
         var firstPassRaster = new Raster(originalRaster.getBounds(), cellSize);
         var finalPassRaster = new Raster(originalRaster.getBounds(), cellSize);
 
+
         // smooth horizontally
-    /*    for (var x = bounds.minX; x < bounds.maxX; x += cellSize) {
-            for (var y = bounds.minY; y < bounds.maxY; y += cellSize) {
+        firstPassRaster.forEachIndex((x, y) -> {
 
-                // TODO creating a new coord each time is expensice I guess
-                var pollution = pollutionCells.computeIfAbsent(new Coord(x, y), c -> 0.);
+            var value = 0.;
 
-                var averageValue = 0.;
-                // get the values from the cells within the kernel
-                for (var ki = -3; ki <= 3; ki++) {
+            // make sure we don't try to read values outside the bounds of the raster
+            var startIndex = (x - halfKernelLength < 0) ? halfKernelLength - x : 0;
+            var endIndex = (x + halfKernelLength >= firstPassRaster.getXLength()) ? firstPassRaster.getXLength() - x : kernel.length;
 
-                    var kernelValue = kernel[ki + 3];
-                    var otherPollution = pollutionCells.computeIfAbsent(new Coord(x + cellSize * ki, y), c -> 0.);
-                    averageValue += otherPollution;
-                }
-
-                averageValue = averageValue / kernel.length;
-
+            for (var ki = startIndex; ki < endIndex; ki++) {
+                var kernelValue = kernel[ki];
+                var originalValue = originalRaster.getValueByIndex(x + ki - halfKernelLength, y);
+                value += originalValue * kernelValue;
             }
-        }
-                // if cells not already present create one
-                // calculate the value for the cell
+            return value;
+        });
 
-     */
+        // TODO extract this pretty much similar executions
+        //smoth vertically
+        finalPassRaster.forEachIndex((x, y) -> {
 
+            var value = 0.;
+
+            // make sure we don't try to read values outside the bounds of the raster
+            var startIndex = (y - halfKernelLength < 0) ? halfKernelLength - y : 0;
+            var endIndex = (y + halfKernelLength >= finalPassRaster.getYLength()) ? finalPassRaster.getYLength() - y : kernel.length;
+
+            for (var ki = startIndex; ki < endIndex; ki++) {
+                var kernelValue = kernel[ki];
+                var originalValue = firstPassRaster.getValueByIndex(x, y + ki - halfKernelLength);
+                value += originalValue * kernelValue;
+            }
+            return value;
+
+        });
         return finalPassRaster;
     }
 
@@ -96,12 +107,12 @@ public class FastEmissionGridAnalyzer {
         if (dx == 0 && dy == 0) {
             // the algorithm doesn't really support lines shorter than the cell size.
             // do avoid complicated computation within the loop, catch this case here
-            raster.adjustValue(x0 * cellSize, y0 * cellSize, value);
+            raster.adjustValueForCoord(x0 * cellSize, y0 * cellSize, value);
             return 1;
         }
 
         do {
-            raster.adjustValue(x0 * cellSize, y0 * cellSize, value);
+            raster.adjustValueForCoord(x0 * cellSize, y0 * cellSize, value);
             result++;
             e2 = err + err;
             if (e2 >= dy) {
