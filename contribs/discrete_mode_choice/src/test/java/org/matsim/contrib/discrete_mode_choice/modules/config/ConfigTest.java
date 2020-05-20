@@ -11,14 +11,19 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contribs.discrete_mode_choice.modules.config.DiscreteModeChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class ConfigTest {
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testReadWriteConfig() {
 		// Create config
@@ -29,11 +34,11 @@ public class ConfigTest {
 		dmcConfig.getCarModeAvailabilityConfig().setAvailableModes(Arrays.asList("abc", "def"));
 
 		// Write config
-		new ConfigWriter(config).write("test_config.xml");
+		new ConfigWriter(config).write(utils.getOutputDirectory() + "/test_config.xml");
 
 		// Read in again
 		DiscreteModeChoiceConfigGroup dmcConfig2 = new DiscreteModeChoiceConfigGroup();
-		ConfigUtils.loadConfig("test_config.xml", dmcConfig2);
+		ConfigUtils.loadConfig(utils.getOutputDirectory() + "/test_config.xml", dmcConfig2);
 
 		assertEquals("unknown selector", dmcConfig2.getSelector());
 		assertEquals(new HashSet<>(dmcConfig.getCarModeAvailabilityConfig().getAvailableModes()),
@@ -45,16 +50,18 @@ public class ConfigTest {
 		DiscreteModeChoiceConfigGroup dmcConfig = new DiscreteModeChoiceConfigGroup();
 		Config config1 = ConfigUtils.createConfig(dmcConfig);
 
-		new ConfigWriter(config1).write("test_config1.xml");
+		new ConfigWriter(config1).write(utils.getOutputDirectory() + "/test_config1.xml");
 
-		Config config2 = ConfigUtils.loadConfig("test_config1.xml", new DiscreteModeChoiceConfigGroup());
-		new ConfigWriter(config2).write("test_config2.xml");
+		Config config2 = ConfigUtils.loadConfig(utils.getOutputDirectory() + "/test_config1.xml",
+				new DiscreteModeChoiceConfigGroup());
+		new ConfigWriter(config2).write(utils.getOutputDirectory() + "/test_config2.xml");
 
-		Config config3 = ConfigUtils.loadConfig("test_config2.xml", new DiscreteModeChoiceConfigGroup());
-		new ConfigWriter(config3).write("test_config3.xml");
+		Config config3 = ConfigUtils.loadConfig(utils.getOutputDirectory() + "/test_config2.xml",
+				new DiscreteModeChoiceConfigGroup());
+		new ConfigWriter(config3).write(utils.getOutputDirectory() + "/test_config3.xml");
 
 		BufferedReader reader = new BufferedReader(
-				new InputStreamReader(new FileInputStream(new File("test_config3.xml"))));
+				new InputStreamReader(new FileInputStream(new File(utils.getOutputDirectory() + "/test_config3.xml"))));
 
 		String line = null;
 
@@ -83,11 +90,11 @@ public class ConfigTest {
 		dmcConfig1.setTripConstraints(Arrays.asList("A", "B", "C"));
 
 		Config config1 = ConfigUtils.createConfig(dmcConfig1);
-		new ConfigWriter(config1).write("test_config.xml");
+		new ConfigWriter(config1).write(utils.getOutputDirectory() + "/test_config.xml");
 
 		DiscreteModeChoiceConfigGroup dmcConfig2 = new DiscreteModeChoiceConfigGroup();
 		Config config2 = ConfigUtils.createConfig(dmcConfig2);
-		new ConfigReader(config2).readFile("test_config.xml");
+		new ConfigReader(config2).readFile(utils.getOutputDirectory() + "/test_config.xml");
 
 		assertTrue(dmcConfig2.getTripConstraints().contains("A"));
 		assertTrue(dmcConfig2.getTripConstraints().contains("B"));
