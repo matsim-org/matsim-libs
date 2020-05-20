@@ -3,8 +3,10 @@ package ch.sbb.matsim.routing.pt.raptor;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
@@ -34,7 +36,7 @@ import java.util.Map;
  *
  * @author mrieser / Simunto GmbH
  */
-public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler {
+public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private final IdMap<TransitLine, LineData> lineData = new IdMap<>(TransitLine.class);
 	private final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
@@ -67,9 +69,7 @@ public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, Transi
 			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
 			DepartureData dep = stop.getOrCreate(vehData.departureId);
 			dep.vehDepTime = event.getTime();
-//			if (!Double.isFinite(dep.latestWaitStart)) { // TODO handle completely full
-//				dep.latestWaitStart = event.getTime();
-//			}
+			dep.paxCountAtDeparture = vehData.currentPaxCount;
 		}
 
 	}
@@ -81,13 +81,22 @@ public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, Transi
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		double waitStart = this.waitingStarttimes.remove(event.getPersonId());
 		VehicleData vehData = this.vehicleData.get(event.getVehicleId());
 		if (vehData != null) {
+			vehData.currentPaxCount++;
+			double waitStart = this.waitingStarttimes.remove(event.getPersonId());
 			LineData line = this.lineData.computeIfAbsent(vehData.lineId, id -> new LineData());
 			RouteData route = line.routeData.computeIfAbsent(vehData.routeId, id -> new RouteData());
 			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
 			stop.getOrCreate(vehData.departureId).addWaitingPerson(waitStart);
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		VehicleData vehData = this.vehicleData.get(event.getVehicleId());
+		if (vehData != null) {
+			vehData.currentPaxCount--;
 		}
 	}
 
@@ -123,6 +132,27 @@ public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, Transi
 		for (DepartureData dep : departures) {
 			if (time <= dep.latestWaitStart) {
 				return dep;
+			}
+		}
+		return null;
+	}
+
+	public DepartureData getDepartureData(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<TransitStopFacility> stopFacility, Id<Departure> departure) {
+		LineData line = this.lineData.get(transitLine);
+		if (line == null) {
+			return null;
+		}
+		RouteData route = line.routeData.get(transitRoute);
+		if (route == null) {
+			return null;
+		}
+		StopData stop = route.stopData.get(stopFacility);
+		if (stop == null) {
+			return null;
+		}
+		for (DepartureData d : stop.depList) {
+			if (d.departureId.equals(departure)) {
+				return d;
 			}
 		}
 		return null;
@@ -191,6 +221,7 @@ public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, Transi
 		double vehDepTime = Double.NEGATIVE_INFINITY;
 		double earliestWaitStart = Double.POSITIVE_INFINITY;
 		double latestWaitStart = Double.NEGATIVE_INFINITY;
+		int paxCountAtDeparture = -1;
 
 		public DepartureData(Id<Departure> departureId) {
 			this.departureId = departureId;
@@ -218,6 +249,7 @@ public class WaitingTimeTracker implements AgentWaitingForPtEventHandler, Transi
 		private final Id<TransitRoute> routeId;
 		private final Id<Departure> departureId;
 		private Id<TransitStopFacility> stopFacilityId = null;
+		private int currentPaxCount = 0;
 
 		public VehicleData(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<Departure> departureId) {
 			this.lineId = lineId;
