@@ -13,8 +13,9 @@ To learn more about these applications (and how you can implement "frozen random
 For more customized applications and set-ups, have a look at [Customizing the framework](docs/Customizing.md).
 
 When referencing the contrib, please use the following papers:
-- Hörl, S., M. Balac and K.W. Axhausen (2018) [A first look at bridging discrete choice modeling and agent-based microsimulation in MATSim](https://www.sciencedirect.com/science/article/pii/S1877050918304496?via%3Dihub), *Procedia Computer Science*, **130**, 900-907.
-- Hörl, S., M. Balac and K.W. Axhausen (2019) [Pairing discrete mode choice models and agent-based transport simulation with MATSim](https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/303667/ab1373.pdf), paper presented at the *98th Annual Meeting of the Transportation Research Board*, Washington D.C., January, 2019.
+> Hörl, S., M. Balac and K.W. Axhausen (2018) [A first look at bridging discrete choice modeling and agent-based microsimulation in MATSim](https://www.sciencedirect.com/science/article/pii/S1877050918304496?via%3Dihub), *Procedia Computer Science*, **130**, 900-907.
+
+> Hörl, S., M. Balac and K.W. Axhausen (2019) [Pairing discrete mode choice models and agent-based transport simulation with MATSim](https://www.research-collection.ethz.ch/bitstream/handle/20.500.11850/303667/ab1373.pdf), paper presented at the *98th Annual Meeting of the Transportation Research Board*, Washington D.C., January, 2019.
 
 
 ## Literature
