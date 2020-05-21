@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourDataSet;
+import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
@@ -42,10 +42,10 @@ public class SingleVehicleInsertionFilter {
 
 	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
-		DetourDataSet<Double> set = detourTimesProvider.getDetourDataSet(drtRequest, vEntry);
+		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest, vEntry);
 
 		return insertions.stream()
-				.map(set::createInsertionDetourData)
+				.map(insertion -> data.createInsertionWithDetourData(insertion, drtRequest, vEntry))
 				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry, iWithDetourTimes,
 						Double::doubleValue) < InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
 				.collect(Collectors.toList());

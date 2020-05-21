@@ -34,7 +34,8 @@ public class DetourTimesProvider implements DetourDataProvider<Double> {
 		this.detourTimeEstimator = detourTimeEstimator;
 	}
 
-	public DetourDataSet<Double> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
+	@Override
+	public DetourData<Double> getDetourData(DrtRequest drtRequest, Entry vEntry) {
 		//TODO add departure/arrival times to improve estimation
 		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
 		Function<Link, Double> timesFromPickup = link -> detourTimeEstimator.estimateTime(drtRequest.getFromLink(),
@@ -42,7 +43,6 @@ public class DetourTimesProvider implements DetourDataProvider<Double> {
 		Function<Link, Double> timesToDropoff = link -> detourTimeEstimator.estimateTime(link, drtRequest.getToLink());
 		Function<Link, Double> timesFromDropoff = link -> detourTimeEstimator.estimateTime(drtRequest.getToLink(),
 				link);
-		return DetourDataProvider.getDetourDataSet(drtRequest, vEntry, timesToPickup, timesFromPickup, timesToDropoff,
-				timesFromDropoff);
+		return new DetourData<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff);
 	}
 }

@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import static org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -28,7 +30,6 @@ import javax.inject.Named;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -123,9 +124,9 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public DetourDataSet<PathData> getDetourDataSet(DrtRequest drtRequest, Entry vEntry) {
-		return DetourDataProvider.getDetourDataSet(drtRequest, vEntry, pathsToPickupMap::get, pathsFromPickupMap::get,
-				pathsToDropoffMap::get, pathsFromDropoffMap::get);
+	public DetourData<PathData> getDetourData(DrtRequest drtRequest, Entry vEntry) {
+		return new DetourData<>(pathsToPickupMap::get, pathsFromPickupMap::get, pathsToDropoffMap::get,
+				pathsFromDropoffMap::get);
 	}
 
 	@Override

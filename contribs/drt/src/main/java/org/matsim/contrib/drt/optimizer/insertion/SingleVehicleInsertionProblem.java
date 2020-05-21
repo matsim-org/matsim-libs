@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourDataSet;
+import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -68,12 +68,12 @@ public class SingleVehicleInsertionProblem<D> {
 
 	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
-		DetourDataSet<D> set = pathDataProvider.getDetourDataSet(drtRequest, vEntry);
+		DetourData<D> set = pathDataProvider.getDetourData(drtRequest, vEntry);
 
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithDetourData<D> insertion = set.createInsertionDetourData(i);
+			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i, drtRequest, vEntry);
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;

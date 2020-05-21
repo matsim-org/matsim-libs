@@ -21,24 +21,20 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider.getPathDataSet;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Start;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourDataSet;
+import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.testcases.fakes.FakeLink;
-import org.matsim.testcases.fakes.FakeNode;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -47,73 +43,85 @@ import com.google.common.collect.ImmutableMap;
  * @author Michal Maciejewski (michalm)
  */
 public class PrecalculablePathDataProviderTest {
-	private final Node node0 = node("0");
-	private final Node node1 = node("1");
-	private final Node node2 = node("2");
-	private final Node node3 = node("3");
-	private final Node node4 = node("4");
+	private final Link pickupLink = link("pickupLink");
+	private final Link dropoffLink = link("dropoffLink");
+	private final Link startLink = link("startLink");
+	private final Link stop0Link = link("stop0Link");
+	private final Link stop1Link = link("stop1Link");
 
-	private final Link pickupLink = link(node0, node1);
-	private final Link dropoffLink = link(node1, node2);
-	private final Link startLink = link(node2, node3);
-	private final Link stop0Link = link(node3, node4);
-	private final Link stop1Link = link(node4, node0);
+	private final String start_pickup = "start_pickup";
+	private final String stop0_pickup = "stop0_pickup";
+	private final String stop1_pickup = "stop1_pickup";
 
-	private final PathData start_pickup = pathData();
-	private final PathData stop0_pickup = pathData();
-	private final PathData stop1_pickup = pathData();
+	private final String pickup_stop0 = "pickup_stop0";
+	private final String pickup_stop1 = "pickup_stop1";
 
-	private final PathData pickup_stop0 = pathData();
-	private final PathData pickup_stop1 = pathData();
+	private final String pickup_dropoff = "pickup_dropoff";
 
-	private final PathData pickup_dropoff = pathData();
+	private final String stop0_dropoff = "stop0_dropoff";
+	private final String stop1_dropoff = "stop1_dropoff";
 
-	private final PathData stop0_dropoff = pathData();
-	private final PathData stop1_dropoff = pathData();
+	private final String dropoff_stop0 = "dropoff_stop0";
+	private final String dropoff_stop1 = "dropoff_stop1";
 
-	private final PathData dropoff_stop0 = pathData();
-	private final PathData dropoff_stop1 = pathData();
+	private final DrtRequest request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
+	private final Entry entry = entry(startLink, stop0Link, stop1Link);
 
-	private final PathData dropoff_zeroPath = pathData();
+	private final ImmutableMap<Link, String> pathToPickupMap = ImmutableMap.of(startLink, start_pickup, stop0Link,
+			stop0_pickup, stop1Link, stop1_pickup);
+
+	private final ImmutableMap<Link, String> pathFromPickupMap = ImmutableMap.of(stop0Link, pickup_stop0, stop1Link,
+			pickup_stop1, dropoffLink, pickup_dropoff);
+
+	private final ImmutableMap<Link, String> pathToDropoffMap = ImmutableMap.of(pickupLink, pickup_dropoff, stop0Link,
+			stop0_dropoff, stop1Link, stop1_dropoff);
+
+	private final ImmutableMap<Link, String> pathFromDropoffMap = ImmutableMap.of(stop0Link, dropoff_stop0, stop1Link,
+			dropoff_stop1);
+
+	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap::get, pathFromPickupMap::get,
+			pathToDropoffMap::get, pathFromDropoffMap::get);
 
 	@Test
-	public void testGetPathDataSet() {
-		DrtRequest request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
-		Entry entry = entry(startLink, stop0Link, stop1Link);
-		var pathToPickupMap = ImmutableMap.of(startLink.getId(), start_pickup, stop0Link.getId(), stop0_pickup,
-				stop1Link.getId(), stop1_pickup);
-
-		var pathFromPickupMap = ImmutableMap.of(stop0Link.getId(), pickup_stop0, stop1Link.getId(), pickup_stop1,
-				dropoffLink.getId(), pickup_dropoff);
-
-		var pathToDropoffMap = ImmutableMap.of(pickupLink.getId(), pickup_dropoff, stop0Link.getId(), stop0_dropoff,
-				stop1Link.getId(), stop1_dropoff);
-
-		var pathFromDropoffMap = ImmutableMap.of(dropoffLink.getId(), dropoff_zeroPath, stop0Link.getId(),
-				dropoff_stop0, stop1Link.getId(), dropoff_stop1);
-
-		DetourDataSet<PathData> pathDataSet = getPathDataSet(request, entry, pathToPickupMap, pathFromPickupMap,
-				pathToDropoffMap, pathFromDropoffMap);
-
-		DetourDataSet<PathData> expectedDataSet = new DetourDataSet<>(//
-				asArray(start_pickup, stop0_pickup, stop1_pickup),//
-				asArray(pickup_dropoff, pickup_stop0, pickup_stop1),//
-				asArray(null, stop0_dropoff, stop1_dropoff),//
-				asArray(null, dropoff_stop0, dropoff_stop1));
-
-		assertThat(pathDataSet).isEqualToComparingFieldByField(expectedDataSet);
+	public void insertion_0_0() {
+		assertInsertion(0, 0, start_pickup, pickup_dropoff, null, dropoff_stop0);
 	}
 
-	private PathData[] asArray(PathData... pathData) {
-		return pathData;
+	@Test
+	public void insertion_0_1() {
+		assertInsertion(0, 1, start_pickup, pickup_stop0, stop0_dropoff, dropoff_stop1);
 	}
 
-	private Link link(Node from, Node to) {
-		return new FakeLink(Id.createLinkId(from.getId() + "_" + to.getId()), from, to);
+	@Test
+	public void insertion_0_2() {
+		assertInsertion(0, 2, start_pickup, pickup_stop0, stop1_dropoff, null);
 	}
 
-	private Node node(String id) {
-		return new FakeNode(Id.createNodeId(id));
+	@Test
+	public void insertion_1_1() {
+		assertInsertion(1, 1, stop0_pickup, pickup_dropoff, null, dropoff_stop1);
+	}
+
+	@Test
+	public void insertion_1_2() {
+		assertInsertion(1, 2, stop0_pickup, pickup_stop1, stop1_dropoff, null);
+	}
+
+	@Test
+	public void insertion_2_2() {
+		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, null);
+	}
+
+	private void assertInsertion(int pickupIdx, int dropoffIdx, String detourToPickup, String detourFromPickup,
+			String detourToDropoff, String detourFromDropoff) {
+		var actual = detourData.createInsertionWithDetourData(new Insertion(pickupIdx, dropoffIdx), request, entry);
+		var expected = new InsertionWithDetourData<>(pickupIdx, dropoffIdx, detourToPickup, detourFromPickup,
+				detourToDropoff, detourFromDropoff);
+		assertThat(actual).isEqualToComparingFieldByField(expected);
+	}
+
+	private Link link(String id) {
+		return new FakeLink(Id.createLinkId(id));
 	}
 
 	private Entry entry(Link startLink, Link... stopLinks) {
@@ -123,9 +131,5 @@ public class PrecalculablePathDataProviderTest {
 
 	private Stop stop(Link link) {
 		return new Stop(new DrtStopTask(0, 60, link), 0);
-	}
-
-	private PathData pathData() {
-		return new PathData(new Path(null, ImmutableList.of(), 0, 0), 0);
 	}
 }
