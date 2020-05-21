@@ -39,25 +39,18 @@ public class SwissRailRaptor implements TransitRouter {
     private final RaptorParametersForPerson parametersForPerson;
     private final RaptorRouteSelector defaultRouteSelector;
     private final RaptorStopFinder stopFinder;
-//    private final String subpopulationAttribute;
 
     private boolean treeWarningShown = false;
 
-//    public SwissRailRaptor(final SwissRailRaptorData data, RaptorParametersForPerson parametersForPerson,
-//                           RaptorRouteSelector routeSelector, RaptorStopFinder stopFinder) {
-//        this(data, parametersForPerson, routeSelector, stopFinder );
-//        log.info("SwissRailRaptor was initialized without support for subpopulations or intermodal access/egress legs.");
-//    }
-
-    public SwissRailRaptor( final SwissRailRaptorData data, RaptorParametersForPerson parametersForPerson,
-                            RaptorRouteSelector routeSelector,
-                            RaptorStopFinder stopFinder ) {
+    public SwissRailRaptor(SwissRailRaptorData data,
+                           RaptorParametersForPerson parametersForPerson,
+                           RaptorRouteSelector routeSelector,
+                           RaptorStopFinder stopFinder) {
         this.data = data;
         this.raptor = new SwissRailRaptorCore(data);
         this.parametersForPerson = parametersForPerson;
         this.defaultRouteSelector = routeSelector;
         this.stopFinder = stopFinder;
-//        this.subpopulationAttribute = subpopulationAttribute;
     }
 
     @Override
@@ -127,13 +120,10 @@ public class SwissRailRaptor implements TransitRouter {
 		return true;
 	}
 
-	private List<Leg> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters) {
+    private List<Leg> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters) {
         SwissRailRaptorConfigGroup srrConfig = parameters.getConfig();
 
-//        Object attr = this.personAttributes.getAttribute(person.getId().toString(), this.subpopulationAttribute);
-//	    Object attr = person.getAttributes().getAttribute( this.subpopulationAttribute ) ;
-//        String subpopulation = attr == null ? null : attr.toString();
-                String subpopulation = PopulationUtils.getSubpopulation( person );
+        String subpopulation = PopulationUtils.getSubpopulation(person);
         SwissRailRaptorConfigGroup.RangeQuerySettingsParameterSet rangeSettings = srrConfig.getRangeQuerySettings(subpopulation);
 
         double earliestDepartureTime = desiredDepartureTime - rangeSettings.getMaxEarlierDeparture();

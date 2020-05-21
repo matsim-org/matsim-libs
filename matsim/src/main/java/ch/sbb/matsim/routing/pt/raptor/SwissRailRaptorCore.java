@@ -7,7 +7,6 @@ package ch.sbb.matsim.routing.pt.raptor;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.misc.Time;
@@ -33,8 +32,6 @@ import java.util.Map;
  * @author mrieser / SBB
  */
 public class SwissRailRaptorCore {
-	private static final Logger log = Logger.getLogger( SwissRailRaptorCore.class ) ;
-
     private final SwissRailRaptorData data;
 
     private final PathElement[] arrivalPathPerRouteStop;
