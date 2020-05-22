@@ -62,15 +62,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	@Override
 	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest, penaltyCalculator);
-		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
-
-		// detourLinksStats.updateStats(vEntries, detourLinksProvider);
-		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
+		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.filterInsertions(forkJoinPool, vEntries);
 		if (filteredInsertions.isEmpty()) {
 			return Optional.empty();
 		}
 
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
+		pathDataProvider.precalculatePathData(drtRequest, new DetourLinksSet(filteredInsertions));
 
 		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
 				.parallelStream()
@@ -93,9 +90,10 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
 		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
 
-		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
-			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
-			updateInsertionStats(detourLinksProvider.getFilteredInsertions());
+		private void updateStats(Collection<Entry> vEntries, Map<Entry, List<Insertion>> filteredInsertions,
+				DetourLinksSet detourLinksSet) {
+			addSet(detourLinksSet, vEntries.size());
+			updateInsertionStats(filteredInsertions);
 		}
 
 		private void addSet(DetourLinksSet set, int vEntriesCount) {

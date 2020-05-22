@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,12 +46,24 @@ class DetourLinksProvider {
 		final Map<Id<Link>, Link> dropoffDetourStartLinks;
 		final Map<Id<Link>, Link> dropoffDetourEndLinks;
 
-		public DetourLinksSet(Map<Id<Link>, Link> linksToPickup, Map<Id<Link>, Link> linksFromPickup,
-				Map<Id<Link>, Link> linksToDropoff, Map<Id<Link>, Link> linksFromDropoff) {
-			this.pickupDetourStartLinks = linksToPickup;
-			this.pickupDetourEndLinks = linksFromPickup;
-			this.dropoffDetourStartLinks = linksToDropoff;
-			this.dropoffDetourEndLinks = linksFromDropoff;
+		public DetourLinksSet(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
+			pickupDetourStartLinks = new HashMap<>();
+			pickupDetourEndLinks = new HashMap<>();
+			dropoffDetourStartLinks = new HashMap<>();
+			dropoffDetourEndLinks = new HashMap<>();
+
+			filteredInsertionsPerVehicle.values().stream().flatMap(Collection::stream).forEach(insertion -> {
+				addLink(pickupDetourStartLinks, insertion.pickup.previousLink);
+				addLink(pickupDetourEndLinks, insertion.pickup.nextLink);
+				addLink(dropoffDetourStartLinks, insertion.dropoff.previousLink);
+				addLink(dropoffDetourEndLinks, insertion.dropoff.nextLink);
+			});
+		}
+
+		private void addLink(Map<Id<Link>, Link> map, Link link) {
+			if (link != null) {
+				map.put(link.getId(), link);
+			}
 		}
 	}
 
@@ -69,11 +82,6 @@ class DetourLinksProvider {
 
 	private DetourLinksSet detourLinksSet;
 	private final Map<Entry, List<Insertion>> filteredInsertionsPerVehicle;
-
-	private final Map<Id<Link>, Link> linksToPickup;
-	private final Map<Id<Link>, Link> linksFromPickup;
-	private final Map<Id<Link>, Link> linksToDropoff;
-	private final Map<Id<Link>, Link> linksFromDropoff;
 
 	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
 	private final PartialSort<InsertionAtEnd> nearestInsertionsAtEnd = new PartialSort<>(
@@ -97,10 +105,6 @@ class DetourLinksProvider {
 		// in general, for larger fleets they should be slightly higher than for smaller fleets,
 		// nevertheless NEAREST_INSERTIONS_AT_END_LIMIT keeps them more independent of the fleet size
 		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 2);
-		linksToPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT);
-		linksFromPickup = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT / 2);
-		linksToDropoff = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT / 2);
-		linksFromDropoff = new ConcurrentHashMap<>();
 
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
@@ -110,10 +114,10 @@ class DetourLinksProvider {
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
-	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
-		forkJoinPool.submit(() -> vEntries.parallelStream().forEach(this::addDetourLinks)).join();
-		processNearestInsertionsAtEnd();
-		detourLinksSet = new DetourLinksSet(linksToPickup, linksFromPickup, linksToDropoff, linksFromDropoff);
+	Map<Entry, List<Insertion>> filterInsertions(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
+		forkJoinPool.submit(() -> vEntries.parallelStream().forEach(this::filterInsertions)).join();
+		filterNearestInsertionsAtEnd();
+		return filteredInsertionsPerVehicle;
 	}
 
 	/**
@@ -121,8 +125,10 @@ class DetourLinksProvider {
 	 *
 	 * @param vEntry
 	 */
-	private void addDetourLinks(Entry vEntry) {
+	private void filterInsertions(Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
+
+		//optimistic pre-filtering (admissible cost function using an optimistic beeline speed coefficient)
 		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(
 				drtRequest, vEntry, insertions);
 		if (insertionsWithDetourTimes.isEmpty()) {
@@ -142,7 +148,6 @@ class DetourLinksProvider {
 				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
 			} else {
 				filteredInsertions.add(new Insertion(drtRequest, vEntry, i, j));
-				addLinks(i, j, vEntry);
 			}
 		}
 
@@ -151,54 +156,17 @@ class DetourLinksProvider {
 		}
 	}
 
-	private void processNearestInsertionsAtEnd() {
+	private void filterNearestInsertionsAtEnd() {
 		List<InsertionAtEnd> insertionsAtEnd = nearestInsertionsAtEnd.kSmallestElements();
 		for (InsertionAtEnd iAtEnd : insertionsAtEnd) {
 			int i = iAtEnd.insertion.getPickupIdx();
 			int j = iAtEnd.insertion.getDropoffIdx();
 			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry, k -> new ArrayList<>())
 					.add(new Insertion(drtRequest, iAtEnd.vEntry, i, j));
-			addLinks(i, j, iAtEnd.vEntry);
 		}
 	}
 
 	private synchronized void addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance) {
 		nearestInsertionsAtEnd.add(insertionAtEnd, timeDistance);
-	}
-
-	private void addLinks(int i, int j, Entry vEntry) {
-		// i -> pickup
-		putLinkToMap(linksToPickup, (i == 0) ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink());
-
-		// XXX optimise: if pickup/dropoff is inserted at existing stop,
-		// no need to calc a path from pickup/dropoff to the next stop (the path is already in Schedule)
-
-		if (i == j) {
-			// pickup -> dropoff
-			putLinkToMap(linksFromPickup, drtRequest.getToLink());
-		} else {
-			// pickup -> i + 1
-			putLinkToMap(linksFromPickup, vEntry.stops.get(i).task.getLink());
-
-			// j -> dropoff
-			putLinkToMap(linksToDropoff, vEntry.stops.get(j - 1).task.getLink());
-		}
-
-		// dropoff -> j+1 // j+1 may not exist (dropoff appended after last stop)
-		if (j < vEntry.stops.size()) {
-			putLinkToMap(linksFromDropoff, vEntry.stops.get(j).task.getLink());
-		}
-	}
-
-	private void putLinkToMap(Map<Id<Link>, Link> map, Link link) {
-		map.putIfAbsent(link.getId(), link);
-	}
-
-	Map<Entry, List<Insertion>> getFilteredInsertions() {
-		return filteredInsertionsPerVehicle;
-	}
-
-	DetourLinksSet getDetourLinksSet() {
-		return detourLinksSet;
 	}
 }
