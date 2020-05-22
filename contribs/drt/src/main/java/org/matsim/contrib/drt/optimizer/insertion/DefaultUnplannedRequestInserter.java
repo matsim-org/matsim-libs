@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -83,8 +84,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			Optional<BestInsertion> best = insertionProblem.findBestInsertion(req, vData.getEntries());
-			if (!best.isPresent()) {
+			Optional<BestInsertion<PathData>> best = insertionProblem.findBestInsertion(req, vData.getEntries());
+			if (best.isEmpty()) {
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								req.getPassengerId(), NO_INSERTION_FOUND_CAUSE));
@@ -95,7 +96,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 						+ " fromLinkId="
 						+ req.getFromLink().getId());
 			} else {
-				BestInsertion bestInsertion = best.get();
+				BestInsertion<PathData> bestInsertion = best.get();
 				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(

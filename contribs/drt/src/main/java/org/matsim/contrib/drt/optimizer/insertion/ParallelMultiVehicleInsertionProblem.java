@@ -34,12 +34,13 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
 	private final PrecalculablePathDataProvider pathDataProvider;
 	private final DrtConfigGroup drtCfg;
 	private final MobsimTimer timer;
@@ -59,7 +60,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	@Override
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest, penaltyCalculator);
 		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
 
@@ -73,7 +74,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
 				.parallelStream()
-				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider,
+				.map(e -> SingleVehicleInsertionProblem.createWithDetourPathProvider(pathDataProvider,
 						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
 				.filter(Optional::isPresent)
 				.map(Optional::get)

@@ -81,9 +81,9 @@ class DetourLinksProvider {
 
 	private static class InsertionAtEnd {
 		private final Entry vEntry;
-		private final InsertionWithDetourTimes insertion;
+		private final InsertionWithDetourData<Double> insertion;
 
-		private InsertionAtEnd(Entry vEntry, InsertionWithDetourTimes insertion) {
+		private InsertionAtEnd(Entry vEntry, InsertionWithDetourData<Double> insertion) {
 			this.vEntry = vEntry;
 			this.insertion = insertion;
 		}
@@ -106,8 +106,8 @@ class DetourLinksProvider {
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
 		insertionFilter = new SingleVehicleInsertionFilter(new DetourTimesProvider(
-				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
-				drtCfg.getStopDuration()), new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
+				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed),
+				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
@@ -123,14 +123,14 @@ class DetourLinksProvider {
 	 */
 	private void addDetourLinks(Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
-		List<InsertionWithDetourTimes> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(drtRequest,
-				vEntry, insertions);
+		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(
+				drtRequest, vEntry, insertions);
 		if (insertionsWithDetourTimes.isEmpty()) {
 			return;
 		}
 
 		List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
-		for (InsertionWithDetourTimes insert : insertionsWithDetourTimes) {
+		for (InsertionWithDetourData<Double> insert : insertionsWithDetourTimes) {
 			int i = insert.getPickupIdx();
 			int j = insert.getDropoffIdx();
 
@@ -138,7 +138,7 @@ class DetourLinksProvider {
 				double departureTime = (i == 0) ? vEntry.start.time : vEntry.stops.get(i - 1).task.getEndTime();
 				// x OPTIMISTIC_BEELINE_SPEED_COEFF to remove bias towards near but still busy vehicles
 				// (timeToPickup is underestimated by this factor)
-				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getTimeToPickup();
+				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getDetourToPickup();
 				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
 			} else {
 				filteredInsertions.add(new Insertion(i, j));

@@ -91,7 +91,7 @@ public class InsertionGenerator {
 	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<Insertion> insertions = new ArrayList<>();
-		int occupancy = vEntry.startOccupancy;
+		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			VehicleData.Stop nextStop = nextStop(vEntry, i);
 
