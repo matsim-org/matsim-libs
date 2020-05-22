@@ -20,14 +20,11 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -40,32 +37,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 class DetourLinksProvider {
-	static class DetourLinksSet {
-		final Map<Id<Link>, Link> pickupDetourStartLinks;
-		final Map<Id<Link>, Link> pickupDetourEndLinks;
-		final Map<Id<Link>, Link> dropoffDetourStartLinks;
-		final Map<Id<Link>, Link> dropoffDetourEndLinks;
-
-		public DetourLinksSet(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
-			pickupDetourStartLinks = new HashMap<>();
-			pickupDetourEndLinks = new HashMap<>();
-			dropoffDetourStartLinks = new HashMap<>();
-			dropoffDetourEndLinks = new HashMap<>();
-
-			filteredInsertionsPerVehicle.values().stream().flatMap(Collection::stream).forEach(insertion -> {
-				addLink(pickupDetourStartLinks, insertion.pickup.previousLink);
-				addLink(pickupDetourEndLinks, insertion.pickup.nextLink);
-				addLink(dropoffDetourStartLinks, insertion.dropoff.previousLink);
-				addLink(dropoffDetourEndLinks, insertion.dropoff.nextLink);
-			});
-		}
-
-		private void addLink(Map<Id<Link>, Link> map, Link link) {
-			if (link != null) {
-				map.put(link.getId(), link);
-			}
-		}
-	}
 
 	// used to prevent filtering out feasible insertions
 	private static final double OPTIMISTIC_BEELINE_SPEED_COEFF = 1.5;
@@ -80,7 +51,6 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
-	private DetourLinksSet detourLinksSet;
 	private final Map<Entry, List<Insertion>> filteredInsertionsPerVehicle;
 
 	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)

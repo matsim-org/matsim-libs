@@ -25,11 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -47,7 +45,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final InsertionCostCalculator.PenaltyCalculator penaltyCalculator;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
-	// private final DetourLinksStats detourLinksStats = new DetourLinksStats();
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
@@ -67,7 +64,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			return Optional.empty();
 		}
 
-		pathDataProvider.precalculatePathData(drtRequest, new DetourLinksSet(filteredInsertions));
+		pathDataProvider.precalculatePathData(drtRequest,
+				filteredInsertions.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
 
 		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
 				.parallelStream()
@@ -76,67 +74,5 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.min(Comparator.comparingDouble(i -> i.cost))).join();
-	}
-
-	private static class DetourLinksStats {
-		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
-
-		private final SummaryStatistics toPickupStats = new SummaryStatistics();
-		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
-		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
-		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
-		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
-		private final SummaryStatistics insertionStats = new SummaryStatistics();
-		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
-		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
-
-		private void updateStats(Collection<Entry> vEntries, Map<Entry, List<Insertion>> filteredInsertions,
-				DetourLinksSet detourLinksSet) {
-			addSet(detourLinksSet, vEntries.size());
-			updateInsertionStats(filteredInsertions);
-		}
-
-		private void addSet(DetourLinksSet set, int vEntriesCount) {
-			toPickupStats.addValue(set.pickupDetourStartLinks.size());
-			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
-			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
-			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
-			vEntriesStats.addValue(vEntriesCount);
-		}
-
-		private void updateInsertionStats(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
-			int insertionCount = 0;
-			int insertionAtEndCount = 0;
-			int insertionAtEndToEmptyCount = 0;
-
-			for (java.util.Map.Entry<Entry, List<Insertion>> e : filteredInsertionsPerVehicle.entrySet()) {
-				List<Insertion> insertions = e.getValue();
-				insertionCount += insertions.size();
-
-				Insertion lastInsertion = insertions.get(insertions.size() - 1);
-				if (lastInsertion.pickup.index == lastInsertion.dropoff.index
-						&& lastInsertion.pickup.index == e.getKey().stops.size()) {
-					insertionAtEndCount++;
-					if (lastInsertion.pickup.index == 0) {
-						insertionAtEndToEmptyCount++;
-					}
-				}
-			}
-
-			insertionStats.addValue(insertionCount);
-			insertionAtEndStats.addValue(insertionAtEndCount);
-			insertionAtEndWhenNoStopsStats.addValue(insertionAtEndToEmptyCount);
-		}
-
-		private void printStats() {
-			log.debug("toPickupStats:\n" + toPickupStats);
-			log.debug("fromPickupStats:\n" + fromPickupStats);
-			log.debug("toDropoffStats:\n" + toDropoffStats);
-			log.debug("fromDropoffStats:\n" + fromDropoffStats);
-			log.debug("vEntriesStats:\n" + vEntriesStats);
-			log.debug("insertionStats:\n" + insertionStats);
-			log.debug("insertionAtEndStats:\n" + insertionAtEndStats);
-			log.debug("insertionAtEndWhenNoStopsStats:\n" + insertionAtEndWhenNoStopsStats);
-		}
 	}
 }

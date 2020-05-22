@@ -18,7 +18,9 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import java.util.List;
+
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
@@ -26,5 +28,5 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
  * @author michalm
  */
 public interface PrecalculablePathDataProvider extends DetourDataProvider<PathData> {
-	void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinkSet);
+	void precalculatePathData(DrtRequest drtRequest, List<Insertion> filteredInsertions);
 }
