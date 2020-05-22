@@ -141,7 +141,7 @@ class DetourLinksProvider {
 				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getDetourToPickup();
 				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
 			} else {
-				filteredInsertions.add(new Insertion(i, j));
+				filteredInsertions.add(new Insertion(drtRequest, vEntry, i, j));
 				addLinks(i, j, vEntry);
 			}
 		}
@@ -157,7 +157,7 @@ class DetourLinksProvider {
 			int i = iAtEnd.insertion.getPickupIdx();
 			int j = iAtEnd.insertion.getDropoffIdx();
 			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry, k -> new ArrayList<>())
-					.add(new Insertion(i, j));
+					.add(new Insertion(drtRequest, iAtEnd.vEntry, i, j));
 			addLinks(i, j, iAtEnd.vEntry);
 		}
 	}

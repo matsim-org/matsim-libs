@@ -59,10 +59,15 @@ import com.google.common.base.Objects;
  */
 public class InsertionGenerator {
 	public static class Insertion {
+		private final DrtRequest request;
+		private final VehicleData.Entry entry;
+
 		public final int pickupIdx;
 		public final int dropoffIdx;
 
-		public Insertion(int pickupIdx, int dropoffIdx) {
+		public Insertion(DrtRequest request, VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
+			this.request = request;
+			this.entry = entry;
 			this.pickupIdx = pickupIdx;
 			this.dropoffIdx = dropoffIdx;
 		}
@@ -120,7 +125,7 @@ public class InsertionGenerator {
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
-						insertions.add(new Insertion(i, j));
+						insertions.add(new Insertion(drtRequest, vEntry, i, j));
 					}
 
 					return;// stop iterating -- cannot insert dropoff after node j
@@ -128,12 +133,12 @@ public class InsertionGenerator {
 			}
 
 			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(new Insertion(i, j));
+				insertions.add(new Insertion(drtRequest, vEntry, i, j));
 			}
 			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		insertions.add(new Insertion(i, stopCount));// insertion after last stop
+		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
 	private VehicleData.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
