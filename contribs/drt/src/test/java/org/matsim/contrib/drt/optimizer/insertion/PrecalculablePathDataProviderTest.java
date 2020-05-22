@@ -114,10 +114,10 @@ public class PrecalculablePathDataProviderTest {
 
 	private void assertInsertion(int pickupIdx, int dropoffIdx, String detourToPickup, String detourFromPickup,
 			String detourToDropoff, String detourFromDropoff) {
-		var actual = detourData.createInsertionWithDetourData(new Insertion(request, entry, pickupIdx, dropoffIdx),
-				request, entry);
-		var expected = new InsertionWithDetourData<>(pickupIdx, dropoffIdx, detourToPickup, detourFromPickup,
-				detourToDropoff, detourFromDropoff);
+		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
+		var actual = detourData.createInsertionWithDetourData(insertion, request, entry);
+		var expected = new InsertionWithDetourData<>(insertion, detourToPickup, detourFromPickup, detourToDropoff,
+				detourFromDropoff);
 		assertThat(actual).isEqualToComparingFieldByField(expected);
 	}
 

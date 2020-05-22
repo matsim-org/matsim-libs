@@ -22,9 +22,11 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 /**
@@ -58,23 +60,62 @@ import com.google.common.base.Objects;
  * @author michalm
  */
 public class InsertionGenerator {
-	public static class Insertion {
-		private final DrtRequest request;
-		private final VehicleData.Entry entry;
+	public static class InsertionPoint {
+		public final int index;
+		public final Link previousLink;
+		public final Link nextLink;
 
-		public final int pickupIdx;
-		public final int dropoffIdx;
+		public InsertionPoint(int index, Link previousLink, Link nextLink) {
+			this.index = index;
+			this.previousLink = previousLink;
+			this.nextLink = nextLink;
+		}
 
-		public Insertion(DrtRequest request, VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
-			this.request = request;
-			this.entry = entry;
-			this.pickupIdx = pickupIdx;
-			this.dropoffIdx = dropoffIdx;
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			InsertionPoint that = (InsertionPoint)o;
+			return index == that.index && Objects.equal(previousLink, that.previousLink) && Objects.equal(nextLink,
+					that.nextLink);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(index, previousLink, nextLink);
 		}
 
 		@Override
 		public String toString() {
-			return "[pickupIdx=" + pickupIdx + "][dropoffIdx=" + dropoffIdx + "]";
+			return MoreObjects.toStringHelper(this)
+					.add("index", index)
+					.add("previousLink", previousLink)
+					.add("nextLink", nextLink)
+					.toString();
+		}
+	}
+
+	public static class Insertion {
+		public final InsertionPoint pickup;
+		public final InsertionPoint dropoff;
+
+		public Insertion(DrtRequest request, VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
+			Link pickupPreviousLink = pickupIdx == 0 ? entry.start.link : entry.stops.get(pickupIdx - 1).task.getLink();
+			Link pickupNextLink = pickupIdx == dropoffIdx ?
+					request.getToLink() :
+					entry.stops.get(pickupIdx).task.getLink();
+			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, pickupNextLink);
+
+			Link dropoffPreviousLink = pickupIdx == dropoffIdx ? null : entry.stops.get(dropoffIdx - 1).task.getLink();
+			Link dropoffNextLink = dropoffIdx == entry.stops.size() ? null : entry.stops.get(dropoffIdx).task.getLink();
+			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffNextLink);
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this).add("pickup", pickup).add("dropoff", dropoff).toString();
 		}
 
 		@Override
@@ -84,12 +125,12 @@ public class InsertionGenerator {
 			if (o == null || getClass() != o.getClass())
 				return false;
 			Insertion insertion = (Insertion)o;
-			return pickupIdx == insertion.pickupIdx && dropoffIdx == insertion.dropoffIdx;
+			return Objects.equal(pickup, insertion.pickup) && Objects.equal(dropoff, insertion.dropoff);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(pickupIdx, dropoffIdx);
+			return Objects.hashCode(pickup, dropoff);
 		}
 	}
 
@@ -114,6 +155,7 @@ public class InsertionGenerator {
 		return insertions;
 	}
 
+	//TODO replace argument: int i -> InsertionPoint pickup
 	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i,
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();

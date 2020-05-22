@@ -20,22 +20,22 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+
 /**
  * @author michalm
  */
 public class InsertionWithDetourData<D> {
-	private final int pickupIdx;
-	private final int dropoffIdx;
+	private final Insertion insertion;
 
 	private final D detourToPickup;
 	private final D detourFromPickup; // "zero" detour if pickup inserted at the end of schedule !!!
 	private final D detourToDropoff; // detour from pickup if dropoff inserted directly after pickup
 	private final D detourFromDropoff; // "zero" detour if dropoff inserted at the end of schedule
 
-	InsertionWithDetourData(int pickupIdx, int dropoffIdx, D detourToPickup, D detourFromPickup, D detourToDropoff,
+	InsertionWithDetourData(Insertion insertion, D detourToPickup, D detourFromPickup, D detourToDropoff,
 			D detourFromDropoff) {
-		this.pickupIdx = pickupIdx;
-		this.dropoffIdx = dropoffIdx;
+		this.insertion = insertion;
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
 		this.detourToDropoff = detourToDropoff;
@@ -51,7 +51,7 @@ public class InsertionWithDetourData<D> {
 	 * @return pickup insertion index
 	 */
 	public int getPickupIdx() {
-		return pickupIdx;
+		return insertion.pickup.index;
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class InsertionWithDetourData<D> {
 	 * @return dropoff insertion index
 	 */
 	public int getDropoffIdx() {
-		return dropoffIdx;
+		return insertion.dropoff.index;
 	}
 
 	/**

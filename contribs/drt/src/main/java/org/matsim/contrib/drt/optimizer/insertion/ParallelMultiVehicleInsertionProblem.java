@@ -116,10 +116,10 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				insertionCount += insertions.size();
 
 				Insertion lastInsertion = insertions.get(insertions.size() - 1);
-				if (lastInsertion.pickupIdx == lastInsertion.dropoffIdx
-						&& lastInsertion.pickupIdx == e.getKey().stops.size()) {
+				if (lastInsertion.pickup.index == lastInsertion.dropoff.index
+						&& lastInsertion.pickup.index == e.getKey().stops.size()) {
 					insertionAtEndCount++;
-					if (lastInsertion.pickupIdx == 0) {
+					if (lastInsertion.pickup.index == 0) {
 						insertionAtEndToEmptyCount++;
 					}
 				}

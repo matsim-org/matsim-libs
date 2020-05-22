@@ -60,19 +60,14 @@ public interface DetourDataProvider<D> {
 
 		public InsertionWithDetourData<D> createInsertionWithDetourData(Insertion insertion, DrtRequest request,
 				VehicleData.Entry vEntry) {
-			int i = insertion.pickupIdx;
-			int j = insertion.dropoffIdx;
-
-			Link pickupDetourStartLink = i == 0 ? vEntry.start.link : vEntry.stops.get(i - 1).task.getLink();
-			Link pickupDetourEndLink = i == j ? request.getToLink() : vEntry.stops.get(i).task.getLink();
-
-			Link dropoffDetourStartLink = i == j ? null : vEntry.stops.get(j - 1).task.getLink();
-			Link dropoffDetourEndLink = j == vEntry.stops.size() ? null : vEntry.stops.get(j).task.getLink();
-
-			D toPickup = detourToPickup.apply(pickupDetourStartLink);
-			D fromPickup = detourFromPickup.apply(pickupDetourEndLink);
-			D toDropoff = dropoffDetourStartLink == null ? null : detourToDropoff.apply(dropoffDetourStartLink);
-			D fromDropoff = dropoffDetourEndLink == null ? null : detourFromDropoff.apply(dropoffDetourEndLink);
+			D toPickup = detourToPickup.apply(insertion.pickup.previousLink);
+			D fromPickup = detourFromPickup.apply(insertion.pickup.nextLink);
+			D toDropoff = insertion.dropoff.previousLink == null ?
+					null :
+					detourToDropoff.apply(insertion.dropoff.previousLink);
+			D fromDropoff = insertion.dropoff.nextLink == null ?
+					null :
+					detourFromDropoff.apply(insertion.dropoff.nextLink);
 
 			// TODO switch to the new approach
 			//			D fromPickup = i == detourFromPickup.length //
@@ -84,7 +79,7 @@ public interface DetourDataProvider<D> {
 			//					? detourFromDropoff[0] // dropoff inserted at the end
 			//					: detourFromDropoff[j + 1];
 
-			return new InsertionWithDetourData<>(i, j, toPickup, fromPickup, toDropoff, fromDropoff);
+			return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
 		}
 	}
 }
