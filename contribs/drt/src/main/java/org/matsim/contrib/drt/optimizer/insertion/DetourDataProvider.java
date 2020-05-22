@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
@@ -31,7 +30,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author Michal Maciejewski (michalm)
  */
 public interface DetourDataProvider<D> {
-	DetourData<D> getDetourData(DrtRequest drtRequest, VehicleData.Entry vEntry);
+	DetourData<D> getDetourData(DrtRequest drtRequest);
 
 	/**
 	 * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)

@@ -97,11 +97,11 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 						+ req.getFromLink().getId());
 			} else {
 				BestInsertion<PathData> bestInsertion = best.get();
-				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
-				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
+				insertionScheduler.scheduleRequest(req, bestInsertion.insertion);
+				vData.updateEntry(bestInsertion.insertion.getVehicleEntry().vehicle);
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId(), bestInsertion.vehicleEntry.vehicle.getId(),
+								req.getPassengerId(), bestInsertion.insertion.getVehicleEntry().vehicle.getId(),
 								req.getPickupTask().getEndTime(), req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();

@@ -98,24 +98,37 @@ public class InsertionGenerator {
 	}
 
 	public static class Insertion {
+		public final VehicleData.Entry vehicleEntry;
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
 
-		public Insertion(DrtRequest request, VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
-			Link pickupPreviousLink = pickupIdx == 0 ? entry.start.link : entry.stops.get(pickupIdx - 1).task.getLink();
+		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
+			this.vehicleEntry = vehicleEntry;
+
+			Link pickupPreviousLink = pickupIdx == 0 ?
+					vehicleEntry.start.link :
+					vehicleEntry.stops.get(pickupIdx - 1).task.getLink();
 			Link pickupNextLink = pickupIdx == dropoffIdx ?
 					request.getToLink() :
-					entry.stops.get(pickupIdx).task.getLink();
+					vehicleEntry.stops.get(pickupIdx).task.getLink();
 			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, pickupNextLink);
 
-			Link dropoffPreviousLink = pickupIdx == dropoffIdx ? null : entry.stops.get(dropoffIdx - 1).task.getLink();
-			Link dropoffNextLink = dropoffIdx == entry.stops.size() ? null : entry.stops.get(dropoffIdx).task.getLink();
+			Link dropoffPreviousLink = pickupIdx == dropoffIdx ?
+					null :
+					vehicleEntry.stops.get(dropoffIdx - 1).task.getLink();
+			Link dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
+					null :
+					vehicleEntry.stops.get(dropoffIdx).task.getLink();
 			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffNextLink);
 		}
 
 		@Override
 		public String toString() {
-			return MoreObjects.toStringHelper(this).add("pickup", pickup).add("dropoff", dropoff).toString();
+			return MoreObjects.toStringHelper(this)
+					.add("vehicleId", vehicleEntry.vehicle.getId())
+					.add("pickup", pickup)
+					.add("dropoff", dropoff)
+					.toString();
 		}
 
 		@Override
@@ -125,12 +138,14 @@ public class InsertionGenerator {
 			if (o == null || getClass() != o.getClass())
 				return false;
 			Insertion insertion = (Insertion)o;
-			return Objects.equal(pickup, insertion.pickup) && Objects.equal(dropoff, insertion.dropoff);
+			return Objects.equal(vehicleEntry, insertion.vehicleEntry)
+					&& Objects.equal(pickup, insertion.pickup)
+					&& Objects.equal(dropoff, insertion.dropoff);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(pickup, dropoff);
+			return Objects.hashCode(vehicleEntry, pickup, dropoff);
 		}
 	}
 

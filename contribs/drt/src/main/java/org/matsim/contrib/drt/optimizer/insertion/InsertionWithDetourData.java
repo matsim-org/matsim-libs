@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 
 /**
@@ -40,6 +41,10 @@ public class InsertionWithDetourData<D> {
 		this.detourFromPickup = detourFromPickup;
 		this.detourToDropoff = detourToDropoff;
 		this.detourFromDropoff = detourFromDropoff;
+	}
+
+	public VehicleData.Entry getVehicleEntry() {
+		return insertion.vehicleEntry;
 	}
 
 	/**

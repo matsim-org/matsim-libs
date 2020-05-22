@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -35,7 +34,7 @@ public class DetourTimesProvider implements DetourDataProvider<Double> {
 	}
 
 	@Override
-	public DetourData<Double> getDetourData(DrtRequest drtRequest, Entry vEntry) {
+	public DetourData<Double> getDetourData(DrtRequest drtRequest) {
 		//TODO add departure/arrival times to improve estimation
 		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
 		Function<Link, Double> timesFromPickup = link -> detourTimeEstimator.estimateTime(drtRequest.getFromLink(),

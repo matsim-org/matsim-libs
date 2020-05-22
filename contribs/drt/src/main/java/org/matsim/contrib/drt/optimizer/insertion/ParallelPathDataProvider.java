@@ -18,8 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +155,7 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public DetourData<PathData> getDetourData(DrtRequest drtRequest, Entry vEntry) {
+	public DetourData<PathData> getDetourData(DrtRequest drtRequest) {
 		return new DetourData<>(pathsToPickupMap::get, pathsFromPickupMap::get, pathsToDropoffMap::get,
 				pathsFromDropoffMap::get);
 	}

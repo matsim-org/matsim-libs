@@ -80,14 +80,13 @@ public class RequestInsertionScheduler {
 		}
 	}
 
-	public void scheduleRequest(VehicleData.Entry vehicleEntry, DrtRequest request,
-			InsertionWithDetourData<PathData> insertion) {
-		insertPickup(vehicleEntry, request, insertion);
-		insertDropoff(vehicleEntry, request, insertion);
+	public void scheduleRequest(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+		insertPickup(request, insertion);
+		insertDropoff(request, insertion);
 	}
 
-	private void insertPickup(VehicleData.Entry vehicleEntry, DrtRequest request,
-			InsertionWithDetourData<PathData> insertion) {
+	private void insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickupIdx();
@@ -231,8 +230,8 @@ public class RequestInsertionScheduler {
 				driveFromPickupTask.getEndTime());
 	}
 
-	private void insertDropoff(VehicleData.Entry vehicleEntry, DrtRequest request,
-			InsertionWithDetourData<PathData> insertion) {
+	private void insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickupIdx();

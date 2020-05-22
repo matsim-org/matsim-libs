@@ -70,7 +70,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
 				.parallelStream()
 				.map(e -> SingleVehicleInsertionProblem.createWithDetourPathProvider(pathDataProvider,
-						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
+						insertionCostCalculator).findBestInsertion(drtRequest, e.getValue()))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.min(Comparator.comparingDouble(i -> i.cost))).join();

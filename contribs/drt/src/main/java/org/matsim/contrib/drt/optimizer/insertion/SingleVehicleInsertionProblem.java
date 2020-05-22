@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -45,12 +44,10 @@ public class SingleVehicleInsertionProblem<D> {
 
 	public static class BestInsertion<D> {
 		public final InsertionWithDetourData<D> insertion;
-		public final VehicleData.Entry vehicleEntry;
 		public final double cost;
 
-		public BestInsertion(InsertionWithDetourData<D> insertion, VehicleData.Entry vehicleEntry, double cost) {
+		public BestInsertion(InsertionWithDetourData<D> insertion, double cost) {
 			this.insertion = insertion;
-			this.vehicleEntry = vehicleEntry;
 			this.cost = cost;
 		}
 	}
@@ -66,15 +63,14 @@ public class SingleVehicleInsertionProblem<D> {
 		this.detourTime = detourTime;
 	}
 
-	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
-			List<Insertion> insertions) {
-		DetourData<D> set = pathDataProvider.getDetourData(drtRequest, vEntry);
+	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, List<Insertion> insertions) {
+		DetourData<D> set = pathDataProvider.getDetourData(drtRequest);
 
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
 			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i);
-			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, detourTime);
+			double cost = costCalculator.calculate(drtRequest, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;
@@ -83,6 +79,6 @@ public class SingleVehicleInsertionProblem<D> {
 
 		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ?
 				Optional.empty() :
-				Optional.of(new BestInsertion<>(bestInsertion, vEntry, minCost));
+				Optional.of(new BestInsertion<>(bestInsertion, minCost));
 	}
 }

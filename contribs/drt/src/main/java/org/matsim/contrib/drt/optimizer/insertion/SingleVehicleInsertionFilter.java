@@ -42,11 +42,12 @@ public class SingleVehicleInsertionFilter {
 
 	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
-		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest, vEntry);
+		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
 
-		return insertions.stream().map(data::createInsertionWithDetourData)
-				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry, iWithDetourTimes,
-						Double::doubleValue) < InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
+		return insertions.stream()
+				.map(data::createInsertionWithDetourData)
+				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, iWithDetourTimes, Double::doubleValue)
+						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
 				.collect(Collectors.toList());
 	}
 }
