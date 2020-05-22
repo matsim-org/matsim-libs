@@ -21,23 +21,34 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
  */
-public class SingleVehicleInsertionProblem {
-	public static class BestInsertion {
-		public final InsertionWithPathData insertion;
+public class SingleVehicleInsertionProblem<D> {
+	public static SingleVehicleInsertionProblem<PathData> createWithDetourPathProvider(
+			DetourDataProvider<PathData> pathDataProvider, InsertionCostCalculator costCalculator) {
+		return new SingleVehicleInsertionProblem<>(pathDataProvider, PathData::getTravelTime, costCalculator);
+	}
+
+	public static SingleVehicleInsertionProblem<Double> createWithDetourTimeProvider(
+			DetourDataProvider<Double> detourTimeProvider, InsertionCostCalculator costCalculator) {
+		return new SingleVehicleInsertionProblem<>(detourTimeProvider, Double::doubleValue, costCalculator);
+	}
+
+	public static class BestInsertion<D> {
+		public final InsertionWithDetourData<D> insertion;
 		public final VehicleData.Entry vehicleEntry;
 		public final double cost;
 
-		public BestInsertion(InsertionWithPathData insertion, VehicleData.Entry vehicleEntry, double cost) {
+		public BestInsertion(InsertionWithDetourData<D> insertion, VehicleData.Entry vehicleEntry, double cost) {
 			this.insertion = insertion;
 			this.vehicleEntry = vehicleEntry;
 			this.cost = cost;
@@ -45,23 +56,25 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private final InsertionCostCalculator costCalculator;
-	private final PathDataProvider pathDataProvider;
+	private final DetourDataProvider<D> pathDataProvider;
+	private final ToDoubleFunction<D> detourTime;
 
-	public SingleVehicleInsertionProblem(PathDataProvider pathDataProvider, InsertionCostCalculator costCalculator) {
+	SingleVehicleInsertionProblem(DetourDataProvider<D> pathDataProvider, ToDoubleFunction<D> detourTime,
+			InsertionCostCalculator costCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.costCalculator = costCalculator;
+		this.detourTime = detourTime;
 	}
 
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
+	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			List<Insertion> insertions) {
-		PathDataSet set = pathDataProvider.getPathDataSet(drtRequest, vEntry);
-		int stopCount = vEntry.stops.size();
+		DetourData<D> set = pathDataProvider.getDetourData(drtRequest, vEntry);
 
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-		InsertionWithPathData bestInsertion = null;
+		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithPathData insertion = createInsertionWithPathData(i, set, stopCount);
-			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
+			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i, drtRequest, vEntry);
+			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;
@@ -70,20 +83,6 @@ public class SingleVehicleInsertionProblem {
 
 		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ?
 				Optional.empty() :
-				Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
-	}
-
-	private InsertionWithPathData createInsertionWithPathData(Insertion insertion, PathDataSet set, int stopCount) {
-		int i = insertion.pickupIdx;
-		int j = insertion.dropoffIdx;
-
-		// i -> pickup
-		PathData toPickup = set.pathsToPickup[i]; // i -> pickup
-		PathData fromPickup = set.pathsFromPickup[i == j ? 0 : i + 1]; // pickup -> (dropoff | i+1)
-		PathData toDropoff = i == j ? null // pickup followed by dropoff
-				: set.pathsToDropoff[j]; // j -> dropoff
-		PathData fromDropoff = j == stopCount ? null // dropoff inserted at the end
-				: set.pathsFromDropoff[j + 1];
-		return new InsertionWithPathData(i, j, toPickup, fromPickup, toDropoff, fromDropoff);
+				Optional.of(new BestInsertion<>(bestInsertion, vEntry, minCost));
 	}
 }
