@@ -58,8 +58,7 @@ public interface DetourDataProvider<D> {
 			this.detourFromDropoff = detourFromDropoff;
 		}
 
-		public InsertionWithDetourData<D> createInsertionWithDetourData(Insertion insertion, DrtRequest request,
-				VehicleData.Entry vEntry) {
+		public InsertionWithDetourData<D> createInsertionWithDetourData(Insertion insertion) {
 			D toPickup = detourToPickup.apply(insertion.pickup.previousLink);
 			D fromPickup = detourFromPickup.apply(insertion.pickup.nextLink);
 			D toDropoff = insertion.dropoff.previousLink == null ?

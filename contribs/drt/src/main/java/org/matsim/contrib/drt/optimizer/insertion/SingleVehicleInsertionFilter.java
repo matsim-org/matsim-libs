@@ -44,8 +44,7 @@ public class SingleVehicleInsertionFilter {
 			List<Insertion> insertions) {
 		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest, vEntry);
 
-		return insertions.stream()
-				.map(insertion -> data.createInsertionWithDetourData(insertion, drtRequest, vEntry))
+		return insertions.stream().map(data::createInsertionWithDetourData)
 				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry, iWithDetourTimes,
 						Double::doubleValue) < InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
 				.collect(Collectors.toList());

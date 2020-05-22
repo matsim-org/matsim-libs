@@ -73,7 +73,7 @@ public class SingleVehicleInsertionProblem<D> {
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i, drtRequest, vEntry);
+			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i);
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;
