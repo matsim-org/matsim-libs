@@ -53,23 +53,23 @@ public class SingleVehicleInsertionProblem<D> {
 	}
 
 	private final InsertionCostCalculator costCalculator;
-	private final DetourDataProvider<D> pathDataProvider;
+	private final DetourDataProvider<D> detourDataProvider;
 	private final ToDoubleFunction<D> detourTime;
 
-	SingleVehicleInsertionProblem(DetourDataProvider<D> pathDataProvider, ToDoubleFunction<D> detourTime,
+	SingleVehicleInsertionProblem(DetourDataProvider<D> detourDataProvider, ToDoubleFunction<D> detourTime,
 			InsertionCostCalculator costCalculator) {
-		this.pathDataProvider = pathDataProvider;
+		this.detourDataProvider = detourDataProvider;
 		this.costCalculator = costCalculator;
 		this.detourTime = detourTime;
 	}
 
 	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, List<Insertion> insertions) {
-		DetourData<D> set = pathDataProvider.getDetourData(drtRequest);
+		DetourData<D> data = detourDataProvider.getDetourData(drtRequest);
 
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 		InsertionWithDetourData<D> bestInsertion = null;
 		for (Insertion i : insertions) {
-			InsertionWithDetourData<D> insertion = set.createInsertionWithDetourData(i);
+			InsertionWithDetourData<D> insertion = data.createInsertionWithDetourData(i);
 			double cost = costCalculator.calculate(drtRequest, insertion, detourTime);
 			if (cost < minCost) {
 				bestInsertion = insertion;
