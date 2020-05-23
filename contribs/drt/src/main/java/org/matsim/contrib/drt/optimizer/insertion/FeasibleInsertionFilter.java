@@ -27,20 +27,21 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
+ * Feasibility wrt DetourDataProvider and InsertionCostCalculator
+ *
  * @author michalm
  */
-public class SingleVehicleInsertionFilter {
+public class FeasibleInsertionFilter {
 	private final DetourDataProvider<Double> detourTimesProvider;
 	private final InsertionCostCalculator costCalculator;
 
-	public SingleVehicleInsertionFilter(DetourDataProvider<Double> detourTimesProvider,
+	public FeasibleInsertionFilter(DetourDataProvider<Double> detourTimesProvider,
 			InsertionCostCalculator costCalculator) {
 		this.detourTimesProvider = detourTimesProvider;
 		this.costCalculator = costCalculator;
 	}
 
-	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest,
-			List<Insertion> insertions) {
+	public List<InsertionWithDetourData<Double>> filter(DrtRequest drtRequest, List<Insertion> insertions) {
 		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
 		return insertions.stream()
 				.map(data::createInsertionWithDetourData)

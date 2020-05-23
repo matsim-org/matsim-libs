@@ -48,7 +48,7 @@ class DetourLinksProvider {
 	private final DrtRequest drtRequest;
 
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
-	private final SingleVehicleInsertionFilter insertionFilter;
+	private final FeasibleInsertionFilter insertionFilter;
 
 	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
 	private final PartialSort<Insertion> nearestInsertionsAtEnd = new PartialSort<>(NEAREST_INSERTIONS_AT_END_LIMIT);
@@ -60,7 +60,7 @@ class DetourLinksProvider {
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
-		insertionFilter = new SingleVehicleInsertionFilter(new DetourTimesProvider(
+		insertionFilter = new FeasibleInsertionFilter(new DetourTimesProvider(
 				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed),
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
@@ -83,8 +83,8 @@ class DetourLinksProvider {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
 
 		//optimistic pre-filtering (admissible cost function using an optimistic beeline speed coefficient)
-		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(
-				drtRequest, insertions);
+		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.filter(drtRequest,
+				insertions);
 		if (insertionsWithDetourTimes.isEmpty()) {
 			return List.of();
 		}
