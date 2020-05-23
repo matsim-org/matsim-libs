@@ -89,8 +89,8 @@ public class RequestInsertionScheduler {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
-		int pickupIdx = insertion.getPickupIdx();
-		int dropoffIdx = insertion.getDropoffIdx();
+		int pickupIdx = insertion.getPickup().index;
+		int dropoffIdx = insertion.getDropoff().index;
 
 		ScheduleStatus scheduleStatus = schedule.getStatus();
 		Task currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : schedule.getCurrentTask();
@@ -234,8 +234,8 @@ public class RequestInsertionScheduler {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
-		int pickupIdx = insertion.getPickupIdx();
-		int dropoffIdx = insertion.getDropoffIdx();
+		int pickupIdx = insertion.getPickup().index;
+		int dropoffIdx = insertion.getDropoff().index;
 
 		Task driveToDropoffTask;
 		if (pickupIdx == dropoffIdx) { // no drive to dropoff

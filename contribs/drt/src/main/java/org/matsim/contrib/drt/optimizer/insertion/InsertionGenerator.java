@@ -39,13 +39,13 @@ import com.google.common.base.Objects;
  * <ul>
  * <li>{@code pickupIdx = 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
  * latter resulting in immediate diversion)</li>
- * <li>{@code 0 < pickupIdx <= N} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
+ * <li>{@code 0 < pickupIdx <= stops.size()} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
  * </ul>
  * <p>
  * Dropoff insertion points are indexed in the following way:
  * <ul>
  * <li>{@code dropoffIdx = pickupIdx} - dropoff inserted directly after pickup</li>
- * <li>{@code pickupIdx < dropoffIdx <= N} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
+ * <li>{@code pickupIdx < dropoffIdx <= stops.size()} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
  * </ul>
  * <p>
  * A pickup/dropoff is inserted at (i.e. included into) a given stop if they are on the same link. Otherwise, it is

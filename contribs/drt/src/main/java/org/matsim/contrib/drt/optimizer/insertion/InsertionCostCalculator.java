@@ -119,8 +119,8 @@ public class InsertionCostCalculator {
 	<D> double calculatePickupDetourTimeLoss(DrtRequest drtRequest, InsertionWithDetourData<D> insertion,
 			ToDoubleFunction<D> detourTime) {
 		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickupIdx();
-		final int dropoffIdx = insertion.getDropoffIdx();
+		final int pickupIdx = insertion.getPickup().index;
+		final int dropoffIdx = insertion.getDropoff().index;
 
 		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
 		Schedule schedule = vEntry.vehicle.getSchedule();
@@ -153,8 +153,8 @@ public class InsertionCostCalculator {
 	<D> double calculateDropoffDetourTimeLoss(DrtRequest drtRequest, InsertionWithDetourData<D> insertion,
 			ToDoubleFunction<D> detourTime) {
 		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickupIdx();
-		final int dropoffIdx = insertion.getDropoffIdx();
+		final int pickupIdx = insertion.getPickup().index;
+		final int dropoffIdx = insertion.getDropoff().index;
 
 		if (dropoffIdx > 0 && pickupIdx != dropoffIdx && drtRequest.getToLink() == vEntry.stops.get(dropoffIdx - 1).task
 				.getLink()) {
@@ -186,8 +186,8 @@ public class InsertionCostCalculator {
 	private boolean isHardConstraintsViolated(InsertionWithDetourData<?> insertion, double pickupDetourTimeLoss,
 			double totalTimeLoss) {
 		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickupIdx();
-		final int dropoffIdx = insertion.getDropoffIdx();
+		final int pickupIdx = insertion.getPickup().index;
+		final int dropoffIdx = insertion.getDropoff().index;
 
 		// this is what we cannot violate
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
@@ -243,8 +243,8 @@ public class InsertionCostCalculator {
 	private <D> double calcSoftConstraintPenalty(DrtRequest drtRequest, InsertionWithDetourData<D> insertion,
 			ToDoubleFunction<D> detourTime, double pickupDetourTimeLoss) {
 		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickupIdx();
-		final int dropoffIdx = insertion.getDropoffIdx();
+		final int pickupIdx = insertion.getPickup().index;
+		final int dropoffIdx = insertion.getDropoff().index;
 
 		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, pickupIdx);
 		// (normally the end time of the previous task)

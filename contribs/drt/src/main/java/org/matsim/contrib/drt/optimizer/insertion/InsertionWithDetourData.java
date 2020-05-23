@@ -57,30 +57,6 @@ public class InsertionWithDetourData<D> {
 	}
 
 	/**
-	 * Range: 0 <= idx <= stops.length
-	 * <p>
-	 * idx == 0 -> inserted after start
-	 * idx > 0 -> inserted after/at stop[idx-1]
-	 *
-	 * @return pickup insertion index
-	 */
-	public int getPickupIdx() {
-		return getPickup().index;
-	}
-
-	/**
-	 * Range: pickupInsertionIdx <= idx <= stops.length
-	 * <p>
-	 * idx == pickupInsertionIdx -> inserted after pickup
-	 * idx > pickupInsertionIdx -> inserted after/at stop[idx-1]
-	 *
-	 * @return dropoff insertion index
-	 */
-	public int getDropoffIdx() {
-		return getDropoff().index;
-	}
-
-	/**
 	 * Detour necessary to get from start or the preceding stop to pickup.
 	 * <p>
 	 * If pickup is inserted at the (existing) previous stop -> no detour.

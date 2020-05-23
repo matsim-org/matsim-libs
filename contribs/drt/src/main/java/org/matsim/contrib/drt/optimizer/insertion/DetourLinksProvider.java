@@ -97,8 +97,8 @@ class DetourLinksProvider {
 
 		List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
 		for (InsertionWithDetourData<Double> insert : insertionsWithDetourTimes) {
-			int i = insert.getPickupIdx();
-			int j = insert.getDropoffIdx();
+			int i = insert.getPickup().index;
+			int j = insert.getDropoff().index;
 
 			if (i == vEntry.stops.size()) {// implies i == j
 				double departureTime = vEntry.getWaypoint(i).getDepartureTime();
