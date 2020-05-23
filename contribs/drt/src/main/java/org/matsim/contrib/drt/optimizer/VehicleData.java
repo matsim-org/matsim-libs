@@ -66,6 +66,8 @@ public class VehicleData {
 		Link getLink();
 
 		double getDepartureTime();
+
+		int getOutgoingOccupancy();
 	}
 
 	public static class Start implements Waypoint {
@@ -90,6 +92,11 @@ public class VehicleData {
 		@Override
 		public double getDepartureTime() {
 			return time;
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			return occupancy;
 		}
 	}
 
@@ -124,6 +131,11 @@ public class VehicleData {
 		public double getDepartureTime() {
 			return time.seconds();
 		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			throw new UnsupportedOperationException("End is the terminal waypoint");
+		}
 	}
 
 	public static class Stop implements Waypoint {
@@ -154,6 +166,11 @@ public class VehicleData {
 		@Override
 		public double getDepartureTime() {
 			return task.getEndTime();
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			return outgoingOccupancy;
 		}
 
 		private double calcLatestArrivalTime() {
