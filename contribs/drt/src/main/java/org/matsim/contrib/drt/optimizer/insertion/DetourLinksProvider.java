@@ -100,8 +100,8 @@ class DetourLinksProvider {
 			int i = insert.getPickupIdx();
 			int j = insert.getDropoffIdx();
 
-			if (i == j && i == vEntry.stops.size()) {
-				double departureTime = (i == 0) ? vEntry.start.time : vEntry.stops.get(i - 1).task.getEndTime();
+			if (i == vEntry.stops.size()) {// implies i == j
+				double departureTime = vEntry.getWaypoint(i).getDepartureTime();
 				// x OPTIMISTIC_BEELINE_SPEED_COEFF to remove bias towards near but still busy vehicles
 				// (timeToPickup is underestimated by this factor)
 				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getDetourToPickup();

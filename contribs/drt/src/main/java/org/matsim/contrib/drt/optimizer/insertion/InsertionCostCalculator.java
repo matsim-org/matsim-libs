@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -127,9 +128,9 @@ public class InsertionCostCalculator {
 				&& schedule.getStatus() == ScheduleStatus.STARTED
 				&& schedule.getCurrentTask().getTaskType() == DrtTaskType.STOP;
 
-		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
-				|| (pickupIdx > 0 //
-				&& drtRequest.getFromLink() == vEntry.stops.get(pickupIdx - 1).task.getLink())) {
+		Link pickupPreviousLink = insertion.getPickup().previousLink;
+		if ((ongoingStopTask && drtRequest.getFromLink() == pickupPreviousLink) //
+				|| (pickupIdx > 0 && drtRequest.getFromLink() == pickupPreviousLink)) {
 			if (pickupIdx != dropoffIdx) {// not: PICKUP->DROPOFF
 				return 0;// no detour
 			}
@@ -268,6 +269,6 @@ public class InsertionCostCalculator {
 	}
 
 	private double getDriveToInsertionStartTime(VehicleData.Entry vEntry, int insertionIdx) {
-		return (insertionIdx == 0) ? vEntry.start.time : vEntry.stops.get(insertionIdx - 1).task.getEndTime();
+		return vEntry.getWaypoint(insertionIdx).getDepartureTime();
 	}
 }

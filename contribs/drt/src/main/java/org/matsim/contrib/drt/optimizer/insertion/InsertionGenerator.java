@@ -105,9 +105,7 @@ public class InsertionGenerator {
 		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 
-			Link pickupPreviousLink = pickupIdx == 0 ?
-					vehicleEntry.start.link :
-					vehicleEntry.stops.get(pickupIdx - 1).task.getLink();
+			Link pickupPreviousLink = vehicleEntry.getWaypoint(pickupIdx).getLink();
 			Link pickupNextLink = pickupIdx == dropoffIdx ?
 					request.getToLink() :
 					vehicleEntry.stops.get(pickupIdx).task.getLink();
@@ -166,7 +164,7 @@ public class InsertionGenerator {
 			occupancy = nextStop.outgoingOccupancy;
 		}
 
-		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// last stop
+		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
 		return insertions;
 	}
 

@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 
 /**
  * @author michalm
@@ -47,6 +48,14 @@ public class InsertionWithDetourData<D> {
 		return insertion.vehicleEntry;
 	}
 
+	public InsertionPoint getPickup() {
+		return insertion.pickup;
+	}
+
+	public InsertionPoint getDropoff() {
+		return insertion.dropoff;
+	}
+
 	/**
 	 * Range: 0 <= idx <= stops.length
 	 * <p>
@@ -56,7 +65,7 @@ public class InsertionWithDetourData<D> {
 	 * @return pickup insertion index
 	 */
 	public int getPickupIdx() {
-		return insertion.pickup.index;
+		return getPickup().index;
 	}
 
 	/**
@@ -68,7 +77,7 @@ public class InsertionWithDetourData<D> {
 	 * @return dropoff insertion index
 	 */
 	public int getDropoffIdx() {
-		return insertion.dropoff.index;
+		return getDropoff().index;
 	}
 
 	/**

@@ -56,6 +56,7 @@ public class VehicleData {
 			this.end = End.OPEN_END;
 		}
 
+		//TODO allow index == stops.size() ==> return end ???
 		public Waypoint getWaypoint(int index) {
 			return index == 0 ? start : stops.get(index - 1);
 		}
