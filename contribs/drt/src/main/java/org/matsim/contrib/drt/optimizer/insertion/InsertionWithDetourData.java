@@ -44,6 +44,10 @@ public class InsertionWithDetourData<D> {
 		this.detourFromDropoff = detourFromDropoff;
 	}
 
+	public Insertion getInsertion() {
+		return insertion;
+	}
+
 	public VehicleData.Entry getVehicleEntry() {
 		return insertion.vehicleEntry;
 	}
