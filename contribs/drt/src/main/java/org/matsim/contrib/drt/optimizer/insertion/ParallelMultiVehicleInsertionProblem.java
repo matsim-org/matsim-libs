@@ -20,12 +20,9 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
-import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -59,20 +56,14 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	@Override
 	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest, penaltyCalculator);
-		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.filterInsertions(forkJoinPool, vEntries);
+		List<Insertion> filteredInsertions = detourLinksProvider.filterInsertions(forkJoinPool, vEntries);
 		if (filteredInsertions.isEmpty()) {
 			return Optional.empty();
 		}
 
-		pathDataProvider.precalculatePathData(drtRequest,
-				filteredInsertions.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
+		pathDataProvider.precalculatePathData(drtRequest, filteredInsertions);
 
-		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
-				.parallelStream()
-				.map(e -> SingleVehicleInsertionProblem.createWithDetourPathProvider(pathDataProvider,
-						insertionCostCalculator).findBestInsertion(drtRequest, e.getValue()))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.min(Comparator.comparingDouble(i -> i.cost))).join();
+		return SingleVehicleInsertionProblem.createWithDetourPathProvider(pathDataProvider, insertionCostCalculator)
+				.findBestInsertion(drtRequest, filteredInsertions);
 	}
 }

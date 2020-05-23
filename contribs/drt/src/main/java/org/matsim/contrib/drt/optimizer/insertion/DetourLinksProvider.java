@@ -21,9 +21,8 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
@@ -51,30 +50,12 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final SingleVehicleInsertionFilter insertionFilter;
 
-	private final Map<Entry, List<Insertion>> filteredInsertionsPerVehicle;
-
 	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
-	private final PartialSort<InsertionAtEnd> nearestInsertionsAtEnd = new PartialSort<>(
-			NEAREST_INSERTIONS_AT_END_LIMIT);
-
-	private static class InsertionAtEnd {
-		private final Entry vEntry;
-		private final InsertionWithDetourData<Double> insertion;
-
-		private InsertionAtEnd(Entry vEntry, InsertionWithDetourData<Double> insertion) {
-			this.vEntry = vEntry;
-			this.insertion = insertion;
-		}
-	}
+	private final PartialSort<Insertion> nearestInsertionsAtEnd = new PartialSort<>(NEAREST_INSERTIONS_AT_END_LIMIT);
 
 	public DetourLinksProvider(DrtConfigGroup drtCfg, MobsimTimer timer, DrtRequest drtRequest,
 			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.drtRequest = drtRequest;
-
-		// initial capacities of concurrent maps according to insertion stats for AT Berlin 10pct
-		// in general, for larger fleets they should be slightly higher than for smaller fleets,
-		// nevertheless NEAREST_INSERTIONS_AT_END_LIMIT keeps them more independent of the fleet size
-		filteredInsertionsPerVehicle = new ConcurrentHashMap<>(NEAREST_INSERTIONS_AT_END_LIMIT * 2);
 
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
@@ -84,10 +65,13 @@ class DetourLinksProvider {
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
-	Map<Entry, List<Insertion>> filterInsertions(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
-		forkJoinPool.submit(() -> vEntries.parallelStream().forEach(this::filterInsertions)).join();
-		filterNearestInsertionsAtEnd();
-		return filteredInsertionsPerVehicle;
+	List<Insertion> filterInsertions(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
+		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vEntries.parallelStream()// parallel outer stream
+				.map(this::filterInsertions)//
+				.flatMap(Collection::stream)// sequential inner stream
+				.collect(Collectors.toList())).join();
+		filteredInsertions.addAll(nearestInsertionsAtEnd.kSmallestElements());
+		return filteredInsertions;
 	}
 
 	/**
@@ -95,14 +79,14 @@ class DetourLinksProvider {
 	 *
 	 * @param vEntry
 	 */
-	private void filterInsertions(Entry vEntry) {
+	private List<Insertion> filterInsertions(Entry vEntry) {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
 
 		//optimistic pre-filtering (admissible cost function using an optimistic beeline speed coefficient)
 		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.findFeasibleInsertions(
-				drtRequest, vEntry, insertions);
+				drtRequest, insertions);
 		if (insertionsWithDetourTimes.isEmpty()) {
-			return;
+			return List.of();
 		}
 
 		List<Insertion> filteredInsertions = new ArrayList<>(insertionsWithDetourTimes.size());
@@ -115,28 +99,16 @@ class DetourLinksProvider {
 				// x OPTIMISTIC_BEELINE_SPEED_COEFF to remove bias towards near but still busy vehicles
 				// (timeToPickup is underestimated by this factor)
 				double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insert.getDetourToPickup();
-				addInsertionAtEndCandidate(new InsertionAtEnd(vEntry, insert), timeDistance);
+				addInsertionAtEndCandidate(new Insertion(drtRequest, vEntry, i, j), timeDistance);
 			} else {
 				filteredInsertions.add(new Insertion(drtRequest, vEntry, i, j));
 			}
 		}
 
-		if (!filteredInsertions.isEmpty()) {
-			filteredInsertionsPerVehicle.put(vEntry, filteredInsertions);
-		}
+		return filteredInsertions;
 	}
 
-	private void filterNearestInsertionsAtEnd() {
-		List<InsertionAtEnd> insertionsAtEnd = nearestInsertionsAtEnd.kSmallestElements();
-		for (InsertionAtEnd iAtEnd : insertionsAtEnd) {
-			int i = iAtEnd.insertion.getPickupIdx();
-			int j = iAtEnd.insertion.getDropoffIdx();
-			filteredInsertionsPerVehicle.computeIfAbsent(iAtEnd.vEntry, k -> new ArrayList<>())
-					.add(new Insertion(drtRequest, iAtEnd.vEntry, i, j));
-		}
-	}
-
-	private synchronized void addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance) {
+	private synchronized void addInsertionAtEndCandidate(Insertion insertionAtEnd, double timeDistance) {
 		nearestInsertionsAtEnd.add(insertionAtEnd, timeDistance);
 	}
 }

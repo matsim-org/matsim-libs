@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -40,10 +39,9 @@ public class SingleVehicleInsertionFilter {
 		this.costCalculator = costCalculator;
 	}
 
-	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry,
+	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest,
 			List<Insertion> insertions) {
 		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
-
 		return insertions.stream()
 				.map(data::createInsertionWithDetourData)
 				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, iWithDetourTimes, Double::doubleValue)
