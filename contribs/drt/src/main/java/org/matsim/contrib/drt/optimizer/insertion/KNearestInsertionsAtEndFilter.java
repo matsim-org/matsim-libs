@@ -27,17 +27,19 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.util.PartialSort;
 
 /**
+ * "Insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
+ * is not shared (like a normal taxi). In this case, the best insertion-at-end is the one that is closest in time,
+ * so we just select the nearest (in straight-line) for the MultiNodeDijkstra (OneToManyPathSearch)
+ *
  * @author michalm
  */
-class DetourLinksProvider {
+class KNearestInsertionsAtEndFilter {
+	// synchronised addition via addInsertionAtEndCandidate(Insertion insertionAtEnd, double timeDistance)
+	private final PartialSort<Insertion> nearestInsertionsAtEnd;
 
-	// "insertion at end" means appending both pickup and dropoff at the end of the schedule, which means the ride
-	// is not shared (like a normal taxi). In this case, the best insertion-at-end is the one that is closest in time,
-	// so we just select the nearest (in straight-line) for the MultiNodeDijkstra (OneToManyPathSearch)
-	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
-
-	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
-	private final PartialSort<Insertion> nearestInsertionsAtEnd = new PartialSort<>(NEAREST_INSERTIONS_AT_END_LIMIT);
+	public KNearestInsertionsAtEndFilter(int k) {
+		nearestInsertionsAtEnd = new PartialSort<>(k);
+	}
 
 	/**
 	 * Designed to be used with parallel streams

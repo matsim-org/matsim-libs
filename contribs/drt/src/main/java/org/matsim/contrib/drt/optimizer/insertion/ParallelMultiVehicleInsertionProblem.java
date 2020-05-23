@@ -37,6 +37,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
+
+	// FIXME make it more flexible... 40 is way too big for many smaller scenarios
+	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
+
 	private final PrecalculablePathDataProvider pathDataProvider;
 	private final InsertionCostCalculator insertionCostCalculator;
 	private final ForkJoinPool forkJoinPool;
@@ -67,7 +71,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	@Override
 	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		DetourDataProvider.DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
-		DetourLinksProvider detourLinksProvider = new DetourLinksProvider();
+		KNearestInsertionsAtEndFilter KNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
+				NEAREST_INSERTIONS_AT_END_LIMIT);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vEntries.parallelStream()
@@ -77,12 +82,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.map(data::createInsertionWithDetourData)
 				.filter(insertion -> feasibleInsertionFilter.filter(drtRequest, insertion))
 				//skip insertions at schedule ends (only selected will be added later)
-				.filter(detourLinksProvider::filter)
+				.filter(KNearestInsertionsAtEndFilter::filter)
 				//forget (approximated) detour times
 				.map(InsertionWithDetourData::getInsertion)
 				.collect(Collectors.toList())).join();
 
-		filteredInsertions.addAll(detourLinksProvider.getNearestInsertionsAtEnd());
+		filteredInsertions.addAll(KNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
 		pathDataProvider.precalculatePathData(drtRequest, filteredInsertions);
 
