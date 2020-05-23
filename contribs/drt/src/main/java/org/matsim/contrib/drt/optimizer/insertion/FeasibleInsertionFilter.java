@@ -19,11 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.ToDoubleFunction;
 
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -31,22 +28,21 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  *
  * @author michalm
  */
-public class FeasibleInsertionFilter {
-	private final DetourDataProvider<Double> detourTimesProvider;
-	private final InsertionCostCalculator costCalculator;
-
-	public FeasibleInsertionFilter(DetourDataProvider<Double> detourTimesProvider,
-			InsertionCostCalculator costCalculator) {
-		this.detourTimesProvider = detourTimesProvider;
-		this.costCalculator = costCalculator;
+public class FeasibleInsertionFilter<D> {
+	public static FeasibleInsertionFilter<Double> createWithDetourTimes(InsertionCostCalculator costCalculator) {
+		return new FeasibleInsertionFilter<>(costCalculator, Double::doubleValue);
 	}
 
-	public List<InsertionWithDetourData<Double>> filter(DrtRequest drtRequest, List<Insertion> insertions) {
-		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
-		return insertions.stream()
-				.map(data::createInsertionWithDetourData)
-				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, iWithDetourTimes, Double::doubleValue)
-						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
-				.collect(Collectors.toList());
+	private final InsertionCostCalculator costCalculator;
+	private final ToDoubleFunction<D> detourTime;
+
+	public FeasibleInsertionFilter(InsertionCostCalculator costCalculator, ToDoubleFunction<D> detourTime) {
+		this.costCalculator = costCalculator;
+		this.detourTime = detourTime;
+	}
+
+	public boolean filter(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
+		return costCalculator.calculate(drtRequest, insertion, detourTime)
+				< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 	}
 }

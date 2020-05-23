@@ -29,7 +29,6 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.PartialSort;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -50,6 +49,8 @@ class DetourLinksProvider {
 	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final FeasibleInsertionFilter insertionFilter;
 
+	private final DetourTimesProvider detourTimesProvider;
+
 	// synchronised addition via addInsertionAtEndCandidate(InsertionAtEnd insertionAtEnd, double timeDistance)
 	private final PartialSort<Insertion> nearestInsertionsAtEnd = new PartialSort<>(NEAREST_INSERTIONS_AT_END_LIMIT);
 
@@ -60,8 +61,10 @@ class DetourLinksProvider {
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
-		insertionFilter = new FeasibleInsertionFilter(new DetourTimesProvider(
-				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed),
+
+		detourTimesProvider = new DetourTimesProvider(
+				DetourTimeEstimator.createBeelineTimeEstimator(optimisticBeelineSpeed));
+		insertionFilter = FeasibleInsertionFilter.createWithDetourTimes(
 				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
@@ -83,8 +86,11 @@ class DetourLinksProvider {
 		List<Insertion> insertions = insertionGenerator.generateInsertions(drtRequest, vEntry);
 
 		//optimistic pre-filtering (admissible cost function using an optimistic beeline speed coefficient)
-		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertionFilter.filter(drtRequest,
-				insertions);
+		DetourDataProvider.DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
+		List<InsertionWithDetourData<Double>> insertionsWithDetourTimes = insertions.stream()
+				.map(data::createInsertionWithDetourData)
+				.filter(insertion -> insertionFilter.filter(drtRequest, insertion))
+				.collect(Collectors.toList());
 		if (insertionsWithDetourTimes.isEmpty()) {
 			return List.of();
 		}
