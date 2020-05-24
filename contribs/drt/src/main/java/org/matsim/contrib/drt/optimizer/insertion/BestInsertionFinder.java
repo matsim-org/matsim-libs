@@ -31,7 +31,7 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 /**
  * @author michalm
  */
-public class SingleVehicleInsertionProblem<D> {
+public class BestInsertionFinder<D> {
 	private static class InsertionWithCost<D> {
 		private final InsertionWithDetourData<D> insertionWithDetourData;
 		private final double cost;
@@ -45,7 +45,7 @@ public class SingleVehicleInsertionProblem<D> {
 	private final InsertionCostCalculator costCalculator;
 	private final ToDoubleFunction<D> detourTime;
 
-	SingleVehicleInsertionProblem(ToDoubleFunction<D> detourTime, InsertionCostCalculator costCalculator) {
+	BestInsertionFinder(ToDoubleFunction<D> detourTime, InsertionCostCalculator costCalculator) {
 		this.costCalculator = costCalculator;
 		this.detourTime = detourTime;
 	}

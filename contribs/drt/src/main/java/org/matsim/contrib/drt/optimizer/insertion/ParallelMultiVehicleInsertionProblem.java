@@ -84,8 +84,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				//skip insertions at schedule ends (only selected will be added later)
 				.filter(kNearestInsertionsAtEndFilter::filter)
 				//forget (approximated) detour times
-				.map(InsertionWithDetourData::getInsertion)
-				.collect(Collectors.toList())).join();
+				.map(InsertionWithDetourData::getInsertion).collect(Collectors.toList())).join();
 
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
@@ -94,7 +93,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
 		// as possible, and then using a parallel stream does not make sense.
-		return new SingleVehicleInsertionProblem<>(PathData::getTravelTime, insertionCostCalculator).findBestInsertion(
-				drtRequest, filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
+		return new BestInsertionFinder<>(PathData::getTravelTime, insertionCostCalculator).findBestInsertion(drtRequest,
+				filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
 	}
 }
