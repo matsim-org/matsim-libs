@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.function.Function;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -31,53 +27,4 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  */
 public interface DetourDataProvider<D> {
 	DetourData<D> getDetourData(DrtRequest drtRequest);
-
-	/**
-	 * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)
-	 * <p>
-	 * Having them collected in one set allows the typical use case where all paths are precomputed in one go
-	 * and then provided via InsertionWithPathData for a specific Insertion.
-	 * <p>
-	 * The current implementation assumes the DetourData functions are time independent. This may be changed in the future (esp.
-	 * for pre-booking or to enhance simple beeline TT estimation) to BiFunctions: (Link, time) -> data.
-	 * <p>
-	 * On the other hand, detour data (D) could itself provide time-dependent information.
-	 */
-	class DetourData<D> {
-		private final Function<Link, D> detourToPickup;
-		private final Function<Link, D> detourFromPickup;
-		private final Function<Link, D> detourToDropoff;
-		private final Function<Link, D> detourFromDropoff;
-
-		DetourData(Function<Link, D> detourToPickup, Function<Link, D> detourFromPickup,
-				Function<Link, D> detourToDropoff, Function<Link, D> detourFromDropoff) {
-			this.detourToPickup = detourToPickup;
-			this.detourFromPickup = detourFromPickup;
-			this.detourToDropoff = detourToDropoff;
-			this.detourFromDropoff = detourFromDropoff;
-		}
-
-		public InsertionWithDetourData<D> createInsertionWithDetourData(Insertion insertion) {
-			D toPickup = detourToPickup.apply(insertion.pickup.previousLink);
-			D fromPickup = detourFromPickup.apply(insertion.pickup.nextLink);
-			D toDropoff = insertion.dropoff.previousLink == null ?
-					null :
-					detourToDropoff.apply(insertion.dropoff.previousLink);
-			D fromDropoff = insertion.dropoff.nextLink == null ?
-					null :
-					detourFromDropoff.apply(insertion.dropoff.nextLink);
-
-			// TODO switch to the new approach
-			//			D fromPickup = i == detourFromPickup.length //
-			//					? detourFromPickup[0] // pickup inserted at the end
-			//					: detourFromPickup[i + 1]; // pickup -> i+1
-			//			D toDropoff = i == j ? detourFromPickup[0] // pickup followed by dropoff
-			//					: detourToDropoff[j]; // j -> dropoff
-			//			D fromDropoff = j == detourFromDropoff.length //
-			//					? detourFromDropoff[0] // dropoff inserted at the end
-			//					: detourFromDropoff[j + 1];
-
-			return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
-		}
-	}
 }

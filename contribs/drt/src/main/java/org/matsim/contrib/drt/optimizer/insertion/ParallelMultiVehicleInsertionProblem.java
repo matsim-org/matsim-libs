@@ -72,7 +72,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
-		DetourDataProvider.DetourData<Double> timeData = optimisticDetourTimesProvider.getDetourData(drtRequest);
+		DetourData<Double> timeData = optimisticDetourTimesProvider.getDetourData(drtRequest);
 		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				NEAREST_INSERTIONS_AT_END_LIMIT);
 
@@ -93,7 +93,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
 		pathDataProvider.precalculatePathData(drtRequest, filteredInsertions);
-		DetourDataProvider.DetourData<PathData> pathData = pathDataProvider.getDetourData(drtRequest);
+		DetourData<PathData> pathData = pathDataProvider.getDetourData(drtRequest);
 
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
 		// as possible, and then using a parallel stream does not make sense.
