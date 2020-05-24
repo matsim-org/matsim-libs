@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.ToDoubleFunction;
@@ -42,12 +45,12 @@ public class SingleVehicleInsertionProblem<D> {
 		return new SingleVehicleInsertionProblem<>(detourTimeProvider, Double::doubleValue, costCalculator);
 	}
 
-	public static class BestInsertion<D> {
-		public final InsertionWithDetourData<D> insertion;
-		public final double cost;
+	private static class InsertionWithCost<D> {
+		private final InsertionWithDetourData<D> insertionWithDetourData;
+		private final double cost;
 
-		public BestInsertion(InsertionWithDetourData<D> insertion, double cost) {
-			this.insertion = insertion;
+		private InsertionWithCost(InsertionWithDetourData<D> insertionWithDetourData, double cost) {
+			this.insertionWithDetourData = insertionWithDetourData;
 			this.cost = cost;
 		}
 	}
@@ -63,22 +66,14 @@ public class SingleVehicleInsertionProblem<D> {
 		this.detourTime = detourTime;
 	}
 
-	public Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, List<Insertion> insertions) {
+	public Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest, List<Insertion> insertions) {
 		DetourData<D> data = detourDataProvider.getDetourData(drtRequest);
-
-		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-		InsertionWithDetourData<D> bestInsertion = null;
-		for (Insertion i : insertions) {
-			InsertionWithDetourData<D> insertion = data.createInsertionWithDetourData(i);
-			double cost = costCalculator.calculate(drtRequest, insertion, detourTime);
-			if (cost < minCost) {
-				bestInsertion = insertion;
-				minCost = cost;
-			}
-		}
-
-		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ?
-				Optional.empty() :
-				Optional.of(new BestInsertion<>(bestInsertion, minCost));
+		return insertions.stream()
+				.map(data::createInsertionWithDetourData)
+				.map(insertion -> new InsertionWithCost<>(insertion,
+						costCalculator.calculate(drtRequest, insertion, detourTime)))
+				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
+				.max(Comparator.comparingDouble(insertionWithCost -> insertionWithCost.cost))
+				.map(insertionWithCost -> insertionWithCost.insertionWithDetourData);
 	}
 }

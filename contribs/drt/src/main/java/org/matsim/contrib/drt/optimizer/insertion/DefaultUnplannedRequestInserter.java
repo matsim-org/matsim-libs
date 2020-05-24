@@ -27,7 +27,6 @@ import java.util.concurrent.ForkJoinPool;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -84,7 +83,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			Optional<BestInsertion<PathData>> best = insertionProblem.findBestInsertion(req, vData.getEntries());
+			Optional<InsertionWithDetourData<PathData>> best = insertionProblem.findBestInsertion(req,
+					vData.getEntries());
 			if (best.isEmpty()) {
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
@@ -96,12 +96,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 						+ " fromLinkId="
 						+ req.getFromLink().getId());
 			} else {
-				BestInsertion<PathData> bestInsertion = best.get();
-				insertionScheduler.scheduleRequest(req, bestInsertion.insertion);
-				vData.updateEntry(bestInsertion.insertion.getVehicleEntry().vehicle);
+				InsertionWithDetourData<PathData> insertion = best.get();
+				insertionScheduler.scheduleRequest(req, insertion);
+				vData.updateEntry(insertion.getVehicleEntry().vehicle);
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId(), bestInsertion.insertion.getVehicleEntry().vehicle.getId(),
+								req.getPassengerId(), insertion.getVehicleEntry().vehicle.getId(),
 								req.getPickupTask().getEndTime(), req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();

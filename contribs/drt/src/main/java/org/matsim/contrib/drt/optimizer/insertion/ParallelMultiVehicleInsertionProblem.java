@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -69,7 +68,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	@Override
-	public Optional<BestInsertion<PathData>> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
+			Collection<Entry> vEntries) {
 		DetourDataProvider.DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
 		KNearestInsertionsAtEndFilter KNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				NEAREST_INSERTIONS_AT_END_LIMIT);
