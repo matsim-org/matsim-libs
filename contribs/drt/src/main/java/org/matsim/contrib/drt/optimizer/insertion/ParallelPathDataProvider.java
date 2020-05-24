@@ -84,12 +84,6 @@ public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeC
 
 	private final ExecutorService executorService;
 
-	// ==== recalculated by precalculatePathData()
-	private Map<Link, PathData> pathsToPickupMap;
-	private Map<Link, PathData> pathsFromPickupMap;
-	private Map<Link, PathData> pathsToDropoffMap;
-	private Map<Link, PathData> pathsFromDropoffMap;
-
 	public ParallelPathDataProvider(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
 		toPickupPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
@@ -146,16 +140,16 @@ public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeC
 
 		try {
 			// start from earliest (fastest) to latest (slowest)
-			pathsFromDropoffMap = pathsFromDropoffFuture.get();
-			pathsToDropoffMap = pathsToDropoffFuture.get();
-			pathsFromPickupMap = pathsFromPickupFuture.get();
-			pathsToPickupMap = pathsToPickupFuture.get();
+			Map<Link, PathData> pathsFromDropoffMap = pathsFromDropoffFuture.get();
+			Map<Link, PathData> pathsToDropoffMap = pathsToDropoffFuture.get();
+			Map<Link, PathData> pathsFromPickupMap = pathsFromPickupFuture.get();
+			Map<Link, PathData> pathsToPickupMap = pathsToPickupFuture.get();
+
+			return new DetourData<>(pathsToPickupMap::get, pathsFromPickupMap::get, pathsToDropoffMap::get,
+					pathsFromDropoffMap::get);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-
-		return new DetourData<>(pathsToPickupMap::get, pathsFromPickupMap::get, pathsToDropoffMap::get,
-				pathsFromDropoffMap::get);
 	}
 
 	@Override
