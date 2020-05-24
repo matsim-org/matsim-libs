@@ -27,6 +27,8 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 /**
  * @author michalm
  */
-public interface PrecalculablePathDataProvider extends DetourDataProvider<PathData> {
+public interface PrecalculablePathDataProvider {
 	void precalculatePathData(DrtRequest drtRequest, List<Insertion> filteredInsertions);
+
+	DetourData<PathData> getDetourData(DrtRequest drtRequest);
 }

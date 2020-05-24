@@ -26,14 +26,13 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 /**
  * @author michalm
  */
-public class DetourTimesProvider implements DetourDataProvider<Double> {
+public class DetourTimesProvider {
 	private final DetourTimeEstimator detourTimeEstimator;
 
 	public DetourTimesProvider(DetourTimeEstimator detourTimeEstimator) {
 		this.detourTimeEstimator = detourTimeEstimator;
 	}
 
-	@Override
 	public DetourData<Double> getDetourData(DrtRequest drtRequest) {
 		//TODO add departure/arrival times to improve estimation
 		Function<Link, Double> timesToPickup = link -> detourTimeEstimator.estimateTime(link, drtRequest.getFromLink());
