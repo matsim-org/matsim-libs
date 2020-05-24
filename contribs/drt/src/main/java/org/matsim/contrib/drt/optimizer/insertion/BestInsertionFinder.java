@@ -19,35 +19,40 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
-public class SingleVehicleInsertionFilter {
-	private final DetourDataProvider<Double> detourTimesProvider;
-	private final InsertionCostCalculator costCalculator;
+public class BestInsertionFinder<D> {
+	private static class InsertionWithCost<D> {
+		private final InsertionWithDetourData<D> insertionWithDetourData;
+		private final double cost;
 
-	public SingleVehicleInsertionFilter(DetourDataProvider<Double> detourTimesProvider,
-			InsertionCostCalculator costCalculator) {
-		this.detourTimesProvider = detourTimesProvider;
+		private InsertionWithCost(InsertionWithDetourData<D> insertionWithDetourData, double cost) {
+			this.insertionWithDetourData = insertionWithDetourData;
+			this.cost = cost;
+		}
+	}
+
+	private final InsertionCostCalculator<D> costCalculator;
+
+	BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {
 		this.costCalculator = costCalculator;
 	}
 
-	public List<InsertionWithDetourData<Double>> findFeasibleInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry,
-			List<Insertion> insertions) {
-		DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest, vEntry);
-
-		return insertions.stream()
-				.map(insertion -> data.createInsertionWithDetourData(insertion, drtRequest, vEntry))
-				.filter(iWithDetourTimes -> costCalculator.calculate(drtRequest, vEntry, iWithDetourTimes,
-						Double::doubleValue) < InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
-				.collect(Collectors.toList());
+	public Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest,
+			Stream<InsertionWithDetourData<D>> insertions) {
+		return insertions.map(
+				insertion -> new InsertionWithCost<>(insertion, costCalculator.calculate(drtRequest, insertion)))
+				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
+				.max(Comparator.comparingDouble(insertionWithCost -> insertionWithCost.cost))
+				.map(insertionWithCost -> insertionWithCost.insertionWithDetourData);
 	}
 }
