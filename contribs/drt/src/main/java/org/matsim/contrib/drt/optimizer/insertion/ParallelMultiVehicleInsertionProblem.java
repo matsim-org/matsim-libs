@@ -70,8 +70,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	@Override
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
-		DetourDataProvider.DetourData<Double> data = detourTimesProvider.getDetourData(drtRequest);
-		KNearestInsertionsAtEndFilter KNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
+		DetourDataProvider.DetourData<Double> timeData = detourTimesProvider.getDetourData(drtRequest);
+		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				NEAREST_INSERTIONS_AT_END_LIMIT);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
@@ -79,19 +79,22 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				//generate feasible insertions (wrt occupancy limits)
 				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 				//optimistic pre-filtering wrt (admissible cost function using an optimistic beeline speed coefficient)
-				.map(data::createInsertionWithDetourData)
+				.map(timeData::createInsertionWithDetourData)
 				.filter(insertion -> feasibleInsertionFilter.filter(drtRequest, insertion))
 				//skip insertions at schedule ends (only selected will be added later)
-				.filter(KNearestInsertionsAtEndFilter::filter)
+				.filter(kNearestInsertionsAtEndFilter::filter)
 				//forget (approximated) detour times
 				.map(InsertionWithDetourData::getInsertion)
 				.collect(Collectors.toList())).join();
 
-		filteredInsertions.addAll(KNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
+		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
 		pathDataProvider.precalculatePathData(drtRequest, filteredInsertions);
+		DetourDataProvider.DetourData<PathData> pathData = pathDataProvider.getDetourData(drtRequest);
 
-		return SingleVehicleInsertionProblem.createWithDetourPathProvider(pathDataProvider, insertionCostCalculator)
-				.findBestInsertion(drtRequest, filteredInsertions);
+		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
+		// as possible, and then using a parallel stream does not make sense.
+		return new SingleVehicleInsertionProblem<>(PathData::getTravelTime, insertionCostCalculator).findBestInsertion(
+				drtRequest, filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
 	}
 }
