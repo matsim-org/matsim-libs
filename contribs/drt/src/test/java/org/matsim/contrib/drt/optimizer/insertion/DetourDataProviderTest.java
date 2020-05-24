@@ -42,7 +42,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class PrecalculablePathDataProviderTest {
+public class DetourDataProviderTest {
 	private final Link pickupLink = link("pickupLink");
 	private final Link dropoffLink = link("dropoffLink");
 	private final Link startLink = link("startLink");
