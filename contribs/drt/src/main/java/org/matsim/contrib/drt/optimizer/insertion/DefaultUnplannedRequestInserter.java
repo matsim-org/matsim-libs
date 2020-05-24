@@ -56,9 +56,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider,
-			InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
-			QSimScopeForkJoinPoolHolder forkJoinPoolHolder) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, PathDataProvider pathDataProvider,
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator, QSimScopeForkJoinPoolHolder forkJoinPoolHolder) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;

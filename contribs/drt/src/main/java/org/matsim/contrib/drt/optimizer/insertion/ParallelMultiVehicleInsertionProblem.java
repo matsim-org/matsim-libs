@@ -46,10 +46,10 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	// step 2: finding best insertion
 	private final ForkJoinPool forkJoinPool;
-	private final PrecalculablePathDataProvider pathDataProvider;
+	private final PathDataProvider pathDataProvider;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
-	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+	public ParallelMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.forkJoinPool = forkJoinPool;
@@ -89,12 +89,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				//forget (approximated) detour times
 				.map(InsertionWithDetourData::getInsertion)
 				.collect(Collectors.toList())).join();
-
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
-		pathDataProvider.precalculatePathData(drtRequest, filteredInsertions);
-		DetourData<PathData> pathData = pathDataProvider.getDetourData(drtRequest);
-
+		DetourData<PathData> pathData = pathDataProvider.getPathData(drtRequest, filteredInsertions);
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
 		// as possible, and then using a parallel stream does not make sense.
 		return bestInsertionFinder.findBestInsertion(drtRequest,

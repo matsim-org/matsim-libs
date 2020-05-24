@@ -44,7 +44,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PrecalculablePathDataProvider, MobsimBeforeCleanupListener {
+public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeCleanupListener {
 
 	private static class DetourLinksSet {
 		final Map<Id<Link>, Link> pickupDetourStartLinks;
@@ -101,7 +101,8 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, List<InsertionGenerator.Insertion> filteredInsertions) {
+	public DetourData<PathData> getPathData(DrtRequest drtRequest,
+			List<InsertionGenerator.Insertion> filteredInsertions) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -152,10 +153,7 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-	}
 
-	@Override
-	public DetourData<PathData> getDetourData(DrtRequest drtRequest) {
 		return new DetourData<>(pathsToPickupMap::get, pathsFromPickupMap::get, pathsToDropoffMap::get,
 				pathsFromDropoffMap::get);
 	}
