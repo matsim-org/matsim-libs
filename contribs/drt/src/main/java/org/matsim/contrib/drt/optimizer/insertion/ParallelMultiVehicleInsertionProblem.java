@@ -37,34 +37,31 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
 
-	// FIXME make it more flexible... 40 is way too big for many smaller scenarios
+	// step 1: initial filtering out feasible insertions
+	// FIXME make it more flexible... 40 is way too big for many smaller scenarios, we may also want to reduce 1.5
 	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
+	static final double OPTIMISTIC_BEELINE_SPEED_COEFF = 1.5;
+	private final InsertionCostCalculator<Double> approximateCostCalculator;
+	private final DetourTimesProvider optimisticDetourTimesProvider;
 
+	// step 2: finding best insertion
+	private final ForkJoinPool forkJoinPool;
 	private final PrecalculablePathDataProvider pathDataProvider;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
-
-	private final ForkJoinPool forkJoinPool;
-
-	// used to prevent filtering out feasible insertions
-	static final double OPTIMISTIC_BEELINE_SPEED_COEFF = 1.5;
-
-	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
-	private final FeasibleInsertionFilter<Double> feasibleInsertionFilter;
-	private final DetourTimesProvider detourTimesProvider;
 
 	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.forkJoinPool = forkJoinPool;
 
-		feasibleInsertionFilter = new FeasibleInsertionFilter<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue));
+		approximateCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator,
+				Double::doubleValue);
 
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
 
-		detourTimesProvider = new DetourTimesProvider(
+		optimisticDetourTimesProvider = new DetourTimesProvider(
 				DetourTimeEstimator.createBeelineTimeEstimator(optimisticBeelineSpeed));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
@@ -74,7 +71,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	@Override
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
-		DetourDataProvider.DetourData<Double> timeData = detourTimesProvider.getDetourData(drtRequest);
+		InsertionGenerator insertionGenerator = new InsertionGenerator();
+		DetourDataProvider.DetourData<Double> timeData = optimisticDetourTimesProvider.getDetourData(drtRequest);
 		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				NEAREST_INSERTIONS_AT_END_LIMIT);
 
@@ -84,7 +82,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 				//optimistic pre-filtering wrt (admissible cost function using an optimistic beeline speed coefficient)
 				.map(timeData::createInsertionWithDetourData)
-				.filter(insertion -> feasibleInsertionFilter.filter(drtRequest, insertion))
+				.filter(insertion -> approximateCostCalculator.calculate(drtRequest, insertion)
+						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
 				//skip insertions at schedule ends (only selected will be added later)
 				.filter(kNearestInsertionsAtEndFilter::filter)
 				//forget (approximated) detour times
