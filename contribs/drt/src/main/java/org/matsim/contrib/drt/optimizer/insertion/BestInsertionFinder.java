@@ -23,7 +23,6 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -42,18 +41,16 @@ public class BestInsertionFinder<D> {
 		}
 	}
 
-	private final InsertionCostCalculator costCalculator;
-	private final ToDoubleFunction<D> detourTime;
+	private final InsertionCostCalculator<D> costCalculator;
 
-	BestInsertionFinder(ToDoubleFunction<D> detourTime, InsertionCostCalculator costCalculator) {
+	BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {
 		this.costCalculator = costCalculator;
-		this.detourTime = detourTime;
 	}
 
 	public Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest,
 			Stream<InsertionWithDetourData<D>> insertions) {
-		return insertions.map(insertion -> new InsertionWithCost<>(insertion,
-				costCalculator.calculate(drtRequest, insertion, detourTime)))
+		return insertions.map(
+				insertion -> new InsertionWithCost<>(insertion, costCalculator.calculate(drtRequest, insertion)))
 				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
 				.max(Comparator.comparingDouble(insertionWithCost -> insertionWithCost.cost))
 				.map(insertionWithCost -> insertionWithCost.insertionWithDetourData);

@@ -41,7 +41,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
 
 	private final PrecalculablePathDataProvider pathDataProvider;
-	private final InsertionCostCalculator insertionCostCalculator;
+	private final BestInsertionFinder<PathData> bestInsertionFinder;
+
 	private final ForkJoinPool forkJoinPool;
 
 	// used to prevent filtering out feasible insertions
@@ -55,7 +56,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.forkJoinPool = forkJoinPool;
-		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer, penaltyCalculator);
+
+		feasibleInsertionFilter = new FeasibleInsertionFilter<>(
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue));
 
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
@@ -63,8 +66,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		detourTimesProvider = new DetourTimesProvider(
 				DetourTimeEstimator.createBeelineTimeEstimator(optimisticBeelineSpeed));
-		feasibleInsertionFilter = FeasibleInsertionFilter.createWithDetourTimes(
-				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
+
+		bestInsertionFinder = new BestInsertionFinder<>(
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
 	}
 
 	@Override
@@ -84,7 +88,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 				//skip insertions at schedule ends (only selected will be added later)
 				.filter(kNearestInsertionsAtEndFilter::filter)
 				//forget (approximated) detour times
-				.map(InsertionWithDetourData::getInsertion).collect(Collectors.toList())).join();
+				.map(InsertionWithDetourData::getInsertion)
+				.collect(Collectors.toList())).join();
 
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
@@ -93,7 +98,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
 		// as possible, and then using a parallel stream does not make sense.
-		return new BestInsertionFinder<>(PathData::getTravelTime, insertionCostCalculator).findBestInsertion(drtRequest,
+		return bestInsertionFinder.findBestInsertion(drtRequest,
 				filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
 	}
 }
