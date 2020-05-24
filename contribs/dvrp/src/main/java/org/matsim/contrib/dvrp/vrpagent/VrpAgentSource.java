@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
 public class VrpAgentSource implements AgentSource {
@@ -38,15 +37,12 @@ public class VrpAgentSource implements AgentSource {
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
 	private final QSim qSim;
-	private final VehicleType vehicleType;
 
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
-			VehicleType vehicleType) {
+	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
 		this.qSim = qSim;
-		this.vehicleType = vehicleType;
 	}
 
 	@Override
@@ -61,7 +57,7 @@ public class VrpAgentSource implements AgentSource {
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);
 			QVehicle mobsimVehicle = new QVehicleImpl(
-					vehicleFactory.createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vehicleType));
+					vehicleFactory.createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vrpVeh.getVehicleType()));
 			vrpAgent.setVehicle(mobsimVehicle);
 			mobsimVehicle.setDriver(vrpAgent);
 

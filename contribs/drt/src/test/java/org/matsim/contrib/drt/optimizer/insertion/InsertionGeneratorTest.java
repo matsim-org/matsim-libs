@@ -36,6 +36,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.testcases.fakes.FakeLink;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -45,6 +47,12 @@ import com.google.common.collect.ImmutableList;
  */
 public class InsertionGeneratorTest {
 	private static final int CAPACITY = 4;
+	private static final VehicleType VEHICLE_TYPE;
+	
+	static {
+		VEHICLE_TYPE = VehicleUtils.createVehicleType(Id.create("test", VehicleType.class));
+		VEHICLE_TYPE.getCapacity().setSeats(CAPACITY);
+	}
 
 	private final Link fromLink = link("from");
 	private final Link toLink = link("to");
@@ -53,12 +61,12 @@ public class InsertionGeneratorTest {
 	private final Link depotLink = link("depot");
 	private final DvrpVehicleSpecification vehicleSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
 			.id(Id.create("v1", DvrpVehicle.class))
-			.capacity(CAPACITY)
+			.vehicleTypeId(VEHICLE_TYPE.getId())
 			.startLinkId(depotLink.getId())
 			.serviceBeginTime(0)
 			.serviceEndTime(24 * 3600)
 			.build();
-	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, depotLink);
+	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, VEHICLE_TYPE, depotLink);
 
 	@Test
 	public void generateInsertions_startEmpty_noStops() {

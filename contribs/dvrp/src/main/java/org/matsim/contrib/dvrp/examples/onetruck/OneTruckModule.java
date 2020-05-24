@@ -35,8 +35,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.name.Names;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -53,8 +51,6 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		install(new DvrpModeRoutingNetworkModule(getMode(), false));
 
-		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
-				.toInstance(createTruckType());
 		install(new FleetModule(getMode(), fleetSpecificationUrl));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
@@ -69,7 +65,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		});
 	}
 
-	private static VehicleType createTruckType() {
+	public static VehicleType createTruckType() {
 		VehicleType truckType = VehicleUtils.getFactory().createVehicleType(Id.create("truckType", VehicleType.class));
 		truckType.setLength(15.);
 		truckType.setPcuEquivalents(2.5);

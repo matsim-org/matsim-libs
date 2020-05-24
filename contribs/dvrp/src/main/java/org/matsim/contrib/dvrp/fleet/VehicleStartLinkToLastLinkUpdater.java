@@ -59,7 +59,7 @@ public class VehicleStartLinkToLastLinkUpdater
 				.map(v -> ImmutableDvrpVehicleSpecification.newBuilder()
 						.id(v.getId())
 						.startLinkId(Schedules.getLastLinkInSchedule(v).getId())
-						.capacity(v.getCapacity())
+						.vehicleTypeId(v.getVehicleType().getId())
 						.serviceBeginTime(v.getServiceBeginTime())
 						.serviceEndTime(v.getServiceEndTime())
 						.build())

@@ -59,12 +59,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * @author jbischoff
@@ -508,11 +508,11 @@ public class DrtTripsAnalyser {
 	 * @param fleet
 	 * @return
 	 */
-	public static int findMaxVehicleCapacity(FleetSpecification fleet) {
+	public static int findMaxVehicleCapacity(FleetSpecification fleet, Vehicles vehicles) {
 		return fleet.getVehicleSpecifications()
 				.values()
 				.stream()
-				.mapToInt(DvrpVehicleSpecification::getCapacity)
+				.mapToInt(v -> vehicles.getVehicleTypes().get(v.getVehicleTypeId()).getCapacity().getSeats())
 				.max()
 				.getAsInt();
 	}

@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v2.dtd">
 
 <vehicles>
-	<vehicle id="truck_one" start_link="215" t_0="0" t_1="8000"/>
+	<vehicle id="truck_one" vehicle_type_id="truckType" start_link="215" t_0="0" t_1="8000"/>
 </vehicles>

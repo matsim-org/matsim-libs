@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.fleet.Fleets;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.inject.Inject;
 
@@ -45,13 +46,17 @@ public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 			@Inject
 			private ElectricFleet evFleet;
 
+			@Inject
+			private Vehicles vehicles;
+
 			@Override
 			public Fleet get() {
 				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
 				Network network = getModalInstance(Network.class);
 				return Fleets.createCustomFleet(fleetSpecification,
-						s -> EvDvrpVehicle.create(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())),
-								evFleet));
+						s -> EvDvrpVehicle
+								.create(new DvrpVehicleImpl(s, vehicles.getVehicleTypes().get(s.getVehicleTypeId()),
+										network.getLinks().get(s.getStartLinkId())), evFleet));
 
 			}
 		}).asEagerSingleton();

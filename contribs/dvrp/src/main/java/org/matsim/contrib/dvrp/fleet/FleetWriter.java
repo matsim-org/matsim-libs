@@ -40,7 +40,7 @@ public class FleetWriter extends MatsimXmlWriter {
 
 	public void write(String file) {
 		openFile(file);
-		writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd");
+		writeDoctype("vehicles", "http://matsim.org/files/dtd/dvrp_vehicles_v2.dtd");
 		writeStartTag("vehicles", Collections.emptyList());
 		this.vehicleSpecifications.forEach(this::writeVehicle);
 		writeEndTag("vehicles");
@@ -50,7 +50,7 @@ public class FleetWriter extends MatsimXmlWriter {
 	private synchronized void writeVehicle(DvrpVehicleSpecification vehicle) {
 		List<Tuple<String, String>> attributes = Arrays.asList(Tuple.of("id", vehicle.getId().toString()),
 				Tuple.of("start_link", vehicle.getStartLinkId() + ""), Tuple.of("t_0", vehicle.getServiceBeginTime() + ""),
-				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("capacity", vehicle.getCapacity() + ""));
+				Tuple.of("t_1", vehicle.getServiceEndTime() + ""), Tuple.of("vehicleTypeId", vehicle.getVehicleTypeId() + ""));
 		writeStartTag("vehicle", attributes, true);
 	}
 }

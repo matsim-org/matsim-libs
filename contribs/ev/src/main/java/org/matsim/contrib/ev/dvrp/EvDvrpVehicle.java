@@ -24,6 +24,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * @author michalm
@@ -74,5 +75,10 @@ public class EvDvrpVehicle implements DvrpVehicle {
 	@Override
 	public Schedule getSchedule() {
 		return vehicle.getSchedule();
+	}
+
+	@Override
+	public VehicleType getVehicleType() {
+		return vehicle.getVehicleType();
 	}
 }

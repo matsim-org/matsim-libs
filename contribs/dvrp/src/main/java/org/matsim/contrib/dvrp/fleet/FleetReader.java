@@ -25,6 +25,8 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 /**
@@ -32,8 +34,6 @@ import org.xml.sax.Attributes;
  */
 public class FleetReader extends MatsimXmlParser {
 	private static final String VEHICLE = "vehicle";
-
-	private static final int DEFAULT_CAPACITY = 1;
 
 	private final FleetSpecification fleet;
 
@@ -56,18 +56,14 @@ public class FleetReader extends MatsimXmlParser {
 		return ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create(atts.getValue("id"), DvrpVehicle.class))
 				.startLinkId(Id.createLinkId(atts.getValue("start_link")))
-				.capacity(getCapacity(atts.getValue("capacity")))
+				.vehicleTypeId(getVehicleTypeId(atts.getValue("vehicleTypeId")))
 				.serviceBeginTime(Double.parseDouble(atts.getValue("t_0")))
 				.serviceEndTime(Double.parseDouble(atts.getValue("t_1")))
 				.build();
 	}
 
-	private static int getCapacity(String capacityAttribute) {
-		double capacity = Double.parseDouble(Optional.ofNullable(capacityAttribute).orElse(DEFAULT_CAPACITY + ""));
-		if ((int)capacity != capacity) {
-			//for backwards compatibility: use double when reading files (capacity used to be double)
-			throw new IllegalArgumentException("capacity must be an integer value");
-		}
-		return (int)capacity;
+	private static Id<VehicleType> getVehicleTypeId(String attribute) {
+		return Optional.ofNullable(attribute).map(id -> Id.create(id, VehicleType.class))
+				.orElse(VehicleUtils.getDefaultVehicleType().getId());
 	}
 }

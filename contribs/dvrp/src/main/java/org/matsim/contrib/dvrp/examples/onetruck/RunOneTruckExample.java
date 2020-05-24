@@ -32,6 +32,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -45,7 +46,11 @@ public final class RunOneTruckExample {
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
+		
+		// set up vehicle type
+		Vehicles vehicles = scenario.getVehicles();
+		vehicles.addVehicleType(OneTruckModule.createTruckType());
+		
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());

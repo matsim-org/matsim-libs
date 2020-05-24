@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * DvrpVehicle is created from DvrpVehicleSpecification.
@@ -62,4 +63,9 @@ public interface DvrpVehicle extends Identifiable<DvrpVehicle> {
 	 * </ul>
 	 */
 	Schedule getSchedule();
+	
+	/**
+	 * @return the {@link VehicleType} of the vehicle
+	 */
+	VehicleType getVehicleType();
 }

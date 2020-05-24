@@ -35,6 +35,7 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * @author jbischoff
@@ -53,7 +54,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DecimalFormat format = new DecimalFormat();
 	private final int maxcap;
 
-	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
+	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet, Vehicles vehicles,
 										DrtPassengerAndVehicleStats drtPassengerStats, MatsimServices matsimServices, Network network,
 										DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.drtPassengerStats = drtPassengerStats;
@@ -63,7 +64,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
 		runId = config.controler().getRunId();
-		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleet);
+		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleet, vehicles);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);

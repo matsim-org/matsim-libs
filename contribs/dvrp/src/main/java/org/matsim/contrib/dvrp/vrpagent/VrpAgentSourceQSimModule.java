@@ -25,14 +25,10 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.vehicles.VehicleType;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
-	public static final String DVRP_VEHICLE_TYPE = "dvrp_vehicle_type";
-
 	public VrpAgentSourceQSimModule(String mode) {
 		super(mode);
 	}
@@ -43,14 +39,10 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 			@Inject
 			private QSim qSim;
 
-			@Inject
-			@Named(DVRP_VEHICLE_TYPE)
-			private VehicleType vehicleType;
-
 			@Override
 			public VrpAgentSource get() {
 				return new VrpAgentSource(getModalInstance(VrpAgentLogic.DynActionCreator.class),
-						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim, vehicleType);
+						getModalInstance(Fleet.class), getModalInstance(VrpOptimizer.class), qSim);
 			}
 		});
 	}

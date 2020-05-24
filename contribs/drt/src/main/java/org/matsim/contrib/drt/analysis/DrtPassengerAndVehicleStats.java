@@ -45,6 +45,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,13 +70,15 @@ public class DrtPassengerAndVehicleStats
 	private final Map<Id<Request>, Id<Person>> request2person = new HashMap<>();
 	private final String mode;
 	private final Network network;
+	private final Vehicles vehicles;
 	private Set<Id<Vehicle>> monitoredVehicles;
 	private final FleetSpecification fleetSpecification;
 
-	public DrtPassengerAndVehicleStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
+	public DrtPassengerAndVehicleStats(Network network, Vehicles vehicles, EventsManager events, DrtConfigGroup drtCfg,
 									   FleetSpecification fleetSpecification) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
+		this.vehicles = vehicles;
 		events.addHandler(this);
 		this.fleetSpecification = fleetSpecification;
 		
@@ -99,7 +102,7 @@ public class DrtPassengerAndVehicleStats
 
 
 	private void initializeVehicles() {
-		int maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
+		int maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification, vehicles);
 		this.monitoredVehicles = fleetSpecification.getVehicleSpecifications()
 				.keySet()
 				.stream()

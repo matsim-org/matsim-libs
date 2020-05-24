@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.VehicleType;
 
 import com.google.common.base.MoreObjects;
 
@@ -35,7 +36,7 @@ import com.google.common.base.MoreObjects;
 public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpecification {
 	private final Id<DvrpVehicle> id;
 	private final Id<Link> startLinkId;
-	private final int capacity;
+	private final Id<VehicleType> vehicleTypeId;
 
 	// time window
 	private final double serviceBeginTime;
@@ -44,7 +45,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	private ImmutableDvrpVehicleSpecification(Builder builder) {
 		id = Objects.requireNonNull(builder.id);
 		startLinkId = Objects.requireNonNull(builder.startLinkId);
-		capacity = Objects.requireNonNull(builder.capacity);
+		vehicleTypeId = Objects.requireNonNull(builder.vehicleTypeId);
 		serviceBeginTime = Objects.requireNonNull(builder.serviceBeginTime);
 		serviceEndTime = Objects.requireNonNull(builder.serviceEndTime);
 	}
@@ -57,7 +58,6 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 		Builder builder = new Builder();
 		builder.id = copy.getId();
 		builder.startLinkId = copy.getStartLinkId();
-		builder.capacity = copy.getCapacity();
 		builder.serviceBeginTime = copy.getServiceBeginTime();
 		builder.serviceEndTime = copy.getServiceEndTime();
 		return builder;
@@ -74,11 +74,6 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	}
 
 	@Override
-	public int getCapacity() {
-		return capacity;
-	}
-
-	@Override
 	public double getServiceBeginTime() {
 		return serviceBeginTime;
 	}
@@ -87,13 +82,18 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	public double getServiceEndTime() {
 		return serviceEndTime;
 	}
+	
+    @Override
+    public Id<VehicleType> getVehicleTypeId() {
+        return vehicleTypeId;
+    }
 
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
 				.add("id", id)
 				.add("startLinkId", startLinkId)
-				.add("capacity", capacity)
+				.add("vehicleTypeId", vehicleTypeId)
 				.add("serviceBeginTime", serviceBeginTime)
 				.add("serviceEndTime", serviceEndTime)
 				.toString();
@@ -102,7 +102,7 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 	public static final class Builder {
 		private Id<DvrpVehicle> id;
 		private Id<Link> startLinkId;
-		private Integer capacity;
+		private Id<VehicleType> vehicleTypeId;
 		private Double serviceBeginTime;
 		private Double serviceEndTime;
 
@@ -119,8 +119,8 @@ public final class ImmutableDvrpVehicleSpecification implements DvrpVehicleSpeci
 			return this;
 		}
 
-		public Builder capacity(int val) {
-			capacity = val;
+		public Builder vehicleTypeId(Id<VehicleType> val) {
+		    vehicleTypeId = val;
 			return this;
 		}
 

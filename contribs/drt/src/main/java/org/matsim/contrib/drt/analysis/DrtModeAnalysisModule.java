@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -48,8 +49,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		bindModal(DrtPassengerAndVehicleStats.class).toProvider(modalProvider(
-				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), getter.get(EventsManager.class), drtCfg,
-						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), getter.get(Vehicles.class),
+						getter.get(EventsManager.class), drtCfg, getter.getModal(FleetSpecification.class))))
+				.asEagerSingleton();
 
 		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(
 				getter -> new DrtRequestAnalyzer(getter.get(EventsManager.class), getter.get(Network.class), drtCfg)))
@@ -57,9 +59,10 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(FleetSpecification.class), getter.getModal(DrtPassengerAndVehicleStats.class),
-						getter.get(MatsimServices.class), getter.get(Network.class),
-						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
+						getter.getModal(FleetSpecification.class), getter.get(Vehicles.class),
+						getter.getModal(DrtPassengerAndVehicleStats.class), getter.get(MatsimServices.class),
+						getter.get(Network.class), getter.getModal(DrtRequestAnalyzer.class))))
+				.asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override

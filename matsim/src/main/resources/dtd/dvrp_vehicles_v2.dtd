@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+<!-- For further information or questions, please contact
+     Michal Maciejewski, maciejewski at vsp dot tu-berlin dot de -->
+
+<!-- ============================================================ -->
+
+<!ELEMENT vehicles (vehicle)*>
+
+<!ELEMENT vehicle EMPTY>
+
+<!ATTLIST vehicle
+	id          		CDATA   #REQUIRED
+	start_link  		CDATA   #REQUIRED
+	vehicle_type_id    	CDATA   #IMPLIED
+	t_0         		CDATA   #REQUIRED
+	t_1         		CDATA   #REQUIRED>

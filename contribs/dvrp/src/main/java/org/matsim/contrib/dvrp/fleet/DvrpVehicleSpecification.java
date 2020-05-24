@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.fleet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * DvrpVehicleSpecification is assumed to be immutable.
@@ -41,11 +42,6 @@ public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
 	Id<Link> getStartLinkId();
 
 	/**
-	 * @return vehicle capacity
-	 */
-	int getCapacity();
-
-	/**
 	 * @return vehicle operations start time
 	 */
 	double getServiceBeginTime();
@@ -54,4 +50,9 @@ public interface DvrpVehicleSpecification extends Identifiable<DvrpVehicle> {
 	 * @return vehicle operations end time
 	 */
 	double getServiceEndTime();
+	
+	/**
+	 * @return id of the {@link VehicleType}
+	 */
+	Id<VehicleType> getVehicleTypeId();
 }

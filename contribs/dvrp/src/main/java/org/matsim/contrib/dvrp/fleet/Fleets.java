@@ -25,6 +25,7 @@ import java.util.function.Function;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.util.LinkProvider;
+import org.matsim.vehicles.Vehicles;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -32,9 +33,9 @@ import com.google.common.collect.ImmutableMap;
  * @author michalm
  */
 public class Fleets {
-	public static Fleet createDefaultFleet(FleetSpecification fleetSpecification, LinkProvider<Id<Link>> linkProvider) {
+	public static Fleet createDefaultFleet(FleetSpecification fleetSpecification, Vehicles vehicles, LinkProvider<Id<Link>> linkProvider) {
 		return createCustomFleet(fleetSpecification,
-				s -> new DvrpVehicleImpl(s, linkProvider.apply(s.getStartLinkId())));
+				s -> new DvrpVehicleImpl(s, vehicles.getVehicleTypes().get(s.getVehicleTypeId()), linkProvider.apply(s.getStartLinkId())));
 	}
 
 	public static Fleet createCustomFleet(FleetSpecification fleetSpecification,
