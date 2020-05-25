@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -178,8 +179,8 @@ class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
-		return 0. ;  // what does this matter for?
+	public OptionalTime getExpectedTravelTime() {
+		return OptionalTime.defined( 0. );  // what does this matter for?
 	}
 
 	@Override

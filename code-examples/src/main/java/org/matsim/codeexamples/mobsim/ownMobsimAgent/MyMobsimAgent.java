@@ -8,6 +8,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 
 class MyMobsimAgent implements MobsimAgent {
@@ -89,8 +90,8 @@ class MyMobsimAgent implements MobsimAgent {
     }
 
     @Override
-    public Double getExpectedTravelTime() {
-        return 5 * 60.0; // all my travels take 5 minutes
+    public OptionalTime getExpectedTravelTime() {
+        return OptionalTime.defined( 5 * 60.0 ); // all my travels take 5 minutes
     }
 
     @Override

@@ -34,6 +34,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * This is is an example, taken from Thibaut, of how to set an additional route factory before the controler has started.
@@ -92,15 +93,18 @@ public class RunReadNonstandardRoutesExample {
 		}
 
 		@Override
-		public double getTravelTime() {
+		public OptionalTime getTravelTime() {
 			// TODO Auto-generated method stub
-			return 0;
+			return OptionalTime.defined( 0 );
 		}
 
 		@Override
 		public void setTravelTime(double travelTime) {
 			// TODO Auto-generated method stub
 
+		}
+		@Override public void setTravelTimeUndefined(){
+			throw new RuntimeException( "not implemented" );
 		}
 
 		@Override

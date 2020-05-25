@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -108,6 +109,17 @@ public class RunSubpopulationsExample {
 			config.strategy().addStrategySettings( new StrategySettings( ).setStrategyName( DefaultStrategy.ReRoute ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.2 ) );
 			config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setSubpopulation(SUBPOP2_NAME ).setWeight(0.8 ) );
 		}
+		{
+			PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters( SUBPOP1_NAME );
+			scoringParams.setPerforming_utils_hr( 6. );
+			scoringParams.addModeParams( new PlanCalcScoreConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( 0. ) );
+		}
+		{
+			PlanCalcScoreConfigGroup.ScoringParameterSet scoringParams = config.planCalcScore().getOrCreateScoringParameters( SUBPOP2_NAME );
+			scoringParams.setPerforming_utils_hr( 12. );
+			scoringParams.addModeParams( new PlanCalcScoreConfigGroup.ModeParams( "car" ).setMarginalUtilityOfTraveling( -3. ) );
+		}
+
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		/* Run the model. */
