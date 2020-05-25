@@ -22,16 +22,35 @@ public class Raster {
         this.data = new double[xLength * yLength];
     }
 
-    void forEachIndex(IndexFunction valueSupplier) {
+    /**
+     * This iterates over the x and y index of the raster. The iteration is done in parallel. The result of the valueSupplier
+     * will be set on the corresponding pixel of the raster. This manipulates the state of the raster. Make sure to not alter
+     * the state during the execution of this method from outside.
+     *
+     * @param valueSupplier Function which takes an x and a y index and supplies a double value which is written into
+     *                      The corresponding pixel of the raster
+     */
+    void setValueForEachIndex(IndexSupplier valueSupplier) {
 
-        IntStream.range(0, xLength)
-                .forEach(xi ->
-                        IntStream.range(0, yLength)
-                                .forEach(yi -> {
-                                    var value = valueSupplier.supply(xi, yi);
-                                    var index = yi * xLength + xi;
-                                    data[index] = value;
-                                }));
+        IntStream.range(0, xLength).parallel().forEach(xi ->
+                IntStream.range(0, yLength).parallel().forEach(yi -> {
+                    var value = valueSupplier.supply(xi, yi);
+                    adjustValueForIndex(xi, yi, value);
+                }));
+    }
+
+    /**
+     * This iterates over the x and y index of the raster and supplies the corresponding value into the acceptor function
+     * At the moment this iteration is done sequentially. But this may change in the future.
+     *
+     * @param acceptor Accepts x and y index and the current value within the raster.
+     */
+    void forEachIndex(IndexAcceptor acceptor) {
+        IntStream.range(0, xLength).forEach(xi -> IntStream.range(0, yLength)
+                .forEach(yi -> {
+                    var value = getValueByIndex(xi, yi);
+                    acceptor.accept(xi, yi, value);
+                }));
     }
 
     Bounds getBounds() {
@@ -131,8 +150,13 @@ public class Raster {
     }
 
     @FunctionalInterface
-    interface IndexFunction {
+    interface IndexSupplier {
 
         double supply(int xi, int yi);
+    }
+
+    @FunctionalInterface
+    interface IndexAcceptor {
+        void accept(int xi, int yi, double value);
     }
 }

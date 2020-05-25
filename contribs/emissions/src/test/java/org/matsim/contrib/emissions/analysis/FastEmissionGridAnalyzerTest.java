@@ -3,9 +3,15 @@ package org.matsim.contrib.emissions.analysis;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,6 +60,46 @@ public class FastEmissionGridAnalyzerTest {
         assertEquals(11, raster.getYLength());
     }
 
+    private static Network createRandomNetwork(int numberOfLinks, double maxX, double maxY) {
+
+        Network network = NetworkUtils.createNetwork();
+
+        for (long i = 0; i < numberOfLinks; i++) {
+
+            Link link = createRandomLink(network.getFactory(), maxX, maxY);
+            network.addNode(link.getFromNode());
+            network.addNode(link.getToNode());
+            network.addLink(link);
+        }
+        return network;
+    }
+
+    private static Link createRandomLink(NetworkFactory factory, double maxX, double maxY) {
+        Node fromNode = createRandomNode(factory, maxX, maxY);
+        Node toNode = createRandomNode(factory, maxX, maxY);
+        return factory.createLink(Id.createLinkId(UUID.randomUUID().toString()), fromNode, toNode);
+    }
+
+    private static Node createRandomNode(NetworkFactory factory, double maxX, double maxY) {
+        Coord coord = new Coord(getRandomValue(maxX), getRandomValue(maxY));
+        return factory.createNode(Id.createNodeId(UUID.randomUUID().toString()), coord);
+    }
+
+    private static double getRandomValue(double upperBounds) {
+        return Math.random() * upperBounds;
+    }
+
+    private static Map<Id<Link>, Double> createEmissions(Network network, double emissionValuePerLink) {
+
+        Map<Id<Link>, Double> result = new HashMap<>();
+        for (Link value : network.getLinks().values()) {
+
+            result.put(value.getId(), emissionValuePerLink);
+        }
+
+        return result;
+    }
+
     @Test
     public void smooth_singleLink() {
 
@@ -71,9 +117,22 @@ public class FastEmissionGridAnalyzerTest {
 
         var emissions = Map.of(link1.getId(), 20., link2.getId(), 10.);
 
-        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 10);
+        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 10, 3);
 
         assertNotNull(smoothedRaster);
+
+    }
+
+    @Test
+    public void benchmark() {
+
+        var network = createRandomNetwork(10000, 100000, 100000);
+        var emissions = createEmissions(network, 20);
+
+        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 100, 3);
+
+        assertNotNull(smoothedRaster);
+
 
     }
 }
