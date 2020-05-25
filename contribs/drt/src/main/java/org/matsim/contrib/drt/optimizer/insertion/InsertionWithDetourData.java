@@ -20,50 +20,44 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
+
 /**
  * @author michalm
  */
 public class InsertionWithDetourData<D> {
-	private final int pickupIdx;
-	private final int dropoffIdx;
+	private final Insertion insertion;
 
 	private final D detourToPickup;
 	private final D detourFromPickup; // "zero" detour if pickup inserted at the end of schedule !!!
 	private final D detourToDropoff; // detour from pickup if dropoff inserted directly after pickup
 	private final D detourFromDropoff; // "zero" detour if dropoff inserted at the end of schedule
 
-	InsertionWithDetourData(int pickupIdx, int dropoffIdx, D detourToPickup, D detourFromPickup, D detourToDropoff,
+	InsertionWithDetourData(Insertion insertion, D detourToPickup, D detourFromPickup, D detourToDropoff,
 			D detourFromDropoff) {
-		this.pickupIdx = pickupIdx;
-		this.dropoffIdx = dropoffIdx;
+		this.insertion = insertion;
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
 		this.detourToDropoff = detourToDropoff;
 		this.detourFromDropoff = detourFromDropoff;
 	}
 
-	/**
-	 * Range: 0 <= idx <= stops.length
-	 * <p>
-	 * idx == 0 -> inserted after start
-	 * idx > 0 -> inserted after/at stop[idx-1]
-	 *
-	 * @return pickup insertion index
-	 */
-	public int getPickupIdx() {
-		return pickupIdx;
+	public Insertion getInsertion() {
+		return insertion;
 	}
 
-	/**
-	 * Range: pickupInsertionIdx <= idx <= stops.length
-	 * <p>
-	 * idx == pickupInsertionIdx -> inserted after pickup
-	 * idx > pickupInsertionIdx -> inserted after/at stop[idx-1]
-	 *
-	 * @return dropoff insertion index
-	 */
-	public int getDropoffIdx() {
-		return dropoffIdx;
+	public VehicleData.Entry getVehicleEntry() {
+		return insertion.vehicleEntry;
+	}
+
+	public InsertionPoint getPickup() {
+		return insertion.pickup;
+	}
+
+	public InsertionPoint getDropoff() {
+		return insertion.dropoff;
 	}
 
 	/**

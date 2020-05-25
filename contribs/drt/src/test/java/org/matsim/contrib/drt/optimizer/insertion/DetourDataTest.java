@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Start;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.DetourDataProvider.DetourData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -42,7 +41,7 @@ import com.google.common.collect.ImmutableMap;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class PrecalculablePathDataProviderTest {
+public class DetourDataTest {
 	private final Link pickupLink = link("pickupLink");
 	private final Link dropoffLink = link("dropoffLink");
 	private final Link startLink = link("startLink");
@@ -114,9 +113,10 @@ public class PrecalculablePathDataProviderTest {
 
 	private void assertInsertion(int pickupIdx, int dropoffIdx, String detourToPickup, String detourFromPickup,
 			String detourToDropoff, String detourFromDropoff) {
-		var actual = detourData.createInsertionWithDetourData(new Insertion(pickupIdx, dropoffIdx), request, entry);
-		var expected = new InsertionWithDetourData<>(pickupIdx, dropoffIdx, detourToPickup, detourFromPickup,
-				detourToDropoff, detourFromDropoff);
+		Insertion insertion = new Insertion(request, entry, pickupIdx, dropoffIdx);
+		var actual = detourData.createInsertionWithDetourData(insertion);
+		var expected = new InsertionWithDetourData<>(insertion, detourToPickup, detourFromPickup, detourToDropoff,
+				detourFromDropoff);
 		assertThat(actual).isEqualToComparingFieldByField(expected);
 	}
 

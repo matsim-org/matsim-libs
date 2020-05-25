@@ -66,7 +66,7 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
-				insertion(0, 0));
+				insertion(entry, 0, 0));
 	}
 
 	@Test
@@ -76,9 +76,9 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
-				insertion(0, 0), insertion(0, 1),
+				insertion(entry, 0, 0), insertion(entry, 0, 1),
 				//picup after stop 0
-				insertion(1, 1));
+				insertion(entry, 1, 1));
 	}
 
 	@Test
@@ -89,7 +89,7 @@ public class InsertionGeneratorTest {
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after stop
 				//pickup after stop 0
-				insertion(1, 1));
+				insertion(entry, 1, 1));
 	}
 
 	@Test
@@ -100,11 +100,11 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
-				insertion(0, 0), insertion(0, 1), insertion(0, 2),
+				insertion(entry, 0, 0), insertion(entry, 0, 1), insertion(entry, 0, 2),
 				//pickup after stop 0
-				insertion(1, 1), insertion(1, 2),
+				insertion(entry, 1, 1), insertion(entry, 1, 2),
 				//pickup after stop 1
-				insertion(2, 2));
+				insertion(entry, 2, 2));
 	}
 
 	@Test
@@ -115,10 +115,10 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
-				insertion(0, 0),
+				insertion(entry, 0, 0),
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(2, 2));
+				insertion(entry, 2, 2));
 	}
 
 	@Test
@@ -130,9 +130,9 @@ public class InsertionGeneratorTest {
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start
 				//pickup after stop 0
-				insertion(1, 1), insertion(1, 2),
+				insertion(entry, 1, 1), insertion(entry, 1, 2),
 				//pickup after stop 1
-				insertion(2, 2));
+				insertion(entry, 2, 2));
 	}
 
 	@Test
@@ -145,7 +145,7 @@ public class InsertionGeneratorTest {
 				//no pickup after start
 				//no pickup after stop 0
 				//pickup after stop 1
-				insertion(2, 2));
+				insertion(entry, 2, 2));
 	}
 
 	@Test
@@ -157,12 +157,12 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0, stop1, stop2);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start
-				insertion(0, 0), insertion(0, 1),
+				insertion(entry, 0, 0), insertion(entry, 0, 1),
 				//pickup after stop 0
-				insertion(1, 1),
+				insertion(entry, 1, 1),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(3, 3));
+				insertion(entry, 3, 3));
 	}
 
 	@Test
@@ -175,10 +175,10 @@ public class InsertionGeneratorTest {
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start
 				//pickup after stop 0
-				insertion(1, 1),
+				insertion(entry, 1, 1),
 				//pickup after stop 1
 				//pickup after stop 2
-				insertion(3, 3));
+				insertion(entry, 3, 3));
 	}
 
 	@Test
@@ -189,7 +189,7 @@ public class InsertionGeneratorTest {
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//no pickup after start (pickup is exactly at stop0)
 				//pickup after stop 0
-				insertion(1, 1));
+				insertion(entry, 1, 1));
 	}
 
 	@Test
@@ -199,9 +199,9 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(0, 1),
+				insertion(entry, 0, 1),
 				//pickup after stop 0
-				insertion(1, 1));
+				insertion(entry, 1, 1));
 	}
 
 	@Test
@@ -214,9 +214,9 @@ public class InsertionGeneratorTest {
 		VehicleData.Entry entry = entry(start, stop0, stop1);
 		assertThatInsertions(drtRequest, entry).containsExactly(
 				//pickup after start: insertion(0, 0) is a duplicate of insertion(0, 1)
-				insertion(0, 1),
+				insertion(entry, 0, 1),
 				//pickup after stop 0
-				insertion(2, 2));
+				insertion(entry, 2, 2));
 	}
 
 	private Link link(String id) {
@@ -231,8 +231,8 @@ public class InsertionGeneratorTest {
 		return assertThat(new InsertionGenerator().generateInsertions(drtRequest, entry));
 	}
 
-	private Insertion insertion(int pickupIdx, int dropoffIdx) {
-		return new Insertion(pickupIdx, dropoffIdx);
+	private Insertion insertion(VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
+		return new Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
 	}
 
 	private VehicleData.Stop stop(Link link, int outputOccupancy) {

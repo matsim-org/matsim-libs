@@ -22,12 +22,11 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
  * @author michalm
  */
 public interface MultiVehicleInsertionProblem<D> {
-	Optional<BestInsertion<D>> findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
+	Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
 }
