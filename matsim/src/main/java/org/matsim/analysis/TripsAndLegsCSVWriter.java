@@ -56,17 +56,19 @@ import org.matsim.pt.routes.TransitPassengerRoute;
  * @author jbischoff / SBB
  */
 public class TripsAndLegsCSVWriter {
-    public static String[] TRIPSHEADER = {"person", "trip_number", "trip_id",
+    public static final String[] TRIPSHEADER_BASE = {"person", "trip_number", "trip_id",
             "dep_time", "trav_time", "wait_time", "traveled_distance", "euclidean_distance",
             "longest_distance_mode", "modes", "start_activity_type",
             "end_activity_type", "start_facility_id", "start_link",
             "start_x", "start_y", "end_facility_id",
             "end_link", "end_x", "end_y", "first_pt_boarding_stop", "last_pt_egress_stop"};
 
-    public static String[] LEGSHEADER = {"person", "trip_id",
+    public static final String[] LEGSHEADER_BASE = {"person", "trip_id",
             "dep_time", "trav_time", "wait_time", "distance", "mode", "start_link",
             "start_x", "start_y", "end_link", "end_x", "end_y", "access_stop_id", "egress_stop_id", "transit_line", "transit_route"};
 
+    private final String[] TRIPSHEADER;
+    private final String[] LEGSHEADER;
     private final String separator;
     private final CustomTripsWriterExtension tripsWriterExtension;
     private final Scenario scenario;
@@ -78,8 +80,8 @@ public class TripsAndLegsCSVWriter {
     public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
         this.scenario = scenario;
         this.separator = scenario.getConfig().global().getDefaultDelimiter();
-        TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER, tripsWriterExtension.getAdditionalTripHeader());
-        LEGSHEADER = ArrayUtils.addAll(LEGSHEADER, legWriterExtension.getAdditionalLegHeader());
+        TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER_BASE, tripsWriterExtension.getAdditionalTripHeader());
+        LEGSHEADER = ArrayUtils.addAll(LEGSHEADER_BASE, legWriterExtension.getAdditionalLegHeader());
         this.tripsWriterExtension = tripsWriterExtension;
         this.legsWriterExtension = legWriterExtension;
     }
