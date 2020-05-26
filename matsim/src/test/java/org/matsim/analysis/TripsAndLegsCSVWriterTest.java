@@ -42,7 +42,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -228,8 +228,8 @@ public class TripsAndLegsCSVWriterTest {
 					if(boardingTime != null) {
 						waiting_time += boardingTime - leg.getDepartureTime().seconds();
 					}
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+					if (leg.getRoute() instanceof TransitPassengerRoute) {
+						TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 						first_pt_boarding_stop =  first_pt_boarding_stop != null ? first_pt_boarding_stop : route.getAccessStopId().toString();		
 				        last_pt_egress_stop = route.getEgressStopId().toString();
 					}
@@ -251,8 +251,8 @@ public class TripsAndLegsCSVWriterTest {
 				}
 				String transitStopsVisited = null;
 				for (Leg leg: trip.getLegsOnly()) {
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						ExperimentalTransitRoute expTransitRoute = (ExperimentalTransitRoute) leg.getRoute();
+					if (leg.getRoute() instanceof TransitPassengerRoute) {
+						TransitPassengerRoute expTransitRoute = (TransitPassengerRoute) leg.getRoute();
 						transitStopsVisited = expTransitRoute.getAccessStopId().toString() + "-" + expTransitRoute.getEgressStopId().toString() + "-";
 					}
 				}
@@ -333,8 +333,8 @@ public class TripsAndLegsCSVWriterTest {
 					if (boardingTime != null) {
 			            waitingTime = boardingTime - leg.getDepartureTime().seconds();
 			        }
-					if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-						 ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+					if (leg.getRoute() instanceof TransitPassengerRoute) {
+						 TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 				         String transitLine = route.getLineId().toString();
 				         String transitRoute = route.getRouteId().toString();
 				         String ptAccessStop = route.getAccessStopId().toString();
@@ -641,8 +641,8 @@ public class TripsAndLegsCSVWriterTest {
 
 			String transitStopsVisited = null;
 			for (Leg leg: trip.getLegsOnly()) {
-				if (leg.getRoute() instanceof ExperimentalTransitRoute) {
-					ExperimentalTransitRoute expTransitRoute = (ExperimentalTransitRoute) leg.getRoute();
+				if (leg.getRoute() instanceof TransitPassengerRoute) {
+					TransitPassengerRoute expTransitRoute = (TransitPassengerRoute) leg.getRoute();
 					transitStopsVisited = expTransitRoute.getAccessStopId().toString() + "-" + expTransitRoute.getEgressStopId().toString() + "-";
 				}
 			}
