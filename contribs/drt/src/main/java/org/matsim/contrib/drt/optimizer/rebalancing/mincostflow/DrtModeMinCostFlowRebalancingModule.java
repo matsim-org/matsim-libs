@@ -21,6 +21,8 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.analysis.zonal.ActivityLocationBasedZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
@@ -67,8 +69,20 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-				getter -> new PreviousIterationZonalDemandAggregator(getter.get(EventsManager.class),
-						getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+		switch (params.getZonalDemandAggregatorType()) {
+			case PreviousIterationZonalDemandAggregator:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationZonalDemandAggregator(getter.get(EventsManager.class),
+								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				break;
+			case ActivityLocationBasedZonalDemandAggregator:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(Population.class),
+								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				break;
+			case EqualVehicleDensityZonalDemandAggregator:
+				throw new IllegalArgumentException("not implemented yet");
+		}
+
 	}
 }
