@@ -33,7 +33,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
-	public static enum ZonalDemandAggregatorTypes {PreviousIterationZonalDemandAggregator,
+	public static enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
 		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator};
 
 	public static final String INTERVAL = "interval";
@@ -84,7 +84,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private double cellSize = Double.NaN;// [m]
 
 	@NotNull
-	private ZonalDemandAggregatorTypes zonalDemandAggregatorType = ZonalDemandAggregatorTypes.PreviousIterationZonalDemandAggregator;
+	private MinCostFlowRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);
@@ -208,4 +208,19 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public void setCellSize(double cellSize) {
 		this.cellSize = cellSize;
 	}
+
+	/**
+	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 */
+	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	public ZonalDemandAggregatorType getZonalDemandAggregatorType() {
+		return zonalDemandAggregatorType;
+	}
+
+	/**
+	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 */
+	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	public void setZonalDemandAggregatorType(ZonalDemandAggregatorType aggregatorType) { this.zonalDemandAggregatorType = aggregatorType; }
+
 }
