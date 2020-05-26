@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -41,22 +42,20 @@ public class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggr
 
 	private final Map<String, MutableInt> vehiclesPerZone = new HashMap<>();
 
-	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem, @NotNull Fleet fleet) {
-		this.compute(zonalSystem,fleet);
+	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem, @NotNull FleetSpecification fleetSpecification) {
+		this.compute(zonalSystem,fleetSpecification.getVehicleSpecifications().size());
 	}
 
 	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {
 		return vehiclesPerZone;
 	}
 
-	private void compute(@NotNull DrtZonalSystem zonalSystem, @NotNull Fleet fleet) {
+	private void compute(@NotNull DrtZonalSystem zonalSystem, int fleetSize) {
 		vehiclesPerZone.clear();
 
 		double areaSum = zonalSystem.getZones().values().stream()
 				.mapToDouble(zone -> zone.getArea())
 				.sum();
-
-		double fleetSize = fleet.getVehicles().size();
 
 		for(String zone : zonalSystem.getZones().keySet()){
 			double areaShare = zonalSystem.getZone(zone).getArea() / areaSum;

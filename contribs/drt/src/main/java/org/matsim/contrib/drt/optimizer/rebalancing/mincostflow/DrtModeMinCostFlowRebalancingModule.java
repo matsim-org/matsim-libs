@@ -27,6 +27,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -80,7 +81,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			case EqualVehicleDensityZonalDemandAggregator:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Fleet.class)))).asEagerSingleton();
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 		}
 
