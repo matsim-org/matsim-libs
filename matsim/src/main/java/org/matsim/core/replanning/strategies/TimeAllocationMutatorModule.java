@@ -20,12 +20,6 @@
 
 package org.matsim.core.replanning.strategies;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -43,6 +37,11 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
+import javax.inject.Provider;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
  * PlanAlgorithm into a {@link PlanStrategyModule} so it can be used for plans
@@ -52,6 +51,8 @@ import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
  * @see org.matsim.core.population.algorithms.PlanMutateTimeAllocation
  */
 class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
+
+	private static boolean ACTIVITY_DURATION_WARNING_SHOWN = false;
 
 	private static final Logger log = Logger.getLogger( TimeAllocationMutatorModule.class );
 	
@@ -121,11 +122,16 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 					this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
 			break;
 		default:
-			if(this.affectingDuration) log.warn("Please be aware that durations of activities now can mutate freely and possibly become negative." +
-					"This might be a problem if you have \n" +
-					"a) short activities that are only provided with duration and not with endtime  AND\n" +
-					"b) agents with only one or two initial plans.\n" +
-					"This can have impact on scoring and maybe even on qsim execution. It is recommended to set affectingDuration=false for such set up.");
+			if(this.affectingDuration) {
+				if (!ACTIVITY_DURATION_WARNING_SHOWN) {
+					log.warn("Please be aware that durations of activities now can mutate freely and possibly become negative." +
+							"This might be a problem if you have \n" +
+							"a) short activities that are only provided with duration and not with endtime  AND\n" +
+							"b) agents with only one or two initial plans.\n" +
+							"This can have impact on scoring and maybe even on qsim execution. It is recommended to set affectingDuration=false for such set up.");
+					ACTIVITY_DURATION_WARNING_SHOWN = true;
+				}
+			}
 			pmta = new PlanMutateTimeAllocationSimplified(
 					// TODO: is StageActivityHandling.ExcludeStageActivities right here?
 					StageActivityHandling.ExcludeStageActivities, this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
