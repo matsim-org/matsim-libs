@@ -42,6 +42,8 @@ import java.util.Map;
  * Alternatively, one could implement ActivityEndEventHandler and recalculate every iteration. This might be computionally expensive and may not be worth the effort
  * (depending on the time mutation range).
  *
+ *  TODO:test
+ *
  * @author tschlenther
  */
 public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, BeforeMobsimListener {

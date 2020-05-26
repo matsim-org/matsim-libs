@@ -33,6 +33,8 @@ import java.util.Map;
  * This class does not really calculate the expected demand but aims to
  * distribute the fleet vehicles equally over all zones, weighted by zone area size.
  *
+ * TODO:test
+ *
  * @author tschlenther
  */
 public class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
