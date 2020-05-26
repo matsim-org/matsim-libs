@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -31,6 +32,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  */
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
+
+	public static enum ZonalDemandAggregatorTypes {PreviousIterationZonalDemandAggregator,
+		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator};
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
@@ -58,6 +62,9 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
 
+	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
+	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "see enum"; //TODO
+
 	@Positive
 	private int interval = 1800;// [s]
 
@@ -75,6 +82,9 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	@Positive
 	private double cellSize = Double.NaN;// [m]
+
+	@NotNull
+	private ZonalDemandAggregatorTypes zonalDemandAggregatorType = ZonalDemandAggregatorTypes.PreviousIterationZonalDemandAggregator;
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);

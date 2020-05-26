@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
@@ -67,7 +68,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		});
 
 		bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-				getter -> new ZonalDemandAggregator(getter.get(EventsManager.class),
+				getter -> new PreviousIterationZonalDemandAggregator(getter.get(EventsManager.class),
 						getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 	}
 }
