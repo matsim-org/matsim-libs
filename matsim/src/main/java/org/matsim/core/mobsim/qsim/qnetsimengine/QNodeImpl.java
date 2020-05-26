@@ -62,7 +62,6 @@ final class QNodeImpl extends AbstractQNode {
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
 	
-	
 	private final Random random;
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
