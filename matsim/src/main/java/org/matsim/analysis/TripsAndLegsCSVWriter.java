@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -70,6 +71,8 @@ public class TripsAndLegsCSVWriter {
     private final CustomTripsWriterExtension tripsWriterExtension;
     private final Scenario scenario;
     private final CustomLegsWriterExtension legsWriterExtension;
+
+    private static final Logger log = Logger.getLogger(TripsAndLegsCSVWriter.class);
 
 
     public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
@@ -181,7 +184,27 @@ public class TripsAndLegsCSVWriter {
             tripRecord.add(lastPtEgressStop != null ? lastPtEgressStop : "");
             tripRecord.addAll(tripsWriterExtension.getAdditionalTripColumns(trip));
             if (TRIPSHEADER.length != tripRecord.size()) {
-                throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional columns. Must be " + TRIPSHEADER.length + " , but is " + tripRecord.size());
+                // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
+                StringBuilder str = new StringBuilder();
+                str.append("Custom CSV Trip Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is " + TRIPSHEADER.length + ", and number of values is " + tripRecord.size() + ".\n");
+                str.append("TripsWriterExtension class was: " + tripsWriterExtension.getClass() + ". Column name to value pairs supplied were:\n");
+                for(int j = 0; j < Math.max(TRIPSHEADER.length, tripRecord.size()); j++) {
+                    String columnNameJ;
+                    try {
+                        columnNameJ = TRIPSHEADER[j];
+                    } catch (ArrayIndexOutOfBoundsException e) {
+                        columnNameJ = "!COLUMN MISSING!";
+                    }
+                    String tripRecordJ;
+                    try {
+                        tripRecordJ = tripRecord.get(j);
+                    } catch (IndexOutOfBoundsException e) {
+                        tripRecordJ = "!VALUE MISSING!";
+                    }
+                    str.append(j + ": " + columnNameJ + ": " + tripRecordJ + "\n");
+                }
+                log.error(str.toString());
+                throw new RuntimeException(str.toString());
             }
             Activity prevAct = null;
             Leg prevLeg = null;
@@ -247,7 +270,27 @@ public class TripsAndLegsCSVWriter {
 
         record.addAll(legsWriterExtension.getAdditionalLegColumns(trip, leg));
         if (LEGSHEADER.length != record.size()) {
-            throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional leg columns. Must be " + LEGSHEADER.length + " , but is " + record.size());
+            // put the whole error message also into the RuntimeException, so maven shows it on the command line output (log messages are shown incompletely)
+            StringBuilder str = new StringBuilder();
+            str.append("Custom CSV Leg Writer Extension does not provide an identical number of additional values and additional columns. Number of columns is " + LEGSHEADER.length + ", and number of values is " + record.size() + ".\n");
+            str.append("LegsWriterExtension class was: " + legsWriterExtension.getClass() + ". Column name to value pairs supplied were:\n");
+            for(int j = 0; j < Math.max(LEGSHEADER.length, record.size()); j++) {
+                String columnNameJ;
+                try {
+                    columnNameJ = LEGSHEADER[j];
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    columnNameJ = "!COLUMN MISSING!";
+                }
+                String recordJ;
+                try {
+                    recordJ = record.get(j);
+                } catch (IndexOutOfBoundsException e) {
+                    recordJ = "!VALUE MISSING!";
+                }
+                str.append(j + ": " + columnNameJ + ": " + recordJ + "\n");
+            }
+            log.error(str.toString());
+            throw new RuntimeException(str.toString());
         }
 
         return record;
