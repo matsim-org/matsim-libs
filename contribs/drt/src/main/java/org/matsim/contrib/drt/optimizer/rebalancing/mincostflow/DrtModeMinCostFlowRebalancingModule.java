@@ -22,10 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.zonal.ActivityLocationBasedZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -81,7 +78,10 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:
-				throw new IllegalArgumentException("not implemented yet");
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(Fleet.class)))).asEagerSingleton();
+				break;
 		}
 
 	}
