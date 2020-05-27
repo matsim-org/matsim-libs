@@ -45,6 +45,10 @@ public class SwissRailRaptorModule extends AbstractModule {
             }
             bind(RaptorStopFinder.class).to(DefaultRaptorStopFinder.class);
 
+            bind(ExecutionData.class).asEagerSingleton();
+            if (srrConfig.isUseCapacityConstraints()) {
+                addEventHandlerBinding().to(ExecutionTracker.class);
+            }
             
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
         }

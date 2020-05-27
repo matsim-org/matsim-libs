@@ -46,6 +46,7 @@ public class SwissRailRaptorCore {
     private final PathElement[] arrivalPathPerStop;
     private final PathElement[] tmpArrivalPathPerStop; // only used to ensure parallel update
     private final BitSet tmpImprovedStops; // only used to ensure parallel update
+    private final boolean useCapacityConstraints;
 
     public SwissRailRaptorCore(SwissRailRaptorData data) {
         this.data = data;
@@ -60,6 +61,7 @@ public class SwissRailRaptorCore {
         this.arrivalPathPerStop = new PathElement[this.data.countStops];
         this.tmpArrivalPathPerStop = new PathElement[this.data.countStops];
         this.tmpImprovedStops = new BitSet(this.data.countStops);
+        this.useCapacityConstraints = this.data.config.isUseCapacityConstraints();
     }
 
     private void reset() {
@@ -672,6 +674,9 @@ public class SwissRailRaptorCore {
     }
 
     private int findNextDepartureIndex(RRoute route, RRouteStop routeStop, double time) {
+        if (this.useCapacityConstraints) {
+            return findNextDepartureIndexWithConstraints(route, routeStop, time);
+        }
         double depTimeAtRouteStart = time - routeStop.departureOffset;
         int fromIndex = route.indexFirstDeparture;
         int toIndex = fromIndex + route.countDepartures;
@@ -689,6 +694,10 @@ public class SwissRailRaptorCore {
             return -1;
         }
         return pos;
+    }
+
+    private int findNextDepartureIndexWithConstraints(RRoute route, RRouteStop routeStop, double time) {
+        return this.data.executionData.getNextAvailableDeparture(this.data, routeStop, time);
     }
 
     private double calcTransferCost(double costBase, double costPerHour, double costMin, double costMax, double travelTime) {

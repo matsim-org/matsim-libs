@@ -50,11 +50,13 @@ public class SwissRailRaptorData {
     final Map<TransitStopFacility, int[]> routeStopsPerStopFacility;
     final QuadTree<TransitStopFacility> stopsQT;
     final Map<String, Map<String, QuadTree<TransitStopFacility>>> stopFilterAttribute2Value2StopsQT;
+    final ExecutionData executionData;
 
     private SwissRailRaptorData(RaptorStaticConfig config, int countStops,
                                 RRoute[] routes, double[] departures, RRouteStop[] routeStops,
                                 RTransfer[] transfers, Map<TransitStopFacility, Integer> stopFacilityIndices,
-                                Map<TransitStopFacility, int[]> routeStopsPerStopFacility, QuadTree<TransitStopFacility> stopsQT) {
+                                Map<TransitStopFacility, int[]> routeStopsPerStopFacility, QuadTree<TransitStopFacility> stopsQT,
+                                ExecutionData executionData) {
         this.config = config;
         this.countStops = countStops;
         this.countRouteStops = routeStops.length;
@@ -65,10 +67,11 @@ public class SwissRailRaptorData {
         this.stopFacilityIndices = stopFacilityIndices;
         this.routeStopsPerStopFacility = routeStopsPerStopFacility;
         this.stopsQT = stopsQT;
-        this.stopFilterAttribute2Value2StopsQT = new HashMap<String, Map<String, QuadTree<TransitStopFacility>>>();
+        this.stopFilterAttribute2Value2StopsQT = new HashMap<>();
+        this.executionData = executionData;
     }
 
-    public static SwissRailRaptorData create(TransitSchedule schedule, RaptorStaticConfig staticConfig, Network network) {
+    public static SwissRailRaptorData create(TransitSchedule schedule, RaptorStaticConfig staticConfig, Network network, ExecutionData executionData) {
         log.info("Preparing data for SwissRailRaptor...");
         long startMillis = System.currentTimeMillis();
 
@@ -138,8 +141,8 @@ public class SwissRailRaptorData {
                         }
                     }
                     int stopFacilityIndex = stopFacilityIndices.computeIfAbsent(routeStop.getStopFacility(), stop -> stopFacilityIndices.size());
-                    RRouteStop rRouteStop = new RRouteStop(routeStop, line, route, mode, indexRoutes, stopFacilityIndex, distanceAlongRoute);
                     final int thisRouteStopIndex = indexRouteStops;
+                    RRouteStop rRouteStop = new RRouteStop(thisRouteStopIndex, routeStop, line, route, mode, indexRoutes, stopFacilityIndex, distanceAlongRoute);
                     routeStops[thisRouteStopIndex] = rRouteStop;
                     routeStopsPerStopFacility.compute(routeStop.getStopFacility(), (stop, currentRouteStops) -> {
                         if (currentRouteStops == null) {
@@ -188,7 +191,7 @@ public class SwissRailRaptorData {
             }
         }
 
-        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT);
+        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, executionData);
 
         long endMillis = System.currentTimeMillis();
         log.info("SwissRailRaptor data preparation done. Took " + (endMillis - startMillis) / 1000 + " seconds.");
@@ -468,6 +471,7 @@ public class SwissRailRaptorData {
     }
 
     static final class RRouteStop {
+        final int index;
         final TransitRouteStop routeStop;
         final TransitLine line;
         final TransitRoute route;
@@ -480,7 +484,8 @@ public class SwissRailRaptorData {
         int indexFirstTransfer = -1;
         int countTransfers = 0;
 
-        RRouteStop(TransitRouteStop routeStop, TransitLine line, TransitRoute route, String mode, int transitRouteIndex, int stopFacilityIndex, double distanceAlongRoute) {
+        RRouteStop(int index, TransitRouteStop routeStop, TransitLine line, TransitRoute route, String mode, int transitRouteIndex, int stopFacilityIndex, double distanceAlongRoute) {
+            this.index = index;
             this.routeStop = routeStop;
             this.line = line;
             this.route = route;

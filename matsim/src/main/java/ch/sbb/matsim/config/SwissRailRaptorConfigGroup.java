@@ -32,11 +32,14 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_TRANSFER_PENALTY_MIN = "transferPenaltyMinCost";
     private static final String PARAM_TRANSFER_PENALTY_MAX = "transferPenaltyMaxCost";
     private static final String PARAM_TRANSFER_PENALTY_PERHOUR = "transferPenaltyCostPerTravelTimeHour";
+    private static final String PARAM_USE_CAPACITY_CONSTRAINTS = "useCapacityConstraints";
+    private static final String PARAM_USE_CAPACITY_CONSTRAINTS_DESC = "If true, SwissRailRaptor tries to detect when agents cannot board a vehicle in the previous iteration because it is already full and tries to find an alternative route instead.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
     private IntermodalAccessEgressModeSelection intermodalAccessEgressModeSelection = IntermodalAccessEgressModeSelection.CalcLeastCostModePerStop;
     private boolean useModeMapping = false;
+    private boolean useCapacityConstraints = false;
 
     private double transferPenaltyBaseCost = 0;
     private double transferPenaltyMinCost = Double.NEGATIVE_INFINITY;
@@ -102,7 +105,17 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     public void setUseModeMappingForPassengers(boolean useModeMapping) {
         this.useModeMapping = useModeMapping;
     }
-    
+
+    @StringGetter(PARAM_USE_CAPACITY_CONSTRAINTS)
+    public boolean isUseCapacityConstraints() {
+        return this.useCapacityConstraints;
+    }
+
+    @StringSetter(PARAM_USE_CAPACITY_CONSTRAINTS)
+    public void setUseCapacityConstraints(boolean useCapacityConstraints) {
+        this.useCapacityConstraints = useCapacityConstraints;
+    }
+
     @StringGetter(PARAM_SCORING_PARAMETERS)
     public ScoringParameters getScoringParameters() {
         return this.scoringParameters;
@@ -560,6 +573,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
+        comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
         return comments;
     }
 

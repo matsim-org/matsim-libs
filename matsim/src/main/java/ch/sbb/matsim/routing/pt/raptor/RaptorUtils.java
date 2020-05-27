@@ -4,10 +4,7 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -24,7 +21,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author mrieser / SBB
@@ -54,6 +53,7 @@ public final class RaptorUtils {
                 staticConfig.addModeMappingForPassengers(mapping.getRouteMode(), mapping.getPassengerMode());
             }
         }
+        staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
 
         return staticConfig;
     }

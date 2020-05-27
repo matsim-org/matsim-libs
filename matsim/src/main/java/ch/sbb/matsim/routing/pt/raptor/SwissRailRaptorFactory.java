@@ -26,12 +26,14 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     private final RaptorParametersForPerson raptorParametersForPerson;
     private final RaptorRouteSelector routeSelector;
     private final Provider<RaptorStopFinder> stopFinderProvider;
+    private final ExecutionData executionData;
+
     private final Network network;
 
     @Inject
     public SwissRailRaptorFactory(final TransitSchedule schedule, final Config config, final Network network,
                                   RaptorParametersForPerson raptorParametersForPerson, RaptorRouteSelector routeSelector,
-                                  Provider<RaptorStopFinder> stopFinderProvider,
+                                  Provider<RaptorStopFinder> stopFinderProvider, ExecutionData executionData,
                                   final EventsManager events) {
         this.schedule = schedule;
         this.raptorConfig = RaptorUtils.createStaticConfig(config);
@@ -39,6 +41,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
         this.raptorParametersForPerson = raptorParametersForPerson;
         this.routeSelector = routeSelector;
         this.stopFinderProvider = stopFinderProvider;
+        this.executionData = executionData;
 
         if (events != null) {
             events.addHandler((TransitScheduleChangedEventHandler) event -> this.data = null);
@@ -64,7 +67,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
             // prevent doing the work twice.
             return this.data;
         }
-        this.data = SwissRailRaptorData.create(this.schedule, this.raptorConfig, this.network);
+        this.data = SwissRailRaptorData.create(this.schedule, this.raptorConfig, this.network, this.executionData);
         return this.data;
     }
 

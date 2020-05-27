@@ -1,6 +1,6 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.WaitingTimeTracker.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -22,80 +22,81 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author mrieser / Simunto GmbH
  */
-public class WaitingTimeTrackerTest {
+public class ExecutionTrackerTest {
 
 	@Test
 	public void testGetNextDeparture() {
 		Fixture f = new Fixture();
 
 		EventsManager events = EventsUtils.createEventsManager();
-		WaitingTimeTracker tracker = new WaitingTimeTracker();
+		ExecutionData execData = new ExecutionData();
+		ExecutionTracker tracker = new ExecutionTracker(execData);
 		events.addHandler(tracker);
 
 		f.generateEvents(events);
 
 		DepartureData data;
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:45:00")); // before there is any vehicle
 		Assert.assertEquals(f.dep0, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:55:00")); // before we have any pax observations
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("06:55:00")); // before we have any pax observations
 		Assert.assertEquals(f.dep0, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:00"));
 		Assert.assertEquals(f.dep0, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:30"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:30"));
 		Assert.assertEquals(f.dep0, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:31"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:00:31"));
 		Assert.assertEquals(f.dep1, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:05:00"));
 		Assert.assertEquals(f.dep1, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:00"));
 		Assert.assertEquals(f.dep1, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:01"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:06:01"));
 		Assert.assertEquals(f.dep2, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:00"));
 		Assert.assertEquals(f.dep2, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:01"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:11:01"));
 		Assert.assertEquals(f.dep3, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:00"));
 		Assert.assertEquals(f.dep3, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:05"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:18:05"));
 		Assert.assertEquals(f.dep3, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:22:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:22:00"));
 		Assert.assertEquals(f.dep3, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:24:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:24:00"));
 		Assert.assertEquals(f.dep3, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:24:03"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:24:03"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:29:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:29:00"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:35:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:35:00"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:40:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:40:00"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:00"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:00"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:05"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:05"));
 		Assert.assertEquals(f.dep5, data.departureId);
 
-		data = tracker.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:30"));
+		data = execData.getNextAvailableDeparture(f.line1, f.route1, f.stop1, Time.parseTime("07:50:30"));
 		Assert.assertNull(data);
 	}
 
@@ -104,28 +105,29 @@ public class WaitingTimeTrackerTest {
 		Fixture f = new Fixture();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		WaitingTimeTracker tracker = new WaitingTimeTracker();
+		ExecutionData execData = new ExecutionData();
+		ExecutionTracker tracker = new ExecutionTracker(execData);
 		events.addHandler(tracker);
 		
 		f.generateEvents(events);
 		
 		DepartureData data;
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
 		Assert.assertEquals(0, data.paxCountAtDeparture);
 
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep1);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep1);
 		Assert.assertEquals(2, data.paxCountAtDeparture);
 
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep2);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep2);
 		Assert.assertEquals(2, data.paxCountAtDeparture);
 
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep3);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep3);
 		Assert.assertEquals(3, data.paxCountAtDeparture);
 
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep4);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep4);
 		Assert.assertEquals(0, data.paxCountAtDeparture);
 
-		data = tracker.getDepartureData(f.line1, f.route1, f.stop1, f.dep5);
+		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep5);
 		Assert.assertEquals(1, data.paxCountAtDeparture);
 	}
 
