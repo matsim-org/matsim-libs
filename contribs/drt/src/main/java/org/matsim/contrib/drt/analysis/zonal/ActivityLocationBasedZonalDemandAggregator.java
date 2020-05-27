@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -58,10 +59,12 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private final Scenario scenario;
 
-	public ActivityLocationBasedZonalDemandAggregator(Scenario scenario, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
-		this.scenario = scenario;
+	public ActivityLocationBasedZonalDemandAggregator(MatsimServices services, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+		this.scenario = services.getScenario();
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
+		//self registration
+		services.addControlerListener(this);
 	}
 
 	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {

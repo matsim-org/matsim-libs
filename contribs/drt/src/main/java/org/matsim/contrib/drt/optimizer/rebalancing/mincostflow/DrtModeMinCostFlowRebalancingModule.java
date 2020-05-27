@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * @author michalm
@@ -86,22 +87,16 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 				ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator> provider = new ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator>(getMode()) {
 					@Inject
-					Scenario scenario;
-
-					ActivityLocationBasedZonalDemandAggregator aggregator = null;
+					MatsimServices services;
 
 					@Override
 					public ActivityLocationBasedZonalDemandAggregator get() {
-						if (aggregator == null) {
-							aggregator = new ActivityLocationBasedZonalDemandAggregator(scenario,
+						return new ActivityLocationBasedZonalDemandAggregator(services,
 									getModalInstance(DrtZonalSystem.class), drtCfg);
-						}
-						return aggregator;
 					}
 				};
 
-				bindModal(ZonalDemandAggregator.class).toProvider(provider).in(Singleton.class);
-				addControlerListenerBinding().toProvider(provider).in(Singleton.class);
+				bindModal(ZonalDemandAggregator.class).toProvider(provider).asEagerSingleton();
 
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:
