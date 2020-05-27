@@ -20,17 +20,25 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+import org.checkerframework.checker.units.qual.C;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 
 /**
  * @author michalm
@@ -74,9 +82,27 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case ActivityLocationBasedZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(Population.class),
-								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				//TODO sort this out. could not find another way to register the same aggregator instance as controler listener but storing it in a fielf of the provider.. tschlenther may '20
+
+				ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator> provider = new ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator>(getMode()) {
+					@Inject
+					Scenario scenario;
+
+					ActivityLocationBasedZonalDemandAggregator aggregator = null;
+
+					@Override
+					public ActivityLocationBasedZonalDemandAggregator get() {
+						if (aggregator == null) {
+							aggregator = new ActivityLocationBasedZonalDemandAggregator(scenario,
+									getModalInstance(DrtZonalSystem.class), drtCfg);
+						}
+						return aggregator;
+					}
+				};
+
+				bindModal(ZonalDemandAggregator.class).toProvider(provider).in(Singleton.class);
+				addControlerListenerBinding().toProvider(provider).in(Singleton.class);
+
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(

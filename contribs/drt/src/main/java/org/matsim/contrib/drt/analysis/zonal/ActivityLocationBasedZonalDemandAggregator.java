@@ -22,14 +22,19 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.Collections;
@@ -46,15 +51,15 @@ import java.util.Map;
  *
  * @author tschlenther
  */
-public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, BeforeMobsimListener {
+public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, StartupListener {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
-	private final Population population;
+	private final Scenario scenario;
 
-	public ActivityLocationBasedZonalDemandAggregator(Population population, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
-		this.population = population;
+	public ActivityLocationBasedZonalDemandAggregator(Scenario scenario, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+		this.scenario = scenario;
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
 	}
@@ -65,21 +70,32 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 	}
 
 	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+	public void notifyStartup(StartupEvent event) {
 		activityEndsPerTimeBinAndZone.clear();
 		prepareZones();
 
 		//go through the selected plans, grab all planned activity end times and save them into activityEndsPerTimeBinAndZone
-		for (Person person : this.population.getPersons().values()) {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			person.getSelectedPlan().getPlanElements().stream()
 					.filter(planElement -> planElement instanceof Activity)
+					.filter(activity -> ! TripStructureUtils.isStageActivityType(((Activity) activity).getType()))
 					.forEach(planElement -> {
 						Activity act = (Activity) planElement;
 						double endTime;
 						if(act.getEndTime().isDefined()) {
 							endTime = act.getEndTime().seconds();
 						} else {
-							endTime = act.getStartTime().seconds() + act.getMaximumDuration().seconds(); //this fails intentionally if one of startTime and maximumDuration is not set
+							if(act.getStartTime().isUndefined() || act.getMaximumDuration().isUndefined()){
+								//if this is the last activity, we can use qsim end time or set endTime to 36h
+								if(person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() -1).equals(act)){
+									endTime = scenario.getConfig().qsim().getEndTime().isDefined() ? scenario.getConfig().qsim().getEndTime().seconds() : 36*3600;
+								} else {
+									throw new RuntimeException("activity " + act + " of person " + person + " has no information on end time and it can not " +
+											"be derived out of start time and maximum duration. As the activity is not the last in the plan, we do not know how to deal with that...");
+								}
+							} else {
+								endTime = act.getStartTime().seconds() + act.getMaximumDuration().seconds(); //this fails intentionally if one of startTime and maximumDuration is not set
+							}
 						}
 						String zoneId = zonalSystem.getZoneForLinkId(act.getLinkId());
 						Double bin = getBinForTime(endTime);
