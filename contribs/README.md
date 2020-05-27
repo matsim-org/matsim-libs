@@ -40,6 +40,6 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [pseudosimulation](pseudosimulation/README.md) | Pseudo-simulation to speed-up simulation times
 | [roadpricing](roadpricing/README.md) | Functionality to simulate different road-pricing scenarios in MATSim
 | [signals](signals/README.md) | Simulate traffic lights microscopically
-| [socnetsim](socnetsim/README.md) | Allows to represent agent coordination, for social travel and activities. 
+| [socnetsim](socnetsim/README.md) | Social network simulation
 | [taxi](taxi/README.md) | Taxi service functionality
 | vsp |
