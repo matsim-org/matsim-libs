@@ -281,14 +281,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private void updateFastFlowAccumulation(){
 		double now = context.getSimTimer().getTimeOfDay() ;
 
+		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		
 		if( this.flowcap_accumulate.getTimeStep() < now
-				&& this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
-				&& isNotOfferingVehicle() ){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 
 			double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
 			double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
 			double newFlowCap = Math.min(flowcap_accumulate.getValue() + accumulateFlowCap,
-					flowCapacityPerTimeStep);
+					remainingFlowCapThisTimeStep);
 
 			flowcap_accumulate.setValue(newFlowCap);
 			flowcap_accumulate.setTimeStep( now );
@@ -296,13 +297,23 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void updateSlowFlowAccumulation(){
+		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		
 		if (this.thisTimeStepGreen
-				&& this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
-				&& isNotOfferingVehicle() ){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 			double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
-					flowCapacityPerTimeStep);
+					remainingFlowCapThisTimeStep);
 			flowcap_accumulate.setValue(newFlowCap);
 		}
+	}
+
+	private double subtractSizeOfVehiclesThatAreAlreadyInTheBuffer() {
+		double remainingFlowCapThisTimeStep = flowCapacityPerTimeStep;
+		for (QVehicle veh : buffer) {
+			// Subtract size of vehicles that are already in the buffer (from previous time steps)
+			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh);
+		}
+		return remainingFlowCapThisTimeStep;
 	}
 
 	@Override
