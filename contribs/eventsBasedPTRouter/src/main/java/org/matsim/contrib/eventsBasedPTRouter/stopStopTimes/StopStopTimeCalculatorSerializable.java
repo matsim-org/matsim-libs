@@ -83,7 +83,7 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 							num = 0;
 						}
 					}
-					map2.put(route.getStops().get(s+1).getStopFacility().getId().toString(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					map2.put(route.getStops().get(s+1).getStopFacility().getId().toString(), stopStopTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds());
 					map3.put(route.getStops().get(s+1).getStopFacility().getId().toString(), ++num);
 				}
 				for(Departure departure:route.getDepartures().values())

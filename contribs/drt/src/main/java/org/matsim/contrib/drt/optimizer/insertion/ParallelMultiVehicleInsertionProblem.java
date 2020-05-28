@@ -20,124 +20,81 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
-	private final PrecalculablePathDataProvider pathDataProvider;
-	private final DrtConfigGroup drtCfg;
-	private final MobsimTimer timer;
-	private final InsertionCostCalculator.PenaltyCalculator penaltyCalculator;
-	private final InsertionCostCalculator insertionCostCalculator;
-	private final ForkJoinPool forkJoinPool;
-	// private final DetourLinksStats detourLinksStats = new DetourLinksStats();
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
 
-	public ParallelMultiVehicleInsertionProblem(PrecalculablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+	// step 1: initial filtering out feasible insertions
+	// FIXME make it more flexible... 40 is way too big for many smaller scenarios, we may also want to reduce 1.5
+	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
+	static final double OPTIMISTIC_BEELINE_SPEED_COEFF = 1.5;
+	private final InsertionCostCalculator<Double> approximateCostCalculator;
+	private final DetourTimesProvider optimisticDetourTimesProvider;
+
+	// step 2: finding best insertion
+	private final ForkJoinPool forkJoinPool;
+	private final PathDataProvider pathDataProvider;
+	private final BestInsertionFinder<PathData> bestInsertionFinder;
+
+	public ParallelMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.pathDataProvider = pathDataProvider;
-		this.drtCfg = drtCfg;
-		this.timer = timer;
 		this.forkJoinPool = forkJoinPool;
-		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer, penaltyCalculator);
-		this.penaltyCalculator = penaltyCalculator;
+
+		approximateCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator,
+				Double::doubleValue);
+
+		// TODO use more sophisticated DetourTimeEstimator
+		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
+				/ drtCfg.getEstimatedBeelineDistanceFactor();
+
+		optimisticDetourTimesProvider = new DetourTimesProvider(
+				DetourTimeEstimator.createBeelineTimeEstimator(optimisticBeelineSpeed));
+
+		bestInsertionFinder = new BestInsertionFinder<>(
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
 	}
 
 	@Override
-	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		DetourLinksProvider detourLinksProvider = new DetourLinksProvider(drtCfg, timer, drtRequest, penaltyCalculator);
-		detourLinksProvider.findInsertionsAndLinks(forkJoinPool, vEntries);
+	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
+			Collection<Entry> vEntries) {
+		InsertionGenerator insertionGenerator = new InsertionGenerator();
+		DetourData<Double> timeData = optimisticDetourTimesProvider.getDetourData(drtRequest);
+		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
+				NEAREST_INSERTIONS_AT_END_LIMIT);
 
-		// detourLinksStats.updateStats(vEntries, detourLinksProvider);
-		Map<Entry, List<Insertion>> filteredInsertions = detourLinksProvider.getFilteredInsertions();
-		if (filteredInsertions.isEmpty()) {
-			return Optional.empty();
-		}
+		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
+		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vEntries.parallelStream()
+				//generate feasible insertions (wrt occupancy limits)
+				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
+				//optimistic pre-filtering wrt (admissible cost function using an optimistic beeline speed coefficient)
+				.map(timeData::createInsertionWithDetourData)
+				.filter(insertion -> approximateCostCalculator.calculate(drtRequest, insertion)
+						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
+				//skip insertions at schedule ends (only selected will be added later)
+				.filter(kNearestInsertionsAtEndFilter::filter)
+				//forget (approximated) detour times
+				.map(InsertionWithDetourData::getInsertion)
+				.collect(Collectors.toList())).join();
+		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
-		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
-
-		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
-				.parallelStream()
-				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider,
-						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.min(Comparator.comparingDouble(i -> i.cost))).join();
-	}
-
-	private static class DetourLinksStats {
-		private static final Logger log = Logger.getLogger(DetourLinksStats.class);
-
-		private final SummaryStatistics toPickupStats = new SummaryStatistics();
-		private final SummaryStatistics fromPickupStats = new SummaryStatistics();
-		private final SummaryStatistics toDropoffStats = new SummaryStatistics();
-		private final SummaryStatistics fromDropoffStats = new SummaryStatistics();
-		private final SummaryStatistics vEntriesStats = new SummaryStatistics();
-		private final SummaryStatistics insertionStats = new SummaryStatistics();
-		private final SummaryStatistics insertionAtEndStats = new SummaryStatistics();
-		private final SummaryStatistics insertionAtEndWhenNoStopsStats = new SummaryStatistics();
-
-		private void updateStats(Collection<Entry> vEntries, DetourLinksProvider detourLinksProvider) {
-			addSet(detourLinksProvider.getDetourLinksSet(), vEntries.size());
-			updateInsertionStats(detourLinksProvider.getFilteredInsertions());
-		}
-
-		private void addSet(DetourLinksSet set, int vEntriesCount) {
-			toPickupStats.addValue(set.pickupDetourStartLinks.size());
-			fromPickupStats.addValue(set.pickupDetourEndLinks.size());
-			toDropoffStats.addValue(set.dropoffDetourStartLinks.size());
-			fromDropoffStats.addValue(set.dropoffDetourEndLinks.size());
-			vEntriesStats.addValue(vEntriesCount);
-		}
-
-		private void updateInsertionStats(Map<Entry, List<Insertion>> filteredInsertionsPerVehicle) {
-			int insertionCount = 0;
-			int insertionAtEndCount = 0;
-			int insertionAtEndToEmptyCount = 0;
-
-			for (java.util.Map.Entry<Entry, List<Insertion>> e : filteredInsertionsPerVehicle.entrySet()) {
-				List<Insertion> insertions = e.getValue();
-				insertionCount += insertions.size();
-
-				Insertion lastInsertion = insertions.get(insertions.size() - 1);
-				if (lastInsertion.pickupIdx == lastInsertion.dropoffIdx
-						&& lastInsertion.pickupIdx == e.getKey().stops.size()) {
-					insertionAtEndCount++;
-					if (lastInsertion.pickupIdx == 0) {
-						insertionAtEndToEmptyCount++;
-					}
-				}
-			}
-
-			insertionStats.addValue(insertionCount);
-			insertionAtEndStats.addValue(insertionAtEndCount);
-			insertionAtEndWhenNoStopsStats.addValue(insertionAtEndToEmptyCount);
-		}
-
-		private void printStats() {
-			log.debug("toPickupStats:\n" + toPickupStats);
-			log.debug("fromPickupStats:\n" + fromPickupStats);
-			log.debug("toDropoffStats:\n" + toDropoffStats);
-			log.debug("fromDropoffStats:\n" + fromDropoffStats);
-			log.debug("vEntriesStats:\n" + vEntriesStats);
-			log.debug("insertionStats:\n" + insertionStats);
-			log.debug("insertionAtEndStats:\n" + insertionAtEndStats);
-			log.debug("insertionAtEndWhenNoStopsStats:\n" + insertionAtEndWhenNoStopsStats);
-		}
+		DetourData<PathData> pathData = pathDataProvider.getPathData(drtRequest, filteredInsertions);
+		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
+		// as possible, and then using a parallel stream does not make sense.
+		return bestInsertionFinder.findBestInsertion(drtRequest,
+				filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
 	}
 }

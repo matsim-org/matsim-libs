@@ -40,6 +40,8 @@ public interface TransitScheduleFactory extends MatsimFactory {
 
 	public abstract TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay);
 
+	public abstract TransitRouteStop.Builder<?> createTransitRouteStopBuilder(final TransitStopFacility stop);
+
 	public abstract TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane);
 
 	public abstract Departure createDeparture(final Id<Departure> departureId, final double time);

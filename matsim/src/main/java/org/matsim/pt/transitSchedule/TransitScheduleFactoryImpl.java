@@ -49,7 +49,12 @@ public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 
 	@Override
 	public TransitRouteStop createTransitRouteStop(final TransitStopFacility stop, final double arrivalDelay, final double departureDelay) {
-		return new TransitRouteStopImpl(stop, arrivalDelay, departureDelay);
+		return new TransitRouteStopImpl.Builder().stop(stop).arrivalOffset(arrivalDelay).departureOffset(departureDelay).build();
+	}
+
+	@Override
+	public TransitRouteStopImpl.Builder createTransitRouteStopBuilder(TransitStopFacility stop) {
+		return new TransitRouteStopImpl.Builder().stop(stop);
 	}
 
 	@Override

@@ -554,7 +554,7 @@ public final class TripStructureUtils {
 		}
 	}
 
-	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
+	// if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
 	public static MainModeIdentifier getRoutingModeIdentifier() {
 		return new RoutingModeMainModeIdentifier();
 	}

@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -104,17 +103,17 @@ public class WaitTimeCalculatorSerializable implements
 						double endTime = timeSlot * (i + 1);
 						if (endTime > 24 * 3600)
 							endTime -= 24 * 3600;
-						cacheWaitTimes[i] = Time.getUndefinedTime();
+						cacheWaitTimes[i] = Double.NaN;
 						SORTED_DEPARTURES:
 						for (double departure : sortedDepartures) {
-							double arrivalTime = departure + (!Time.isUndefinedTime(stop.getArrivalOffset()) ? stop.getArrivalOffset() : stop.getDepartureOffset());
+							double arrivalTime = departure + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
 							if (arrivalTime >= endTime) {
 								cacheWaitTimes[i] = arrivalTime - endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
-						if (Time.isUndefinedTime(cacheWaitTimes[i]))
-							cacheWaitTimes[i] = sortedDepartures[0] + 24 * 3600 + (!Time.isUndefinedTime(stop.getArrivalOffset()) ? stop.getArrivalOffset() : stop.getDepartureOffset()) - endTime;
+						if (Double.isNaN(cacheWaitTimes[i]))
+							cacheWaitTimes[i] = sortedDepartures[0] + 24 * 3600 + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds() - endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId().toString(), cacheWaitTimes);
 				}

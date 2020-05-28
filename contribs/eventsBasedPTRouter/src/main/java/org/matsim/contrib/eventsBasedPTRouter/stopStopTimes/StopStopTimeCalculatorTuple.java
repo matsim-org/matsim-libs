@@ -53,7 +53,7 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 						num = 0;
 						numObservations.put(key, num);
 					}
-					scheduledStopStopTimes.put(key, (num*sTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset())/++num);
+					scheduledStopStopTimes.put(key, (num*sTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds())/++num);
 					numObservations.put(key, num);
 				}
 				for(Departure departure:route.getDepartures().values())
