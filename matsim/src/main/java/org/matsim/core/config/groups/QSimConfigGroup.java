@@ -151,6 +151,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private boolean isSeepModeStorageFree = false;
 
 	private EndtimeInterpretation simEndtimeInterpretation;
+	
+	// ---
+	public enum NodeTransition { emptyBufferAfterBufferRandomDistribution, moveVehByVehRandomDistribution, moveVehByVehDeterministicPriorities
+	}
+	private NodeTransition nodeTransitionLogic = NodeTransition.emptyBufferAfterBufferRandomDistribution;
+	private boolean blockNodeWhenSingleOutlinkFull = false;
+	
 	// ---
 	
 	public QSimConfigGroup() {
@@ -610,6 +617,22 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 */
 	public void setPcuThresholdForFlowCapacityEasing(double pcuThresholdForFlowCapacityEasing) {
 		this.pcuThresholdForFlowCapacityEasing = pcuThresholdForFlowCapacityEasing;
+	}
+
+	public NodeTransition getNodeTransitionLogic() {
+		return nodeTransitionLogic;
+	}
+
+	public void setNodeTransitionLogic(NodeTransition nodeTransitionLogic) {
+		this.nodeTransitionLogic = nodeTransitionLogic;
+	}
+
+	public boolean isBlockNodeWhenSingleOutlinkFull() {
+		return blockNodeWhenSingleOutlinkFull;
+	}
+
+	public void setBlockNodeWhenSingleOutlinkFull(boolean blockNodeWhenSingleOutlinkFull) {
+		this.blockNodeWhenSingleOutlinkFull = blockNodeWhenSingleOutlinkFull;
 	}
 
 ////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
