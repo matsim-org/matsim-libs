@@ -43,7 +43,7 @@ public class SwissRailRaptorData {
     final int countStops;
     final int countRouteStops;
     final RRoute[] routes;
-    final double[] departures; // in the RAPTOR paper, this is usually called "trips", but I stick with the MATSim nomenclature
+    final int[] departures; // in the RAPTOR paper, this is usually called "trips", but I stick with the MATSim nomenclature
     final RRouteStop[] routeStops; // list of all route stops
     final RTransfer[] transfers;
     final Map<TransitStopFacility, Integer> stopFacilityIndices;
@@ -53,7 +53,7 @@ public class SwissRailRaptorData {
     final ExecutionData executionData;
 
     private SwissRailRaptorData(RaptorStaticConfig config, int countStops,
-                                RRoute[] routes, double[] departures, RRouteStop[] routeStops,
+                                RRoute[] routes, int[] departures, RRouteStop[] routeStops,
                                 RTransfer[] transfers, Map<TransitStopFacility, Integer> stopFacilityIndices,
                                 Map<TransitStopFacility, int[]> routeStopsPerStopFacility, QuadTree<TransitStopFacility> stopsQT,
                                 ExecutionData executionData) {
@@ -94,7 +94,7 @@ public class SwissRailRaptorData {
             throw new RuntimeException("TransitSchedule has too many Departures: " + countDepartures);
         }
 
-        double[] departures = new double[(int) countDepartures];
+        int[] departures = new int[(int) countDepartures];
         RRoute[] routes = new RRoute[countRoutes];
         RRouteStop[] routeStops = new RRouteStop[(int) countRouteStops];
 
@@ -156,7 +156,7 @@ public class SwissRailRaptorData {
                     indexRouteStops++;
                 }
                 for (Departure dep : route.getDepartures().values()) {
-                    departures[indexDeparture] = dep.getDepartureTime();
+                    departures[indexDeparture] = (int) dep.getDepartureTime();
                     indexDeparture++;
                 }
                 Arrays.sort(departures, indexFirstDeparture, indexDeparture);
@@ -478,8 +478,8 @@ public class SwissRailRaptorData {
         final String mode;
         final int transitRouteIndex;
         final int stopFacilityIndex;
-        final double arrivalOffset;
-        final double departureOffset;
+        final int arrivalOffset;
+        final int departureOffset;
         final double distanceAlongRoute;
         int indexFirstTransfer = -1;
         int countTransfers = 0;
@@ -494,8 +494,8 @@ public class SwissRailRaptorData {
             this.stopFacilityIndex = stopFacilityIndex;
             this.distanceAlongRoute = distanceAlongRoute;
             // "normalize" the arrival and departure offsets, make sure they are always well defined.
-            this.arrivalOffset = isUndefinedTime(routeStop.getArrivalOffset()) ? routeStop.getDepartureOffset() : routeStop.getArrivalOffset();
-            this.departureOffset = isUndefinedTime(routeStop.getDepartureOffset()) ? routeStop.getArrivalOffset() : routeStop.getDepartureOffset();
+            this.arrivalOffset = (int) (isUndefinedTime(routeStop.getArrivalOffset()) ? routeStop.getDepartureOffset() : routeStop.getArrivalOffset());
+            this.departureOffset = (int) (isUndefinedTime(routeStop.getDepartureOffset()) ? routeStop.getArrivalOffset() : routeStop.getDepartureOffset());
         }
 
         private static boolean isUndefinedTime(double time) {
@@ -506,14 +506,14 @@ public class SwissRailRaptorData {
     static final class RTransfer {
         final int fromRouteStop;
         final int toRouteStop;
-        final double transferTime;
-        final double transferDistance;
+        final int transferTime;
+        final int transferDistance;
 
         RTransfer(int fromRouteStop, int toRouteStop, double transferTime, double transferDistance) {
             this.fromRouteStop = fromRouteStop;
             this.toRouteStop = toRouteStop;
-            this.transferTime = transferTime;
-            this.transferDistance = transferDistance;
+            this.transferTime = (int) Math.ceil(transferTime);
+            this.transferDistance = (int) Math.ceil(transferDistance);
         }
     }
     
