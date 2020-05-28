@@ -1,12 +1,17 @@
 package org.matsim.contrib.emissions.analysis;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.core.utils.collections.Tuple;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -14,59 +19,98 @@ public class FastEmissionGridAnalyzer {
 
     private static final Logger logger = Logger.getLogger(FastEmissionGridAnalyzer.class);
 
-    static Raster calculate(Network network, Map<Id<Link>, Double> emissions, double cellSize, int radius) {
+    public static Map<Pollutant, Raster> processEventsFile(final String eventsFile, final Network network, final double cellSize, final int radius) {
+
+        logger.info("Start parsing events file.");
+        Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> linkEmissionsByPollutant = new HashMap<>();
+
+        new RawEmissionEventsReader((time, linkId, vehicleId, pollutant, value) -> {
+
+            var id = Id.createLinkId(linkId);
+            if (network.getLinks().containsKey(id)) {
+
+                var linkMap = linkEmissionsByPollutant.computeIfAbsent(pollutant, key -> new TObjectDoubleHashMap<>());
+                linkMap.adjustOrPutValue(id, value, value);
+            }
+        }).readFile(eventsFile);
+
+        logger.info("Start smoothing pollution.");
+        return linkEmissionsByPollutant.entrySet().stream()
+                .map(entry -> {
+                    logger.info("Smoothing of: " + entry.getKey());
+                    return Tuple.of(entry.getKey(), processLinkEmissions(entry.getValue(), network, cellSize, radius));
+                })
+                .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+    }
+
+    public static Raster processLinkEmissions(final TObjectDoubleMap<Id<Link>> emissions, final Network network, final double cellSize, final int radius) {
+
+        var originalRaster = rasterizeNetwork(network, emissions, cellSize);
+        return blur(originalRaster, radius);
+    }
+
+    public static Raster processLinkEmissions(final Map<Id<Link>, Double> emissions, final Network network, final double cellSize, final int radius) {
+
+        var originalRaster = rasterizeNetwork(network, emissions, cellSize);
+        return blur(originalRaster, radius);
+    }
+
+    static Raster blur(Raster raster, int radius) {
 
         logger.info("Creating Kernel with " + (radius * 2 + 1) + " taps");
         var kernel = createKernel(radius * 2 + 1);
-        var halfKernelLength = kernel.length / 2;
 
-        logger.info("Raster network");
-        var originalRaster = rasterNetwork(network, emissions, cellSize);
-        var firstPassRaster = new Raster(originalRaster.getBounds(), cellSize);
-        var finalPassRaster = new Raster(originalRaster.getBounds(), cellSize);
+        var result = new Raster(raster.getBounds(), raster.getCellSize());
 
-        logger.info("smooth first pass");
+        var firstPassRaster = new Raster(raster.getBounds(), raster.getCellSize());
+
         // smooth horizontally
-        firstPassRaster.setValueForEachIndex((x, y) -> {
+        firstPassRaster.setValueForEachIndex((x, y) ->
+                calculateBlurredValue(y, x, firstPassRaster.getXLength(), kernel, (yf, xv) -> raster.getValueByIndex(xv, yf))
+        );
 
-            var value = 0.;
+        // smooth vertically
+        result.setValueForEachIndex((x, y) ->
+                calculateBlurredValue(x, y, result.getYLength(), kernel, firstPassRaster::getValueByIndex)
+        );
 
-            // make sure we don't try to read values outside the bounds of the raster
-            var startIndex = (x - halfKernelLength < 0) ? halfKernelLength - x : 0;
-            var endIndex = (x + halfKernelLength >= firstPassRaster.getXLength()) ? firstPassRaster.getXLength() - 1 - x + halfKernelLength : kernel.length;
-
-            for (var ki = startIndex; ki < endIndex; ki++) {
-                var kernelValue = kernel[ki];
-                var originalValue = originalRaster.getValueByIndex(x + ki - halfKernelLength, y);
-                value += originalValue * kernelValue;
-            }
-            return value;
-        });
-
-        logger.info("smooth second pass");
-        // TODO extract this pretty much similar executions
-        //smooth vertically
-        finalPassRaster.setValueForEachIndex((x, y) -> {
-
-            var value = 0.;
-
-            // make sure we don't try to read values outside the bounds of the raster
-            var startIndex = (y - halfKernelLength < 0) ? halfKernelLength - y : 0;
-            var endIndex = (y + halfKernelLength >= finalPassRaster.getYLength()) ? finalPassRaster.getYLength() - 1 - y + halfKernelLength : kernel.length;
-
-            for (var ki = startIndex; ki < endIndex; ki++) {
-                var kernelValue = kernel[ki];
-                var originalValue = firstPassRaster.getValueByIndex(x, y + ki - halfKernelLength);
-                value += originalValue * kernelValue;
-            }
-            return value;
-
-        });
-        logger.info("done smoothing.");
-        return finalPassRaster;
+        return result;
     }
 
-    static Raster rasterNetwork(Network network, Map<Id<Link>, Double> emissions, double cellSize) {
+    private static double calculateBlurredValue(int fixedIndex, int volatileIndex, int volatileLength, double[] kernel, GetValue getValue) {
+
+        var halfKernelLength = kernel.length / 2;
+        var value = 0.;
+        var startIndex = (volatileIndex - halfKernelLength < 0) ? halfKernelLength - volatileIndex : 0;
+        var endIndex = (volatileIndex + halfKernelLength >= volatileLength) ? volatileLength - 1 - volatileIndex + halfKernelLength : kernel.length;
+
+        for (var ki = startIndex; ki < endIndex; ki++) {
+            var kernelValue = kernel[ki];
+            var originalValue = getValue.forIndex(fixedIndex, volatileIndex + ki - halfKernelLength);
+            value += originalValue * kernelValue;
+        }
+        return value;
+    }
+
+    static Raster rasterizeNetwork(final Network network, final TObjectDoubleMap<Id<Link>> emissions, final double cellSize) {
+
+        var coords = network.getNodes().values().stream()
+                .map(BasicLocation::getCoord)
+                .collect(Collectors.toSet());
+
+        var bounds = new Raster.Bounds(coords);
+        var raster = new Raster(bounds, cellSize);
+
+        emissions.forEachEntry((linkId, value) -> {
+            var link = network.getLinks().get(linkId);
+            var numberOfCells = rasterizeLink(link, 0, raster);
+            rasterizeLink(link, value / numberOfCells, raster);
+            return true;
+        });
+        return raster;
+    }
+
+    static Raster rasterizeNetwork(Network network, Map<Id<Link>, Double> emissions, double cellSize) {
 
         var coords = network.getNodes().values().stream()
                 .map(BasicLocation::getCoord)
@@ -81,9 +125,9 @@ public class FastEmissionGridAnalyzer {
             var link = network.getLinks().get(entry.getKey());
             var value = entry.getValue();
             // first count number of cells
-            var numberOfCells = rasterizeLink(link, cellSize, 0, raster);
+            var numberOfCells = rasterizeLink(link, 0, raster);
             // second pass for actually writing the emission values
-            rasterizeLink(link, cellSize, value / numberOfCells, raster);
+            rasterizeLink(link, value / numberOfCells, raster);
         }
         return raster;
     }
@@ -95,7 +139,7 @@ public class FastEmissionGridAnalyzer {
      * @param link Matsim network link
      * @return number of cells the link is rastered to
      */
-    private static int rasterizeLink(Link link, double cellSize, double value, Raster raster) {
+    private static int rasterizeLink(Link link, double value, Raster raster) {
 
 
         int x0 = raster.getXIndex(link.getFromNode().getCoord().getX());
@@ -114,13 +158,11 @@ public class FastEmissionGridAnalyzer {
         if (dx == 0 && dy == 0) {
             // the algorithm doesn't really support lines shorter than the cell size.
             // do avoid complicated computation within the loop, catch this case here
-            // raster.adjustValueForCoord(x0 * cellSize, y0 * cellSize, value);
             raster.adjustValueForIndex(x0, y0, value);
             return 1;
         }
 
         do {
-            //raster.adjustValueForCoord(x0 * cellSize, y0 * cellSize, value);
             try {
                 raster.adjustValueForIndex(x0, y0, value);
             } catch (Exception e) {
@@ -158,5 +200,10 @@ public class FastEmissionGridAnalyzer {
             result[i] = coefficient / sum;
         }
         return result;
+    }
+
+    @FunctionalInterface
+    private interface GetValue {
+        double forIndex(int fixedIndex, int volatileIndex);
     }
 }

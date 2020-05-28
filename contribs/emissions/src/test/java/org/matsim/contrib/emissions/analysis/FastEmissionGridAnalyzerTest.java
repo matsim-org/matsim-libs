@@ -31,7 +31,7 @@ public class FastEmissionGridAnalyzerTest {
 
         var emissions = Map.of(link.getId(), 20.);
 
-        var raster = FastEmissionGridAnalyzer.rasterNetwork(network, emissions, 10);
+        var raster = FastEmissionGridAnalyzer.rasterizeNetwork(network, emissions, 10);
 
         assertEquals(11, raster.getXLength());
         assertEquals(1, raster.getYLength());
@@ -54,7 +54,7 @@ public class FastEmissionGridAnalyzerTest {
 
         var emissions = Map.of(link1.getId(), 20., link2.getId(), 10.);
 
-        var raster = FastEmissionGridAnalyzer.rasterNetwork(network, emissions, 10);
+        var raster = FastEmissionGridAnalyzer.rasterizeNetwork(network, emissions, 10);
 
         assertEquals(11, raster.getXLength());
         assertEquals(11, raster.getYLength());
@@ -117,7 +117,7 @@ public class FastEmissionGridAnalyzerTest {
 
         var emissions = Map.of(link1.getId(), 20., link2.getId(), 10.);
 
-        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 10, 3);
+        var smoothedRaster = FastEmissionGridAnalyzer.processLinkEmissions(emissions, network, 10, 3);
 
         assertNotNull(smoothedRaster);
 
@@ -126,13 +126,11 @@ public class FastEmissionGridAnalyzerTest {
     @Test
     public void benchmark() {
 
-        var network = createRandomNetwork(10000, 100000, 100000);
+        var network = createRandomNetwork(10000, 1000000, 1000000);
         var emissions = createEmissions(network, 20);
 
-        var smoothedRaster = FastEmissionGridAnalyzer.calculate(network, emissions, 100, 3);
+        var smoothedRaster = FastEmissionGridAnalyzer.processLinkEmissions(emissions, network, 100, 3);
 
         assertNotNull(smoothedRaster);
-
-
     }
 }
