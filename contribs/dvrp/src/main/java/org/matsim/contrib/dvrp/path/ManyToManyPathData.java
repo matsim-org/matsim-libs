@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -58,7 +59,9 @@ public class ManyToManyPathData {
 	}
 
 	private Table<Id<Link>, Id<Link>, PathData>[] createTables(List<Link> links) {
-		ImmutableList<Id<Link>> linkIds = links.stream().map(l -> l.getId()).collect(ImmutableList.toImmutableList());
+		ImmutableList<Id<Link>> linkIds = links.stream()
+				.map(Identifiable::getId)
+				.collect(ImmutableList.toImmutableList());
 		@SuppressWarnings("unchecked")
 		Table<Id<Link>, Id<Link>, PathData>[] tables = new Table[discretizer.getIntervalCount()];
 		for (int i = 0; i < tables.length; i++) {
@@ -70,7 +73,8 @@ public class ManyToManyPathData {
 	private void updateTable(List<Link> links, int threads, Supplier<OneToManyPathSearch> oneToManyPathSearchProvider) {
 		log.info("Matrix calculation started");
 		ExecutorServiceWithResource<OneToManyPathSearch> executorService = new ExecutorServiceWithResource<>(
-				IntStream.range(0, threads).mapToObj(i -> oneToManyPathSearchProvider.get())
+				IntStream.range(0, threads)
+						.mapToObj(i -> oneToManyPathSearchProvider.get())
 						.collect(Collectors.toList()));
 
 		executorService.submitRunnablesAndWait(//
@@ -84,9 +88,9 @@ public class ManyToManyPathData {
 
 	private void updateRow(OneToManyPathSearch search, Link fromLink, Collection<Link> toLinks, int timeIdx) {
 		int startTime = timeIdx * discretizer.getTimeInterval();
-		Map<Id<Link>, PathData> pathData = search.calcPathDataMap(fromLink, toLinks, startTime);
-		for (Map.Entry<Id<Link>, PathData> e : pathData.entrySet()) {
-			tables[timeIdx].put(fromLink.getId(), e.getKey(), e.getValue());
+		Map<Link, PathData> pathData = search.calcPathDataMap(fromLink, toLinks, startTime);
+		for (Map.Entry<Link, PathData> e : pathData.entrySet()) {
+			tables[timeIdx].put(fromLink.getId(), e.getKey().getId(), e.getValue());
 		}
 	}
 

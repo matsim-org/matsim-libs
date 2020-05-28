@@ -22,9 +22,11 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 /**
@@ -37,13 +39,13 @@ import com.google.common.base.Objects;
  * <ul>
  * <li>{@code pickupIdx = 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
  * latter resulting in immediate diversion)</li>
- * <li>{@code 0 < pickupIdx <= N} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
+ * <li>{@code 0 < pickupIdx <= stops.size()} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
  * </ul>
  * <p>
  * Dropoff insertion points are indexed in the following way:
  * <ul>
  * <li>{@code dropoffIdx = pickupIdx} - dropoff inserted directly after pickup</li>
- * <li>{@code pickupIdx < dropoffIdx <= N} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
+ * <li>{@code pickupIdx < dropoffIdx <= stops.size()} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
  * </ul>
  * <p>
  * A pickup/dropoff is inserted at (i.e. included into) a given stop if they are on the same link. Otherwise, it is
@@ -58,18 +60,73 @@ import com.google.common.base.Objects;
  * @author michalm
  */
 public class InsertionGenerator {
-	public static class Insertion {
-		public final int pickupIdx;
-		public final int dropoffIdx;
+	public static class InsertionPoint {
+		public final int index;
+		public final Link previousLink;
+		public final Link nextLink;
 
-		public Insertion(int pickupIdx, int dropoffIdx) {
-			this.pickupIdx = pickupIdx;
-			this.dropoffIdx = dropoffIdx;
+		public InsertionPoint(int index, Link previousLink, Link nextLink) {
+			this.index = index;
+			this.previousLink = previousLink;
+			this.nextLink = nextLink;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			InsertionPoint that = (InsertionPoint)o;
+			return index == that.index && Objects.equal(previousLink, that.previousLink) && Objects.equal(nextLink,
+					that.nextLink);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hashCode(index, previousLink, nextLink);
 		}
 
 		@Override
 		public String toString() {
-			return "[pickupIdx=" + pickupIdx + "][dropoffIdx=" + dropoffIdx + "]";
+			return MoreObjects.toStringHelper(this)
+					.add("index", index)
+					.add("previousLink", previousLink)
+					.add("nextLink", nextLink)
+					.toString();
+		}
+	}
+
+	public static class Insertion {
+		public final VehicleData.Entry vehicleEntry;
+		public final InsertionPoint pickup;
+		public final InsertionPoint dropoff;
+
+		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
+			this.vehicleEntry = vehicleEntry;
+
+			Link pickupPreviousLink = vehicleEntry.getWaypoint(pickupIdx).getLink();
+			Link pickupNextLink = pickupIdx == dropoffIdx ?
+					request.getToLink() :
+					vehicleEntry.stops.get(pickupIdx).task.getLink();
+			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, pickupNextLink);
+
+			Link dropoffPreviousLink = pickupIdx == dropoffIdx ?
+					null :
+					vehicleEntry.stops.get(dropoffIdx - 1).task.getLink();
+			Link dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
+					null :
+					vehicleEntry.stops.get(dropoffIdx).task.getLink();
+			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffNextLink);
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("vehicleId", vehicleEntry.vehicle.getId())
+					.add("pickup", pickup)
+					.add("dropoff", dropoff)
+					.toString();
 		}
 
 		@Override
@@ -79,19 +136,21 @@ public class InsertionGenerator {
 			if (o == null || getClass() != o.getClass())
 				return false;
 			Insertion insertion = (Insertion)o;
-			return pickupIdx == insertion.pickupIdx && dropoffIdx == insertion.dropoffIdx;
+			return Objects.equal(vehicleEntry, insertion.vehicleEntry)
+					&& Objects.equal(pickup, insertion.pickup)
+					&& Objects.equal(dropoff, insertion.dropoff);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(pickupIdx, dropoffIdx);
+			return Objects.hashCode(vehicleEntry, pickup, dropoff);
 		}
 	}
 
 	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<Insertion> insertions = new ArrayList<>();
-		int occupancy = vEntry.startOccupancy;
+		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			VehicleData.Stop nextStop = nextStop(vEntry, i);
 
@@ -105,10 +164,11 @@ public class InsertionGenerator {
 			occupancy = nextStop.outgoingOccupancy;
 		}
 
-		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// last stop
+		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// at/after last stop
 		return insertions;
 	}
 
+	//TODO replace argument: int i -> InsertionPoint pickup
 	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i,
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();
@@ -120,7 +180,7 @@ public class InsertionGenerator {
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
-						insertions.add(new Insertion(i, j));
+						insertions.add(new Insertion(drtRequest, vEntry, i, j));
 					}
 
 					return;// stop iterating -- cannot insert dropoff after node j
@@ -128,12 +188,12 @@ public class InsertionGenerator {
 			}
 
 			if (drtRequest.getToLink() != nextStop(vEntry, j).task.getLink()) {// next stop at different link
-				insertions.add(new Insertion(i, j));
+				insertions.add(new Insertion(drtRequest, vEntry, i, j));
 			}
 			// else: do not evaluate insertion _before_stop j, evaluate only insertion _after_ stop j
 		}
 
-		insertions.add(new Insertion(i, stopCount));// insertion after last stop
+		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
 	private VehicleData.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
