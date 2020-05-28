@@ -18,8 +18,6 @@ public class RasteredNetwork {
     private final Map<Id<Link>, List<Coord>> linkMap;
     private final double cellSize;
 
-    private final int bla = 0;
-
     RasteredNetwork(Network network, Geometry bounds, double cellSize) {
 
         this.cellSize = cellSize;
