@@ -15,10 +15,41 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class FastEmissionGridAnalyzer {
+/**
+ * This class provides functions for blurring emissions. It does the same thing as {@link EmissionGridAnalyzer} but is much faster
+ * The most convenient way to use it is the {@link FastEmissionGridAnalyzer#processEventsFile(String, Network, double, int)} method. If an emissions
+ * Events file is already parsed, one may also use the {@link FastEmissionGridAnalyzer#processLinkEmissions(Map, Network, double, int)} method
+ */
+public abstract class FastEmissionGridAnalyzer {
 
     private static final Logger logger = Logger.getLogger(FastEmissionGridAnalyzer.class);
 
+    /**
+     * Processes an events file with emissions and renders emissions in three steps:
+     * <p>
+     * 1. All emissions are summed up by link id if the link id was found within the supplied network.
+     * 2. The aggregated emissions for each link are rastered onto all the raster-cells covered by the link.
+     * 3. In the smoothing step the emissions are blurred onto the surrounding raster-cells.
+     * <p>
+     * The blurring algorithm is a gaussian blur https://en.wikipedia.org/wiki/Gaussian_blur
+     * <p>
+     * If only a certain area of the scenario is of interest for the analysis. The supplied network must be filtered beforehand.
+     * The resulting raster's size depends on the bounding box of the supplied network.
+     * <p>
+     * Note: The algorithm is not accurate at the edges of the raster. The kernel is cut of a the edges meaning that emissions
+     * are underestimated at the edges of the raster. I didn't bother to implement this correctly. Otherwise the overall
+     * amount of emissions doesn't change.
+     *
+     * @param eventsFile The events file which contains the emission events
+     * @param network    The network those emissions occurred on. The size of the resulting rater depends on the bounding box of the network
+     * @param cellSize   size of a cell. This determines how many 'pixels' the resulting raster will have. Smaller cellSize means
+     *                   higher pixel-density
+     * @param radius     smoothing radius which determines the strength of the blur. The radius describes onto how many cells
+     *                   the emissions of a single cell are distributed in one direction. A radius of 0 means no blurring. A radius of ~20
+     *                   is probably a good guess for real-world scenarios.
+     *                   The resulting smoothing kernel will have radius * 2 + 1 entries.
+     * @return A raster containing emission values for each (x,y)-cell within the bounds of the network
+     */
     public static Map<Pollutant, Raster> processEventsFile(final String eventsFile, final Network network, final double cellSize, final int radius) {
 
         logger.info("Start parsing events file.");
@@ -43,12 +74,20 @@ public class FastEmissionGridAnalyzer {
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
     }
 
+    /**
+     * Works as {@link FastEmissionGridAnalyzer#processEventsFile(String, Network, double, int)} but without events parsing
+     * The emissions per link have to be supplied.
+     */
     public static Raster processLinkEmissions(final TObjectDoubleMap<Id<Link>> emissions, final Network network, final double cellSize, final int radius) {
 
         var originalRaster = rasterizeNetwork(network, emissions, cellSize);
         return blur(originalRaster, radius);
     }
 
+    /**
+     * Works as {@link FastEmissionGridAnalyzer#processEventsFile(String, Network, double, int)} but without events parsing
+     * The emissions per link have to be supplied.
+     */
     public static Raster processLinkEmissions(final Map<Id<Link>, Double> emissions, final Network network, final double cellSize, final int radius) {
 
         var originalRaster = rasterizeNetwork(network, emissions, cellSize);

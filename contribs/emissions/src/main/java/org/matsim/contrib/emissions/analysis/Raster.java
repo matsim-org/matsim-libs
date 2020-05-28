@@ -5,6 +5,10 @@ import org.matsim.api.core.v01.Coord;
 import java.util.Set;
 import java.util.stream.IntStream;
 
+/**
+ * Raster holding (x,y, value) values
+ * The data is stored within a double[]. The class only offers convenient methods to access this data by (x,y)-coordinates
+ */
 public class Raster {
 
     private final Bounds bounds;
@@ -53,31 +57,57 @@ public class Raster {
                 }));
     }
 
+    /**
+     * get the bounds of the raster
+     *
+     * @return well, the bounds
+     */
     public Bounds getBounds() {
         return this.bounds;
     }
 
+    /**
+     * Get the cell size of the raster, which determines the transformation between x,y-coodinates and index
+     */
     public double getCellSize() {
         return cellSize;
     }
 
+    /**
+     * Items in x-direction
+     */
     public int getXLength() {
         return xLength;
     }
 
+    /**
+     * Items in -direction
+     */
     public int getYLength() {
         return yLength;
     }
 
+    /**
+     * Transform x-coordinate into index
+     *
+     * @param x x-value of a coordinate
+     * @return x-index
+     */
     public int getXIndex(double x) {
         return (int) ((x - bounds.minX) / cellSize);
     }
 
+    /**
+     * Transform y-coordinate into index
+     *
+     * @param y y-value of a coordinate
+     * @return y-index
+     */
     public int getYIndex(double y) {
         return (int) ((y - bounds.minY) / cellSize);
     }
 
-    public int getIndexForCoord(double x, double y) {
+    int getIndexForCoord(double x, double y) {
         var xi = getXIndex(x);
         var yi = getYIndex(y);
 

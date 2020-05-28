@@ -11,6 +11,9 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Events reader for emissions wich doesn't bother with events manager and all.
+ */
 class RawEmissionEventsReader extends MatsimXmlParser {
 
     private static final String EVENT = "event";
