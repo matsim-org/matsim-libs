@@ -1,6 +1,5 @@
 package org.matsim.contrib.emissions.analysis;
 
-import gnu.trove.map.TObjectDoubleMap;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
@@ -43,7 +42,6 @@ public class DisplayRasterOnPanel {
 
     private static void displayFromEventsFile() {
 
-        Map<Id<Link>, TObjectDoubleMap<Pollutant>> linkEmissions = new HashMap<>();
         String eventsFile = "C:\\Users\\Janekdererste\\Desktop\\deurb-no-drt\\deurbanisation-no-drt-50pct-matches.emission.events.offline.xml.gz";
         String networkFile = "C:\\Users\\Janekdererste\\Desktop\\deurb-no-drt\\deurbanisation-no-drt-50pct-matches.output_network.xml.gz";
         String outputFile = "C:/Users/Janekdererste/Desktop/testitest/test.csv";

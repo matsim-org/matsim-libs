@@ -47,8 +47,8 @@ public class Raster {
         IntStream.range(0, xLength).forEach(xi -> IntStream.range(0, yLength)
                 .forEach(yi -> {
                     var value = getValueByIndex(xi, yi);
-                    var x = xi * cellSize - bounds.minX;
-                    var y = yi * cellSize - bounds.minY;
+                    var x = xi * cellSize + bounds.minX;
+                    var y = yi * cellSize + bounds.minY;
                     consumer.consume(x, y, value);
                 }));
     }
@@ -111,7 +111,7 @@ public class Raster {
         return data[index];
     }
 
-    double getValue(double x, double y) {
+    double getValueByCoord(double x, double y) {
         var index = getIndexForCoord(x, y);
         return data[index];
     }

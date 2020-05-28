@@ -2,7 +2,7 @@ package org.matsim.contrib.emissions.analysis;
 
 import org.junit.Test;
 import org.matsim.contrib.emissions.Pollutant;
-import org.matsim.contrib.emissions.utils.TestEmissionUtils;
+import org.matsim.contrib.emissions.utils.EmissionUtilsTest;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,7 +23,7 @@ public class EmissionsByPollutantTest {
     @Test
     public void initialize() {
 
-        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
         Map<Pollutant,Double> map = new LinkedHashMap<>();
         emissions.forEach( map::put ) ;
@@ -41,7 +41,7 @@ public class EmissionsByPollutantTest {
     @Test
     public void addEmission() {
 
-        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
         final double valueToAdd = 5;
         final Pollutant pollutant = CO;
         final double expectedValue = emissions.get(pollutant) + valueToAdd;
@@ -77,7 +77,7 @@ public class EmissionsByPollutantTest {
     @Test
     public void addEmissions() {
 
-        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = EmissionUtilsTest.createEmissions();
 
         Map<Pollutant,Double> map = new LinkedHashMap<>();
         emissions.forEach( map::put ) ;

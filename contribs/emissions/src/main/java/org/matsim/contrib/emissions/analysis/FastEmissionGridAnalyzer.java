@@ -178,7 +178,7 @@ public class FastEmissionGridAnalyzer {
                 err += dx;
                 y0 += sy;
             }
-        } while (x0 != x1 || y0 != y1);
+        } while (x0 <= x1 && y0 <= y1);
 
         return result;
     }
