@@ -23,7 +23,7 @@ public class FastEmissionGridAnalyzerTest {
     public MatsimTestUtils utils = new MatsimTestUtils();
 
     @Test
-    public void rasterNework_singelLink() {
+    public void rasterNetwork_singleLink() {
 
         final var cellSize = 10.;
         final var emissionPerLink = 20.;
@@ -36,6 +36,32 @@ public class FastEmissionGridAnalyzerTest {
         var link = network.getFactory().createLink(Id.createLinkId("link"), node1, node2);
         network.addNode(node1);
         network.addNode(node2);
+        network.addLink(link);
+
+        var emissions = Map.of(link.getId(), emissionPerLink);
+
+        var raster = FastEmissionGridAnalyzer.rasterizeNetwork(network, emissions, cellSize);
+
+        assertEquals(expectedCellNumber, raster.getXLength());
+        assertEquals(1, raster.getYLength());
+
+        raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber, value, 0.00000001));
+    }
+
+    @Test
+    public void rasterNetwork_singleLinkWithBackwardsOrientation() {
+
+        final var cellSize = 10.;
+        final var emissionPerLink = 20.;
+        final var linkLength = 99;
+        final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
+
+        var network = NetworkUtils.createNetwork();
+        var node1 = network.getFactory().createNode(Id.createNodeId("node1"), new Coord(0, 0));
+        var node2 = network.getFactory().createNode(Id.createNodeId("node2"), new Coord(linkLength, 0));
+        var link = network.getFactory().createLink(Id.createLinkId("link"), node2, node1);
+        network.addNode(node2);
+        network.addNode(node1);
         network.addLink(link);
 
         var emissions = Map.of(link.getId(), emissionPerLink);
