@@ -180,7 +180,7 @@ final class QNodeImpl extends AbstractQNode {
 		switch (nodeTransitionLogic) {
 		case emptyBufferAfterBufferRandomDistribution:
 			// randomize based on link capacity: select a link; if next links have enough space all vehicles from the buffer are allowed to pass the node
-			for (int auxCounter = 0; auxCounter < this.inLinksArrayCache.length; auxCounter++) {
+			while (inLinksCapSum > 0) {
 				double rndNum = random.nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
