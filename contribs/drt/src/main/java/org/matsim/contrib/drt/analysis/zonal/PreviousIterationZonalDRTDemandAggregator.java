@@ -35,7 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Aggregates PersonDepartureEvents of the previous iteration.
+ * Aggregates PersonDepartureEvents per iteration for the given mode and returns the numbers from the previous iteration
+ * as expected demand for the current iteration.
  *
  * @author jbischoff
  */

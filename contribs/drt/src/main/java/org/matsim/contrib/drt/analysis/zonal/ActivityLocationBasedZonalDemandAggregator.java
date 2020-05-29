@@ -26,10 +26,13 @@ import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -43,28 +46,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Counts activity ends per zone.
- * At the moment, this takes places once, before the mobsim starts. Thus, we do not account for time allocation of activities..
- * Alternatively, one could implement ActivityEndEventHandler and recalculate every iteration. This might be computionally expensive and may not be worth the effort
- * (depending on the time mutation range).
- *
- *  TODO:test
+ * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
+ * as expected demand for the current iteration. This will lead to rebalancing target locations related to activity volume per zone.
  *
  * @author tschlenther
  */
-public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, StartupListener {
+public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
+	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
-	private final Scenario scenario;
 
-	public ActivityLocationBasedZonalDemandAggregator(MatsimServices services, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
-		this.scenario = services.getScenario();
+	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
-		//self registration
-		services.addControlerListener(this);
+		//self-registration
+		eventsManager.addHandler(this);
 	}
 
 	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {
@@ -73,48 +71,28 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 	}
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		activityEndsPerTimeBinAndZone.clear();
-		prepareZones();
-
-		//go through the selected plans, grab all planned activity end times and save them into activityEndsPerTimeBinAndZone
-		for (Person person : this.scenario.getPopulation().getPersons().values()) {
-			person.getSelectedPlan().getPlanElements().stream()
-					.filter(planElement -> planElement instanceof Activity)
-					.filter(activity -> ! TripStructureUtils.isStageActivityType(((Activity) activity).getType()))
-					.forEach(planElement -> {
-						Activity act = (Activity) planElement;
-						double endTime;
-						if(act.getEndTime().isDefined()) {
-							endTime = act.getEndTime().seconds();
-						} else {
-							if(act.getStartTime().isUndefined() || act.getMaximumDuration().isUndefined()){
-								//if this is the last activity, we can use qsim end time or set endTime to 36h
-								if(person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() -1).equals(act)){
-									endTime = scenario.getConfig().qsim().getEndTime().isDefined() ? scenario.getConfig().qsim().getEndTime().seconds() : 36*3600;
-								} else {
-									throw new RuntimeException("activity " + act + " of person " + person + " has no information on end time and it can not " +
-											"be derived out of start time and maximum duration. As the activity is not the last in the plan, we do not know how to deal with that...");
-								}
-							} else {
-								endTime = act.getStartTime().seconds() + act.getMaximumDuration().seconds(); //this fails intentionally if one of startTime and maximumDuration is not set
-							}
-						}
-						String zoneId = zonalSystem.getZoneForLinkId(act.getLinkId());
-						Double bin = getBinForTime(endTime);
-
-						if (zoneId == null) {
-							Logger.getLogger(getClass()).error("No zone found for linkId " + act.getLinkId().toString());
-							return;
-						}
-						if (activityEndsPerTimeBinAndZone.containsKey(bin)) {
-							this.activityEndsPerTimeBinAndZone.get(bin).get(zoneId).increment();
-						} else
-							Logger.getLogger(getClass())
-									.error("Time " + Time.writeTime(endTime) + " / bin " + bin + " is out of boundary");
-					});
+	public void handleEvent(ActivityEndEvent event) {
+		Double bin = getBinForTime(event.getTime());
+		String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
+		if (zoneId == null) {
+			Logger.getLogger(getClass()).error("No zone found for linkId " + event.getLinkId().toString());
+			return;
 		}
+		if (actEnds.containsKey(bin)) {
+			this.actEnds.get(bin).get(zoneId).increment();
+		} else
+			Logger.getLogger(getClass())
+					.error("Time " + Time.writeTime(event.getTime()) + " / bin " + bin + " is out of boundary");
 	}
+
+	@Override
+	public void reset(int iteration) {
+		activityEndsPerTimeBinAndZone.clear();
+		activityEndsPerTimeBinAndZone.putAll(actEnds);
+		actEnds.clear();
+		prepareZones();
+	}
+
 
 	private void prepareZones() {
 		for (int i = 0; i < (3600 / timeBinSize) * 36; i++) {
@@ -122,11 +100,13 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 			for (String zone : zonalSystem.getZones().keySet()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
-			activityEndsPerTimeBinAndZone.put(Double.valueOf(i), zonesPerSlot);
+			actEnds.put(Double.valueOf(i), zonesPerSlot);
 		}
 	}
 
 	private Double getBinForTime(double time) {
 		return Math.floor(time / timeBinSize);
 	}
+
+
 }

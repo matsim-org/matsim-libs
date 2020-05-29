@@ -76,21 +76,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case ActivityLocationBasedZonalDemandAggregator:
-				//TODO sort this out. could not find another way to register the same aggregator instance as controler listener but storing it in a fielf of the provider.. tschlenther may '20
-
-				ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator> provider = new ModalProviders.AbstractProvider<ActivityLocationBasedZonalDemandAggregator>(getMode()) {
-					@Inject
-					MatsimServices services;
-
-					@Override
-					public ActivityLocationBasedZonalDemandAggregator get() {
-						return new ActivityLocationBasedZonalDemandAggregator(services,
-									getModalInstance(DrtZonalSystem.class), drtCfg);
-					}
-				};
-
-				bindModal(ZonalDemandAggregator.class).toProvider(provider).asEagerSingleton();
-
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
