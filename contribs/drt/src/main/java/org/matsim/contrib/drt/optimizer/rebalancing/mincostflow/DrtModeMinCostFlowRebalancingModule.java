@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
@@ -77,7 +78,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				break;
 			case ActivityLocationBasedZonalDemandAggregator:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class), getter.get(Population.class).getPersons().keySet(),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:
@@ -87,5 +88,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				break;
 		}
 
+		addControlerListenerBinding().toProvider(modalProvider(getter ->
+				new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 	}
 }
