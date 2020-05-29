@@ -25,6 +25,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -44,6 +45,7 @@ import org.matsim.core.utils.misc.Time;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
@@ -55,12 +57,14 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
+	private final Set<Id<Person>> persons;
 	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 
-	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, Set<Id<Person>> personsToBeMonitored, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
+		this.persons = personsToBeMonitored;
 		//self-registration
 		eventsManager.addHandler(this);
 	}
@@ -72,6 +76,7 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		if(TripStructureUtils.isStageActivityType(event.getActType()) || ! this.persons.contains(event.getPersonId())) return;
 		Double bin = getBinForTime(event.getTime());
 		String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
 		if (zoneId == null) {
