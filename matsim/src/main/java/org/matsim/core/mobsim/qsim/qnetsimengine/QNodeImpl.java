@@ -217,8 +217,8 @@ final class QNodeImpl extends AbstractQNode {
 							// try to move a vehicle from this link over the node
 							if ( ! moveFirstVehicleOnLink(now, link)) {
 								// the link is not able to move (more) vehicles in this time step
-									inLinksCapSum -= link.getLink().getCapacity(now);
-									this.tempLinks[i] = null;
+								inLinksCapSum -= link.getLink().getCapacity(now);
+								this.tempLinks[i] = null;
 							} else {
 								// a vehicle has been moved
 							}
