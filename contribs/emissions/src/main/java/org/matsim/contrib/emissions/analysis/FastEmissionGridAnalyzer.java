@@ -216,7 +216,7 @@ public abstract class FastEmissionGridAnalyzer {
             }
             // have this condition in separate method because we want to get one more cell than the original algorithm
             // but then the direction of the line requires different conditions
-        } while (keepRasterizing(x0, x1, sx) && keepRasterizing(y0, y1, sy)); //while (x0 <= x1 && y0 <= y1);
+        } while (keepRasterizing(x0, x1, sx) && keepRasterizing(y0, y1, sy));
 
         return result;
     }
