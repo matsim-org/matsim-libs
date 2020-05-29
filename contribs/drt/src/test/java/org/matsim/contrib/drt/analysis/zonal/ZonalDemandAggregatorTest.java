@@ -102,7 +102,7 @@ public class ZonalDemandAggregatorTest {
 	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
 	 *    That should lead to half of the drt vehicles rebalanced to the left column when using ActivityLocationBasedZonalDemandAggregator.
 	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
-	 * 	  That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDemandAggregator.
+	 * 	  That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDRTDemandAggregator.
 	 * 3) in the center, there is nothing happening.
 	 *    But, when using EqualVehicleDensityZonalDemandAggregator, one vehicle should get sent to every zone..
 	 */

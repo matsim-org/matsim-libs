@@ -39,7 +39,7 @@ import java.util.Map;
  *
  * @author jbischoff
  */
-public class PreviousIterationZonalDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
+public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
@@ -47,7 +47,7 @@ public class PreviousIterationZonalDemandAggregator implements ZonalDemandAggreg
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
 
-	public PreviousIterationZonalDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
