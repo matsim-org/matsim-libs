@@ -703,7 +703,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ) {
-			flowcap_accumulate.setTimeStep(now - context.qsimConfig.getTimeStepSize());
+//			flowcap_accumulate.setTimeStep(now - context.qsimConfig.getTimeStepSize());
+			flowcap_accumulate.setTimeStep(now - 1);
 		}
 		return veh;
 	}
