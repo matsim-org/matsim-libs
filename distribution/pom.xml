@@ -185,6 +185,7 @@
 					<descriptors>
 						<descriptor>src/assembly/assembly-release.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
