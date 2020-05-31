@@ -283,8 +283,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
 		
 		if( this.flowcap_accumulate.getTimeStep() < now
-				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep
-				&& isNotOfferingVehicle()){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 
 			double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
 			double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
@@ -300,8 +299,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
 		
 		if (this.thisTimeStepGreen
-				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep
-				&& isNotOfferingVehicle()){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 			double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
 					remainingFlowCapThisTimeStep);
 			flowcap_accumulate.setValue(newFlowCap);
@@ -310,10 +308,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private double subtractSizeOfVehiclesThatAreAlreadyInTheBuffer() {
 		double remainingFlowCapThisTimeStep = flowCapacityPerTimeStep;
-//		for (QVehicle veh : buffer) {
-//			// Subtract size of vehicles that are already in the buffer (from previous time steps)
-//			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh);
-//		}
+		for (QVehicle veh : buffer) {
+			// Subtract size of vehicles that are already in the buffer (from previous time steps)
+			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh);
+		}
 		return remainingFlowCapThisTimeStep;
 	}
 
