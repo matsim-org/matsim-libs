@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -64,7 +63,6 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  *
  */
-@Ignore
 public class NodeTransitionTest {
 	
 	@Test
