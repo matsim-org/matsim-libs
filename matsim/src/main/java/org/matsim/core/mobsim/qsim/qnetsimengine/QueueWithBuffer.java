@@ -219,14 +219,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.calculateStorageCapacity();
 
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-
-//		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
-//			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
-//					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
-//					+ "(This statement may no longer be correct; I think that the incriminating code was modified.  So please test and remove"
-//					+ " the warning if it works. kai, sep'14") ;
-//		}
-
 	}
 
 	@Override
