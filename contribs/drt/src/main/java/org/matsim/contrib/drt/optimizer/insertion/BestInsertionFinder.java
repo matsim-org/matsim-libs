@@ -52,7 +52,7 @@ public class BestInsertionFinder<D> {
 		return insertions.map(
 				insertion -> new InsertionWithCost<>(insertion, costCalculator.calculate(drtRequest, insertion)))
 				.filter(iWithCost -> iWithCost.cost < INFEASIBLE_SOLUTION_COST)
-				.max(Comparator.comparingDouble(insertionWithCost -> insertionWithCost.cost))
+				.min(Comparator.comparingDouble(insertionWithCost -> insertionWithCost.cost))
 				.map(insertionWithCost -> insertionWithCost.insertionWithDetourData);
 	}
 }

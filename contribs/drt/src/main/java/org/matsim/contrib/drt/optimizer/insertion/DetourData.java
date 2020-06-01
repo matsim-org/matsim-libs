@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import java.util.Map;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +41,11 @@ public class DetourData<D> {
 	private final Function<Link, D> detourFromPickup;
 	private final Function<Link, D> detourToDropoff;
 	private final Function<Link, D> detourFromDropoff;
+
+	DetourData(Map<Link, D> detourToPickup, Map<Link, D> detourFromPickup, Map<Link, D> detourToDropoff,
+			Map<Link, D> detourFromDropoff) {
+		this(detourToPickup::get, detourFromPickup::get, detourToDropoff::get, detourFromDropoff::get);
+	}
 
 	DetourData(Function<Link, D> detourToPickup, Function<Link, D> detourFromPickup, Function<Link, D> detourToDropoff,
 			Function<Link, D> detourFromDropoff) {

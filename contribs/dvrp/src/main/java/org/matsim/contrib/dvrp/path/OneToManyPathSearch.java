@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -168,7 +170,7 @@ public class OneToManyPathSearch {
 		double lastLinkTT = forward ?
 				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) :
 				VrpPaths.getLastLinkTT(fromLink, time);
-		return VrpPaths.FIRST_LINK_TT + lastLinkTT;
+		return FIRST_LINK_TT + lastLinkTT;
 	}
 
 	public static PathData createZeroPathData(Node node) {

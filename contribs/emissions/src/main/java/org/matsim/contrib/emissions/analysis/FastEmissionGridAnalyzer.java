@@ -202,12 +202,9 @@ public abstract class FastEmissionGridAnalyzer {
         }
 
         do {
-            try {
-                raster.adjustValueForIndex(x0, y0, value);
-            } catch (Exception e) {
-                logger.error(e);
-            }
+            raster.adjustValueForIndex(x0, y0, value);
             result++;
+
             e2 = err + err;
             if (e2 >= dy) {
                 err += dy;
@@ -217,9 +214,17 @@ public abstract class FastEmissionGridAnalyzer {
                 err += dx;
                 y0 += sy;
             }
-        } while (x0 <= x1 && y0 <= y1);
+            // have this condition in separate method because we want to get one more cell than the original algorithm
+            // but then the direction of the line requires different conditions
+        } while (keepRasterizing(x0, x1, sx) && keepRasterizing(y0, y1, sy));
 
         return result;
+    }
+
+    private static boolean keepRasterizing(int value, int endCondition, int direction) {
+
+        if (direction > 0) return value <= endCondition;
+        else return value >= endCondition;
     }
 
     /**
