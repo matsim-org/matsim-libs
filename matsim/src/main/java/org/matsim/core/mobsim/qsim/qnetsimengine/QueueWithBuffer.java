@@ -379,7 +379,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap.
 		 * Example: Assume freeSpeedTravelTime (aka freeTravelDuration) is 2 seconds. Than we need the spaceCap = TWO
-		 * times the flowCap to handle the flowCap.
+		 * times the flowCap per second to handle the flowCap.
 		 *
 		 * Will base these computations (for the time being) on the standard free speed; i.e. reductions in free speed
 		 * will also reduce the maximum flow.
@@ -393,6 +393,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		
 		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
 		double tempStorageCapacity = freespeedTravelTime * flowCapacityPerTimeStep; 
+//		double tempStorageCapacity = freespeedTravelTime * unscaledFlowCapacity_s; // TODO
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
