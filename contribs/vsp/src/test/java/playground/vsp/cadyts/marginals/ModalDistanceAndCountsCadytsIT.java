@@ -308,14 +308,14 @@ public class ModalDistanceAndCountsCadytsIT {
 						config,
 						modalDistanceCadytsContext);
 
-				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight/10);
+				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight);
 				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
 
 				// add counts cadyts
 				final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<>(person.getSelectedPlan(),
 						config,
 						cadytsContext);
-				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight/10);
+				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight);
 				sumScoringFunction.addScoringFunction(scoringFunctionCounts);
 
 				return sumScoringFunction;
