@@ -308,14 +308,14 @@ public class ModalDistanceAndCountsCadytsIT {
 						config,
 						modalDistanceCadytsContext);
 
-				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight);
+				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight/10);
 				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
 
 				// add counts cadyts
 				final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<>(person.getSelectedPlan(),
 						config,
 						cadytsContext);
-				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight);
+				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight/10);
 				sumScoringFunction.addScoringFunction(scoringFunctionCounts);
 
 				return sumScoringFunction;
@@ -347,22 +347,24 @@ public class ModalDistanceAndCountsCadytsIT {
 		}
 
 		if (this.modalDistanceWeight > 0 && this.countsWeight == 0) {
-//			bike_2150.0=395, bike_2050.0=424, car_2050.0=37, car_2250.0=55, car_2150.0=89 without bug fix in QueueWithBuffer
-//			bike_2150.0=342, bike_2050.0=443, car_2050.0=36, car_2250.0=93, car_2150.0=86 with bug fix in QueueWithBuffer
 			// don't know how to get a better accuracy than 8%
 			assertEquals(100, modalDistanceCount.get("car_2050.0"), 80);
 			assertEquals(100, modalDistanceCount.get("car_2150.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
 			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
 		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
-//			bike_2150.0=1, bike_2050.0=2, car_2050.0=193, car_2250.0=625, car_2150.0=179 without bug fix in QueueWithBuffer
-//			bike_2050.0=2, car_2050.0=214, car_2250.0=592, car_2150.0=192 with bug fix in QueueWithBuffer
-//			assertEquals(5, modalDistanceCount.size());
 			assertTrue(modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count corretion but there isn't
 		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
-//			bike_2150.0=244, bike_2050.0=414, car_2050.0=33, car_2250.0=156, car_2150.0=153 without bug fix in QueueWithBuffer
-//			bike_2150.0=212, bike_2050.0=418, car_2050.0=23, car_2250.0=171, car_2150.0=176 with bug fix in QueueWithBuffer
-			assertTrue(modalDistanceCount.get("car_2250.0") + 6 > modalDistanceCount.get("car_2150.0")); // allow an error of 6...
+			/* This assumes that counts have a higher impact than distance distributions 
+			 * (because counts request 1000 on car_2250 and the distance distribution requests 100 on car_2050 and car_2150 but 0 on car_2250).
+			 * Probably this should rather depend on the weight that is set for counts and distance distributions...
+			 * Since the values are almost the same as before and at the moment nobody seems to understand exactly why cadyts is not working 
+			 * properly for illustrative scenarios, we allow an error of 6 here...
+			 * TODO In the future somebody should investigate into cadyts on illustrative scenarios;
+			 * might be that cadyts has some assumptions in it's values that only hold for real-world plans or scores.
+			 * theresa, jun'2020 (in agreement with janek)
+			 */
+			assertTrue(modalDistanceCount.get("car_2250.0") + 6 > modalDistanceCount.get("car_2150.0"));
 			assertTrue(modalDistanceCount.get("car_2250.0") > modalDistanceCount.get("car_2050.0"));
 		}
 	}
