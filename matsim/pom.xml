@@ -182,6 +182,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
