@@ -12,7 +12,14 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Stream;
 
+/**
+ * Collector to transform a {@link Stream<Link>} into a {@link Network}. The collector makes shallow copies of nodes
+ * attached to the supplied links.
+ * <p>
+ * The collector works fine with parallel streams.
+ */
 public class NetworkCollector implements Collector<Link, Collection<Link>, Network> {
 
     /**
@@ -24,23 +31,16 @@ public class NetworkCollector implements Collector<Link, Collection<Link>, Netwo
     private static void addNodeIfNecessary(Network network, Node node) {
         if (!network.getNodes().containsKey(node.getId())) {
 
-            // usually this collector is used with links, which have been inside a network before,
-            // therefore the nodes already have in and out links. If in a previous stream operation
-            // links from the original network are filtered out, nodes still might have a reference
-            // to those links in their in and out lists
-            clearInAndOutLinks(node);
-            network.addNode(node);
-        }
-    }
+            // nodes keep internal state of in- and out-links. Since we don't know, whether this state is stale at this
+            // point we create a shallow copy with empty in-out-links mappings. Simply clearing the mappings would alter the
+            // state in the original network, which would be unexpected behaviour of a collector.
+            var copy = NetworkUtils.createNode(node.getId());
+            copy.setCoord(node.getCoord());
 
-    private static void clearInAndOutLinks(Node node) {
-
-        for (var linkId : node.getInLinks().keySet()) {
-            node.removeInLink(linkId);
-        }
-
-        for (var linkId : node.getOutLinks().keySet()) {
-            node.removeOutLink(linkId);
+            for (var entry : node.getAttributes().getAsMap().entrySet()) {
+                copy.getAttributes().putAttribute(entry.getKey(), entry.getValue());
+            }
+            network.addNode(copy);
         }
     }
 
