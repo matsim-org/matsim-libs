@@ -32,11 +32,8 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.contrib.dvrp.run.Modal;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -55,7 +52,6 @@ public class ZonalDemandAggregatorTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	//TODO actually test something...
 	public void EqualVehicleDensityZonalDemandAggregatorTest(){
 		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensityZonalDemandAggregator);
 		controler.run();
@@ -74,7 +70,6 @@ public class ZonalDemandAggregatorTest {
 	}
 
 	@Test
-	//TODO actually test something...
 	public void PreviousIterationZonalDemandAggregatorTest(){
 		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator);
 		controler.run();
@@ -93,7 +88,6 @@ public class ZonalDemandAggregatorTest {
 	}
 
 	@Test
-	//TODO actually test something...
 	public void ActivityLocationBasedZonalDemandAggregatorTest(){
 		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.ActivityLocationBasedZonalDemandAggregator);
 		controler.run();
