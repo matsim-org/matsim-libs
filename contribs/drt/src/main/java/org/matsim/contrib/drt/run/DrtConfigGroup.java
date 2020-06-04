@@ -35,6 +35,8 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
@@ -201,6 +203,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}
+
+	@NotNull
+	private DrtInsertionSearchParams drtInsertionSearchParams;
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -616,10 +621,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
-	/**
-	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
-	 * specified
-	 */
+	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
+		return drtInsertionSearchParams;
+	}
+
 	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
 		if (parameterSets.size() > 1) {
@@ -632,9 +637,36 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
-			return new MinCostFlowRebalancingParams();
+		switch (type) {
+			case MinCostFlowRebalancingParams.SET_NAME:
+				return new MinCostFlowRebalancingParams();
+
+			case ExtensiveInsertionSearchParams.SET_NAME:
+				return new ExtensiveInsertionSearchParams();
 		}
+
 		return super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams == null,
+					"Remove the existing drtRequestInsertionParams before adding a new one");
+			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams != null,
+					"The existing drtRequestInsertionParams is null. Cannot remove it.");
+			drtInsertionSearchParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 }

@@ -36,11 +36,9 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
+	private final ExtensiveInsertionSearchParams insertionParams;
 
 	// step 1: initial filtering out feasible insertions
-	// FIXME make it more flexible... 40 is way too big for many smaller scenarios, we may also want to reduce 1.5
-	private static final int NEAREST_INSERTIONS_AT_END_LIMIT = 40;
-	static final double ADMISSIBLE_BEELINE_SPEED_FACTOR = 1.5;
 	private final InsertionCostCalculator<Double> admissibleCostCalculator;
 	private final DetourTimesProvider admissibleDetourTimesProvider;
 
@@ -54,11 +52,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		this.pathDataProvider = pathDataProvider;
 		this.forkJoinPool = forkJoinPool;
 
+		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue);
 
 		// TODO use more sophisticated DetourTimeEstimator
-		double admissibleBeelineSpeed = ADMISSIBLE_BEELINE_SPEED_FACTOR * drtCfg.getEstimatedDrtSpeed()
-				/ drtCfg.getEstimatedBeelineDistanceFactor();
+		double admissibleBeelineSpeed = insertionParams.getAdmissibleBeelineSpeedFactor()
+				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
 
 		admissibleDetourTimesProvider = new DetourTimesProvider(
 				DetourTimeEstimator.createBeelineTimeEstimator(admissibleBeelineSpeed));
@@ -73,7 +72,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> admissibleTimeData = admissibleDetourTimesProvider.getDetourData(drtRequest);
 		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
-				NEAREST_INSERTIONS_AT_END_LIMIT);
+				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vEntries.parallelStream()
