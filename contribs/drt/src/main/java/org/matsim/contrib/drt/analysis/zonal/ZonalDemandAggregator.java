@@ -25,11 +25,12 @@ package org.matsim.contrib.drt.analysis.zonal;
 import org.apache.commons.lang3.mutable.MutableInt;
 
 import java.util.Map;
+import java.util.function.ToIntFunction;
 
 /**
  * @author jbischoff
  */
 public interface ZonalDemandAggregator {
 
-	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time);
+	ToIntFunction<String> getExpectedDemandForTimeBin(double time);
 }

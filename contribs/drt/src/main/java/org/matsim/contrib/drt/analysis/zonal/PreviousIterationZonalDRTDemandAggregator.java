@@ -33,6 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.ToIntFunction;
 
 /**
  * Aggregates PersonDepartureEvents per iteration for the given mode and returns the numbers from the previous iteration
@@ -47,6 +48,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
+	private static final MutableInt ZERO =  new MutableInt(0);
 
 	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
@@ -95,8 +97,9 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 		return Math.floor(time / timeBinSize);
 	}
 
-	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		return previousIterationDepartures.getOrDefault(bin, Collections.emptyMap());
+		Map<String, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin, Collections.emptyMap());
+		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
 	}
 }

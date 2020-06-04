@@ -37,6 +37,7 @@ import org.matsim.pt.PtConstants;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.ToIntFunction;
 
 /**
  * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
@@ -50,6 +51,7 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
+	private static final MutableInt ZERO =  new MutableInt(0);
 
 	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
@@ -58,9 +60,10 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 		eventsManager.addHandler(this);
 	}
 
-	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		return activityEndsPerTimeBinAndZone.getOrDefault(bin, Collections.emptyMap());
+		Map<String, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin, Collections.emptyMap());
+		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
 	}
 
 	@Override

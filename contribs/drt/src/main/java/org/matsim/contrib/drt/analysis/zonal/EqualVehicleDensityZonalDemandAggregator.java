@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.ToIntFunction;
 
 /**
  * This class does not really calculate the expected demand but aims to
@@ -40,13 +41,14 @@ import java.util.Map;
 public class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
 
 	private final Map<String, MutableInt> vehiclesPerZone = new HashMap<>();
+	private static final MutableInt ZERO =  new MutableInt(0);
 
 	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem, @NotNull FleetSpecification fleetSpecification) {
 		this.compute(zonalSystem,fleetSpecification.getVehicleSpecifications().size());
 	}
 
-	public Map<String, MutableInt> getExpectedDemandForTimeBin(double time) {
-		return vehiclesPerZone;
+	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
+		return zoneId-> vehiclesPerZone.getOrDefault(zoneId,ZERO).intValue();
 	}
 
 	private void compute(@NotNull DrtZonalSystem zonalSystem, int fleetSize) {
