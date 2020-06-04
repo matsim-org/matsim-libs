@@ -52,12 +52,13 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
 	private final ForkJoinPool forkJoinPool;
-	private final ParallelMultiVehicleInsertionProblem insertionProblem;
+	private final MultiVehicleInsertionProblem<PathData> insertionProblem;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
 			VehicleData.EntryFactory vehicleDataEntryFactory, PathDataProvider pathDataProvider,
-			InsertionCostCalculator.PenaltyCalculator penaltyCalculator, QSimScopeForkJoinPoolHolder forkJoinPoolHolder) {
+			InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
+			QSimScopeForkJoinPoolHolder forkJoinPoolHolder) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
