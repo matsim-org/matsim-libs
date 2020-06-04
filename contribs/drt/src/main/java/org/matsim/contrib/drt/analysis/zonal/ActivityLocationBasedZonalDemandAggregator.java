@@ -61,14 +61,12 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
-	private final Set<Id<Person>> persons;
 	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 
-	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, Set<Id<Person>> personsToBeMonitored, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
-		this.persons = personsToBeMonitored;
 		//self-registration
 		eventsManager.addHandler(this);
 	}
