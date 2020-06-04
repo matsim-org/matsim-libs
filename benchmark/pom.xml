@@ -38,6 +38,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/benchmark.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
