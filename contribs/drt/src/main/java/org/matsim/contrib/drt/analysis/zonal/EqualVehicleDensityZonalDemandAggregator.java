@@ -23,7 +23,6 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 import javax.validation.constraints.NotNull;
