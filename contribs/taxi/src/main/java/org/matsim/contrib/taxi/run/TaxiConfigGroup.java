@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
@@ -151,6 +152,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
 
+	@NotNull
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	public TaxiConfigGroup() {
@@ -440,10 +442,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@Override
 	public void addParameterSet(ConfigGroup set) {
 		if (set instanceof AbstractTaxiOptimizerParams) {
-			if (taxiOptimizerParams != null) {
-				throw new IllegalStateException(
-						"Remove the existing taxi optimizer parameter set before adding a new one");
-			}
+			Preconditions.checkState(taxiOptimizerParams == null,
+					"Remove the existing taxi optimizer parameter set before adding a new one");
 			taxiOptimizerParams = (AbstractTaxiOptimizerParams)set;
 		}
 
@@ -453,9 +453,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@Override
 	public boolean removeParameterSet(ConfigGroup set) {
 		if (set instanceof AbstractTaxiOptimizerParams) {
-			if (taxiOptimizerParams == null) {
-				throw new IllegalStateException("The existing taxi optimizer param set is null. Cannot remove it.");
-			}
+			Preconditions.checkState(taxiOptimizerParams != null,
+					"The existing taxi optimizer param set is null. Cannot remove it.");
 			taxiOptimizerParams = null;
 		}
 
