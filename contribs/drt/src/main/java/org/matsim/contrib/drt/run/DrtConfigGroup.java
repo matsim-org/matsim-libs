@@ -194,8 +194,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private boolean plotDetailedCustomerStats = true;
 
 	@Positive
-	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
-			MultiInsertionDetourPathCalculator.MAX_THREADS);
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
