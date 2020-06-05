@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,34 +20,45 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.matsim.api.core.v01.Id;
+import com.opencsv.CSVWriter;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.collections.Tuple;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-/**
- * @author jbischoff
- */
-public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, ActivityStartEventHandler, IterationEndsListener {
 
-	private Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
-	private Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
+	private final MatsimServices services;
 
-	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
-		events.addHandler(this);
+	private Map<String, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
+
+	public ZonalIdleVehicleXYVisualiser(MatsimServices services, DrtZonalSystem zonalSystem) {
+		this.services = services;
+		services.getEvents().addHandler(this);
 		this.zonalSystem = zonalSystem;
+		initEntryMap();
+	}
+
+	private void initEntryMap() {
 		for (String z : zonalSystem.getZones().keySet()) {
-			vehiclesPerZone.put(z, new LinkedList<Id<DvrpVehicle>>());
+			LinkedList<Tuple<Double,Integer>> list = new LinkedList<>();
+			list.add(new Tuple<Double,Integer>(0d,0));
+			zoneEntries.put(z, list);
 		}
 	}
 
@@ -55,18 +67,16 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
-				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
-				vehiclesPerZone.get(zone).add(vid);
-				zonePerVehicle.put(vid, zone);
+				Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
+				zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
 			}
 		}
 
 		if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
-				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
-				zonePerVehicle.remove(vid);
-				vehiclesPerZone.get(zone).remove(vid);
+				Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
+				zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
 			}
 		}
 
@@ -77,16 +87,35 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
 			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
-
-				Id<DvrpVehicle> vid = Id.create(event.getPersonId(), DvrpVehicle.class);
-				zonePerVehicle.remove(vid);
-				vehiclesPerZone.get(zone).remove(vid);
-
+				Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
+				zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
 			}
 		}
 	}
 
-	public LinkedList<Id<DvrpVehicle>> getIdleVehiclesPerZone(String zone) {
-		return this.vehiclesPerZone.get(zone);
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		String filename = services.getControlerIO().getIterationFilename(services.getIterationNumber(), "idleVehiclesPerZoneXY.csv");
+
+		try {
+			CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");
+			writer.writeNext(new String[]{"zone", "X", "Y", "time", "idleDRTVehicles"}, false);
+			this.zoneEntries.forEach( (zone, entriesList) -> {
+				Point p = zonalSystem.getZone(zone).getCentroid();
+				double x = p.getX();
+				double y = p.getY();
+				entriesList.forEach(entry -> writer.writeNext(new String[]{zone, "" + x, "" + y, "" + entry.getFirst(), "" + entry.getSecond()}, false));
+			});
+
+			writer.close();
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
 	}
+
+	@Override
+	public void reset(int iteration) {
+		initEntryMap();
+	}
+
 }
