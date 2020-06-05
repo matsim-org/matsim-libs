@@ -27,6 +27,6 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 /**
  * @author michalm
  */
-public interface MultiVehicleInsertionProblem<D> {
+public interface DrtInsertionSearch<D> {
 	Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
 }

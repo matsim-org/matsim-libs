@@ -35,7 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem<PathData> {
+public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final ExtensiveInsertionSearchParams insertionParams;
 
 	// step 1: initial filtering out feasible insertions
@@ -47,8 +47,8 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final PathDataProvider pathDataProvider;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
-	public ParallelMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+	public ExtensiveInsertionSearch(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer,
+			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.pathDataProvider = pathDataProvider;
 		this.forkJoinPool = forkJoinPool;
 

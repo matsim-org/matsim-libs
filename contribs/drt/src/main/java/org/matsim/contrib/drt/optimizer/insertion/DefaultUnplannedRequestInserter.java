@@ -52,7 +52,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
 	private final ForkJoinPool forkJoinPool;
-	private final MultiVehicleInsertionProblem<PathData> insertionProblem;
+	private final DrtInsertionSearch<PathData> insertionProblem;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
@@ -67,7 +67,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
 		this.forkJoinPool = forkJoinPoolHolder.getPool();
 
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
+		insertionProblem = new ExtensiveInsertionSearch(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
 				penaltyCalculator);
 	}
 
