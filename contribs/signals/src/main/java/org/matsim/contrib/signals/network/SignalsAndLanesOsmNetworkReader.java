@@ -105,11 +105,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	//TODO I added this one: sbraun24102019
 	private final static String IS_ORIG_LANE = "isOrigLane";
 
+	private final String OSM_TURN_INFO = "osmTurnInfo";
 
 
 	// specify turn restrictions of lanes without turn:lanes information on OSM
 	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
 	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
+	private final boolean SAVE_TURN_LANES = false;
+
 	public enum MiddleLaneRestriction {
 		REGULATION_BASED, // all turns are allowed from middle lanes, except u-turns
 		REALISTIC // only straight traffic allowed from middle lanes
@@ -154,12 +157,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	public static void main(String[] args) {
 //		String inputOSM = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/osm/brandenburg.osm";
 //		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
-//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/brandenburg-latest.osm";
+		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
-		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_05_11";
+//		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_05_29";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -187,20 +190,42 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.setMakePedestrianSignals(false);         //TODO check was passiert
 //		reader.setMakePedestrianSignals(false);
 
-		//spree neisse
-		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
-		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
-		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
-		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 4);
-		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 5);
-		//cottbus innenstadt
-		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 6);
-		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 7);
-		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 8);
 
+		//nur Cottbus
+//		//spree neisse
+//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
+//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
+//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
+//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 4);
+//		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 5);
+//		//cottbus innenstadt
+//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 6);
+//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 7);
+//		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 8);
 
-		//reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
+//Cottbus
+//		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
+
+		//nur Berlin
+		//spree neisse
+		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 1);
+		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 2);
+		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 3);
+		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 4);
+		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 5);
+		//cottbus innenstadt
+		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 6);
+		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 7);
+		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 8);
+
+
+//Berlin
+//		reader.setBoundingBox(52.44844, 13.25544, 52.57667, 13.52695); // setting Bounding Box for signals and lanes
+		reader.setBoundingBox(52.47, 13.3, 52.57, 13.5); // setting Bounding Box for signals and lanes
+
+		// (south,west,north,east)
+
 		reader.parse(inputOSM);
 		reader.stats();
 
@@ -300,9 +325,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	public void setBoundingBox(double south, double west, double north, double east) {
-		Coord nw = this.transform.transform(new Coord(west, north));
-		Coord se = this.transform.transform(new Coord(east, south));
-		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
+	    if (north > south && east > west) {
+            Coord nw = this.transform.transform(new Coord(west, north));
+            Coord se = this.transform.transform(new Coord(east, south));
+            this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
+        } else {
+	        LOG.warn("Invalid Bounding Box. Use Reader without.");
+        }
 	}
 
     public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
@@ -356,13 +385,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		findingFourNodeJunctions(addingNodes, checkedNodes);
+		LOG.info("Found all Four-Node-Junctions");
 
 		findingMoreNodeJunctions(addingNodes, checkedNodes);
+		LOG.info("Found all More-Node-Junctions");
 
 		findingTwoNodeJunctions(addingNodes, checkedNodes);
+		LOG.info("Found all Two-Node-Junctions");
+
 
 		if (this.mergeOnewaySignalSystems)
+			LOG.info("Start merging One-Way Signalsystems...");
 			mergeOnewaySignalSystems(addingNodes, checkedNodes);
+			LOG.info("Done merging One-Way Signalsystems...");
 
 		for (OsmNode node : addingNodes) {
 			super.nodes.put(node.id, node);
@@ -372,6 +407,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		addingNodes.clear();
 		checkedNodes.clear();
 		// TODO check and clean this methods
+		LOG.info("Finished simplification of OSM-Data");
+
 	}
 	
 	/**
@@ -437,7 +474,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		//sbraun 07052020 add Network Cleaner here to create plans on the precleaned network
+		LOG.info("Start precleaning Network before Creation of the Signal plans.");
 		new NetworkCleaner().run(network);
+
 
 		for (Link link : network.getLinks().values()) {
 			if (lanes.getLanesToLinkAssignments().get(link.getId()) != null) {
@@ -620,61 +659,65 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		}
 
 	}
-
+	//added check if node is in bbox for speed up -> is that right
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
-			List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
-			if (signalizedOsmNodes.contains(node.id) && isNodeAtJunction(node) 
-					&& !oldToMergedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
-				junctionNodes.add(node);
-				for (OsmNode otherNode : this.nodes.values()) {
-                    if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
-							&& NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
-                            otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
-							&& !oldToMergedJunctionNodeMap.containsKey(otherNode.id)
-							&& hasNodeOneway(otherNode)) {
-						junctionNodes.add(otherNode);
+			if (this.bbox.contains(node.coord)) {
+				List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
+				if (signalizedOsmNodes.contains(node.id) && isNodeAtJunction(node)
+						&& !oldToMergedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
+					junctionNodes.add(node);
+					for (OsmNode otherNode : this.nodes.values()) {
+						if (this.bbox.contains(otherNode.coord)) {
+							if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
+									&& NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
+									otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
+									&& !oldToMergedJunctionNodeMap.containsKey(otherNode.id)
+									&& hasNodeOneway(otherNode)) {
+								junctionNodes.add(otherNode);
+							}
+						}
 					}
 				}
-			}
 //TODo this seems to be used several times
-			if (junctionNodes.size() > 1) {
-				double repXmin = 0;
-				double repXmax = 0;
-				double repYmin = 0;
-				double repYmax = 0;
-				double repX;
-				double repY;
-				for (OsmNode tempNode : junctionNodes) {
-					if (repXmin == 0 || tempNode.coord.getX() < repXmin)
-						repXmin = tempNode.coord.getX();
-					if (repXmax == 0 || tempNode.coord.getX() > repXmax)
-						repXmax = tempNode.coord.getX();
-					if (repYmin == 0 || tempNode.coord.getY() < repYmin)
-						repYmin = tempNode.coord.getY();
-					if (repYmax == 0 || tempNode.coord.getY() > repYmax)
-						repYmax = tempNode.coord.getY();
-				}
-				repX = repXmin + (repXmax - repXmin) / 2;
-				repY = repYmin + (repYmax - repYmin) / 2;
-				BoundingBox box = new BoundingBox(repYmin, repXmin, repYmax, repXmax);
-				for (OsmNode betweenNode : this.nodes.values()) {
-					if (box.contains(betweenNode.coord))
-						junctionNodes.add(betweenNode);
-				}
-				OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
-				signalizedOsmNodes.add(junctionNode.id);
-				junctionNode.used = true;
-				for (OsmNode tempNode : junctionNodes) {
-					// TODO tempNode.used = false; node in way ersetzen -> repJunNode nicht noetig?!
-					oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
-					if (osmNodeRestrictions.containsKey(tempNode.id)) {
-						osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
+				if (junctionNodes.size() > 1) {
+					double repXmin = 0;
+					double repXmax = 0;
+					double repYmin = 0;
+					double repYmax = 0;
+					double repX;
+					double repY;
+					for (OsmNode tempNode : junctionNodes) {
+						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
+							repXmin = tempNode.coord.getX();
+						if (repXmax == 0 || tempNode.coord.getX() > repXmax)
+							repXmax = tempNode.coord.getX();
+						if (repYmin == 0 || tempNode.coord.getY() < repYmin)
+							repYmin = tempNode.coord.getY();
+						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
+							repYmax = tempNode.coord.getY();
 					}
-					checkedNodes.add(tempNode);
+					repX = repXmin + (repXmax - repXmin) / 2;
+					repY = repYmin + (repYmax - repYmin) / 2;
+					BoundingBox box = new BoundingBox(repYmin, repXmin, repYmax, repXmax);
+					for (OsmNode betweenNode : this.nodes.values()) {
+						if (box.contains(betweenNode.coord))
+							junctionNodes.add(betweenNode);
+					}
+					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
+					signalizedOsmNodes.add(junctionNode.id);
+					junctionNode.used = true;
+					for (OsmNode tempNode : junctionNodes) {
+						// TODO tempNode.used = false; node in way ersetzen -> repJunNode nicht noetig?!
+						oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
+						if (osmNodeRestrictions.containsKey(tempNode.id)) {
+							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));
+						}
+						checkedNodes.add(tempNode);
+					}
+					addingNodes.add(junctionNode);
+					id++;
 				}
-				addingNodes.add(junctionNode);
-				id++;
 			}
 		}
 	}
@@ -957,7 +1000,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 	}
-
+	//TODO add bounding box check here
 	private void findingFourNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
 			if (!checkedNodes.contains(node) && node.used && signalizedOsmNodes.contains(node.id)
@@ -1855,16 +1898,21 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int indexLane2 = indexLane1+1; indexLane2 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane2++) {
 					Lane lane2 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane2, Lane.class));
 					//TODO check if this is sensible. I added the if ToLinkList==null to make it work ---sbraun 20191024
-					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
-						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
+ 					try {
+						if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
+							for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
 //							if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { //TODO---> makes more sense???
-							if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
-								break mergeCheck; // the lanes have not the same to-links
+								if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
+									break mergeCheck; // the lanes have not the same to-links
+								}
 							}
+							// lane2 has the same outgoing links as lane1. save it as to be merged
+							lanesToBeRemoved.add(lane2.getId());
+							lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 						}
-						// lane2 has the same outgoing links as lane1. save it as to be merged
-						lanesToBeRemoved.add(lane2.getId());
-						lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
+					} catch (Exception e) {
+ 						LOG.warn("Error when trying to merge lanes on "+link.getId().toString());
+						e.printStackTrace();
 					}
 				}
 			}
@@ -1900,7 +1948,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = 4;
 				} else if (directionsPerLane[j].equals("reverse")) {
 					tempDir = 5;
-				} else if (directionsPerLane[j].equals("through")) {
+				} else if (directionsPerLane[j].equals("none") || //29052020 geändert zu geradeausfahren als default
+						directionsPerLane[j].equals("through") ||
+						directionsPerLane[j].equals("")) {
 					tempDir = 0;
 				} else if (directionsPerLane[j].equals("right")) {
 					tempDir = -1;
@@ -1910,7 +1960,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = -3;
 				} else if (directionsPerLane[j].equals("merge_to_left")) {
 					tempDir = -5;
-				} else if (directionsPerLane[j].equals("none") || directionsPerLane[j].equals(null)) {
+				} else if (directionsPerLane[j].equals(null)) { //TODO Lane wird gelöscht
 					tempDir = null;
 				} else {
 					tempDir = null;
@@ -2018,135 +2068,140 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	private void setToLinksForLanesDefault(Link link, List<LinkVector> toLinks) {
-		int straightLink = 0;
-		int reverseLink = 0;
-		int straightestLink = 0;
-		for (int i = 1; i < toLinks.size(); i++) {
-			if (Math.abs(toLinks.get(i).getRotation() - Math.PI) < Math
-					.abs(toLinks.get(straightLink).getRotation() - Math.PI))
-				straightLink = i;
-			if (Math.abs(toLinks.get(i).getRotation() - Math.PI) > Math
-					.abs(toLinks.get(reverseLink).getRotation() - Math.PI))
-				reverseLink = i;
-		}
-		if (toLinks.get(straightLink).getRotation() < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
-				|| toLinks.get(straightLink).getRotation() > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI) {
-			straightestLink = straightLink;
-			straightLink = -1;
-		}
-		if (toLinks.get(reverseLink).getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI
-				&& toLinks.get(reverseLink).getRotation() < (2. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
-			reverseLink = -1;
-		if (toLinks.size() == 1) {
-			lanes.getLanesToLinkAssignments().remove(link.getId());
-			return;
-		}
-		if (toLinks.size() == 2 && reverseLink >= 0) {
-			lanes.getLanesToLinkAssignments().remove(link.getId());
-			return;
-		}
-
-		if (lanes.getLanesToLinkAssignments().containsKey(link.getId()) && toLinks.size() > 1) {
-			{
-				// add right turn
-				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-				if (reverseLink != 0)
-					lane.addToLinkId(toLinks.get(0).getLink().getId());
-				else
-					lane.addToLinkId(toLinks.get(1).getLink().getId());
-				lane.setAlignment(-2);
-				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
-				
-				// add left turn
-				lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
-				if (reverseLink != -1)
-					lane.addToLinkId(toLinks.get(reverseLink).getLink().getId());
-				if (reverseLink == toLinks.size() - 1)
-					lane.addToLinkId(toLinks.get(toLinks.size() - 2).getLink().getId());
-				else
-					lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
-				lane.setAlignment(2);
-				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
+		try {
+			int straightLink = 0;
+			int reverseLink = 0;
+			int straightestLink = 0;
+			for (int i = 1; i < toLinks.size(); i++) {
+				if (Math.abs(toLinks.get(i).getRotation() - Math.PI) < Math
+						.abs(toLinks.get(straightLink).getRotation() - Math.PI))
+					straightLink = i;
+				if (Math.abs(toLinks.get(i).getRotation() - Math.PI) > Math
+						.abs(toLinks.get(reverseLink).getRotation() - Math.PI))
+					reverseLink = i;
+			}
+			if (toLinks.get(straightLink).getRotation() < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
+					|| toLinks.get(straightLink).getRotation() > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI) {
+				straightestLink = straightLink;
+				straightLink = -1;
+			}
+			if (toLinks.get(reverseLink).getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI
+					&& toLinks.get(reverseLink).getRotation() < (2. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
+				reverseLink = -1;
+			if (toLinks.size() == 1) {
+				lanes.getLanesToLinkAssignments().remove(link.getId());
+				return;
+			}
+			if (toLinks.size() == 2 && reverseLink >= 0) {
+				lanes.getLanesToLinkAssignments().remove(link.getId());
+				return;
 			}
 
-			if (!OUTER_LANE_TYPE.equals(OuterLaneRestriction.RESTRICTIVE)) {
-				// add straight turn to right lane
-				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-				if (reverseLink != 0)
-					lane.addToLinkId(toLinks.get(1).getLink().getId());
-				else if (straightLink != 1)
-					lane.addToLinkId(toLinks.get(2).getLink().getId());
-				lane.setAlignment(-1);
-				if (OUTER_LANE_TYPE.equals(OuterLaneRestriction.NON_RESTRICTIVE)) {
-					// add straight turn to left lane
+			if (lanes.getLanesToLinkAssignments().containsKey(link.getId()) && toLinks.size() > 1) {
+				{
+					// add right turn
+					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+							.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
+					if (reverseLink != 0)
+						lane.addToLinkId(toLinks.get(0).getLink().getId());
+					else
+						lane.addToLinkId(toLinks.get(1).getLink().getId());
+					lane.setAlignment(-2);
+					//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
+
+					// add left turn
 					lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 							.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
-					if (straightLink < toLinks.size() - 2) {
-						if (reverseLink == toLinks.size() - 1)
-							lane.addToLinkId(toLinks.get(toLinks.size() - 3).getLink().getId());
-						else
-							lane.addToLinkId(toLinks.get(toLinks.size() - 2).getLink().getId());
-					}
-					lane.setAlignment(1);
+					if (reverseLink != -1)
+						lane.addToLinkId(toLinks.get(reverseLink).getLink().getId());
+					if (reverseLink == toLinks.size() - 1)
+						lane.addToLinkId(toLinks.get(toLinks.size() - 2).getLink().getId());
+					else
+						lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
+					lane.setAlignment(2);
+					//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
 				}
-			}
-			// check for all toLinks can be reached. If not, add to right Lane
-			if (link.getNumberOfLanes() == 2) {
-				Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
-				Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-				for (LinkVector lvec : toLinks) {
-					if (!leftLane.getToLinkIds().contains(lvec.getLink().getId())
-							&& !rightLane.getToLinkIds().contains(lvec.getLink().getId()))
-						rightLane.addToLinkId(lvec.getLink().getId());
-				}
-			}
 
-			int midLink = -1;
-			{
-				// add straight turns to middle lanes
-				for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
+				if (!OUTER_LANE_TYPE.equals(OuterLaneRestriction.RESTRICTIVE)) {
+					// add straight turn to right lane
 					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-							.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-					if (straightLink >= 0) {
-						lane.addToLinkId(toLinks.get(straightLink).getLink().getId());
-						midLink = straightLink;
-					} else {
-						lane.addToLinkId(toLinks.get(straightestLink).getLink().getId());
-						midLink = straightestLink;
+							.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
+					if (reverseLink != 0)
+						lane.addToLinkId(toLinks.get(1).getLink().getId());
+					else if (straightLink != 1)
+						lane.addToLinkId(toLinks.get(2).getLink().getId());
+					lane.setAlignment(-1);
+					if (OUTER_LANE_TYPE.equals(OuterLaneRestriction.NON_RESTRICTIVE)) {
+						// add straight turn to left lane
+						lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+								.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
+						if (straightLink < toLinks.size() - 2) {
+							if (reverseLink == toLinks.size() - 1)
+								lane.addToLinkId(toLinks.get(toLinks.size() - 3).getLink().getId());
+							else
+								lane.addToLinkId(toLinks.get(toLinks.size() - 2).getLink().getId());
+						}
+						lane.setAlignment(1);
 					}
-					//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
 				}
-			}
+				// check for all toLinks can be reached. If not, add to right Lane
+				if (link.getNumberOfLanes() == 2) {
+					Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+							.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
+					Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+							.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
+					for (LinkVector lvec : toLinks) {
+						if (!leftLane.getToLinkIds().contains(lvec.getLink().getId())
+								&& !rightLane.getToLinkIds().contains(lvec.getLink().getId()))
+							rightLane.addToLinkId(lvec.getLink().getId());
+					}
+				}
 
-			if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REGULATION_BASED)) {
-				// add all other out-links except u-turn to middle lanes
-				for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
-					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-							.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-					if (midLink > 0 && (midLink - 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
-						lane.addToLinkId(toLinks.get(midLink - 1).getLink().getId());
-					if (midLink < toLinks.size() - 1 && (midLink + 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
-						lane.addToLinkId(toLinks.get(midLink + 1).getLink().getId());
+				int midLink = -1;
+				{
+					// add straight turns to middle lanes
+					for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
+						Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+								.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
+						if (straightLink >= 0) {
+							lane.addToLinkId(toLinks.get(straightLink).getLink().getId());
+							midLink = straightLink;
+						} else {
+							lane.addToLinkId(toLinks.get(straightestLink).getLink().getId());
+							midLink = straightestLink;
+						}
+						//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
+					}
+				}
+
+				if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REGULATION_BASED)) {
+					// add all other out-links except u-turn to middle lanes
+					for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
+						Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+								.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
+						if (midLink > 0 && (midLink - 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
+							lane.addToLinkId(toLinks.get(midLink - 1).getLink().getId());
+						if (midLink < toLinks.size() - 1 && (midLink + 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
+							lane.addToLinkId(toLinks.get(midLink + 1).getLink().getId());
+					}
+				}
+				// check for all toLinks can be reached. If not, add to second farthest right
+				// Lane
+				if (link.getNumberOfLanes() > 2) {
+					List<Id<Link>> coveredLinks = new ArrayList<Id<Link>>();
+					Lane laneToPutTo = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+							.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes() - 1), Lane.class));
+					for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values())
+						coveredLinks.addAll(lane.getToLinkIds());
+					for (LinkVector lvec : toLinks) {
+						if (!coveredLinks.contains(lvec.getLink().getId()))
+							laneToPutTo.addToLinkId(lvec.getLink().getId());
+					}
 				}
 			}
-			// check for all toLinks can be reached. If not, add to second farthest right
-			// Lane
-			if (link.getNumberOfLanes() > 2) {
-				List<Id<Link>> coveredLinks = new ArrayList<Id<Link>>();
-				Lane laneToPutTo = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-						.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes() - 1), Lane.class));
-				for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values())
-					coveredLinks.addAll(lane.getToLinkIds());
-				for (LinkVector lvec : toLinks) {
-					if (!coveredLinks.contains(lvec.getLink().getId()))
-						laneToPutTo.addToLinkId(lvec.getLink().getId());
-				}
-			}
+		} catch (Exception e) {
+			LOG.warn("Could not set Links for Lane Defaults for Link "+link.getId().toString());
+			e.printStackTrace();
 		}
 	}
 
@@ -2207,21 +2262,69 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (tempLinks.size() == 1) { // if there is just one "right"
 					// link, take it
 					lane.addToLinkId(tempLinks.get(0).getLink().getId());
+                    if (this.SAVE_TURN_LANES ==true) {
+						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
+						} else {
+							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|right");
+						}
+					}
+//                    lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
 				} else if (tempLinks.size() == 2) {
 					if (tempDir == -1) { // lane direction: "right"
-						for (LinkVector lvec : tempLinks)
+						for (LinkVector lvec : tempLinks) {
 							lane.addToLinkId(lvec.getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|right");
+								}
+							}
+//                            lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
+						}
 					}
 					if (tempDir == -2) { // lane direction: "slight_right"
-						if (tempLinks.get(0).dirTheta < Math.PI / 2.)
-							lane.addToLinkId(tempLinks.get(1).getLink().getId());
-						else
-							lane.addToLinkId(tempLinks.get(0).getLink().getId());
+						if (tempLinks.get(0).dirTheta < Math.PI / 2.) {
+                            lane.addToLinkId(tempLinks.get(1).getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_right");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|slight_right");
+								}
+							}
+//                            lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_right");
+                        } else {
+                            lane.addToLinkId(tempLinks.get(0).getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_right");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|slight_right");
+								}
+							}
+						}
 					}
 					if (tempDir == -3) // lane direction: "sharp_right"
 						lane.addToLinkId(tempLinks.get(0).getLink().getId());
+					if (this.SAVE_TURN_LANES ==true) {
+						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, "sharp_right");
+						} else {
+							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|sharp_right");
+						}
+					}
+//					    lane.getAttributes().putAttribute(OSM_TURN_INFO,"sharp_right");
 				} else {
+					//TODO hier lieber geradeaus sbraun29052020 check ob tempDir==null
 					lane.addToLinkId(toLinks.get(0).getLink().getId());
+                    //lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
 				}
 				lane.setAlignment(-2);
 			}
@@ -2237,28 +2340,91 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (tempLinks.size() == 1) { // if there is just one "left"
 					// link, take it
 					lane.addToLinkId(tempLinks.get(0).getLink().getId());
+					if (this.SAVE_TURN_LANES ==true) {
+						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, "left");
+						} else {
+							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|left");
+						}
+					}
 				} else if (tempLinks.size() == 2) {
 					if (tempDir == 1) { // lane direction: "left"
-						for (LinkVector lvec : tempLinks)
-							// TODO does this make sense? it means:
-							// add link as to-link, if it is not the reverse link OR the link has only one lane OR u-turn is allowed at any lane
-							if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly)
-								lane.addToLinkId(lvec.getLink().getId());
+						for (LinkVector lvec : tempLinks) {
+                            // TODO does this make sense? it means:
+                            // add link as to-link, if it is not the reverse link OR the link has only one lane OR u-turn is allowed at any lane
+                            if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly) {
+                                lane.addToLinkId(lvec.getLink().getId());
+								if (this.SAVE_TURN_LANES ==true) {
+									if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+										lane.getAttributes().putAttribute(OSM_TURN_INFO, "left");
+									} else {
+										String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+										lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|left");
+									}
+								}
+                            }
+                        }
 					}
 					if (tempDir == 2) { // lane direction: "slight_left"
-						if (tempLinks.get(1).dirTheta > 3. * Math.PI / 2. || !tempLinks.get(1).equals(reverseLink))
-							lane.addToLinkId(tempLinks.get(0).getLink().getId());
-						else
+						if (tempLinks.get(1).dirTheta > 3. * Math.PI / 2. || !tempLinks.get(1).equals(reverseLink)) {
+                            lane.addToLinkId(tempLinks.get(0).getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_left");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|slight_left");
+								}
+							}
+                            //lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_left");
+                        }else{
 							lane.addToLinkId(tempLinks.get(1).getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_left");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|slight_left");
+								}
+							}
+						}
 					}
-					if (tempDir == 3) // lane direction: "sharp_left"
-						lane.addToLinkId(tempLinks.get(1).getLink().getId());
+					if (tempDir == 3) { // lane direction: "sharp_left"
+                        lane.addToLinkId(tempLinks.get(1).getLink().getId());
+						if (this.SAVE_TURN_LANES ==true) {
+							if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+								lane.getAttributes().putAttribute(OSM_TURN_INFO, "sharp_left");
+							} else {
+								String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+								lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|sharp_left");
+							}
+						}
+                        //lane.getAttributes().putAttribute(OSM_TURN_INFO, "sharp_left");
+                    }
 				} else if (tempLinks.size() > 2) {
 					for (LinkVector lvec : tempLinks)
-						if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly)
-							lane.addToLinkId(lvec.getLink().getId());
+						if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly) {
+                            lane.addToLinkId(lvec.getLink().getId());
+							if (this.SAVE_TURN_LANES ==true) {
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, "left");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|left");
+								}
+							}
+                        }
 				} else {
 					lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
+					if (this.SAVE_TURN_LANES ==true) {
+						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, "left");
+						} else {
+							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|left");
+						}
+					}
 				}
 				if (alignmentAnte == 0)
 					lane.setAlignment(1);
@@ -2271,6 +2437,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 														// take it
 
 				lane.addToLinkId(throughLink.getLink().getId());
+				if (this.SAVE_TURN_LANES ==true) {
+					if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+						lane.getAttributes().putAttribute(OSM_TURN_INFO, "through");
+					} else {
+						String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+						lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|through");
+					}
+				}
+
 				if (alignmentAnte == -2)
 					lane.setAlignment(-1);
 			}
@@ -2278,18 +2453,34 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				// look for the most "backward" link (furthest from 180° or pi)
 				// and take it
 				alignmentAnte = lane.getAlignment();
-				if (alignmentAnte == 0 && lane.getToLinkIds().isEmpty())
+				System.out.print(alignmentAnte);
+				System.out.print(lane.getToLinkIds());
+				if (alignmentAnte == 0 && lane.getToLinkIds()!=null) {// || lane.getToLinkIds().isEmpty())) //sbraun26052020
+					if (lane.getToLinkIds().isEmpty())
 					alignmentAnte = -10;
-				lane.addToLinkId(reverseLink.getLink().getId());
+				}
+				if (reverseLink!=null) {
+					lane.addToLinkId(reverseLink.getLink().getId());
+				}
+				if (this.SAVE_TURN_LANES ==true) {
+					if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+						lane.getAttributes().putAttribute(OSM_TURN_INFO, "reverse");
+					} else {
+						String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+						lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|reverse");
+					}
+				}
 				if (alignmentAnte == 0)
 					lane.setAlignment(1);
 				else
 					lane.setAlignment(2);
 
 			}
-			if (lane.getToLinkIds().isEmpty()) {
+			if (lane.getToLinkIds()==null || lane.getToLinkIds().isEmpty()) {
 				LOG.warn("No toLink could be found for " + lane.getId());
-				lane.addToLinkId(toLinks.get(0).getLink().getId());
+				if (toLinks.get(0).getLink()!=null) {
+					lane.addToLinkId(toLinks.get(0).getLink().getId());
+				}
 			}
 			it++;
 		}
