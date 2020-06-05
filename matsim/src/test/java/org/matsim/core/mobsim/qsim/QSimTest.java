@@ -1095,6 +1095,7 @@ public class QSimTest {
 		sim.doSimStep(); // agent should be moved to qlink2.buffer
 		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(); // agent should be moved to qlink3
+		events.finishProcessing();
 
 		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
 		Assert.assertEquals(1, vehicles.size());

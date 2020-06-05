@@ -52,7 +52,9 @@ public final class ParallelEventsManager implements EventsManager {
 	private int iteration = 0;
 	private final BlockingQueue<EventArray> eventQueue;
 
-	private final int eventsQueueSize = 1048576 * 32;
+	// TODO - this should be configurable as it can have performance impact on large sims.
+	private final int eventsQueueSize = 65536;
+	//private final int eventsQueueSize = 1048576 * 32;
 	private final int eventsArraySize;
 
 	@Inject
