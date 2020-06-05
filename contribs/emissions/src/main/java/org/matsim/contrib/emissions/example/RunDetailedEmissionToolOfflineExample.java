@@ -91,10 +91,12 @@ public final class RunDetailedEmissionToolOfflineExample{
 
         EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
         emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+        eventsManager.initProcessing();
 
         MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
         matsimEventsReader.readFile(eventsFile);
 
+        eventsManager.finishProcessing();
         emissionEventWriter.closeFile();
 
     }

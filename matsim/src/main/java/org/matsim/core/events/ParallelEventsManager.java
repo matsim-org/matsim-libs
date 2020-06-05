@@ -289,8 +289,6 @@ public final class ParallelEventsManager implements EventsManager {
 								// termination criteria for the flush
 								if (eventQueue.isEmpty()) {
 									shouldFlush = false;
-									this.notify();
-									//Gbl.printCurrentThreadCpuTime();
 								}
 							}
 						}
@@ -351,7 +349,7 @@ public final class ParallelEventsManager implements EventsManager {
 		public void run() {
 			try {
 				while (true) {
-					EventArray events = this.eventsQueue.poll(10, TimeUnit.MILLISECONDS);
+					EventArray events = this.eventsQueue.poll(50, TimeUnit.MICROSECONDS);
 
 					if (events != null) {
 						for (int i = 0; i < events.size(); i++) {
@@ -363,10 +361,6 @@ public final class ParallelEventsManager implements EventsManager {
 					if (flush && this.eventsQueue.isEmpty()) {
 						synchronized (this) {
 							flush = false;
-						}
-
-						synchronized (this.distributor) {
-							this.distributor.notify();
 						}
 					}
 				}
