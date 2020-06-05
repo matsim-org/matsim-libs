@@ -25,7 +25,6 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -52,23 +51,20 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
 	private final ForkJoinPool forkJoinPool;
-	private final DrtInsertionSearch<PathData> insertionProblem;
+	private final DrtInsertionSearch<PathData> insertionSearch;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, PathDataProvider pathDataProvider,
-			InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
-			QSimScopeForkJoinPoolHolder forkJoinPoolHolder) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
+			ForkJoinPool forkJoinPool) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.insertionScheduler = insertionScheduler;
 		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
-		this.forkJoinPool = forkJoinPoolHolder.getPool();
-
-		insertionProblem = new ExtensiveInsertionSearch(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
-				penaltyCalculator);
+		this.forkJoinPool = forkJoinPool;
+		this.insertionSearch = insertionSearch;
 	}
 
 	@Override
@@ -83,7 +79,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			Optional<InsertionWithDetourData<PathData>> best = insertionProblem.findBestInsertion(req,
+			Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
 					vData.getEntries());
 			if (best.isEmpty()) {
 				eventsManager.processEvent(
