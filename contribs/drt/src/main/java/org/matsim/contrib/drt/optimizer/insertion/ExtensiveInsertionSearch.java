@@ -44,12 +44,12 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	// step 2: finding best insertion
 	private final ForkJoinPool forkJoinPool;
-	private final PathDataProvider pathDataProvider;
+	private final DetourPathCalculator detourPathCalculator;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
-	public ExtensiveInsertionSearch(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer,
+	public ExtensiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
 			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
-		this.pathDataProvider = pathDataProvider;
+		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
 
 		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
@@ -89,7 +89,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 				.map(InsertionWithDetourData::getInsertion).collect(Collectors.toList())).join();
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
-		DetourData<PathData> pathData = pathDataProvider.getPathData(drtRequest, filteredInsertions);
+		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, filteredInsertions);
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
 		// as possible, and then using a parallel stream does not make sense.
 		return bestInsertionFinder.findBestInsertion(drtRequest,

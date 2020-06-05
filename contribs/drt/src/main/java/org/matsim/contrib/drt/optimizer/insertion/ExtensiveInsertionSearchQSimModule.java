@@ -51,23 +51,23 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 	protected void configureQSim() {
 		bindModal(new TypeLiteral<DrtInsertionSearch<OneToManyPathSearch.PathData>>() {
 		}).toProvider(modalProvider(
-				getter -> new ExtensiveInsertionSearch(getter.getModal(PathDataProvider.class), drtCfg,
+				getter -> new ExtensiveInsertionSearch(getter.getModal(DetourPathCalculator.class), drtCfg,
 						getter.get(MobsimTimer.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
 						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
 
-		addModalComponent(ParallelPathDataProvider.class, new ModalProviders.AbstractProvider<>(getMode()) {
+		addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
 			@Override
-			public ParallelPathDataProvider get() {
+			public MultiInsertionDetourPathCalculator get() {
 				Network network = getModalInstance(Network.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
+				return new MultiInsertionDetourPathCalculator(network, travelTime, travelDisutility, drtCfg);
 			}
 		});
-		bindModal(PathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
+		bindModal(DetourPathCalculator.class).to(modalKey(MultiInsertionDetourPathCalculator.class));
 	}
 }

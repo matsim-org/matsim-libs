@@ -46,7 +46,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeCleanupListener {
+public class MultiInsertionDetourPathCalculator implements DetourPathCalculator, MobsimBeforeCleanupListener {
 
 	private static class DetourLinksSet {
 		final Map<Id<Link>, Link> pickupDetourStartLinks;
@@ -86,8 +86,9 @@ public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeC
 
 	private final ExecutorService executorService;
 
-	public ParallelPathDataProvider(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
+	public MultiInsertionDetourPathCalculator(Network network,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
+			DrtConfigGroup drtCfg) {
 		toPickupPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
 		fromPickupPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
 		toDropoffPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
@@ -97,7 +98,7 @@ public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeC
 	}
 
 	@Override
-	public DetourData<PathData> getPathData(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
+	public DetourData<PathData> calculatePaths(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
