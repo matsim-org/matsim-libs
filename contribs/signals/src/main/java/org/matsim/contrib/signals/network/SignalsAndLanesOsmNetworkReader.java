@@ -89,7 +89,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
 
-	//Define what a small Roundabout is (used in method findingSmallRoundabouts())
+	//Define what a small Roundabout is (used in method findingSmallRoundabouts()) - sbraun
 	private final double roundaboutRadius = 20;
 
 
@@ -111,7 +111,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// specify turn restrictions of lanes without turn:lanes information on OSM
 	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
 	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
-	private final boolean SAVE_TURN_LANES = false;
+	private final boolean SAVE_TURN_LANES = false; // add turn info as attribute in lane file
 
 	public enum MiddleLaneRestriction {
 		REGULATION_BASED, // all turns are allowed from middle lanes, except u-turns
@@ -188,11 +188,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
 		reader.setMakePedestrianSignals(false);         //TODO check was passiert
-//		reader.setMakePedestrianSignals(false);
 
 
-		//nur Cottbus
-//		//spree neisse
+		//fuer Cottbus
+		//spree neisse
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
@@ -203,12 +202,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 7);
 //		reader.setHierarchyLayer(51.820578,14.247866, 51.684789,14.507332, 8);
 
-//Cottbus
+        // BoundingBox Cottbus
 //		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
 
-		//nur Berlin
-		//spree neisse
+		// fuer Berlin
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 1);
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 2);
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 3);
@@ -220,8 +218,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.setHierarchyLayer(52.57667, 13.25544, 52.44844, 13.52695, 8);
 
 
-//Berlin
-//		reader.setBoundingBox(52.44844, 13.25544, 52.57667, 13.52695); // setting Bounding Box for signals and lanes
+        // BOundingBox Berlin
 		reader.setBoundingBox(52.47, 13.3, 52.57, 13.5); // setting Bounding Box for signals and lanes
 
 		// (south,west,north,east)
@@ -229,16 +226,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.parse(inputOSM);
 		reader.stats();
 
+
 		/*
-		 * Clean the Network. Cleaning means removing disconnected components, so that
-		 * afterwards there is a route from every link to every other link. This may not
-		 * be the case in the initial network converted from OpenStreetMap.
-		 */
-
-
-
-
-
+        Simplify the network except the juntions with signals as this might mess up already created plans
+        */
 		Set<Long> signalizedNodes = new HashSet<>();
 		for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()){
 			for (SignalData signaldata:signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()){
@@ -255,15 +246,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				signalizedNodes.add(temp2);
 
 			}
-
-
-			//.create("System" + Long.valueOf(node.getId().toString()), SignalSystem.class);
 		}
 
 		NetworkSimplifier netsimplify = new NetworkSimplifier();
 		netsimplify.setNodesNotToMerge(signalizedNodes);
 		netsimplify.run(network);
 
+        /*
+         * Clean the Network. Cleaning means removing disconnected components, so that
+         * afterwards there is a route from every link to every other link. This may not
+         * be the case in the initial network converted from OpenStreetMap.
+         */
 		new NetworkCleaner().run(network);
 		new LanesAndSignalsCleaner().run(scenario);
 		/*
@@ -278,28 +271,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		signalsWriter.setSignalGroupsOutputFilename(outputDir + "signalGroups.xml");
 		signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
 		signalsWriter.writeSignalsData(scenario);
-/*
-
-
-		String outputDir1 = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/OriginalReader/UseHighWayDefaults";
-		String outputDir2 = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/OriginalReader/NOTUseHighwayDefaults";
-
-		Config config1 = ConfigUtils.createConfig();
-		Scenario scenario1 = ScenarioUtils.createScenario(config1);
-		Network network1 = scenario1.getNetwork();
-		OsmNetworkReader reader1 = new OsmNetworkReader(network1, ct, true );
-		reader1.parse(inputOSM);
-		new NetworkCleaner().run(network1);
-		new NetworkWriter(network1).write(outputDir1+ "network.xml");
-
-		Config config2 = ConfigUtils.createConfig();
-		Scenario scenario2 = ScenarioUtils.createScenario(config2);
-		Network network2 = scenario2.getNetwork();
-		OsmNetworkReader reader2 = new OsmNetworkReader(network2, ct, false );
-		reader2.parse(inputOSM);
-		new NetworkCleaner().run(network2);
-		new org.matsim.api.core.v01.network.NetworkWriter(network2).write(outputDir2+ "network.xml");*/
-
 	}
 
 	public SignalsAndLanesOsmNetworkReader(Network network, CoordinateTransformation transformation,
@@ -323,7 +294,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		LOG.info("MATSim: # links with lanes created: " + this.lanes.getLanesToLinkAssignments().size());
 		LOG.info("MATSim: # signals created: " + this.systems.getSignalSystemData().size());
 	}
-
+    /*
+    Set Bounding Box in which signals and lanes are going to be created
+    If Bounding Box == null than signals/lanes are created for the whole network which might take a while...
+     */
 	public void setBoundingBox(double south, double west, double north, double east) {
 	    if (north > south && east > west) {
             Coord nw = this.transform.transform(new Coord(west, north));
@@ -337,7 +311,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
     public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
         this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
     }
-    //TODO That looks not good
+
     public void setUseRadiusReduction(boolean useRadiusReduction){
         this.useRadiusReduction = useRadiusReduction;
     }
@@ -359,12 +333,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	@Override
 	protected void preprocessOsmData() {
 		super.preprocessOsmData();
+		// The logic to merge small roundabouts is depreciated as the original reader is doing something similar anyway.
 //		simplifiyRoundaboutSignals();
 		pushSignalsIntoNearbyJunctions();
 		pushingSingnalsIntoEndpoints();
 		pushSignalsOverShortWays();
 		removeSignalsAtDeadEnds();
-		// TODO check and clean this methods
 	}
 
 	/**
@@ -393,11 +367,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		findingTwoNodeJunctions(addingNodes, checkedNodes);
 		LOG.info("Found all Two-Node-Junctions");
 
-
+        // This method the most time consuming as it has inner loops over all nodes.
 		if (this.mergeOnewaySignalSystems)
-			LOG.info("Start merging One-Way Signalsystems...");
+			LOG.info("Start merging One-Way signal systems...");
 			mergeOnewaySignalSystems(addingNodes, checkedNodes);
-			LOG.info("Done merging One-Way Signalsystems...");
+			LOG.info("Done merging One-Way signal systems...");
 
 		for (OsmNode node : addingNodes) {
 			super.nodes.put(node.id, node);
@@ -432,11 +406,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 
-		// TODO check and clean this method!
-//		for (Id<SignalSystem> set : this.systems.getSignalSystemData().keySet()) {
-//			LOG.warn(set.toString());
-//			this.systems.getSignalSystemData().get(set).
-//		}
 		// lanes were already created (via setOrModifyLinkAttributes()) but without toLinks. add toLinks now:
 
 		for (Link link : network.getLinks().values()) {
@@ -474,7 +443,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		//sbraun 07052020 add Network Cleaner here to create plans on the precleaned network
-		LOG.info("Start precleaning Network before Creation of the Signal plans.");
+		LOG.info("Start pre-cleaning network before Creation of the Signal plans.");
 		new NetworkCleaner().run(network);
 
 
@@ -505,20 +474,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 
-
-//		for (Id<SignalSystem> signalsystem : this.systems.getSignalSystemData().keySet()) {
-//			if (this.systems.getSignalSystemData().get(signalsystem).getSignalData() == null) {
-//				LOG.warn(signalsystem.toString()+" is missing SignalData");
-//			}
-//		}
-
-
-
+        //THis counts signals with only Oneway ie. pedestrian signals
 		int badCounter = 0;
-
-
 		for (Node node : network.getNodes().values()) {
-
 			Id<SignalSystem> systemId = Id.create("System" + Long.valueOf(node.getId().toString()), SignalSystem.class);
 			if (this.systems.getSignalSystemData().containsKey(systemId)) {
 				SignalSystemData signalSystem = this.systems.getSignalSystemData().get(systemId);
@@ -592,6 +550,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		LOG.info(badCounter);
 
+
+		/*
+		The following logic was added to remove bad/empty signal system as they were producing NullPointerExceptions
+		 */
 
 		//TODO BRUTE FORCE THIS LOGIC PRODUCES SIGNALSYSTEMS WITHOUT SIGNALDATA	OR WITHOUT LINKS/LANES -> delete them
 		Set<Id<SignalSystem>> badSignalSystemData= new HashSet<Id<SignalSystem>>();
@@ -679,7 +641,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						}
 					}
 				}
-//TODo this seems to be used several times
+
 				if (junctionNodes.size() > 1) {
 					double repXmin = 0;
 					double repXmax = 0;
