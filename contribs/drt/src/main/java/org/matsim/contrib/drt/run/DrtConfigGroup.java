@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.insertion.MultiInsertionDetourPathCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -194,8 +194,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private boolean plotDetailedCustomerStats = true;
 
 	@Positive
-	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
-			MultiInsertionDetourPathCalculator.MAX_THREADS);
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
@@ -643,6 +642,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 			case ExtensiveInsertionSearchParams.SET_NAME:
 				return new ExtensiveInsertionSearchParams();
+
+			case SelectiveInsertionSearchParams.SET_NAME:
+				return new SelectiveInsertionSearchParams();
 		}
 
 		return super.createParameterSet(type);

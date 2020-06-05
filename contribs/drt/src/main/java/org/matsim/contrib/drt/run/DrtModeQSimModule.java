@@ -30,8 +30,11 @@ import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
@@ -107,7 +110,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		install(new ExtensiveInsertionSearchQSimModule(drtCfg));
+		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
 
@@ -167,5 +170,19 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		}).asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
+	}
+
+	public static AbstractDvrpModeQSimModule getInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
+		switch (drtCfg.getDrtInsertionSearchParams().getName()) {
+			case ExtensiveInsertionSearchParams.SET_NAME:
+				return new ExtensiveInsertionSearchQSimModule(drtCfg);
+
+			case SelectiveInsertionSearchParams.SET_NAME:
+				return new SelectiveInsertionSearchQSimModule(drtCfg);
+
+			default:
+				throw new RuntimeException(
+						"Unsupported DRT insertion search type: " + drtCfg.getDrtInsertionSearchParams().getName());
+		}
 	}
 }
