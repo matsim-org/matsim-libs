@@ -289,6 +289,7 @@ public final class ParallelEventsManager implements EventsManager {
 								// termination criteria for the flush
 								if (eventQueue.isEmpty()) {
 									shouldFlush = false;
+									this.notify();
 								}
 							}
 						}
@@ -361,6 +362,9 @@ public final class ParallelEventsManager implements EventsManager {
 					if (flush && this.eventsQueue.isEmpty()) {
 						synchronized (this) {
 							flush = false;
+						}
+						synchronized (this.distributor) {
+							this.distributor.notify();
 						}
 					}
 				}
