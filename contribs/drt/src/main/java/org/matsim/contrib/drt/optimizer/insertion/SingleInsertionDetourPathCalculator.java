@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -73,14 +74,11 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
 		//TODO use Landmarks instead of AStarEuclidean
-		toPickupPathSearch = new FastAStarEuclideanFactory(OVERDO_FACTOR).createPathCalculator(network,
-				travelDisutility, travelTime);
-		fromPickupPathSearch = new FastAStarEuclideanFactory(OVERDO_FACTOR).createPathCalculator(network,
-				travelDisutility, travelTime);
-		toDropoffPathSearch = new FastAStarEuclideanFactory(OVERDO_FACTOR).createPathCalculator(network,
-				travelDisutility, travelTime);
-		fromDropoffPathSearch = new FastAStarEuclideanFactory(OVERDO_FACTOR).createPathCalculator(network,
-				travelDisutility, travelTime);
+		LeastCostPathCalculatorFactory pathCalculatorFactory = new FastAStarEuclideanFactory(OVERDO_FACTOR);
+		toPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
+		fromPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
+		toDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
+		fromDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		stopDuration = drtCfg.getStopDuration();
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
