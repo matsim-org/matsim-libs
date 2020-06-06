@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Positive;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -28,21 +28,23 @@ import javax.validation.constraints.DecimalMin;
 public class SelectiveInsertionSearchParams extends DrtInsertionSearchParams {
 	public static final String SET_NAME = "SelectiveInsertionSearch";
 
-	public static final String ADMISSIBLE_BEELINE_SPEED_FACTOR = "admissibleBeelineSpeedFactor";
-	@DecimalMin("1.0")
-	private double admissibleBeelineSpeedFactor = 1.5;
+	public static final String RESTRICTIVE_BEELINE_SPEED_FACTOR = "restrictiveBeelineSpeedFactor";
+	//use values that underestimate the actual speed, so the risk that the pre-filtering returns an insertion that
+	//violates time windows constraints (for existing passengers, given the actual path)
+	@Positive
+	private double restrictiveBeelineSpeedFactor = 0.5;
 
 	public SelectiveInsertionSearchParams() {
 		super(SET_NAME);
 	}
 
-	@StringGetter(ADMISSIBLE_BEELINE_SPEED_FACTOR)
-	public double getAdmissibleBeelineSpeedFactor() {
-		return admissibleBeelineSpeedFactor;
+	@StringGetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
+	public double getRestrictiveBeelineSpeedFactor() {
+		return restrictiveBeelineSpeedFactor;
 	}
 
-	@StringSetter(ADMISSIBLE_BEELINE_SPEED_FACTOR)
-	public void setAdmissibleBeelineSpeedFactor(double admissibleBeelineSpeedFactor) {
-		this.admissibleBeelineSpeedFactor = admissibleBeelineSpeedFactor;
+	@StringSetter(RESTRICTIVE_BEELINE_SPEED_FACTOR)
+	public void setRestrictiveBeelineSpeedFactor(double restrictiveBeelineSpeedFactor) {
+		this.restrictiveBeelineSpeedFactor = restrictiveBeelineSpeedFactor;
 	}
 }

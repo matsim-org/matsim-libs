@@ -10,7 +10,7 @@
 	<name>freight</name>
 
 	<properties>
-		<matsim.version>12.0-SNAPSHOT</matsim.version>
+		<matsim.version>13.0-SNAPSHOT</matsim.version>
 	</properties>
 
 	<build>
