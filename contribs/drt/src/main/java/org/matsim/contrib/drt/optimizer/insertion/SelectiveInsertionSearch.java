@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 /**
  * @author michalm
  */
-public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData> {
+public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final SelectiveInsertionSearchParams insertionParams;
 
 	// step 1: initial filtering out feasible insertions
@@ -46,8 +46,8 @@ public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData>
 	private final DetourPathCalculator detourPathCalculator;
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
-	public SelectiveDrtInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg,
-			MobsimTimer timer, ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+	public SelectiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
+			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
 
