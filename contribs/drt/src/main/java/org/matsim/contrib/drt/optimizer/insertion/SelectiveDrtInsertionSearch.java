@@ -38,7 +38,7 @@ public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData>
 	private final SelectiveInsertionSearchParams insertionParams;
 
 	// step 1: initial filtering out feasible insertions
-	private final DetourTimesProvider admissibleDetourTimesProvider;
+	private final DetourTimesProvider restrictiveDetourTimesProvider;
 	private final BestInsertionFinder<Double> initialInsertionFinder;
 
 	// step 2: finding best insertion
@@ -54,11 +54,11 @@ public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData>
 		insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 
 		// TODO use more sophisticated DetourTimeEstimator
-		double admissibleBeelineSpeed = insertionParams.getAdmissibleBeelineSpeedFactor()
+		double restrictiveBeelineSpeed = insertionParams.getRestrictiveBeelineSpeedFactor()
 				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
 
-		admissibleDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createBeelineTimeEstimator(admissibleBeelineSpeed));
+		restrictiveDetourTimesProvider = new DetourTimesProvider(
+				DetourTimeEstimator.createBeelineTimeEstimator(restrictiveBeelineSpeed));
 
 		initialInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue));
@@ -71,7 +71,7 @@ public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData>
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
-		DetourData<Double> admissibleTimeData = admissibleDetourTimesProvider.getDetourData(drtRequest);
+		DetourData<Double> restrictiveTimeData = restrictiveDetourTimesProvider.getDetourData(drtRequest);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<Insertion> bestInsertion = forkJoinPool.submit(
@@ -82,7 +82,7 @@ public class SelectiveDrtInsertionSearch implements DrtInsertionSearch<PathData>
 								//generate feasible insertions (wrt occupancy limits)
 								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 								//map them to insertions with admissible detour times
-								.map(admissibleTimeData::createInsertionWithDetourData))
+								.map(restrictiveTimeData::createInsertionWithDetourData))
 						.map(InsertionWithDetourData::getInsertion)).join();
 
 		if (bestInsertion.isEmpty()) {
