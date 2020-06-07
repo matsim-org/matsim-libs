@@ -174,24 +174,6 @@ public final class GridUtils {
 		return measuringPoints;
 	}
 
-
-	/**
-	 * returns a spatial grid for a given geometry (e.g. shape file) with a given grid size
-	 * @param boundary a boundary, e.g. from a shape file
-	 * @param gridSize side length of the grid
-	 * 
-	 * @return SpatialGrid storing accessibility values
-	 */
-	public static SpatialGrid createSpatialGridByShapeBoundary(Geometry boundary, double gridSize) {
-		Envelope env = boundary.getEnvelopeInternal();
-		double xMin = env.getMinX();
-		double xMax = env.getMaxX();
-		double yMin = env.getMinY();
-		double yMax = env.getMaxY();
-
-		return new SpatialGrid(xMin, yMin, xMax, yMax, gridSize, Double.NaN);
-	}
-
 	/**
 	 * stores measured accessibilities in a file
 	 * 
@@ -207,69 +189,6 @@ public final class GridUtils {
 			LOG.info("... done!");
 		}catch(IOException e){
 			e.printStackTrace();
-		}
-	}
-
-	public static final String WEIGHT = "weight";
-
-	public static final void writeSpatialGrids( List<SpatialGrid> spatialGrids, String path ) {
-		// seems that we cannot re-use the accessibility write method since it plays games with the modes. kai, mar'14
-
-		final CSVWriter writer = new CSVWriter( path ) ;
-
-		writer.writeField("x");
-		writer.writeField("y");
-		for ( SpatialGrid spatialGrid : spatialGrids ) {
-			writer.writeField( spatialGrid.getLabel() ) ; 
-		}
-		writer.writeNewLine();
-
-		final SpatialGrid spatialGrid = spatialGrids.get(0) ;
-		for ( double y = spatialGrid.getYmin() ; y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution() ) {
-			for ( double x = spatialGrid.getXmin() ; x <= spatialGrid.getXmax(); x+= spatialGrid.getResolution() ) {
-				writer.writeField( x ) ;
-				writer.writeField( y ) ;
-				for ( SpatialGrid theSpatialGrid : spatialGrids ) {
-					writer.writeField( theSpatialGrid.getValue(x,y) ) ;
-				}
-				writer.writeNewLine();
-			}
-			writer.writeNewLine() ; // gnuplot pm3d scanlines
-		}
-		writer.close();
-
-	}
-
-
-	public static void aggregateFacilitiesIntoSpatialGrid(ActivityFacilities facilities, SpatialGrid spatialGridSum, SpatialGrid spatialGridCnt,
-			SpatialGrid spatialGridAv ) {
-		for ( ActivityFacility fac : facilities.getFacilities().values() ) {
-			Coord coord = fac.getCoord() ;
-
-			final Object weight = fac.getCustomAttributes().get(WEIGHT);
-			double value = 1 ;
-			if ( weight != null ) {
-				value = (Double) weight ;
-			}
-			//				double value = fac.getActivityOptions().get("h").getCapacity() ; // infinity if undefined!!!
-
-			spatialGridSum.addToValue(value, coord) ;
-			spatialGridCnt.addToValue(1., coord) ;
-		}
-		if ( spatialGridAv!=null ) {
-			double[][] cntMatrix = spatialGridCnt.getMatrix();
-			for ( int ii=0 ; ii<cntMatrix.length ; ii++ ) {
-				//				log.warn("ii=" + ii );
-				for ( int jj=0 ; jj<cntMatrix[ii].length ; jj++ ) {
-					double cnt = cntMatrix[ii][jj];
-					if ( cnt > 0. ) {
-						//						log.warn("jj=" + jj );
-						double sum = spatialGridSum.getMatrix()[ii][jj];
-						spatialGridAv.getMatrix()[ii][jj] = sum/cnt ;
-						LOG.warn("sum=" + sum + "; cnt=" + cnt + "; av=" + spatialGridAv.getMatrix()[ii][jj] ) ;
-					}
-				}
-			}
 		}
 	}
 }
