@@ -169,8 +169,11 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
             //check whether direct walk time is cheaper
             travelCost = Math.min(travelCost, directWalkCost);
 
+            // Pre-computed effect of all opportunities reachable from destination network node
+            double sumExpVjkWalk = destination.getSum();
+
             double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-            expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
+            expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant)) * sumExpVjkWalk;
         }
         return expSum;
 	}
