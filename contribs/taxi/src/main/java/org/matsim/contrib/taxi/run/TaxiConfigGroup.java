@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -86,12 +85,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	public static final String DROPOFF_DURATION = "dropoffDuration";
 	static final String DROPOFF_DURATION_EXP = "Dropoff duration. Must be positive.";
 
-	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
-	static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP =
-			"Used in AStarEuclidean for shortest path search for occupied drives. Default value is 1.0. "
-					+ "Values above 1.0 (typically, 1.5 to 3.0) speed up search, "
-					+ "but at the cost of obtaining longer paths";
-
 	public static final String ONLINE_VEHICLE_TRACKER = "onlineVehicleTracker";
 	static final String ONLINE_VEHICLE_TRACKER_EXP =
 			"If true, vehicles are (GPS-like) monitored while moving. This helps in getting more accurate "
@@ -138,9 +131,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@Positive
 	private double dropoffDuration = Double.NaN;// seconds
 
-	@DecimalMin("1.0")
-	private double AStarEuclideanOverdoFactor = 2.;
-
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
@@ -182,7 +172,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 		map.put(VEHICLE_DIVERSION, VEHICLE_DIVERSION_EXP);
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
 		map.put(DROPOFF_DURATION, DROPOFF_DURATION_EXP);
-		map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR, A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP);
 		map.put(ONLINE_VEHICLE_TRACKER, ONLINE_VEHICLE_TRACKER_EXP);
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE, CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP);
 		map.put(TAXIS_FILE, TAXIS_FILE_EXP);
@@ -293,23 +282,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@StringSetter(DROPOFF_DURATION)
 	public TaxiConfigGroup setDropoffDuration(double dropoffDuration) {
 		this.dropoffDuration = dropoffDuration;
-		return this;
-	}
-
-	/**
-	 * @return {@value #A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP}
-	 */
-	@StringGetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public double getAStarEuclideanOverdoFactor() {
-		return AStarEuclideanOverdoFactor;
-	}
-
-	/**
-	 * @param aStarEuclideanOverdoFactor {@value #A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP}
-	 */
-	@StringSetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public TaxiConfigGroup setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
-		AStarEuclideanOverdoFactor = aStarEuclideanOverdoFactor;
 		return this;
 	}
 
