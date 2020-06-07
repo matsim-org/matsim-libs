@@ -156,8 +156,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
-	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
-	// (hence AStarEuclideanOverdoFactor needs to be specified)
+	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
 	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
