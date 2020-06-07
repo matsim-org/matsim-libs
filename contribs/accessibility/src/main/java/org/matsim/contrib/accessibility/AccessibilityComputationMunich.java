@@ -82,11 +82,8 @@ public class AccessibilityComputationMunich {
 
         // Prepare config
         Config config = ConfigUtils.createConfig();
-        // Config config = ConfigUtils.loadConfig("/Users/dominik/Workspace/runs-svn/fabilut/fabiland/25r_8x_ae_cap240_1-l_nes_smc/matsim/10/10.output_config_reduced.xml");
 
         ConfigUtils.setVspDefaults(config);
-
-
 
         boolean push2Geoserver = false; // Set true for run on server
         boolean createQGisOutput = false; // Set false for run on server
@@ -111,11 +108,6 @@ public class AccessibilityComputationMunich {
         config.transit().setUsingTransitInMobsim(false);
 
         config.plansCalcRoute().setRoutingRandomness(0.);
-
-        // new
-        //config.controler().setRoutingAlgorithmType( FastAStarLandmarks );
-
-
 
         AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
         acg.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile);
@@ -142,7 +134,6 @@ public class AccessibilityComputationMunich {
         //acg.setAccessibilityMeasureType(AccessibilityConfigGroup.AccessibilityMeasureType.logSum);
 
         //final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(Labels.DENSITIY, scenario.getNetwork());
-
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
