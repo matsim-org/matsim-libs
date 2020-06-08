@@ -331,10 +331,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 * @param seconds
 	 */
 	public void setTimeStepSize(final double seconds) {
-		if ( seconds != 1.0 ) {
-			Logger.getLogger(this.getClass()).warn("there are nearly no tests for time step size != 1.0.  Please write such tests and remove "
-					+ "this warning. ") ;
-		}
 		this.timeStepSize = seconds;
 	}
 
