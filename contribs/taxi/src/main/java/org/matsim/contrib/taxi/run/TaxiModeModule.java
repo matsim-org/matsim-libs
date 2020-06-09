@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.AStarEuclideanFactory;
+import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 /**
@@ -52,13 +52,13 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new DvrpModeRoutingModule(getMode(),
-				new AStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor())));
+		install(new DvrpModeRoutingModule(getMode(), new FastAStarLandmarksFactory(getConfig().global())));
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class).mode(getMode())
+		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
+				.mode(getMode())
 				.objectClass(Fleet.class)
 				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
 						getter.get(IterationCounter.class)))

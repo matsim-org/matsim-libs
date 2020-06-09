@@ -20,16 +20,20 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.MatsimServices;
 
 /**
  * @author michalm
@@ -66,8 +70,26 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-				getter -> new ZonalDemandAggregator(getter.get(EventsManager.class),
-						getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+		switch (params.getZonalDemandAggregatorType()) {
+			case PreviousIterationZonalDemandAggregator:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
+								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				break;
+			case ActivityLocationBasedZonalDemandAggregator:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				break;
+			case EqualVehicleDensityZonalDemandAggregator:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+				break;
+		}
+
+		addControlerListenerBinding().toProvider(modalProvider(getter ->
+				new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 	}
 }
