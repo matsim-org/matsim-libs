@@ -115,7 +115,7 @@ import org.matsim.vehicles.VehicleUtils;
 				
 			} else if (newAct instanceof DeliverShipment) {
 				// calculates the distance new for integrating the associated pickup
-				routeDistance = calulateRouteDistanceWithAssiciatedPickup(context);
+				routeDistance = calculateRouteDistanceWithAssociatedPickup(context);
 				routeConsumption = routeDistance * (consumptionPerMeter);
 
 				additionalDistance = getDistance(prevAct, newAct, newVehicle) + getDistance(newAct, nextAct, newVehicle)
@@ -142,7 +142,7 @@ import org.matsim.vehicles.VehicleUtils;
 	 * Calculates the distance based on the route-based distances between every tour
 	 * activities. The method also integrates the associated pickup in the tour.
 	 */
-	private double calulateRouteDistanceWithAssiciatedPickup(JobInsertionContext context) {
+	private double calculateRouteDistanceWithAssociatedPickup(JobInsertionContext context) {
 		double routeDistance = 0;
 		int positionOfRelatedPickup = context.getRelatedActivityContext().getInsertionIndex();
 		int nextRouteActivity = 0;
