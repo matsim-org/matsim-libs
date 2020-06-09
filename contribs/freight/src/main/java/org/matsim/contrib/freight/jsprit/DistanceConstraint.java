@@ -21,22 +21,17 @@
 
 package org.matsim.contrib.freight.jsprit;
 
+import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
+import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.DeliverShipment;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.PickupShipment;
-
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
-
-import com.graphhopper.jsprit.core.algorithm.state.StateId;
-import com.graphhopper.jsprit.core.algorithm.state.StateManager;
-import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
-import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
-import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-
 import org.matsim.vehicles.VehicleUtils;
 
 /**
@@ -52,22 +47,16 @@ import org.matsim.vehicles.VehicleUtils;
  *
  *         Creates the distance constraint.
  */
-/* pacakge-private */ class DistanceConstraint implements HardActivityConstraint {
+/* package-private */ class DistanceConstraint implements HardActivityConstraint {
 
 	static final Logger log = Logger.getLogger(DistanceConstraint.class);
-
-	private final StateManager stateManager;
-
-	private final StateId distanceStateId;
 
 	private final CarrierVehicleTypes vehicleTypes;
 
 	private final NetworkBasedTransportCosts netBasedCosts;
 
-	public DistanceConstraint(StateId distanceStateId, StateManager stateManager, CarrierVehicleTypes vehicleTypes,
-			NetworkBasedTransportCosts netBasedCosts) {
-		this.stateManager = stateManager;
-		this.distanceStateId = distanceStateId;
+	public DistanceConstraint(CarrierVehicleTypes vehicleTypes,
+							  NetworkBasedTransportCosts netBasedCosts) {
 		this.vehicleTypes = vehicleTypes;
 		this.netBasedCosts = netBasedCosts;
 	}
@@ -84,14 +73,14 @@ import org.matsim.vehicles.VehicleUtils;
 	 * including the additional shipment is possible with the possible
 	 * energyCapacity.
 	 */
-	//TODO add the time dependencies of the distance calculation because the rout choice can be different for different times
+	//TODO add the time dependencies of the distance calculation because the route choice can be different for different times
 	@Override
 	public ConstraintsStatus fulfilled(JobInsertionContext context, TourActivity prevAct, TourActivity newAct,
 			TourActivity nextAct, double departureTime) {
 		double additionalDistance;
 
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
-				.get(Id.create(context.getNewVehicle().getType().getTypeId().toString(), VehicleType.class));
+				.get(Id.create(context.getNewVehicle().getType().getTypeId(), VehicleType.class));
 		if (VehicleUtils.getEnergyCapacity(vehicleTypeOfNewVehicle.getEngineInformation()) != null) {
 
 			Vehicle newVehicle = context.getNewVehicle();
@@ -150,15 +139,17 @@ import org.matsim.vehicles.VehicleUtils;
 		// checks if the associated pickup is on first position
 		if (positionOfRelatedPickup == 0 && context.getRoute().getActivities().isEmpty()) {
 			context.getRoute().getStart().setLocation(context.getNewVehicle().getStartLocation());
-			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-					context.getNewVehicle(), context.getNewDepTime());
+			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
+//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
+//					context.getNewVehicle(), context.getNewDepTime());
 			context.getRoute().getEnd().setLocation(context.getNewVehicle().getEndLocation());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0), context.getRoute().getEnd(),
 					context.getNewVehicle(), context.getNewDepTime());
 			return routeDistance;
 		} else if (positionOfRelatedPickup == 0 && !context.getRoute().getActivities().isEmpty()) {
-			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
-					context.getNewVehicle(), context.getNewDepTime());
+			//This value is never used. it gets overwritten before usage. -- commenting it out. KMT, Jun'20
+//			routeDistance = getDistance(context.getRoute().getStart(), context.getAssociatedActivities().get(0),
+//					context.getNewVehicle(), context.getNewDepTime());
 			routeDistance = getDistance(context.getAssociatedActivities().get(0),
 					context.getRoute().getActivities().get(0), context.getNewVehicle(), context.getNewDepTime());
 		} else {
@@ -173,13 +164,11 @@ import org.matsim.vehicles.VehicleUtils;
 						context.getAssociatedActivities().get(0), context.getNewVehicle());
 				routeDistance = routeDistance + getDistance(context.getAssociatedActivities().get(0),
 						context.getRoute().getActivities().get(nextRouteActivity), context.getNewVehicle());
-				nextRouteActivity++;
 			} else {
-
 				routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
 						context.getRoute().getActivities().get(nextRouteActivity + 1), context.getNewVehicle());
-				nextRouteActivity++;
 			}
+			nextRouteActivity++;
 		}
 		if (positionOfRelatedPickup == context.getRoute().getActivities().size()) {
 			routeDistance = routeDistance + getDistance(context.getRoute().getActivities().get(nextRouteActivity),
