@@ -58,7 +58,9 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final Map<Id<DvrpVehicle>, Double> stopBeginTimes = new IdMap<>(DvrpVehicle.class);
 	private final Map<Id<DvrpVehicle>, Double> idleBeginTimes = new IdMap<>(DvrpVehicle.class);
 	private final Map<Id<DvrpVehicle>, Double> driveBeginTimes = new IdMap<>(DvrpVehicle.class);
+
 	private final Map<Id<DvrpVehicle>, Integer> vehicleOccupancies = new IdMap<>(DvrpVehicle.class);
+	private final Map<Id<DvrpVehicle>, Integer> stopOccupancies = new IdMap<>(DvrpVehicle.class);
 
 	private final double endTime;
 
@@ -92,7 +94,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		}
 
 		for (Map.Entry<Id<DvrpVehicle>, Double> entry : stopBeginTimes.entrySet()) {
-			int occupancy = vehicleOccupancies.get(entry.getKey());
+			int occupancy = stopOccupancies.get(entry.getKey());
 			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), endTime);
 		}
 
@@ -161,6 +163,7 @@ public class DrtVehicleOccupancyProfileCalculator
 
 			if (vehicleOccupancies.containsKey(vehicleId)) {
 				stopBeginTimes.put(vehicleId, event.getTime());
+				stopOccupancies.put(vehicleId, vehicleOccupancies.get(vehicleId));
 			}
 		}
 	}
@@ -179,7 +182,7 @@ public class DrtVehicleOccupancyProfileCalculator
 
 			if (vehicleOccupancies.containsKey(vehicleId)) {
 				double beginTime = stopBeginTimes.remove(vehicleId);
-				int occupancy = vehicleOccupancies.get(vehicleId);
+				int occupancy = stopOccupancies.remove(vehicleId);
 
 				increment(vehicleOccupancyProfilesInSeconds[occupancy], beginTime, event.getTime());
 			}
@@ -208,6 +211,10 @@ public class DrtVehicleOccupancyProfileCalculator
 
 			if (!vehicleOccupancies.containsKey(personId)) { // We need to ignore the driver!
 				vehicleOccupancies.put(vehicleId, vehicleOccupancies.get(vehicleId) - 1);
+
+				if (stopOccupancies.containsKey(vehicleId)) {
+					stopOccupancies.put(vehicleId, stopOccupancies.get(vehicleId) - 1);
+				}
 			}
 		}
 	}
@@ -238,6 +245,9 @@ public class DrtVehicleOccupancyProfileCalculator
 		idleBeginTimes.clear();
 		stopBeginTimes.clear();
 		driveBeginTimes.clear();
+
+		stopOccupancies.clear();
+		vehicleOccupancies.clear();
 
 		for (int i = 0; i < idleVehicleProfileInSeconds.length; i++) {
 			idleVehicleProfileInSeconds[i] = 0;
