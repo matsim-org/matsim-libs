@@ -2191,6 +2191,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				&& reverseLink.getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI)
 			reverseLink = null;
 		int it = 1;
+		boolean insertedUTurnOnLeftLane = false;
+
 		while (!laneStack.isEmpty()) {
 
 			Integer tempDir = laneStack.pop();
@@ -2222,17 +2224,21 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						tempLinks.add(lvec);
 				}
 				//TODO !this.allowUTurnAtLeftLaneOnly actually sbraun11.06202020
-				if (tempLinks.size() > 0 && reverseLink!=null && this.allowUTurnAtLeftLaneOnly) {
+				if (tempLinks.size() > 0 && reverseLink!=null) {
 					if (tempLinks.get(0).getLink().getId().equals(reverseLink.getLink().getId())) {
-						lane.addToLinkId(tempLinks.get(0).getLink().getId());
-						if (this.SAVE_TURN_LANES == true) {
-							String toLinkId = tempLinks.get(0).getLink().getId().toString();
-							if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-								lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":reverse");
-							} else {
-								String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-								lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":reverse");
+						if (!this.allowUTurnAtLeftLaneOnly && insertedUTurnOnLeftLane) {
+							lane.addToLinkId(tempLinks.get(0).getLink().getId());
+							if (this.SAVE_TURN_LANES == true) {
+								String toLinkId = tempLinks.get(0).getLink().getId().toString();
+								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":reverse");
+								} else {
+									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":reverse");
+								}
 							}
+							//Flag here reverse Link with wrong tempDir and use Flag on a left lane to force U-Turn on left lane
+							//sbraun 11.06.2020
 						}
 					}
 				}
@@ -2324,10 +2330,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					if (lvec.dirTheta > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
 						tempLinks.add(lvec);
 				}
+
+
 				if (tempLinks.size() == 1) { // if there is just one "left"
 					// link, take it
 					lane.addToLinkId(tempLinks.get(0).getLink().getId());
-					if (this.SAVE_TURN_LANES ==true) {
+					if (this.SAVE_TURN_LANES) {
 						String toLinkId = tempLinks.get(0).getLink().getId().toString();
 						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 							lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":left");
@@ -2337,13 +2345,29 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						}
 					}
 				} else if (tempLinks.size() == 2) {
+					//add Reverse Turn here if flag "insertedUTurnOnLeftLane" set to true to push U turn to left lane
+					//sbraun 11.06.2020
+					if (this.allowUTurnAtLeftLaneOnly && reverseLink != null){
+						lane.addToLinkId(reverseLink.getLink().getId());
+						insertedUTurnOnLeftLane = true;
+						if (this.SAVE_TURN_LANES) {
+							String toLinkId = reverseLink.getLink().getId().toString();
+							if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+								lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":reverse");
+							} else {
+								String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+								lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":reverse");
+							}
+						}
+					}
+
 					if (tempDir == 1) { // lane direction: "left"
 						for (LinkVector lvec : tempLinks) {
                             // TODO does this make sense? it means:
                             // add link as to-link, if it is not the reverse link OR the link has only one lane OR u-turn is allowed at any lane
                             if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly) {
                                 lane.addToLinkId(lvec.getLink().getId());
-								if (this.SAVE_TURN_LANES ==true) {
+								if (this.SAVE_TURN_LANES) {
 									String toLinkId = lvec.getLink().getId().toString();
 									if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 										lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":left");
@@ -2358,7 +2382,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					if (tempDir == 2) { // lane direction: "slight_left"
 						if (tempLinks.get(1).dirTheta > 3. * Math.PI / 2. || !tempLinks.get(1).equals(reverseLink)) {
                             lane.addToLinkId(tempLinks.get(0).getLink().getId());
-							if (this.SAVE_TURN_LANES ==true) {
+							if (this.SAVE_TURN_LANES) {
 								String toLinkId = tempLinks.get(0).getLink().getId().toString();
 								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":slight_left");
@@ -2370,7 +2394,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
                             //lane.getAttributes().putAttribute(OSM_TURN_INFO, "slight_left");
                         }else{
 							lane.addToLinkId(tempLinks.get(1).getLink().getId());
-							if (this.SAVE_TURN_LANES ==true) {
+							if (this.SAVE_TURN_LANES) {
 								String toLinkId = tempLinks.get(1).getLink().getId().toString();
 								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":slight_left");
@@ -2383,7 +2407,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 					if (tempDir == 3) { // lane direction: "sharp_left"
                         lane.addToLinkId(tempLinks.get(1).getLink().getId());
-						if (this.SAVE_TURN_LANES ==true) {
+						if (this.SAVE_TURN_LANES) {
 							String toLinkId = tempLinks.get(1).getLink().getId().toString();
 							if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 								lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":sharp_left");
