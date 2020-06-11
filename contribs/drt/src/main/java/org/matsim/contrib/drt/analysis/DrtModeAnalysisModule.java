@@ -31,6 +31,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
 /**
@@ -62,7 +63,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		
 		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileCalculator(getter.getModal(FleetSpecification.class), 
-						getter.get(EventsManager.class), 300)));
+						getter.get(EventsManager.class), 300, getter.get(QSimConfigGroup.class))));
 		
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg, 

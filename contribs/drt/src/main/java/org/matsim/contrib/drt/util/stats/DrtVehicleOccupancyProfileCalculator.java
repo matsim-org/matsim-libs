@@ -40,6 +40,8 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -62,19 +64,27 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final Map<Id<DvrpVehicle>, Integer> vehicleOccupancies = new IdMap<>(DvrpVehicle.class);
 	private final Map<Id<DvrpVehicle>, Integer> stopOccupancies = new IdMap<>(DvrpVehicle.class);
 
-	private final double endTime;
+	private final double analysisEndTime;
 
-	public DrtVehicleOccupancyProfileCalculator(FleetSpecification fleet, EventsManager events, int timeInterval) {
+	public DrtVehicleOccupancyProfileCalculator(FleetSpecification fleet, EventsManager events, int timeInterval,
+			QSimConfigGroup qsimConfig) {
 		events.addHandler(this);
 
 		Max maxCapacity = new Max();
-		Max maxTime = new Max();
+		Max maxServiceTime = new Max();
 		for (DvrpVehicleSpecification v : fleet.getVehicleSpecifications().values()) {
 			maxCapacity.increment(v.getCapacity());
-			maxTime.increment(v.getServiceEndTime());
+			maxServiceTime.increment(v.getServiceEndTime());
 		}
 
-		int intervalCount = (int) Math.ceil((maxTime.getResult() + 1) / timeInterval);
+		if (qsimConfig.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime
+				&& qsimConfig.getEndTime().isDefined()) {
+			analysisEndTime = qsimConfig.getEndTime().seconds();
+		} else {
+			analysisEndTime = maxServiceTime.getResult();
+		}
+
+		int intervalCount = (int) Math.ceil((analysisEndTime + 1) / timeInterval);
 		timeDiscretizer = new TimeDiscretizer(intervalCount * timeInterval, timeInterval, TimeDiscretizer.Type.ACYCLIC);
 
 		int occupancyProfilesCount = (int) maxCapacity.getResult() + 1;
@@ -85,22 +95,21 @@ public class DrtVehicleOccupancyProfileCalculator
 		idleVehicleProfileRelative = new double[timeDiscretizer.getIntervalCount()];
 
 		fleet.getVehicleSpecifications().keySet().forEach(id -> vehicleOccupancies.put(id, 0));
-		this.endTime = maxTime.getResult();
 	}
 
 	public void consolidate() {
 		for (double beginTime : idleBeginTimes.values()) {
-			increment(idleVehicleProfileInSeconds, beginTime, endTime);
+			increment(idleVehicleProfileInSeconds, beginTime, analysisEndTime);
 		}
 
 		for (Map.Entry<Id<DvrpVehicle>, Double> entry : stopBeginTimes.entrySet()) {
 			int occupancy = stopOccupancies.get(entry.getKey());
-			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), endTime);
+			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), analysisEndTime);
 		}
 
 		for (Map.Entry<Id<DvrpVehicle>, Double> entry : driveBeginTimes.entrySet()) {
 			int occupancy = vehicleOccupancies.get(entry.getKey());
-			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), endTime);
+			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), analysisEndTime);
 		}
 
 		idleBeginTimes.clear();
@@ -134,8 +143,8 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private void increment(long[] values, double beginTime, double endTime) {
 		int timeInterval = timeDiscretizer.getTimeInterval();
-		int fromIdx = timeDiscretizer.getIdx(beginTime);
-		int toIdx = timeDiscretizer.getIdx(endTime);
+		int fromIdx = timeDiscretizer.getIdx(Math.min(beginTime, analysisEndTime));
+		int toIdx = timeDiscretizer.getIdx(Math.min(endTime, analysisEndTime));
 
 		for (int i = fromIdx; i < toIdx; i++) {
 			values[i] += timeInterval;
@@ -246,8 +255,8 @@ public class DrtVehicleOccupancyProfileCalculator
 		stopBeginTimes.clear();
 		driveBeginTimes.clear();
 
-		stopOccupancies.clear();
-		vehicleOccupancies.clear();
+		vehicleOccupancies.replaceAll((k, v) -> 0);
+		stopOccupancies.replaceAll((k, v) -> 0);
 
 		for (int i = 0; i < idleVehicleProfileInSeconds.length; i++) {
 			idleVehicleProfileInSeconds[i] = 0;
