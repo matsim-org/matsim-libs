@@ -22,15 +22,18 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author  jbischoff
@@ -41,8 +44,10 @@ import java.util.Map;
  */
 public class DrtGridUtils {
 
-	public static Map<String,Geometry> createGridFromNetwork(Network network, double cellsize){
+	static Logger log = Logger.getLogger(DrtGridUtils.class);
 
+	public static Map<String,Geometry> createGridFromNetwork(Network network, double cellsize){
+		log.info("start creating grid from network");
 		double[] boundingbox = NetworkUtils.getBoundingBox(network.getNodes().values());
 		double minX = (Math.floor(boundingbox[0] / cellsize)*cellsize);
 		double maxX = (Math.ceil(boundingbox[2] / cellsize) * cellsize);
@@ -64,7 +69,43 @@ public class DrtGridUtils {
 				grid.put(cell+"", p);
 			}
 		}
+		log.info("finished creating grid from network");
+		return grid;
+	}
 
+	/**
+	 *
+	 * First creates a grid based on the network bounding box. Then removes all zones that do not intersect the service area.
+	 * Result may contain zones that are barely included in the service area. But as passengers may walk into the service area,
+	 * it seems appropiate that the DrtZonalSystem, which is used for demand estimation, is larger than the service area.
+	 * The {@code cellsize} indirectly determines, how much larger the DrtZonalSystem may get.
+	 *
+	 * @param network
+	 * @param cellsize
+	 * @param serviceAreaGeoms geometries that define the service area
+	 * @return
+	 */
+	public static Map<String,Geometry> createGridFromNetworkWithinServiceArea (Network network, double cellsize, List<PreparedGeometry> serviceAreaGeoms) {
+		Map<String, Geometry> grid = createGridFromNetwork(network, cellsize);
+		Set<String> zonesToRemove = new HashSet<>();
+
+		log.info("checking zones for intersection with drt service area...");
+		log.info("total number of created zones = " + grid.size());
+		Counter counter = new Counter("dealt with zone ");
+		grid.entrySet().forEach(stringGeometryEntry -> {
+
+			boolean delete = true;
+
+			for (PreparedGeometry serviceAreaGeom : serviceAreaGeoms) {
+				if (serviceAreaGeom.intersects(stringGeometryEntry.getValue())) delete = false;
+				break;
+			}
+			if (delete) zonesToRemove.add(stringGeometryEntry.getKey());
+			counter.incCounter();
+		});
+		zonesToRemove.forEach(zone -> grid.remove(zone));
+
+		log.info("number of remaining zones = " + grid.size());
 		return grid;
 	}
 }

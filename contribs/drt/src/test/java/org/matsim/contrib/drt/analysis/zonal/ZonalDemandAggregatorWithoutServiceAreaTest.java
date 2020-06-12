@@ -47,7 +47,10 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.ToIntFunction;
 
-public class ZonalDemandAggregatorTest {
+public class ZonalDemandAggregatorWithoutServiceAreaTest {
+
+	//TODO write test with service area !!
+	// (with an service are, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
