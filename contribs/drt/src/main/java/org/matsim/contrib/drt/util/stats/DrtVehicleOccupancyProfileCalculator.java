@@ -26,29 +26,44 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DrtVehicleOccupancyProfileCalculator
-		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleEntersTrafficEventHandler,
-		VehicleLeavesTrafficEventHandler, ActivityStartEventHandler, ActivityEndEventHandler {
+		implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler,
+		ActivityEndEventHandler {
+
+	private static class VehicleState {
+		private final double beginTime;
+		private final boolean idle;
+		private final int occupancy;
+
+		private VehicleState(double beginTime, boolean idle, int occupancy) {
+			this.beginTime = beginTime;
+			this.idle = idle;
+			this.occupancy = occupancy;
+			//maybe we could relax it in some situations, but that would also require adapting the charts
+			Preconditions.checkArgument(!idle || occupancy == 0, "Idle vehicles must not be occupied ");
+		}
+	}
+
 	private final TimeDiscretizer timeDiscretizer;
 
 	private final long[] idleVehicleProfileInSeconds;
@@ -57,17 +72,16 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final double[] idleVehicleProfileRelative;
 	private final double[][] vehicleOccupancyProfilesRelative;
 
-	private final Map<Id<DvrpVehicle>, Double> stopBeginTimes = new IdMap<>(DvrpVehicle.class);
-	private final Map<Id<DvrpVehicle>, Double> idleBeginTimes = new IdMap<>(DvrpVehicle.class);
-	private final Map<Id<DvrpVehicle>, Double> driveBeginTimes = new IdMap<>(DvrpVehicle.class);
-
-	private final Map<Id<DvrpVehicle>, Integer> vehicleOccupancies = new IdMap<>(DvrpVehicle.class);
-	private final Map<Id<DvrpVehicle>, Integer> stopOccupancies = new IdMap<>(DvrpVehicle.class);
+	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
 
+	private final FleetSpecification fleet;
+
 	public DrtVehicleOccupancyProfileCalculator(FleetSpecification fleet, EventsManager events, int timeInterval,
 			QSimConfigGroup qsimConfig) {
+		this.fleet = fleet;
+
 		events.addHandler(this);
 
 		Max maxCapacity = new Max();
@@ -77,49 +91,32 @@ public class DrtVehicleOccupancyProfileCalculator
 			maxServiceTime.increment(v.getServiceEndTime());
 		}
 
-		if (qsimConfig.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime
-				&& qsimConfig.getEndTime().isDefined()) {
+		if (qsimConfig.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime && qsimConfig.getEndTime()
+				.isDefined()) {
 			analysisEndTime = qsimConfig.getEndTime().seconds();
 		} else {
 			analysisEndTime = maxServiceTime.getResult();
 		}
 
-		int intervalCount = (int) Math.ceil((analysisEndTime + 1) / timeInterval);
+		int intervalCount = (int)Math.ceil((analysisEndTime + 1) / timeInterval);
 		timeDiscretizer = new TimeDiscretizer(intervalCount * timeInterval, timeInterval, TimeDiscretizer.Type.ACYCLIC);
 
-		int occupancyProfilesCount = (int) maxCapacity.getResult() + 1;
+		int occupancyProfilesCount = (int)maxCapacity.getResult() + 1;
 		vehicleOccupancyProfilesInSeconds = new long[occupancyProfilesCount][timeDiscretizer.getIntervalCount()];
 		idleVehicleProfileInSeconds = new long[timeDiscretizer.getIntervalCount()];
 
 		vehicleOccupancyProfilesRelative = new double[occupancyProfilesCount][timeDiscretizer.getIntervalCount()];
 		idleVehicleProfileRelative = new double[timeDiscretizer.getIntervalCount()];
-
-		fleet.getVehicleSpecifications().keySet().forEach(id -> vehicleOccupancies.put(id, 0));
 	}
 
 	public void consolidate() {
-		for (double beginTime : idleBeginTimes.values()) {
-			increment(idleVehicleProfileInSeconds, beginTime, analysisEndTime);
-		}
-
-		for (Map.Entry<Id<DvrpVehicle>, Double> entry : stopBeginTimes.entrySet()) {
-			int occupancy = stopOccupancies.get(entry.getKey());
-			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), analysisEndTime);
-		}
-
-		for (Map.Entry<Id<DvrpVehicle>, Double> entry : driveBeginTimes.entrySet()) {
-			int occupancy = vehicleOccupancies.get(entry.getKey());
-			increment(vehicleOccupancyProfilesInSeconds[occupancy], entry.getValue(), analysisEndTime);
-		}
-
-		idleBeginTimes.clear();
-		stopBeginTimes.clear();
-		driveBeginTimes.clear();
+		vehicleStates.values().forEach(state -> increment(state, analysisEndTime));
+		vehicleStates.clear();
 
 		for (int t = 0; t < timeDiscretizer.getIntervalCount(); t++) {
-			idleVehicleProfileRelative[t] = (double) idleVehicleProfileInSeconds[t] / timeDiscretizer.getTimeInterval();
+			idleVehicleProfileRelative[t] = (double)idleVehicleProfileInSeconds[t] / timeDiscretizer.getTimeInterval();
 			for (int o = 0; o < vehicleOccupancyProfilesInSeconds.length; o++) {
-				vehicleOccupancyProfilesRelative[o][t] = (double) vehicleOccupancyProfilesInSeconds[o][t]
+				vehicleOccupancyProfilesRelative[o][t] = (double)vehicleOccupancyProfilesInSeconds[o][t]
 						/ timeDiscretizer.getTimeInterval();
 			}
 		}
@@ -141,20 +138,25 @@ public class DrtVehicleOccupancyProfileCalculator
 		return timeDiscretizer;
 	}
 
+	private void increment(VehicleState state, double endTime) {
+		long[] profile = state.idle ? idleVehicleProfileInSeconds : vehicleOccupancyProfilesInSeconds[state.occupancy];
+		increment(profile, Math.min(state.beginTime, endTime), endTime);
+	}
+
 	private void increment(long[] values, double beginTime, double endTime) {
 		int timeInterval = timeDiscretizer.getTimeInterval();
-		int fromIdx = timeDiscretizer.getIdx(Math.min(beginTime, analysisEndTime));
-		int toIdx = timeDiscretizer.getIdx(Math.min(endTime, analysisEndTime));
+		int fromIdx = timeDiscretizer.getIdx(beginTime);
+		int toIdx = timeDiscretizer.getIdx(endTime);
 
 		for (int i = fromIdx; i < toIdx; i++) {
 			values[i] += timeInterval;
 		}
 
 		// reduce first time bin
-		values[fromIdx] -= (int) beginTime % timeInterval;
+		values[fromIdx] -= (int)beginTime % timeInterval;
 
 		// handle last time bin
-		values[toIdx] += (int) endTime % timeInterval;
+		values[toIdx] += (int)endTime % timeInterval;
 	}
 
 	/* Event handling starts here */
@@ -162,101 +164,65 @@ public class DrtVehicleOccupancyProfileCalculator
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
-			Id<DvrpVehicle> vehicleId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (vehicleOccupancies.containsKey(vehicleId)) {
-				idleBeginTimes.put(vehicleId, event.getTime());
-			}
-		} else if (event.getActType().equals(DrtActionCreator.DRT_STOP_NAME)) {
-			Id<DvrpVehicle> vehicleId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (vehicleOccupancies.containsKey(vehicleId)) {
-				stopBeginTimes.put(vehicleId, event.getTime());
-				stopOccupancies.put(vehicleId, vehicleOccupancies.get(vehicleId));
-			}
+			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				increment(oldState, event.getTime());
+				return new VehicleState(event.getTime(), true, oldState.occupancy);
+			});
+		} else if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
+			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				increment(oldState, event.getTime());
+				return null;
+			});
 		}
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
-			Id<DvrpVehicle> vehicleId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (vehicleOccupancies.containsKey(vehicleId)) {
-				double beginTime = idleBeginTimes.remove(vehicleId);
-				increment(idleVehicleProfileInSeconds, beginTime, event.getTime());
+		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
+			if (fleet.getVehicleSpecifications().containsKey(vehicleId(event.getPersonId()))) {
+				vehicleStates.put(vehicleId(event.getPersonId()), new VehicleState(event.getTime(), false, 0));
 			}
-		} else if (event.getActType().equals(DrtActionCreator.DRT_STOP_NAME)) {
-			Id<DvrpVehicle> vehicleId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (vehicleOccupancies.containsKey(vehicleId)) {
-				double beginTime = stopBeginTimes.remove(vehicleId);
-				int occupancy = stopOccupancies.remove(vehicleId);
-
-				increment(vehicleOccupancyProfilesInSeconds[occupancy], beginTime, event.getTime());
-			}
+		} else if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
+			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				increment(oldState, event.getTime());
+				return new VehicleState(event.getTime(), false, oldState.occupancy);
+			});
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id<DvrpVehicle> vehicleId = Id.create(event.getVehicleId(), DvrpVehicle.class);
-
-		if (vehicleOccupancies.containsKey(vehicleId)) {
-			Id<DvrpVehicle> personId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (!vehicleOccupancies.containsKey(personId)) { // We need to ignore the driver!
-				vehicleOccupancies.put(vehicleId, vehicleOccupancies.get(vehicleId) + 1);
+		vehicleStates.computeIfPresent(vehicleId(event.getVehicleId()), (id, oldState) -> {
+			if (isDriver(event.getPersonId(), id)) {
+				return oldState;//ignore the driver, no state change
 			}
-		}
+			increment(oldState, event.getTime());
+			return new VehicleState(event.getTime(), oldState.idle, oldState.occupancy + 1);
+		});
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id<DvrpVehicle> vehicleId = Id.create(event.getVehicleId(), DvrpVehicle.class);
-
-		if (vehicleOccupancies.containsKey(vehicleId)) {
-			Id<DvrpVehicle> personId = Id.create(event.getPersonId(), DvrpVehicle.class);
-
-			if (!vehicleOccupancies.containsKey(personId)) { // We need to ignore the driver!
-				vehicleOccupancies.put(vehicleId, vehicleOccupancies.get(vehicleId) - 1);
-
-				if (stopOccupancies.containsKey(vehicleId)) {
-					stopOccupancies.put(vehicleId, stopOccupancies.get(vehicleId) - 1);
-				}
+		vehicleStates.computeIfPresent(vehicleId(event.getVehicleId()), (id, oldState) -> {
+			if (isDriver(event.getPersonId(), id)) {
+				return oldState;//ignore the driver, no state change
 			}
-		}
+			increment(oldState, event.getTime());
+			return new VehicleState(event.getTime(), oldState.idle, oldState.occupancy - 1);
+		});
 	}
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		Id<DvrpVehicle> vehicleId = Id.create(event.getVehicleId(), DvrpVehicle.class);
-
-		if (vehicleOccupancies.containsKey(vehicleId)) {
-			driveBeginTimes.put(vehicleId, event.getTime());
-		}
+	private Id<DvrpVehicle> vehicleId(Id<?> id) {
+		return Id.create(id, DvrpVehicle.class);
 	}
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		Id<DvrpVehicle> vehicleId = Id.create(event.getVehicleId(), DvrpVehicle.class);
-
-		if (vehicleOccupancies.containsKey(vehicleId)) {
-			double beginTime = driveBeginTimes.remove(vehicleId);
-			int occupancy = vehicleOccupancies.get(vehicleId);
-
-			increment(vehicleOccupancyProfilesInSeconds[occupancy], beginTime, event.getTime());
-		}
+	private boolean isDriver(Id<Person> personId, Id<DvrpVehicle> vehicleId) {
+		return personId.equals(vehicleId);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		idleBeginTimes.clear();
-		stopBeginTimes.clear();
-		driveBeginTimes.clear();
-
-		vehicleOccupancies.replaceAll((k, v) -> 0);
-		stopOccupancies.replaceAll((k, v) -> 0);
+		vehicleStates.clear();
 
 		for (int i = 0; i < idleVehicleProfileInSeconds.length; i++) {
 			idleVehicleProfileInSeconds[i] = 0;
