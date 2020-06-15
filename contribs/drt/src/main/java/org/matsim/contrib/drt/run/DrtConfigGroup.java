@@ -35,7 +35,9 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -154,8 +156,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
-	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
-	// (hence AStarEuclideanOverdoFactor needs to be specified)
+	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
 	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
@@ -192,8 +193,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private boolean plotDetailedCustomerStats = true;
 
 	@Positive
-	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
-			ParallelPathDataProvider.MAX_THREADS);
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
@@ -201,6 +201,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}
+
+	@NotNull
+	private DrtInsertionSearchParams drtInsertionSearchParams;
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -616,10 +619,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
-	/**
-	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
-	 * specified
-	 */
+	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
+		return drtInsertionSearchParams;
+	}
+
 	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
 		if (parameterSets.size() > 1) {
@@ -632,9 +635,39 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
-			return new MinCostFlowRebalancingParams();
+		switch (type) {
+			case MinCostFlowRebalancingParams.SET_NAME:
+				return new MinCostFlowRebalancingParams();
+
+			case ExtensiveInsertionSearchParams.SET_NAME:
+				return new ExtensiveInsertionSearchParams();
+
+			case SelectiveInsertionSearchParams.SET_NAME:
+				return new SelectiveInsertionSearchParams();
 		}
+
 		return super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams == null,
+					"Remove the existing drtRequestInsertionParams before adding a new one");
+			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams != null,
+					"The existing drtRequestInsertionParams is null. Cannot remove it.");
+			drtInsertionSearchParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 }

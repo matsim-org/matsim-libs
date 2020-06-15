@@ -29,9 +29,12 @@ import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
@@ -49,6 +52,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -64,6 +68,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
 /**
@@ -101,9 +106,11 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleData.EntryFactory.class), getter.getModal(PathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
-						getter.getModal(QSimScopeForkJoinPoolHolder.class)))).asEagerSingleton();
+						getter.getModal(VehicleData.EntryFactory.class),
+						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
+						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
+
+		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
 
@@ -115,7 +122,6 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
 		bindModal(EmptyVehicleRelocator.class).toProvider(new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
-
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
@@ -146,21 +152,6 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
 						new DrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
 
-		addModalComponent(ParallelPathDataProvider.class, new ModalProviders.AbstractProvider<>(getMode()) {
-			@Inject
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-			private TravelTime travelTime;
-
-			@Override
-			public ParallelPathDataProvider get() {
-				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
-			}
-		});
-		bindModal(PathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
-
 		bindModal(VrpAgentLogic.DynActionCreator.class).
 				toProvider(modalProvider(getter -> new DrtActionCreator(getter.getModal(PassengerEngine.class),
 						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
@@ -179,5 +170,19 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		}).asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
+	}
+
+	public static AbstractDvrpModeQSimModule getInsertionSearchQSimModule(DrtConfigGroup drtCfg) {
+		switch (drtCfg.getDrtInsertionSearchParams().getName()) {
+			case ExtensiveInsertionSearchParams.SET_NAME:
+				return new ExtensiveInsertionSearchQSimModule(drtCfg);
+
+			case SelectiveInsertionSearchParams.SET_NAME:
+				return new SelectiveInsertionSearchQSimModule(drtCfg);
+
+			default:
+				throw new RuntimeException(
+						"Unsupported DRT insertion search type: " + drtCfg.getDrtInsertionSearchParams().getName());
+		}
 	}
 }

@@ -23,46 +23,43 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupListener {
+public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	private static final String OUTPUT_FILE = "drt_occupancy_time_profiles";
 
-	private final Fleet fleet;
 	private final MatsimServices matsimServices;
 	private final DrtConfigGroup drtCfg;
+	private final DrtVehicleOccupancyProfileCalculator calculator;
 
-	public DrtVehicleOccupancyProfileWriter(Fleet fleet, MatsimServices matsimServices, DrtConfigGroup drtCfg) {
-		this.fleet = fleet;
+	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, DrtConfigGroup drtCfg,
+			DrtVehicleOccupancyProfileCalculator calculator) {
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
+		this.calculator = calculator;
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		DrtVehicleOccupancyProfileCalculator calculator = new DrtVehicleOccupancyProfileCalculator(fleet, 300);
-
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-		calculator.calculate();
+		calculator.consolidate();
 
 		String file = filename(OUTPUT_FILE);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
-			String[] paxHeader = IntStream.rangeClosed(0, calculator.getMaxCapacity())
-					.mapToObj(i -> i + " pax")
+			String[] paxHeader = IntStream.rangeClosed(0, calculator.getMaxCapacity()).mapToObj(i -> i + " pax")
 					.toArray(String[]::new);
 			writer.writeNext("time", "stay", paxHeader);
 
@@ -101,7 +98,7 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 		}
 
 		for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
-			double hour = ((double)(i * timeDiscretizer.getTimeInterval())) / 3600;
+			double hour = ((double) (i * timeDiscretizer.getTimeInterval())) / 3600;
 			seriesArray[0].add(hour, idleVehicleProfile[i]);
 			for (int s = 0; s < vehicleOccupancyProfiles.length; s++) {
 				seriesArray[1 + s].add(hour, vehicleOccupancyProfiles[s][i]);
@@ -122,7 +119,7 @@ public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupList
 	}
 
 	private String filename(String prefix) {
-		return matsimServices.getControlerIO()
-				.getIterationFilename(matsimServices.getIterationNumber(), prefix + "_" + drtCfg.getMode());
+		return matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),
+				prefix + "_" + drtCfg.getMode());
 	}
 }

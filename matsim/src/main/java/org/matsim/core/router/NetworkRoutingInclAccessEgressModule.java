@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +32,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -40,12 +51,6 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 
 /**
@@ -231,17 +236,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private static double routeBushwhackingLeg( Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 						    Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config ) {
-		ModeRoutingParams params = null ;
+		final ModeRoutingParams params;
 		ModeRoutingParams tmp;
 		final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
-		if ( (tmp = paramsMap.get( TransportMode.non_network_walk ) ) != null ){
+		if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
 			params = tmp;
-		} else if ( (tmp = paramsMap.get(  TransportMode.walk ) ) != null ) {
-			params = tmp ;
-		} else{
+		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
+			params = tmp;
+		} else {
 			params = new ModeRoutingParams();
 			// old defaults
-			params.setBeelineDistanceFactor( 1.3 );
+			params.setBeelineDistanceFactor(1.3);
 			params.setTeleportedModeSpeed( 2.0 );
 		}
 		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);

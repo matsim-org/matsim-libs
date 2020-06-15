@@ -25,13 +25,13 @@ package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 
 /**
@@ -60,14 +60,13 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(FleetSpecification.class), getter.getModal(DrtPassengerAndVehicleStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
-
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				addModalQSimComponentBinding().toProvider(modalProvider(
-						getter -> new DrtVehicleOccupancyProfileWriter(getter.getModal(Fleet.class),
-								getter.get(MatsimServices.class), drtCfg)));
-			}
-		});
+		
+		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
+				getter -> new DrtVehicleOccupancyProfileCalculator(getter.getModal(FleetSpecification.class), 
+						getter.get(EventsManager.class), 300, getter.get(QSimConfigGroup.class))));
+		
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg, 
+						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
 	}
 }
