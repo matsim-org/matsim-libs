@@ -17,6 +17,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.util.stats;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
@@ -224,16 +225,12 @@ public class DrtVehicleOccupancyProfileCalculator
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
-		for (int i = 0; i < idleVehicleProfileInSeconds.length; i++) {
-			idleVehicleProfileInSeconds[i] = 0;
-			idleVehicleProfileRelative[i] = 0;
-		}
+		Arrays.fill(idleVehicleProfileInSeconds, 0);
+		Arrays.fill(idleVehicleProfileRelative, 0);
 
 		for (int k = 0; k < vehicleOccupancyProfilesInSeconds.length; k++) {
-			for (int i = 0; i < vehicleOccupancyProfilesInSeconds[k].length; i++) {
-				vehicleOccupancyProfilesInSeconds[k][i] = 0;
-				vehicleOccupancyProfilesRelative[k][i] = 0;
-			}
+			Arrays.fill(vehicleOccupancyProfilesInSeconds[k], 0);
+			Arrays.fill(vehicleOccupancyProfilesRelative[k], 0);
 		}
 	}
 }
