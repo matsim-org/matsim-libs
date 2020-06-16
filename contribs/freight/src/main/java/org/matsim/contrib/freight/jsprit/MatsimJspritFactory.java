@@ -734,7 +734,7 @@ public class MatsimJspritFactory {
 
 				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 				constraintManager.addConstraint(
-						new DistanceConstraint(distanceStateId, stateManager,
+						new DistanceConstraint(
 								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 						ConstraintManager.Priority.CRITICAL);
 
@@ -765,7 +765,7 @@ public class MatsimJspritFactory {
 
 				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 				constraintManager.addConstraint(
-						new DistanceConstraint(distanceStateId, stateManager,
+						new DistanceConstraint(
 								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 						ConstraintManager.Priority.CRITICAL);
 				algorithm = Jsprit.Builder.newInstance(problem)
