@@ -1,25 +1,28 @@
 package lspScoringTests;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import lsp.*;
+import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
+import lsp.functions.InfoFunction;
+import lsp.functions.InfoFunctionUtils;
+import lsp.functions.InfoFunctionValue;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.resources.Resource;
+import lsp.scoring.LSPScorer;
+import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -29,20 +32,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
-import lsp.controler.LSPModule;
-import lsp.events.EventUtils;
-import lsp.functions.InfoFunction;
-import lsp.functions.InfoFunctionImpl;
-import lsp.functions.InfoFunctionValueImpl;
-import lsp.resources.Resource;
-import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScorer;
-import lsp.scoring.LSPScoringModuleImpl;
-import lsp.shipment.LSPShipment;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 public class CollectionLSPScoringTest {
 
@@ -55,7 +49,7 @@ public class CollectionLSPScoringTest {
 	private TipSimulationTracker tipTracker;
 	private TipInfo info;
 	private InfoFunction function;
-	private InfoFunctionValueImpl<Double> value;
+	private InfoFunctionValue<Double> value;
 	private int numberOfShipments = 25;
 
 	@Before
@@ -129,8 +123,8 @@ public class CollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		value = new InfoFunctionValueImpl<Double>("TIP IN EUR");
-		function = new InfoFunctionImpl();
+		value = InfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+		function = InfoFunctionUtils.createDefaultInfoFunction();
 		function.getValues().add(value);
 		info = new TipInfo(function);
 		tipTracker = new TipSimulationTracker(handler, info);

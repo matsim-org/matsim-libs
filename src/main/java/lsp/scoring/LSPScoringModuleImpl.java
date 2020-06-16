@@ -1,10 +1,8 @@
 package lsp.scoring;
 
-import org.matsim.core.controler.events.ScoringEvent;
-
-import demand.decoratedLSP.LSPDecorators;
 import lsp.LSP;
 import lsp.LSPs;
+import org.matsim.core.controler.events.ScoringEvent;
 
 public class LSPScoringModuleImpl implements LSPScoringModule{
 

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.functions.*;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,10 +36,6 @@ import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
-import lsp.functions.InfoFunction;
-import lsp.functions.InfoFunctionImpl;
-import lsp.functions.InfoFunctionValue;
-import lsp.functions.InfoFunctionValueImpl;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScorer;
@@ -133,8 +130,8 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionLSP = collectionLSPBuilder.build();
 
 		TipEventHandler handler = new TipEventHandler();
-		value = new InfoFunctionValueImpl<Double>("TIP IN EUR");
-		function = new InfoFunctionImpl();
+		value = InfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+		function = InfoFunctionUtils.createDefaultInfoFunction();
 		function.getValues().add(value);
 		info = new TipInfo(function);
 		tipTracker = new TipSimulationTracker(handler, info);

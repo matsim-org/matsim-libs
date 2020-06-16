@@ -41,7 +41,7 @@ import lsp.tracking.SimulationTracker;
 
 
 
-public class LSPControlerListener implements FreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+class LSPControlerListener implements FreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 ReplanningListener, IterationEndsListener, IterationStartsListener{
 
 	

@@ -1,18 +1,14 @@
 package requirementsCheckerTests;
 
-import lsp.functions.Info;
-import lsp.functions.InfoFunction;
-import lsp.functions.InfoFunctionImpl;
-import lsp.functions.InfoFunctionValue;
-import lsp.functions.InfoFunctionValueImpl;
+import lsp.functions.*;
 
 public class RedInfo extends Info{
 
-	private InfoFunctionImpl redInfoFunction;
+	private InfoFunction redInfoFunction;
 	
 	public RedInfo() {
-		redInfoFunction = new InfoFunctionImpl();
-		InfoFunctionValue<String> value = new InfoFunctionValueImpl<String>("red");
+		redInfoFunction = InfoFunctionUtils.createDefaultInfoFunction();
+		InfoFunctionValue<String> value = InfoFunctionUtils.createInfoFunctionValue("red" );
 		value.setValue("red");
 		redInfoFunction.getValues().add(value);
 	}
