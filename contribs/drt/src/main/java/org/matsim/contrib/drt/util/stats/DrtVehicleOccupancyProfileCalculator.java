@@ -151,7 +151,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		}
 	}
 
-	public Map<String, double[]> getIdleVehicleProfile() {
+	public Map<String, double[]> getNonOperatingVehicleProfiles() {
 		return nonOperatingVehicleProfileNormalized;
 	}
 

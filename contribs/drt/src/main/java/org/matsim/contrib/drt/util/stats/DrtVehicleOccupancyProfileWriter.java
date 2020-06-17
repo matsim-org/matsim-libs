@@ -65,7 +65,7 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
 		calculator.consolidate();
 
-		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getIdleVehicleProfile().entrySet().stream(),
+		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonOperatingVehicleProfiles().entrySet().stream(),
 				EntryStream.of(calculator.getVehicleOccupancyProfiles())
 						.map(e -> Pair.of(e.getKey() + " pax", e.getValue())))
 				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
