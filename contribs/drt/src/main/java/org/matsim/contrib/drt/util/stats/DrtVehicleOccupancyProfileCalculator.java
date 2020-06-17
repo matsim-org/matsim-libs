@@ -19,7 +19,6 @@ package org.matsim.contrib.drt.util.stats;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -42,6 +41,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -54,10 +54,11 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private static class VehicleState {
 		private static VehicleState nonOperating(double beginTime, String nonOperatingStateType) {
-			return new VehicleState(beginTime, Objects.requireNonNull(nonOperatingStateType), 0);
+			return new VehicleState(beginTime, Preconditions.checkNotNull(nonOperatingStateType), 0);
 		}
 
 		private static VehicleState operating(double beginTime, int occupancy) {
+			Preconditions.checkArgument(occupancy >= 0);
 			return new VehicleState(beginTime, null, occupancy);
 		}
 
@@ -170,6 +171,10 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	private void increment(long[] values, double beginTime, double endTime) {
+		if (beginTime == endTime) {
+			return;
+		}
+
 		int timeInterval = timeDiscretizer.getTimeInterval();
 		int fromIdx = timeDiscretizer.getIdx(beginTime);
 		int toIdx = timeDiscretizer.getIdx(endTime);
@@ -191,11 +196,13 @@ public class DrtVehicleOccupancyProfileCalculator
 	public void handleEvent(ActivityStartEvent event) {
 		if (nonOperatingActivities.contains(event.getActType())) {
 			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				Verify.verify(oldState.nonOperatingStateType == null && oldState.occupancy == 0);
 				increment(oldState, event.getTime());
 				return VehicleState.nonOperating(event.getTime(), event.getActType());
 			});
 		} else if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
 			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				Verify.verify(oldState.nonOperatingStateType == null && oldState.occupancy == 0);
 				increment(oldState, event.getTime());
 				return null;
 			});
@@ -210,6 +217,7 @@ public class DrtVehicleOccupancyProfileCalculator
 			}
 		} else if (nonOperatingActivities.contains(event.getActType())) {
 			vehicleStates.computeIfPresent(vehicleId(event.getPersonId()), (id, oldState) -> {
+				Verify.verify(oldState.nonOperatingStateType.equals(event.getActType()));
 				increment(oldState, event.getTime());
 				return VehicleState.operating(event.getTime(), 0);
 			});
@@ -222,6 +230,7 @@ public class DrtVehicleOccupancyProfileCalculator
 			if (isDriver(event.getPersonId(), id)) {
 				return oldState;//ignore the driver, no state change
 			}
+			Verify.verify(oldState.nonOperatingStateType == null);
 			increment(oldState, event.getTime());
 			return VehicleState.operating(event.getTime(), oldState.occupancy + 1);
 		});
@@ -233,6 +242,7 @@ public class DrtVehicleOccupancyProfileCalculator
 			if (isDriver(event.getPersonId(), id)) {
 				return oldState;//ignore the driver, no state change
 			}
+			Verify.verify(oldState.nonOperatingStateType == null);
 			increment(oldState, event.getTime());
 			return VehicleState.operating(event.getTime(), oldState.occupancy - 1);
 		});
