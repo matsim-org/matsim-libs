@@ -18,15 +18,15 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Optional;
 
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
  * @author michalm
  */
-public interface PathDataProvider {
-	DetourData<PathData> getPathData(DrtRequest drtRequest, List<Insertion> filteredInsertions);
+public interface DrtInsertionSearch<D> {
+	Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
 }

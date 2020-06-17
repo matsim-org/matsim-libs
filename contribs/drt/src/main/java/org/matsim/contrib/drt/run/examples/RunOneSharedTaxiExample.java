@@ -37,6 +37,6 @@ public class RunOneSharedTaxiExample {
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 		config.controler().setWriteEventsInterval(lastIteration);
-		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
+		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 }

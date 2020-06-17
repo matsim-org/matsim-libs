@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,19 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.Collection;
-import java.util.Optional;
-
-import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.passenger.DrtRequest;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface MultiVehicleInsertionProblem<D> {
-	Optional<InsertionWithDetourData<D>> findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
+public abstract class DrtInsertionSearchParams extends ReflectiveConfigGroup {
+	public DrtInsertionSearchParams(String paramSetName) {
+		super(paramSetName);
+	}
 }
