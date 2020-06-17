@@ -21,19 +21,18 @@ package org.matsim.contrib.av.robotaxi.fares.taxi;/*
  * created by jbischoff, 11.12.2018
  */
 
+import javax.inject.Inject;
+
 import org.matsim.core.controler.AbstractModule;
 
 public class TaxiFareModule extends AbstractModule {
-    @Override
-    public void install() {
-        if ((getConfig().getModules().containsKey(TaxiFareConfigGroup.GROUP_NAME)) && (getConfig().getModules().containsKey(TaxiFaresConfigGroup.GROUP_NAME))) {
-            throw new RuntimeException("Both taxifare and taxifares - config groups are specified. Please use only one of them in your config file and restart");
-        }
-        if (getConfig().getModules().containsKey(TaxiFareConfigGroup.GROUP_NAME)) {
-            addEventHandlerBinding().toInstance(new TaxiFareHandler(TaxiFareConfigGroup.get(getConfig())));
-        } else {
-            TaxiFaresConfigGroup taxiFaresConfigGroup = TaxiFaresConfigGroup.get(getConfig());
-            taxiFaresConfigGroup.getTaxiFareConfigGroups().forEach(taxiFareConfigGroup -> addEventHandlerBinding().toInstance(new TaxiFareHandler(taxiFareConfigGroup)));
-        }
-    }
+	@Inject
+	private TaxiFaresConfigGroup taxiFaresConfigGroup;
+
+	@Override
+	public void install() {
+		for (TaxiFareConfigGroup taxiFareCfg : taxiFaresConfigGroup.getTaxiFareConfigGroups()) {
+			addEventHandlerBinding().toInstance(new TaxiFareHandler(taxiFareCfg));
+		}
+	}
 }
