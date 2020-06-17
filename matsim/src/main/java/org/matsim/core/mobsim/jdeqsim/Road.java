@@ -41,20 +41,6 @@ public class Road extends SimUnit {
 		Road.config = config;
 	}
 
-	/**
-	 * this must be initialized before starting the simulation! mapping:
-	 * key=linkId used to find a road corresponding to a link
-	 */
-	static HashMap<Id<Link>, Road> allRoads = null;
-
-	public static HashMap<Id<Link>, Road> getAllRoads() {
-		return allRoads;
-	}
-
-	public static void setAllRoads(HashMap<Id<Link>, Road> allRoads) {
-		Road.allRoads = allRoads;
-	}
-
 	protected Link link;
 
 	// see method enterRequest for a detailed description of variable 'gap'
@@ -350,10 +336,6 @@ public class Road extends SimUnit {
 	public void removeFromInterestedInEnteringRoad() {
 		this.interestedInEnteringRoad.removeFirst();
 		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
-	}
-
-	public static Road getRoad(Id<Link> linkId) {
-		return getAllRoads().get(linkId);
 	}
 
 	public void setLink(Link link) {

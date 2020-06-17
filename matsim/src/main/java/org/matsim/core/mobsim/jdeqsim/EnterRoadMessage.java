@@ -34,7 +34,7 @@ public class EnterRoadMessage extends EventMessage {
 	@Override
 	public void handleMessage() {
 		// enter the next road
-		Road road = Road.getRoad(vehicle.getCurrentLinkId());
+		Road road = this.vehicle.getRoad();
 		road.enterRoad(vehicle, getMessageArrivalTime());
 	}
 

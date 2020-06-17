@@ -50,7 +50,7 @@ public class StartingLegMessage extends EventMessage {
 
 			} else {
 				// start the new leg
-				Road road = Road.getRoad(vehicle.getCurrentLinkId());
+				Road road = this.vehicle.getRoad();
 				road.enterRequest(vehicle, getMessageArrivalTime());
 			}
 
@@ -62,7 +62,7 @@ public class StartingLegMessage extends EventMessage {
 	private void scheduleEndLegMessage(double time) {
 		// move to first link in next leg and schedule an end leg message
 		vehicle.moveToFirstLinkInNextLeg();
-		Road road = Road.getRoad(vehicle.getCurrentLinkId());
+		Road road = this.vehicle.getRoad();
 		vehicle.scheduleEndLegMessage(time, road);
 	}
 

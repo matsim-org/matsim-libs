@@ -89,7 +89,7 @@ public class EndLegMessage extends EventMessage {
 			// update current link (we arrived at a new activity)
 			this.vehicle.setCurrentLinkId(currentAct.getLinkId());
 
-			Road road = Road.getRoad(this.vehicle.getCurrentLinkId());
+			Road road = this.vehicle.getRoad();
 			// schedule a departure from the current link in future
 			this.vehicle.scheduleStartingLegMessage(departureTime, road);
 		}

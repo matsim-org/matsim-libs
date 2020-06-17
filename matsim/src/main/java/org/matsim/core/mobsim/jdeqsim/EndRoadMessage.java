@@ -37,13 +37,13 @@ public class EndRoadMessage extends EventMessage {
 
 			vehicle.initiateEndingLegMode();
 			vehicle.moveToFirstLinkInNextLeg();
-			Road road = Road.getRoad(vehicle.getCurrentLinkId());
+			Road road = this.vehicle.getRoad();
 			road.enterRequest(vehicle, getMessageArrivalTime());
 		} else if (!vehicle.isCurrentLegFinished()) {
 			// if leg is not finished yet
 			vehicle.moveToNextLinkInLeg();
 
-			Road nextRoad = Road.getRoad(vehicle.getCurrentLinkId());
+            Road nextRoad = this.vehicle.getRoad();
 			nextRoad.enterRequest(vehicle, getMessageArrivalTime());
 		}
 	}
