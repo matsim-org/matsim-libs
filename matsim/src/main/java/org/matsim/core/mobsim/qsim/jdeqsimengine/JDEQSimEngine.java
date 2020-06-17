@@ -54,7 +54,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
         // initialize network
         for (Link link : this.scenario.getNetwork().getLinks().values()) {
-            Road road = new Road(scheduler, link);
+            Road road = new Road(scheduler, link, config);
             allRoads.put(link.getId(), road);
         }
 

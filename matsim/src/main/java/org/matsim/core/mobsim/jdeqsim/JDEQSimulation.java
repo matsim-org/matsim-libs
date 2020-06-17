@@ -54,7 +54,6 @@ public class JDEQSimulation implements Mobsim {
 
 	@Inject
 	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events) {
-		Road.setConfig(config);
 		Message.setEventsManager(events);
 		this.config = config;
 		this.scenario = scenario;
@@ -82,7 +81,7 @@ public class JDEQSimulation implements Mobsim {
 
 	protected void initializeRoads() {
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			allRoads.put(link.getId(), new Road(scheduler, link));
+			allRoads.put(link.getId(), new Road(scheduler, link, config));
 		}
 	}
 
