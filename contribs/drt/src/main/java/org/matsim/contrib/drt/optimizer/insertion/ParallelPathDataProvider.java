@@ -18,6 +18,10 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,8 +33,6 @@ import javax.inject.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
@@ -44,7 +46,35 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PrecalculablePathDataProvider, MobsimBeforeCleanupListener {
+public class ParallelPathDataProvider implements PathDataProvider, MobsimBeforeCleanupListener {
+
+	private static class DetourLinksSet {
+		final Map<Id<Link>, Link> pickupDetourStartLinks;
+		final Map<Id<Link>, Link> pickupDetourEndLinks;
+		final Map<Id<Link>, Link> dropoffDetourStartLinks;
+		final Map<Id<Link>, Link> dropoffDetourEndLinks;
+
+		public DetourLinksSet(List<Insertion> filteredInsertions) {
+			pickupDetourStartLinks = new HashMap<>();
+			pickupDetourEndLinks = new HashMap<>();
+			dropoffDetourStartLinks = new HashMap<>();
+			dropoffDetourEndLinks = new HashMap<>();
+
+			filteredInsertions.forEach(insertion -> {
+				addLink(pickupDetourStartLinks, insertion.pickup.previousLink);
+				addLink(pickupDetourEndLinks, insertion.pickup.nextLink);
+				addLink(dropoffDetourStartLinks, insertion.dropoff.previousLink);
+				addLink(dropoffDetourEndLinks, insertion.dropoff.nextLink);
+			});
+		}
+
+		private void addLink(Map<Id<Link>, Link> map, Link link) {
+			if (link != null) {
+				map.put(link.getId(), link);
+			}
+		}
+	}
+
 	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -55,12 +85,6 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	private final double stopDuration;
 
 	private final ExecutorService executorService;
-
-	// ==== recalculated by precalculatePathData()
-	private Map<Id<Link>, PathData> pathsToPickupMap;
-	private Map<Id<Link>, PathData> pathsFromPickupMap;
-	private Map<Id<Link>, PathData> pathsToDropoffMap;
-	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
 	public ParallelPathDataProvider(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
@@ -73,7 +97,7 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 	}
 
 	@Override
-	public void precalculatePathData(DrtRequest drtRequest, DetourLinksSet detourLinksSet) {
+	public DetourData<PathData> getPathData(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
@@ -84,49 +108,39 @@ public class ParallelPathDataProvider implements PrecalculablePathDataProvider, 
 		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
 		// pathsFromDropoff is the least demanding one
 
+		//TODO move extraction of links from filteredInsertions to each Callable task
+		DetourLinksSet detourLinksSet = new DetourLinksSet(filteredInsertions);
+
+		// calc backward dijkstra from pickup to ends of selected stops + starts
 		// highest computation time (approx. 45% total CPU time)
-		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
-			// calc backward dijkstra from pickup to ends of selected stops + starts
-			return toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
-					earliestPickupTime);
-		});
+		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
+				() -> toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
+						earliestPickupTime));
 
+		// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
 		// medium computation time (approx. 25% total CPU time)
-		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
-			// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
-			return fromPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourEndLinks.values(),
-					earliestPickupTime);
-		});
+		Future<Map<Link, PathData>> pathsFromPickupFuture = executorService.submit(
+				() -> fromPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourEndLinks.values(),
+						earliestPickupTime));
 
+		// calc backward dijkstra from dropoff to ends of selected stops
 		// medium computation time (approx. 25% total CPU time)
-		Future<Map<Id<Link>, PathData>> pathsToDropoffFuture = executorService.submit(() -> {
-			// calc backward dijkstra from dropoff to ends of selected stops
-			return toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
-					earliestDropoffTime);
-		});
+		Future<Map<Link, PathData>> pathsToDropoffFuture = executorService.submit(
+				() -> toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
+						earliestDropoffTime));
 
+		// calc forward dijkstra from dropoff to beginnings of selected stops
 		// lowest computation time (approx. 5% total CPU time)
-		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
-			// calc forward dijkstra from dropoff to beginnings of selected stops
-			return fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
-					earliestDropoffTime);
-		});
+		Future<Map<Link, PathData>> pathsFromDropoffFuture = executorService.submit(
+				() -> fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
+						earliestDropoffTime));
 
 		try {
-			// start from earliest (fastest) to latest (slowest)
-			pathsFromDropoffMap = pathsFromDropoffFuture.get();
-			pathsToDropoffMap = pathsToDropoffFuture.get();
-			pathsFromPickupMap = pathsFromPickupFuture.get();
-			pathsToPickupMap = pathsToPickupFuture.get();
+			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
+					pathsFromDropoffFuture.get());
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	@Override
-	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
-		return PrecalculablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
-				pathsToDropoffMap, pathsFromDropoffMap);
 	}
 
 	@Override

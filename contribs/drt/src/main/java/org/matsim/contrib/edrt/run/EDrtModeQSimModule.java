@@ -29,7 +29,7 @@ import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.PrecalculablePathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
@@ -125,8 +125,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleData.EntryFactory.class),
-						getter.getModal(PrecalculablePathDataProvider.class),
+						getter.getModal(VehicleData.EntryFactory.class), getter.getModal(PathDataProvider.class),
 						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
 						getter.getModal(QSimScopeForkJoinPoolHolder.class)))).asEagerSingleton();
 
@@ -184,7 +183,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 			}
 		});
-		bindModal(PrecalculablePathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
+		bindModal(PathDataProvider.class).to(modalKey(ParallelPathDataProvider.class));
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
 				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerEngine.class),

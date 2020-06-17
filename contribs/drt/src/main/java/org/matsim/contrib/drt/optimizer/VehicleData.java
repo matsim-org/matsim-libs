@@ -29,12 +29,15 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.collect.ImmutableList;
+import com.sun.istack.Nullable;
 
 /**
  * @author michalm
@@ -42,19 +45,100 @@ import com.google.common.collect.ImmutableList;
 public class VehicleData {
 	public static class Entry {
 		public final DvrpVehicle vehicle;
-		public final LinkTimePair start;
-		public final int startOccupancy;
+		public final Start start;
 		public final ImmutableList<Stop> stops;
+		private final End end;//TODO keep it private until it is used in insertion cost calculation etc.
 
-		public Entry(DvrpVehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
+		public Entry(DvrpVehicle vehicle, Start start, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
-			this.startOccupancy = startOccupancy;
 			this.stops = stops;
+			this.end = End.OPEN_END;
+		}
+
+		//TODO allow index == stops.size() ==> return end ???
+		public Waypoint getWaypoint(int index) {
+			return index == 0 ? start : stops.get(index - 1);
 		}
 	}
 
-	public static class Stop {
+	public interface Waypoint {
+		Link getLink();
+
+		double getDepartureTime();
+
+		int getOutgoingOccupancy();
+	}
+
+	public static class Start implements Waypoint {
+		@Nullable // if schedule status is PLANNED
+		public final Task task;
+		public final Link link;
+		public final double time;
+		public final int occupancy;
+
+		public Start(Task task, Link link, double time, int occupancy) {
+			this.task = task;
+			this.link = link;
+			this.time = time;
+			this.occupancy = occupancy;
+		}
+
+		@Override
+		public Link getLink() {
+			return link;
+		}
+
+		@Override
+		public double getDepartureTime() {
+			return time;
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			return occupancy;
+		}
+	}
+
+	public static class End implements Waypoint {
+		public static End OPEN_END = new End();
+
+		@Nullable
+		public final Link link;//null if open-end route
+		public final OptionalTime time;//undefined if open-end route
+
+		private End() {
+			link = null;
+			time = OptionalTime.undefined();
+		}
+
+		public End(Link link, double time) {
+			this.link = link;
+			this.time = OptionalTime.defined(time);
+		}
+
+		public boolean isOpenEnd() {
+			return link == null;
+		}
+
+		@Override
+		@Nullable
+		public Link getLink() {
+			return link;
+		}
+
+		@Override
+		public double getDepartureTime() {
+			return time.seconds();
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			throw new UnsupportedOperationException("End is the terminal waypoint");
+		}
+	}
+
+	public static class Stop implements Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
 		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
@@ -72,6 +156,21 @@ public class VehicleData {
 			// essentially the min of the latest possible pickup times at this stop
 
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
+		}
+
+		@Override
+		public Link getLink() {
+			return task.getLink();
+		}
+
+		@Override
+		public double getDepartureTime() {
+			return task.getEndTime();
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			return outgoingOccupancy;
 		}
 
 		private double calcLatestArrivalTime() {
