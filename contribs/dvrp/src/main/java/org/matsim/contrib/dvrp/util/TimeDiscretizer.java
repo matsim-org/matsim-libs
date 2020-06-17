@@ -95,4 +95,14 @@ public class TimeDiscretizer {
 	public int getIntervalCount() {
 		return intervalCount;
 	}
+
+	public interface TimeBinConsumer {
+		void accept(int bin, int time);
+	}
+
+	public void forEach(TimeBinConsumer consumer) {
+		for (int i = 0; i < intervalCount; i++) {
+			consumer.accept(i, i * timeInterval);
+		}
+	}
 }
