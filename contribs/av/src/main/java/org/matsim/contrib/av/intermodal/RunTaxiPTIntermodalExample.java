@@ -35,6 +35,7 @@ import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -53,26 +54,26 @@ public class RunTaxiPTIntermodalExample {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-		
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+
 		SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
 		srrConfig.setUseIntermodalAccessEgress(true);
 		srrConfig.setIntermodalAccessEgressModeSelection(IntermodalAccessEgressModeSelection.RandomSelectOneModePerRoutingRequestAndDirection);
-		
+
 		IntermodalAccessEgressParameterSet paramSetTaxi = new IntermodalAccessEgressParameterSet();
 		paramSetTaxi.setMode(TransportMode.taxi);
 		paramSetTaxi.setInitialSearchRadius(15000);
 		paramSetTaxi.setMaxRadius(20000);
 		paramSetTaxi.setSearchExtensionRadius(0.1);
 		srrConfig.addIntermodalAccessEgress(paramSetTaxi);
-		
+
 		IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
 		paramSetWalk.setMode(TransportMode.walk);
 		paramSetWalk.setInitialSearchRadius(1000);
 		paramSetWalk.setMaxRadius(1000);
 		paramSetWalk.setSearchExtensionRadius(0.1);
 		srrConfig.addIntermodalAccessEgress(paramSetWalk);
-		
+
 		config.addModule(srrConfig);
 
 		OTFVisConfigGroup otfvis = new OTFVisConfigGroup();

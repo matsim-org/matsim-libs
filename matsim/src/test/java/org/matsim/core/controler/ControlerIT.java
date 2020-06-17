@@ -55,6 +55,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -461,7 +462,7 @@ public class ControlerIT {
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 		
 		int expectedPlanLength = 3 ;
-		if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
 			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
 			expectedPlanLength = 7 ;
 		}
@@ -478,7 +479,7 @@ public class ControlerIT {
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
-			if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
 				assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 3 )).getRoute());

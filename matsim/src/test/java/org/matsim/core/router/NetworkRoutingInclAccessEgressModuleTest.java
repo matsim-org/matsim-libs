@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -100,7 +101,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.controler().setLastIteration(0);
         config.controler().setOutputDirectory(utils.getOutputDirectory());
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
 
         final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
         homeParams.setTypicalDuration(1);

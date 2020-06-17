@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -70,6 +71,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Scenario scenario;
 	private final RoutingModule accessEgressToNetworkRouter;
 	private final Config config;
+	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accessTime_";
+	private final String accessTimeLinkAttribute;
 
 	NetworkRoutingInclAccessEgressModule(
 		  final String mode,
@@ -84,7 +87,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.config = scenario.getConfig();
 		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		this.accessTimeLinkAttribute = ACCESSTIMELINKATTRIBUTEPREFIX+mode;
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
 		}

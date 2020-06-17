@@ -34,10 +34,12 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.*;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -792,8 +794,22 @@ public final class NetworkUtils {
 		new MatsimNetworkReader(network).readFile(string);
 	}
 
+	public static OptionalTime getLinkAccessTime(Link link, String mode){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+mode;
+		Object o = link.getAttributes().getAttribute(attribute);
+		if (o!=null){
+			return OptionalTime.defined((double) o);
+		}
+		else return OptionalTime.undefined();
+	}
+	public static void setLinkAccessTime(Link link, String mode, double accessTime){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+mode;
+		link.getAttributes().putAttribute(attribute,accessTime);
+	}
+
+
 	public static Network readNetwork(String string) {
-		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+		Network network = createNetwork();
 		new MatsimNetworkReader(network).readFile(string);
 		return network;
 	}

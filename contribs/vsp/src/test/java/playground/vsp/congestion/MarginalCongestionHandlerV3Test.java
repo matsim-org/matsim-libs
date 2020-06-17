@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -69,7 +70,7 @@ public class MarginalCongestionHandlerV3Test {
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.None);
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {

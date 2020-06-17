@@ -69,8 +69,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	private boolean insertingAccessEgressWalk = false ;
-	
+	public enum AccessEgressWalkType {None, directWalk, readAccessTimeFromLinkAttribute}
+
+	private static final String ISINSERTINGACCESSEGRESSWALK = "insertAccessEgressWalk";
+	private AccessEgressWalkType accessEgressWalkType = AccessEgressWalkType.None;
+
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
@@ -559,11 +562,15 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public boolean isInsertingAccessEgressWalk() {
-		return this.insertingAccessEgressWalk ;
+
+	@StringGetter(ISINSERTINGACCESSEGRESSWALK)
+	public AccessEgressWalkType getAccessEgressWalkType() {
+		return this.accessEgressWalkType ;
 	}
-	public void setInsertingAccessEgressWalk( boolean val ) {
-		this.insertingAccessEgressWalk = val ;
+
+	@StringSetter(ISINSERTINGACCESSEGRESSWALK)
+	public void setInsertingAccessEgressWalk( AccessEgressWalkType accessEgressWalkType) {
+		this.accessEgressWalkType = accessEgressWalkType;
 	}
 
 	@StringGetter(RANDOMNESS)
