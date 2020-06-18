@@ -63,10 +63,9 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
 
-		return TimeProfiles.createProfileCalculator(header, () -> {
-			return selectedEvs.stream().map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
-					.toArray(Double[]::new);
-		});
+		return TimeProfiles.createProfileCalculator(header, () -> selectedEvs.stream()
+				.map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
+				.toArray(Double[]::new));
 	}
 
 }

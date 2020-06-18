@@ -107,7 +107,7 @@ public class DrtPassengerAndVehicleStats
 		Set<Id<Vehicle>> monitoredVehicles = fleetSpecification.getVehicleSpecifications()
 				.keySet()
 				.stream()
-				.map(vid -> Id.createVehicleId(vid))
+				.map(Id::createVehicleId)
 				.collect(Collectors.toSet());
 
 		for (Id<Vehicle> vid : monitoredVehicles) {
