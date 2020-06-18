@@ -25,7 +25,7 @@ import com.google.common.base.Preconditions;
 
 public class TimeDiscretizer {
 	public enum Type {
-		ACYCLIC, CYCLIC, OPEN_ENDED;
+		ACYCLIC, CYCLIC, OPEN_ENDED
 	}
 
 	public static final TimeDiscretizer ACYCLIC_1_SEC = new TimeDiscretizer(30 * 3600, 1, Type.ACYCLIC);

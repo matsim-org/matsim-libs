@@ -101,7 +101,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 		zoneToIdleVehicleQueue = new HashMap<>();
 		for (Id<Zone> zoneId : zones.keySet()) {
-			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<DvrpVehicle>(10, LONGEST_WAITING_FIRST));
+			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<>(10, LONGEST_WAITING_FIRST));
 		}
 
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {

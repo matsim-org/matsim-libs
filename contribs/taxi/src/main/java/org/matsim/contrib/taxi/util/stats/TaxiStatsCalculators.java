@@ -52,8 +52,8 @@ public class TaxiStatsCalculators {
 	}
 
 	public static int[] calcHourlyDurations(int from, int to) {
-		int firstHour = (int)from / 3600;
-		int lastHour = (int)to / 3600;
+		int firstHour = from / 3600;
+		int lastHour = to / 3600;
 
 		if (firstHour == lastHour) {
 			return new int[] { to - from };

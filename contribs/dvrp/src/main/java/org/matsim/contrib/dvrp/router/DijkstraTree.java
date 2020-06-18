@@ -46,7 +46,7 @@ public class DijkstraTree extends Dijkstra {
 		this.startTime = startTime;
 
 		augmentIterationId();
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);// TODO other options??
+		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<>(500);// TODO other options??
 		initFromNode(fromNode, null, startTime, pendingNodes);
 
 		while (!pendingNodes.isEmpty()) {

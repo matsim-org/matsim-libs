@@ -17,7 +17,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addModalComponent(PassengerEngine.class, new ModalProviders.AbstractProvider<PassengerEngine>(getMode()) {
+		addModalComponent(PassengerEngine.class, new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject
 			private EventsManager eventsManager;
 
