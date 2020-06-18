@@ -36,7 +36,7 @@ import java.util.stream.Stream;
  */
 public class PartialSort<T> {
 	public static <T> List<T> kSmallestElements(int k, Stream<T> elements, ToDoubleFunction<T> evaluator) {
-		PartialSort<T> nearestRequestSort = new PartialSort<T>(k);
+		PartialSort<T> nearestRequestSort = new PartialSort<>(k);
 		nearestRequestSort.addAll(elements, evaluator);
 		return nearestRequestSort.kSmallestElements();
 	}

@@ -58,7 +58,7 @@ public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, Ac
 	private void initEntryMap() {
 		for (String z : zonalSystem.getZones().keySet()) {
 			LinkedList<Tuple<Double,Integer>> list = new LinkedList<>();
-			list.add(new Tuple<Double,Integer>(0d,0));
+			list.add(new Tuple<>(0d, 0));
 			zoneEntries.put(z, list);
 		}
 	}

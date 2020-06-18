@@ -86,7 +86,7 @@ public class ScheduleReconstructionIT {
 			@Override
 			public void install() {
 				bindModal(ScheduleReconstructor.class).toProvider(
-						new ModalProviders.AbstractProvider<ScheduleReconstructor>(taxiCfg.getMode()) {
+						new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 							@Inject
 							private EventsManager eventsManager;
 

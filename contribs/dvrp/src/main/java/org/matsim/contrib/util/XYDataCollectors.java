@@ -35,7 +35,7 @@ public class XYDataCollectors {
 
 	public static <T extends BasicLocation> XYDataCalculator<T> createCalculator(String[] header,
 			Function<T, Coord> coordGetter, Function<T, Object[]> valueCalculator) {
-		return new XYDataCalculator<T>() {
+		return new XYDataCalculator<>() {
 			@Override
 			public String[] getHeader() {
 				return header;

@@ -46,7 +46,7 @@ public class WeightedRandomSelection<T> {
 			throw new ArithmeticException("Total weight is infinite");
 		}
 
-		entryList.add(new Entry<T>(obj, totalWeight));
+		entryList.add(new Entry<>(obj, totalWeight));
 	}
 
 	public T select() {

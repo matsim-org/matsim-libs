@@ -211,7 +211,7 @@ public class DrtTripsAnalyser {
 		if (trips == null)
 			return;
 
-		List<String> detours = new ArrayList<String>();
+		List<String> detours = new ArrayList<>();
 		XYSeries distances = new XYSeries("distances");
 		XYSeries travelTimes = new XYSeries("travel times");
 		XYSeries rideTimes = new XYSeries("ride times");
