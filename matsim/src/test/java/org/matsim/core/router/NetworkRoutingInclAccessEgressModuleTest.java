@@ -226,26 +226,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
 
-    @Test
-    public void useAccessEgressTimeFromLinkAttributes() {
 
-        Config config = createConfig();
-        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
-        Scenario scenario = createScenario(config);
-        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
-        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
-        // add persons
-        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
-        scenario.getPopulation().addPerson(person);
-
-        Controler controler = createControler(scenario);
-        controler.run();
-        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
-        Assert.equals(3,legs.size());
-        Assert.equals(75.0,legs.get(0).getTravelTime().seconds());
-        Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
-    }
 
     @Test
     public void calcRoute_defaultVehicle_defaultVehicleIsAssigned() {
@@ -273,6 +254,70 @@ public class NetworkRoutingInclAccessEgressModuleTest {
             assertTrue(scenario.getVehicles().getVehicles().containsKey(vehicleId));
             assertEquals(VehicleUtils.getDefaultVehicleType(), scenario.getVehicles().getVehicles().get(vehicleId).getType());
         }
+    }
+
+
+    @Test
+    public void useAccessEgressTimeFromLinkAttributes() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        Assert.equals(3,legs.size());
+        Assert.equals(75.0,legs.get(0).getTravelTime().seconds());
+        Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
+    }
+
+    @Test
+    public void calcAccessTimeFromDistanceToNode() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        Assert.equals(3,legs.size());
+        Assert.equals(78.0,legs.get(0).getTravelTime().seconds());
+        Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
+    }
+
+    @Test
+    public void noBushwackingLegs() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.None);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        Assert.equals(1,legs.size());
+        Assert.equals(TransportMode.car,legs.get(0).getMode());
+
     }
 
     /**
