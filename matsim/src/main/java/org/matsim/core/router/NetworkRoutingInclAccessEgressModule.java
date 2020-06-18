@@ -88,7 +88,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.config = scenario.getConfig();
 		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
 		this.accessTimeLinkAttribute = ACCESSTIMELINKATTRIBUTEPREFIX+mode;
-		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
 		}
