@@ -36,7 +36,7 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	}
 	
 	private void addNetworkChangeEventToMessageQ(NetworkChangeEvent changeEvent) {
-		Message m = new Message() {
+		Message m = new Message(null) {
 			@Override
 			public void processEvent() {
 

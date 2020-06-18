@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * The micro-simulation internal handler for starting a leg.
@@ -31,8 +32,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
  */
 public class StartingLegMessage extends EventMessage {
 
-	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
+	public StartingLegMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(scheduler, vehicle, eventsManager);
 		priority = JDEQSimConfigGroup.PRIORITY_DEPARTUARE_MESSAGE;
 	}
 

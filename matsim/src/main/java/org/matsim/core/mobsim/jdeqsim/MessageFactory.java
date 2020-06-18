@@ -21,6 +21,8 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.LinkedList;
 
+import org.matsim.core.api.experimental.events.EventsManager;
+
 /**
  * The message factory is used for creating and disposing messages - mainly for
  * performance gain to have lesser garbage collection.
@@ -29,6 +31,7 @@ import java.util.LinkedList;
  */
 public class MessageFactory {
 
+	private final EventsManager eventsManager;
 	private LinkedList<EndLegMessage> endLegMessageQueue = new LinkedList<EndLegMessage>();
 	private LinkedList<EnterRoadMessage> enterRoadMessageQueue = new LinkedList<EnterRoadMessage>();
 	private LinkedList<StartingLegMessage> startingLegMessageQueue = new LinkedList<StartingLegMessage>();
@@ -36,6 +39,10 @@ public class MessageFactory {
 	private LinkedList<EndRoadMessage> endRoadMessageQueue = new LinkedList<EndRoadMessage>();
 
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessageQueue = new LinkedList<DeadlockPreventionMessage>();
+
+	public MessageFactory(EventsManager eventsManager) {
+		this.eventsManager = eventsManager;
+	}
 
 	public void disposeEndLegMessage(EndLegMessage message) {
 		if (!JDEQSimConfigGroup.isGC_MESSAGES()) {
@@ -75,7 +82,7 @@ public class MessageFactory {
 
 	public EndLegMessage getEndLegMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (endLegMessageQueue.size() == 0) {
-			return new EndLegMessage(scheduler, vehicle);
+			return new EndLegMessage(scheduler, vehicle, eventsManager);
 		} else {
 			EndLegMessage message = endLegMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -85,7 +92,7 @@ public class MessageFactory {
 
 	public EnterRoadMessage getEnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (enterRoadMessageQueue.size() == 0) {
-			return new EnterRoadMessage(scheduler, vehicle);
+			return new EnterRoadMessage(scheduler, vehicle, eventsManager);
 		} else {
 			EnterRoadMessage message = enterRoadMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -95,7 +102,7 @@ public class MessageFactory {
 
 	public StartingLegMessage getStartingLegMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (startingLegMessageQueue.size() == 0) {
-			return new StartingLegMessage(scheduler, vehicle);
+			return new StartingLegMessage(scheduler, vehicle, eventsManager);
 		} else {
 			StartingLegMessage message = startingLegMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -105,7 +112,7 @@ public class MessageFactory {
 
 	public LeaveRoadMessage getLeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (leaveRoadMessageQueue.size() == 0) {
-			return new LeaveRoadMessage(scheduler, vehicle);
+			return new LeaveRoadMessage(scheduler, vehicle, eventsManager);
 		} else {
 			LeaveRoadMessage message = leaveRoadMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -115,7 +122,7 @@ public class MessageFactory {
 
 	public EndRoadMessage getEndRoadMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (endRoadMessageQueue.size() == 0) {
-			return new EndRoadMessage(scheduler, vehicle);
+			return new EndRoadMessage(scheduler, vehicle, eventsManager);
 		} else {
 			EndRoadMessage message = endRoadMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -125,7 +132,7 @@ public class MessageFactory {
 
 	public DeadlockPreventionMessage getDeadlockPreventionMessage(Scheduler scheduler, Vehicle vehicle) {
 		if (deadlockPreventionMessageQueue.size() == 0) {
-			return new DeadlockPreventionMessage(scheduler, vehicle);
+			return new DeadlockPreventionMessage(scheduler, vehicle, eventsManager);
 		} else {
 			DeadlockPreventionMessage message = deadlockPreventionMessageQueue.poll();
 			message.resetMessage(scheduler, vehicle);
@@ -167,4 +174,7 @@ public class MessageFactory {
 		return deadlockPreventionMessageQueue;
 	}
 
+	public EventsManager getEventsManager() {
+		return eventsManager;
+	}
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.core.api.experimental.events.EventsManager;
+
 /**
  * The basic EventMessage type.
  *
@@ -28,8 +30,8 @@ public abstract class EventMessage extends Message {
 	public Vehicle vehicle;
 	public Scheduler scheduler;
 
-	public EventMessage(Scheduler scheduler, Vehicle vehicle) {
-		super();
+	public EventMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(eventsManager);
 		this.vehicle = vehicle;
 		this.scheduler = scheduler;
 	}

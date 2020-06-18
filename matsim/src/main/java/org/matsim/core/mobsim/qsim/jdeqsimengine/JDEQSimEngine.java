@@ -46,7 +46,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         this.eventsManager = eventsManager;
         this.agentCounter = agentCounter;
         this.allRoads = new HashMap<>();
-        messageFactory = new MessageFactory();
+        messageFactory = new MessageFactory(eventsManager);
     }
 
     @Override

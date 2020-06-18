@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * The micro-simulation internal handler for entering a road.
@@ -38,8 +39,8 @@ public class EnterRoadMessage extends EventMessage {
 		road.enterRoad(vehicle, getMessageArrivalTime());
 	}
 
-	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
+	public EnterRoadMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(scheduler, vehicle, eventsManager);
 		priority = JDEQSimConfigGroup.PRIORITY_ENTER_ROAD_MESSAGE;
 	}
 
