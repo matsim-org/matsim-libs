@@ -19,18 +19,23 @@
 
 package org.matsim.contrib.util.timeprofile;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.List;
 
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.*;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.*;
+import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYSeries;
 
 public class TimeProfileCharts {
 	public enum ChartType {
-		Line, StackedArea;
+		Line, StackedArea
 	}
 
 	public static JFreeChart chartProfile(String[] series, List<Double> times, List<Object[]> timeProfile,

@@ -38,15 +38,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
-	private Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
+	private final Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
+	private final Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
 
 	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
 		events.addHandler(this);
 		this.zonalSystem = zonalSystem;
 		for (String z : zonalSystem.getZones().keySet()) {
-			vehiclesPerZone.put(z, new LinkedList<Id<DvrpVehicle>>());
+			vehiclesPerZone.put(z, new LinkedList<>());
 		}
 	}
 

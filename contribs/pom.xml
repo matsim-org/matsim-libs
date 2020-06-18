@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -126,6 +126,7 @@
 						<descriptors>
 							<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 						</descriptors>
+						<attach>false</attach>
 					</configuration>
 					<executions>
 						<execution>
@@ -152,6 +153,7 @@
 		<module>commercialTrafficApplications</module>
 		<module>common</module>
 		<module>decongestion</module>
+		<module>discrete_mode_choice</module>
 		<module>drt</module>
 		<module>dvrp</module>
 		<module>ev</module>
@@ -215,14 +217,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -235,7 +237,7 @@
 			<!--<version>0.10.0</version>-->
 			<!--<version>0.11.0-apr17</version>-->
 			<scope>test</scope>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 		<dependency>

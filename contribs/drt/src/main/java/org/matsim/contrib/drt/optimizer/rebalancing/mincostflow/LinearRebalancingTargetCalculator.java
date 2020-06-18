@@ -18,7 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 
@@ -39,10 +38,10 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 	@Override
 	public int estimate(String zone, double time) {
 		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		MutableInt expectedDemand = demandAggregator.getExpectedDemandForTimeBin(time + 60).get(zone);
-		if (expectedDemand == null || expectedDemand.intValue() == 0) {
+		int expectedDemand = demandAggregator.getExpectedDemandForTimeBin(time + 60).applyAsInt(zone);
+		if (expectedDemand == 0) {
 			return 0;// for larger zones we may assume that target is at least 1 (or in some cases) ??????
 		}
-		return (int)Math.round(params.getTargetAlpha() * expectedDemand.intValue() + params.getTargetBeta());
+		return (int)Math.round(params.getTargetAlpha() * expectedDemand + params.getTargetBeta());
 	}
 }

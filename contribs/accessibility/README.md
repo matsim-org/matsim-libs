@@ -1,5 +1,7 @@
 # Accessibility
 
+This package provides a tool for accessibility calculation.
+
 The code in this contribution relates mainly to the _ER Africa_ project titled _MAXess: Measuring accessibility in policy evaluation_. The project is a joint research project between the following entities:
 
 * Prof Johan W. Joubert, University of Pretoria, South Africa (coordinator);

@@ -1,7 +1,9 @@
 package org.matsim.contrib.ev.routing;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -22,9 +24,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
@@ -96,7 +97,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 		log.debug("requesting network routing module with routingMode=" + routingMode + ";\tmode=" + mode);
 
 		// the network refers to the (transport)mode:
-		Network filteredNetwork = null;
+		Network filteredNetwork;
 
 		// Ensure this is not performed concurrently by multiple threads!
 		synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
