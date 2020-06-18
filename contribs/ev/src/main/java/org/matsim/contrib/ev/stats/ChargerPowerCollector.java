@@ -48,7 +48,7 @@ public class ChargerPowerCollector
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet fleet;
-	private final Map<Id<ElectricVehicle>, ImmutablePair> chargeBeginSoc = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ImmutablePair<Double, Double>> chargeBeginSoc = new HashMap<>();
 
 	private final List<ChargingLogEntry> logList = new ArrayList<>();
 
@@ -143,7 +143,7 @@ public class ChargerPowerCollector
 
 		@Override
 		public int compareTo(ChargingLogEntry o) {
-			return Double.valueOf(chargeStart).compareTo(o.chargeStart);
+			return Double.compare(chargeStart, o.chargeStart);
 		}
 
 		public Id<ElectricVehicle> getVehicleId() {
