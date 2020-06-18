@@ -23,11 +23,13 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.DynAgentLogic;
 import org.matsim.contrib.dynagent.IdleDynActivity;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author michalm
@@ -40,15 +42,18 @@ public class VrpAgentLogic implements DynAgentLogic {
 		DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now);
 	}
 
+	private final EventsManager eventsManager;
 	private final VrpOptimizer optimizer;
 	private final DynActionCreator dynActionCreator;
 	private final DvrpVehicle vehicle;
 	private DynAgent agent;
 
-	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle) {
+	public VrpAgentLogic(VrpOptimizer optimizer, DynActionCreator dynActionCreator, DvrpVehicle vehicle,
+			EventsManager eventsManager) {
 		this.optimizer = optimizer;
 		this.dynActionCreator = dynActionCreator;
 		this.vehicle = vehicle;
+		this.eventsManager = eventsManager;
 	}
 
 	@Override
@@ -69,10 +74,18 @@ public class VrpAgentLogic implements DynAgentLogic {
 		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
 			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
 		}
-		// else: PLANNED or STARTED
 
+		if (schedule.getStatus() == ScheduleStatus.STARTED) {
+			Task task = schedule.getCurrentTask();
+			eventsManager.processEvent(new TaskEndedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+
+		}
 		optimizer.nextTask(vehicle);
-		// remember to REFRESH status (after nextTask -> now it can be COMPLETED)!!!
+		if (schedule.getStatus() == ScheduleStatus.STARTED) {
+			Task task = schedule.getCurrentTask();
+			eventsManager.processEvent(
+					new TaskStartedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+		}
 
 		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
 			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
