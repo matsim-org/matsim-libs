@@ -51,6 +51,8 @@ public class JDEQSimulation implements Mobsim {
 
     private final Scheduler scheduler;
 	protected final HashMap<Id<Link>, Road> allRoads;
+	protected final MessageFactory messageFactory;
+
 
 	@Inject
 	public JDEQSimulation(final JDEQSimConfigGroup config, final Scenario scenario, final EventsManager events) {
@@ -61,6 +63,7 @@ public class JDEQSimulation implements Mobsim {
 		activityDurationInterpretation = scenario.getConfig().plans().getActivityDurationInterpretation();
 		scheduler = new Scheduler(new MessageQueue(), config.getSimulationEndTime());
 		this.allRoads = new HashMap<>();
+		messageFactory = new MessageFactory();
 	}
 
 	@Override
@@ -88,7 +91,7 @@ public class JDEQSimulation implements Mobsim {
 	protected void initializeVehicles() {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			// the vehicle registers itself to the scheduler
-			new Vehicle(scheduler, person, activityDurationInterpretation, allRoads);
+			new Vehicle(scheduler, person, activityDurationInterpretation, allRoads, messageFactory);
 		}
 	}
 
