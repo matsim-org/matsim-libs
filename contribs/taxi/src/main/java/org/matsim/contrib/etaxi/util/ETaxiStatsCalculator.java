@@ -30,13 +30,12 @@ import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculators;
 
 public class ETaxiStatsCalculator {
-	private final int hours;
 	private final ETaxiStats[] hourlyEStats;
 	private final ETaxiStats dailyEStats = new ETaxiStats(TaxiStatsCalculators.DAILY_STATS_ID);
 	private final List<ETaxiStats> eTaxiStats;
 
 	public ETaxiStatsCalculator(Iterable<? extends DvrpVehicle> vehicles) {
-		hours = TaxiStatsCalculators.calcHourCount(vehicles);
+		int hours = TaxiStatsCalculators.calcHourCount(vehicles);
 		hourlyEStats = new ETaxiStats[hours];
 		for (int h = 0; h < hours; h++) {
 			hourlyEStats[h] = new ETaxiStats(h + "");

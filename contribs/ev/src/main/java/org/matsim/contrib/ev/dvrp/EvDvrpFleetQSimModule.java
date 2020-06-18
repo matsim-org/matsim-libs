@@ -41,7 +41,7 @@ public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	public void configureQSim() {
-		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<Fleet>(getMode()) {
+		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject
 			private ElectricFleet evFleet;
 

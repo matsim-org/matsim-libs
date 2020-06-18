@@ -33,8 +33,7 @@ import com.google.common.primitives.Doubles;
 
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
-	private PiecewiseBicubicSplineInterpolator splineInterpolater = new PiecewiseBicubicSplineInterpolator();
-	private PiecewiseBicubicSplineInterpolatingFunction function;
+	private final PiecewiseBicubicSplineInterpolatingFunction function;
 
 	private final double minSpeed;
 	private final double maxSpeed;
@@ -72,7 +71,8 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private LTHDriveEnergyConsumption(double[] speeds, double[] slopes, double[][] consumptionPerSpeedAndSlope,
 			boolean crashIfOutOfBoundValue) {
-		this.function = splineInterpolater.interpolate(speeds, slopes, consumptionPerSpeedAndSlope);
+		this.function = new PiecewiseBicubicSplineInterpolator().interpolate(speeds, slopes,
+				consumptionPerSpeedAndSlope);
 		this.minSpeed = Doubles.min(speeds);
 		this.maxSpeed = Doubles.max(speeds);
 		this.minSlope = Doubles.min(slopes);

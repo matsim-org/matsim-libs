@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import com.google.inject.Inject;
 
 /**
- * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idle engines,
+ * AUX discharging is executed for non-moving vehicles. This is useful for vehicles with idling engines,
  * such as taxis (where heating is on during a stay at a taxi rank), but should not be used with ordinary passenger cars.
  * <p>
  * VehicleProvider is responsible to decide if AUX discharging applies to a given vehicle based on information from
