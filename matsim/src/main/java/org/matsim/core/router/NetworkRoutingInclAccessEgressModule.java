@@ -62,291 +62,291 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 
-    private static final Logger log = Logger.getLogger(NetworkRoutingInclAccessEgressModule.class);
+	private static final Logger log = Logger.getLogger(NetworkRoutingInclAccessEgressModule.class);
 
-    private final String mode;
-    private final PopulationFactory populationFactory;
+	private final String mode;
+	private final PopulationFactory populationFactory;
 
-    private final Network filteredNetwork;
-    private final LeastCostPathCalculator routeAlgo;
-    private final Scenario scenario;
-    private final RoutingModule accessEgressToNetworkRouter;
-    private final Config config;
-    public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
+	private final Network filteredNetwork;
+	private final LeastCostPathCalculator routeAlgo;
+	private final Scenario scenario;
+	private final RoutingModule accessEgressToNetworkRouter;
+	private final Config config;
+	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 
-    NetworkRoutingInclAccessEgressModule(
-            final String mode,
-            final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
-            final RoutingModule accessEgressToNetworkRouter) {
-        Gbl.assertNotNull(scenario.getNetwork());
-        Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
-        this.filteredNetwork = filteredNetwork;
-        this.routeAlgo = routeAlgo;
-        this.mode = mode;
-        this.scenario = scenario;
-        this.populationFactory = scenario.getPopulation().getFactory();
-        this.config = scenario.getConfig();
-        this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-        if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
-            throw new RuntimeException("trying to use access/egress but not switched on in config.  "
-                    + "currently not supported; there are too many other problems");
-        }
-    }
+	NetworkRoutingInclAccessEgressModule(
+			final String mode,
+			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
+			final RoutingModule accessEgressToNetworkRouter) {
+		Gbl.assertNotNull(scenario.getNetwork());
+		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
+		this.filteredNetwork = filteredNetwork;
+		this.routeAlgo = routeAlgo;
+		this.mode = mode;
+		this.scenario = scenario;
+		this.populationFactory = scenario.getPopulation().getFactory();
+		this.config = scenario.getConfig();
+		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
+		if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
+			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
+					+ "currently not supported; there are too many other problems");
+		}
+	}
 
-    @Override
-    public synchronized List<? extends PlanElement> calcRoute(
-            final Facility fromFacility,
-            final Facility toFacility,
-            final double departureTime,
-            final Person person) {
-        // I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
-        // mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
+	@Override
+	public synchronized List<? extends PlanElement> calcRoute(
+			final Facility fromFacility,
+			final Facility toFacility,
+			final double departureTime,
+			final Person person) {
+		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
+		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 
-        Gbl.assertNotNull(fromFacility);
-        Gbl.assertNotNull(toFacility);
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
 
-        Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, filteredNetwork);
+		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, filteredNetwork);
 
-        Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, filteredNetwork);
+		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, filteredNetwork);
 
-        double now = departureTime;
+		double now = departureTime;
 
-        List<PlanElement> result = new ArrayList<>();
+		List<PlanElement> result = new ArrayList<>();
 
-        // === access:
-        {
-            now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result, populationFactory, mode,
-                    scenario.getConfig());
-        }
+		// === access:
+		{
+			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result, populationFactory, mode,
+					scenario.getConfig());
+		}
 
-        // === compute the network leg:
-        {
-            Leg newLeg = this.populationFactory.createLeg(this.mode);
-            newLeg.setDepartureTime(now);
-            now += routeLeg(person, newLeg, accessActLink, egressActLink, now);
+		// === compute the network leg:
+		{
+			Leg newLeg = this.populationFactory.createLeg(this.mode);
+			newLeg.setDepartureTime(now);
+			now += routeLeg(person, newLeg, accessActLink, egressActLink, now);
 
-            result.add(newLeg);
-            //			log.warn( newLeg );
-        }
+			result.add(newLeg);
+			//			log.warn( newLeg );
+		}
 
-        // === egress:
-        {
-            addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result, populationFactory, mode,
-                    scenario.getConfig());
-        }
+		// === egress:
+		{
+			addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result, populationFactory, mode,
+					scenario.getConfig());
+		}
 
-        return result;
-    }
+		return result;
+	}
 
-    private void addBushwhackingLegFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
-            final Link egressActLink, double now, final List<PlanElement> result,
-            final PopulationFactory populationFactory, final String stageActivityType,
-            Config config) {
+	private void addBushwhackingLegFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
+			final Link egressActLink, double now, final List<PlanElement> result,
+			final PopulationFactory populationFactory, final String stageActivityType,
+			Config config) {
 
-        log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
+		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
-        if (isNotNeedingBushwhackingLeg(toFacility)) {
-            return;
-        }
+		if (isNotNeedingBushwhackingLeg(toFacility)) {
+			return;
+		}
 
-        Coord startCoord = egressActLink.getToNode().getCoord();
-        Gbl.assertNotNull(startCoord);
+		Coord startCoord = egressActLink.getToNode().getCoord();
+		Gbl.assertNotNull(startCoord);
 
-        final Id<Link> startLinkId = egressActLink.getId();
+		final Id<Link> startLinkId = egressActLink.getId();
 
-        // check whether we already have an identical interaction activity directly before
-        PlanElement lastPlanElement = result.get(result.size() - 1);
-        if (lastPlanElement instanceof Leg) {
-            final Activity interactionActivity = createInteractionActivity(startCoord, startLinkId, stageActivityType);
-            result.add(interactionActivity);
-        } else {
-            // don't add another (interaction) activity
-            // TODO: assuming that this is an interaction activity, e.g. walk - drt interaction - walk
-            // Not clear what we should do if it is not an interaction activity (and how that could happen).
-        }
+		// check whether we already have an identical interaction activity directly before
+		PlanElement lastPlanElement = result.get(result.size() - 1);
+		if (lastPlanElement instanceof Leg) {
+			final Activity interactionActivity = createInteractionActivity(startCoord, startLinkId, stageActivityType);
+			result.add(interactionActivity);
+		} else {
+			// don't add another (interaction) activity
+			// TODO: assuming that this is an interaction activity, e.g. walk - drt interaction - walk
+			// Not clear what we should do if it is not an interaction activity (and how that could happen).
+		}
 
-        Id<Link> endLinkId = toFacility.getLinkId();
-        if (endLinkId == null) {
-            endLinkId = startLinkId;
-        }
+		Id<Link> endLinkId = toFacility.getLinkId();
+		if (endLinkId == null) {
+			endLinkId = startLinkId;
+		}
 
-        if (mode.equals(TransportMode.walk)) {
-            Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
-            egressLeg.setDepartureTime(now);
-            routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
-            result.add(egressLeg);
-        } else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
-            Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
-            egressLeg.setDepartureTime(now);
-            routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
-            double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(endLinkId), mode).orElse(0.0);
-            egressLeg.setTravelTime(accessTime);
-            egressLeg.getRoute().setTravelTime(accessTime);
-            result.add(egressLeg);
-        } else {
-            Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
-            result.addAll(accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
-        }
-    }
+		if (mode.equals(TransportMode.walk)) {
+			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
+			egressLeg.setDepartureTime(now);
+			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
+			result.add(egressLeg);
+		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
+			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
+			egressLeg.setDepartureTime(now);
+			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
+			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(endLinkId), mode).orElse(0.0);
+			egressLeg.setTravelTime(accessTime);
+			egressLeg.getRoute().setTravelTime(accessTime);
+			result.add(egressLeg);
+		} else {
+			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
+			result.addAll(accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
+		}
+	}
 
-    private static boolean isNotNeedingBushwhackingLeg(Facility toFacility) {
-        if (toFacility.getCoord() == null) {
-            // facility does not have a coordinate; we cannot bushwhack
-            return true;
-        }
-        // trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
-        return toFacility instanceof LinkWrapperFacility;
-    }
+	private static boolean isNotNeedingBushwhackingLeg(Facility toFacility) {
+		if (toFacility.getCoord() == null) {
+			// facility does not have a coordinate; we cannot bushwhack
+			return true;
+		}
+		// trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
+		return toFacility instanceof LinkWrapperFacility;
+	}
 
-    private double addBushwhackingLegFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
-            final Link accessActLink, double now, final List<PlanElement> result,
-            final PopulationFactory populationFactory, final String stageActivityType,
-            Config config) {
-        if (isNotNeedingBushwhackingLeg(fromFacility)) {
-            return now;
-        }
+	private double addBushwhackingLegFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
+			final Link accessActLink, double now, final List<PlanElement> result,
+			final PopulationFactory populationFactory, final String stageActivityType,
+			Config config) {
+		if (isNotNeedingBushwhackingLeg(fromFacility)) {
+			return now;
+		}
 
-        Coord endCoord = accessActLink.getToNode().getCoord();
-        // yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
-        Gbl.assertNotNull(endCoord);
+		Coord endCoord = accessActLink.getToNode().getCoord();
+		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
+		Gbl.assertNotNull(endCoord);
 
-        if (mode.equals(TransportMode.walk)) {
-            Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
-            accessLeg.setDepartureTime(now);
+		if (mode.equals(TransportMode.walk)) {
+			Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
+			accessLeg.setDepartureTime(now);
 
-            final Id<Link> startLinkId = fromFacility.getLinkId();
-            if (startLinkId == null) {
-                accessActLink.getId();
-            }
+			final Id<Link> startLinkId = fromFacility.getLinkId();
+			if (startLinkId == null) {
+				accessActLink.getId();
+			}
 
-            now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
-                    config);
-            // yyyy might be possible to set the link ids to null. kai & dominik, may'16
+			now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
+					config);
+			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
-            result.add(accessLeg);
-        } else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
-            Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
-            accessLeg.setDepartureTime(now);
-            final Id<Link> startLinkId = fromFacility.getLinkId();
-            if (startLinkId == null) {
-                accessActLink.getId();
-            }
-            routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
-                    config);
-            double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(startLinkId), mode).orElse(0.0);
-            accessLeg.setTravelTime(accessTime);
-            accessLeg.getRoute().setTravelTime(accessTime);
-            result.add(accessLeg);
-            now += accessTime;
-        } else {
-            Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
-            List<? extends PlanElement> accessTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
-            for (PlanElement planElement : accessTrip) {
-                now = TripRouter.calcEndOfPlanElement(now, planElement, config);
-            }
-            result.addAll(accessTrip);
-        }
+			result.add(accessLeg);
+		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
+			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
+			accessLeg.setDepartureTime(now);
+			final Id<Link> startLinkId = fromFacility.getLinkId();
+			if (startLinkId == null) {
+				accessActLink.getId();
+			}
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
+					config);
+			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(startLinkId), mode).orElse(0.0);
+			accessLeg.setTravelTime(accessTime);
+			accessLeg.getRoute().setTravelTime(accessTime);
+			result.add(accessLeg);
+			now += accessTime;
+		} else {
+			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
+			List<? extends PlanElement> accessTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			for (PlanElement planElement : accessTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
+			}
+			result.addAll(accessTrip);
+		}
 
-        final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
-        result.add(interactionActivity);
+		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
+		result.add(interactionActivity);
 
-        return now;
-    }
+		return now;
+	}
 
-    private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
-        Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
-        act.setMaximumDuration(0.0);
-        return act;
-    }
+	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
+		Activity act = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(interactionCoord, interactionLink, mode);
+		act.setMaximumDuration(0.0);
+		return act;
+	}
 
-    private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-            Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
-        final ModeRoutingParams params;
-        ModeRoutingParams tmp;
-        final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
-        if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
-            params = tmp;
-        } else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
-            params = tmp;
-        } else {
-            params = new ModeRoutingParams();
-            // old defaults
-            params.setBeelineDistanceFactor(1.3);
-            params.setTeleportedModeSpeed(2.0);
-        }
-        return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
-    }
+	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
+		final ModeRoutingParams params;
+		ModeRoutingParams tmp;
+		final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
+		if ((tmp = paramsMap.get(TransportMode.non_network_walk)) != null) {
+			params = tmp;
+		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
+			params = tmp;
+		} else {
+			params = new ModeRoutingParams();
+			// old defaults
+			params.setBeelineDistanceFactor(1.3);
+			params.setTeleportedModeSpeed(2.0);
+		}
+		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
+	}
 
-    static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-            Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
-        // I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
-        // map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
-        // complication which I certainly don't want here.  kai, dec'15
+	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
+		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
+		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
+		// complication which I certainly don't want here.  kai, dec'15
 
-        // dpLinkId, arLinkId need to be in Route for lots of code to function.   So I am essentially putting in the "street address"
-        // for completeness. Note that if we are walking to a parked car, this can be different from the car link id!!  kai, dec'15
+		// dpLinkId, arLinkId need to be in Route for lots of code to function.   So I am essentially putting in the "street address"
+		// for completeness. Note that if we are walking to a parked car, this can be different from the car link id!!  kai, dec'15
 
-        // make simple assumption about distance and walking speed
-        double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+		// make simple assumption about distance and walking speed
+		double dist = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 
-        // create an empty route, but with realistic travel time
-        Route route = pf.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId);
+		// create an empty route, but with realistic travel time
+		Route route = pf.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId);
 
-        Gbl.assertNotNull(params);
-        double beelineDistanceFactor = params.getBeelineDistanceFactor();
-        double networkTravelSpeed = params.getTeleportedModeSpeed();
+		Gbl.assertNotNull(params);
+		double beelineDistanceFactor = params.getBeelineDistanceFactor();
+		double networkTravelSpeed = params.getTeleportedModeSpeed();
 
-        double estimatedNetworkDistance = dist * beelineDistanceFactor;
-        int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
-        route.setTravelTime(travTime);
-        route.setDistance(estimatedNetworkDistance);
-        leg.setRoute(route);
-        leg.setDepartureTime(depTime);
-        leg.setTravelTime(travTime);
-        return travTime;
-    }
+		double estimatedNetworkDistance = dist * beelineDistanceFactor;
+		int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
+		route.setTravelTime(travTime);
+		route.setDistance(estimatedNetworkDistance);
+		leg.setRoute(route);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+		return travTime;
+	}
 
-    @Override
-    public String toString() {
-        return "[NetworkRoutingModule: mode=" + this.mode + "]";
-    }
+	@Override
+	public String toString() {
+		return "[NetworkRoutingModule: mode=" + this.mode + "]";
+	}
 
-    /*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
-        double travTime;
+	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
+		double travTime;
 
-        Node startNode = fromLink.getToNode();    // start at the end of the "current" link
-        Node endNode = toLink.getFromNode(); // the target is the start of the link
+		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
+		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
-        if (toLink != fromLink) { // (a "true" route)
+		if (toLink != fromLink) { // (a "true" route)
 
-            Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
-            Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
-            Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
+			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) {
 				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 			}
 
-            NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-            route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-            route.setTravelTime((int) path.travelTime);
-            route.setTravelCost(path.travelCost);
-            route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.filteredNetwork));
-            leg.setRoute(route);
-            travTime = (int) path.travelTime;
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
+			route.setTravelTime((int) path.travelTime);
+			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.filteredNetwork));
+			leg.setRoute(route);
+			travTime = (int) path.travelTime;
 
-        } else {
-            // create an empty route == staying on place if toLink == endLink
-            // note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-            NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-            route.setTravelTime(0);
-            route.setDistance(0.0);
-            leg.setRoute(route);
-            travTime = 0;
-        }
+		} else {
+			// create an empty route == staying on place if toLink == endLink
+			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setTravelTime(0);
+			route.setDistance(0.0);
+			leg.setRoute(route);
+			travTime = 0;
+		}
 
-        leg.setDepartureTime(depTime);
-        leg.setTravelTime(travTime);
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
 
-        return travTime;
-    }
+		return travTime;
+	}
 }
