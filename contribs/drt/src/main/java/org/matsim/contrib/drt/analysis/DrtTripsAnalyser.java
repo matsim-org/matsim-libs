@@ -72,8 +72,8 @@ import org.matsim.vehicles.Vehicle;
 
 public class DrtTripsAnalyser {
 
-	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime,
-																int endTime, int binSize_s) {
+	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
+			int binSize_s) {
 		LinkedList<DrtTrip> alltrips = new LinkedList<>();
 		alltrips.addAll(trips);
 		Collections.sort(alltrips);
@@ -100,7 +100,7 @@ public class DrtTripsAnalyser {
 	}
 
 	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
-													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
@@ -173,7 +173,7 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
 			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
-		String value = format.format(waitStats.getValues().length)
+		return format.format(waitStats.getValues().length)
 				+ delimiter
 				+ format.format(waitStats.getMean())
 				+ delimiter
@@ -192,7 +192,6 @@ public class DrtTripsAnalyser {
 				+ format.format(directDistanceStats.getMean())
 				+ delimiter
 				+ format.format(traveltimes.getMean());
-		return value;
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {
@@ -209,8 +208,8 @@ public class DrtTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg,
-									  String fileName, boolean createGraphs) {
+	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg, String fileName,
+			boolean createGraphs) {
 		if (trips == null)
 			return;
 
@@ -476,7 +475,7 @@ public class DrtTripsAnalyser {
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		String result = vehicleDistances.size()
+		return vehicleDistances.size()
 				+ del
 				+ format.format(driven.getSum())
 				+ del
@@ -493,7 +492,6 @@ public class DrtTripsAnalyser {
 				+ format.format(revenue.getMean())
 				+ del
 				+ format.format(d_r_d_t);
-		return result;
 	}
 
 	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {

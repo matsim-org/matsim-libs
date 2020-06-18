@@ -131,8 +131,7 @@ public class DvrpRoutingModule implements RoutingModule {
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility, double now) {
-		Activity activity = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stopFacility.getCoord(),
+		return PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stopFacility.getCoord(),
 				stopFacility.getLinkId(), mode);
-		return activity;
 	}
 }

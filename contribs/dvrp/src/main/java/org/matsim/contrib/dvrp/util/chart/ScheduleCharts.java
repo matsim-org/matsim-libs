@@ -124,8 +124,7 @@ public class ScheduleCharts {
 		}
 
 		private ChartTask getTask(int series, int item) {
-			ChartTask chartTask = (ChartTask)tsc.getSeries(series).get(item);
-			return chartTask;
+			return (ChartTask)tsc.getSeries(series).get(item);
 		}
 
 	}
