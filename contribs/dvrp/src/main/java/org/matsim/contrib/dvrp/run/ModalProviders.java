@@ -35,7 +35,7 @@ import com.google.inject.name.Names;
  */
 public class ModalProviders {
 	public static <T> Provider<T> createProvider(Function<Injector, T> delegate) {
-		return new Provider<T>() {
+		return new Provider<>() {
 			@Inject
 			private Injector injector;
 
@@ -47,7 +47,7 @@ public class ModalProviders {
 	}
 
 	public static <T> Provider<T> createProvider(String mode, Function<InstanceGetter, T> delegate) {
-		return new Provider<T>() {
+		return new Provider<>() {
 			@Inject
 			private Injector injector;
 

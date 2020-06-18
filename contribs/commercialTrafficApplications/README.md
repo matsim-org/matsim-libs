@@ -1,7 +1,6 @@
 
 # commercialTrafficApplications
-This contribution represents a collection of applications of the freight contrib in combination
-with one or more other contribs.
+This contribution represents a collection of applications of the freight contrib in combination with one or more other contribs.
 Applications are kept separated in packages.
 
 ##jointDemand

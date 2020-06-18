@@ -66,12 +66,12 @@ public class TaxiFareHandler
 	private final double timeFare_hour;
 	private final double dailyFee;
 
-	Map<Id<Vehicle>, MutableDouble> currentRideDistance = new HashMap<>();
-	Map<Id<Person>, Id<Vehicle>> currentVehicle = new HashMap<>();
-	Set<Id<Person>> waitingPax = new HashSet<>();
-	Map<Id<Person>, Double> vehicleEnterTime = new HashMap<>();
-	Set<Id<Person>> dailyFeeCharged = new HashSet<>();
-	private String mode;
+	private final Map<Id<Vehicle>, MutableDouble> currentRideDistance = new HashMap<>();
+	private final Map<Id<Person>, Id<Vehicle>> currentVehicle = new HashMap<>();
+	private final Set<Id<Person>> waitingPax = new HashSet<>();
+	private final Map<Id<Person>, Double> vehicleEnterTime = new HashMap<>();
+	private final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+	private final String mode;
 
 	/**
 	 * @params taxiFareConfigGroup: TaxiFareConfigGroup for the specific mode

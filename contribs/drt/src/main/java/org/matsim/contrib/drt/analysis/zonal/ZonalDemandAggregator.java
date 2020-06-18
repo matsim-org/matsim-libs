@@ -22,9 +22,6 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.apache.commons.lang3.mutable.MutableInt;
-
-import java.util.Map;
 import java.util.function.ToIntFunction;
 
 /**

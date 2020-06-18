@@ -86,7 +86,7 @@ public class ScheduleReconstructionIT {
 			@Override
 			public void install() {
 				bindModal(ScheduleReconstructor.class).toProvider(
-						new ModalProviders.AbstractProvider<ScheduleReconstructor>(taxiCfg.getMode()) {
+						new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 							@Inject
 							private EventsManager eventsManager;
 
@@ -116,8 +116,7 @@ public class ScheduleReconstructionIT {
 			SubmittedTaxiRequestsCollector requestCollector) {
 		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
 		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
-		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
-				scheduleReconstructor.taxiRequests.values());
+		compareRequests(requestCollector.getRequests().values(), scheduleReconstructor.taxiRequests.values());
 	}
 
 	private void compareVehicles(Collection<? extends DvrpVehicle> originalVehs,
@@ -166,11 +165,12 @@ public class ScheduleReconstructionIT {
 		}
 	}
 
-	private void compareRequests(Collection<TaxiRequest> originalReqs, Collection<TaxiRequest> reconstructedReqs) {
+	private void compareRequests(Collection<? extends TaxiRequest> originalReqs,
+			Collection<? extends TaxiRequest> reconstructedReqs) {
 		Assert.assertNotEquals(originalReqs, reconstructedReqs);
 		Assert.assertEquals(originalReqs.size(), reconstructedReqs.size());
 
-		Iterator<TaxiRequest> rIter = reconstructedReqs.iterator();
+		Iterator<? extends TaxiRequest> rIter = reconstructedReqs.iterator();
 		for (TaxiRequest o : originalReqs) {
 			TaxiRequest r = rIter.next();
 

@@ -32,7 +32,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
@@ -55,6 +54,7 @@ public class RunTaxiPTIntermodalExample {
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+
 
 		SwissRailRaptorConfigGroup srrConfig = new SwissRailRaptorConfigGroup();
 		srrConfig.setUseIntermodalAccessEgress(true);
@@ -80,15 +80,13 @@ public class RunTaxiPTIntermodalExample {
 		otfvis.setDrawNonMovingItems(true);
 		config.addModule(otfvis);
 
-		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
-
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config)));
 
 		controler.addOverridingModule(new MultiModeTaxiModule());
 
