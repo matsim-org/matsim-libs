@@ -87,9 +87,9 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 	}
 
 	class TemperatureChange implements Comparable<TemperatureChange> {
-		Double time;
-		double temperature;
-		Id<Link> linkId;
+		final Double time;
+		final double temperature;
+		final Id<Link> linkId;
 
 		public TemperatureChange(double time, double temperature, Id<Link> linkId) {
 			this.time = time;

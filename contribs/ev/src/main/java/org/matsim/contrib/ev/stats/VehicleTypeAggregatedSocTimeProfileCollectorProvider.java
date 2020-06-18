@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
@@ -55,10 +56,10 @@ public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Pro
 		Set<String> vehicleTypes = evFleet.getElectricVehicles()
 				.values()
 				.stream()
-				.map(electricVehicle -> electricVehicle.getVehicleType())
+				.map(ElectricVehicle::getVehicleType)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		vehicleTypes.add("Fleet Average");
-		String[] header = vehicleTypes.stream().toArray(String[]::new);
+		String[] header = vehicleTypes.toArray(new String[0]);
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			Double[] result = new Double[header.length];
 			for (int i = 0; i < header.length - 1; i++) {

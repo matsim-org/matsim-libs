@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -74,8 +73,7 @@ public class DrtTripsAnalyser {
 
 	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
 			int binSize_s) {
-		LinkedList<DrtTrip> alltrips = new LinkedList<>();
-		alltrips.addAll(trips);
+		LinkedList<DrtTrip> alltrips = new LinkedList<>(trips);
 		Collections.sort(alltrips);
 		DrtTrip currentTrip = alltrips.pollFirst();
 		if (currentTrip.getDepartureTime() > endTime) {
@@ -84,7 +82,7 @@ public class DrtTripsAnalyser {
 		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtTrip> currentList = new ArrayList<>();
-			splitTrips.put(Double.valueOf(time), currentList);
+			splitTrips.put((double)time, currentList);
 			while (currentTrip.getDepartureTime() < time + binSize_s) {
 				currentList.add(currentTrip);
 				currentTrip = alltrips.pollFirst();
@@ -399,9 +397,8 @@ public class DrtTripsAnalyser {
 				bw.write(header);
 				bw.newLine();
 			}
-			for (Iterator<T> iterator = c.iterator(); iterator.hasNext(); ) {
-
-				bw.write(iterator.next().toString());
+			for (T t : c) {
+				bw.write(t.toString());
 				bw.newLine();
 			}
 			bw.flush();
@@ -532,11 +529,11 @@ public class DrtTripsAnalyser {
 				sum[i - 2] += dist[i];
 			}
 		}
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i <= maxcap; i++) {
-			result = result + ";" + format.format(sum[i]);
+			result.append(";").append(format.format(sum[i]));
 		}
 
-		return result;
+		return result.toString();
 	}
 }

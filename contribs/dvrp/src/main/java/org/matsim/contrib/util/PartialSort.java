@@ -31,13 +31,13 @@ import java.util.stream.Stream;
  * version of heapsort or quicksort.
  * <p>
  * More info: <a href="http://en.wikipedia.org/wiki/Partial_sorting">Partial sorting</a>
- * 
+ *
  * @param <T>
  */
 public class PartialSort<T> {
 	public static <T> List<T> kSmallestElements(int k, Stream<T> elements, ToDoubleFunction<T> evaluator) {
 		PartialSort<T> nearestRequestSort = new PartialSort<T>(k);
-		nearestRequestSort.addAll(elements, evaluator::applyAsDouble);
+		nearestRequestSort.addAll(elements, evaluator);
 		return nearestRequestSort.kSmallestElements();
 	}
 
@@ -79,7 +79,7 @@ public class PartialSort<T> {
 
 	/**
 	 * Gets k smallest elements (side effect: they are removed from the queue -- the queue gets empty).
-	 * 
+	 *
 	 * @return list containing k smallest elements sorted ascending: from the smallest to the k-th smallest
 	 */
 	public List<T> kSmallestElements() {

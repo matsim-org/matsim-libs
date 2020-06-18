@@ -22,6 +22,12 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -31,9 +37,6 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
-
-import java.util.*;
 
 /**
  * @author  jbischoff
@@ -44,7 +47,7 @@ import java.util.*;
  */
 public class DrtGridUtils {
 
-	static Logger log = Logger.getLogger(DrtGridUtils.class);
+	static final Logger log = Logger.getLogger(DrtGridUtils.class);
 
 	public static Map<String,Geometry> createGridFromNetwork(Network network, double cellsize){
 		log.info("start creating grid from network");

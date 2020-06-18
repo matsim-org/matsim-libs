@@ -65,6 +65,6 @@ public class TaxiStatsReader {
 
 		int row = section.ordinal() * (hours + 4) + hour + 2;
 
-		return Double.valueOf(content.get(row)[col]);
+		return Double.parseDouble(content.get(row)[col]);
 	}
 }

@@ -71,7 +71,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
-		if (!stops.isPresent()) {
+		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
 					+ ") and routing mode "

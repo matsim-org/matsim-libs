@@ -121,8 +121,8 @@ public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 		}
 		double slopeSegmentTravelDistance = (link.getLength() / 1000.0) / (double)linkslopes.length;
 		double consumption = 0;
-		for (int i = 0; i < linkslopes.length; i++) {
-			double currentSlope = checkSlope(linkslopes[i]);
+		for (double linkslope : linkslopes) {
+			double currentSlope = checkSlope(linkslope);
 			double currentEnergyuse = function.value(speed, currentSlope);
 			consumption += currentEnergyuse * slopeSegmentTravelDistance;
 		}

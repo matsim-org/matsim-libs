@@ -101,7 +101,7 @@ public class VehicleData {
 	}
 
 	public static class End implements Waypoint {
-		public static End OPEN_END = new End();
+		public static final End OPEN_END = new End();
 
 		@Nullable
 		public final Link link;//null if open-end route

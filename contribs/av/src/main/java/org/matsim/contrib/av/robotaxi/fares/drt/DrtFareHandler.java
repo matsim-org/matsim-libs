@@ -55,8 +55,8 @@ public class DrtFareHandler
     private final double minFarePerTrip;
     private final double timeFare_sec;
     private final double dailyFee;
-    Set<Id<Person>> dailyFeeCharged = new HashSet<>();
-    Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
+    final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+    final Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
     private final String mode;
 
     /**
