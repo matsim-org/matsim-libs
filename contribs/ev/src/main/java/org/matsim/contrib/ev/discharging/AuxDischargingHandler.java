@@ -59,7 +59,7 @@ public class AuxDischargingHandler
 		ElectricVehicle getVehicle(ActivityStartEvent event);
 	}
 
-	private final class VehicleAndLink {
+	private static final class VehicleAndLink {
 		private final ElectricVehicle vehicle;
 		private final Id<Link> linkId;
 

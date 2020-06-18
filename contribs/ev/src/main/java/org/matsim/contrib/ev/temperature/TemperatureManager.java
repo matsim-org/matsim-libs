@@ -86,7 +86,7 @@ public class TemperatureManager implements MobsimBeforeSimStepListener, MobsimIn
 		temperatureChanges.addAll(temperatureChangeList);
 	}
 
-	class TemperatureChange implements Comparable<TemperatureChange> {
+	static class TemperatureChange implements Comparable<TemperatureChange> {
 		final Double time;
 		final double temperature;
 		final Id<Link> linkId;
