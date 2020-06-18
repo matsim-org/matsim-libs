@@ -72,6 +72,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public enum AccessEgressWalkType {None, directWalk, readAccessTimeFromLinkAttribute}
 
 	private static final String ISINSERTINGACCESSEGRESSWALK = "insertAccessEgressWalk";
+	private static final String ISINSERTINGACCESSEGRESSWALKCMT = "Inserts access and Egress walk legs to main mode routes. Either of [None, directWalk, readAccessTimeFromLinkAttribute], Default=None ";
 	private AccessEgressWalkType accessEgressWalkType = AccessEgressWalkType.None;
 
 	// ---
@@ -442,6 +443,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.setClearingDefaultModeRoutingParams( Boolean.parseBoolean( value ) );
 		} else if (RANDOMNESS.equals( key ) ) {
 			this.setRoutingRandomness( Double.parseDouble( value ) );
+		} else if (ISINSERTINGACCESSEGRESSWALK.equals( key ) ) {
+			this.setInsertingAccessEgressWalk(AccessEgressWalkType.valueOf(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -453,6 +456,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
+		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressWalkType().toString()) ;
 
 		//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 
@@ -479,6 +483,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
+		map.put(ISINSERTINGACCESSEGRESSWALK,ISINSERTINGACCESSEGRESSWALKCMT);
 		return map;
 	}
 
