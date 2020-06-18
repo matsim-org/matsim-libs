@@ -56,8 +56,7 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-		List<ElectricVehicle> allEvs = new ArrayList<>();
-		allEvs.addAll(evFleet.getElectricVehicles().values());
+		List<ElectricVehicle> allEvs = new ArrayList<>(evFleet.getElectricVehicles().values());
 		Collections.shuffle(allEvs);
 		List<ElectricVehicle> selectedEvs = allEvs.stream().limit(columns).collect(Collectors.toList());
 

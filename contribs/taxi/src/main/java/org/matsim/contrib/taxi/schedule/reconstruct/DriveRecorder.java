@@ -85,7 +85,7 @@ public class DriveRecorder
 		if (drive != null) {
 			updateDrive(drive, event.getLinkId(), event.getTime());
 			double duration = event.getTime() - drive.departureTime;
-			Link[] links = drive.links.toArray(new Link[drive.links.size()]);
+			Link[] links = drive.links.toArray(new Link[0]);
 			double[] linkTTs = createLinkTTs(drive);
 			VrpPathWithTravelData vrpPath = new VrpPathWithTravelDataImpl(drive.departureTime, duration, links,
 					linkTTs);
