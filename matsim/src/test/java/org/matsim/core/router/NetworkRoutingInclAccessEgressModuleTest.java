@@ -295,7 +295,9 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         controler.run();
         var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
         Assert.equals(3,legs.size());
+        //the agent needs to walk along the whole link, as its home is on the from node
         Assert.equals(78.0,legs.get(0).getTravelTime().seconds());
+        //the agent is lucky: work location is at the to-node
         Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
     }
 
