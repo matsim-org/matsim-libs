@@ -18,8 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.optimizer.insertion.ParallelMultiVehicleInsertionProblem.OPTIMISTIC_BEELINE_SPEED_COEFF;
-
 import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
@@ -37,8 +35,11 @@ class KNearestInsertionsAtEndFilter {
 	// synchronised addition via addInsertionAtEndCandidate(Insertion insertionAtEnd, double timeDistance)
 	private final PartialSort<Insertion> nearestInsertionsAtEnd;
 
-	public KNearestInsertionsAtEndFilter(int k) {
+	private final double admissibleBeelineSpeedFactor;
+
+	public KNearestInsertionsAtEndFilter(int k, double admissibleBeelineSpeedFactor) {
 		nearestInsertionsAtEnd = new PartialSort<>(k);
+		this.admissibleBeelineSpeedFactor = admissibleBeelineSpeedFactor;
 	}
 
 	/**
@@ -55,9 +56,9 @@ class KNearestInsertionsAtEndFilter {
 		//i == j == stops.size()
 		double departureTime = vEntry.getWaypoint(i).getDepartureTime();
 
-		// x OPTIMISTIC_BEELINE_SPEED_COEFF to remove bias towards near but still busy vehicles
+		// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
 		// (timeToPickup is underestimated by this factor)
-		double timeDistance = departureTime + OPTIMISTIC_BEELINE_SPEED_COEFF * insertion.getDetourToPickup();
+		double timeDistance = departureTime + admissibleBeelineSpeedFactor * insertion.getDetourToPickup();
 		addInsertionAtEndCandidate(insertion.getInsertion(), timeDistance);
 		return false;//skip now; the selected (i.e. K nearest) insertions will be added later
 	}

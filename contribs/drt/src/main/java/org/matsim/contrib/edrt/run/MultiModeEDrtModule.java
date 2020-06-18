@@ -25,9 +25,12 @@ import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.ev.dvrp.ChargingActivity;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 /**
@@ -43,7 +46,8 @@ public class MultiModeEDrtModule extends AbstractModule {
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			install(new DrtModeModule(drtCfg));
 			installQSimModule(new EDrtModeQSimModule(drtCfg));
-			install(new DrtModeAnalysisModule(drtCfg));
+			install(new DrtModeAnalysisModule(drtCfg,
+					ImmutableSet.of(DrtActionCreator.DRT_STAY_NAME, ChargingActivity.ACTIVITY_TYPE)));
 		}
 
 		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));

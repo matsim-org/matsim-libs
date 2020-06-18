@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="shared_taxi_one" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_two" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_three" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_four" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_five" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_six" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_seven" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+	<vehicle id="shared_taxi_eight" start_link="227" t_0="0" t_1="64800" capacity="2"/>
+</vehicles>

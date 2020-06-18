@@ -18,19 +18,18 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import java.util.Map;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author  jbischoff
  * Config Group to set taxi or drt fares.
- * 
+ *
  */
 public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 
@@ -49,15 +48,12 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	private double timeFare_h;
 	private double distanceFare_m;
 	private String mode = "taxi";
-	
+
 	public TaxiFareConfigGroup() {
 		super(GROUP_NAME);
 
 	}
-	public static TaxiFareConfigGroup get(Config config) {
-        return (TaxiFareConfigGroup) config.getModules().get(GROUP_NAME);
-	}
-	
+
     @Override
     public Map<String, String> getComments()
     {
@@ -71,7 +67,7 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 		return map;
     }
 
-	
+
 	@StringGetter(BASEFARE)
 	public double getBasefare() {
 		return basefare;
@@ -81,7 +77,7 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public void setBasefare(double basefare) {
 		this.basefare = basefare;
 	}
-	
+
     @StringGetter(MINFARE_PER_TRIP)
     public double getMinFarePerTrip() {
         return minFarePerTrip;
@@ -123,12 +119,12 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public void setDistanceFare_m(double distanceFare_m) {
 		this.distanceFare_m = distanceFare_m;
 	}
-	
+
 	@StringGetter(MODE)
 	public String getMode() {
 		return mode;
 	}
-	
+
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
