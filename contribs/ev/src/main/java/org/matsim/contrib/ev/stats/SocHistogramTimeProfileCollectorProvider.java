@@ -20,7 +20,6 @@
 package org.matsim.contrib.ev.stats;
 
 import java.awt.Color;
-import java.awt.Paint;
 
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -52,8 +51,8 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles",
 				matsimServices);
 		collector.setChartTypes(ChartType.StackedArea);
-		collector.setChartCustomizer((chart, chartType) -> TimeProfileCharts.changeSeriesColors(chart,
-				new Paint[] { new Color(0, 0f, 0), // 0+
+		collector.setChartCustomizer(
+				(chart, chartType) -> TimeProfileCharts.changeSeriesColors(chart, new Color(0, 0f, 0), // 0+
 						new Color(1, 0f, 0), // 0.1+
 						new Color(1, .25f, 0), // 0.2+
 						new Color(1, .5f, 0), // 0.3+
@@ -63,7 +62,7 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 						new Color(.5f, 1, 0), // 0.7+
 						new Color(.25f, 1, 0), // 0.8+
 						new Color(0f, 1, 0) // 0.9+
-				}));
+				));
 		return collector;
 	}
 

@@ -20,7 +20,7 @@ public class ZoneXmlWriter extends MatsimXmlWriter {
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("zones", "http://matsim.org/files/dtd/zones_v1.dtd");
-		writeStartTag("zones", Collections.<Tuple<String, String>>emptyList());
+		writeStartTag("zones", Collections.emptyList());
 		writeZones();
 		writeEndTag("zones");
 		close();

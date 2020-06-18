@@ -45,7 +45,7 @@ public class RandomPointUtils {
 		double minY = envelope.getMinY();
 		double maxY = envelope.getMaxY();
 
-		Point p = null;
+		Point p;
 		do {
 			double x = uniform.nextDouble(minX, maxX);
 			double y = uniform.nextDouble(minY, maxY);
