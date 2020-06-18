@@ -67,7 +67,11 @@ public class CoordArrayConverter implements AttributeConverter<Coord[]> {
             if (i > 0) {
                 result.append(DELIMITER_ARRAY);
             }
-            result.append(String.format(Locale.ROOT, BRACER_COORD_BEGIN+"%f"+DELIMITER_COORD+"%f"+BRACER_COORD_END, c[i].getX(), c[i].getY()));
+            result.append(String.format(
+                    BRACER_COORD_BEGIN+"%s"+DELIMITER_COORD+"%s"+BRACER_COORD_END,
+                    Double.toString(c[i].getX()),
+                    Double.toString(c[i].getY())
+            ));
         }
         result.append(BRACER_ARRAY_END);
         return result.toString();

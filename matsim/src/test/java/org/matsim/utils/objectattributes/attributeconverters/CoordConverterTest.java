@@ -37,7 +37,7 @@ public class CoordConverterTest {
         Assert.assertEquals(coord.getY(), 6757449.720111595, 0.00005);
 
         String b = converter.convertToString(coord);
-        Assert.assertEquals("(224489,366750;6757449,720112)", b);
+        Assert.assertEquals(a, b);
     }
 
 }

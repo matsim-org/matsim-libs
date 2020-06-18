@@ -46,7 +46,7 @@ public class CoordConverter implements AttributeConverter<Coord> {
 		}
 		Coord c = (Coord)o;
 		
-		return String.format(Locale.ROOT, "(%f;%f)", c.getX(), c.getY());
+		return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
 	}
 
 }
