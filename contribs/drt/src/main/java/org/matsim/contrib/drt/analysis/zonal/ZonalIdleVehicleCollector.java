@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -29,24 +33,20 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
 /**
  * @author jbischoff
  */
 public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
 
-	private Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
-	private Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
+	private final Map<String, LinkedList<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
+	private final Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
 
 	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
 		events.addHandler(this);
 		this.zonalSystem = zonalSystem;
 		for (String z : zonalSystem.getZones().keySet()) {
-			vehiclesPerZone.put(z, new LinkedList<Id<DvrpVehicle>>());
+			vehiclesPerZone.put(z, new LinkedList<>());
 		}
 	}
 

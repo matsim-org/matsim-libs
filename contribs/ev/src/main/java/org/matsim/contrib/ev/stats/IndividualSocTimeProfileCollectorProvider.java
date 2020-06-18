@@ -56,17 +56,15 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-		List<ElectricVehicle> allEvs = new ArrayList<>();
-		allEvs.addAll(evFleet.getElectricVehicles().values());
+		List<ElectricVehicle> allEvs = new ArrayList<>(evFleet.getElectricVehicles().values());
 		Collections.shuffle(allEvs);
 		List<ElectricVehicle> selectedEvs = allEvs.stream().limit(columns).collect(Collectors.toList());
 
 		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
 
-		return TimeProfiles.createProfileCalculator(header, () -> {
-			return selectedEvs.stream().map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
-					.toArray(Double[]::new);
-		});
+		return TimeProfiles.createProfileCalculator(header, () -> selectedEvs.stream()
+				.map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
+				.toArray(Double[]::new));
 	}
 
 }

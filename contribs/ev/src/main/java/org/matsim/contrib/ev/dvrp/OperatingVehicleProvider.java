@@ -44,7 +44,7 @@ public class OperatingVehicleProvider implements AuxDischargingHandler.VehiclePr
 	@Override
 	public ElectricVehicle getVehicle(ActivityStartEvent event) {
 		//assumes driverId == vehicleId
-		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle((Id<DvrpVehicle>)(Id<?>)event.getPersonId());
+		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle(Id.create(event.getPersonId(), DvrpVehicle.class));
 
 		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
 		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?

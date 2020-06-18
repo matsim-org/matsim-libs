@@ -60,8 +60,7 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 						.mapToDouble(DrtRequest::getEarliestStartTime)
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
-				double duration = stopDuration;
-				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
+				return Math.max(newBeginTime + stopDuration, maxEarliestPickupTime);
 			}
 
 			default:

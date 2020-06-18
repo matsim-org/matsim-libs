@@ -67,9 +67,9 @@ public class VehicleGenerator {
 		previousTime = startTime;
 		currentTime = startTime;
 
-		for (int i = 0; i < vehicleCounts.length; i++) {
+		for (double vehicleCount : vehicleCounts) {
 			removeVehiclesOnT1();
-			reachExpectedVehicleCount(vehicleCounts[i]);
+			reachExpectedVehicleCount(vehicleCount);
 			previousTime = currentTime;
 			currentTime += periodDuration;
 		}

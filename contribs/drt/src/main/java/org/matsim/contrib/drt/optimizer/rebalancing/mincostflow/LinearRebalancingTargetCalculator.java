@@ -18,7 +18,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 

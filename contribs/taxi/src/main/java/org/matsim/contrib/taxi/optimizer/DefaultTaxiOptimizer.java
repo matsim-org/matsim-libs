@@ -49,7 +49,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final AbstractTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
-	private ScheduleTimingUpdater scheduleTimingUpdater;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, UnplannedRequestInserter requestInserter) {
