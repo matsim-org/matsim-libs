@@ -2,6 +2,7 @@ package org.matsim.core.router;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -20,6 +21,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -221,6 +223,28 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         assertEquals(2, fastLinkIds.size());
         assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-1"), fastLinkIds.get(0));
         assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-2"), fastLinkIds.get(1));
+    }
+
+
+    @Test
+    public void useAccessEgressTimeFromLinkAttributes() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        Assert.equals(3,legs.size());
+        Assert.equals(75.0,legs.get(0).getTravelTime().seconds());
+        Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
     @Test
