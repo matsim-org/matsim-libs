@@ -72,8 +72,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
     private final Scenario scenario;
     private final RoutingModule accessEgressToNetworkRouter;
     private final Config config;
-    public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accessTime_";
-    private final String accessTimeLinkAttribute;
+    public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 
     NetworkRoutingInclAccessEgressModule(
             final String mode,
@@ -88,7 +87,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
         this.populationFactory = scenario.getPopulation().getFactory();
         this.config = scenario.getConfig();
         this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-        this.accessTimeLinkAttribute = ACCESSTIMELINKATTRIBUTEPREFIX + mode;
         if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
             throw new RuntimeException("trying to use access/egress but not switched on in config.  "
                     + "currently not supported; there are too many other problems");
