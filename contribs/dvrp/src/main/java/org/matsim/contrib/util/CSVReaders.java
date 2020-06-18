@@ -47,7 +47,7 @@ public class CSVReaders {
 		try (CSVReader reader = new CSVReaderBuilder(IOUtils.getBufferedReader(file))
 				.withCSVParser(new CSVParserBuilder().withSeparator(separator).build()).build()) {
 			return reader.readAll();
-		} catch (IOException | CsvException e) {
+		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
