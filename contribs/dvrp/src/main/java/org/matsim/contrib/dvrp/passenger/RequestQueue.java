@@ -36,7 +36,7 @@ public final class RequestQueue<R extends PassengerRequest> {
 
 	public static final class RequestEntry<R extends PassengerRequest> {
 		private final R request;
-		private RequestStatus status;
+		private final RequestStatus status;
 
 		public RequestEntry(R request, RequestStatus status) {
 			this.request = request;

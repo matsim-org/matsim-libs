@@ -26,14 +26,15 @@ import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.*;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 public class DefaultLeastCostPathCalculatorWithCache implements LeastCostPathCalculatorWithCache {
 	private final LeastCostPathCalculator calculator;
 	private final TimeDiscretizer timeDiscretizer;
 	private final Table<Id<Node>, Id<Node>, Path>[] pathCache;
 
-	private CacheStats cacheStats = new CacheStats();
+	private final CacheStats cacheStats = new CacheStats();
 
 	@SuppressWarnings("unchecked")
 	public DefaultLeastCostPathCalculatorWithCache(LeastCostPathCalculator calculator,

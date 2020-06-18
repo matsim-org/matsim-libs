@@ -89,7 +89,7 @@ public class ScheduleCharts {
 
 	@SuppressWarnings("serial")
 	private static class ChartTask extends org.jfree.data.gantt.Task {
-		private Task vrpTask;
+		private final Task vrpTask;
 
 		private ChartTask(String description, TimePeriod duration, Task vrpTask) {
 			super(description, duration);

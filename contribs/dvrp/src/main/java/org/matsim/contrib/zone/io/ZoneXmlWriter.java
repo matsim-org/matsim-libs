@@ -11,7 +11,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ZoneXmlWriter extends MatsimXmlWriter {
-	private Map<Id<Zone>, Zone> zones;
+	private final Map<Id<Zone>, Zone> zones;
 
 	public ZoneXmlWriter(Map<Id<Zone>, Zone> zones) {
 		this.zones = zones;

@@ -20,7 +20,13 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import com.opencsv.CSVWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,19 +39,14 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.collections.Tuple;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import com.opencsv.CSVWriter;
 
 public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, ActivityStartEventHandler, IterationEndsListener {
 
 	private final DrtZonalSystem zonalSystem;
 	private final MatsimServices services;
 
-	private Map<String, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
+	private final Map<String, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
 
 	public ZonalIdleVehicleXYVisualiser(MatsimServices services, DrtZonalSystem zonalSystem) {
 		this.services = services;
