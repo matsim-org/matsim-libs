@@ -40,7 +40,7 @@ class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
 			if (earliestStart <= currentTime) {
 				urgentReqCount++;
 			}
-			builder.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), earliestStart));
+			builder.add(new DestEntry<>(idx++, r, r.getFromLink(), earliestStart));
 		}
 
 		return new AssignmentRequestData(builder.build(), urgentReqCount);

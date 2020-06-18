@@ -44,7 +44,7 @@ public interface Schedule {
 	}
 
 	enum ScheduleStatus {
-		UNPLANNED, PLANNED, STARTED, COMPLETED;
+		UNPLANNED, PLANNED, STARTED, COMPLETED
 	}
 
 	/**

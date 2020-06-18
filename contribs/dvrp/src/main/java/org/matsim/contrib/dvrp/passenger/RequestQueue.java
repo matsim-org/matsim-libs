@@ -36,7 +36,7 @@ public final class RequestQueue<R extends PassengerRequest> {
 
 	public static final class RequestEntry<R extends PassengerRequest> {
 		private final R request;
-		private RequestStatus status;
+		private final RequestStatus status;
 
 		public RequestEntry(R request, RequestStatus status) {
 			this.request = request;
@@ -55,15 +55,15 @@ public final class RequestQueue<R extends PassengerRequest> {
 	public static <R extends PassengerRequest> RequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
 			double planningHorizon) {
 		//all immediate and selected advance (i.e. starting within the planning horizon) requests are scheduled
-		return new RequestQueue<R>(planningHorizon);
+		return new RequestQueue<>(planningHorizon);
 	}
 
 	public static <R extends PassengerRequest> RequestQueue<R> withInfiniteAdvanceRequestPlanningHorizon() {
-		return new RequestQueue<R>(Double.POSITIVE_INFINITY);//all immediate and advance requests are scheduled
+		return new RequestQueue<>(Double.POSITIVE_INFINITY);//all immediate and advance requests are scheduled
 	}
 
 	public static <R extends PassengerRequest> RequestQueue<R> withNoAdvanceRequestPlanningHorizon() {
-		return new RequestQueue<R>(0);//immediate requests only
+		return new RequestQueue<>(0);//immediate requests only
 	}
 
 	private static final Comparator<PassengerRequest> ABSOLUTE_COMPARATOR = Comparator.comparing(

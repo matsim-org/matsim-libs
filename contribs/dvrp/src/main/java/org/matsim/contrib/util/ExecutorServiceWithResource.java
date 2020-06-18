@@ -60,7 +60,7 @@ public class ExecutorServiceWithResource<R> {
 	}
 
 	public <V> List<Future<V>> submitCallables(Stream<CallableWithResource<V, R>> tasks) {
-		return tasks.map(t -> submitCallable(t)).collect(Collectors.toList());
+		return tasks.map(this::submitCallable).collect(Collectors.toList());
 	}
 
 	public <V> List<V> submitCallablesAndGetResults(Stream<CallableWithResource<V, R>> tasks) {
@@ -76,7 +76,7 @@ public class ExecutorServiceWithResource<R> {
 	}
 
 	public List<Future<?>> submitRunnables(Stream<RunnableWithResource<R>> tasks) {
-		return tasks.map(t -> submitRunnable(t)).collect(Collectors.toList());
+		return tasks.map(this::submitRunnable).collect(Collectors.toList());
 	}
 
 	public void submitRunnablesAndWait(Stream<RunnableWithResource<R>> tasks) {

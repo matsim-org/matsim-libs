@@ -33,7 +33,7 @@ public class ChargingTaskImpl extends StayTask implements ChargingTask {
 	private final ChargingWithQueueingAndAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
 	private Double chargingStartedTime;
-	private double totalEnergy;
+	private final double totalEnergy;
 
 	public ChargingTaskImpl(TaskType taskType, double beginTime, double endTime, Charger charger, ElectricVehicle ev,
 			double totalEnergy) {

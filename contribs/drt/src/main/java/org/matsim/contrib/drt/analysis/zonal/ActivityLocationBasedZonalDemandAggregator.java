@@ -22,6 +22,11 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.ToIntFunction;
+
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -33,11 +38,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.ToIntFunction;
 
 /**
  * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
@@ -109,7 +109,7 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 			for (String zone : zonalSystem.getZones().keySet()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
-			actEnds.put(Double.valueOf(i), zonesPerSlot);
+			actEnds.put((double)i, zonesPerSlot);
 		}
 	}
 

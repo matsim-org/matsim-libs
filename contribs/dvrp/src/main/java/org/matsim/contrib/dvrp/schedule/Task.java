@@ -40,7 +40,7 @@ public interface Task {
 	}
 
 	enum TaskStatus {
-		PLANNED, STARTED, PERFORMED;
+		PLANNED, STARTED, PERFORMED
 	}
 
 	TaskType getTaskType();

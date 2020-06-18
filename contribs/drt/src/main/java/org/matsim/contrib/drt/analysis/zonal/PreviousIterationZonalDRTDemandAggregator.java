@@ -22,6 +22,11 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.ToIntFunction;
+
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -29,11 +34,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.ToIntFunction;
 
 /**
  * Aggregates PersonDepartureEvents per iteration for the given mode and returns the numbers from the previous iteration
@@ -89,7 +89,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 			for (String zone : zonalSystem.getZones().keySet()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
-			departures.put(Double.valueOf(i), zonesPerSlot);
+			departures.put((double)i, zonesPerSlot);
 		}
 	}
 
