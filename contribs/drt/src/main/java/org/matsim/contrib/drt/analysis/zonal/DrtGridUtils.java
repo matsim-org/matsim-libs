@@ -39,37 +39,34 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Counter;
 
 /**
- * @author  jbischoff
- *
- */
-/**
+ * @author jbischoff
  *
  */
 public class DrtGridUtils {
 
 	static final Logger log = Logger.getLogger(DrtGridUtils.class);
 
-	public static Map<String,Geometry> createGridFromNetwork(Network network, double cellsize){
+	public static Map<String, Geometry> createGridFromNetwork(Network network, double cellsize) {
 		log.info("start creating grid from network");
 		double[] boundingbox = NetworkUtils.getBoundingBox(network.getNodes().values());
-		double minX = (Math.floor(boundingbox[0] / cellsize)*cellsize);
+		double minX = (Math.floor(boundingbox[0] / cellsize) * cellsize);
 		double maxX = (Math.ceil(boundingbox[2] / cellsize) * cellsize);
-		double minY = (Math.floor(boundingbox[1] / cellsize)*cellsize);
+		double minY = (Math.floor(boundingbox[1] / cellsize) * cellsize);
 		double maxY = (Math.ceil(boundingbox[3] / cellsize) * cellsize);
 		GeometryFactory gf = new GeometryFactory();
-		Map<String,Geometry> grid = new HashMap<>();
+		Map<String, Geometry> grid = new HashMap<>();
 		int cell = 0;
-		for (double lx = minX;lx<maxX;lx +=cellsize ){
+		for (double lx = minX; lx < maxX; lx += cellsize) {
 
-			for (double by = minY;by<maxY;by+=cellsize){
+			for (double by = minY; by < maxY; by += cellsize) {
 				cell++;
 				Coordinate p1 = new Coordinate(lx, by);
-				Coordinate p2 = new Coordinate(lx+cellsize, by);
-				Coordinate p3 = new Coordinate(lx+cellsize, by+cellsize);
-				Coordinate p4 = new Coordinate(lx, by+cellsize);
-				Coordinate [] ca = {p1, p2, p3, p4, p1};
+				Coordinate p2 = new Coordinate(lx + cellsize, by);
+				Coordinate p3 = new Coordinate(lx + cellsize, by + cellsize);
+				Coordinate p4 = new Coordinate(lx, by + cellsize);
+				Coordinate[] ca = { p1, p2, p3, p4, p1 };
 				Polygon p = new Polygon(gf.createLinearRing(ca), null, gf);
-				grid.put(cell+"", p);
+				grid.put(cell + "", p);
 			}
 		}
 		log.info("finished creating grid from network");
@@ -88,25 +85,24 @@ public class DrtGridUtils {
 	 * @param serviceAreaGeoms geometries that define the service area
 	 * @return
 	 */
-	public static Map<String,Geometry> createGridFromNetworkWithinServiceArea (Network network, double cellsize, List<PreparedGeometry> serviceAreaGeoms) {
+	public static Map<String, Geometry> createGridFromNetworkWithinServiceArea(Network network, double cellsize,
+			List<PreparedGeometry> serviceAreaGeoms) {
 		Map<String, Geometry> grid = createGridFromNetwork(network, cellsize);
 		Set<String> zonesToRemove = new HashSet<>();
 
 		log.info("checking zones for intersection with drt service area...");
 		log.info("total number of created zones = " + grid.size());
 		Counter counter = new Counter("dealt with zone ");
-		grid.entrySet().forEach(stringGeometryEntry -> {
-
-			boolean delete = true;
-
-			for (PreparedGeometry serviceAreaGeom : serviceAreaGeoms) {
-				if (serviceAreaGeom.intersects(stringGeometryEntry.getValue())) delete = false;
-				break;
-			}
-			if (delete) zonesToRemove.add(stringGeometryEntry.getKey());
+		grid.forEach((key, value) -> {
 			counter.incCounter();
+			for (PreparedGeometry serviceAreaGeom : serviceAreaGeoms) {
+				if (serviceAreaGeom.intersects(value)) {
+					return;
+				}
+			}
+			zonesToRemove.add(key);
 		});
-		zonesToRemove.forEach(zone -> grid.remove(zone));
+		zonesToRemove.forEach(grid::remove);
 
 		log.info("number of remaining zones = " + grid.size());
 		return grid;
