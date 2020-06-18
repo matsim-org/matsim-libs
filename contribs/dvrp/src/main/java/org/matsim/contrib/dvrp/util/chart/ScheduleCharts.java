@@ -130,7 +130,7 @@ public class ScheduleCharts {
 
 	}
 
-	public static interface PaintSelector {
+	public interface PaintSelector {
 		Paint select(Task task);
 	}
 
@@ -146,7 +146,7 @@ public class ScheduleCharts {
 		throw new IllegalStateException();
 	};
 
-	public static interface DescriptionCreator {
+	public interface DescriptionCreator {
 		String create(Task task);
 	}
 

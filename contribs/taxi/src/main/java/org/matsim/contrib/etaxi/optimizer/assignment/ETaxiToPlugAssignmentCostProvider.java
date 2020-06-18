@@ -33,7 +33,7 @@ public class ETaxiToPlugAssignmentCostProvider {
 
 		// PLUG_IDLE_TIME,
 
-		CHARGING_START_TIME;
+		CHARGING_START_TIME
 
 		// both:
 		// good during when we do not have so many plugs, we do want to increase charging throughput,

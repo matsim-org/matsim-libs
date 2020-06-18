@@ -25,7 +25,7 @@ import org.matsim.contrib.util.CSVReaders;
 
 public class TaxiStatsReader {
 	public enum Section {
-		PassengerWaitTime, VehicleEmptyDriveRatio, VehicleWaitRatio, TaskTypeTotalDuration;
+		PassengerWaitTime, VehicleEmptyDriveRatio, VehicleWaitRatio, TaskTypeTotalDuration
 	}
 
 	private final List<String[]> content;
