@@ -129,8 +129,9 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass an
 			 * accessEgressToNetworkRouter RoutingModule.
 			 */
+			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
 			if (mode.equals(TransportMode.walk)) {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null ) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null );
 			} else {
 				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork,
 						walkRouter) ;

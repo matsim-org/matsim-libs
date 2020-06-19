@@ -68,13 +68,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
 	private final Scenario scenario;
-	private final RoutingModule accessEgressToNetworkRouter;
+	private final RoutingModule accessToNetworkRouter;
 	private final Config config;
+	private RoutingModule egressFromNetworkRouter;
 
 	NetworkRoutingInclAccessEgressModule(
 		  final String mode,
 		  final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
-		  final RoutingModule accessEgressToNetworkRouter) {
+		  final RoutingModule accessToNetworkRouter,
+		  final RoutingModule egressFromNetworkRouter) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf( scenario.getNetwork().getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork ;
@@ -83,7 +85,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.scenario = scenario;
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.config = scenario.getConfig();
-		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
+		this.accessToNetworkRouter = accessToNetworkRouter;
+		this.egressFromNetworkRouter = egressFromNetworkRouter;
+
 		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
@@ -174,7 +178,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			result.add( egressLeg ) ;
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
-			result.addAll(accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
+			result.addAll(egressFromNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
 		}
 	}
 
@@ -215,7 +219,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			result.add( accessLeg ) ;
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
-			List<? extends PlanElement> accessTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			List<? extends PlanElement> accessTrip = accessToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
 			for (PlanElement planElement: accessTrip) {
 				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
 			}
