@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v5.dtd">
+
+<population>
+
+	<!-- ====================================================================== -->
+
+	<person id="origin" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
+			<leg mode="car"/>
+			<act type="dummy" link="223" x="-800" y="-500" />
+		</plan>
+	</person>
+
+	<!-- <person id="destination_otherSide_drt" employed="no"> -->
+		<!-- <plan selected="yes"> -->
+			<!-- <act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/> -->
+			<!-- <leg mode="car"/> -->
+			<!-- <act type="dummy" link="228" x="200" y="-500"/> -->
+		<!-- </plan> -->
+	<!-- </person> -->
+
+	<!-- <person id="destination_otherSide_walk" employed="no"> -->
+		<!-- <plan selected="yes"> -->
+			<!-- <act type="dummy" link="123" end_time="00:10:00" x="-700" y="-600"/> -->
+			<!-- <leg mode="car"/> -->
+			<!-- <act type="dummy" link="126" x="100" y="-600"/> -->
+		<!-- </plan> -->
+	<!-- </person> -->
+	
+	<person id="destination_middle" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<leg mode="car"/>
+			<act type="dummy" link="227" x="0" y="-500"/>
+		</plan>
+	</person>
+
+
+
+
+	<!-- ====================================================================== -->
+
+</population>
