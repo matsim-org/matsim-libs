@@ -47,7 +47,7 @@ public class RunRandomDynAgentExample {
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 		config.network().setInputFile(networkFile);
-		config.controler().setOutputDirectory("./test/output/");
+		config.controler().setOutputDirectory("./test/output/random_dyn_agent/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		config.addConfigConsistencyChecker(new DynQSimConfigConsistencyChecker());
