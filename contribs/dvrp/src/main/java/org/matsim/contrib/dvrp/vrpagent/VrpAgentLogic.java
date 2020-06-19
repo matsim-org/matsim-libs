@@ -103,7 +103,7 @@ public class VrpAgentLogic implements DynAgentLogic {
 				case UNPLANNED:
 					return vehicle.getServiceEndTime();
 				default:
-					throw new IllegalStateException();
+					throw new IllegalStateException("Only PLANNED or UNPLANNED schedules allowed.");
 			}
 		});
 	}
