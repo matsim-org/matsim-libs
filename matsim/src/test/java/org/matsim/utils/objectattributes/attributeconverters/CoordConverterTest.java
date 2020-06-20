@@ -1,7 +1,6 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoordConverter.java
+ * CoordConverterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,34 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributeconverters;
+package org.matsim.utils.objectattributes.attributeconverters;
 
-import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.utils.objectattributes.AttributeConverter;
 
-import java.util.Locale;
+public class CoordConverterTest {
 
-public class CoordConverter implements AttributeConverter<Coord> {
-	private final Logger log = Logger.getLogger(CoordConverter.class);
 
-	@Override
-	public Coord convert(String value) {
-		String s = value.replace("(", "");
-		s = s.replace(")", "");
-		String[] sa = s.split(";");
-		return new Coord(Double.parseDouble(sa[0]), Double.parseDouble(sa[1]));
-	}
+    @Test
+    public void testFromToString() {
+        final CoordConverter converter = new CoordConverter();
+        String a = "(224489.3667496938;6757449.720111595)";
+        Coord coord = converter.convert(a);
+        Assert.assertEquals(coord.hasZ(), false);
+        Assert.assertEquals(coord.getX(), 224489.3667496938, 0.00005);
+        Assert.assertEquals(coord.getY(), 6757449.720111595, 0.00005);
 
-	@Override
-	public String convertToString(Object o) {
-		if(!(o instanceof Coord)){
-			log.error("Object is not of type Coord: " + o.getClass().toString());
-			return null;
-		}
-		Coord c = (Coord)o;
-		
-		return String.format("(%s;%s)", Double.toString(c.getX()), Double.toString(c.getY()));
-	}
+        String b = converter.convertToString(coord);
+        Assert.assertEquals(a, b);
+    }
 
 }
