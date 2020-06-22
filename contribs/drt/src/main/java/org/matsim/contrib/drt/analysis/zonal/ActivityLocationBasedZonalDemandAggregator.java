@@ -84,7 +84,7 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 		Double bin = getBinForTime(event.getTime());
 		String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
 		if (zoneId == null) {
-			Logger.getLogger(getClass()).error("No zone found for linkId " + event.getLinkId().toString());
+			//zoneId can be null if the DrtZonalSystem does not cover the entire network (e.g. if OperationalScheme.serviceAreaBased is used)
 			return;
 		}
 		if (actEnds.containsKey(bin)) {
