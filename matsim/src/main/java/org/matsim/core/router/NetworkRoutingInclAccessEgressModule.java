@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,6 +72,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final RoutingModule accessToNetworkRouter;
 	private final Config config;
 	private RoutingModule egressFromNetworkRouter;
+
+	@Inject
+	FallbackRoutingModule fallbackRoutingModule;
 
 	NetworkRoutingInclAccessEgressModule(
 		  final String mode,
@@ -178,7 +182,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			result.add( egressLeg ) ;
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
-			result.addAll(egressFromNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
+
+			List<? extends PlanElement> egressTrip = egressFromNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			if(egressTrip == null){
+				log.warn("could not route egress trip from " + fromFacility + " to " + toFacility + " at time " + now + ". Will call fallbackRoutingModule....");
+				egressTrip = fallbackRoutingModule.calcRoute(fromFacility, toFacility, now, person);
+			}
+			result.addAll(egressTrip);
 		}
 	}
 
