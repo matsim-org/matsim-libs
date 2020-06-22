@@ -241,7 +241,7 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
 	 * @param lookBackTime For which duration of passed time the average should be calculated. Set to Double.POSITIVE_INFINITY to calculate from time the first car enters the link on. 
 	 * @param timeBucketSize Resolution of lookBackTime. Average is calculated only with full time buckets. Set to Double.POSITIVE_INFINITY to calculate from time the first car enters the link on. 
 	 */
-	public void setAvgCarSensorBucketParameters(double lookBackTime, double timeBucketSize) {
+	public void setTimeBucketParametersForLiveArrivalRates(double lookBackTime, double timeBucketSize) {
 		this.lookBackTime = lookBackTime;
 		this.timeBucketSize = timeBucketSize;
 	}
