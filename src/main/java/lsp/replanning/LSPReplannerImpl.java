@@ -9,12 +9,12 @@ import lsp.LSP;
 import lsp.LSPPlan;
 
 
-public class LSPReplannerImpl implements LSPReplanner{
+class LSPReplannerImpl implements LSPReplanner{
 
 	private LSP lsp;
 	private GenericStrategyManager<LSPPlan, LSP> strategyManager;
 	
-	public LSPReplannerImpl(LSP lsp) {
+	LSPReplannerImpl(LSP lsp) {
 		this.lsp = lsp;
 	}
 	

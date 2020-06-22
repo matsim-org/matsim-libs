@@ -5,11 +5,11 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import lsp.LSP;
 import lsp.LSPs;
 
-public class LSPReplanningModuleImpl implements LSPReplanningModule{
+class LSPReplanningModuleImpl implements LSPReplanningModule{
 
 	private LSPs lsps;
 	
-	public LSPReplanningModuleImpl(LSPs lsps) {
+	LSPReplanningModuleImpl(LSPs lsps) {
 		this.lsps = lsps;
 	}
 		

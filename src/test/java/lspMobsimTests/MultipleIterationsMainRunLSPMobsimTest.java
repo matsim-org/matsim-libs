@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +43,6 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
-import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
 
 public class MultipleIterationsMainRunLSPMobsimTest {
@@ -242,7 +242,7 @@ public class MultipleIterationsMainRunLSPMobsimTest {
 			
 			Controler controler = new Controler(config);
 			
-			LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
+			LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 			controler.addOverridingModule(module);
 			config.controler().setFirstIteration(0);

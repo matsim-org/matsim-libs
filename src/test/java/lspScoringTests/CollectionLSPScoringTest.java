@@ -6,7 +6,7 @@ import lsp.events.EventUtils;
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionUtils;
 import lsp.functions.InfoFunctionValue;
-import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.resources.Resource;
 import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModuleImpl;
@@ -172,7 +172,7 @@ public class CollectionLSPScoringTest {
 
 		Controler controler = new Controler(config);
 
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps),
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), new LSPScoringModuleImpl(lsps),
 				EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);

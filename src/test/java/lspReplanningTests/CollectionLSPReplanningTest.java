@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.replanning.LSPReplanner;
+import lsp.replanning.LSPReplanningUtils;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +39,6 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
-import lsp.replanning.LSPReplannerImpl;
-import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 
@@ -158,7 +158,7 @@ public class CollectionLSPReplanningTest {
 		collectionLSP.scheduleSoultions();
 		GenericStrategyManagerFactoryImpl factory = new GenericStrategyManagerFactoryImpl();
 		GenericStrategyManager<LSPPlan, LSP> manager = factory.createStrategyManager(collectionLSP);
-		LSPReplannerImpl replanner = new LSPReplannerImpl(collectionLSP);
+		LSPReplanner replanner = LSPReplanningUtils.createDefaultLSPReplanner(collectionLSP);
 		replanner.setStrategyManager(manager);
 		collectionLSP.setReplanner(replanner);
 		
@@ -168,7 +168,7 @@ public class CollectionLSPReplanningTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
