@@ -51,8 +51,8 @@ public class TaxiBenchmarkStats
 		pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTime.getPercentile(95));
 		maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMax());
 
-		emptyDriveRatio.addValue(singleRunStats.getFleetEmptyDriveRatio());
-		stayRatio.addValue(singleRunStats.getFleetStayRatio());
+		singleRunStats.calculateFleetEmptyDriveRatio().ifPresent(emptyDriveRatio::addValue);
+		singleRunStats.calculateFleetStayRatio().ifPresent(stayRatio::addValue);
 	}
 
 	@Override
