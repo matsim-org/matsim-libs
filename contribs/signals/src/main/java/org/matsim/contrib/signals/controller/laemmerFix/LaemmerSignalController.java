@@ -508,7 +508,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 			 * becomes -Infinity and the signal is always selected for stabilization (which
 			 * makes sense). tt, dec'18
 			 */
-            if (n >= nCrit) {
+            if (n > 0 && n >= nCrit) {
             	/* TODO actually, this is the wrong place to check downstream conditions, since situation can change until the group has moved up to the queue front. 
             	 * a better moment would be while polling from the queue: poll the first element with downstream empty. but we would need a linked list instead of queue for this
             	 * and could no longer check for empty regulationQueue to decide for stabilization vs optimization... I would prefer to have some tests before! theresa, jul'17 */
