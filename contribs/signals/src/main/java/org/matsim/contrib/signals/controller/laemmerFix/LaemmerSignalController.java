@@ -256,12 +256,12 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                 if (signal.getLaneIds() != null && !(signal.getLaneIds().isEmpty())) {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
                         this.sensorManager.registerNumberOfCarsOnLaneInDistanceMonitoring(signal.getLinkId(), laneId, 0.);
-                        this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoringOnLane(signal.getLinkId(), laneId);
+                        this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoringOnLane(signal.getLinkId(), laneId, laemmerConfig.getLookBackTime(), laemmerConfig.getTimeBucketSize());
                     }
                 }
                 //always register link in case only one lane is specified (-> no LaneEnter/Leave-Events?)
                 this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
-                this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
+                this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId(), laemmerConfig.getLookBackTime(), laemmerConfig.getTimeBucketSize());
             }
         }
         if (laemmerConfig.isCheckDownstream()){
