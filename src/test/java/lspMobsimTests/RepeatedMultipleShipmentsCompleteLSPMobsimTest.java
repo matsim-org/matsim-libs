@@ -10,6 +10,7 @@ import java.util.Random;
 
 import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.*;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +45,6 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
-import lsp.scoring.LSPScoringModuleImpl;
 
 public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 	private Network network;
@@ -308,7 +308,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);

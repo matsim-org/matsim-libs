@@ -4,11 +4,11 @@ import lsp.LSP;
 import lsp.LSPs;
 import org.matsim.core.controler.events.ScoringEvent;
 
-public class LSPScoringModuleImpl implements LSPScoringModule{
+class LSPScoringModuleImpl implements LSPScoringModule{
 
 	private LSPs lsps;
 	
-	public LSPScoringModuleImpl(LSPs lsps) {
+	LSPScoringModuleImpl(LSPs lsps) {
 		this.lsps = lsps;
 	}
 		

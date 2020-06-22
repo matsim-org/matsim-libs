@@ -9,6 +9,7 @@ import java.util.Random;
 import lsp.*;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
+import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,6 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
-import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 
 public class CollectionLSPReplanningTest {
@@ -168,7 +168,7 @@ public class CollectionLSPReplanningTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
