@@ -259,13 +259,13 @@ final class QNodeImpl extends AbstractQNode {
 		fromLane.popFirstVehicle();
 		// -->
 		//		network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(now, veh.getId(), currentLinkId, fromLane.getId()));
-		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId, veh.getDriver().getId()));
+		this.context.getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getId(), currentLinkId));
 		// <--
 		
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 		
 		// -->
-		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId, veh.getDriver().getId() ));
+		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId));
 		// <--
 		nextQueueLane.addFromUpstream(veh);
 	}

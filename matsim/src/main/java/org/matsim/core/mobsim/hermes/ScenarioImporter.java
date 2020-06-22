@@ -317,16 +317,16 @@ public class ScenarioImporter {
         events.add(new PersonEntersVehicleEvent(0, id, vid));
         events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
         if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
-            events.add(new LinkLeaveEvent(0, vid, startLId, id));
+            events.add(new LinkLeaveEvent(0, vid, startLId));
         }
         for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
             int linkId = linkid.index();
-            events.add(new LinkEnterEvent(0, vid, linkid, id));
+            events.add(new LinkEnterEvent(0, vid, linkid));
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity));
-            events.add(new LinkLeaveEvent(0, vid, linkid, id));
+            events.add(new LinkLeaveEvent(0, vid, linkid));
         }
         if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
-            events.add(new LinkEnterEvent(0, vid, endLId, id));
+            events.add(new LinkEnterEvent(0, vid, endLId));
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity));
         }
         events.add(new VehicleLeavesTrafficEvent(0, id, endLId, vid, leg.getMode(), 1));
@@ -502,7 +502,7 @@ public class ScenarioImporter {
             flatplan.add(Agent.prepareStopDelayEntry((int)departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
             flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
             flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
-            flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId(), driverid));
+            flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
 
             stopidx += 1;
 
@@ -513,7 +513,7 @@ public class ScenarioImporter {
         // For each link (exclucing the first and the last)
         for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
             int linkid = link.index();
-            flatevents.add(new LinkEnterEvent(0, v.getId(), link, driverid));
+            flatevents.add(new LinkEnterEvent(0, v.getId(), link));
             flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, velocity));
             // Adding link and possibly a stop.
             if (next.getStopFacility().getLinkId().equals(link)) {
@@ -527,11 +527,11 @@ public class ScenarioImporter {
                 stopidx += 1;
                 next = trs.get(stopidx);
             }
-            flatevents.add(new LinkLeaveEvent(0, v.getId(), link, driverid));
+            flatevents.add(new LinkLeaveEvent(0, v.getId(), link));
         }
 
         // Adding last link and possibly the last stop.
-        flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId(), driverid));
+        flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
         flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, velocity));
         if (next.getStopFacility().getLinkId().equals(nr.getEndLinkId())) {
             flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
