@@ -43,6 +43,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
 import org.matsim.vis.otfvis.data.OTFServerQuadTree;
 import org.matsim.vis.otfvis.interfaces.OTFQuery;
@@ -69,6 +70,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jogamp.opengl.GL2GL3.GL_QUADS;
+import static org.matsim.vis.otfvis.OTFVisConfigGroup.*;
 
 /**
  * For a given agentID this QueryAgentPlan draws a visual representation of the
@@ -129,12 +131,15 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					if ( !includeRoutes && PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType()) ) {
 						continue ; // skip
 					}
+					if ( StageActivityTypeIdentifier.isStageActivity( act.getType() )
+							     && OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme()== ColoringScheme.infection ) {
+
+						continue ; // skip
+					}
 					Coord c2 = getCoord(act);
 					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
-
-
 					if ( StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
-						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "interaction", "i" ) ) ;
+						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "interaction", "i" ) );
 					}
 					result.acts.add(activityInfo);
 				}

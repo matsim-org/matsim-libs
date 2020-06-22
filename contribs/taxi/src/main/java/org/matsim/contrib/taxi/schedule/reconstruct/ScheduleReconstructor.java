@@ -35,6 +35,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 
 public class ScheduleReconstructor {
@@ -71,11 +72,9 @@ public class ScheduleReconstructor {
 	}
 
 	private void validateSchedulesAndAddVehiclesToFleet() {
-		if (driveRecorder.hasOngoingDrives()
-				|| stayRecorder.hasOngoingStays()
-				|| requestRecorder.hasAwaitingRequests()) {
-			throw new IllegalStateException();
-		}
+		Preconditions.checkState(!driveRecorder.hasOngoingDrives());
+		Preconditions.checkState(!stayRecorder.hasOngoingStays());
+		Preconditions.checkState(!requestRecorder.hasAwaitingRequests());
 
 		fleet = scheduleBuilders.values()
 				.stream()
@@ -86,6 +85,7 @@ public class ScheduleReconstructor {
 	public Fleet getFleet() {
 		if (!schedulesValidatedAndVehiclesAddedToFleet) {
 			validateSchedulesAndAddVehiclesToFleet();
+			schedulesValidatedAndVehiclesAddedToFleet = true;
 		}
 
 		return () -> fleet;

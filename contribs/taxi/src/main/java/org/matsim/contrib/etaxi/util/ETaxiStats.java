@@ -24,7 +24,7 @@ import org.matsim.contrib.util.LongEnumAdder;
 
 public class ETaxiStats {
 	public enum ETaxiState {
-		QUEUED, PLUGGED;
+		QUEUED, PLUGGED
 	}
 
 	public final String id;

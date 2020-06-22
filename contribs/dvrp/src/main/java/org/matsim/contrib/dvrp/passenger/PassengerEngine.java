@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -209,7 +208,9 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	}
 
 	private Link getLink(Id<Link> linkId) {
-		return Preconditions.checkNotNull(network.getLinks().get(linkId), "Link id=%s does not exist", linkId);
+		return Preconditions.checkNotNull(network.getLinks().get(linkId),
+				"Link id=%s does not exist in network for mode %s. Agent departs from a link that does not belong to that network?",
+				linkId, mode);
 	}
 
 	private boolean validateRequest(PassengerRequest request) {
@@ -301,9 +302,9 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.empty());
 		} else {
 			//not much else can be done for immediate requests
-			PassengerRequest request = requestEntry.request;
-			eventsManager.processEvent(new PersonStuckEvent(mobsimTimer.getTimeOfDay(), request.getPassengerId(),
-					request.getFromLink().getId(), request.getMode()));
+			//set the passenger agent to abort - the event will be thrown by the QSim
+			requestEntry.passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+			internalInterface.arrangeNextAgentState(requestEntry.passenger);
 		}
 	}
 

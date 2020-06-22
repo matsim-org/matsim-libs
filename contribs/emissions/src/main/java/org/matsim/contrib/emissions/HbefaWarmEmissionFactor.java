@@ -47,4 +47,12 @@ class HbefaWarmEmissionFactor {
 	/*package-private*/ void setWarmEmissionFactor(double warmEmissionFactor) {
 		this.warmEmissionFactor = warmEmissionFactor;
 	}
+
+	@Override
+	public String toString() {
+		return "HbefaWarmEmissionFactor{" +
+				"speed=" + speed +
+				", warmEmissionFactor=" + warmEmissionFactor +
+				'}';
+	}
 }

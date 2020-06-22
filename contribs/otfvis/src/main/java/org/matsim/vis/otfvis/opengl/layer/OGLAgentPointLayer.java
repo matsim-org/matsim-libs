@@ -227,18 +227,19 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 	}
 	private static Color infectionColoringScheme(AgentSnapshotInfo agInfo) {
-		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
-			return redToGreenColorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne());
-		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
-			return new Color( 1.f, 0.65f, 0.f, 0.03f );
-		} else if ( agInfo.getAgentState()==AgentState.PERSON_OTHER_MODE ) {
-			return new Color( 0.f, 1.f, 1.f, 0.1f );
-		} else if ( agInfo.getAgentState()==AgentState.MARKER ) {
-			return Color.RED;
-		} else if ( agInfo.getAgentState()==AgentState.TRANSIT_DRIVER ) {
-			return new Color( 0.f, 0.f, 1.f, 0.1f );
-		} else {
-			return Color.YELLOW;
+		switch( agInfo.getAgentState() ){
+			case MARKER:
+				return Color.RED;
+			case PERSON_DRIVING_CAR:
+				return redToGreenColorizer.getColorZeroOne( agInfo.getColorValueBetweenZeroAndOne() );
+			case PERSON_AT_ACTIVITY:
+				return new Color( 1.f, 0.65f, 0.f, 0.03f );
+			case PERSON_OTHER_MODE:
+				return new Color( 0.f, 1.f, 1.f, 0.1f );
+			case TRANSIT_DRIVER:
+				return new Color( 0.f, 0.f, 1.f, 0.1f );
+			default:
+				return Color.YELLOW;
 		}
 	}
 

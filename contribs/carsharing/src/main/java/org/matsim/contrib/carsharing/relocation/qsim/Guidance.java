@@ -13,7 +13,7 @@ import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 
 /**
@@ -46,15 +46,13 @@ public class Guidance {
        
     }
 
-    public synchronized double getExpectedTravelTime(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
+    public synchronized OptionalTime getExpectedTravelTime(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {
         Facility startFacility = new LinkWrapperFacility(startLink);
         Facility destinationFacility = new LinkWrapperFacility(destinationLink);
         List<? extends PlanElement> trip = router.calcRoute(mode, startFacility, destinationFacility, departureTime, person);
 		Route route = ((Leg) trip.get(0)).getRoute();
 
-		double travelTime = route != null ? route.getTravelTime() : Time.getUndefinedTime();
-
-		return travelTime;
+		return route != null ? route.getTravelTime() : OptionalTime.undefined();
     }
 
     public synchronized double getExpectedTravelDistance(Link startLink, Link destinationLink, double departureTime, String mode, Person person) {

@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
@@ -171,7 +171,7 @@
 						</group>
 					</groups>
 					<detectLinks>true</detectLinks>
-					<additionalJOption>-Xdoclint:none</additionalJOption>
+					<doclint>none</doclint>
 					<linksource>true</linksource>
 				</configuration>
 			</plugin>
@@ -182,6 +182,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
@@ -236,10 +237,15 @@
 
 	<repositories>
 		<repository>
-            <!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
-			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
         <repository>
             <id>matsim</id>
@@ -315,7 +321,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

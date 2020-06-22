@@ -3,6 +3,7 @@
 <config>
 	<module name="multiModeDrt">
 		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="mode" value="drt_A"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>
@@ -14,6 +15,7 @@
 		</parameterset>
 
 		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="mode" value="drt_B"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>
@@ -25,6 +27,7 @@
 		</parameterset>
 
 		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="mode" value="drt_C"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>

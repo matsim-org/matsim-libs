@@ -54,7 +54,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.analysis.TransitRouteAccessEgressAnalysis;
 import org.matsim.pt.analysis.VehicleTracker;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -63,7 +63,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
@@ -205,7 +204,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(i-1, TransitStopFacility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new DefaultTransitPassengerRoute(schedule.getFacilities().get(Id.create(i-1, TransitStopFacility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, TransitStopFacility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks-1, Link.class));
 
 			population.addPerson(person);
@@ -223,7 +222,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(nOfLinks+i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new DefaultTransitPassengerRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(2*nOfLinks-1, Link.class));
 
 			population.addPerson(person);

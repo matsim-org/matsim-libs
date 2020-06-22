@@ -20,6 +20,17 @@
 
 package org.matsim.analysis;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.jfree.chart.axis.CategoryLabelPositions;
@@ -33,16 +44,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.charts.StackedBarChart;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.AbstractMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * analyses passenger hours traveled based on experienced plans.
@@ -76,18 +77,19 @@ public class PHbyModeCalculator {
                         double travelTime = 0.0;
                         double waitTime = 0.0;
                         if (leg.getRoute()!=null) {
-                            travelTime = leg.getRoute().getTravelTime();
+							travelTime = leg.getRoute().getTravelTime().seconds();
                             double enterVehicleTime = Double.NaN;
                             Object attr = leg.getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME);
                             if (attr != null) {
                             	enterVehicleTime = (Double) attr;
                             }
-                            waitTime = enterVehicleTime - leg.getDepartureTime();
+							waitTime = enterVehicleTime - leg.getDepartureTime().seconds();
                             if (!Double.isFinite(waitTime)) {waitTime = 0.0;}
                             if (waitTime >= 0.0) {
                             	travelTime -= waitTime;
                             } else {
-                            	throw new RuntimeException("negative wait time" + enterVehicleTime + " " + leg.getDepartureTime());
+								throw new RuntimeException("negative wait time" + enterVehicleTime + " " + leg.getDepartureTime()
+										.seconds());
                             }
                         }
 
@@ -99,7 +101,6 @@ public class PHbyModeCalculator {
                 		Activity act = (Activity) pe;
                 		if (StageActivityTypeIdentifier.isStageActivity(act.getType())) {
                             double duration = act.getEndTime().orElse(0) - act.getStartTime().orElse(0);
-                            if (Double.isNaN(duration)) {duration = 0.0; }
                             return new AbstractMap.SimpleEntry<>(STAGE_ACTIVITY,new TravelTimeAndWaitTime(0.0, duration));
                 		}
                 	}

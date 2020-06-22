@@ -23,6 +23,8 @@
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,12 +49,13 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
@@ -67,7 +70,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private final EventsManager events;
 	private final MobsimTimer simTimer;
 	private MobsimVehicle vehicle ;
-	private double activityEndTime = Time.getUndefinedTime();
+	private double activityEndTime;
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 	/**
@@ -85,17 +88,16 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		this.scenario = scenario ;
 		this.events = events ;
 		this.simTimer = simTimer ;
-		List<PlanElement> planElements = this.getCurrentPlan().getPlanElements();
-		if (planElements.size() > 0) {
-			Activity firstAct = (Activity) planElements.get(0);				
-//			this.setCurrentLinkId( firstAct.getLinkId() ) ;
-			final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
-			Gbl.assertIf( linkId!=null );
-			this.setCurrentLinkId( linkId );
-			this.setState(MobsimAgent.State.ACTIVITY) ;
-			calculateAndSetDepartureTime(firstAct);
-		}
-}
+
+		List<PlanElement> planElements = this.plan.getPlanElements();
+		Preconditions.checkArgument(!planElements.isEmpty(), "Plan must consist of at least one activity");
+		Activity firstAct = (Activity) planElements.get(0);
+		//this.setCurrentLinkId( firstAct.getLinkId() ) ;
+		final Id<Link> linkId = PopulationUtils.computeLinkIdFromActivity(firstAct, scenario.getActivityFacilities(), scenario.getConfig() );
+		this.setCurrentLinkId( linkId );
+		this.setState(State.ACTIVITY) ;
+		calculateAndSetDepartureTime(firstAct);
+	}
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
@@ -120,7 +122,6 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
-		Gbl.assertNotNull(linkId);
 		this.setCurrentLinkId( linkId ) ;
 	}
 
@@ -251,19 +252,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return ((Leg) currentPlanElement).getMode() ;
 	}
 	@Override
-	public final Double getExpectedTravelTime() {
-		PlanElement currentPlanElement = this.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
-		}
-		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
-		if (  !Time.isUndefinedTime(travelTimeFromRoute ) ) {
-			return travelTimeFromRoute ;
-		} else if ( !Time.isUndefinedTime(((Leg) currentPlanElement).getTravelTime() ) ) {
-			return ((Leg) currentPlanElement).getTravelTime()  ;
-		} else {
-			return null ;
-		}
+	public final OptionalTime getExpectedTravelTime() {
+		return PopulationUtils.decideOnTravelTimeForLeg((Leg)this.getCurrentPlanElement());
 	}
 
     @Override
@@ -360,8 +350,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		return this.currentLinkId;
 	}
 	
-	/* package */ final void setCurrentLinkId( Id<Link> linkId ) {
-		this.currentLinkId = linkId ;
+	/* package */ final void setCurrentLinkId(@NotNull Id<Link> linkId ) {
+		this.currentLinkId = Preconditions.checkNotNull(linkId);
 	}
 	
 	@Override

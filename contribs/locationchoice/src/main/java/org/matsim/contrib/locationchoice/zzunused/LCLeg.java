@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.zzunused;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -60,31 +61,41 @@ class LCLeg implements Leg, LCPlanElement {
 	}
 
 	@Override
-	public final double getDepartureTime() {
+	public final OptionalTime getDepartureTime() {
 		return this.plan.depTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setDepartureTime(double seconds) {
-		this.plan.depTimes[this.arrayIndex] = seconds;
+		this.plan.depTimes[this.arrayIndex] = OptionalTime.defined(seconds);
 	}
 
 	@Override
-	public final double getTravelTime() {
+	public void setDepartureTimeUndefined() {
+		this.plan.depTimes[this.arrayIndex] = OptionalTime.undefined();
+	}
+
+	@Override
+	public final OptionalTime getTravelTime() {
 		return this.plan.travTimes[this.arrayIndex];
 	}
 
 	@Override
 	public final void setTravelTime(double seconds) {
-		this.plan.travTimes[this.arrayIndex] = seconds;
+		this.plan.travTimes[this.arrayIndex] = OptionalTime.defined(seconds);
 	}
 
-	public final double getArrivalTime() {
+	@Override
+	public void setTravelTimeUndefined() {
+		this.plan.travTimes[this.arrayIndex] = OptionalTime.undefined();
+	}
+
+	public final OptionalTime getArrivalTime() {
 		return this.plan.arrTimes[this.arrayIndex];
 	}
 	
 	public final void setArrivalTime(final double arrTime) {
-		this.plan.arrTimes[this.arrayIndex] = arrTime;
+		this.plan.arrTimes[this.arrayIndex] = OptionalTime.defined(arrTime);
 	}
 
 	@Override

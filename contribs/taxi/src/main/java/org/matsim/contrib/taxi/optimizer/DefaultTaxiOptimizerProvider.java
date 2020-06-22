@@ -56,8 +56,9 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public DefaultTaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-										Network network, MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-										TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, URL context) {
+			Network network, MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelDisutility travelDisutility, TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater,
+			URL context) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -76,16 +77,22 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 			case AssignmentTaxiOptimizerParams.SET_NAME:
 				return new AssignmentTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
 						travelDisutility, scheduler, scheduleTimingUpdater);
+
 			case FifoTaxiOptimizerParams.SET_NAME:
 				return new FifoTaxiOptimizer(eventsManager, taxiCfg, fleet, network, timer, travelTime,
 						travelDisutility, scheduler, scheduleTimingUpdater);
+
 			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer,
-						travelTime, travelDisutility);
+				return RuleBasedTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+						network, timer, travelTime, travelDisutility);
+
 			case ZonalTaxiOptimizerParams.SET_NAME:
-				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime,
-						travelDisutility, context);
+				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+						network, timer, travelTime, travelDisutility, context);
+
+			default:
+				throw new RuntimeException(
+						"Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 		}
-		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 	}
 }

@@ -385,4 +385,60 @@ public final class EmissionUtils {
 		return pollutant;
 	}
 
+	/**
+	 *  try to re-write the key from hbefa3.x to hbefa4.x:
+	 */
+	/*package-private*/
+	static HbefaVehicleAttributes tryRewriteHbefa3toHbefa4(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
+		// try to re-write the key from hbefa3.x to hbefa4.x:
+		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
+
+		// technology is copied:
+		attribs2.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+
+		// size class is "not specified":
+		attribs2.setHbefaSizeClass("not specified");
+
+		// em concept is re-written with different dashes:
+		switch (vehicleInformationTuple.getSecond().getHbefaEmConcept()) {
+			case "PC-P-Euro-1":
+				attribs2.setHbefaEmConcept("PC P Euro-1");
+				break;
+			case "PC-P-Euro-2":
+				attribs2.setHbefaEmConcept("PC P Euro-2");
+				break;
+			case "PC-P-Euro-3":
+				attribs2.setHbefaEmConcept("PC P Euro-3");
+				break;
+			case "PC-P-Euro-4":
+				attribs2.setHbefaEmConcept("PC P Euro-4");
+				break;
+			case "PC-P-Euro-5":
+				attribs2.setHbefaEmConcept("PC P Euro-5");
+				break;
+			case "PC-P-Euro-6":
+				attribs2.setHbefaEmConcept("PC P Euro-6");
+				break;
+			case "PC-D-Euro-1":
+				attribs2.setHbefaEmConcept("PC D Euro-1");
+				break;
+			case "PC-D-Euro-2":
+				attribs2.setHbefaEmConcept("PC D Euro-2");
+				break;
+			case "PC-D-Euro-3":
+				attribs2.setHbefaEmConcept("PC D Euro-3");
+				break;
+			case "PC-D-Euro-4":
+				attribs2.setHbefaEmConcept("PC D Euro-4");
+				break;
+			case "PC-D-Euro-5":
+				attribs2.setHbefaEmConcept("PC D Euro-5");
+				break;
+			case "PC-D-Euro-6":
+				attribs2.setHbefaEmConcept("PC D Euro-6");
+				break;
+		}
+		return attribs2;
+	}
+
 }

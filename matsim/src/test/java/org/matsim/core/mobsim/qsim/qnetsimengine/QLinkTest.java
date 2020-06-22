@@ -117,7 +117,9 @@ public final class QLinkTest extends MatsimTestCase {
 		QVehicle v = new QVehicleImpl(f.basicVehicle);
 
 		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
-		p.addPlan(PopulationUtils.createPlan());
+		Plan plan = PopulationUtils.createPlan();
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("type", Id.createLinkId("0")));
+		p.addPlan(plan);
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 		
 		f.qlink1.getAcceptingQLane().addFromUpstream(v);
@@ -211,7 +213,9 @@ public final class QLinkTest extends MatsimTestCase {
 
 		QVehicle veh = new QVehicleImpl(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
-		p.addPlan(PopulationUtils.createPlan());
+		Plan plan = PopulationUtils.createPlan();
+		plan.addActivity(PopulationUtils.createActivityFromLinkId("type", Id.createLinkId("0")));
+		p.addPlan(plan);
 		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		// start test, check initial conditions

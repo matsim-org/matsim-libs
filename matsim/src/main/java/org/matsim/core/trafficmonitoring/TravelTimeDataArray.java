@@ -22,6 +22,8 @@ package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.network.Link;
 
+import java.util.Arrays;
+
 /**
  * Implementation of {@link TravelTimeData} that stores the data per time bin
  * in simple arrays. Useful if not too many empty time bins (time bins with 
@@ -44,10 +46,8 @@ class TravelTimeDataArray extends TravelTimeData {
 
 	@Override
 	public void resetTravelTimes() {
-		for (int i = 0; i < this.travelTimes.length; i++) {
-			this.timeCnt[i] = 0;
-			this.travelTimes[i] = -1.0;
-		}
+		Arrays.fill(this.timeCnt, (short) 0);
+		Arrays.fill(this.travelTimes, -1.0);
 	}
 
 	@Override
@@ -77,6 +77,23 @@ class TravelTimeDataArray extends TravelTimeData {
 		double freespeed = this.link.getLength() / this.link.getFreespeed(now);
 		this.travelTimes[timeSlot] = freespeed;
 		return freespeed;
+	}
+
+	/* package-private for debugging */ String cntToString(){
+		StringBuilder strb = new StringBuilder().append( "cnt=[ " );
+		for( int ii = 0 ; ii < this.timeCnt.length ; ii++ ){
+			strb.append( this.timeCnt[ii] ).append( "      " );
+		}
+		strb.append( "]" );
+		return strb.toString();
+	}
+	/* package-private for debugging */ String ttToString() {
+		StringBuilder strb = new StringBuilder().append( "tt=[ " );
+		for ( int ii=0 ; ii<this.travelTimes.length ; ii++ ) {
+			strb.append( this.travelTimes[ii] ).append( " " );
+		}
+		strb.append( "]" );
+		return strb.toString();
 	}
 
 }

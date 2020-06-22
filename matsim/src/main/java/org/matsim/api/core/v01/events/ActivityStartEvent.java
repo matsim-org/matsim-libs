@@ -37,7 +37,7 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 
 
 	private final Id<Person> personId;
-	private final Coord coord;
+	private Coord coord;
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
@@ -105,5 +105,9 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 	}
 	@Override public Coord getCoord(){
 		return coord;
+	}
+	public void setCoord( Coord coord ) {
+		// yy  this is to retrofit the coordinate into existing events that don't have it.  :-(  kai, mar'20
+		this.coord = coord;
 	}
 }

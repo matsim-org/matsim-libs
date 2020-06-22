@@ -70,8 +70,8 @@ public class DrtRoutingModuleTest {
 	public void testCottbusClosestAccessEgressStopFinder() {
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();
-		final Double networkTravelSpeed = 0.83333;
-		final Double beelineFactor = 1.3;
+		final double networkTravelSpeed = 0.83333;
+		final double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
 				networkTravelSpeed, beelineFactor);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());

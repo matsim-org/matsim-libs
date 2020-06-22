@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
@@ -393,16 +394,18 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			if ( actType.isScoringThisActivityAtAll() ) {
 				// (checking consistency only if activity is scored at all)
 
-				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (!Time.isUndefinedTime(actType.getClosingTime()))) {
+				if (actType.getOpeningTime().isDefined() && actType.getClosingTime().isDefined()) {
 					hasOpeningAndClosingTime = true;
+
+					if (actType.getOpeningTime().seconds() == 0. && actType.getClosingTime().seconds() > 24. * 3600 - 1) {
+						log.error("it looks like you have an activity type with opening time set to 0:00 and closing "
+								+ "time set to 24:00. This is most probably not the same as not setting them at all.  "
+								+ "In particular, activities which extend past midnight may not accumulate scores.");
+					}
+
 				}
-				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
+				if (actType.getOpeningTime().isDefined() && (getLateArrival_utils_hr() < -0.001)) {
 					hasOpeningTimeAndLatePenalty = true;
-				}
-				if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
-					log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
-							"time set to 24:00. This is most probably not the same as not setting them at all.  " +
-							"In particular, activities which extend past midnight may not accumulate scores.") ;
 				}
 			}
 		}
@@ -555,12 +558,12 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		final static String SET_TYPE = "activityParams";
 		private String type;
 		private double priority = 1.0;
-		private double typicalDuration = Time.getUndefinedTime();
-		private double minimalDuration = Time.getUndefinedTime();
-		private double openingTime = Time.getUndefinedTime();
-		private double latestStartTime = Time.getUndefinedTime();
-		private double earliestEndTime = Time.getUndefinedTime();
-		private double closingTime = Time.getUndefinedTime();
+		private OptionalTime typicalDuration = OptionalTime.undefined();
+		private OptionalTime minimalDuration = OptionalTime.undefined();
+		private OptionalTime openingTime = OptionalTime.undefined();
+		private OptionalTime latestStartTime = OptionalTime.undefined();
+		private OptionalTime earliestEndTime = OptionalTime.undefined();
+		private OptionalTime closingTime = OptionalTime.undefined();
 		private boolean scoringThisActivityAtAll = true ;
 
 		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.uniform ;
@@ -620,7 +623,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getTypicalDuration() );
 		}
 
-		public double getTypicalDuration() {
+		public OptionalTime getTypicalDuration() {
 			return this.typicalDuration;
 		}
 
@@ -632,7 +635,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setTypicalDuration(final double typicalDuration) {
 			testForLocked() ;
-			this.typicalDuration = typicalDuration;
+			this.typicalDuration = OptionalTime.defined(typicalDuration);
 		}
 
 		@StringGetter( "minimalDuration" )
@@ -640,7 +643,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getMinimalDuration() );
 		}
 
-		public double getMinimalDuration() {
+		public OptionalTime getMinimalDuration() {
 			return this.minimalDuration;
 		}
 
@@ -653,12 +656,12 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
 			testForLocked() ;
-			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt<1) ) {
+			this.minimalDuration = OptionalTime.defined(minimalDuration);
+			if (this.minimalDuration.isDefined() && minDurCnt < 1 ) {
 				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
 						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
 			}
-			this.minimalDuration = minimalDuration;
 		}
 
 		@StringGetter( "openingTime" )
@@ -666,7 +669,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getOpeningTime() );
 		}
 
-		public double getOpeningTime() {
+		public OptionalTime getOpeningTime() {
 			return this.openingTime;
 		}
 		@StringSetter( "openingTime" )
@@ -677,7 +680,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setOpeningTime(final double openingTime) {
 			testForLocked() ;
-			this.openingTime = openingTime;
+			this.openingTime = OptionalTime.defined(openingTime);
 		}
 
 		@StringGetter( "latestStartTime" )
@@ -685,7 +688,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getLatestStartTime() );
 		}
 
-		public double getLatestStartTime() {
+		public OptionalTime getLatestStartTime() {
 			return this.latestStartTime;
 		}
 		@StringSetter( "latestStartTime" )
@@ -696,7 +699,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setLatestStartTime(final double latestStartTime) {
 			testForLocked() ;
-			this.latestStartTime = latestStartTime;
+			this.latestStartTime = OptionalTime.defined(latestStartTime);
 		}
 
 		@StringGetter( "earliestEndTime" )
@@ -704,7 +707,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getEarliestEndTime() );
 		}
 
-		public double getEarliestEndTime() {
+		public OptionalTime getEarliestEndTime() {
 			return this.earliestEndTime;
 		}
 		@StringSetter( "earliestEndTime" )
@@ -715,7 +718,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setEarliestEndTime(final double earliestEndTime) {
 			testForLocked() ;
-			this.earliestEndTime = earliestEndTime;
+			this.earliestEndTime = OptionalTime.defined(earliestEndTime);
 		}
 
 		@StringGetter( "closingTime" )
@@ -723,7 +726,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			return Time.writeTime( getClosingTime() );
 		}
 
-		public double getClosingTime() {
+		public OptionalTime getClosingTime() {
 			return this.closingTime;
 		}
 		@StringSetter( "closingTime" )
@@ -734,7 +737,7 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public void setClosingTime(final double closingTime) {
 			testForLocked() ;
-			this.closingTime = closingTime;
+			this.closingTime = OptionalTime.defined(closingTime);
 		}
 
 		@StringGetter( "scoringThisActivityAtAll" )

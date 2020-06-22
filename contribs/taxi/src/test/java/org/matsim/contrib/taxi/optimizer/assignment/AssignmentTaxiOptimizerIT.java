@@ -19,24 +19,22 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
+import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.*;
+
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.util.List;
-
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.PreloadedBenchmark;
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.TaxiConfigVariant;
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.createDefaultTaxiConfigVariants;
-import static org.matsim.contrib.taxi.optimizer.TaxiOptimizerTests.runBenchmark;
-
 public class AssignmentTaxiOptimizerIT {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Test @Ignore // temporarily ignore this test due to problems on the build server
+	@Test
+	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_arrivalTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
@@ -50,7 +48,8 @@ public class AssignmentTaxiOptimizerIT {
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
 	}
 
-	@Test @Ignore // temporarily ignore this test due to problems on the build server
+	@Test
+	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_pickupTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
@@ -65,7 +64,8 @@ public class AssignmentTaxiOptimizerIT {
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory());
 	}
 
-	@Test @Ignore // temporarily ignore this test due to problems on the build server
+	@Test
+	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_dse() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);
@@ -82,7 +82,8 @@ public class AssignmentTaxiOptimizerIT {
 
 	}
 
-	@Test @Ignore // temporarily ignore this test due to problems on the build server
+	@Test
+	@Ignore // temporarily ignore this test due to problems on the build server
 	public void testAssignment_totalWaitTime() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
 		List<TaxiConfigVariant> variants = createDefaultTaxiConfigVariants(true);

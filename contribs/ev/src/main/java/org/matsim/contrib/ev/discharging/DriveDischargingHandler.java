@@ -67,7 +67,7 @@ public class DriveDischargingHandler
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EvDrive> evDrives;
-	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
+	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
 	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg,

@@ -1,8 +1,10 @@
 package org.matsim.integration.drtAndPt;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,7 +16,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -22,9 +28,10 @@ import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetWriter;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -44,7 +51,13 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
@@ -52,12 +65,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class PtAlongALineTest{
 
@@ -121,10 +131,6 @@ public class PtAlongALineTest{
 	@Test
 	public void testDrtAlongALine() {
 
-		Path taxisA = Paths.get("./test/input/one_shared_taxi_vehicles_A.xml");
-		// (forward slash should also work on windows.  kai, jun'19)
-
-		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"), 4);
 
 		Config config = ConfigUtils.createConfig();
 
@@ -146,7 +152,6 @@ public class PtAlongALineTest{
 			drtConfig.setMaxTravelTimeAlpha(1.3);
 			drtConfig.setMaxTravelTimeBeta(10. * 60.);
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-			drtConfig.setVehiclesFile(taxisA.toString());
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
@@ -218,6 +223,11 @@ public class PtAlongALineTest{
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes("drt_A"));
 
+		controler.addOverridingModule(
+				PtAlongALineTest.createGeneratedFleetSpecificationModule("drt_A", "drtA-", 200,
+						Id.createLinkId("499-500"), 4));
+
+
 		controler.run();
 	}
 
@@ -269,14 +279,12 @@ public class PtAlongALineTest{
 		}
 
 
-			String drtVehiclesFile = "drt_vehicles.xml";
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
 			drtConfig.setMaxTravelTimeAlpha( 1.3 );
-			drtConfig.setVehiclesFile( drtVehiclesFile );
 			drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 			drtConfig.setStopDuration( 60. );
 			drtConfig.setMaxWaitTime( Double.MAX_VALUE );
@@ -288,7 +296,6 @@ public class PtAlongALineTest{
 		for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
 			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore(), config.plansCalcRoute() );
 		}
-		PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ), 4);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn );
 
@@ -321,6 +328,10 @@ public class PtAlongALineTest{
 		controler.addOverridingModule( new DvrpModule() );
 		controler.addOverridingModule( new MultiModeDrtModule() );
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt ) );
+
+		controler.addOverridingModule(
+				PtAlongALineTest.createGeneratedFleetSpecificationModule(TransportMode.drt, "DRT-", 10,
+						Id.createLinkId("0-1"), 4));
 
 
 		// This will start otfvis.  Comment out if not needed.
@@ -638,20 +649,32 @@ public class PtAlongALineTest{
 		scenario.getActivityFacilities().addActivityFacility( af );
 	}
 
-	static void createDrtVehiclesFile( String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId, int capacity ) {
-		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
-		for (int i = 0; i< numberofVehicles;i++){
+	static AbstractDvrpModeModule createGeneratedFleetSpecificationModule(String mode, String vehPrefix,
+			int numberofVehicles, Id<Link> startLinkId, int capacity) {
+		return new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				bindModal(FleetSpecification.class).toProvider(
+						() -> PtAlongALineTest.createDrtFleetSpecifications(vehPrefix, numberofVehicles, startLinkId,
+								capacity)).asEagerSingleton();
+			}
+		};
+	}
+
+	static FleetSpecification createDrtFleetSpecifications(String vehPrefix, int numberofVehicles, Id<Link> startLinkId,
+			int capacity) {
+		FleetSpecification fleetSpecification = new FleetSpecificationImpl();
+		for (int i = 0; i < numberofVehicles; i++) {
 			//for multi-modal networks: Only links where drts can ride should be used.
-			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
-													  .id(Id.create(vehPrefix + i, DvrpVehicle.class))
-													  .startLinkId(startLinkId)
-													  .capacity(capacity)
-													  .serviceBeginTime(0)
-													  .serviceEndTime(36*3600)
-													  .build();
-			vehicles.add(v);
+			fleetSpecification.addVehicleSpecification(ImmutableDvrpVehicleSpecification.newBuilder()
+					.id(Id.create(vehPrefix + i, DvrpVehicle.class))
+					.startLinkId(startLinkId)
+					.capacity(capacity)
+					.serviceBeginTime(0)
+					.serviceEndTime(36 * 3600)
+					.build());
 		}
-		new FleetWriter(vehicles.stream()).write(taxisFile);
+		return fleetSpecification;
 	}
 
 	static void addModeToAllLinksBtwnGivenNodes( Network network, int fromNodeNumber, int toNodeNumber, String drtMode ) {
