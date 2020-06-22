@@ -20,7 +20,6 @@
 package org.matsim.contrib.ev.stats;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,6 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
 		List<ElectricVehicle> allEvs = new ArrayList<>(evFleet.getElectricVehicles().values());
-		Collections.shuffle(allEvs);
 		List<ElectricVehicle> selectedEvs = allEvs.stream().limit(columns).collect(Collectors.toList());
 
 		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
