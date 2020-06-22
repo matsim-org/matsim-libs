@@ -118,9 +118,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             signal.update(now);
         }
         
-        // TODO test what happens, when I move this up to the first line of this method. should save runtime. tt, dez'17
-        // note: stabilization has still to be done to increment 'a'... tt, dez'17
-        // if 'a' is be dependent on the time and not on the number of calls (as it is best anyway), this could be moved up. tt, dec'18
+        // note: signals need to be updated before to increment 'a' (in stabilization)... tt, dez'17
         if(activeRequest != null && activeRequest.signal.group.getState().equals(SignalGroupState.GREEN)) {
             double remainingMinG = activeRequest.onsetTime + laemmerConfig.getMinGreenTime() - now;
             if (remainingMinG > 0) {
@@ -488,8 +486,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             if (n == 0) {
                 a = laemmerConfig.getIntergreenTime();
             } else {
-            		// TODO: a should be time dependent and not dependent on the simulation time step size as it is now. tt, jan'18
-                a++;
+            	a+=config.qsim().getTimeStepSize();
             }
 
             if (regulationQueue.contains(this)) {
