@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
-	private final SelectiveInsertionSearchParams insertionParams;
 
 	// step 1: initial filtering out feasible insertions
 	private final DetourTimesProvider restrictiveDetourTimesProvider;
@@ -51,10 +50,8 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
 
-		insertionParams = (SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-
 		// TODO use more sophisticated DetourTimeEstimator
-		double restrictiveBeelineSpeed = insertionParams.getRestrictiveBeelineSpeedFactor()
+		double restrictiveBeelineSpeed = ((SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams()).getRestrictiveBeelineSpeedFactor()
 				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
 
 		restrictiveDetourTimesProvider = new DetourTimesProvider(

@@ -41,13 +41,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public final class DynAgent implements MobsimDriverPassengerAgent {
-	private DynAgentLogic agentLogic;
+	private final DynAgentLogic agentLogic;
 
-	private Id<Person> id;
+	private final Id<Person> id;
 
 	private MobsimVehicle veh;
 
-	private EventsManager events;
+	private final EventsManager events;
 
 	private MobsimAgent.State state;
 

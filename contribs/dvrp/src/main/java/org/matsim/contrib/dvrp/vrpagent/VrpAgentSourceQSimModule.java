@@ -39,7 +39,7 @@ public class VrpAgentSourceQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		addModalComponent(VrpAgentSource.class, new ModalProviders.AbstractProvider<VrpAgentSource>(getMode()) {
+		addModalComponent(VrpAgentSource.class, new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject
 			private QSim qSim;
 

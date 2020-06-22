@@ -22,13 +22,15 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.apache.commons.lang3.mutable.MutableInt;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-
-import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
+
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.locationtech.jts.geom.Geometry;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 /**
  * This class does not really calculate the expected demand but aims to
@@ -55,7 +57,7 @@ public class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggr
 		vehiclesPerZone.clear();
 
 		double areaSum = zonalSystem.getZones().values().stream()
-				.mapToDouble(zone -> zone.getArea())
+				.mapToDouble(Geometry::getArea)
 				.sum();
 
 		for(String zone : zonalSystem.getZones().keySet()){

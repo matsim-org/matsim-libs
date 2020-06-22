@@ -90,6 +90,6 @@ public class Schedules2GIS {
 			coordList.add(new Coordinate(c.getX(), c.getY()));
 		}
 
-		return coordList.toArray(new Coordinate[coordList.size()]);
+		return coordList.toArray(new Coordinate[0]);
 	}
 }

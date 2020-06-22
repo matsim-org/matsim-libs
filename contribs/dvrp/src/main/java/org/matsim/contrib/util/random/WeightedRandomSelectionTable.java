@@ -19,18 +19,20 @@
 
 package org.matsim.contrib.util.random;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ArrayTable;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 public class WeightedRandomSelectionTable<R, C, V> {
 	public static <R, C, V> WeightedRandomSelectionTable<R, C, V> createWithArrayTable(Iterable<? extends R> rowKeys,
 			Iterable<? extends C> colKeys) {
 		Table<R, C, WeightedRandomSelection<V>> selectionTable = ArrayTable.create(rowKeys, colKeys);
-		return new WeightedRandomSelectionTable<R, C, V>(selectionTable);
+		return new WeightedRandomSelectionTable<>(selectionTable);
 	}
 
 	public static <R, C, V> WeightedRandomSelectionTable<R, C, V> createWithHashBasedTable() {
 		Table<R, C, WeightedRandomSelection<V>> selectionTable = HashBasedTable.create();
-		return new WeightedRandomSelectionTable<R, C, V>(selectionTable);
+		return new WeightedRandomSelectionTable<>(selectionTable);
 	}
 
 	// (K1, K2) -> random selection of V
