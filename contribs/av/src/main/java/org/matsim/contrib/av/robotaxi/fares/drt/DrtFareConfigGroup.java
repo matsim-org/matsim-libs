@@ -24,7 +24,6 @@ package org.matsim.contrib.av.robotaxi.fares.drt;
 
 import java.util.Map;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -54,10 +53,6 @@ public final class DrtFareConfigGroup extends ReflectiveConfigGroup {
 
     }
 
-    public static DrtFareConfigGroup get(Config config) {
-        return (DrtFareConfigGroup) config.getModules().get(GROUP_NAME);
-    }
-
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
@@ -80,7 +75,7 @@ public final class DrtFareConfigGroup extends ReflectiveConfigGroup {
     public void setBasefare(double basefare) {
         this.basefare = basefare;
     }
-    
+
     @StringGetter(MINFARE_PER_TRIP)
     public double getMinFarePerTrip() {
         return minFarePerTrip;
