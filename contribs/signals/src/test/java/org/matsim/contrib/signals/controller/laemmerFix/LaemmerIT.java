@@ -426,36 +426,58 @@ public class LaemmerIT {
 	 */
 	@Test
 	public void testMultipleIterations() {
-		Fixture fixture = new Fixture(500, 2000, 5.0, Regime.COMBINED);
-		int lastIt = 1;
-		fixture.setLastIteration(lastIt);
-		fixture.addLeftTurnTraffic();
-		SignalAnalysisTool signalAnalyzer = new SignalAnalysisTool();
-		DelayAnalysisTool generalAnalyzer = fixture.run(signalAnalyzer);
+		Fixture fixture0It = new Fixture(500, 2000, 5.0, Regime.COMBINED);
+		fixture0It.setLastIteration(0);
+		fixture0It.addLeftTurnTraffic();
+		SignalAnalysisTool signalAnalyzer0It = new SignalAnalysisTool();
+		DelayAnalysisTool generalAnalyzer0It = fixture0It.run(signalAnalyzer0It);
 
-		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime();
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle();
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem();
-		Map<Id<Link>, Double> avgDelayPerLink = generalAnalyzer.getAvgDelayPerLink();
-		Double avgDelayWE = avgDelayPerLink.get(Id.createLinkId("2_3"));
-		Double avgDelayNS = avgDelayPerLink.get(Id.createLinkId("7_3"));
+		Map<Id<SignalGroup>, Double> totalSignalGreenTimes0It = signalAnalyzer0It.getTotalSignalGreenTime();
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle0It = signalAnalyzer0It.calculateAvgSignalGreenTimePerFlexibleCycle();
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem0It = signalAnalyzer0It.calculateAvgFlexibleCycleTimePerSignalSystem();
+		Map<Id<Link>, Double> avgDelayPerLink0It = generalAnalyzer0It.getAvgDelayPerLink();
+		Double avgDelayWE0It = avgDelayPerLink0It.get(Id.createLinkId("2_3"));
+		Double avgDelayNS0It = avgDelayPerLink0It.get(Id.createLinkId("7_3"));
 		
-		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId1l) + ", "
-				+ totalSignalGreenTimes.get(signalGroupId2));
-		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId1l) + ", "
-				+ avgSignalGreenTimePerCycle.get(signalGroupId2));
-		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		log.info("avg delay per link: " + avgDelayWE + ", " + avgDelayNS);
+		log.info("total signal green times in iteration 0: " + totalSignalGreenTimes0It.get(signalGroupId1) + ", " + totalSignalGreenTimes0It.get(signalGroupId1l) + ", "
+				+ totalSignalGreenTimes0It.get(signalGroupId2));
+		log.info("avg signal green times per cycle in itertion 0: " + avgSignalGreenTimePerCycle0It.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle0It.get(signalGroupId1l) + ", "
+				+ avgSignalGreenTimePerCycle0It.get(signalGroupId2));
+		log.info("avg cycle time per system in itertion 0: " + avgCycleTimePerSystem0It.get(signalSystemId));
+		log.info("avg delay per link in itertion 0: " + avgDelayWE0It + ", " + avgDelayNS0It);
 
-		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", 3023.0, totalSignalGreenTimes.get(signalGroupId1), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("total green time of signal group 1l should be the same as in the first iteration", 599.0, totalSignalGreenTimes.get(signalGroupId1l), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", 1501.0, totalSignalGreenTimes.get(signalGroupId2), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", 28.252, avgSignalGreenTimePerCycle.get(signalGroupId1), .01);
-		Assert.assertEquals("avg green time of signal group 1l should be the same as in the first iteration", 5.598, avgSignalGreenTimePerCycle.get(signalGroupId1l), .01);
-		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", 14.028, avgSignalGreenTimePerCycle.get(signalGroupId2), .01);
-		Assert.assertEquals("avg cycle time should be the same as in the first iteration", 64.037, avgCycleTimePerSystem.get(signalSystemId), .01);
-		Assert.assertEquals("avg delay in direction WE should be the same as in the first iteration", 304.106, avgDelayWE, .01);
-		Assert.assertEquals("avg delay in direction NS should be the same as in the first iteration", 322.704, avgDelayNS, .01);
+				
+		Fixture fixture1It = new Fixture(500, 2000, 5.0, Regime.COMBINED);
+		int lastIt = 1;
+		fixture1It.setLastIteration(lastIt);
+		fixture1It.addLeftTurnTraffic();
+		SignalAnalysisTool signalAnalyzer1It = new SignalAnalysisTool();
+		DelayAnalysisTool generalAnalyzer1It = fixture1It.run(signalAnalyzer1It);
+
+		Map<Id<SignalGroup>, Double> totalSignalGreenTimes1It = signalAnalyzer1It.getTotalSignalGreenTime();
+		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle1It = signalAnalyzer1It.calculateAvgSignalGreenTimePerFlexibleCycle();
+		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem1It = signalAnalyzer1It.calculateAvgFlexibleCycleTimePerSignalSystem();
+		Map<Id<Link>, Double> avgDelayPerLink1It = generalAnalyzer1It.getAvgDelayPerLink();
+		Double avgDelayWE1It = avgDelayPerLink1It.get(Id.createLinkId("2_3"));
+		Double avgDelayNS1It = avgDelayPerLink1It.get(Id.createLinkId("7_3"));
+		
+		log.info("total signal green times in itertion 1: " + totalSignalGreenTimes1It.get(signalGroupId1) + ", " + totalSignalGreenTimes1It.get(signalGroupId1l) + ", "
+				+ totalSignalGreenTimes1It.get(signalGroupId2));
+		log.info("avg signal green times per cycle in itertion 1: " + avgSignalGreenTimePerCycle1It.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle1It.get(signalGroupId1l) + ", "
+				+ avgSignalGreenTimePerCycle1It.get(signalGroupId2));
+		log.info("avg cycle time per system in itertion 1: " + avgCycleTimePerSystem1It.get(signalSystemId));
+		log.info("avg delay per link in itertion 1: " + avgDelayWE1It + ", " + avgDelayNS1It);
+
+		
+		Assert.assertEquals("total green time of signal group 1 should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId1), totalSignalGreenTimes1It.get(signalGroupId1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("total green time of signal group 1l should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId1l), totalSignalGreenTimes1It.get(signalGroupId1l), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("total green time of signal group 2 should be the same as in the first iteration", totalSignalGreenTimes0It.get(signalGroupId2), totalSignalGreenTimes1It.get(signalGroupId2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("avg green time of signal group 1 should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId1), avgSignalGreenTimePerCycle1It.get(signalGroupId1), .01);
+		Assert.assertEquals("avg green time of signal group 1l should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId1l), avgSignalGreenTimePerCycle1It.get(signalGroupId1l), .01);
+		Assert.assertEquals("avg green time of signal group 2 should be the same as in the first iteration", avgSignalGreenTimePerCycle0It.get(signalGroupId2), avgSignalGreenTimePerCycle1It.get(signalGroupId2), .01);
+		Assert.assertEquals("avg cycle time should be the same as in the first iteration", avgCycleTimePerSystem0It.get(signalSystemId), avgCycleTimePerSystem1It.get(signalSystemId), .01);
+		Assert.assertEquals("avg delay in direction WE should be the same as in the first iteration", avgDelayWE0It, avgDelayWE1It, .01);
+		Assert.assertEquals("avg delay in direction NS should be the same as in the first iteration", avgDelayNS0It, avgDelayNS1It, .01);
 		// compare signal event files
 		long checksum_it0 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it.0/signalEvents2Via.csv");
 		long checksum_itLast = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it."+lastIt+"/signalEvents2Via.csv");
