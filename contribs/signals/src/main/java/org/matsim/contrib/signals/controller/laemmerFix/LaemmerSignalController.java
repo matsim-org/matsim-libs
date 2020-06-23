@@ -184,13 +184,13 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
     private void processSelection(double now, LaemmerSignal max) {
         if (activeRequest != null && (max == null || !max.equals(activeRequest.signal))) {
-        		/* quit the active request, when the next selection (max) is different from the current (activeRequest)
-        		 * or, when the next selection (max) is null
-        		 */
-        		if (activeRequest.onsetTime < now) {
-        			// do not schedule a dropping when the signal does not yet show green
-        			this.system.scheduleDropping(now, activeRequest.signal.group.getId());
-        		}
+        	/* quit the active request, when the next selection (max) is different from the current (activeRequest)
+        	 * or, when the next selection (max) is null
+        	 */
+        	if (activeRequest.onsetTime < now) {
+        		// do not schedule a dropping when the previous signal hasn't shown green yet
+        		this.system.scheduleDropping(now, activeRequest.signal.group.getId());
+        	}
             activeRequest = null;
         }
 
@@ -511,9 +511,8 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             	 * and could no longer check for empty regulationQueue to decide for stabilization vs optimization... I would prefer to have some tests before! theresa, jul'17 */
 				if (!laemmerConfig.isCheckDownstream() || downstreamSensor.allDownstreamLinksEmpty(system.getId(), group.getId())) {
 					regulationQueue.add(this);
-					// signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + desiredPeriod + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" +
-					// tIdle);
-					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacityPerS / systemOutflowCapacity) * tIdle), laemmerConfig.getMinGreenTime());
+					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacityPerS / systemOutflowCapacity) * tIdle), 
+							laemmerConfig.getMinGreenTime());
 					this.stabilize = true;
 				}
             }
