@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
@@ -380,29 +381,22 @@ public class ScenarioImporter {
             if (route == null) return;
 
             events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
-			//TODO: probably a switch over the route type would be better here
-            switch (mode) {
-                case TransportMode.car:
-                case TransportMode.motorcycle:
-                case TransportMode.truck:
-                case "freight":
-                    assert route instanceof NetworkRoute;
-                    processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
-                    break;
-                case TransportMode.pt:
-                    assert route instanceof TransitPassengerRoute;
-                    processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
-                    break;
-                default:
-                    double routeTravelTime = route.getTravelTime().orElse(0.0);
-                    double legTravelTime = ((Leg)element ).getTravelTime().orElse(0.0);
+            if (route instanceof NetworkRoute){
+				processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
+			}
+            else if (route instanceof TransitPassengerRoute){
+				processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
 
-                    int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
-                    flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
-                    events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
-                    break;
+			} else if (route instanceof GenericRouteImpl){
+				double routeTravelTime = route.getTravelTime().orElse(0.0);
+				double legTravelTime = ((Leg)element ).getTravelTime().orElse(0.0);
+				int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
+				flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
+				events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
+			} else {
+            	throw new RuntimeException("Route type not supported by Hermes: "+route.getRouteType() + "\n Person:" + id+"\n Leg"+leg+"\n Leg"+route);
+			}
 
-             }
 
             events.add(new PersonArrivalEvent(0, id, route.getEndLinkId(), leg.getMode()));
 
