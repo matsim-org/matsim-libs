@@ -11,6 +11,7 @@ import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,10 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
@@ -89,7 +86,7 @@ public class CollectionLSPReplanningTest {
 		
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder adapterBuilder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(scheduler);
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);

@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 import lsp.*;
+import lsp.resources.CarrierResource;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -23,7 +25,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.resources.Resource;
 
@@ -31,7 +32,7 @@ public class CollectionSolutionTest {
 
 	private Network network;
 	private Carrier carrier;
-	private CollectionCarrierAdapter adapter;
+	private CarrierResource carrierAdapter;
 	private LogisticsSolutionElement collectionElement; 
 	private LogisticsSolution collectionSolution;
 	
@@ -68,17 +69,17 @@ public class CollectionSolutionTest {
 		carrier.setCarrierCapabilities(capabilities);
 
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder adapterBuilder = CollectionCarrierAdapter.Builder.newInstance(adapterId,
+		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId,
 				network);
 		adapterBuilder.setCollectionScheduler(scheduler);
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		adapter = adapterBuilder.build();
+		carrierAdapter = adapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
-		collectionElementBuilder.setResource(adapter);
+		collectionElementBuilder.setResource(carrierAdapter);
 				collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);

@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public class ScheduledShipmentTransport implements AbstractShipmentPlanElement{
+public class ScheduledShipmentTransport implements ShipmentPlanElement {
 
 	private final String type = "TRANSPORT";
 	private double startTime;

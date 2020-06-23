@@ -26,7 +26,7 @@ import lsp.ShipmentTuple;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
-import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ScheduledShipmentLoad;
 import lsp.shipment.ScheduledShipmentTransport;
 import lsp.shipment.ScheduledShipmentUnload;
@@ -182,7 +182,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 		builder.setCarrierService(serviceActivity.getService());
 		ScheduledShipmentLoad  load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
-		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, load);
 	}
 	
@@ -229,7 +229,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 		builder.setCarrierService(serviceActivity.getService());
 		ScheduledShipmentTransport transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
-		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, transport);
 	}
 	
@@ -250,7 +250,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 		builder.setCarrierService(serviceActivity.getService());
 		ScheduledShipmentUnload unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
-		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, unload);
 	}
 	

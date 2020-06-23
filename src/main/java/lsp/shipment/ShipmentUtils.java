@@ -1,7 +1,9 @@
 package lsp.shipment;
 
 import demand.utilityFunctions.UtilityFunction;
+import lsp.LogisticsSolutionElement;
 import lsp.functions.Info;
+import lsp.resources.Resource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
@@ -85,4 +87,49 @@ public class ShipmentUtils{
 
 
 	}
+
+	public static class LoggedShipmentHandleBuilder {
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		Id<Link> linkId;
+
+		private LoggedShipmentHandleBuilder(){
+		}
+
+		public static LoggedShipmentHandleBuilder newInstance(){
+			return new LoggedShipmentHandleBuilder();
+		}
+
+		public LoggedShipmentHandleBuilder setStartTime(double startTime){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public LoggedShipmentHandleBuilder setEndTime(double endTime){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public LoggedShipmentHandleBuilder setLogisticsSolutionElement(LogisticsSolutionElement element){
+			this.element = element;
+			return this;
+		}
+
+		public LoggedShipmentHandleBuilder setResourceId(Id<Resource> resourceId){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public LoggedShipmentHandleBuilder setLinkId(Id<Link> linkId){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public ShipmentPlanElement build(){
+			return new LoggedShipmentHandle(this);
+		}
+	}
+
 }

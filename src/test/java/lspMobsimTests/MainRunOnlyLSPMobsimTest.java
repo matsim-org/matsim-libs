@@ -190,13 +190,13 @@ public class MainRunOnlyLSPMobsimTest {
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
-			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new ShipmentPlanElementComparator());
 
-			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
-				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+			for(ShipmentPlanElement scheduleElement : scheduleElements){
+				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
 				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
 				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());

@@ -10,6 +10,7 @@ import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -35,10 +36,6 @@ import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 
 /*package-private*/ class ExampleLSPReplanning {
 
@@ -70,7 +67,7 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 				
 				//The Adapter i.e. the Resource is created
 				Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-				CollectionCarrierAdapter.Builder adapterBuilder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+				UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 				
 				//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 				CollectionCarrierScheduler scheduler = new CollectionCarrierScheduler();

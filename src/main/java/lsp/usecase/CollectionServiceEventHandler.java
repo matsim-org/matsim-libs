@@ -8,7 +8,7 @@ import lsp.events.ServiceEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LoggedShipmentLoad;
 import lsp.shipment.LoggedShipmentTransport;
@@ -52,7 +52,7 @@ public class CollectionServiceEventHandler implements ServiceEndEventHandler {
 		builder.setCarrierId(event.getCarrierId());
 		LoggedShipmentLoad load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
-		Id<AbstractShipmentPlanElement> loadId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(loadId, load);
 	}
 
@@ -65,7 +65,7 @@ public class CollectionServiceEventHandler implements ServiceEndEventHandler {
 		builder.setCarrierId(event.getCarrierId());
 		LoggedShipmentTransport transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
-		Id<AbstractShipmentPlanElement> transportId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(transportId, transport);
 	}
 

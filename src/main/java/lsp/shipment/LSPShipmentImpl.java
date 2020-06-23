@@ -21,8 +21,8 @@ import lsp.functions.Info;
 	private TimeWindow endTimeWindow;
 	private int capacityDemand;
 	private double serviceTime;
-	private AbstractShipmentPlan schedule;
-	private AbstractShipmentPlan log;
+	private ShipmentPlan schedule;
+	private ShipmentPlan log;
 	private ArrayList<EventHandler> eventHandlers;
 	private ArrayList<Requirement> requirements;
 	private ArrayList<UtilityFunction> utilityFunctions;
@@ -81,12 +81,12 @@ import lsp.functions.Info;
 	}
 
 	@Override
-	public AbstractShipmentPlan getSchedule() {
+	public ShipmentPlan getSchedule() {
 		return schedule;
 	}
 
 	@Override
-	public AbstractShipmentPlan getLog() {
+	public ShipmentPlan getLog() {
 		return log;
 	}
 

@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 
-/*package-private*/ class Log implements AbstractShipmentPlan {
+/*package-private*/ class Log implements ShipmentPlan {
 
-	class LogElementComparator implements Comparator<AbstractShipmentPlanElement>{
+	class LogElementComparator implements Comparator<ShipmentPlanElement>{
 
 		@Override
-		public int compare(AbstractShipmentPlanElement o1, AbstractShipmentPlanElement o2) {
+		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
 			if(o1.getStartTime() > o2.getStartTime()){
 				return 1;	
 		}
@@ -29,15 +29,15 @@ import org.matsim.api.core.v01.Id;
 		return 0;	
 		}	
 	}
-	
+
 	
 	private LSPShipment shipment;
-	private HashMap<Id<AbstractShipmentPlanElement> , AbstractShipmentPlanElement> logElements;
+	private HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> logElements;
 	
 	
 	public Log(LSPShipment shipment){
 		this.shipment = shipment;
-		this.logElements = new HashMap<Id<AbstractShipmentPlanElement> , AbstractShipmentPlanElement>();
+		this.logElements = new HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement>();
 	}
 	
 	@Override
@@ -45,18 +45,18 @@ import org.matsim.api.core.v01.Id;
 		return shipment;
 	}
 
-	public void addPlanElement(Id<AbstractShipmentPlanElement> id, AbstractShipmentPlanElement element) {
+	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
 		logElements.put(id, element);
 	}
 
 	@Override
-	public  HashMap<Id<AbstractShipmentPlanElement> , AbstractShipmentPlanElement> getPlanElements() {
+	public  HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> getPlanElements() {
 		return logElements;
 	}
 
 	@Override
-	public AbstractShipmentPlanElement getMostRecentEntry() {
-		ArrayList<AbstractShipmentPlanElement> logList = new ArrayList<AbstractShipmentPlanElement>(logElements.values());
+	public ShipmentPlanElement getMostRecentEntry() {
+		ArrayList<ShipmentPlanElement> logList = new ArrayList<ShipmentPlanElement>(logElements.values());
 		Collections.sort(logList, new LogElementComparator());
 		Collections.reverse(logList);
 		return logList.get(0);

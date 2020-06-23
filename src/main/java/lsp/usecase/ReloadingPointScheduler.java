@@ -8,7 +8,7 @@ import lsp.LogisticsSolutionElement;
 import lsp.ShipmentTuple;
 import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
-import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ScheduledShipmentHandle;
 
 public class ReloadingPointScheduler extends ResourceScheduler {
@@ -88,7 +88,7 @@ public class ReloadingPointScheduler extends ResourceScheduler {
 		builder.setLinkId(reloadingPoint.getStartLinkId());
 		ScheduledShipmentHandle  handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
-		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, handle);
 	}
 	

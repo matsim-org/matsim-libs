@@ -7,6 +7,7 @@ import java.util.Random;
 
 import lsp.*;
 import lsp.shipment.*;
+import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -25,10 +26,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.Resource;
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 
 /*package-private*/ class ExampleSchedulingOfInitialPlan {
 	
@@ -61,7 +58,7 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
 		
 		//The Adapter i.e. the Resource is created
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder adapterBuilder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		CollectionCarrierScheduler scheduler = new CollectionCarrierScheduler();
@@ -165,12 +162,12 @@ import lsp.usecase.SimpleForwardSolutionScheduler;
         //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : shipments) {
         	System.out.println("Shipment: " + shipment.getId());
-        	ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
-			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+        	ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new ShipmentPlanElementComparator());
         	
-			for(AbstractShipmentPlanElement element : shipment.getSchedule().getPlanElements().values()) {
+			for(ShipmentPlanElement element : shipment.getSchedule().getPlanElements().values()) {
         		System.out.println("Solution Id: " + element.getSolutionElement().getLogisticsSolution().getId() 
         		+ " SolutionElement Id: " + element.getSolutionElement().getId()
         		+ " Resource Id: " + element.getResourceId()

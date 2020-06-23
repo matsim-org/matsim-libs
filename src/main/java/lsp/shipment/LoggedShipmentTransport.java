@@ -6,9 +6,8 @@ import org.matsim.contrib.freight.carrier.Carrier;
 
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
-import lsp.shipment.LoggedShipmentLoad.Builder;
 
-public class LoggedShipmentTransport implements AbstractShipmentPlanElement {
+public class LoggedShipmentTransport implements ShipmentPlanElement {
 
 	private final String type = "TRANSPORT";
 	private double startTime;

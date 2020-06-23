@@ -5,7 +5,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 import demand.utilityFunctions.UtilityFunction;
@@ -24,9 +23,9 @@ public interface LSPShipment {
 	
 	public TimeWindow getEndTimeWindow();
 	
-	public AbstractShipmentPlan getSchedule();
+	public ShipmentPlan getSchedule();
 	
-	public AbstractShipmentPlan getLog();
+	public ShipmentPlan getLog();
 	
 	public int getCapacityDemand();
 	

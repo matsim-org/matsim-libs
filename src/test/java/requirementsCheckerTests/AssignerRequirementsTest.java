@@ -8,6 +8,7 @@ import java.util.Random;
 
 import lsp.*;
 import lsp.shipment.ShipmentUtils;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -29,7 +30,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
-import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
@@ -76,7 +76,7 @@ public class AssignerRequirementsTest {
 		redCarrier.setCarrierCapabilities(redCapabilities);
 				
 		Id<Resource> redAdapterId = Id.create("RedCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder redAdapterBuilder = CollectionCarrierAdapter.Builder.newInstance(redAdapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(redAdapterId, network);
 		redAdapterBuilder.setCollectionScheduler(redScheduler);
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
@@ -113,7 +113,7 @@ public class AssignerRequirementsTest {
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 				
 		Id<Resource> blueAdapterId = Id.create("BlueCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder blueAdapterBuilder = CollectionCarrierAdapter.Builder.newInstance(blueAdapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(blueAdapterId, network);
 		blueAdapterBuilder.setCollectionScheduler(blueScheduler);
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);

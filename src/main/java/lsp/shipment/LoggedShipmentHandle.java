@@ -8,7 +8,7 @@ import lsp.resources.Resource;
 
 
 
-public class LoggedShipmentHandle implements AbstractShipmentPlanElement {
+/*package*/ class LoggedShipmentHandle implements ShipmentPlanElement {
 
 	private final String type = "HANDLE";
 	private double startTime;
@@ -16,52 +16,8 @@ public class LoggedShipmentHandle implements AbstractShipmentPlanElement {
 	private LogisticsSolutionElement element;
 	private Id<Resource> resourceId;
 	private Id<Link> linkId;
-	
-	public static class Builder{
-		private double startTime;
-		private double endTime;
-		private LogisticsSolutionElement element;
-		private Id<Resource> resourceId;
-		private Id<Link> linkId;
-		
-		private Builder(){
-		}
-		
-		public static Builder newInstance(){
-			return new Builder();
-		}
-		
-		public Builder setStartTime(double startTime){
-			this.startTime = startTime;
-			return this;
-		}
-		
-		public Builder setEndTime(double endTime){
-			this.endTime = endTime;
-			return this;
-		}
-		
-		public Builder setLogisticsSolutionElement(LogisticsSolutionElement element){
-			this.element = element;
-			return this;
-		}
-	
-		public Builder setResourceId(Id<Resource> resourceId){
-			this.resourceId = resourceId;
-			return this;
-		}
-	
-		public Builder setLinkId(Id<Link> linkId){
-			this.linkId = linkId;
-			return this;
-		}
-		
-		public LoggedShipmentHandle build(){
-			return new LoggedShipmentHandle(this);
-		}
-	}
-	
-	private LoggedShipmentHandle(LoggedShipmentHandle.Builder builder){
+
+	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder){
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;

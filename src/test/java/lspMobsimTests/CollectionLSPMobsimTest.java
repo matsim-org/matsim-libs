@@ -10,6 +10,7 @@ import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.*;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -31,10 +32,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.CarrierResource;
@@ -83,7 +80,7 @@ public class CollectionLSPMobsimTest {
 		
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder adapterBuilder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(scheduler);
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
@@ -171,10 +168,10 @@ public class CollectionLSPMobsimTest {
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
-			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new ShipmentPlanElementComparator());
 					
 			//Das muss besser in den SchedulingTest rein
 			assertTrue(collectionLSP.getResources().iterator().next() == collectionAdapter);
@@ -182,8 +179,8 @@ public class CollectionLSPMobsimTest {
 			assertTrue(carrierResource.getCarrier() == carrier);
 			assertTrue(carrier.getServices().size() == 1);
 			
-			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
-				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+			for(ShipmentPlanElement scheduleElement : scheduleElements){
+				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
 				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
 				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());

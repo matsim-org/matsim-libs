@@ -12,6 +12,7 @@ import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.*;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,12 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
-import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.ReloadingPoint;
-import lsp.usecase.ReloadingPointScheduler;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
@@ -91,7 +86,7 @@ public class FirstReloadLSPMobsimTest {
 		
 		
 		Id<Resource> collectionAdapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder collectionAdapterBuilder = CollectionCarrierAdapter.Builder.newInstance(collectionAdapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(collectionScheduler);
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
 		collectionAdapterBuilder.setLocationLinkId(collectionLinkId);
@@ -217,13 +212,13 @@ public class FirstReloadLSPMobsimTest {
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertFalse(shipment.getLog().getPlanElements().isEmpty());
 			assertTrue(shipment.getSchedule().getPlanElements().size() == shipment.getLog().getPlanElements().size());
-			ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
-			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
-			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new ShipmentPlanElementComparator());
 										
-			for(AbstractShipmentPlanElement scheduleElement : scheduleElements){
-				AbstractShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
+			for(ShipmentPlanElement scheduleElement : scheduleElements){
+				ShipmentPlanElement logElement = logElements.get(scheduleElements.indexOf(scheduleElement));
 				assertTrue(scheduleElement.getElementType() == logElement.getElementType());
 				assertTrue(scheduleElement.getResourceId() == logElement.getResourceId());
 				assertTrue(scheduleElement.getSolutionElement() == logElement.getSolutionElement());

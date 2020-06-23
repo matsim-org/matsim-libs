@@ -17,7 +17,7 @@ import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.tracking.SimulationTracker;
 
-public class CollectionCarrierAdapter implements CarrierResource {
+/*package-private*/ class CollectionCarrierAdapter implements CarrierResource {
 
 	private Id<Resource>id;
 	private Carrier carrier;
@@ -30,48 +30,7 @@ public class CollectionCarrierAdapter implements CarrierResource {
 	private Collection<SimulationTracker> trackers;
 	private EventsManager eventsManager;
 
-public static class Builder {
-		
-	private Id<Resource>id;
-	private Carrier carrier;
-	private Id<Link> locationLinkId;
-	private ArrayList<LogisticsSolutionElement> clientElements;
-	private CollectionCarrierScheduler collectionScheduler;
-	private Network network;
-		
-		public static Builder newInstance(Id<Resource> id, Network network){
-			return new Builder(id,network);
-		}
-		
-		private Builder(Id<Resource> id, Network network){
-			this.id = id;
-			this.clientElements = new ArrayList <LogisticsSolutionElement>();
-			this.network = network;
-		}
-		
-		public Builder setLocationLinkId(Id<Link> locationLinkId){
-			this.locationLinkId = locationLinkId;
-			return this;
-		}
-		
-		public Builder setCarrier(Carrier carrier){
-			this.carrier = carrier;
-			return this;
-		}
-		
-		
-		public Builder setCollectionScheduler(CollectionCarrierScheduler collectionHandler){
-			this.collectionScheduler = collectionHandler; 
-			return this;
-		}
-		
-		public CollectionCarrierAdapter build(){
-			return new CollectionCarrierAdapter(this);
-		}
-		
-	}
-	
-	private CollectionCarrierAdapter(CollectionCarrierAdapter.Builder builder){
+	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
 		this.id = builder.id;
 		this.locationLinkId = builder.locationLinkId;
 		this.collectionScheduler = builder.collectionScheduler;

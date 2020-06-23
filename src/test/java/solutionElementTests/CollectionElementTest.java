@@ -3,6 +3,8 @@ package solutionElementTests;
 import static org.junit.Assert.*;
 
 import lsp.LSPUtils;
+import lsp.resources.CarrierResource;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -21,7 +23,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
@@ -34,7 +35,7 @@ public class CollectionElementTest {
 	private CarrierCapabilities capabilities;
 	private Carrier carrier; 
 	private LogisticsSolutionElement collectionElement;
-	private CollectionCarrierAdapter adapter;
+	private CarrierResource carrierAdapter;
 	
 	@Before
 	public void initialize() {
@@ -71,15 +72,15 @@ public class CollectionElementTest {
 		
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder builder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(scheduler);
 		builder.setCarrier(carrier);
 		builder.setLocationLinkId(collectionLinkId);
-		adapter = builder.build();
+		carrierAdapter = builder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
-		collectionBuilder.setResource(adapter);
+		collectionBuilder.setResource(carrierAdapter);
 		collectionElement = collectionBuilder.build();
 	}
 	
@@ -96,7 +97,7 @@ public class CollectionElementTest {
 		assertTrue(collectionElement.getOutgoingShipments().getShipments() != null);
 		assertTrue(collectionElement.getOutgoingShipments().getSortedShipments().isEmpty());
 		assertTrue(collectionElement.getPreviousElement() == null);
-		assertTrue(collectionElement.getResource() == adapter);
+		assertTrue(collectionElement.getResource() == carrierAdapter);
 		assertTrue(collectionElement.getResource().getClientElements().iterator().next() == collectionElement);
 	}
 	

@@ -11,7 +11,7 @@ import lsp.events.TourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LoggedShipmentTransport;
 import lsp.shipment.LoggedShipmentUnload;
@@ -60,14 +60,14 @@ public class CollectionTourEndEventHandler implements TourEndEventHandler {
 		builder.setCarrierId(event.getCarrierId());
 		LoggedShipmentUnload unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
-		Id<AbstractShipmentPlanElement> unloadId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(unloadId, unload);
 	}
 
 	private void logTransport(TourEndEvent event, Tour tour){
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
-		Id<AbstractShipmentPlanElement> id = Id.create(idString, AbstractShipmentPlanElement.class);
-		AbstractShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
+		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
+		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
 		if(abstractPlanElement instanceof LoggedShipmentTransport) {
 			LoggedShipmentTransport transport = (LoggedShipmentTransport) abstractPlanElement;
 			transport.setEndTime(event.getTime());

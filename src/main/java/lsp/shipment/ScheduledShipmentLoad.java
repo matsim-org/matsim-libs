@@ -10,7 +10,7 @@ import lsp.resources.Resource;
 
 
 
-public class ScheduledShipmentLoad implements AbstractShipmentPlanElement{
+public class ScheduledShipmentLoad implements ShipmentPlanElement {
 
 	private final String type = "LOAD";
 	private double startTime;

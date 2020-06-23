@@ -2,6 +2,7 @@ package lsp.usecase;
 
 import java.util.HashMap;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -13,10 +14,6 @@ import lsp.events.TourEndEvent;
 import lsp.events.TourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
-import lsp.shipment.AbstractShipmentPlanElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LoggedShipmentHandle;
-import lsp.shipment.ScheduledShipmentTransport;
 
 public class ReloadingPointEventHandler implements TourEndEventHandler {
 
@@ -51,7 +48,7 @@ public class ReloadingPointEventHandler implements TourEndEventHandler {
 	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement){
 		ReloadingPointEventHandlerPair pair = new ReloadingPointEventHandlerPair(shipment, solutionElement);
 		
-		for(AbstractShipmentPlanElement planElement: shipment.getSchedule().getPlanElements().values()){
+		for(ShipmentPlanElement planElement: shipment.getSchedule().getPlanElements().values()){
 			if(planElement instanceof ScheduledShipmentTransport){
 				ScheduledShipmentTransport transport = (ScheduledShipmentTransport) planElement;
 				if(transport.getSolutionElement().getNextElement() == solutionElement){
@@ -100,7 +97,7 @@ public class ReloadingPointEventHandler implements TourEndEventHandler {
 
 	private void logReloadAfterCollection(CarrierService carrierService, TourEndEvent event){
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
-		LoggedShipmentHandle.Builder builder = LoggedShipmentHandle.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime() + getUnloadEndTime(event.getTour());
@@ -108,11 +105,11 @@ public class ReloadingPointEventHandler implements TourEndEventHandler {
 		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getCapacityDemand();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
-		LoggedShipmentHandle handle = builder.build();
-		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
-		Id<AbstractShipmentPlanElement> loadId = Id.create(idString, AbstractShipmentPlanElement.class);
+		ShipmentPlanElement loggedShipmentHandle = builder.build();
+		String idString = loggedShipmentHandle.getResourceId() + "" + loggedShipmentHandle.getSolutionElement().getId() + "" + loggedShipmentHandle.getElementType();
+		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().getPlanElements().put(loadId, handle);
+			lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentHandle);
 		}	
 	}
 	
@@ -131,7 +128,7 @@ public class ReloadingPointEventHandler implements TourEndEventHandler {
 
 	private void logReloadAfterMainRun(CarrierService carrierService, TourEndEvent event){
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
-		LoggedShipmentHandle.Builder builder = LoggedShipmentHandle.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
 		builder.setResourceId(resourceId);
 		double startTime = event.getTime();
@@ -139,9 +136,9 @@ public class ReloadingPointEventHandler implements TourEndEventHandler {
 		double handlingTime = reloadingPoint.getCapacityNeedFixed() + reloadingPoint.getCapacityNeedLinear() * lspShipment.getCapacityDemand();
 		builder.setEndTime(startTime + handlingTime);
 		builder.setLogisticsSolutionElement(servicesWaitedFor.get(carrierService).element);
-		LoggedShipmentHandle handle = builder.build();
+		ShipmentPlanElement handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
-		Id<AbstractShipmentPlanElement> loadId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
 			lspShipment.getLog().getPlanElements().put(loadId, handle);
 		}	

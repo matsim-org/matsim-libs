@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public class ScheduledShipmentHandle implements AbstractShipmentPlanElement{
+public class ScheduledShipmentHandle implements ShipmentPlanElement {
 
 	private final String type = "HANDLE";
 	private double startTime;

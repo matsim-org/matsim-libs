@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -24,7 +25,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 
 
@@ -39,7 +39,7 @@ public class CollectionAdapterTest {
 	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
-	private CollectionCarrierAdapter collectionAdapter;
+	private CarrierResource carrierResource;
 	private Id<Link> collectionLinkId;
 	private CarrierCapabilities capabilities;
 	
@@ -77,31 +77,31 @@ public class CollectionAdapterTest {
 		
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
-		CollectionCarrierAdapter.Builder builder = CollectionCarrierAdapter.Builder.newInstance(adapterId, network);
+		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(scheduler);
 		builder.setCarrier(collectionCarrier);
 		builder.setLocationLinkId(collectionLinkId);
-		collectionAdapter = builder.build();
+		carrierResource = builder.build();
 	}
 	
 	
 	@Test
 	public void testCollectionAdapter() {
-		assertTrue(collectionAdapter.getClientElements() != null);
-		assertTrue(collectionAdapter.getClientElements().isEmpty());
-		assertTrue(CarrierResource.class.isAssignableFrom(collectionAdapter.getClass()));
-		if(CarrierResource.class.isAssignableFrom(collectionAdapter.getClass())) {
-			assertTrue(Carrier.class.isAssignableFrom(collectionAdapter.getClassOfResource()));
-			assertTrue(collectionAdapter.getCarrier() == collectionCarrier);
+		assertTrue(carrierResource.getClientElements() != null);
+		assertTrue(carrierResource.getClientElements().isEmpty());
+		assertTrue(CarrierResource.class.isAssignableFrom(carrierResource.getClass()));
+		if(CarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
+			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
+			assertTrue(carrierResource.getCarrier() == collectionCarrier);
 		}
-		assertTrue(collectionAdapter.getEndLinkId() == collectionLinkId);
-		assertTrue(collectionAdapter.getStartLinkId() == collectionLinkId);
-		assertTrue(collectionAdapter.getEventHandlers() != null);
-		assertTrue(collectionAdapter.getEventHandlers().isEmpty());
-		assertTrue(collectionAdapter.getInfos() != null);
-		assertTrue(collectionAdapter.getInfos().isEmpty());
-		assertTrue(collectionAdapter.getStartLinkId() == collectionLinkId);
-		if(collectionAdapter.getCarrier() == collectionCarrier) {
+		assertTrue(carrierResource.getEndLinkId() == collectionLinkId);
+		assertTrue(carrierResource.getStartLinkId() == collectionLinkId);
+		assertTrue(carrierResource.getEventHandlers() != null);
+		assertTrue(carrierResource.getEventHandlers().isEmpty());
+		assertTrue(carrierResource.getInfos() != null);
+		assertTrue(carrierResource.getInfos().isEmpty());
+		assertTrue(carrierResource.getStartLinkId() == collectionLinkId);
+		if(carrierResource.getCarrier() == collectionCarrier) {
 			assertTrue(collectionCarrier.getCarrierCapabilities() == capabilities);
 			assertTrue(Carrier.class.isAssignableFrom(collectionCarrier.getClass()));
 			assertTrue(collectionCarrier.getPlans().isEmpty());

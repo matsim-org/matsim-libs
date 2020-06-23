@@ -10,7 +10,7 @@ import lsp.events.TourStartEvent;
 import lsp.events.TourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
-import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LoggedShipmentLoad;
 import lsp.shipment.LoggedShipmentTransport;
@@ -62,7 +62,7 @@ public class MainRunStartEventHandler implements TourStartEventHandler {
 		builder.setResourceId(resource.getId());
 		LoggedShipmentLoad load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
-		Id<AbstractShipmentPlanElement> loadId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(loadId, load);
 	}
 
@@ -87,7 +87,7 @@ public class MainRunStartEventHandler implements TourStartEventHandler {
 		builder.setResourceId(resource.getId());
 		LoggedShipmentTransport transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
-		Id<AbstractShipmentPlanElement> transportId = Id.create(idString, AbstractShipmentPlanElement.class);
+		Id<ShipmentPlanElement> transportId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(transportId, transport);
 	}
 
