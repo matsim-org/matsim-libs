@@ -129,7 +129,8 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
      *  Setting this only has an effect if lookBackTime is different to Double.POSITIVE_INFINITY. */
     private double timeBucketSize = 30.;
     /** lookBackTime in seconds for live arrival rates in LaneSensor and LinkSensor.
-     *  If you use Double.POSITIVE_INFINITY, the sensor will start monitoring the arrival rate newly each time the link is empty. */
+     *  If you use Double.POSITIVE_INFINITY, the sensor will start monitoring the arrival rates newly each time the link is empty; 
+     *  as long as the link is not empty, it simply averages all past arrivals. */
     private double lookBackTime = 5 * 60.;
 
     private Map<Id<Link>, Double> linkArrivalRates = new HashMap<>();
