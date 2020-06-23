@@ -26,11 +26,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import com.google.common.base.Verify;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import com.google.common.base.Verify;
 
 /**
  * @author michalm
@@ -38,8 +38,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
-	public static enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
-		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator};
+	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
+		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 

@@ -19,25 +19,26 @@
 
 package org.matsim.contrib.etaxi.util;
 
-import org.matsim.contrib.util.EnumAdder;
-import org.matsim.contrib.util.LongEnumAdder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalDouble;
 
 public class ETaxiStats {
 	public enum ETaxiState {
-		QUEUED, PLUGGED;
+		QUEUED, PLUGGED
 	}
 
 	public final String id;
 
-	public final EnumAdder<ETaxiState, Long> stateTimeSumsByState = new LongEnumAdder<>(ETaxiState.class);
+	public final Map<ETaxiState, Double> stateDurations = new HashMap<>();
 
 	public ETaxiStats(String id) {
 		this.id = id;
 	}
 
-	public double getFleetQueuedTimeRatio() {
-		double queued = stateTimeSumsByState.get(ETaxiState.QUEUED);
-		double plugged = stateTimeSumsByState.get(ETaxiState.PLUGGED);
-		return queued / (queued + plugged);
+	public OptionalDouble getFleetQueuedTimeRatio() {
+		double queued = stateDurations.getOrDefault(ETaxiState.QUEUED, 0.);
+		double plugged = stateDurations.getOrDefault(ETaxiState.PLUGGED, 0.);
+		return (queued != 0 && plugged != 0) ? OptionalDouble.of(queued / (queued + plugged)) : OptionalDouble.empty();
 	}
 }

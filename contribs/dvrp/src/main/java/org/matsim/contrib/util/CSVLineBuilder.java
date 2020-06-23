@@ -58,6 +58,6 @@ public class CSVLineBuilder {
 	}
 
 	public String[] build() {
-		return line.toArray(new String[line.size()]);
+		return line.toArray(new String[0]);
 	}
 }

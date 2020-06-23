@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.edrt.run;
 
+import static org.matsim.contrib.drt.run.DrtModeQSimModule.getInsertionSearchQSimModule;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
@@ -28,7 +30,6 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
-import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -131,7 +132,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		install(new ExtensiveInsertionSearchQSimModule(drtCfg));
+		install(getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();

@@ -1,4 +1,15 @@
-Because I keep forgetting it:
+# Cadyts Integration
+
+Cadyts (Calibration of dynamics traffic simulations) is a package developed by Gunnar Flötteröd, which takes measurements as
+input and provides corrections as output.  Those corrections can be used as weights during plans choice, bringing the system 
+closer to the measurement.
+
+See <a href="http://people.kth.se/~gunnarfl/cadyts.html"> here </a> or search for "cadyts" on the web.
+
+For examples see the org.matsim.contrib.cadyts.run package.
+
+
+### Because I keep forgetting it:
 * (Note: "measurement" is from reality, "feature" is from the simulation.)
 * The correction per measurement item is
 ```java

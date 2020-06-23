@@ -21,14 +21,14 @@ package org.matsim.contrib.ev.discharging;/*
  * created by jbischoff, 11.10.2018
  */
 
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+
 public class VehicleTypeSpecificDriveEnergyConsumptionFactory implements DriveEnergyConsumption.Factory {
 
-    private Map<String, DriveEnergyConsumption.Factory> consumptionMap = new HashMap<>();
+    private final Map<String, DriveEnergyConsumption.Factory> consumptionMap = new HashMap<>();
 
     public void addEnergyConsumptionModelFactory(String vehicleType, DriveEnergyConsumption.Factory driveEnergyConsumption) {
 		consumptionMap.put(vehicleType, driveEnergyConsumption);

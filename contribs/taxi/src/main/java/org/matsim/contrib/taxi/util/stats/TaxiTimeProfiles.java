@@ -19,17 +19,22 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
-import org.matsim.contrib.util.LongEnumAdder;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 
@@ -45,18 +50,16 @@ public class TaxiTimeProfiles {
 	}
 
 	public static Long[] calculateTaxiTaskTypeCounts(Fleet fleet) {
-		LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
-		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-				counter.increment((TaxiTaskType)veh.getSchedule().getCurrentTask().getTaskType());
-			}
-		}
+		Map<Task.TaskType, Long> countsByType = fleet.getVehicles()
+				.values()
+				.stream()
+				.map(DvrpVehicle::getSchedule)
+				.filter(schedule -> schedule.getStatus() == ScheduleStatus.STARTED)
+				.collect(groupingBy(schedule -> schedule.getCurrentTask().getTaskType(), counting()));
 
-		Long[] counts = new Long[TaxiTaskType.values().length];
-		for (TaxiTaskType e : TaxiTaskType.values()) {
-			counts[e.ordinal()] = counter.getLong(e);
-		}
-		return counts;
+		return Arrays.stream(TaxiTaskType.values())
+				.map(type -> countsByType.getOrDefault(type, 0L))
+				.toArray(Long[]::new);
 	}
 
 	public static ProfileCalculator createRequestsWithStatusCounter(final Collection<? extends Request> requests,

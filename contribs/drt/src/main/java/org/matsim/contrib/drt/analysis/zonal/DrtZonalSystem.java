@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -27,10 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author jbischoff
@@ -93,7 +93,6 @@ public class DrtZonalSystem {
 			Logger.getLogger(getClass()).error("Zone " + zoneId + " not found.");
 			return null;
 		}
-		Coord c = MGC.point2Coord(zone.getCentroid());
-		return c;
+		return MGC.point2Coord(zone.getCentroid());
 	}
 }

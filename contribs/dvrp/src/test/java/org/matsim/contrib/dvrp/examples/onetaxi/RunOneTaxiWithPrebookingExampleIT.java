@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.assertj.core.data.Offset;
 import org.junit.Rule;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -55,7 +53,6 @@ import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -64,6 +61,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.inject.Singleton;
 
 public class RunOneTaxiWithPrebookingExampleIT {
 

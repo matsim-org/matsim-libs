@@ -162,7 +162,13 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 				bw.newLine();
 				double first = e.getValue().getFirst();
 				double second = e.getValue().getSecond();
-				bw.append(e.getKey().toString() + ";" + first + ";" + second + ";" + (first - second));
+				bw.append(e.getKey().toString())
+						.append(";")
+						.append(String.valueOf(first))
+						.append(";")
+						.append(String.valueOf(second))
+						.append(";")
+						.append(String.valueOf(first - second));
 				times.add(first, second);
 			}
 			bw.flush();
