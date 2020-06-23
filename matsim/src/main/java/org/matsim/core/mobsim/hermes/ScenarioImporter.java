@@ -11,6 +11,7 @@ import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.*;
@@ -425,15 +426,12 @@ public class ScenarioImporter {
         hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);
     }
 
-    private boolean isGoodDouble(double value) {
-        return !Double.isNaN(value) && !Double.isInfinite(value);
-    }
 
-    private double delay_helper(double expected, double delay_a, double delay_b) {
-        if (isGoodDouble(delay_a)) {
-            return expected + delay_a;
-        } else if (isGoodDouble(delay_b)) {
-            return expected + delay_b;
+    private double delay_helper(double expected, OptionalTime delay_a, OptionalTime delay_b) {
+        if (delay_a.isDefined()) {
+            return expected + delay_a.seconds();
+        } else if (delay_b.isDefined()) {
+            return expected + delay_b.seconds();
         } else {
             return expected;
         }
@@ -441,12 +439,12 @@ public class ScenarioImporter {
 
     private double arrivalOffsetHelper(Departure depart, TransitRouteStop trs) {
         return delay_helper(
-            depart.getDepartureTime(), trs.getArrivalOffset().seconds(), trs.getDepartureOffset().seconds());
+            depart.getDepartureTime(), trs.getArrivalOffset(), trs.getDepartureOffset());
     }
 
     private double departureOffsetHelper(Departure depart, TransitRouteStop trs) {
         return delay_helper(
-            depart.getDepartureTime(), trs.getDepartureOffset().seconds(), trs.getArrivalOffset().seconds());
+            depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
     }
 
     private void generateVehicleTrip(
