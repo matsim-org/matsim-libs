@@ -36,9 +36,9 @@ import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
-public class ExampleMobsimOfSimpleLSP {
+/*package-private*/ class ExampleMobsimOfSimpleLSP {
 
-public static LSP createInitialLSP(Network network) {
+	private static LSP createInitialLSP(Network network) {
 		
 		//The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -109,7 +109,7 @@ public static LSP createInitialLSP(Network network) {
 		
 	}
 	
-	public static Collection<LSPShipment> createInitialLSPShipments(Network network){
+	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
 		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");

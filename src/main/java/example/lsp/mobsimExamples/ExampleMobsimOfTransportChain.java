@@ -42,9 +42,9 @@ import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
-public class ExampleMobsimOfTransportChain {
+/*package-private*/ class ExampleMobsimOfTransportChain {
 
-public static LSP createInitialLSP(Network network) {
+	private static LSP createInitialLSP(Network network) {
 		
 		//The Carrier for collection is created
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
@@ -263,7 +263,7 @@ public static LSP createInitialLSP(Network network) {
 		
 	}
 	
-	public static Collection<LSPShipment> createInitialLSPShipments(Network network){
+	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
 		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		Random rand = new Random(1);
