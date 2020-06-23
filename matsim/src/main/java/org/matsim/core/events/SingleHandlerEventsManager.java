@@ -172,7 +172,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 2;
+			this.nextCounterMsg *= 4;
 			log.info(" event # " + this.counter);
 		}
 		computeEvent(event);
