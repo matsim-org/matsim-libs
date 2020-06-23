@@ -123,7 +123,7 @@ final class LaneSensor {
 
 		if (now > monitoringStartTime) {
 			if (lookBackTime == Double.POSITIVE_INFINITY) {
-				avgVehPerSecond = totalVehicles / ((now - monitoringStartTime)+1);
+				avgVehPerSecond = totalVehicles / (now - monitoringStartTime + 1);
 			} else {
 				updateBucketsUntil(now);
 				if (timeBuckets.size() > 0) {
@@ -135,7 +135,7 @@ final class LaneSensor {
 					/* if there hasn't been any vehicle in the lookback-time but in the current bucket vehicles are measured, 
 					 * we take only the current bucket for evaluation 
 					 * (which is not finished and therefore not part of the timeBuckets list): */
-					avgVehPerSecond = currentBucket.get()/((now-currentBucketStartTime)+1);
+					avgVehPerSecond = currentBucket.get()/(now-currentBucketStartTime + 1);
 				}
 			}
 		} 
