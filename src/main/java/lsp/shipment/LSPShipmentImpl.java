@@ -30,26 +30,26 @@ import lsp.functions.Info;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
-		this.id = builder.id;
-		this.fromLinkId = builder.fromLinkId;
-		this.toLinkId = builder.toLinkId;
-		this.startTimeWindow = builder.startTimeWindow;
-		this.endTimeWindow = builder.endTimeWindow;
-		this.capacityDemand = builder.capacityDemand;
-		this.serviceTime = builder.serviceTime;
+		this.id = builder.getId();
+		this.fromLinkId = builder.getFromLinkId();
+		this.toLinkId = builder.getToLinkId();
+		this.startTimeWindow = builder.getStartTimeWindow();
+		this.endTimeWindow = builder.getEndTimeWindow();
+		this.capacityDemand = builder.getCapacityDemand();
+		this.serviceTime = builder.getServiceTime();
 		this.schedule = new Schedule(this);
 		this.log = new Log(this);
 		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
-		for(Requirement requirement : builder.requirements) {
+		for(Requirement requirement : builder.getRequirements()) {
 			this.requirements.add(requirement);
 		}
 		this.utilityFunctions = new ArrayList<>();
-		for(UtilityFunction utilityFunction : builder.utilityFunctions) {
+		for(UtilityFunction utilityFunction : builder.getUtilityFunctions()) {
 			this.utilityFunctions.add(utilityFunction);
 		}
 		this.infos = new ArrayList<>();
-		for(Info info : builder.infos) {
+		for(Info info : builder.getInfos()) {
 			this.infos.add(info);
 		}
 	}
