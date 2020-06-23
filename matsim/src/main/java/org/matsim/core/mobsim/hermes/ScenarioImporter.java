@@ -12,7 +12,7 @@ import org.matsim.core.events.EventArray;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
@@ -345,7 +345,7 @@ public class ScenarioImporter {
             Id<Person> id,
             PlanArray flatplan,
             EventArray events,
-            ExperimentalTransitRoute troute) {
+            TransitPassengerRoute troute) {
         Id<TransitStopFacility> access = troute.getAccessStopId();
         Id<TransitStopFacility> egress = troute.getEgressStopId();
         int routeid = troute.getRouteId().index();
@@ -389,8 +389,8 @@ public class ScenarioImporter {
                     processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
                     break;
                 case TransportMode.pt:
-                    assert route instanceof ExperimentalTransitRoute;
-                    processPlanTransitRoute(id, flatplan, events, (ExperimentalTransitRoute) route);
+                    assert route instanceof TransitPassengerRoute;
+                    processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
                     break;
                 case TransportMode.ride:
                 case TransportMode.walk:
