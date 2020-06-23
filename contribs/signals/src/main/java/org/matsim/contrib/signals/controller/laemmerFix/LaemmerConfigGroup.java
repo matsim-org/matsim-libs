@@ -125,10 +125,12 @@ public final class LaemmerConfigGroup extends ReflectiveConfigGroup {
     public enum StabilizationStrategy {USE_MAX_LANECOUNT, PRIORIZE_HIGHER_POSITIONS, COMBINE_SIMILAR_REGULATIONTIME, HEURISTIC}; 
     private StabilizationStrategy activeStabilizationStrategy = StabilizationStrategy.HEURISTIC;
     
-    /** size of timeBuckets for live arrival rates in LaneSensor and LinkSensor */
-    private double timeBucketSize = Double.POSITIVE_INFINITY;
-    /** lookBackTime for live arrival rates in LaneSensor and LinkSensor */
-    private double lookBackTime = Double.POSITIVE_INFINITY;
+    /** size of timeBuckets in seconds for live arrival rates in LaneSensor and LinkSensor.
+     *  Setting this only has an effect if lookBackTime is different to Double.POSITIVE_INFINITY. */
+    private double timeBucketSize = 30.;
+    /** lookBackTime in seconds for live arrival rates in LaneSensor and LinkSensor.
+     *  If you use Double.POSITIVE_INFINITY, the sensor will start monitoring the arrival rate newly each time the link is empty. */
+    private double lookBackTime = 5 * 60.;
 
     private Map<Id<Link>, Double> linkArrivalRates = new HashMap<>();
     private Map<Id<Link>, Map<Id<Lane>,Double>> laneArrivalRates = new HashMap<>();
