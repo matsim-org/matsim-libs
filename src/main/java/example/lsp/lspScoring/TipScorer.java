@@ -6,12 +6,12 @@ import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionValue;
 import lsp.scoring.LSPScorer;
 
-public class TipScorer implements LSPScorer {
+/*package-private*/ class TipScorer implements LSPScorer {
 
 	private LSP lsp;
 	private TipSimulationTracker tracker;
-	
-	public TipScorer(LSP lsp, TipSimulationTracker tracker) {
+
+	/*package-private*/ TipScorer(LSP lsp, TipSimulationTracker tracker) {
 		this.lsp = lsp;
 		this.tracker = tracker;
 	}

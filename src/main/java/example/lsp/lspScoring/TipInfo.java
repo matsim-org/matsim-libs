@@ -3,12 +3,12 @@ package example.lsp.lspScoring;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 
-public class TipInfo extends Info{
+/*package-private*/ class TipInfo extends Info{
 
 	private InfoFunction function;
 	private String name = "TIPINFO";
-	
-	public TipInfo (InfoFunction function) {
+
+	/*package-private*/ TipInfo (InfoFunction function) {
 		this.function = function;
 	}
 	

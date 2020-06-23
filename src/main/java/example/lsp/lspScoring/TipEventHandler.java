@@ -5,12 +5,12 @@ import java.util.Random;
 import lsp.events.ServiceEndEvent;
 import lsp.events.ServiceEndEventHandler;
 
-public class TipEventHandler implements ServiceEndEventHandler{
+/*package-private*/ class TipEventHandler implements ServiceEndEventHandler{
 
 	private double tipSum;
 	private Random tipRandom;
-	
-	public TipEventHandler() {
+
+	/*package-private*/ TipEventHandler() {
 		tipRandom = new Random(1);
 		tipSum = 0;
 	}
@@ -26,7 +26,7 @@ public class TipEventHandler implements ServiceEndEventHandler{
 		tipSum += tip;
 	}
 
-	public double getTip() {
+	/*package-private*/ double getTip() {
 		return tipSum;
 	}
 }

@@ -11,12 +11,12 @@ import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
 import lsp.tracking.SimulationTracker;
 
-public class TipSimulationTracker implements SimulationTracker {
+/*package-private*/ class TipSimulationTracker implements SimulationTracker {
 
 	private TipEventHandler handler;
 	private Info info;
-	
-	public TipSimulationTracker(TipEventHandler handler, Info info) {
+
+	/*package-private*/ TipSimulationTracker(TipEventHandler handler, Info info) {
 		this.info = info;
 		this.handler = handler;
 	}
