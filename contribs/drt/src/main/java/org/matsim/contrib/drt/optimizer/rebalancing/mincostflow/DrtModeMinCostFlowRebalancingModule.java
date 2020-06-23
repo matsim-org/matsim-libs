@@ -81,7 +81,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				return new DrtZonalSystem(modalNetwork, zones);
 			}
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
-		}));
+		})).asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
