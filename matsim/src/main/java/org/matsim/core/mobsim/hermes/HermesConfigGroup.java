@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.hermes;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
@@ -54,5 +55,12 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
         Map<String, String> comments = super.getComments();
         comments.put(END_TIME, "Simulation End Time");
         return comments;
+    }
+    @Override
+    protected void checkConsistency(Config config) {
+        super.checkConsistency(config);
+        if (config.parallelEventHandling().getOneThreadPerHandler()!=true && config.controler().getMobsim().equals("hermes")){
+            throw new RuntimeException("Hermes should be run with one thread per handler.");
+        }
     }
 }
