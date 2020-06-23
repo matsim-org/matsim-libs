@@ -79,11 +79,12 @@ public final class DefaultRoutingModules {
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter ) {
+																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter,
+																 FallbackRoutingModule fallbackRoutingModule) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork, accessToNetworkRouter, egressFromNetworkRouter );
+				scenario, filteredNetwork, accessToNetworkRouter, egressFromNetworkRouter, fallbackRoutingModule );
 	}
 
 }

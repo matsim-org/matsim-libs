@@ -54,6 +54,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 
+
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
  * routes from a {@link Facility} to another {@link Facility}, as we need in MATSim.
@@ -73,7 +74,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Config config;
 	private RoutingModule egressFromNetworkRouter;
 
-	@Inject
+	//	@Inject
+	//TODO: i failed to inject the fallBackRoutingModule (instantiation right here also won't work)
+	// so for test purposes, i create another constructor :(  ... schlenther june 23, '20
 	FallbackRoutingModule fallbackRoutingModule;
 
 	NetworkRoutingInclAccessEgressModule(
@@ -81,6 +84,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		  final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
 		  final RoutingModule accessToNetworkRouter,
 		  final RoutingModule egressFromNetworkRouter) {
+		this(mode,routeAlgo,scenario,filteredNetwork,accessToNetworkRouter,egressFromNetworkRouter,null);
+	}
+
+	NetworkRoutingInclAccessEgressModule(
+			final String mode,
+			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
+			final RoutingModule accessToNetworkRouter,
+			final RoutingModule egressFromNetworkRouter,
+			final FallbackRoutingModule fallbackRoutingModule) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf( scenario.getNetwork().getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork ;
@@ -91,7 +103,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.config = scenario.getConfig();
 		this.accessToNetworkRouter = accessToNetworkRouter;
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
-
+		this.fallbackRoutingModule = fallbackRoutingModule;
 		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
@@ -186,6 +198,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			List<? extends PlanElement> egressTrip = egressFromNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
 			if(egressTrip == null){
 				log.warn("could not route egress trip from " + fromFacility + " to " + toFacility + " at time " + now + ". Will call fallbackRoutingModule....");
+				if(fallbackRoutingModule == null){
+					log.fatal("no egress route could be calculated by " + egressFromNetworkRouter + " and no fallbackRoutingModule was provided! This will lead to a NullPointerException." +
+							" If you want to use a custom egress mode (other than walk), make sure to use injection and provide a fallBackRoutingModule...");
+				}
 				egressTrip = fallbackRoutingModule.calcRoute(fromFacility, toFacility, now, person);
 			}
 			result.addAll(egressTrip);
@@ -230,6 +246,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
 			List<? extends PlanElement> accessTrip = accessToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			if(accessTrip == null){
+				log.warn("could not route access trip from " + fromFacility + " to " + toFacility + " at time " + now + ". Will call fallbackRoutingModule....");
+				if(fallbackRoutingModule == null){
+					log.fatal("no access route could be calculated by " + accessToNetworkRouter + " and no fallbackRoutingModule was provided! This will lead to a NullPointerException." +
+							" If you want to use a custom access mode (other than walk), make sure to use injection and provide a fallBackRoutingModule...");
+				}
+				accessTrip = fallbackRoutingModule.calcRoute(fromFacility, toFacility, now, person);
+			}
+
 			for (PlanElement planElement: accessTrip) {
 				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
 			}
