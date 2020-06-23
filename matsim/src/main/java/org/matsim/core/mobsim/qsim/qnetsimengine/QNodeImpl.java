@@ -83,7 +83,21 @@ final class QNodeImpl extends AbstractQNode {
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
 		this.nodeTransitionLogic = qsimConfig.getNodeTransitionLogic();
-		this.stopMoveNodeWhenSingleOutlinkFull = qsimConfig.isBlockNodeWhenSingleOutlinkFull();
+		
+		switch (nodeTransitionLogic) {
+		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+		case moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull:
+			this.stopMoveNodeWhenSingleOutlinkFull = true;
+			break;
+		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
+		case moveVehByVehRandomDistribution_dontBlockNode:
+			this.stopMoveNodeWhenSingleOutlinkFull = false;
+			break;
+		default:
+			throw new UnsupportedOperationException("Node transition logic " + nodeTransitionLogic + " is not implemented.");
+		}
+		
 		int nofInLinks = n.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
@@ -94,11 +108,6 @@ final class QNodeImpl extends AbstractQNode {
 			this.random = MatsimRandom.getLocalInstance();
 		} else {
 			this.random = MatsimRandom.getRandom();
-		}
-		// check consistency
-		if (qsimConfig.getNodeTransitionLogic().equals(NodeTransition.moveVehByVehDeterministicPriorities) && !qsimConfig.isBlockNodeWhenSingleOutlinkFull()) {
-			throw new RuntimeException("The deterministic node transition only works when the node is blocked as soon as one outgoing link is full. "
-					+ "You have to set the corresponding parameter blockNodeWhenSingleOutlinkFull in the qsim config to true.");
 		}
 	}
 	
@@ -178,7 +187,8 @@ final class QNodeImpl extends AbstractQNode {
 		
 		// select vehicles to be moved over the node. The order of vehicles selected depends on the chosen node transition logic.
 		switch (nodeTransitionLogic) {
-		case emptyBufferAfterBufferRandomDistribution:
+		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
+		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
 			// randomize based on link capacity: select a link; if next links have enough space all vehicles from the buffer are allowed to pass the node
 			while (inLinksCapSum > 0) {
 				double rndNum = random.nextDouble() * inLinksCapSum;
@@ -203,7 +213,8 @@ final class QNodeImpl extends AbstractQNode {
 				}
 			}
 			break;
-		case moveVehByVehRandomDistribution:
+		case moveVehByVehRandomDistribution_dontBlockNode:
+		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
 			// randomize based on link capacity: select the vehicles (one by one) that are allowed to pass the node
 			while (inLinksCapSum > 0) {
 				double rndNum = random.nextDouble() * inLinksCapSum;
@@ -233,7 +244,7 @@ final class QNodeImpl extends AbstractQNode {
 				}
 			}
 			break;
-		case moveVehByVehDeterministicPriorities:
+		case moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull:
 			// deterministically choose the inLinks vehicle by vehicle based on their capacity and also account for decisions made in previous time steps (i.e. update priorities) to approximate the correct distribution over time.
 			double prioWithWhichTheLastVehWasSent = 0.;
 			while (inLinksCapSum > 0) {
@@ -307,10 +318,14 @@ final class QNodeImpl extends AbstractQNode {
 	 */
 	private boolean moveFirstVehicleOnLink(final double now, QLinkI link) {
 		if (link.getOfferingQLanes().size() > 1) {
-			throw new RuntimeException("The qsim node transition parameter " + NodeTransition.moveVehByVehRandomDistribution + " and " + NodeTransition.moveVehByVehDeterministicPriorities 
-					+ " are only implemented for the case without lanes. But link " + link.getLink().getId() + " in your scenario has more than one lane. "
-							+ "Use the default node transiton " + NodeTransition.emptyBufferAfterBufferRandomDistribution 
-									+ " or adapt the implementation such that it also works for lanes.");
+			throw new RuntimeException("The qsim node transition parameter " + NodeTransition.moveVehByVehRandomDistribution_dontBlockNode + ", " 
+					+ NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull + " and " 
+						+ NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull 
+							+ " are only implemented for the case without lanes. But link " + link.getLink().getId() 
+								+ " in your scenario has more than one lane. "
+									+ "Use the default node transiton " + NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode
+										+ " or " + NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull 
+											+ " or adapt the implementation such that it also works for lanes.");
 		}
 		for (QLaneI lane : link.getOfferingQLanes()) {
 			if (! lane.isNotOfferingVehicle()) {

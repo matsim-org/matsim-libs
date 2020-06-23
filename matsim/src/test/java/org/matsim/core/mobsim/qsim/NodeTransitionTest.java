@@ -92,8 +92,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testMergeSituationWithEmptyBufferAfterBufferRandomDistribution() {
 		Scenario scenario = Fixture.createMergeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(false);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -161,8 +160,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testMergeSituationWithMoveVehByVehRandomDistribution() {
 		Scenario scenario = Fixture.createMergeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(false);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -237,9 +235,8 @@ public class NodeTransitionTest {
 	@Test
 	public void testMergeSituationWithMoveVehByVehDeterministicPriorities() {
 		Scenario scenario = Fixture.createMergeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities);
-		// the deterministic node transition is only implemented for the case when the node is blocked as soon as one outgoing link is full
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(true);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
+		// note: the deterministic node transition is only implemented for the case when the node is blocked as soon as one outgoing link is full
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -307,8 +304,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testBlockedNodeSituationWithEmptyBufferAfterBufferRandomDistribution() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(true);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -389,8 +385,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testBlockedNodeSituationWithMoveVehByVehRandomDistribution() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(true);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -472,8 +467,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testBlockedNodeSituationWithMoveVehByVehDeterministicPriorities() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(true);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -562,8 +556,7 @@ public class NodeTransitionTest {
 	@Test
 	public void testNodeTransitionWithTimeStepSizeSmallerOne() {
 		Scenario scenario = Fixture.createBlockedNodeScenario();
-		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution);
-		scenario.getConfig().qsim().setBlockNodeWhenSingleOutlinkFull(false);
+		scenario.getConfig().qsim().setNodeTransitionLogic(NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode);
 		scenario.getConfig().qsim().setTimeStepSize(0.5);
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(useFastCapUpdate);
 		

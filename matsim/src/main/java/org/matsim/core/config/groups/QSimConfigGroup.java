@@ -153,10 +153,18 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	private EndtimeInterpretation simEndtimeInterpretation;
 	
 	// ---
-	public enum NodeTransition { emptyBufferAfterBufferRandomDistribution, moveVehByVehRandomDistribution, moveVehByVehDeterministicPriorities
+	public enum NodeTransition { 
+		emptyBufferAfterBufferRandomDistribution_dontBlockNode,
+		emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull, 
+		moveVehByVehRandomDistribution_dontBlockNode, 
+		moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull, 
+		moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull
+		/* note: moveVehByVehDeterministicPriorities is not implemented for the case when the node is not blocked 
+		 * as soon as a single outlink is full
+		 * theresa, jun'20
+		 */
 	}
-	private NodeTransition nodeTransitionLogic = NodeTransition.emptyBufferAfterBufferRandomDistribution;
-	private boolean blockNodeWhenSingleOutlinkFull = false;
+	private NodeTransition nodeTransitionLogic = NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode;
 	
 	// ---
 	
@@ -621,14 +629,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	public void setNodeTransitionLogic(NodeTransition nodeTransitionLogic) {
 		this.nodeTransitionLogic = nodeTransitionLogic;
-	}
-
-	public boolean isBlockNodeWhenSingleOutlinkFull() {
-		return blockNodeWhenSingleOutlinkFull;
-	}
-
-	public void setBlockNodeWhenSingleOutlinkFull(boolean blockNodeWhenSingleOutlinkFull) {
-		this.blockNodeWhenSingleOutlinkFull = blockNodeWhenSingleOutlinkFull;
 	}
 
 ////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
