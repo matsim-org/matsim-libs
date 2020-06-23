@@ -46,6 +46,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -548,7 +549,7 @@ public class HermesTest {
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
 		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
-		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
+		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(GenericRouteImpl.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
