@@ -62,7 +62,7 @@ public class DistributionStartEventHandler implements TourStartEventHandler {
 	}
 	
 	private void logTransport(TourStartEvent event){
-		LoggedShipmentTransport.Builder builder = LoggedShipmentTransport.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getTour().getStartLinkId());
 		builder.setToLinkId(event.getTour().getEndLinkId());

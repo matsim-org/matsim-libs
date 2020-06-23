@@ -54,7 +54,7 @@ public class CollectionServiceEventHandler implements ServiceEndEventHandler {
 	}
 
 	private void logTransport(ServiceEndEvent event){
-		LoggedShipmentTransport.Builder builder  =  LoggedShipmentTransport.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentTransportBuilder builder  =  ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
