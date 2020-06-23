@@ -66,19 +66,8 @@ final class LinkSensor {
 	 * @author dgrether
 	 */
 	public LinkSensor(Link link){
-		this(link, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-	}
-
-	/**
-	 * Calculate the average number of vehicles per second accourding to the number of vehicles, which entered the link in the of the last n seconds. Not-closed buckets will not be used to calculate the average.
-	 * @param link
-	 * @param lookBackTime duration for which the average vehicles per second are calculated. If it isn't divisible by timeBucketSize without a remainder it will be extended to make it divisible by timeBucketDuration
-	 * @param timeBucketDuration size of each bucket. It should be big enough to save runtime compared to collecting vehicles every second or simstep and small enough to get quick enough results about changes in the vehicle flow.
-	 * @author pschade
-	 */
-	public LinkSensor(Link link, double lookBackTime, double timeBucketDuration){
 		this.link  = link;
-			}
+	}
 	
 	/**
 	 * 
