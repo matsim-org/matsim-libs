@@ -98,8 +98,6 @@ public class LaemmerIT {
 		
 		Assert.assertNull("signal group 1 should show no green", avgSignalGreenTimePerCycle.get(signalGroupId1));
 		Assert.assertNotNull("signal group 2 should show green", avgSignalGreenTimePerCycle.get(signalGroupId2));
-		Assert.assertEquals("avg cycle time of the system and total green time of NS-group should be equal", 
-				totalSignalGreenTimes.get(signalGroupId2), avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("avg delay at NS-direction should be zero", 0.0, avgDelayNS, MatsimTestUtils.EPSILON);
 	}
 	
