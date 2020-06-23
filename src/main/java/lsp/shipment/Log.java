@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 
-public class Log implements AbstractShipmentPlan {
+/*package-private*/ class Log implements AbstractShipmentPlan {
 
 	class LogElementComparator implements Comparator<AbstractShipmentPlanElement>{
 
@@ -29,7 +29,6 @@ public class Log implements AbstractShipmentPlan {
 		return 0;	
 		}	
 	}
-	
 	
 	
 	private LSPShipment shipment;

@@ -6,7 +6,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 
-public class LSPShipments {
+//TODO: Unused? -> delete? //set to package-private in first step  KMT, Jun'20
+/*package-private*/ class LSPShipments {
 
 	private Map<Id<LSPShipment>, LSPShipment> lspShipments; 
 

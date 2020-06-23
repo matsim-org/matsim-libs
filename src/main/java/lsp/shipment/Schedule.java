@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 
 
 
-public class Schedule implements AbstractShipmentPlan{
+/* package-private */ class Schedule implements AbstractShipmentPlan{
 
 	class ScheduleElementComparator implements Comparator<AbstractShipmentPlanElement>{
 
@@ -36,9 +36,9 @@ public class Schedule implements AbstractShipmentPlan{
 	
 	private LSPShipment shipment;
 	private HashMap<Id<AbstractShipmentPlanElement> , AbstractShipmentPlanElement> scheduleElements;
-	
-	
-	public Schedule(LSPShipment shipment){
+
+
+	/* package-private */ Schedule(LSPShipment shipment){
 		this.shipment = shipment;
 		this.scheduleElements = new HashMap<Id<AbstractShipmentPlanElement> , AbstractShipmentPlanElement>();
 	}
