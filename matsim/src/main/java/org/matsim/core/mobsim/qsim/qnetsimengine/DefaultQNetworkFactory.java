@@ -92,7 +92,7 @@ public final class DefaultQNetworkFactory implements QNetworkFactory {
 	}
 	@Override
 	public QNodeI createNetsimNode( final Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
 		return builder.build( node ) ;
 	}
 }
