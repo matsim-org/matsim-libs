@@ -1,5 +1,6 @@
 package lsp.usecase;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
@@ -8,10 +9,6 @@ import lsp.events.ServiceEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LoggedShipmentLoad;
-import lsp.shipment.LoggedShipmentTransport;
 
 public class CollectionServiceEventHandler implements ServiceEndEventHandler {
 
@@ -43,17 +40,17 @@ public class CollectionServiceEventHandler implements ServiceEndEventHandler {
 	}
 
 	private void logLoad(ServiceEndEvent event){
-		LoggedShipmentLoad.Builder builder  =  LoggedShipmentLoad.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentLoadBuilder builder  =  ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getService().getServiceDuration());
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
 		builder.setLinkId(event.getService().getLocationLinkId());
 		builder.setCarrierId(event.getCarrierId());
-		LoggedShipmentLoad load = builder.build();
-		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
+		ShipmentPlanElement loggedShipmentLoad = builder.build();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().getPlanElements().put(loadId, load);
+		lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentLoad);
 	}
 
 	private void logTransport(ServiceEndEvent event){

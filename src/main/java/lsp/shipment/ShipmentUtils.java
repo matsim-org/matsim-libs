@@ -6,6 +6,7 @@ import lsp.functions.Info;
 import lsp.resources.Resource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 
 import java.util.ArrayList;
@@ -196,4 +197,79 @@ public class ShipmentUtils{
 		}
 	}
 
+	public static class LoggedShipmentLoadBuilder {
+		private double startTime;
+		private double endTime;
+		private LogisticsSolutionElement element;
+		private Id<Resource> resourceId;
+		private Id<Carrier> carrierId;
+		private Id<Link> linkId;
+
+		private LoggedShipmentLoadBuilder(){
+		}
+
+		public static LoggedShipmentLoadBuilder newInstance(){
+			return new LoggedShipmentLoadBuilder();
+		}
+
+		public LoggedShipmentLoadBuilder setStartTime(double startTime){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public LoggedShipmentLoadBuilder setEndTime(double endTime){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public LoggedShipmentLoadBuilder setLogisticsSolutionElement(LogisticsSolutionElement element){
+			this.element = element;
+			return this;
+		}
+
+		public LoggedShipmentLoadBuilder setResourceId(Id<Resource> resourceId){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public LoggedShipmentLoadBuilder setLinkId(Id<Link> linkId){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public LoggedShipmentLoadBuilder setCarrierId(Id<Carrier> carrierId){
+			this.carrierId = carrierId;
+			return this;
+		}
+
+		public LoggedShipmentLoad build(){
+			return new LoggedShipmentLoad(this);
+		}
+
+		// --- Getters --- //
+
+		public double getStartTime() {
+			return startTime;
+		}
+
+		public double getEndTime() {
+			return endTime;
+		}
+
+		public LogisticsSolutionElement getElement() {
+			return element;
+		}
+
+		public Id<Resource> getResourceId() {
+			return resourceId;
+		}
+
+		public Id<Carrier> getCarrierId() {
+			return carrierId;
+		}
+
+		public Id<Link> getLinkId() {
+			return linkId;
+		}
+	}
 }

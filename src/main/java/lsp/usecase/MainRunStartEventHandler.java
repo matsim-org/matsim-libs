@@ -1,5 +1,6 @@
 package lsp.usecase;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -10,10 +11,6 @@ import lsp.events.TourStartEvent;
 import lsp.events.TourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LoggedShipmentLoad;
-import lsp.shipment.LoggedShipmentTransport;
 
 public class MainRunStartEventHandler implements TourStartEventHandler {
 
@@ -52,7 +49,7 @@ public class MainRunStartEventHandler implements TourStartEventHandler {
 	}
 
 	private void logLoad(TourStartEvent event){
-		LoggedShipmentLoad.Builder builder = LoggedShipmentLoad.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getTour().getStartLinkId());
 		double startTime = event.getTime() - getCumulatedLoadingTime(event.getTour());
@@ -60,10 +57,10 @@ public class MainRunStartEventHandler implements TourStartEventHandler {
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
-		LoggedShipmentLoad load = builder.build();
-		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
+		ShipmentPlanElement loggedShipmentLoad = builder.build();
+		String idString = loggedShipmentLoad.getResourceId() + "" + loggedShipmentLoad.getSolutionElement().getId() + "" + loggedShipmentLoad.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
-		lspShipment.getLog().getPlanElements().put(loadId, load);
+		lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentLoad);
 	}
 
 	private double getCumulatedLoadingTime(Tour tour){
