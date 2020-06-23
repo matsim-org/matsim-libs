@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.zone;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
 public class SquareGrid {
 	private final Network network;
@@ -31,8 +33,8 @@ public class SquareGrid {
 	private double maxX;
 	private double maxY;
 
-	private int cols;
-	private int rows;
+	private final int cols;
+	private final int rows;
 
 	private Zone[] zones;
 

@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -200,24 +201,41 @@ public class PtAlongALine2Test{
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
-								    .setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
-								    .setAdvanceRequestPlanningHorizon(99999));
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
+						.setMaxTravelTimeAlpha(2.0)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true)
+						.setEstimatedBeelineDistanceFactor(1.0)
+						.setEstimatedDrtSpeed(15)
+						.setAdvanceRequestPlanningHorizon(99999);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
+
 			}
 			if ( drt2 ) {
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt2" ).setMaxTravelTimeAlpha( 1.3 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt2")
+						.setMaxTravelTimeAlpha(1.3)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
 			}
 			if ( drt3 ) {
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt3")
+						.setMaxTravelTimeAlpha(1.3)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
 			}
 
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){

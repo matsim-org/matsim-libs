@@ -39,7 +39,7 @@ public class ChargerWriter extends MatsimXmlWriter {
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("chargers", "http://matsim.org/files/dtd/chargers_v1.dtd");
-		writeStartTag("chargers", Collections.<Tuple<String, String>>emptyList());
+		writeStartTag("chargers", Collections.emptyList());
 		writeChargers();
 		writeEndTag("chargers");
 		close();

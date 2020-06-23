@@ -60,7 +60,7 @@ class AssignmentChargerPlugData {
 			int unassignedPlugs = Math.max(c.getPlugCount() - assignedVehicles, 0);
 			for (int p = 0; p < unassignedPlugs; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
-				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), currentTime));
+				builder.add(new DestEntry<>(idx++, plug, c.getLink(), currentTime));
 			}
 
 			// we do not want to have long queues at chargers: 1 awaiting veh per plug is the limit
@@ -79,7 +79,7 @@ class AssignmentChargerPlugData {
 			double chargeStart = currentTime + assignedWorkload / (c.getPlugCount() - unassignedPlugs);
 			for (int p = unassignedPlugs; p < assignableVehicles; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
-				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), chargeStart));
+				builder.add(new DestEntry<>(idx++, plug, c.getLink(), chargeStart));
 			}
 		}
 

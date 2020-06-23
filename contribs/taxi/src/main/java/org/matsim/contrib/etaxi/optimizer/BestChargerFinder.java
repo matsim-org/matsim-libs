@@ -31,7 +31,7 @@ import org.matsim.contrib.util.LinkProvider;
  * @author michalm
  */
 public class BestChargerFinder {
-	private static final LinkProvider<Charger> CHARGER_TO_LINK = charger -> charger.getLink();
+	private static final LinkProvider<Charger> CHARGER_TO_LINK = Charger::getLink;
 
 	private final BestDispatchFinder dispatchFinder;
 

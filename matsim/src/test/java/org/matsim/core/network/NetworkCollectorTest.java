@@ -54,11 +54,18 @@ public class NetworkCollectorTest {
                 .filter(link -> !link.getId().equals(filterId))
                 .collect(NetworkUtils.getCollector());
 
+        // make sure the link is not in filtered network
         assertFalse(collectedNetwork.getLinks().containsKey(filterId));
 
+        // also the internal bookkeeping of in and out links should be without the filtered link
         for (Node node : collectedNetwork.getNodes().values()) {
             assertFalse(node.getInLinks().containsKey(filterId));
             assertFalse(node.getOutLinks().containsKey(filterId));
         }
+
+        // make sure the original network still contains the link
+        assertTrue(network.getLinks().containsKey(filterId));
+        assertTrue(network.getLinks().get(filterId).getFromNode().getOutLinks().containsKey(filterId));
+        assertTrue(network.getLinks().get(filterId).getToNode().getInLinks().containsKey(filterId));
     }
 }

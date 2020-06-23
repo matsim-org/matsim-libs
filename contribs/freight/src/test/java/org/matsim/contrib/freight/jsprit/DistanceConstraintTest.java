@@ -35,17 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraintForTourPlanning;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
@@ -66,10 +56,13 @@ import org.matsim.vehicles.VehicleUtils;
 
 /**
  *
- *  @author rewert
+ *  @author rewert, kturner
  *
  * 	Test for the distance constraint. 4 different setups are used to control the
- * 	correct working of the constraint
+ * 	correct working of the constraint for services
+ *
+ * 	2 additional setups are defined when using shipments instead of service.
+ * 	Shipments allow reloading of good during the tour.
  *
  */
 public class DistanceConstraintTest {
@@ -334,7 +327,7 @@ public class DistanceConstraintTest {
 	}
 
 	/**
-	 * Option 4: An additional shipment outside the range of both BEVtypes.
+	 * Option 4: An additional service outside the range of both BEV types.
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
@@ -342,7 +335,7 @@ public class DistanceConstraintTest {
 	 */
 
 	@Test
-	public final void CarrierWithAddiotionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
+	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -431,6 +424,165 @@ public class DistanceConstraintTest {
 	}
 
 	/**
+	 * Option 5:
+	 * This test uses shipments instead of service .
+	 * As a consequence the vehicles can return to the depot, load more goods and run another subtour.
+	 * Distance is set to a value that, due to distance restrictions, two tours are necessary.
+	 *
+	 * This option (5) is designed similar to option 2
+	 *
+	 * @throws InvalidAttributeValueException
+	 */
+
+	@Test
+	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws InvalidAttributeValueException {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		prepareConfig(config);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Carriers carriers = new Carriers();
+
+		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+
+		FleetSize fleetSize = FleetSize.INFINITE;
+
+		Carrier carrierV5 = CarrierUtils.createCarrier(Id.create("Carrier_Version5", Carrier.class));
+
+		VehicleType vehicleType_MidSizeV5 = VehicleUtils.createVehicleType(Id.create("MidSizeBattery_V5", VehicleType.class));
+		vehicleType_MidSizeV5.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_MidSizeV5.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(vehicleType_MidSizeV5.getEngineInformation(), 300.);
+		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_MidSizeV5.getEngineInformation(), 0.015);
+		vehicleType_MidSizeV5.setDescription("Carrier_Version5");
+		vehicleType_MidSizeV5.getCapacity().setOther(80.);
+
+		vehicleTypes.getVehicleTypes().put(vehicleType_MidSizeV5.getId(), vehicleType_MidSizeV5);
+
+		carriers.addCarrier(addTwoShipmentsToCarrier(carrierV5));
+		createCarriers(carriers, fleetSize, carrierV5, vehicleTypes);
+
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV5, 10);
+
+		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+
+		//We need two tours, due to reloading both shipments must be transported one after the other
+		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
+				carrierV5.getSelectedPlan().getScheduledTours().size());
+
+		Assert.assertEquals(vehicleType_MidSizeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
+				.getVehicle().getType().getId());
+		double maxDistance_vehicleType_LargeV5 = VehicleUtils.getEnergyCapacity(vehicleType_MidSizeV5.getEngineInformation())
+				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_MidSizeV5.getEngineInformation());
+
+		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 20000, maxDistance_vehicleType_LargeV5,
+				MatsimTestUtils.EPSILON);
+
+		ArrayList<Double> distancesOfTours = new ArrayList();
+		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
+			double distanceTour = 0.0;
+			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
+			for (Tour.TourElement element : elements) {
+				if (element instanceof Tour.Leg) {
+					Tour.Leg legElement = (Tour.Leg) element;
+					if (legElement.getRoute().getDistance() != 0)
+						distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0, 0,
+								scenario.getNetwork());
+				}
+			}
+			distancesOfTours.add(distanceTour);
+		}
+
+		Assert.assertEquals("There must be two entry for tour distances", 2, distancesOfTours.size());
+		//One tour has distance of 12000m
+		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(12000.0));
+		//The other tour has distance of 20000m
+		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(20000.0));
+	}
+
+	/**
+	 * Option 6:
+	 * This test uses shipments instead of service .
+	 * As a consequence the vehicles can return to the depot, load more goods and run another subtour.
+	 * Distance is set to a value that one tour can be run with loading once.
+	 *
+	 * This option (6) is designed similar to option 5
+	 *
+	 * @throws InvalidAttributeValueException
+	 */
+
+	@Test
+	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws InvalidAttributeValueException {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		prepareConfig(config);
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		Carriers carriers = new Carriers();
+
+		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+
+		FleetSize fleetSize = FleetSize.INFINITE;
+
+		Carrier carrierV5 = CarrierUtils.createCarrier(Id.create("Carrier_Version5", Carrier.class));
+
+		VehicleType vehicleType_LargeV5 = VehicleUtils.createVehicleType(Id.create("LargeBattery_V5", VehicleType.class));
+		vehicleType_LargeV5.getCostInformation().setCostsPerMeter(0.00055).setCostsPerSecond(0.008).setFixedCost(100.);
+		VehicleUtils.setHbefaTechnology(vehicleType_LargeV5.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(vehicleType_LargeV5.getEngineInformation(), 450.);
+		VehicleUtils.setEnergyConsumptionKWhPerMeter(vehicleType_LargeV5.getEngineInformation(), 0.015);
+		vehicleType_LargeV5.setDescription("Carrier_Version5");
+		vehicleType_LargeV5.getCapacity().setOther(80.);
+
+		vehicleTypes.getVehicleTypes().put(vehicleType_LargeV5.getId(), vehicleType_LargeV5);
+
+		carriers.addCarrier(addTwoShipmentsToCarrier(carrierV5));
+		createCarriers(carriers, fleetSize, carrierV5, vehicleTypes);
+
+		scenario.addScenarioElement("carrierVehicleTypes", vehicleTypes);
+		scenario.addScenarioElement("carriers", carriers);
+		CarrierUtils.setJspritIterations(carrierV5, 10);
+
+		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+
+
+		//We need two tours, due to reloading both shipments must be transported one after the other
+		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
+				carrierV5.getSelectedPlan().getScheduledTours().size());
+
+		Assert.assertEquals(vehicleType_LargeV5.getId(), carrierV5.getSelectedPlan().getScheduledTours().iterator().next()
+				.getVehicle().getType().getId());
+		double maxDistance_vehicleType_LargeV5 = VehicleUtils.getEnergyCapacity(vehicleType_LargeV5.getEngineInformation())
+				/  VehicleUtils.getEnergyConsumptionKWhPerMeter(vehicleType_LargeV5.getEngineInformation());
+
+		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30000, maxDistance_vehicleType_LargeV5,
+				MatsimTestUtils.EPSILON);
+
+		ArrayList<Double> distancesOfTours = new ArrayList();
+		for (ScheduledTour scheduledTour: carrierV5.getSelectedPlan().getScheduledTours()) {
+			double distanceTour = 0.0;
+			List<Tour.TourElement> elements = scheduledTour.getTour().getTourElements();
+			for (Tour.TourElement element : elements) {
+				if (element instanceof Tour.Leg) {
+					Tour.Leg legElement = (Tour.Leg) element;
+					if (legElement.getRoute().getDistance() != 0)
+						distanceTour = distanceTour + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(), 0, 0,
+								scenario.getNetwork());
+				}
+			}
+			distancesOfTours.add(distanceTour);
+		}
+
+		Assert.assertEquals("There must be one entry for tour distances", 1, distancesOfTours.size());
+		//This tour has distance of 24000m
+		Assert.assertTrue("The schedulded tour has a non expected distance", distancesOfTours.contains(24000.0));
+	}
+
+	/**
 	 * Deletes the existing output file and sets the number of the last MATSim iteration to 0.
 	 *
 	 * @param config the config
@@ -468,6 +620,24 @@ public class DistanceConstraintTest {
 		return carrier;
 	}
 
+	private static Carrier addTwoShipmentsToCarrier(Carrier carrier) {
+		// Shipment 1
+		CarrierShipment shipment1 = CarrierShipment.Builder
+				.newInstance(Id.create("Shipment1", CarrierShipment.class), Id.createLinkId("i(1,8)"), Id.createLinkId("j(3,8)"), 40)
+				.setDeliveryServiceTime(20).setDeliveryTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.build();
+		CarrierUtils.addShipment(carrier, shipment1);
+
+		// Shipment 2
+		CarrierShipment shipment2 = CarrierShipment.Builder
+				.newInstance(Id.create("Shipment2", CarrierShipment.class),Id.createLinkId("i(1,8)"), Id.createLinkId("j(0,3)R"), 40)
+				.setDeliveryServiceTime(20).setDeliveryTimeWindow(TimeWindow.newInstance(8 * 3600, 12 * 3600))
+				.build();
+		CarrierUtils.addShipment(carrier, shipment2);
+
+		return carrier;
+	}
+
 	private static Carrier addThreeServicesToCarrier(Carrier carrier) {
 		// Services 1 and 2
 		addTwoServicesToCarrier(carrier);
@@ -496,7 +666,7 @@ public class DistanceConstraintTest {
 		List<CarrierVehicle> vehicles = new ArrayList<>();
 		for (VehicleType singleVehicleType : vehicleTypes.getVehicleTypes().values()) {
 			if (singleCarrier.getId().toString().equals(singleVehicleType.getDescription()))
-				vehicles.add(createGarbageTruck(singleVehicleType.getId().toString(), earliestStartingTime,
+				vehicles.add(createCarrierVehicle(singleVehicleType.getId().toString(), earliestStartingTime,
 						latestFinishingTime, singleVehicleType));
 		}
 
@@ -511,8 +681,8 @@ public class DistanceConstraintTest {
 	 *
 	 * @return new carrierVehicle at the depot
 	 */
-	static CarrierVehicle createGarbageTruck(String vehicleName, double earliestStartingTime,
-											 double latestFinishingTime, VehicleType singleVehicleType) {
+	static CarrierVehicle createCarrierVehicle(String vehicleName, double earliestStartingTime,
+											   double latestFinishingTime, VehicleType singleVehicleType) {
 
 		return CarrierVehicle.Builder.newInstance(Id.create(vehicleName, Vehicle.class), Id.createLinkId("i(1,8)"))
 				.setEarliestStart(earliestStartingTime).setLatestEnd(latestFinishingTime)

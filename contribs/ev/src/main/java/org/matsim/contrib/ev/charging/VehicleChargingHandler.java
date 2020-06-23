@@ -56,8 +56,8 @@ public class VehicleChargingHandler
 
 	public static final String CHARGING_IDENTIFIER = " charging";
 	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(CHARGING_IDENTIFIER);
-	private Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
-	private Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
+	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;

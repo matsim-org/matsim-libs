@@ -28,8 +28,8 @@ import org.matsim.core.utils.misc.OptionalTime;
  * @author jbischoff
  */
 public class StaticPassengerDynLeg implements PassengerDynLeg {
-	private Route route;
-	private String mode;
+	private final Route route;
+	private final String mode;
 
 	public StaticPassengerDynLeg(Route route, String mode) {
 		this.route = route;

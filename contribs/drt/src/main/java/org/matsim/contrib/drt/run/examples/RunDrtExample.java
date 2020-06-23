@@ -30,6 +30,6 @@ import org.matsim.core.config.Config;
  */
 public class RunDrtExample {
 	public static void run(Config config, boolean otfvis) {
-		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
+		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 }
