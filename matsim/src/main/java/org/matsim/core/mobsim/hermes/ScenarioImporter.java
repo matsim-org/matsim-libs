@@ -379,7 +379,7 @@ public class ScenarioImporter {
             if (route == null) return;
 
             events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
-
+			//TODO: probably a switch over the route type would be better here
             switch (mode) {
                 case TransportMode.car:
                 case TransportMode.motorcycle:
@@ -392,29 +392,15 @@ public class ScenarioImporter {
                     assert route instanceof TransitPassengerRoute;
                     processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
                     break;
-                case TransportMode.ride:
-                case TransportMode.walk:
-                case TransportMode.transit_walk:
-                case TransportMode.train:
-                case TransportMode.ship:
-                case TransportMode.airplane:
-                //case TransportMode.access_walk:
-                //case TransportMode.egress_walk:
-                case TransportMode.non_network_walk:
-                case "bike":
-                case "bicycle":
-                case "other":
-                    double routeTravelTime = route.getTravelTime().isDefined() ?
-                            route.getTravelTime().seconds() : 0.0;
-                    double legTravelTime = ((Leg)element ).getTravelTime().isDefined() ?
-                            ((Leg)element ).getTravelTime().seconds() : 0.0;
+                default:
+                    double routeTravelTime = route.getTravelTime().orElse(0.0);
+                    double legTravelTime = ((Leg)element ).getTravelTime().orElse(0.0);
 
                     int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
                     flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
                     events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
                     break;
-                default:
-                    throw new RuntimeException ("Unknown leg mode " + leg.toString());
+
              }
 
             events.add(new PersonArrivalEvent(0, id, route.getEndLinkId(), leg.getMode()));
