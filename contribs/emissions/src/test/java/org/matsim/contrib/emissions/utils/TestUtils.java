@@ -27,12 +27,14 @@ public class TestUtils {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventWriter writer = new EventWriterXML(eventsFile.toString());
         eventsManager.addHandler(writer);
+        eventsManager.initProcessing();
 
         network.getLinks().values().forEach(link -> {
             for (int i = fromTime; i <= toTime; i++) {
                 eventsManager.processEvent(createWarmEmissionEvent(i, link, pollutant, pollutionPerEvent));
             }
         });
+        eventsManager.finishProcessing();
         writer.closeFile();
     }
 
@@ -47,12 +49,14 @@ public class TestUtils {
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventWriter writer = new EventWriterXML(eventsFile.toString());
         eventsManager.addHandler(writer);
+        eventsManager.initProcessing();
 
         network.getLinks().values().forEach(link -> {
             for (int i = fromTime; i <= toTime; i++) {
                 eventsManager.processEvent(createColdEmissionEvent(i, link, pollutant, pollutionPerEvent));
             }
         });
+        eventsManager.finishProcessing();
         writer.closeFile();
     }
 
