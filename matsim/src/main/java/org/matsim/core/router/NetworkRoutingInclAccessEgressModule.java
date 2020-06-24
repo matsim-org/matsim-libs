@@ -118,7 +118,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === access:
 		{
-			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result, populationFactory, mode,
+			now = addAccessLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result, populationFactory, mode,
 					scenario.getConfig());
 		}
 
@@ -134,14 +134,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === egress:
 		{
-			addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result, populationFactory, mode,
+			addEgressLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result, populationFactory, mode,
 					scenario.getConfig());
 		}
 
 		return result;
 	}
 
-	private void addBushwhackingLegFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
+	private void addEgressLegFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
 			final Link egressActLink, double now, final List<PlanElement> result,
 			final PopulationFactory populationFactory, final String stageActivityType,
 			Config config) {
@@ -210,7 +210,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return toFacility instanceof LinkWrapperFacility;
 	}
 
-	private double addBushwhackingLegFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
+	private double addAccessLegFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
 			final Link accessActLink, double now, final List<PlanElement> result,
 			final PopulationFactory populationFactory, final String stageActivityType,
 			Config config) {
