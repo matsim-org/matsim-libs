@@ -5,15 +5,59 @@
 
 	<!-- ====================================================================== -->
 
-	<person id="origin" employed="no">
+	<person id="origin_car" employed="no">
 		<plan selected="yes">
 			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
 			<leg mode="car"/>
 			<act type="dummy" link="223" x="-800" y="-500" />
 		</plan>
 	</person>
+	
+	<person id="origin_walkCarDrt" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
+			<leg mode="walkCarDrt"/>
+			<act type="dummy" link="223" x="-800" y="-500" />
+		</plan>
+	</person>
+	
+	<person id="origin_drtCarWalk" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
+			<leg mode="drtCarWalk"/>
+			<act type="dummy" link="223" x="-800" y="-500" />
+		</plan>
+	</person>
 
-	<!-- <person id="destination_otherSide_drt" employed="no"> -->
+		<!-- ====================================================================== -->
+	
+	<person id="destination_middle_car" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<leg mode="car"/>
+			<act type="dummy" link="227" x="0" y="-500"/>
+		</plan>
+	</person>
+	
+	<person id="destination_middle_walkCarDrt" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<leg mode="walkCarDrt"/>
+			<act type="dummy" link="227" x="0" y="-500"/>
+		</plan>
+	</person>
+	
+	<person id="destination_middle_drtCarWalk" employed="no">
+		<plan selected="yes">
+			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<leg mode="drtCarWalk"/>
+			<act type="dummy" link="227" x="0" y="-500"/>
+		</plan>
+	</person>
+
+		<!-- ====================================================================== -->
+
+<!-- <person id="destination_otherSide_drt" employed="no"> -->
 		<!-- <plan selected="yes"> -->
 			<!-- <act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/> -->
 			<!-- <leg mode="car"/> -->
@@ -28,18 +72,6 @@
 			<!-- <act type="dummy" link="126" x="100" y="-600"/> -->
 		<!-- </plan> -->
 	<!-- </person> -->
-	
-	<person id="destination_middle" employed="no">
-		<plan selected="yes">
-			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
-			<leg mode="car"/>
-			<act type="dummy" link="227" x="0" y="-500"/>
-		</plan>
-	</person>
 
-
-
-
-	<!-- ====================================================================== -->
 
 </population>
