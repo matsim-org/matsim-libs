@@ -53,6 +53,7 @@ public abstract class FastEmissionGridAnalyzer {
     public static Map<Pollutant, Raster> processEventsFile(final String eventsFile, final Network network, final double cellSize, final int radius) {
 
         logger.info("Start parsing events file.");
+
         Map<Pollutant, TObjectDoubleHashMap<Id<Link>>> linkEmissionsByPollutant = new HashMap<>();
 
         new RawEmissionEventsReader((time, linkId, vehicleId, pollutant, value) -> {
@@ -139,11 +140,12 @@ public abstract class FastEmissionGridAnalyzer {
 
         var bounds = new Raster.Bounds(coords);
         var raster = new Raster(bounds, cellSize);
+        var cellArea = cellSize * cellSize; // assume square cells at the moment
 
         emissions.forEachEntry((linkId, value) -> {
             var link = network.getLinks().get(linkId);
             var numberOfCells = rasterizeLink(link, 0, raster);
-            rasterizeLink(link, value / numberOfCells, raster);
+            rasterizeLink(link, value / numberOfCells / cellArea, raster);
             return true;
         });
         return raster;
@@ -157,6 +159,7 @@ public abstract class FastEmissionGridAnalyzer {
 
         var bounds = new Raster.Bounds(coords);
         var raster = new Raster(bounds, cellSize);
+        var cellArea = cellSize * cellSize; // assume square cells at the moment
 
         // rasterize network
         for (var entry : emissions.entrySet()) {
@@ -166,7 +169,7 @@ public abstract class FastEmissionGridAnalyzer {
             // first count number of cells
             var numberOfCells = rasterizeLink(link, 0, raster);
             // second pass for actually writing the emission values
-            rasterizeLink(link, value / numberOfCells, raster);
+            rasterizeLink(link, value / numberOfCells / cellArea, raster);
         }
         return raster;
     }
