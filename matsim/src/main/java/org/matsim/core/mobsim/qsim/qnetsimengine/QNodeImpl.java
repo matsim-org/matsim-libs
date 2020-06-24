@@ -453,7 +453,7 @@ final class QNodeImpl extends AbstractQNode {
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 		
 		// -->
-		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
+		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId));
 		// <--
 		nextQueueLane.addFromUpstream(veh);
 	}

@@ -42,7 +42,7 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 
 	private final Id<Vehicle> vehicleId;
 	private final Id<TransitStopFacility> facilityId;
-	private final double delay;
+	private double delay;
 
 	public VehicleArrivesAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
 			final Id<TransitStopFacility> facilityId, double delay) {
@@ -68,6 +68,10 @@ public final class VehicleArrivesAtFacilityEvent extends Event {
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
+	}
+
+	public void setDelay(double delay) {
+		this.delay = delay;
 	}
 
 	@Override
