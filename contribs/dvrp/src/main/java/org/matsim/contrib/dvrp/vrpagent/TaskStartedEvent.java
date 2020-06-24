@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,30 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.dvrp.vrpagent;
 
-public abstract class AbstractEnumAdder<K extends Enum<K>, N extends Number> implements EnumAdder<K, N> {
-	protected final K[] keys;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
 
-	public AbstractEnumAdder(Class<K> clazz) {
-		this.keys = clazz.getEnumConstants();
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class TaskStartedEvent extends AbstractTaskEvent {
+	public static final String EVENT_TYPE = "dvrpTaskStarted";
 
-	public K[] getKeys() {
-		return keys;
-
-	}
-
-	public void increment(K e) {
-		add(e, 1);// (Integer)1 is cached internally by JVM, so shouldn't be so costly
+	public TaskStartedEvent(double time, Id<DvrpVehicle> dvrpVehicleId, Task.TaskType taskType, int taskIndex) {
+		super(time, dvrpVehicleId, taskType, taskIndex);
 	}
 
 	@Override
-	public void addAll(EnumAdder<K, ?> enumAdder) {
-		for (K e : keys) {
-			add(e, enumAdder.get(e));
-		}
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 }

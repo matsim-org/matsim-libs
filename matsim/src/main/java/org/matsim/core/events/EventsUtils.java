@@ -28,14 +28,9 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public final class EventsUtils {
 
-	private EventsUtils(){
-	}
-
-	public static EventsManager createEventsManager() {
-		final EventsManagerImpl events = new EventsManagerImpl();
-//		events.initProcessing();
-		return events;
-	}
+    public static EventsManager createEventsManager() {
+		return new ParallelEventsManager(false);
+    }
 
 	public static EventsManager createEventsManager(Config config) {
 		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );

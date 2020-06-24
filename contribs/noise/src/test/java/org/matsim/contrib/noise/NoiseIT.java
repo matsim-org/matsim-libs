@@ -56,6 +56,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -206,7 +207,7 @@ public class NoiseIT {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager events = new ParallelEventsManager(false, 1);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
@@ -245,10 +246,13 @@ public class NoiseIT {
 				
 			}
 		});
-		
+
+		events.initProcessing();
+
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
+		events.finishProcessing();
+
 		// ############################
 		// test considered agent units
 		// ############################
@@ -313,7 +317,7 @@ public class NoiseIT {
 				double start = 0.;
 				
 				for(Event e : eventsPerPersonId.get(personId)){
-					
+
 					boolean activityEnded = false;
 					
 					PersonActivityInfo actInfo = null;

@@ -81,9 +81,8 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
-					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.
 					     Property value seems to magically default to false -->
 					<!--<skipTests>${skip.surefire.tests}</skipTests>-->

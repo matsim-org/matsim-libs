@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,37 +15,27 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util.histogram;
+package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.contrib.util.EnumAdder;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
 
-public class EnumAdderHistogram<T extends Enum<T>, N extends Number> implements Histogram<T> {
-	private final EnumAdder<T, N> adder;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class TaskEndedEvent extends AbstractTaskEvent {
+	public static final String EVENT_TYPE = "dvrpTaskEnded";
 
-	public EnumAdderHistogram(EnumAdder<T, N> adder) {
-		this.adder = adder;
+	public TaskEndedEvent(double time, Id<DvrpVehicle> dvrpVehicleId, Task.TaskType taskType, int taskIndex) {
+		super(time, dvrpVehicleId, taskType, taskIndex);
 	}
 
 	@Override
-	public int getBinCount() {
-		return adder.getKeys().length;
-	}
-
-	@Override
-	public T getBin(int idx) {
-		return adder.getKeys()[idx];
-	}
-
-	@Override
-	public long getCount(int idx) {
-		T key = getBin(idx);
-		return adder.get(key).longValue();
-	}
-
-	@Override
-	public long getTotalCount() {
-		return adder.getTotal().longValue();
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
 }

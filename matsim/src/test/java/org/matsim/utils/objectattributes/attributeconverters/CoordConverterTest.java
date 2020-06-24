@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * CoordConverterTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,54 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package org.matsim.utils.objectattributes.attributeconverters;
 
-import java.util.EnumMap;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 
-import org.apache.commons.lang3.mutable.MutableDouble;
+public class CoordConverterTest {
 
-public class DoubleEnumAdder<K extends Enum<K>> extends AbstractEnumAdder<K, Double> {
-	private final EnumMap<K, MutableDouble> sums;
-	private double totalSum;
 
-	public DoubleEnumAdder(Class<K> clazz) {
-		super(clazz);
-		sums = new EnumMap<>(clazz);
-		for (K e : keys) {
-			sums.put(e, new MutableDouble());
-		}
-	}
+    @Test
+    public void testFromToString() {
+        final CoordConverter converter = new CoordConverter();
+        String a = "(224489.3667496938;6757449.720111595)";
+        Coord coord = converter.convert(a);
+        Assert.assertEquals(coord.hasZ(), false);
+        Assert.assertEquals(coord.getX(), 224489.3667496938, 0.00005);
+        Assert.assertEquals(coord.getY(), 6757449.720111595, 0.00005);
 
-	public void addDouble(K e, double value) {
-		sums.get(e).add(value);
-		totalSum += value;
-	}
+        String b = converter.convertToString(coord);
+        Assert.assertEquals(a, b);
+    }
 
-	@Override
-	public void add(K e, Number value) {
-		addDouble(e, value.doubleValue());
-	}
-
-	public double getDouble(K e) {
-		return sums.get(e).doubleValue();
-	}
-
-	public double getDoubleTotal() {
-		return totalSum;
-	}
-
-	@Override
-	public Double get(K e) {
-		return getDouble(e);
-	}
-
-	@Override
-	public Double getTotal() {
-		return getDoubleTotal();
-	}
-
-	@Override
-	public String toString() {
-		return sums + ", total=" + totalSum;
-	}
 }
