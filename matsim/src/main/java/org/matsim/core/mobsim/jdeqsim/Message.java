@@ -19,8 +19,6 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
 /**
  * The basic message type used in the micro-simulation.
  *
@@ -28,16 +26,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public abstract class Message implements Comparable<Message> {
 
-	protected final EventsManager eventsManager;
-
 	private double messageArrivalTime = 0;
 	private SimUnit sendingUnit;
 	private SimUnit receivingUnit;
 	protected int priority = 0;
 	private boolean isAlive = true;
 
-	public Message(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
+	public Message() {
 	}
 
 	public double getMessageArrivalTime() {

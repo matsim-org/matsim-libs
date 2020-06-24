@@ -149,7 +149,7 @@ public class AgentNotificationTest {
 			@Override
 			public void endActivityAndComputeNextState(double now) {
 				delegate.endActivityAndComputeNextState(now);
-				Message m = new Message(simulation.getEventsManager()) {
+				Message m = new Message() {
 					@Override
 					public void processEvent() {
 

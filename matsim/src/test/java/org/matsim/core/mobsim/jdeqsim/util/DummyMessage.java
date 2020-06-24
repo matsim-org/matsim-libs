@@ -4,10 +4,6 @@ import org.matsim.core.mobsim.jdeqsim.Message;
 
 public class DummyMessage extends Message {
 
-	public DummyMessage() {
-		super(null);
-	}
-
 	@Override
 	public void handleMessage() {
 	}
