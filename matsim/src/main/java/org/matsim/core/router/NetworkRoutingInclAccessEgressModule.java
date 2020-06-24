@@ -246,7 +246,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
 					config);
 
-			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(accessActLink), mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
+			double accessTime = NetworkUtils.getLinkAccessTime(accessActLink, mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
 			accessLeg.setTravelTime(accessTime);
 			accessLeg.getRoute().setTravelTime(accessTime);
 			result.add(accessLeg);
