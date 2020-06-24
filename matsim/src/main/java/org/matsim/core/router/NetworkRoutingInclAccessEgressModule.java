@@ -74,6 +74,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Config config;
 	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+	private AccessEgressWalkType accessEgressWalkType;
 
 	NetworkRoutingInclAccessEgressModule(
 			final String mode,
@@ -88,7 +89,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.populationFactory = scenario.getPopulation().getFactory();
 		this.config = scenario.getConfig();
 		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-		if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
+		this.accessEgressWalkType = config.plansCalcRoute().getAccessEgressWalkType();
+		if (accessEgressWalkType.equals(AccessEgressWalkType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
 		}
@@ -175,19 +177,27 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			egressLeg.setDepartureTime(now);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
+
 			result.add(egressLeg);
-		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.constantTimeToLink)) {
+		} else if (accessEgressWalkType.equals(AccessEgressWalkType.constantTimeToLink)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
 			egressLeg.setDepartureTime(now);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
-			Id<Link> finalEndLinkId = endLinkId;
-			double egressTime = NetworkUtils.getLinkEgressTime(filteredNetwork.getLinks().get(endLinkId), mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ finalEndLinkId.toString()));
+			double egressTime = NetworkUtils.getLinkEgressTime(egressActLink, mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId()));
 			egressLeg.setTravelTime(egressTime);
 			egressLeg.getRoute().setTravelTime(egressTime);
 			result.add(egressLeg);
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
-			result.addAll(accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person));
+			List<? extends PlanElement> egressTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			if (this.accessEgressWalkType.equals(AccessEgressWalkType.walkToLinkPlusConstant)){
+				double accessTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ egressActLink.getId().toString()));
+				Leg leg0 = TripStructureUtils.getLegs(egressTrip).get(0);
+				double travelTime = leg0.getTravelTime().seconds()+accessTime;
+				leg0.setTravelTime(travelTime);
+				leg0.getRoute().setTravelTime(travelTime);
+			}
+			result.addAll(egressTrip);
 		}
 	}
 
@@ -226,7 +236,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			result.add(accessLeg);
-		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.constantTimeToLink)) {
+		} else if (accessEgressWalkType.equals(AccessEgressWalkType.constantTimeToLink)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
 			accessLeg.setDepartureTime(now);
 			Id<Link> startLinkId = fromFacility.getLinkId();
@@ -235,9 +245,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			}
 			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
 					config);
-			Id<Link> finalStartLinkId = startLinkId;
-			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(startLinkId), mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ finalStartLinkId
-					.toString()));
+
+			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(accessActLink), mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
 			accessLeg.setTravelTime(accessTime);
 			accessLeg.getRoute().setTravelTime(accessTime);
 			result.add(accessLeg);
@@ -245,9 +254,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
 			List<? extends PlanElement> accessTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
+			if (this.accessEgressWalkType.equals(AccessEgressWalkType.walkToLinkPlusConstant)){
+				double accessTime = NetworkUtils.getLinkAccessTime(accessActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
+				Leg leg0 = TripStructureUtils.getLegs(accessTrip).get(0);
+				double travelTime = leg0.getTravelTime().seconds()+accessTime;
+				leg0.setTravelTime(travelTime);
+				leg0.getRoute().setTravelTime(travelTime);
+			}
 			for (PlanElement planElement : accessTrip) {
 				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
+
 			result.addAll(accessTrip);
 		}
 
@@ -278,6 +295,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			params.setBeelineDistanceFactor(1.3);
 			params.setTeleportedModeSpeed(2.0);
 		}
+
 		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
 	}
 
@@ -302,6 +320,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		double estimatedNetworkDistance = dist * beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
+
+
 		route.setTravelTime(travTime);
 		route.setDistance(estimatedNetworkDistance);
 		leg.setRoute(route);

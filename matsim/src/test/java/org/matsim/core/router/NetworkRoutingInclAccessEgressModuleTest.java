@@ -278,6 +278,27 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
+    @Test
+    public void useAccessEgressTimeFromConstantAndWalkTime() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLinkPlusConstant);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        // add persons
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        Controler controler = createControler(scenario);
+        controler.run();
+        var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
+        Assert.equals(3,legs.size());
+        Assert.equals(153.0,legs.get(0).getTravelTime().seconds());
+        Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
+    }
+
     @Test(expected = RuntimeException.class)
     public void failifNoAccessTimeSet() {
 
