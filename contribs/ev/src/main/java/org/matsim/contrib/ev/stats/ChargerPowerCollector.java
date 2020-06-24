@@ -21,7 +21,11 @@ package org.matsim.contrib.ev.stats;/*
  * created by jbischoff, 26.10.2018
  */
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
@@ -37,19 +41,16 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.utils.misc.Time;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.google.inject.Inject;
 
 public class ChargerPowerCollector
 		implements ChargingStartEventHandler, ChargingEndEventHandler, MobsimScopeEventHandler {
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet fleet;
-	private Map<Id<ElectricVehicle>, ImmutablePair> chargeBeginSoc = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ImmutablePair<Double, Double>> chargeBeginSoc = new HashMap<>();
 
-	private List<ChargingLogEntry> logList = new ArrayList<>();
+	private final List<ChargingLogEntry> logList = new ArrayList<>();
 
 	@Inject
 	public ChargerPowerCollector(ElectricFleet fleet, ChargingInfrastructure chargingInfrastructure,
@@ -142,7 +143,7 @@ public class ChargerPowerCollector
 
 		@Override
 		public int compareTo(ChargingLogEntry o) {
-			return Double.valueOf(chargeStart).compareTo(o.chargeStart);
+			return Double.compare(chargeStart, o.chargeStart);
 		}
 
 		public Id<ElectricVehicle> getVehicleId() {

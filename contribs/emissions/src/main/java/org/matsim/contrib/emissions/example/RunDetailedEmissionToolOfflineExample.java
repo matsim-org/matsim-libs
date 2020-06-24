@@ -27,8 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -74,7 +74,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 			this.prepareConfig() ;
 		}
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        EventsManager eventsManager = EventsUtils.createEventsManager();
+        EventsManager eventsManager = new ParallelEventsManager(false, 1);
 
 		AbstractModule module = new AbstractModule(){
 			@Override
@@ -91,10 +91,12 @@ public final class RunDetailedEmissionToolOfflineExample{
 
         EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
         emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+        eventsManager.initProcessing();
 
         MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
         matsimEventsReader.readFile(eventsFile);
 
+        eventsManager.finishProcessing();
         emissionEventWriter.closeFile();
 
     }

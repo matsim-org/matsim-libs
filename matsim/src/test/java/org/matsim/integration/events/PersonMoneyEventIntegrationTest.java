@@ -50,19 +50,24 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 		EventsManager writeEvents = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFilename);
 		writeEvents.addHandler(writer);
+		writeEvents.initProcessing();
 
 		writeEvents.processEvent(event1);
 		writeEvents.processEvent(event2);
 
+		writeEvents.finishProcessing();
 		writer.closeFile();
+
 
 		// read the events from file
 
 		EventsManager readEvents = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
+		readEvents.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);
 		reader.readFile(eventsFilename);
+		readEvents.finishProcessing();
 
 		// compare the read events with the one written
 
@@ -106,8 +111,10 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 		EventsManager readEvents = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
+		readEvents.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);
 		reader.readFile(eventsFilename);
+		readEvents.finishProcessing();
 		
 		// compare the read events with the one written
 		

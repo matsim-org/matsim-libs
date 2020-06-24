@@ -24,14 +24,14 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class ChargingActivity implements DynActivity {
-	private static final String CHARGING_ACTIVITY_TYPE = "ChargingActivity";
+	public static final String ACTIVITY_TYPE = "Charging";
 
 	private final ChargingTask chargingTask;
 	private double endTime = END_ACTIVITY_LATER;
 
 	private enum State {
 		init, queued, plugged, unplugged
-	};
+	}
 
 	private State state = State.init;
 
@@ -41,7 +41,7 @@ public class ChargingActivity implements DynActivity {
 
 	@Override
 	public String getActivityType() {
-		return CHARGING_ACTIVITY_TYPE;
+		return ACTIVITY_TYPE;
 	}
 
 	@Override

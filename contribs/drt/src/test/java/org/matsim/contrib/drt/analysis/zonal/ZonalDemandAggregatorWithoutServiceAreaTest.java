@@ -20,14 +20,20 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.apache.commons.lang3.mutable.MutableInt;
+import java.net.URL;
+import java.util.function.ToIntFunction;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -42,10 +48,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import java.net.URL;
-import java.util.*;
-import java.util.function.ToIntFunction;
 
 public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
@@ -130,7 +132,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		//this is the wrong way around (create controler before manipulating scenario...
-		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
+		Controler controler = DrtControlerCreator.createControler(config, false);
 		setupPopulation(controler.getScenario().getPopulation());
 		return controler;
 	}

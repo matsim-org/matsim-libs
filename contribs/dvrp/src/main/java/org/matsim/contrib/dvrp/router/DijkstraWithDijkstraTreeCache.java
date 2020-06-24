@@ -22,10 +22,12 @@ package org.matsim.contrib.dvrp.router;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.Maps;
@@ -37,7 +39,7 @@ public class DijkstraWithDijkstraTreeCache implements LeastCostPathCalculatorWit
 	private final TimeDiscretizer timeDiscretizer;
 	private final Map<Id<Node>, DijkstraTree>[] treeCache;
 
-	private CacheStats cacheStats = new CacheStats();
+	private final CacheStats cacheStats = new CacheStats();
 
 	@SuppressWarnings("unchecked")
 	public DijkstraWithDijkstraTreeCache(Network network, TravelDisutility costFunction, final TravelTime timeFunction,

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 
 public class StayRecorder implements ActivityStartEventHandler, ActivityEndEventHandler {
-	class Stay {
+	static class Stay {
 		final Link link;
 		final String activityType;
 		final double startTime;

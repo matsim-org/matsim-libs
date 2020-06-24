@@ -61,7 +61,7 @@ public class TaxiStatsWriter {
 
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).
-					addf("%.4f", s.getFleetEmptyDriveRatio());
+					addf("%.4f", s.calculateFleetEmptyDriveRatio().orElse(Double.NaN));
 			addStats(lineBuilder, "%.4f", "%.3f", s.vehicleEmptyDriveRatio);
 			writer.writeNext(lineBuilder);
 		}
@@ -74,7 +74,7 @@ public class TaxiStatsWriter {
 
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).
-					addf("%.4f", s.getFleetStayRatio());
+					addf("%.4f", s.calculateFleetStayRatio().orElse(Double.NaN));
 			addStats(lineBuilder, "%.4f", "%.3f", s.vehicleStayRatio);
 			writer.writeNext(lineBuilder);
 		}
@@ -112,9 +112,9 @@ public class TaxiStatsWriter {
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
 			for (TaxiTaskType t : TaxiTaskType.values()) {
-				lineBuilder.addf("%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);
+				lineBuilder.addf("%.2f", s.taskTypeDurations.getOrDefault(t, 0.) / 3600);
 			}
-			lineBuilder.addf("%.2f", s.taskTimeSumsByType.getTotal().doubleValue() / 3600);
+			lineBuilder.addf("%.2f", s.calculateTotalDuration() / 3600);
 			writer.writeNext(lineBuilder);
 		}
 		writer.writeNextEmpty();

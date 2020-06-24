@@ -19,9 +19,14 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.lang3.StringUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -95,7 +100,7 @@ public class TaxiBenchmarkPostProcessor {
 	private void readFile(String file, Experiment experiment) {
 		try (Scanner sc = new Scanner(new File(file))) {
 			String header = sc.nextLine();
-			if (!header.split("\t").equals(this.header)) {
+			if (!Arrays.equals(header.split("\t"), this.header)) {
 				throw new RuntimeException("Incompatibile header");
 			}
 
@@ -123,10 +128,10 @@ public class TaxiBenchmarkPostProcessor {
 	private void writeValues(String file, int column) {
 		String field = statsColumns[column];
 		PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(file + "_" + field + ".txt"));
-		StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
-		StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
-		StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
-		StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
+		StringBuilder lineId = new StringBuilder(StringUtils.leftPad(field, 20));
+		StringBuilder lineN = new StringBuilder(StringUtils.leftPad("n", 20));
+		StringBuilder lineM = new StringBuilder(StringUtils.leftPad("m", 20));
+		StringBuilder lineRatio = new StringBuilder(StringUtils.leftPad("ratio", 20));
 
 		for (Experiment e : experiments) {
 			if (e == EMPTY_COLUMN) {

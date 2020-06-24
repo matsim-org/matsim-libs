@@ -82,15 +82,15 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 				.addf("%.0f", s.passengerWaitTime.getPercentile(95))
 				.addf("%.0f", s.passengerWaitTime.getMax())
 				.addEmpty()
-				.addf("%.4f", s.getFleetEmptyDriveRatio())
+				.addf("%.4f", s.calculateFleetEmptyDriveRatio().orElse(Double.NaN))
 				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean())
 				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation())
 				.addEmpty()
-				.addf("%.4f", s.getFleetStayRatio())
+				.addf("%.4f", s.calculateFleetStayRatio().orElse(Double.NaN))
 				.addf("%.4f", s.vehicleStayRatio.getMean())
 				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation())
 				.addEmpty()
-				.addf("%.4f", s.getOccupiedDriveRatio()));
+				.addf("%.4f", s.calculateOccupiedDriveRatio().orElse(Double.NaN)));
 		multiDayWriter.flush();
 	}
 

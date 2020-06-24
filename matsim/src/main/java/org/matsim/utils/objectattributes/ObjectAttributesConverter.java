@@ -24,6 +24,7 @@
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
+import org.matsim.api.core.v01.Coord;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +57,8 @@ public class ObjectAttributesConverter {
 		this.converters.put(Long.class.getName(), new LongConverter());
 		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
 		this.converters.put(Map.class.getName(), new StringStringMapConverter());
+		this.converters.put(Coord.class.getName(), new CoordConverter());
+		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 	}
 
 	public Object convert(String className, String value) {

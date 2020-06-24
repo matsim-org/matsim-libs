@@ -94,7 +94,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			nextTaskIdx = 0;
 		}
 
-		List<Task> tasks = (List<Task>)schedule.getTasks();
+		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (task.getTaskType() == DrtTaskType.STOP) {
