@@ -69,7 +69,6 @@ public abstract class AbstractJDEQSimTest {
 		this.eventsByPerson = null;
 		this.vehicleToDriver = null;
 		this.allEvents = null;
-		Road.getAllRoads().clear(); // SimulationParameter contains a Map containing Links which refer to the Network, give that free for GC
 	}
 
 	public void runJDEQSim(Scenario scenario) {

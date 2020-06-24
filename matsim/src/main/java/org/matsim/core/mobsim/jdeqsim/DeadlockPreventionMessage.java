@@ -19,6 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.core.api.experimental.events.EventsManager;
+
 /**
  * The micro-simulation internal handler for preventig deadlocks.
  *
@@ -41,8 +43,8 @@ public class DeadlockPreventionMessage extends EventMessage {
 		vehicle.scheduleEnterRoadMessage(getMessageArrivalTime(), road);
 	}
 
-	public DeadlockPreventionMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
+	public DeadlockPreventionMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(scheduler, vehicle, eventsManager);
 	}
 
 	@Override

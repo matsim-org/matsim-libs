@@ -11,6 +11,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.jdeqsim.MessageFactory;
 import org.matsim.core.mobsim.jdeqsim.Road;
 import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
@@ -31,12 +32,21 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     private int numberOfAgents = 0;
     private AgentCounter agentCounter;
 
+    /**
+     * this must be initialized before starting the simulation! mapping:
+     * key=linkId used to find a road corresponding to a link
+     */
+    protected final HashMap<Id<Link>, Road> allRoads;
+    protected final MessageFactory messageFactory;
+
     public JDEQSimEngine(JDEQSimConfigGroup config, Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler) {
         this.config = config;
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
         this.agentCounter = agentCounter;
+        this.allRoads = new HashMap<>();
+        messageFactory = new MessageFactory(eventsManager);
     }
 
     @Override
@@ -45,13 +55,10 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         t = new Timer();
         t.startTimer();
 
-        Road.setAllRoads(new HashMap<Id<Link>, Road>());
-
         // initialize network
-        Road road;
         for (Link link : this.scenario.getNetwork().getLinks().values()) {
-            road = new Road(scheduler, link);
-            Road.getAllRoads().put(link.getId(), road);
+            Road road = new Road(scheduler, link, config);
+            allRoads.put(link.getId(), road);
         }
 
     }
@@ -60,7 +67,8 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     public boolean handleActivity(MobsimAgent agent) {
         // We expect all the agents to appear here at the beginning of the simulation (starting their
         // overnight activity.) That's when we enter them into JDEQSim and never let them out.
-        new Vehicle(scheduler, ((HasPerson) agent).getPerson(), scenario.getConfig().plans().getActivityDurationInterpretation());
+        new Vehicle(scheduler, ((HasPerson) agent).getPerson(),
+                scenario.getConfig().plans().getActivityDurationInterpretation(), allRoads, messageFactory);
         numberOfAgents++;
         return true;
     }

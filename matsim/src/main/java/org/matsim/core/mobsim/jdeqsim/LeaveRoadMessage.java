@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * The micro-simulation internal handler for leaving a road.
@@ -36,8 +37,8 @@ public class LeaveRoadMessage extends EventMessage {
 		road.leaveRoad(vehicle, getMessageArrivalTime());
 	}
 
-	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
+	public LeaveRoadMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(scheduler, vehicle, eventsManager);
 		priority = JDEQSimConfigGroup.PRIORITY_LEAVE_ROAD_MESSAGE;
 	}
 

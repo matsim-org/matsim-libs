@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -48,11 +49,15 @@ public class Vehicle extends SimUnit {
 	private int linkIndex;
 	private Id<Link>[] currentLinkRoute = null;
 	private final PlansConfigGroup.ActivityDurationInterpretation activityEndTimeInterpretation;
+	private final HashMap<Id<Link>, Road> allRoads;
+	private final MessageFactory messageFactory;
 
-	public Vehicle(Scheduler scheduler, Person ownerPerson, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson, ActivityDurationInterpretation activityDurationInterpretation, HashMap<Id<Link>, Road> allRoads, MessageFactory messageFactory) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
 		this.activityEndTimeInterpretation = activityDurationInterpretation;
+		this.allRoads = allRoads;
+		this.messageFactory = messageFactory;
 		initialize();
 	}
 
@@ -97,7 +102,7 @@ public class Vehicle extends SimUnit {
 		// this is the link, where the first activity took place
 		setCurrentLinkId(firstAct.getLinkId());
 
-		Road road = Road.getRoad(getCurrentLinkId());
+		Road road = getRoad();
 		// schedule start leg message
 		scheduleStartingLegMessage(departureTime, road);
 	}
@@ -170,6 +175,10 @@ public class Vehicle extends SimUnit {
 
 	public Id<Link> getCurrentLinkId() {
 		return currentLinkId;
+	}
+
+	public Road getRoad() {
+		return allRoads.get(getCurrentLinkId());
 	}
 
 	public int getLinkIndex() {
@@ -256,10 +265,10 @@ public class Vehicle extends SimUnit {
 			Plan plan = ownerPerson.getSelectedPlan();
 			List<? extends PlanElement> actsLegs = plan.getPlanElements();
 			previousLinkId = ((Activity) actsLegs.get(legIndex - 1)).getLinkId();
-			previousRoad = Road.getRoad(previousLinkId);
+			previousRoad = allRoads.get(previousLinkId);
 		} else if (this.getLinkIndex() >= 1) {
 			previousLinkId = this.getCurrentLinkRoute()[this.getLinkIndex() - 1];
-			previousRoad = Road.getRoad(previousLinkId);
+			previousRoad = allRoads.get(previousLinkId);
 		} else {
 			log.error("Some thing is wrong with the simulation: Why is this.getLinkIndex() negative");
 		}
@@ -268,27 +277,27 @@ public class Vehicle extends SimUnit {
 	}
 
 	protected void _scheduleEnterRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEnterRoadMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(messageFactory.getEnterRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleEndRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndRoadMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(messageFactory.getEndRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleLeaveRoadMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getLeaveRoadMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(messageFactory.getLeaveRoadMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleEndLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getEndLegMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(messageFactory.getEndLegMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public void scheduleStartingLegMessage(double scheduleTime, Road road) {
-		sendMessage(MessageFactory.getStartingLegMessage(road.scheduler, this), road, scheduleTime);
+		sendMessage(messageFactory.getStartingLegMessage(road.scheduler, this), road, scheduleTime);
 	}
 
 	public DeadlockPreventionMessage scheduleDeadlockPreventionMessage(double scheduleTime, Road road) {
-		DeadlockPreventionMessage dpMessage = MessageFactory.getDeadlockPreventionMessage(road.scheduler, this);
+		DeadlockPreventionMessage dpMessage = messageFactory.getDeadlockPreventionMessage(road.scheduler, this);
 		sendMessage(dpMessage, road, scheduleTime);
 		return dpMessage;
 	}

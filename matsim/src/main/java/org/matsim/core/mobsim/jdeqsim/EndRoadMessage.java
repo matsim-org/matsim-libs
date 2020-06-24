@@ -19,6 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import org.matsim.core.api.experimental.events.EventsManager;
+
 /**
  * The micro-simulation internal handler, when the end of a road is reached.
  *
@@ -37,19 +39,19 @@ public class EndRoadMessage extends EventMessage {
 
 			vehicle.initiateEndingLegMode();
 			vehicle.moveToFirstLinkInNextLeg();
-			Road road = Road.getRoad(vehicle.getCurrentLinkId());
+			Road road = this.vehicle.getRoad();
 			road.enterRequest(vehicle, getMessageArrivalTime());
 		} else if (!vehicle.isCurrentLegFinished()) {
 			// if leg is not finished yet
 			vehicle.moveToNextLinkInLeg();
 
-			Road nextRoad = Road.getRoad(vehicle.getCurrentLinkId());
+            Road nextRoad = this.vehicle.getRoad();
 			nextRoad.enterRequest(vehicle, getMessageArrivalTime());
 		}
 	}
 
-	public EndRoadMessage(Scheduler scheduler, Vehicle vehicle) {
-		super(scheduler, vehicle);
+	public EndRoadMessage(Scheduler scheduler, Vehicle vehicle, EventsManager eventsManager) {
+		super(scheduler, vehicle, eventsManager);
 	}
 
 	@Override

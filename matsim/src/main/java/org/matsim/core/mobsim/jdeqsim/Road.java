@@ -19,10 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
@@ -35,27 +33,9 @@ import org.matsim.core.utils.misc.Time;
 public class Road extends SimUnit {
 
 	// default
-	protected static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
+	protected final JDEQSimConfigGroup config;
 
-	public static void setConfig(JDEQSimConfigGroup config) {
-		Road.config = config;
-	}
-
-	/**
-	 * this must be initialized before starting the simulation! mapping:
-	 * key=linkId used to find a road corresponding to a link
-	 */
-	static HashMap<Id<Link>, Road> allRoads = null;
-
-	public static HashMap<Id<Link>, Road> getAllRoads() {
-		return allRoads;
-	}
-
-	public static void setAllRoads(HashMap<Id<Link>, Road> allRoads) {
-		Road.allRoads = allRoads;
-	}
-
-	protected Link link;
+	protected final Link link;
 
 	// see method enterRequest for a detailed description of variable 'gap'
 	private LinkedList<Double> gap;
@@ -102,9 +82,10 @@ public class Road extends SimUnit {
 	 */
 	private LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages = new LinkedList<>();
 
-	public Road(Scheduler scheduler, Link link) {
+	public Road(Scheduler scheduler, Link link, JDEQSimConfigGroup config) {
 		super(scheduler);
 		this.link = link;
+		this.config = config;
 
 		/*
 		 * calculate the maximum number of cars, which can be on the road at the
@@ -350,14 +331,6 @@ public class Road extends SimUnit {
 	public void removeFromInterestedInEnteringRoad() {
 		this.interestedInEnteringRoad.removeFirst();
 		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
-	}
-
-	public static Road getRoad(Id<Link> linkId) {
-		return getAllRoads().get(linkId);
-	}
-
-	public void setLink(Link link) {
-		this.link = link;
 	}
 
 	public LinkedList<Double> getGap() {

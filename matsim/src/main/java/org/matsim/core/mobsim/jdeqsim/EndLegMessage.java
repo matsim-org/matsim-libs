@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 
@@ -43,10 +43,10 @@ import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
  */
 public class EndLegMessage extends EventMessage {
 	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ;
-	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {
+	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle, EventsManager eventsManager) {
 		// need the time interpretation info here.  Attaching it to the message feels weird.  The scheduler seems a pure simulation object.
 		// Consequence: attach it to Vehicle
-		super(scheduler, vehicle);
+		super(scheduler, vehicle, eventsManager);
 		this.priority = JDEQSimConfigGroup.PRIORITY_ARRIVAL_MESSAGE;
 		if ( vehicle == null ) {
 			this.activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ;
@@ -89,7 +89,7 @@ public class EndLegMessage extends EventMessage {
 			// update current link (we arrived at a new activity)
 			this.vehicle.setCurrentLinkId(currentAct.getLinkId());
 
-			Road road = Road.getRoad(this.vehicle.getCurrentLinkId());
+			Road road = this.vehicle.getRoad();
 			// schedule a departure from the current link in future
 			this.vehicle.scheduleStartingLegMessage(departureTime, road);
 		}
