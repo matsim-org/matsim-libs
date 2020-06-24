@@ -21,6 +21,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ChangeModeConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -129,7 +130,7 @@ public class ModalDistanceAndCountsCadytsIT {
 		// remove teleported bike
 		config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
 
 		config.qsim().setMainModes(Arrays.asList(modes));
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);

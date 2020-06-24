@@ -14,6 +14,7 @@ import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -127,7 +128,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
+		if (!plansCalcRouteConfigGroup.getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,

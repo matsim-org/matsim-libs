@@ -48,6 +48,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
@@ -155,7 +156,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
 		runTest2a( config ) ;
 	}
 	@Test
@@ -164,7 +165,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
 //		{
 //			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
 //			params.setTeleportedModeSpeed( 2.0 );
@@ -411,7 +412,7 @@ public class NoiseIT {
 						affectedPersons = ( unitsThisPersonActivityInfo * noiseParameters.getScaleFactor() );
 						
 						int outOfHomeActIdx = 2 ;
-						if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+						if ( !runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 							outOfHomeActIdx = 6 ;
 						}
 						Coord coord = actInfo.getActivityType().equals("home") ?
@@ -440,7 +441,7 @@ public class NoiseIT {
 			
 			if(currentTimeSlot == endTime){
 				
-				if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				if ( !runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.48583333333333 /*1.991388888888*/,
 							affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 					// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
@@ -473,7 +474,7 @@ public class NoiseIT {
 					log.warn( "receiverPointId:" + receiverPointId );
 					log.warn( "affected:" + list ) ;
 				}
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("Wrong number of affected persons", expected, actual, MatsimTestUtils.EPSILON);
 				} else {
 					Assert.assertEquals("Wrong number of affected persons", expected, actual, MatsimTestUtils.EPSILON);
@@ -682,7 +683,7 @@ public class NoiseIT {
 			
 		}
 		
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals("Wrong damage!", 0.0664164095284536, 
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		} else {
@@ -736,7 +737,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals("Wrong link's damage contribution!", 0.00079854651258, 
 					damagesPerlinkId.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, 
@@ -787,7 +788,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals("Wrong damage per car per link!", 0.00079854651258 / 2.0, 
 					damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, 
@@ -834,7 +835,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 					
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals("Wrong damage per car per link!", 0.00011994155845965193, 
 					marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong damage per car per link!", 0.008531432493391652, 
@@ -860,7 +861,7 @@ public class NoiseIT {
 			tested = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -870,7 +871,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -879,7 +880,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -888,7 +889,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -910,7 +911,7 @@ public class NoiseIT {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -919,7 +920,7 @@ public class NoiseIT {
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -928,7 +929,7 @@ public class NoiseIT {
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.028225601971719153, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -958,7 +959,7 @@ public class NoiseIT {
 			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
 			runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
+			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
 			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
 			
 			Controler controler = new Controler(runConfig);

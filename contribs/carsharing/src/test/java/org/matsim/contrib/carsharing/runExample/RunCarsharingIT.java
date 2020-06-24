@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -78,9 +77,9 @@ public class RunCarsharingIT {
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none); // otherwise does not work. kai,feb'16
 		config.plansCalcRoute().setRoutingRandomness(0.);
-//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
 		
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
 		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
@@ -117,7 +116,7 @@ public class RunCarsharingIT {
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
 
 		// ---
 
