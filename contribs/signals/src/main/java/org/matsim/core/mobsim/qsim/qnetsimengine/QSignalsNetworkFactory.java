@@ -79,7 +79,7 @@ public final class QSignalsNetworkFactory implements QNetworkFactory{
 
 	@Override
 	public QNodeI createNetsimNode( Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, scenario.getConfig().qsim() ) ;
 		
 		// check whether turn acceptance logic is enabled
 		SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),

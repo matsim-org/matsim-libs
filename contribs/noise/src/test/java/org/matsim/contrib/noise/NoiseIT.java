@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -49,7 +48,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
@@ -57,6 +55,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,8 +63,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author ikaddoura
@@ -209,7 +206,7 @@ public class NoiseIT {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager events = new ParallelEventsManager(false, 1);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
@@ -248,10 +245,13 @@ public class NoiseIT {
 				
 			}
 		});
-		
+
+		events.initProcessing();
+
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
+		events.finishProcessing();
+
 		// ############################
 		// test considered agent units
 		// ############################
@@ -316,7 +316,7 @@ public class NoiseIT {
 				double start = 0.;
 				
 				for(Event e : eventsPerPersonId.get(personId)){
-					
+
 					boolean activityEnded = false;
 					
 					PersonActivityInfo actInfo = null;
