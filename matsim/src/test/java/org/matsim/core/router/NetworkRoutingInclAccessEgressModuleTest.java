@@ -265,7 +265,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
-        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         // add persons
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
         scenario.getPopulation().addPerson(person);

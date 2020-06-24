@@ -794,17 +794,32 @@ public final class NetworkUtils {
 		new MatsimNetworkReader(network).readFile(string);
 	}
 
-	public static OptionalTime getLinkAccessTime(Link link, String mode){
-		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+mode;
+	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		Object o = link.getAttributes().getAttribute(attribute);
 		if (o!=null){
 			return OptionalTime.defined((double) o);
 		}
 		else return OptionalTime.undefined();
 	}
-	public static void setLinkAccessTime(Link link, String mode, double accessTime){
-		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+mode;
+
+	public static void setLinkAccessTime(Link link, String routingMode, double accessTime){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
 		link.getAttributes().putAttribute(attribute,accessTime);
+	}
+
+	public static OptionalTime getLinkEgressTime(Link link, String routingMode){
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		Object o = link.getAttributes().getAttribute(attribute);
+		if (o!=null){
+			return OptionalTime.defined((double) o);
+		}
+		else return OptionalTime.undefined();
+	}
+
+	public static void setLinkEgressTime(Link link, String routingMode, double egressTime){
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		link.getAttributes().putAttribute(attribute,egressTime);
 	}
 
 

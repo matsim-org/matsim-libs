@@ -73,6 +73,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final RoutingModule accessEgressToNetworkRouter;
 	private final Config config;
 	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
+	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
 
 	NetworkRoutingInclAccessEgressModule(
 			final String mode,
@@ -179,9 +180,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
 			egressLeg.setDepartureTime(now);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
-			double accessTime = NetworkUtils.getLinkAccessTime(filteredNetwork.getLinks().get(endLinkId), mode).orElse(0.0);
-			egressLeg.setTravelTime(accessTime);
-			egressLeg.getRoute().setTravelTime(accessTime);
+			double egressTime = NetworkUtils.getLinkEgressTime(filteredNetwork.getLinks().get(endLinkId), mode).orElse(0.0);
+			egressLeg.setTravelTime(egressTime);
+			egressLeg.getRoute().setTravelTime(egressTime);
 			result.add(egressLeg);
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
