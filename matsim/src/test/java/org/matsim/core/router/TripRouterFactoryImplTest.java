@@ -127,7 +127,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 
@@ -202,7 +202,7 @@ public class TripRouterFactoryImplTest {
 				PopulationUtils.getFactory().createPerson(Id.create("toto", Person.class)));
 
 		Leg l = (Leg) trip.get( 0 );
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			l = (Leg) trip.get(2) ;
 		}
 

@@ -156,7 +156,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		Plan newPlan = person.getSelectedPlan();
 		System.err.println( " newPlan: " + newPlan ) ;
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2 );
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		System.err.println( " newWork: " + newWork ) ;

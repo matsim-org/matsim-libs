@@ -103,7 +103,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.controler().setLastIteration(0);
         config.controler().setOutputDirectory(utils.getOutputDirectory());
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
 
         final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
         homeParams.setTypicalDuration(1);
@@ -262,7 +262,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
@@ -283,7 +283,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
@@ -298,7 +298,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
@@ -312,7 +312,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
@@ -335,7 +335,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.None);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);

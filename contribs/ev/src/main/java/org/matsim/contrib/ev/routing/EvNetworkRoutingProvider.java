@@ -128,7 +128,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if (!plansCalcRouteConfigGroup.getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
+		if (!plansCalcRouteConfigGroup.getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
 			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,

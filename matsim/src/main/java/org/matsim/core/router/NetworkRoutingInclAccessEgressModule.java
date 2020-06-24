@@ -88,7 +88,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.populationFactory = scenario.getPopulation().getFactory();
 		this.config = scenario.getConfig();
 		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-		if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
+		if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
 		}
@@ -176,7 +176,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressLeg.setDepartureTime(now);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
 			result.add(egressLeg);
-		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
+		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.constantTimeToLink)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
 			egressLeg.setDepartureTime(now);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
@@ -226,7 +226,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			result.add(accessLeg);
-		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.readAccessTimeFromLinkAttribute)) {
+		} else if (config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.constantTimeToLink)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
 			accessLeg.setDepartureTime(now);
 			Id<Link> startLinkId = fromFacility.getLinkId();

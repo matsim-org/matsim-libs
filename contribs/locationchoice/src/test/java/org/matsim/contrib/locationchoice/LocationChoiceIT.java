@@ -125,7 +125,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		Activity newWork = (Activity) newPlan.getPlanElements().get(2);
-		if (!config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if (!config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			newWork = (Activity) newPlan.getPlanElements().get(6);
 		}
 		assertNotNull( newWork ) ;

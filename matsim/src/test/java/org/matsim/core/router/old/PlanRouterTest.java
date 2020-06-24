@@ -77,7 +77,7 @@ public class PlanRouterTest {
         ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).setVehicleId(vehicleId);
         testee.run(plan);
 
-        if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+        if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
       	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
         } else {
       	  Assert.assertEquals("Vehicle Id transferred to new Plan", vehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());
@@ -130,7 +130,7 @@ public class PlanRouterTest {
 
         PlanRouter testee = new PlanRouter(tripRouter);
         testee.run(plan);
-        if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+        if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
               Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(0).getRoute()).getVehicleId());
         } else {
               Assert.assertEquals("Vehicle Id from TripRouter used", newVehicleId, ((NetworkRoute) TripStructureUtils.getLegs(plan).get(1).getRoute()).getVehicleId());

@@ -615,7 +615,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						+ " Otherwise, crashes can be expected.");
 			}
 		}
-		if (!config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None)) {
+		if (!config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
 			// adding the interaction activities that result from access/egress
 			// routing. this is strictly speaking
 			// not a consistency check, but I don't know a better place where to

@@ -93,7 +93,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -121,7 +121,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setInsertingAccessEgressWalk( AccessEgressWalkType.directWalk );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( AccessEgressWalkType.walkToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );

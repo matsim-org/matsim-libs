@@ -309,7 +309,7 @@ public class MultiModalControlerListenerTest {
 		Logger.getLogger( this.getClass() ).warn( "carTravelTime: " + carTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "bikeTravelTime: " + bikeTravelTime ) ;
 		Logger.getLogger( this.getClass() ).warn( "walkTravelTime: " + walkTravelTime ) ;
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals(
 					"unexpected total travel time for car mode with number of threads "+numberOfThreads,
 					1.1186864E8, carTravelTime, MatsimTestUtils.EPSILON);

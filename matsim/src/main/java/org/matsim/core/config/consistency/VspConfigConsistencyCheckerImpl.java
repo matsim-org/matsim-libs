@@ -243,7 +243,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// === plansCalcRoute:
 		
 		// added feb'16
-		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should use `true' or talk to Kai. " ) ;
 		}
 		

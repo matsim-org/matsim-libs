@@ -317,7 +317,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.None);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );

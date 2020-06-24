@@ -138,7 +138,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
 		}
-		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			return (Leg) (planElements.get(1));
 		} else {
 			return (Leg) (planElements.get(3));
@@ -227,7 +227,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
-		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			return (Leg) (planElements.get(3));
 		} else {
 			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;

@@ -462,7 +462,7 @@ public class ControlerIT {
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 		
 		int expectedPlanLength = 3 ;
-		if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
 			expectedPlanLength = 7 ;
 		}
@@ -479,7 +479,7 @@ public class ControlerIT {
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
-			if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+			if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 				assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 3 )).getRoute());

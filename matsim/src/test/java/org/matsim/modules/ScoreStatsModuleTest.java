@@ -75,7 +75,7 @@ public class ScoreStatsModuleTest {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		config.plansCalcRoute().setInsertingAccessEgressWalk(this.isInsertingAccessEgressWalk?AccessEgressWalkType.directWalk:AccessEgressWalkType.None);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(this.isInsertingAccessEgressWalk?AccessEgressWalkType.walkToLink :AccessEgressWalkType.none);
 
 		config.controler().setLastIteration(1);
 		Controler controler = new Controler(config);
@@ -107,7 +107,7 @@ public class ScoreStatsModuleTest {
 			//            }
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
-			if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+			if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 				{
 					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
 					Assert.assertEquals(64.75686659291274, array[0], DELTA);

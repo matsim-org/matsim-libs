@@ -146,7 +146,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -228,7 +228,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if (! config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if (! config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -320,7 +320,7 @@ public class TollTravelCostCalculatorTest {
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
 
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			carLegIndex = 3 ;
 		}
 

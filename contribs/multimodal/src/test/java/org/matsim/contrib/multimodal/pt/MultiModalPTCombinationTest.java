@@ -133,7 +133,7 @@ public class MultiModalPTCombinationTest {
 		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.None) ) {
+		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
 		} else {
 			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
