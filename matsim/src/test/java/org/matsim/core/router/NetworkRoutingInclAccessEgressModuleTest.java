@@ -278,6 +278,35 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
+    @Test(expected = RuntimeException.class)
+    public void failifNoAccessTimeSet() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+        Controler controler = createControler(scenario);
+        controler.run();
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void failifNoEgressTimeSet() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.readAccessTimeFromLinkAttribute);
+        Scenario scenario = createScenario(config);
+        NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
+        Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+        Controler controler = createControler(scenario);
+        controler.run();
+    }
+
     @Test
     public void calcAccessTimeFromDistanceToNode() {
 
