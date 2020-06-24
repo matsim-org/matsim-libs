@@ -30,17 +30,17 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-                new LeastCostRaptorRouteSelector(), stopFinder );
+                new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", f.schedule.getFacilities().size(), map.size());
 
@@ -75,17 +75,17 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", 20, map.size());
 
@@ -122,17 +122,17 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 50*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         // latest departure on green line is at 07:51, so we'll miss some stops!
         Assert.assertEquals("wrong number of reached stops.", 21, map.size());
@@ -168,17 +168,17 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 50*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         // latest departure on green line is at 07:51, so we'll miss some stops!
         Assert.assertEquals("wrong number of reached stops.", 14, map.size());
@@ -216,10 +216,10 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -230,7 +230,7 @@ public class SwissRailRaptorTreeTest {
         List<TransitStopFacility> fromStops = new ArrayList<>();
         fromStops.add(fromStopB);
         fromStops.add(fromStopH);
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", f.schedule.getFacilities().size(), map.size());
 
@@ -265,10 +265,10 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -279,7 +279,7 @@ public class SwissRailRaptorTreeTest {
         List<TransitStopFacility> fromStops = new ArrayList<>();
         fromStops.add(fromStopB);
         fromStops.add(fromStopH);
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", 22, map.size());
 
@@ -316,22 +316,22 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Id<TransitStopFacility> stop19id = Id.create(19, TransitStopFacility.class);
         assertTravelInfo(map, 19, "23", 1, "07:41:00", "08:01:00"); // transfer at C, 7:50/7:51 green
         TravelInfo info0740 = map.get(stop19id);
-        TravelInfo info0739 = raptor.calcTree(fromStop, 7*3600 + 39*60, raptorParams).get(stop19id);
+        TravelInfo info0739 = raptor.calcTree(fromStop, 7*3600 + 39*60, raptorParams, null).get(stop19id);
 
         Assert.assertEquals("departure time should be the same.", info0740.ptDepartureTime, info0739.ptDepartureTime, 0.0);
         Assert.assertEquals("arrival time should be the same.", info0740.ptArrivalTime, info0739.ptArrivalTime, 0.0);
@@ -351,17 +351,17 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork(), null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+            new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Id<TransitStopFacility> stop2id = Id.create(2, TransitStopFacility.class);
         assertTravelInfo(map, 2 , "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:02 blue, walk at B

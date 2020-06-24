@@ -39,18 +39,21 @@ public class SwissRailRaptor implements TransitRouter {
     private final RaptorParametersForPerson parametersForPerson;
     private final RaptorRouteSelector defaultRouteSelector;
     private final RaptorStopFinder stopFinder;
+    private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
 
     private boolean treeWarningShown = false;
 
     public SwissRailRaptor(SwissRailRaptorData data,
                            RaptorParametersForPerson parametersForPerson,
                            RaptorRouteSelector routeSelector,
-                           RaptorStopFinder stopFinder) {
+                           RaptorStopFinder stopFinder,
+													 RaptorInVehicleCostCalculator inVehicleCostCalculator) {
         this.data = data;
-        this.raptor = new SwissRailRaptorCore(data);
+        this.raptor = new SwissRailRaptorCore(data, inVehicleCostCalculator);
         this.parametersForPerson = parametersForPerson;
         this.defaultRouteSelector = routeSelector;
         this.stopFinder = stopFinder;
+        this.inVehicleCostCalculator = inVehicleCostCalculator;
     }
 
     @Override
@@ -62,7 +65,7 @@ public class SwissRailRaptor implements TransitRouter {
         List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters);
         List<InitialStop> egressStops = findEgressStops(toFacility, person, departureTime, parameters);
 
-        RaptorRoute foundRoute = this.raptor.calcLeastCostRoute(departureTime, fromFacility, toFacility, accessStops, egressStops, parameters);
+        RaptorRoute foundRoute = this.raptor.calcLeastCostRoute(departureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, departureTime, person, parameters);
 
         /*
@@ -151,7 +154,7 @@ public class SwissRailRaptor implements TransitRouter {
         List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters);
         List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters);
 
-        List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters);
+        List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute foundRoute = selector.selectOne(foundRoutes, desiredDepartureTime);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, desiredDepartureTime, person, parameters);
 
@@ -187,7 +190,7 @@ public class SwissRailRaptor implements TransitRouter {
         List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters);
         List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters);
 
-        List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters);
+        List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, desiredDepartureTime, person, parameters);
 
         if (foundRoutes == null) {
@@ -206,11 +209,11 @@ public class SwissRailRaptor implements TransitRouter {
         return foundRoutes;
     }
 
-    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(TransitStopFacility fromStop, double departureTime, RaptorParameters parameters) {
-        return this.calcTree(Collections.singletonList(fromStop), departureTime, parameters);
+    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(TransitStopFacility fromStop, double departureTime, RaptorParameters parameters, Person person) {
+        return this.calcTree(Collections.singletonList(fromStop), departureTime, parameters, person);
     }
 
-    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Collection<TransitStopFacility> fromStops, double departureTime, RaptorParameters parameters) {
+    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Collection<TransitStopFacility> fromStops, double departureTime, RaptorParameters parameters, Person person) {
         if (this.data.config.getOptimization() != RaptorStaticConfig.RaptorOptimization.OneToAllRouting && !this.treeWarningShown) {
             log.warn("SwissRailRaptorData was not initialized with full support for tree calculations and may result in unexpected results. Use `RaptorStaticConfig.setOptimization(RaptorOptimization.OneToAllRouting)` to fix this issue.");
             this.treeWarningShown = true;
@@ -219,17 +222,17 @@ public class SwissRailRaptor implements TransitRouter {
         for (TransitStopFacility stop : fromStops) {
             accessStops.add(new InitialStop(stop, 0, 0, 0, null));
         }
-        return this.calcLeastCostTree(accessStops, departureTime, parameters);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
     }
 
     public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters);
-        return this.calcLeastCostTree(accessStops, departureTime, parameters);
+        return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
     }
 
-    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters) {
-        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters);
+    private Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcLeastCostTree(Collection<InitialStop> accessStops, double departureTime, RaptorParameters parameters, Person person) {
+        return this.raptor.calcLeastCostTree(departureTime, accessStops, parameters, person);
     }
 
     public SwissRailRaptorData getUnderlyingData() {

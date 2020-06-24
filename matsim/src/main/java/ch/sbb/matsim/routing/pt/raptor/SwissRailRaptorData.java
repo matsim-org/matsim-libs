@@ -22,10 +22,14 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.Vehicles;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +48,8 @@ public class SwissRailRaptorData {
     final int countRouteStops;
     final RRoute[] routes;
     final int[] departures; // in the RAPTOR paper, this is usually called "trips", but I stick with the MATSim nomenclature
+    final Vehicle[] departureVehicles; // the vehicle used for each departure
+    final Id<Departure>[] departureIds;
     final RRouteStop[] routeStops; // list of all route stops
     final RTransfer[] transfers;
     final Map<TransitStopFacility, Integer> stopFacilityIndices;
@@ -53,7 +59,7 @@ public class SwissRailRaptorData {
     final ExecutionData executionData;
 
     private SwissRailRaptorData(RaptorStaticConfig config, int countStops,
-                                RRoute[] routes, int[] departures, RRouteStop[] routeStops,
+                                RRoute[] routes, int[] departures, Vehicle[] departureVehicles, Id<Departure>[] departureIds, RRouteStop[] routeStops,
                                 RTransfer[] transfers, Map<TransitStopFacility, Integer> stopFacilityIndices,
                                 Map<TransitStopFacility, int[]> routeStopsPerStopFacility, QuadTree<TransitStopFacility> stopsQT,
                                 ExecutionData executionData) {
@@ -62,6 +68,8 @@ public class SwissRailRaptorData {
         this.countRouteStops = routeStops.length;
         this.routes = routes;
         this.departures = departures;
+        this.departureVehicles = departureVehicles;
+        this.departureIds = departureIds;
         this.routeStops = routeStops;
         this.transfers = transfers;
         this.stopFacilityIndices = stopFacilityIndices;
@@ -71,10 +79,11 @@ public class SwissRailRaptorData {
         this.executionData = executionData;
     }
 
-    public static SwissRailRaptorData create(TransitSchedule schedule, RaptorStaticConfig staticConfig, Network network, ExecutionData executionData) {
+    public static SwissRailRaptorData create(TransitSchedule schedule, @Nullable Vehicles transitVehicles, RaptorStaticConfig staticConfig, Network network, ExecutionData executionData) {
         log.info("Preparing data for SwissRailRaptor...");
         long startMillis = System.currentTimeMillis();
 
+        Map<Id<Vehicle>, Vehicle> vehicles = transitVehicles == null ? Collections.emptyMap() : transitVehicles.getVehicles();
         int countRoutes = 0;
         long countRouteStops = 0;
         long countDepartures = 0;
@@ -95,6 +104,8 @@ public class SwissRailRaptorData {
         }
 
         int[] departures = new int[(int) countDepartures];
+        Vehicle[] departureVehicles = new Vehicle[(int) countDepartures];
+        Id<Departure>[] departureIds = new Id[(int) countDepartures];
         RRoute[] routes = new RRoute[countRoutes];
         RRouteStop[] routeStops = new RRouteStop[(int) countRouteStops];
 
@@ -157,6 +168,8 @@ public class SwissRailRaptorData {
                 }
                 for (Departure dep : route.getDepartures().values()) {
                     departures[indexDeparture] = (int) dep.getDepartureTime();
+                    departureVehicles[indexDeparture] = vehicles.get(dep.getVehicleId());
+                    departureIds[indexDeparture] = dep.getId();
                     indexDeparture++;
                 }
                 Arrays.sort(departures, indexFirstDeparture, indexDeparture);
@@ -191,7 +204,7 @@ public class SwissRailRaptorData {
             }
         }
 
-        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, executionData);
+        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, executionData);
 
         long endMillis = System.currentTimeMillis();
         log.info("SwissRailRaptor data preparation done. Took " + (endMillis - startMillis) / 1000 + " seconds.");

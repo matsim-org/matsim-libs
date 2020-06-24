@@ -21,7 +21,7 @@ public class SwissRailRaptorDataTest {
 
         f.config.transitRouter().setMaxBeelineWalkConnectionDistance(100);
         RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(f.config);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, raptorConfig, f.network, null);
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, raptorConfig, f.network, null);
 
         // check there is no transfer between stopFacility 19 and stopFacility 9
         Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
@@ -39,7 +39,7 @@ public class SwissRailRaptorDataTest {
         // add a previously inexistant transfer
 
         f.schedule.getMinimalTransferTimes().set(stopId19, stopId9, 345);
-        SwissRailRaptorData data2 = SwissRailRaptorData.create(f.schedule, raptorConfig, f.network, null);
+        SwissRailRaptorData data2 = SwissRailRaptorData.create(f.schedule, null, raptorConfig, f.network, null);
         int foundTransferCount = 0;
         for (SwissRailRaptorData.RTransfer t : data2.transfers) {
             TransitStopFacility fromStop = data2.routeStops[t.fromRouteStop].routeStop.getStopFacility();
@@ -53,7 +53,7 @@ public class SwissRailRaptorDataTest {
 
         // assign a high transfer time to a "default" transfer
         f.schedule.getMinimalTransferTimes().set(stopId5, stopId18, 456);
-        SwissRailRaptorData data3 = SwissRailRaptorData.create(f.schedule, raptorConfig, f.network, null);
+        SwissRailRaptorData data3 = SwissRailRaptorData.create(f.schedule, null, raptorConfig, f.network, null);
         boolean foundCorrectTransfer = false;
         for (SwissRailRaptorData.RTransfer t : data3.transfers) {
             TransitStopFacility fromStop = data3.routeStops[t.fromRouteStop].routeStop.getStopFacility();
@@ -68,7 +68,7 @@ public class SwissRailRaptorDataTest {
 
         // assign a low transfer time to a "default" transfer
         f.schedule.getMinimalTransferTimes().set(stopId5, stopId18, 0.2);
-        SwissRailRaptorData data4 = SwissRailRaptorData.create(f.schedule, raptorConfig, f.network, null);
+        SwissRailRaptorData data4 = SwissRailRaptorData.create(f.schedule, null, raptorConfig, f.network, null);
         foundCorrectTransfer = false;
         for (SwissRailRaptorData.RTransfer t : data4.transfers) {
             TransitStopFacility fromStop = data4.routeStops[t.fromRouteStop].routeStop.getStopFacility();
