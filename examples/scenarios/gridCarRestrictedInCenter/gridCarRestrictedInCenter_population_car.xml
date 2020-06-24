@@ -4,6 +4,7 @@
 <population>
 
 	<!-- ====================================================================== -->
+	<!-- ===DESTINED OUTSIDE, ORIGININATING IN CAR BANNED ZONE================= -->
 
 	<person id="origin_car" employed="no">
 		<plan selected="yes">
@@ -15,7 +16,7 @@
 	
 	<person id="origin_walkCarDrt" employed="no">
 		<plan selected="yes">
-			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
+			<act type="dummy" link="227" end_time="00:05:00" x="0" y="-500" />
 			<leg mode="walkCarDrt"/>
 			<act type="dummy" link="223" x="-800" y="-500" />
 		</plan>
@@ -23,17 +24,17 @@
 	
 	<person id="origin_drtCarWalk" employed="no">
 		<plan selected="yes">
-			<act type="dummy" link="227" end_time="00:00:00" x="0" y="-500" />
+			<act type="dummy" link="227" end_time="00:10:00" x="0" y="-500" />
 			<leg mode="drtCarWalk"/>
 			<act type="dummy" link="223" x="-800" y="-500" />
 		</plan>
 	</person>
 
 		<!-- ====================================================================== -->
-	
+		<!-- ===DESTINED FOR CAR BANNED ZONE, ORIGININATING OUTSIDE================ -->
 	<person id="destination_middle_car" employed="no">
 		<plan selected="yes">
-			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<act type="dummy" link="123" end_time="00:15:00" x="-700" y="-600"/>
 			<leg mode="car"/>
 			<act type="dummy" link="227" x="0" y="-500"/>
 		</plan>
@@ -41,7 +42,7 @@
 	
 	<person id="destination_middle_walkCarDrt" employed="no">
 		<plan selected="yes">
-			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<act type="dummy" link="123" end_time="00:20:00" x="-700" y="-600"/>
 			<leg mode="walkCarDrt"/>
 			<act type="dummy" link="227" x="0" y="-500"/>
 		</plan>
@@ -49,15 +50,13 @@
 	
 	<person id="destination_middle_drtCarWalk" employed="no">
 		<plan selected="yes">
-			<act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/>
+			<act type="dummy" link="123" end_time="00:25:00" x="-700" y="-600"/>
 			<leg mode="drtCarWalk"/>
 			<act type="dummy" link="227" x="0" y="-500"/>
 		</plan>
 	</person>
-
-		<!-- ====================================================================== -->
-
-<!-- <person id="destination_otherSide_drt" employed="no"> -->
+	
+	<!-- <person id="destination_otherSide_drt" employed="no"> -->
 		<!-- <plan selected="yes"> -->
 			<!-- <act type="dummy" link="123" end_time="00:05:00" x="-700" y="-600"/> -->
 			<!-- <leg mode="car"/> -->
@@ -72,6 +71,35 @@
 			<!-- <act type="dummy" link="126" x="100" y="-600"/> -->
 		<!-- </plan> -->
 	<!-- </person> -->
+
+		<!-- ====================================================================== -->
+		<!-- ORIGININATING OUTSIDE, GOING THROUGH CAR BANNED ZONE, DESTINED OUTSIDE -->
+					
+
+	<!-- <person id="through_car" employed="no"> -->
+		<!-- <plan selected="yes"> -->
+			<!-- <act type="dummy" link="145" end_time="00:30:00" x="-500" y="-200"/> -->
+			<!-- <leg mode="car"/> -->
+			<!-- <act type="dummy" link="150" x="500" y="-200"/> -->
+		<!-- </plan> -->
+	<!-- </person> -->
+
+	<!-- <person id="through_walkCarDrt" employed="no"> -->
+		<!-- <plan selected="yes"> -->
+			<!-- <act type="dummy" link="145" end_time="00:35:00" x="-500" y="-200"/> -->
+			<!-- <leg mode="walkCarDrt"/> -->
+			<!-- <act type="dummy" link="150" x="500" y="-200"/> -->
+		<!-- </plan> -->
+	<!-- </person> -->
+	
+	<!-- <person id="through_drtCarWalk" employed="no"> -->
+		<!-- <plan selected="yes"> -->
+			<!-- <act type="dummy" link="145" end_time="00:40:00" x="-500" y="-200"/> -->
+			<!-- <leg mode="drtCarWalk"/> -->
+			<!-- <act type="dummy" link="150" x="500" y="-200"/> -->
+		<!-- </plan> -->
+	<!-- </person> -->
+
 
 
 </population>
