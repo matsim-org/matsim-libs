@@ -130,7 +130,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
-	private boolean usingThreadpool = true;
 
 	public static final String LINK_WIDTH = "linkWidth";
 
@@ -284,8 +283,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
 		map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
-		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
-				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
 		map.put(FAST_CAPACITY_UPDATE, "If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, "
 				+ "flows are updated only if an agent wants to enter the link or an agent is added to buffer. "
 				+ "Default is true.") ;
@@ -534,16 +531,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter( VEHICLES_SOURCE )
 	public final VehiclesSource getVehiclesSource() {
 		return this.vehiclesSource ;
-	}
-
-	private static final String USING_THREADPOOL = "usingThreadpool" ;
-	@StringGetter(USING_THREADPOOL)
-	public boolean isUsingThreadpool() {
-		return this.usingThreadpool ;
-	}
-	@StringSetter(USING_THREADPOOL)
-	public void setUsingThreadpool( boolean val ) {
-		this.usingThreadpool = val ;
 	}
 
 	private static final String USE_LANES="useLanes" ;
