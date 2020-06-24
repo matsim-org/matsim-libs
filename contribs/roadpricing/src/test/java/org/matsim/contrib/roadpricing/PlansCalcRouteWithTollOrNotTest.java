@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -75,7 +76,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressWalkType() );
 
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
@@ -94,17 +95,17 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Id<Person> id1 = Id.createPersonId("1");
 
 		// case 1: toll only in morning, it is cheaper to drive around
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressWalkType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress?" + config.plansCalcRoute().getAccessEgressWalkType() );
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
-		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressWalkType() );
 		runOnAll(testee(scenario, toll), population);
-		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
+		log.warn( "access/egress? " + config.plansCalcRoute().getAccessEgressWalkType() );
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
@@ -137,7 +138,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		for ( PlanElement pe : planElements ) {
 			log.warn( pe );
 		}
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			return (Leg) (planElements.get(1));
 		} else {
 			return (Leg) (planElements.get(3));
@@ -226,7 +227,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
 		List<PlanElement> planElements = population.getPersons().get(id1).getPlans().get(0).getPlanElements() ;
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			return (Leg) (planElements.get(3));
 		} else {
 			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;
