@@ -137,24 +137,25 @@ public class ScenarioImporter {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
             int speed = Math.max(1, (int) Math.round(matsim_link.getFreespeed()));
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
-            int capacity = (int) (matsim_link.getLength() / 7.5 * lanes);
+            int storageCapacity = Math.max(1,(int) (Math.ceil(matsim_link.getLength() / 7.5 * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
             int link_id  = matsim_link.getId().index();
             int flowCapactiy, flowPeriod;
 
-            if (matsim_link.getFlowCapacityPerSec() < 1) {
-            	flowPeriod = (int) (1 / matsim_link.getFlowCapacityPerSec());
+			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().flowCapacityFactor;
+			if (effectiveflowCapacityPerSec < 1) {
+            	flowPeriod = (int) (1 / effectiveflowCapacityPerSec);
             	flowCapactiy = 1;
 
             } else {
             	flowPeriod = 1;
-            	flowCapactiy = (int) Math.round(matsim_link.getFlowCapacityPerSec());
+            	flowCapactiy = (int) Math.round(effectiveflowCapacityPerSec);
             }
 
             if (link_id > HermesConfigGroup.MAX_LINK_ID) {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
-            hermes_links[link_id] = new Link(link_id, capacity, length, speed, flowPeriod, flowCapactiy);
+            hermes_links[link_id] = new Link(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy);
         }
     }
 
