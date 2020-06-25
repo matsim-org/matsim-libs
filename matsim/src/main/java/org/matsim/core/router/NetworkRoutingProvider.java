@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -123,7 +124,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 						travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
+		if ( !plansCalcRouteConfigGroup.getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
 			/* 
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass an

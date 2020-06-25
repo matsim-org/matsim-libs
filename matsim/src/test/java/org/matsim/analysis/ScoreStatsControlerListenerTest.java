@@ -547,7 +547,7 @@ public class ScoreStatsControlerListenerTest {
 					Assert.assertEquals("avg average score does not match", (getScore(population, "avgaverage")/getNoOfPlans(population)), avgAverage,
 							0);
 				}
-				
+				iteration++;
 			}
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
