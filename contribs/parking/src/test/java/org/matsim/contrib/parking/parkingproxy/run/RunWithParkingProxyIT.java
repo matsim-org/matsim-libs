@@ -25,7 +25,6 @@ public class RunWithParkingProxyIT {
                                 , "--config:controler.lastIteration=2"
                                 , "--config:controler.writePlansInterval=1"
                                 , "--config:parkingProxy.method=events"
-                                , "--config:qsim.usingThreadpool=false"
                                 , "--config:global.numberOfThreads=1"
                 } );
                 {
