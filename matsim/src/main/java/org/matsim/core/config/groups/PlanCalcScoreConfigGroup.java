@@ -35,6 +35,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
@@ -614,7 +615,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						+ " Otherwise, crashes can be expected.");
 			}
 		}
-		if (config.plansCalcRoute().isInsertingAccessEgressWalk()) {
+		if (!config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
 			// adding the interaction activities that result from access/egress
 			// routing. this is strictly speaking
 			// not a consistency check, but I don't know a better place where to
