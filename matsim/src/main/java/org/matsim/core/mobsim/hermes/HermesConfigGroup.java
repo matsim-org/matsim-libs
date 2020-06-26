@@ -53,8 +53,8 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringGetter(FLOW_CAPACITY_FACTOR)
-    public static String getFlowCapacityFactor() {
-        return FLOW_CAPACITY_FACTOR;
+    public double getFlowCapacityFactor() {
+        return this.flowCapacityFactor;
     }
 
     @StringSetter(STORAGE_CAPACITY_FACTOR)
@@ -63,8 +63,8 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringGetter(STORAGE_CAPACITY_FACTOR)
-    public static String getStorageCapacityFactor() {
-        return STORAGE_CAPACITY_FACTOR;
+    public double getStorageCapacityFactor() {
+        return storageCapacityFactor;
     }
 
     @StringSetter(END_TIME)
