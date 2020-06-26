@@ -38,7 +38,7 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -246,7 +246,7 @@ public class PtAlongALineTest{
 		// yy why?  kai, jun'19
 
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 		ModeParams accessWalk = new ModeParams( TransportMode.non_network_walk );
 		accessWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(accessWalk);

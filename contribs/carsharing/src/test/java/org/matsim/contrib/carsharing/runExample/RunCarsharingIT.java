@@ -77,9 +77,9 @@ public class RunCarsharingIT {
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none); // otherwise does not work. kai,feb'16
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.none); // otherwise does not work. kai,feb'16
 		config.plansCalcRoute().setRoutingRandomness(0.);
-//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.directWalk);
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
 		
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
 		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
@@ -116,7 +116,7 @@ public class RunCarsharingIT {
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.accessEgressModeToLink);
 
 		// ---
 

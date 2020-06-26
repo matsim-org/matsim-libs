@@ -38,7 +38,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class PlanCalcScoreConfigGroupTest {
@@ -93,7 +92,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );
@@ -121,7 +120,7 @@ public class PlanCalcScoreConfigGroupTest {
 		}
 		log.warn( "" );
 		log.warn( "checking consistency ..." );
-		config.plansCalcRoute().setInsertingAccessEgressWalk( AccessEgressWalkType.walkToLink);
+		config.plansCalcRoute().setInsertingAccessEgressWalk( PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 		scoringConfig.checkConsistency( config );
 		testResultsAfterCheckConsistency( config );
 		log.warn( "" );

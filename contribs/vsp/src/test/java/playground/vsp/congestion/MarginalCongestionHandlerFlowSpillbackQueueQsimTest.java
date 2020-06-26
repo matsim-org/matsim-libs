@@ -56,7 +56,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -317,7 +317,7 @@ public class MarginalCongestionHandlerFlowSpillbackQueueQsimTest {
 		
 		Config config = ConfigUtils.loadConfig( configFile ) ;
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
