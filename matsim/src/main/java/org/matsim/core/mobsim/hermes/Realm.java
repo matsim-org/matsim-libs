@@ -58,8 +58,8 @@ public class Realm {
 
 	// the last position is to store events that will not happen...
         for (int i = 0; i <= HermesConfigGroup.SIM_STEPS + 1; i++) {
-            delayedLinksByWakeupTime.add(new ArrayDeque<>(Math.max(16,this.links.length/4)));
-            delayedAgentsByWakeupTime.add(new ArrayDeque<>(Math.max(512,this.si.agent_persons/1000)));
+            delayedLinksByWakeupTime.add(new ArrayDeque<>());
+            delayedAgentsByWakeupTime.add(new ArrayDeque<>());
         }
     }
 
