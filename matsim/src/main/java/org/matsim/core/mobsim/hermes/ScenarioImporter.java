@@ -237,7 +237,7 @@ public class ScenarioImporter {
                     realm.delayedAgents().get(Math.min(sleep, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
                     break;
                 default:
-                    Realm.log(0, String.format("ERROR -> unknow plan element type %d",type));
+                   Logger.getLogger(getClass()).error( String.format("ERROR -> unknow plan element type %d",type));
             }
         }
 
