@@ -145,9 +145,9 @@
 		</link>
 		<link id="114" from="15" to="16" length="310.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="115" from="16" to="17" length="510.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="115" from="16" to="17" length="510.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="116" from="17" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="116" from="17" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="117" from="18" to="19" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -227,7 +227,7 @@
 		</link>
 		<link id="206" from="6" to="17" length="300.0" freespeed="15.0" capacity="48.0" permlanes="1.0" oneway="1" modes="walk" >
 		</link>
-		<link id="207" from="7" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="207" from="7" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="208" from="8" to="19" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -245,7 +245,7 @@
 		</link>
 		<link id="216" from="17" to="28" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="217" from="18" to="29" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="217" from="18" to="29" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="218" from="19" to="30" length="576.0" freespeed="15.0" capacity="144.0" permlanes="3.0" oneway="1" modes="car" >
 		</link>
@@ -263,7 +263,7 @@
 		</link>
 		<link id="227" from="28" to="39" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="228" from="29" to="40" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="228" from="29" to="40" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car	" >
 		</link>
 		<link id="229" from="30" to="41" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -281,7 +281,7 @@
 		</link>
 		<link id="238" from="39" to="50" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="239" from="40" to="51" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="239" from="40" to="51" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="240" from="41" to="52" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -299,7 +299,7 @@
 		</link>
 		<link id="259" from="50" to="61" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="260" from="51" to="62" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="260" from="51" to="62" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="261" from="52" to="63" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -375,9 +375,9 @@
 		</link>
 		<link id="346" from="49" to="48" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="347" from="50" to="49" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="347" from="50" to="49" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="348" from="51" to="50" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="348" from="51" to="50" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="349" from="52" to="51" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -393,11 +393,11 @@
 		</link>
 		<link id="404" from="15" to="4" length="300.0" freespeed="15.0" capacity="48.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
-		<link id="405" from="16" to="5" length="636.0" freespeed="15.0" capacity="48.0" permlanes="1.0" oneway="1" modes="walk" >
+		<link id="405" from="16" to="5" length="636.0" freespeed="15.0" capacity="48.0" permlanes="1.0" oneway="1" modes="car" >
 		</link>
 		<link id="406" from="17" to="6" length="300.0" freespeed="15.0" capacity="48.0" permlanes="1.0" oneway="1" modes="walk" >
 		</link>
-		<link id="407" from="18" to="7" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
+		<link id="407" from="18" to="7" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
 		<link id="408" from="19" to="8" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -411,11 +411,11 @@
 		</link>
 		<link id="414" from="26" to="15" length="310.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="415" from="27" to="16" length="510.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="415" from="27" to="16" length="510.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="416" from="28" to="17" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="417" from="29" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
+		<link id="417" from="29" to="18" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
 		<link id="418" from="30" to="19" length="576.0" freespeed="15.0" capacity="144.0" permlanes="3.0" oneway="1" modes="car" >
 		</link>
@@ -429,11 +429,11 @@
 		</link>
 		<link id="425" from="37" to="26" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="426" from="38" to="27" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="426" from="38" to="27" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="427" from="39" to="28" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="428" from="40" to="29" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
+		<link id="428" from="40" to="29" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
 		<link id="429" from="41" to="30" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -447,11 +447,11 @@
 		</link>
 		<link id="436" from="48" to="37" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="437" from="49" to="38" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="437" from="49" to="38" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="438" from="50" to="39" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="439" from="51" to="40" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
+		<link id="439" from="51" to="40" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
 		<link id="440" from="52" to="41" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
@@ -465,11 +465,11 @@
 		</link>
 		<link id="457" from="59" to="48" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
-		<link id="458" from="60" to="49" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
+		<link id="458" from="60" to="49" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
 		<link id="459" from="61" to="50" length="640.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
-		<link id="460" from="62" to="51" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
+		<link id="460" from="62" to="51" length="370.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="walk" >
 		</link>
 		<link id="461" from="63" to="52" length="300.0" freespeed="15.0" capacity="96.0" permlanes="2.0" oneway="1" modes="car" >
 		</link>
