@@ -246,7 +246,7 @@ public class PtAlongALineTest{
 		// yy why?  kai, jun'19
 
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 		ModeParams accessWalk = new ModeParams( TransportMode.non_network_walk );
 		accessWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(accessWalk);

@@ -157,7 +157,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.none);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 		runTest2a( config ) ;
 	}
 	@Test
@@ -166,7 +166,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 //		{
 //			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
 //			params.setTeleportedModeSpeed( 2.0 );
@@ -960,7 +960,7 @@ public class NoiseIT {
 			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
 			runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.none);
+			runConfig.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
 			
 			Controler controler = new Controler(runConfig);

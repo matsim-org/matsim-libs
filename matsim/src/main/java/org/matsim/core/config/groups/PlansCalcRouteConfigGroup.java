@@ -566,7 +566,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 
 	@StringSetter(ISINSERTINGACCESSEGRESSWALK)
-	public void setInsertingAccessEgressWalk( AccessEgressType accessEgressType) {
+	public void setAccessEgressType(AccessEgressType accessEgressType) {
 		this.accessEgressType = accessEgressType;
 	}
 

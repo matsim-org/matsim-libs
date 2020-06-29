@@ -178,7 +178,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
         // remove teleported bike
         config.plansCalcRoute().removeModeRoutingParams(TransportMode.bike);
         config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
-        config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
         config.qsim().setMainModes(Arrays.asList(modes));
         config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);

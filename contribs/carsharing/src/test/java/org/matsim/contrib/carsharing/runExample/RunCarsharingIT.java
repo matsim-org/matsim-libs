@@ -77,7 +77,7 @@ public class RunCarsharingIT {
 		config.facilities().setInputFile("facilities.xml" );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.none); // otherwise does not work. kai,feb'16
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none); // otherwise does not work. kai,feb'16
 		config.plansCalcRoute().setRoutingRandomness(0.);
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.directWalk);
 		
@@ -116,7 +116,7 @@ public class RunCarsharingIT {
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		// ---
 

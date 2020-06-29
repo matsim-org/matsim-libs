@@ -75,7 +75,7 @@ public class ScoreStatsModuleTest {
 		Config config = utils.loadConfig("test/scenarios/equil/config.xml");
 
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		config.plansCalcRoute().setInsertingAccessEgressWalk(this.isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
+		config.plansCalcRoute().setAccessEgressType(this.isInsertingAccessEgressWalk? AccessEgressType.accessEgressModeToLink : AccessEgressType.none);
 
 		config.controler().setLastIteration(1);
 		Controler controler = new Controler(config);

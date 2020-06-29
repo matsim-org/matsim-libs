@@ -109,7 +109,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -500,7 +500,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -639,7 +639,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressType.accessEgressModeToLink);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)

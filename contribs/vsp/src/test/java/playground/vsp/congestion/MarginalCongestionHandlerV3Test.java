@@ -70,7 +70,7 @@ public class MarginalCongestionHandlerV3Test {
 		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(PlansCalcRouteConfigGroup.AccessEgressType.none);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new AbstractModule() {
