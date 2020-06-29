@@ -141,6 +141,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			for (PlanElement planElement : accessTrip) {
 				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
+			result.addAll(accessTrip);
 		}
 
 		// === compute the network leg:
@@ -220,7 +221,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				leg0.setTravelTime(travelTime);
 				leg0.getRoute().setTravelTime(travelTime);
 			}
-			egressTrip.addAll(egressTrip);
+			egressTrip.addAll(networkRoutedEgressTrip);
 		}
 		return egressTrip;
 	}
