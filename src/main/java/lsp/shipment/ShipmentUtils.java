@@ -404,4 +404,122 @@ public class ShipmentUtils{
 			return new ScheduledShipmentUnload(this);
 		}
 	}
+
+	public static class ScheduledShipmentTransportBuilder{
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		Id<Carrier> carrierId;
+		Id<Link> fromLinkId;
+		Id<Link> toLinkId;
+		CarrierService carrierService;
+
+		private ScheduledShipmentTransportBuilder(){
+		}
+
+		public static ScheduledShipmentTransportBuilder newInstance(){
+			return new ScheduledShipmentTransportBuilder();
+		}
+
+		public ScheduledShipmentTransportBuilder setStartTime( double startTime ){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setEndTime( double endTime ){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+			this.element = element;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setResourceId( Id<Resource> resourceId ){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setCarrierId( Id<Carrier> carrierId ){
+			this.carrierId = carrierId;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setFromLinkId( Id<Link> fromLinkId ){
+			this.fromLinkId = fromLinkId;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setToLinkId( Id<Link> toLinkId ){
+			this.toLinkId = toLinkId;
+			return this;
+		}
+
+		public ScheduledShipmentTransportBuilder setCarrierService( CarrierService carrierService ){
+			this.carrierService = carrierService;
+			return this;
+		}
+
+		public ScheduledShipmentTransport build(){
+			return new ScheduledShipmentTransport(this);
+		}
+	}
+
+	public static class ScheduledShipmentLoadBuilder{
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		Id<Carrier> carrierId;
+		Id<Link> linkId;
+		CarrierService carrierService;
+
+		private ScheduledShipmentLoadBuilder(){
+		}
+
+		public static ScheduledShipmentLoadBuilder newInstance(){
+			return new ScheduledShipmentLoadBuilder();
+		}
+
+		public ScheduledShipmentLoadBuilder setStartTime( double startTime ){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setEndTime( double endTime ){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+			this.element = element;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setResourceId( Id<Resource> resourceId ){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setLinkId( Id<Link> linkId ){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setCarrierId( Id<Carrier> carrierId ){
+			this.carrierId = carrierId;
+			return this;
+		}
+
+		public ScheduledShipmentLoadBuilder setCarrierService( CarrierService carrierService ){
+			this.carrierService = carrierService;
+			return this;
+		}
+
+		public ScheduledShipmentLoad build(){
+			return new ScheduledShipmentLoad(this);
+		}
+	}
 }

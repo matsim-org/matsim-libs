@@ -172,7 +172,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 	}
 	
 	private void addShipmentLoadElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){
-		ScheduledShipmentLoad.Builder builder = ScheduledShipmentLoad.Builder.newInstance();
+		ShipmentUtils.ScheduledShipmentLoadBuilder builder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
@@ -194,14 +194,14 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(tour.getStartLinkId());
 		builder.setCarrierService(serviceActivity.getService());
-		ScheduledShipmentLoad  load = builder.build();
+		ShipmentPlanElement  load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, load);
 	}
 
 	private void addShipmentTransportElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){ 
-		ScheduledShipmentTransport.Builder builder = ScheduledShipmentTransport.Builder.newInstance();
+		ShipmentUtils.ScheduledShipmentTransportBuilder builder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
@@ -217,7 +217,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 		builder.setFromLinkId(tour.getStartLinkId());
 		builder.setToLinkId(tour.getEndLinkId());
 		builder.setCarrierService(serviceActivity.getService());
-		ScheduledShipmentTransport  transport = builder.build();
+		ShipmentPlanElement  transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, transport);
