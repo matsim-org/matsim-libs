@@ -10,7 +10,7 @@ import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
 import lsp.controler.SimulationTracker;
 
-public class LinearCostTracker implements SimulationTracker{
+/*package-private*/ class LinearCostTracker implements SimulationTracker{
 
 	private Collection<EventHandler> eventHandlers;
 	private Collection<Info> infos;

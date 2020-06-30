@@ -2,7 +2,7 @@ package example.lsp.simulationTrackers;
 
 import lsp.functions.InfoFunctionValue;
 
-public class FixedCostFunctionValue implements InfoFunctionValue<Double> {
+/*package-private*/ class FixedCostFunctionValue implements InfoFunctionValue<Double> {
 
 	private double value;
 

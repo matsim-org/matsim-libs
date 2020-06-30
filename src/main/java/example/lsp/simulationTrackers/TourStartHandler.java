@@ -3,7 +3,7 @@ package example.lsp.simulationTrackers;
 import lsp.events.TourStartEvent;
 import lsp.eventhandlers.TourStartEventHandler;
 
-public class TourStartHandler implements TourStartEventHandler{
+/*package-private*/ class TourStartHandler implements TourStartEventHandler{
 
 	private double vehicleFixedCosts;
 		

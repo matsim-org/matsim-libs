@@ -13,7 +13,7 @@ import lsp.eventhandlers.FreightVehicleLeavesTrafficEventHandler;
 import lsp.eventhandlers.FreightLinkEnterEventHandler;
 
 
-public class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, FreightVehicleLeavesTrafficEventHandler, FreightLinkLeaveEventHandler {
+/*package-private*/ class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, FreightVehicleLeavesTrafficEventHandler, FreightLinkLeaveEventHandler {
 
 	private Collection<FreightLinkEnterEvent> events;
 	private double distanceCosts;

@@ -8,16 +8,16 @@ import lsp.functions.InfoFunctionValue;
 
 
 
-public class CostInfoFunction implements InfoFunction {
+/*package-private*/ class CostInfoFunction implements InfoFunction {
 
-	private example.lsp.simulationTrackers.FixedCostFunctionValue fixedValue;
-	private example.lsp.simulationTrackers.LinearCostFunctionValue linearValue;
+	private FixedCostFunctionValue fixedValue;
+	private LinearCostFunctionValue linearValue;
 	private Collection<InfoFunctionValue<?>> values;
 	
 	public CostInfoFunction() {
 		values = new ArrayList<InfoFunctionValue<?>>();
-		fixedValue = new example.lsp.simulationTrackers.FixedCostFunctionValue();
-		linearValue = new example.lsp.simulationTrackers.LinearCostFunctionValue();
+		fixedValue = new FixedCostFunctionValue();
+		linearValue = new LinearCostFunctionValue();
 		values.add(fixedValue);
 		values.add(linearValue);
 		

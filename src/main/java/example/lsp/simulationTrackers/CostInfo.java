@@ -3,12 +3,12 @@ package example.lsp.simulationTrackers;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 
-public class CostInfo extends Info {
+/*package-private*/ class CostInfo extends Info {
 
-private example.lsp.simulationTrackers.CostInfoFunction costFunction;
+private CostInfoFunction costFunction;
 	
 	public CostInfo() {
-		this.costFunction = new example.lsp.simulationTrackers.CostInfoFunction();
+		this.costFunction = new CostInfoFunction();
 	}
 	
 	

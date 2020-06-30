@@ -11,7 +11,7 @@ import lsp.events.ServiceEndEvent;
 import lsp.eventhandlers.ServiceEndEventHandler;
 
 
-public class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{
+/*package-private*/ class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{
 
 	
 	

@@ -36,10 +36,10 @@ import lsp.functions.InfoFunctionValue;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
 
-public class ExampleSimulationTrackers {
+/*package-private*/ class ExampleSimulationTrackers {
 
-public static LSP createLSPWithTracker(Network network) {
-		
+	/*package-private*/ static LSP createLSPWithTracker(Network network) {
+
 		//The Carrier for the resource of the sole LogisticsSolutionElement of the LSP is created
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -50,139 +50,139 @@ public static LSP createLSPWithTracker(Network network) {
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50/3.6);
 		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
-		
+
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
 		carrierVehicle.setVehicleType(collectionType);
-		
+
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		
+
 		Carrier carrier = CarrierImpl.newInstance(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
-		
+
 		//The Adapter i.e. the Resource is created
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
-		
+
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		CollectionCarrierScheduler scheduler = new CollectionCarrierScheduler();
 		adapterBuilder.setCollectionScheduler(scheduler);
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		Resource collectionAdapter = adapterBuilder.build();
-		
+
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 		collectionElementBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
-		
+
 		//The LogisticsSolutionElement is now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(collectionSolutionId );
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
-		
+
 		//Create cost tracker and add it to solution
 		example.lsp.simulationTrackers.LinearCostTracker tracker = new example.lsp.simulationTrackers.LinearCostTracker(0.2);
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.TourStartHandler());
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.CollectionServiceHandler());
 		tracker.getEventHandlers().add(new example.lsp.simulationTrackers.DistanceAndTimeHandler(network));
 		collectionSolution.addSimulationTracker(tracker);
-		
-		
+
+
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
-		
+
 		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		collectionLSPBuilder.setId(collectionLSPId);
-		
+
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		
+
 		return collectionLSPBuilder.build();
-		
+
 	}
-	
+
 	public static Collection<LSPShipment> createInitialLSPShipments(Network network){
 		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Link> toLinkId = collectionLinkId;
-		
+
 		//Create five LSPShipments that are located in the left half of the network.
 		for(int i = 1; i < 6; i++) {
-	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
-	        	Random random = new Random(1);
-	        	int capacityDemand = random.nextInt(4);
-	        	builder.setCapacityDemand(capacityDemand);
-	        	
-	        	while(true) {
-	        		Collections.shuffle(linkList, random);
-	        		Link pendingFromLink = linkList.get(0);
-	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-	        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-	        		   pendingFromLink.getToNode().getCoord().getY() <= 4000) {
-	        		   builder.setFromLinkId(pendingFromLink.getId());
-	        		   break;	
-	        		}	
-	        	}
-	        	
-	        	builder.setToLinkId(toLinkId);
-	        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
-	        	builder.setEndTimeWindow(endTimeWindow);
-	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
-	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
-	        	shipmentList.add(builder.build());
-		 } 	
-	    return shipmentList;
+			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
+			Random random = new Random(1);
+			int capacityDemand = random.nextInt(4);
+			builder.setCapacityDemand(capacityDemand);
+
+			while(true) {
+				Collections.shuffle(linkList, random);
+				Link pendingFromLink = linkList.get(0);
+				if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+						pendingFromLink.getToNode().getCoord().getY() <= 4000) {
+					builder.setFromLinkId(pendingFromLink.getId());
+					break;
+				}
+			}
+
+			builder.setToLinkId(toLinkId);
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			builder.setEndTimeWindow(endTimeWindow);
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
+			builder.setStartTimeWindow(startTimeWindow);
+			builder.setServiceTime(capacityDemand * 60);
+			shipmentList.add(builder.build());
+		}
+		return shipmentList;
 	}
-	
-	
+
+
 	public static void main (String [] args) {
-		
+
 		//Set up required MATSim classes
 		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
-        Network network = scenario.getNetwork();
-        
-        //Create LSP and shipments
-        LSP lsp = createLSPWithTracker(network);
-        Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
-	
-      //assign the shipments to the LSP
-        for(LSPShipment shipment : shipments) {
-        	lsp.assignShipmentToLSP(shipment);
-        }
-        
-      //schedule the LSP with the shipments and according to the scheduler of the Resource
-        lsp.scheduleSoultions();
-        
-      //Prepare LSPModule and add the LSP
-        ArrayList<LSP> lspList = new ArrayList<LSP>();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
+		Network network = scenario.getNetwork();
+
+		//Create LSP and shipments
+		LSP lsp = createLSPWithTracker(network);
+		Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
+
+		//assign the shipments to the LSP
+		for(LSPShipment shipment : shipments) {
+			lsp.assignShipmentToLSP(shipment);
+		}
+
+		//schedule the LSP with the shipments and according to the scheduler of the Resource
+		lsp.scheduleSoultions();
+
+		//Prepare LSPModule and add the LSP
+		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
-		LSPs lsps = new LSPs(lspList);	
+		LSPs lsps = new LSPs(lspList);
 		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
 
-	  //Start the Mobsim one iteration is sufficient for tracking
+		//Start the Mobsim one iteration is sufficient for tracking
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
@@ -190,7 +190,7 @@ public static LSP createLSPWithTracker(Network network) {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("scenarios/2regions/2regions-network.xml");
 		controler.run();
-        
+
 		//Retrieve cost info from lsp
 		Info costInfo;
 		for(Info info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
@@ -200,6 +200,6 @@ public static LSP createLSPWithTracker(Network network) {
 					System.out.println(value.getName() + " " + value.getValue());
 				}
 			}
-		}	
+		}
 	}
 }
