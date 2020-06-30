@@ -70,8 +70,9 @@ public class CollectionTourEndEventHandler implements TourEndEventHandler {
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
 		if(abstractPlanElement instanceof LoggedShipmentTransport) {
 			LoggedShipmentTransport transport = (LoggedShipmentTransport) abstractPlanElement;
-			transport.setEndTime(event.getTime());
-			transport.setToLinkId(tour.getEndLinkId());
+			//Auskommentiert, im Rahmen des reducing-public-footprint-Prozesses. Kein Test reagiert drauf. Was "sollte" hier geschehen? KMT(&kai) Jun'20
+//			transport.setEndTime(event.getTime());
+//			transport.setToLinkId(tour.getEndLinkId());
 		}		
 	}
 
