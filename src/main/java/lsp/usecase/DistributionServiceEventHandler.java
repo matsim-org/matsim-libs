@@ -55,7 +55,7 @@ public class DistributionServiceEventHandler implements ServiceStartEventHandler
 		builder.setResourceId(resource.getId());
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + event.getService().getServiceDuration());
-		LoggedShipmentUnload unload = builder.build();
+		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(unloadId, unload);

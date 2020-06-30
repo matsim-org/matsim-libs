@@ -56,7 +56,7 @@ public class MainRunEndEventHandler implements TourEndEventHandler{
 		builder.setLogisticsSolutionElement(solutionElement);
 		builder.setResourceId(resource.getId());
 		builder.setCarrierId(event.getCarrierId());
-		LoggedShipmentUnload unload = builder.build();
+		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> unloadId = Id.create(idString, ShipmentPlanElement.class);
 		lspShipment.getLog().getPlanElements().put(unloadId, unload);

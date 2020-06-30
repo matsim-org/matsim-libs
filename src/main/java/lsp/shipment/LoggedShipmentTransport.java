@@ -8,6 +8,7 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
 public final class LoggedShipmentTransport implements ShipmentPlanElement {
+	// yyyy cannot make package-private since used outside package.  kai, jun'20
 
 	private final String type = "TRANSPORT";
 	private final double startTime;

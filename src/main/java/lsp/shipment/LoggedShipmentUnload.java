@@ -7,7 +7,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public class LoggedShipmentUnload implements ShipmentPlanElement {
+class LoggedShipmentUnload implements ShipmentPlanElement {
 
 	private final String type = "UNLOAD";
 	private double startTime;
