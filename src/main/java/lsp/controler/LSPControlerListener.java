@@ -32,13 +32,10 @@ import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.events.EventCreator;
-import lsp.mobsim.CarrierResourceTracker;
 import lsp.replanning.LSPReplanningModule;
 import lsp.resources.CarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
-import lsp.tracking.SimulationTracker;
-
 
 
 class LSPControlerListener implements FreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
@@ -60,7 +57,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 
 	
 	@Inject
-	protected LSPControlerListener(LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators) {
+	LSPControlerListener(LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators) {
 	        this.lsps = lsps;
 	        this.replanningModule = replanningModule;
 	        this.scoringModule = scoringModule;

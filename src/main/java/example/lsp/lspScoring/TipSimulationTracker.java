@@ -9,7 +9,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
-import lsp.tracking.SimulationTracker;
+import lsp.controler.SimulationTracker;
 
 /*package-private*/ class TipSimulationTracker implements SimulationTracker {
 

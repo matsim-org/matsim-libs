@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
 import lsp.events.TourStartEvent;
-import lsp.events.TourStartEventHandler;
+import lsp.eventhandlers.TourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 

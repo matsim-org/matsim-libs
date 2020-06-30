@@ -6,9 +6,9 @@ import java.util.Collection;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.events.ServiceStartEvent;
-import lsp.events.ServiceStartEventHandler;
+import lsp.eventhandlers.ServiceStartEventHandler;
 import lsp.events.ServiceEndEvent;
-import lsp.events.ServiceEndEventHandler;
+import lsp.eventhandlers.ServiceEndEventHandler;
 
 
 public class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{

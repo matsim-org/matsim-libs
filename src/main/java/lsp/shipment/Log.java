@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 
 /*package-private*/ class Log implements ShipmentPlan {
 
-	class LogElementComparator implements Comparator<ShipmentPlanElement>{
+	static class LogElementComparator implements Comparator<ShipmentPlanElement>{
 
 		@Override
 		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {
@@ -31,13 +31,13 @@ import org.matsim.api.core.v01.Id;
 	}
 
 	
-	private LSPShipment shipment;
-	private HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> logElements;
+	private final LSPShipment shipment;
+	private final HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> logElements;
 	
 	
 	public Log(LSPShipment shipment){
 		this.shipment = shipment;
-		this.logElements = new HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement>();
+		this.logElements = new HashMap<>();
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ import org.matsim.api.core.v01.Id;
 		return shipment;
 	}
 
-	public void addPlanElement(Id<ShipmentPlanElement> id, ShipmentPlanElement element) {
+	@Override public void addPlanElement( Id<ShipmentPlanElement> id, ShipmentPlanElement element ) {
 		logElements.put(id, element);
 	}
 
@@ -57,7 +57,7 @@ import org.matsim.api.core.v01.Id;
 	@Override
 	public ShipmentPlanElement getMostRecentEntry() {
 		ArrayList<ShipmentPlanElement> logList = new ArrayList<ShipmentPlanElement>(logElements.values());
-		Collections.sort(logList, new LogElementComparator());
+		Collections.sort(logList, new LogElementComparator() );
 		Collections.reverse(logList);
 		return logList.get(0);
 	}

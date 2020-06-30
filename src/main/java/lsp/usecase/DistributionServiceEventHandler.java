@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.events.ServiceStartEvent;
-import lsp.events.ServiceStartEventHandler;
+import lsp.eventhandlers.ServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.shipment.ShipmentPlanElement;

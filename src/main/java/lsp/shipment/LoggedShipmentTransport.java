@@ -10,20 +10,18 @@ import lsp.resources.Resource;
 public final class LoggedShipmentTransport implements ShipmentPlanElement {
 
 	private final String type = "TRANSPORT";
-	private double startTime;
+	private final double startTime;
 	private double endTime;
-	private LogisticsSolutionElement element;
-	private Id<Resource> resourceId;
-	private Id<Link> fromLinkId;
+	private final LogisticsSolutionElement element;
+	private final Id<Resource> resourceId;
+	private final Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
-	private Id<Carrier> carrierId;
 
 	LoggedShipmentTransport(ShipmentUtils.LoggedShipmentTransportBuilder builder){
 		this.startTime = builder.getStartTime();
 		this.element = builder.getElement();
 		this.resourceId = builder.getResourceId();
 		this.fromLinkId = builder.getFromLinkId();
-		this.carrierId = builder.getCarrierId();
 		this.toLinkId = builder.getToLinkId();
 	}
 	

@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.network.Network;
 
 import lsp.events.FreightLinkEnterEvent;
 import lsp.events.FreightLinkLeaveEvent;
-import lsp.events.FreightLinkLeaveEventHandler;
+import lsp.eventhandlers.FreightLinkLeaveEventHandler;
 import lsp.events.FreightVehicleLeavesTrafficEvent;
-import lsp.events.FreightVehicleLeavesTrafficEventHandler;
-import lsp.usecase.FreightLinkEnterEventHandler;
+import lsp.eventhandlers.FreightVehicleLeavesTrafficEventHandler;
+import lsp.eventhandlers.FreightLinkEnterEventHandler;
 
 
 public class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, FreightVehicleLeavesTrafficEventHandler, FreightLinkLeaveEventHandler {
@@ -22,7 +22,7 @@ public class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, Fre
 	
 	public DistanceAndTimeHandler(Network network) {
 		this.network = network;
-		this.events = new ArrayList<FreightLinkEnterEvent>();
+		this.events = new ArrayList<>();
 	}
 	
 	

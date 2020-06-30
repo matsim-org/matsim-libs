@@ -3,7 +3,7 @@ package example.lsp.lspScoring;
 import java.util.Random;
 
 import lsp.events.ServiceEndEvent;
-import lsp.events.ServiceEndEventHandler;
+import lsp.eventhandlers.ServiceEndEventHandler;
 
 /*package-private*/ class TipEventHandler implements ServiceEndEventHandler{
 

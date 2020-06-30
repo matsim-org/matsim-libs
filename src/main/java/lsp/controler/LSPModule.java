@@ -3,8 +3,6 @@ package lsp.controler;
 import com.google.inject.Provides;
 import lsp.LSPs;
 import lsp.events.EventCreator;
-import lsp.mobsim.CarrierResourceTracker;
-import lsp.mobsim.FreightQSimFactory;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -35,16 +33,16 @@ public class LSPModule extends AbstractModule {
 	public void install() {
 		bind(FreightConfigGroup.class).toInstance(carrierConfig);
 		bind(LSPs.class).toInstance(lsps);
-        if(replanningModule != null) {
-        	bind(LSPReplanningModule.class).toInstance(replanningModule);
-        }
+		if(replanningModule != null) {
+			bind(LSPReplanningModule.class).toInstance(replanningModule);
+		}
 		if(scoringModule != null) {
 			 bind(LSPScoringModule.class).toInstance(scoringModule);
 		}
 		
 		bind(LSPControlerListener.class).asEagerSingleton();
-        addControlerListenerBinding().to(LSPControlerListener.class);
-        bindMobsim().toProvider(FreightQSimFactory.class);
+		addControlerListenerBinding().to(LSPControlerListener.class);
+		bindMobsim().toProvider(FreightQSimFactory.class);
 	}
 
 	@Provides
