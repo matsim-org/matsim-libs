@@ -1,5 +1,6 @@
 package lsp.usecase;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Tour;
@@ -10,10 +11,6 @@ import lsp.events.TourEndEvent;
 import lsp.eventhandlers.TourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LoggedShipmentTransport;
-import lsp.shipment.LoggedShipmentUnload;
 
 public class MainRunEndEventHandler implements TourEndEventHandler{
 
@@ -53,7 +50,7 @@ public class MainRunEndEventHandler implements TourEndEventHandler{
 	}
 
 	private void logUnload(TourEndEvent event){
-		LoggedShipmentUnload.Builder builder  =  LoggedShipmentUnload.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentUnloadBuilder builder  =  ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - getTotalUnloadingTime(event.getTour()));
 		builder.setEndTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);

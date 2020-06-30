@@ -1,5 +1,6 @@
 package lsp.usecase;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
@@ -7,10 +8,6 @@ import lsp.events.ServiceStartEvent;
 import lsp.eventhandlers.ServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LoggedShipmentTransport;
-import lsp.shipment.LoggedShipmentUnload;
 
 public class DistributionServiceEventHandler implements ServiceStartEventHandler {
 
@@ -51,7 +48,7 @@ public class DistributionServiceEventHandler implements ServiceStartEventHandler
 	}
 
 	private void logUnload(ServiceStartEvent event) {
-		LoggedShipmentUnload.Builder builder = LoggedShipmentUnload.Builder.newInstance();
+		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getService().getLocationLinkId());
 		builder.setLogisticsSolutionElement(solutionElement);

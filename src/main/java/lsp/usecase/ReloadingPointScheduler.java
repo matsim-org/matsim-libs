@@ -2,6 +2,7 @@ package lsp.usecase;
 
 import java.util.ArrayList;
 
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
@@ -9,7 +10,6 @@ import lsp.ShipmentTuple;
 import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ScheduledShipmentHandle;
 
 public class ReloadingPointScheduler extends ResourceScheduler {
 
@@ -76,7 +76,7 @@ public class ReloadingPointScheduler extends ResourceScheduler {
 	}
 	
 	private void updateSchedule(ShipmentTuple tuple){
-		ScheduledShipmentHandle.Builder builder = ScheduledShipmentHandle.Builder.newInstance();
+		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getCapacityDemand());
 		builder.setResourceId(reloadingPoint.getId());
@@ -86,7 +86,7 @@ public class ReloadingPointScheduler extends ResourceScheduler {
 			}
 		}
 		builder.setLinkId(reloadingPoint.getStartLinkId());
-		ScheduledShipmentHandle  handle = builder.build();
+		ShipmentPlanElement  handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, handle);

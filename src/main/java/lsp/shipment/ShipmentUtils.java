@@ -522,4 +522,98 @@ public class ShipmentUtils{
 			return new ScheduledShipmentLoad(this);
 		}
 	}
+
+	public static class ScheduledShipmentHandleBuilder{
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		private Id<Link> linkId;
+
+		private ScheduledShipmentHandleBuilder(){
+		}
+
+		public static ScheduledShipmentHandleBuilder newInstance(){
+			return new ScheduledShipmentHandleBuilder();
+		}
+
+		public ScheduledShipmentHandleBuilder setStartTime( double startTime ){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public ScheduledShipmentHandleBuilder setEndTime( double endTime ){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public ScheduledShipmentHandleBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+			this.element = element;
+			return this;
+		}
+
+		public ScheduledShipmentHandleBuilder setResourceId( Id<Resource> resourceId ){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public ScheduledShipmentHandleBuilder setLinkId( Id<Link> linkId ){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public ScheduledShipmentHandle build(){
+			return new ScheduledShipmentHandle(this);
+		}
+	}
+
+	public static class LoggedShipmentUnloadBuilder{
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		Id<Carrier> carrierId;
+		Id<Link> linkId;
+
+		private LoggedShipmentUnloadBuilder(){
+		}
+
+		public static LoggedShipmentUnloadBuilder newInstance(){
+			return new LoggedShipmentUnloadBuilder();
+		}
+
+		public LoggedShipmentUnloadBuilder setStartTime( double startTime ){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public LoggedShipmentUnloadBuilder setEndTime( double endTime ){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public LoggedShipmentUnloadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+			this.element = element;
+			return this;
+		}
+
+		public LoggedShipmentUnloadBuilder setResourceId( Id<Resource> resourceId ){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public LoggedShipmentUnloadBuilder setLinkId( Id<Link> linkId ){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public LoggedShipmentUnloadBuilder setCarrierId( Id<Carrier> carrierId ){
+			this.carrierId = carrierId;
+			return this;
+		}
+
+		public LoggedShipmentUnload build(){
+			return new LoggedShipmentUnload(this);
+		}
+	}
 }
