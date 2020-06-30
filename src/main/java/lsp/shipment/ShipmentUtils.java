@@ -7,6 +7,7 @@ import lsp.resources.Resource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 
 import java.util.ArrayList;
@@ -345,6 +346,62 @@ public class ShipmentUtils{
 
 		public Id<Carrier> getCarrierId() {
 			return carrierId;
+		}
+	}
+
+	public static class ScheduledShipmentUnloadBuilder{
+		double startTime;
+		double endTime;
+		LogisticsSolutionElement element;
+		Id<Resource> resourceId;
+		Id<Carrier> carrierId;
+		Id<Link> linkId;
+		CarrierService carrierService;
+
+		private ScheduledShipmentUnloadBuilder(){
+		}
+
+		public static ScheduledShipmentUnloadBuilder newInstance(){
+			return new ScheduledShipmentUnloadBuilder();
+		}
+
+		public ScheduledShipmentUnloadBuilder setStartTime( double startTime ){
+			this.startTime = startTime;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setEndTime( double endTime ){
+			this.endTime = endTime;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setLogisticsSolutionElement( LogisticsSolutionElement element ){
+			this.element = element;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setResourceId( Id<Resource> resourceId ){
+			this.resourceId = resourceId;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setCarrierId( Id<Carrier> carrierId ){
+			this.carrierId = carrierId;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setLinkId( Id<Link> linkId ){
+			this.linkId = linkId;
+			return this;
+		}
+
+		public ScheduledShipmentUnloadBuilder setCarrierService( CarrierService carrierService ){
+			this.carrierService = carrierService;
+			return this;
+		}
+
+		public ScheduledShipmentUnload build(){
+			return new ScheduledShipmentUnload(this);
 		}
 	}
 }

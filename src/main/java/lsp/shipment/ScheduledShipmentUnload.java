@@ -8,7 +8,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public class ScheduledShipmentUnload implements ShipmentPlanElement {
+class ScheduledShipmentUnload implements ShipmentPlanElement {
 
 	private final String type = "UNLOAD";
 	private double startTime;
@@ -18,64 +18,8 @@ public class ScheduledShipmentUnload implements ShipmentPlanElement {
 	private Id<Carrier> carrierId;
 	private Id<Link> linkId;
 	private CarrierService carrierService;
-	
-	public static class Builder{
-		private double startTime;
-		private double endTime;
-		private LogisticsSolutionElement element;
-		private Id<Resource> resourceId;
-		private Id<Carrier> carrierId;
-		private Id<Link> linkId;
-		private CarrierService carrierService;
-		
-		private Builder(){
-		}
-		
-		public static Builder newInstance(){
-			return new Builder();
-		}
-		
-		public Builder setStartTime(double startTime){
-			this.startTime = startTime;
-			return this;
-		}
-		
-		public Builder setEndTime(double endTime){
-			this.endTime = endTime;
-			return this;
-		}
-		
-		public Builder setLogisticsSolutionElement(LogisticsSolutionElement element){
-			this.element = element;
-			return this;
-		}
-	
-		public Builder setResourceId(Id<Resource> resourceId){
-			this.resourceId = resourceId;
-			return this;
-		}
-		
-		public Builder setCarrierId(Id<Carrier> carrierId){
-			this.carrierId = carrierId;
-			return this;
-		}
-		
-		public Builder setLinkId(Id<Link> linkId){
-			this.linkId = linkId;
-			return this;
-		}
-		
-		public Builder setCarrierService(CarrierService carrierService){
-			this.carrierService = carrierService;
-			return this;
-		}
-		
-		public ScheduledShipmentUnload build(){
-			return new ScheduledShipmentUnload(this);
-		}
-	}
-	
-	private ScheduledShipmentUnload(ScheduledShipmentUnload.Builder builder){
+
+	ScheduledShipmentUnload( ShipmentUtils.ScheduledShipmentUnloadBuilder builder ){
 		this.startTime = builder.startTime;
 		this.endTime = builder.endTime;
 		this.element = builder.element;

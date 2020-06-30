@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -22,11 +23,6 @@ import lsp.ShipmentTuple;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
-import lsp.shipment.ShipmentPlanElement;
-import lsp.shipment.ScheduledShipmentLoad;
-import lsp.shipment.ScheduledShipmentTransport;
-import lsp.shipment.ScheduledShipmentUnload;
-import lsp.shipment.ShipmentComparator;
 import org.matsim.vehicles.VehicleType;
 
 
@@ -228,7 +224,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 	}
 
 	private void addShipmentUnloadElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){
-		ScheduledShipmentUnload.Builder builder = ScheduledShipmentUnload.Builder.newInstance();
+		ShipmentUtils.ScheduledShipmentUnloadBuilder builder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
@@ -249,7 +245,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(tour.getEndLinkId());
 		builder.setCarrierService(serviceActivity.getService());
-		ScheduledShipmentUnload  unload = builder.build();
+		ShipmentPlanElement  unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		tuple.getShipment().getSchedule().addPlanElement(id, unload);
