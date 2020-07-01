@@ -360,9 +360,7 @@ public class Realm {
         }
     }
 
-    public int time() { return this.secs; }
-    public Link[] links() { return this.links; }
-    public ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
-    public ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
-    public EventArray getSortedEvents() { return this.sorted_events; }
+    ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
+    ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
+    EventArray getSortedEvents() { return this.sorted_events; }
 }
