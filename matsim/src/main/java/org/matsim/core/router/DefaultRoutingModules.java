@@ -68,22 +68,22 @@ public final class DefaultRoutingModules {
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-											 Network filteredNetwork, String accessEgressMode, RoutingModule accessEgressToNetworkRouter ) {
+											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter ) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
-			  scenario, filteredNetwork, accessEgressMode, accessEgressToNetworkRouter, accessEgressMode, accessEgressToNetworkRouter );
+			  scenario, filteredNetwork, accessEgressToNetworkRouter, accessEgressToNetworkRouter );
 	}
 
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 																 final LeastCostPathCalculator routeAlgo, Scenario scenario,
-																 Network filteredNetwork, String accessMode, RoutingModule accessToNetworkRouter, String egressMode, RoutingModule egressFromNetworkRouter) {
+																 Network filteredNetwork, RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork, accessMode, accessToNetworkRouter, egressMode, egressFromNetworkRouter);
+				scenario, filteredNetwork, accessToNetworkRouter, egressFromNetworkRouter);
 	}
 
 }

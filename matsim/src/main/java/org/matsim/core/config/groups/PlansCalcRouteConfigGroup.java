@@ -69,7 +69,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, constantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
+	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
 
 	private static final String ISINSERTINGACCESSEGRESSWALK = "insertAccessEgressWalk";
 	private static final String ISINSERTINGACCESSEGRESSWALKCMT = "Inserts access and Egress walk legs to main mode routes. Either of [none, walkToLink, constantTimeToLink, walkToLinkPlusConstant], Current default=none ";

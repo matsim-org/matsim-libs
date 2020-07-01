@@ -74,8 +74,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Scenario scenario;
 	private final RoutingModule accessToNetworkRouter;
 	private final RoutingModule egressFromNetworkRouter;
-	private final String accessMode;
-	private final String egressMode;
 	private final Config config;
 	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
@@ -84,9 +82,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	NetworkRoutingInclAccessEgressModule(
 			final String mode,
 			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
-			final String accessMode,
 			final RoutingModule accessToNetworkRouter,
-			final String egressMode,
 			final RoutingModule egressFromNetworkRouter) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
@@ -96,20 +92,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.scenario = scenario;
 		this.populationFactory = scenario.getPopulation().getFactory();
 		this.config = scenario.getConfig();
-		this.accessMode = accessMode;
 		this.accessToNetworkRouter = accessToNetworkRouter;
-		this.egressMode = egressMode;
 		this.egressFromNetworkRouter = egressFromNetworkRouter;
 		this.accessEgressType = config.plansCalcRoute().getAccessEgressType();
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
-		} else if ( (! accessMode.equals(TransportMode.walk)) && accessEgressType.equals(AccessEgressType.constantTimeToLink) ) {
-			log.warn("you are using AccessEgressType=" + AccessEgressType.constantTimeToLink + " with accessMode=" + accessMode + ". " +
-					"This will result in a constant access time and the routing module for mode " + accessMode + " will not get called for access trips!!");
-		} else if ( (! egressMode.equals(TransportMode.walk)) && accessEgressType.equals(AccessEgressType.constantTimeToLink) ) {
-			log.warn("you are using AccessEgressType=" + AccessEgressType.constantTimeToLink + " with egressMode=" + egressMode + ". " +
-				"This will result in a constant access time and the routing module for mode " + egressMode + " will not get called for egress trips!!");
+		} else if ( accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) ) {
+			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
+					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress " );
 		}
 	}
 
@@ -202,8 +193,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 
 			egressTrip.add(egressLeg);
-		} else if (accessEgressType.equals(AccessEgressType.constantTimeToLink)) {
-			Leg egressLeg = populationFactory.createLeg(egressMode);
+		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
+			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			double egressTime = NetworkUtils.getLinkEgressTime(egressActLink, mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId()));
@@ -262,8 +253,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			accessTrip.add(accessLeg);
-		} else if (accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.constantTimeToLink)) {
-			Leg accessLeg = populationFactory.createLeg(accessMode);
+		} else if (accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
+			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
 			accessLeg.setDepartureTime(departureTime);
 			Id<Link> startLinkId = fromFacility.getLinkId();
 			if (startLinkId == null) {
