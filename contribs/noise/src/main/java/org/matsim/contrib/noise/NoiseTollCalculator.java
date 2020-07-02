@@ -43,10 +43,10 @@ class NoiseTollCalculator implements TravelDisutility {
 
             if (isHGV) {
 
-                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
+                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
                     linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerHgv();
 
-                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
+                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
                                     this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerHgv();
 
@@ -56,10 +56,10 @@ class NoiseTollCalculator implements TravelDisutility {
 
             } else {
 
-                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
+                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
                     linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerCar();
 
-                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
+                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
                                     this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerCar();
 

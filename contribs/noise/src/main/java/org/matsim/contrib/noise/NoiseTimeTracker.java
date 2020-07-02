@@ -637,7 +637,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		Set<Id<Vehicle>> busVehicleIds = this.noiseContext.getBusVehicleIDs();
 		double eventTime = this.noiseContext.getEventTime();
 		double currentTimeBinEndTime = this.noiseContext.getCurrentTimeBinEndTime();
-		NoiseAllocationApproach noiseAllocationApproach = this.noiseContext.getNoiseParams().getNoiseAllocationApproach();
+		NoiseConfigGroup.NoiseAllocationApproach noiseAllocationApproach = this.noiseContext.getNoiseParams().getNoiseAllocationApproach();
 		
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
 			NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
@@ -646,11 +646,11 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				double amountCar = 0.;
 				double amountHdv = 0.;
 				
-				if (noiseAllocationApproach == NoiseAllocationApproach.AverageCost) {
+				if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
 					amountCar = noiseLink.getAverageDamageCostPerCar();
 					amountHdv = noiseLink.getAverageDamageCostPerHgv();
 				
-				} else if (noiseAllocationApproach == NoiseAllocationApproach.MarginalCost) {
+				} else if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
 					amountCar = noiseLink.getMarginalDamageCostPerCar();
 					amountHdv = noiseLink.getMarginalDamageCostPerHgv();
 					

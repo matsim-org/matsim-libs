@@ -986,7 +986,7 @@ public class NoiseIT {
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
 		
 		noiseParameters.setScaleFactor(1.);
-		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+		noiseParameters.setNoiseAllocationApproach(NoiseConfigGroup.NoiseAllocationApproach.MarginalCost);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

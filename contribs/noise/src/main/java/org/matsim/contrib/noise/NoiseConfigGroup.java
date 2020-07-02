@@ -816,4 +816,11 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.noiseComputationMethod = noiseComputationMethod;
 	}
 
+	/**
+	 * @author ikaddoura
+	 *
+	 */
+	public enum NoiseAllocationApproach {
+			AverageCost, MarginalCost
+	}
 }
