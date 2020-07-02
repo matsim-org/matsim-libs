@@ -134,7 +134,7 @@ public class Link {
         this.lastFlowUpdate = 0;
         // We do not preallocate using the capacity because it leads to huge memory waste.
         //this.queue = new AgentQueue(Math.max(1, capacity));
-        this.queue = new AgentQueue(Math.max(1, capacity), Math.max(1, 16));
+        this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
     }
 
     public void reset() {
