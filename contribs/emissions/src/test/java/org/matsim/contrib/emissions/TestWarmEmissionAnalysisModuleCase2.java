@@ -124,25 +124,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-//	@Test
-//	public void testWarmEmissionAnalysisParameter(){
-//		setUp();
-//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-//		if ( (Boolean) true ==null ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-//		} else if ( true ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-//		} else {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-//		}
-//
-//		WarmEmissionAnalysisModuleParameter weamp
-//				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, hbefaRoadTrafficSpeeds, pollutants, ecg);
-//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-//		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-//	}
-	// that parameter object no longer exists.  kai, jan'20
+
 
 	//@Test
 	//public void testWarmEmissionAnalysisModule_exceptions(){
@@ -200,10 +182,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 				default:
 					throw new IllegalStateException( "Unexpected value: " + this.emissionsComputationMethod );
 			}
-			// yyyyyy The above are different for the different computation methods, but for the wrong reasons: In the stopGo case, the value is
-			// not properly specified, and so some fall-back occurs, but in the stopGoFraction case, that fallback is also triggered here, while for
-			// the averageSpeed case, that fallback is only triggered in the stopGo case (following below).  Also see comments elsewhere in
-			// this method.  kai, jan'20
 
 			// thow corresponding event:
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
@@ -223,10 +201,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			HandlerToTestEmissionAnalysisModules.reset();
 			warmEmissions.clear();
 
-			// yyyyyy (*) I haven't understood it yet.  My guess is that this is a really confusing test: With the "averageSpeed" computation
-			// method, only the free flow hbefa value is pulled here, so it uses the "detailed" emissions value.  With the "stopGoFraction"
-			// computation method, however, the stopgo hbefa value is _also_ pullsed (!), and thus it (how??) falls back to the average emissions
-			// value.  :-( :-( :-( :-(  kai, jan'20
+
 		}
 
 		// sub case avg speed = stop go speed
@@ -244,6 +219,8 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		}
 	}
 
+	
+	//This test creates an 
 	@Test(expected = RuntimeException.class)
 	public void testCounters3(){
 		setUp();
@@ -388,8 +365,4 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 	}
 
-}
-	
-
-	
-
+} 

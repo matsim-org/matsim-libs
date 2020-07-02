@@ -139,11 +139,13 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	}
 
+	
+	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
+	//the CO2_TOTAL warm Emissions are compared to a given value --> computed by using detail Petrol and the traffic state is freeflow
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
 		//-- set up tables, event handler, parameters, module
 		setUp();
-
 		// case 1 - data in both tables -> use detailed
 		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
 		double linkLength = 200.;
@@ -165,6 +167,11 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		warmEmissions.clear();
 	}
 
+	
+	
+	
+	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
+	//all possible speeds (avg, stop & go , free flow) are tested 
 	@Test
 	public void testCounters1(){
 		setUp();
@@ -175,7 +182,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		 */
 
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create( PASSENGER_CAR + ";"+ PETROL_TECHNOLOGY +";"+ PETROL_SIZE_CLASS +";"+ PETROL_CONCEPT, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -183,17 +189,18 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 		Link mockLink = createMockLink("link 1", linkLength, PETROL_SPEED_FF / 3.6 );
 
-
 		// <stop&go speed
-		Double travelTime = linkLength/ PETROL_SPEED_SG *1.2;
-		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( vehicle, mockLink, travelTime * 3.6 );
-		Assert.assertEquals(0, emissionsModule.getFractionOccurences(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
-		Assert.assertEquals(linkLength/1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(linkLength/1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
-		Assert.assertEquals(1, emissionsModule.getStopGoOccurences() );
-		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
+		
+		Double travelTime = linkLength / PETROL_SPEED_SG * 1.2;
+		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle,
+				mockLink, travelTime * 3.6);
+		Assert.assertEquals(0, emissionsModule.getFractionOccurences(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences());
+		Assert.assertEquals(linkLength / 1000, emissionsModule.getKmCounter(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(linkLength / 1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1, emissionsModule.getStopGoOccurences());
+		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter());
 		emissionsModule.reset();
 
 		// = s&g speed
@@ -230,8 +237,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Assert.assertEquals(0, emissionsModule.getStopGoOccurences() );
 		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 		Assert.assertEquals( emissionsModule.getKmCounter(), (emissionsModule.getStopGoKmCounter()+ emissionsModule.getFreeFlowKmCounter()), MatsimTestUtils.EPSILON );
-		//this assert is no longer relevant. More tests will be added to check the traffic situations, jm oct'18
-		//Assert.assertEquals(travelTime, 3600*weam.getFreeFlowKmCounter()/petrolSpeedFf+3600*weam.getStopGoKmCounter()/petrolSpeedSg, MatsimTestUtils.EPSILON);
 		emissionsModule.reset();
 
 		// = ff speed
@@ -255,6 +260,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception", exceptionThrown);
 		emissionsModule.reset();
 	}
+	
+	
 
 	@Test
 	public void testCounters5(){
@@ -392,6 +399,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	}
 
+	
+	
 	@Test
 	@Ignore
 	public void testCounters6(){

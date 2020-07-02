@@ -167,7 +167,6 @@ public class TestWarmEmissionAnalysisModule {
 			exceptionThrown = true;
 		}
 		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception",exceptionThrown);
-		//Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg=ff=sg -> use ff factors
 		warmEmissions= emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength/sgffDetailedFfSpeed*3.6 );
 		Assert.assertEquals( DETAILED_SGFF_FACTOR_FF *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
