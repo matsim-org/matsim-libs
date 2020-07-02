@@ -607,6 +607,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		}
 	}
+
+	//------ TODO: These (occurrences) seem do be used only for logging statements and tests. -> remove it and test against the resulting emission values? KMT/GR Jul'20
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}
