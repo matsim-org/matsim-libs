@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.hermes;
 
+import javax.validation.constraints.Positive;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.Time;
@@ -26,11 +27,17 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     public static int SIM_STEPS = 30*60*60;
     // Number of ticks that are added to every agent advancing links.
     public static final int LINK_ADVANCE_DELAY = 1;
-
+    private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
+    private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
     public static final boolean DEBUG_REALMS = false;
     public static final boolean DEBUG_EVENTS = false;
     public static final boolean CONCURRENT_EVENT_PROCESSING = true;
 
+    @Positive
+    public double storageCapacityFactor = 1.0;
+
+    @Positive
+    public double flowCapacityFactor = 1.0;
 
     public HermesConfigGroup() {
         super(NAME);
@@ -38,6 +45,26 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
 
     public int getEndTime() {
         return SIM_STEPS;
+    }
+
+    @StringSetter(FLOW_CAPACITY_FACTOR)
+    public void setFlowCapacityFactor(double flowCapacityFactor) {
+        this.flowCapacityFactor = flowCapacityFactor;
+    }
+
+    @StringGetter(FLOW_CAPACITY_FACTOR)
+    public double getFlowCapacityFactor() {
+        return this.flowCapacityFactor;
+    }
+
+    @StringSetter(STORAGE_CAPACITY_FACTOR)
+    public void setStorageCapacityFactor(double storageCapacityFactor) {
+        this.storageCapacityFactor = storageCapacityFactor;
+    }
+
+    @StringGetter(STORAGE_CAPACITY_FACTOR)
+    public double getStorageCapacityFactor() {
+        return storageCapacityFactor;
     }
 
     @StringSetter(END_TIME)
@@ -56,6 +83,9 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
         comments.put(END_TIME, "Simulation End Time");
         return comments;
     }
+
+
+
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);

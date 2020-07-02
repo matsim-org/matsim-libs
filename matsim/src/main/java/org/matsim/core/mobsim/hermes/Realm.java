@@ -1,5 +1,6 @@
 package org.matsim.core.mobsim.hermes;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -10,6 +11,7 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayDeque;
@@ -40,6 +42,8 @@ public class Realm {
     // Current timestamp
     private int secs;
 
+    Logger log = Logger.getLogger(Realm.class);
+
     public Realm(ScenarioImporter scenario, EventsManager eventsManager) throws Exception {
     	this.si = scenario;
         this.links = scenario.hermes_links;
@@ -59,9 +63,9 @@ public class Realm {
         }
     }
 
-    public static void log(int time, String s) {
+    public void log(int time, String s) {
         if (HermesConfigGroup.DEBUG_REALMS) {
-            System.out.println(String.format("ETHZ [ time = %d ] %s", time, s));
+            log.debug(String.format("ETHZ [ time = %d ] %s", time, s));
         }
     }
 
@@ -285,15 +289,21 @@ public class Realm {
         Link link = null;
 
         while (secs != HermesConfigGroup.SIM_STEPS) {
+            if (secs % 3600 == 0){
+                log.info("Hermes running at " + Time.writeTime(secs));
+            }
             while ((agent = delayedAgentsByWakeupTime.get(secs).poll()) != null) {
                 if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing agent %d", agent.id));
                 routed += processAgentActivities(agent);
+
             }
+            delayedAgentsByWakeupTime.set(secs,null);
+
             while ((link = delayedLinksByWakeupTime.get(secs).poll()) != null) {
                 if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing link %d", link.id()));
                 routed += processLinks(link);
             }
-
+            delayedLinksByWakeupTime.set(secs,null);
             if (HermesConfigGroup.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
 
             if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
@@ -350,9 +360,7 @@ public class Realm {
         }
     }
 
-    public int time() { return this.secs; }
-    public Link[] links() { return this.links; }
-    public ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
-    public ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
-    public EventArray getSortedEvents() { return this.sorted_events; }
+    ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
+    ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
+    EventArray getSortedEvents() { return this.sorted_events; }
 }
