@@ -62,7 +62,6 @@ public class NoiseDamageCalculation {
             }
         }
         calculateCostsPerVehiclePerLinkPerTimeInterval();
-        finishNoiseDamageCosts();
     }
 
     private void calculateAffectedAgentUnits(NoiseReceiverPoint rp) {
@@ -81,7 +80,7 @@ public class NoiseDamageCalculation {
         rp.setAffectedAgentUnits(affectedAgentUnits);
     }
 
-    private void finishNoiseDamageCosts() {
+    void finishNoiseDamageCosts() {
 
         if (writeOutput()) {
             NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);

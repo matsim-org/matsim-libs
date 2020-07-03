@@ -38,6 +38,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import static org.matsim.contrib.noise.RLS90VehicleType.car;
+import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
 
 /**
  * 
@@ -177,8 +178,8 @@ final class NoiseWriter {
 				double vHdv = vCar;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
 					double averageTravelTimeHGV_sec = 0.;
-					if (noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() > 0) {
-						averageTravelTimeHGV_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() / noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving();
+					if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(RLS90VehicleType.hgv.getId()) > 0) {
+						averageTravelTimeHGV_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(RLS90VehicleType.hgv.getId()) / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(RLS90VehicleType.hgv.getId());
 					}
 					if (averageTravelTimeHGV_sec > 0.) {
 						vHdv = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeHGV_sec );
@@ -418,7 +419,7 @@ final class NoiseWriter {
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getAverageDamageCostPerCar());
+				bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(car.getId()));
 				bw.newLine();
 			}
 			
@@ -464,7 +465,7 @@ final class NoiseWriter {
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getAverageDamageCostPerHgv());
+				bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(hgv.getId()));
 				bw.newLine();
 			}
 			
@@ -510,7 +511,7 @@ final class NoiseWriter {
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerCar());
+				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(car.getId()));
 				bw.newLine();
 			}
 			
@@ -556,7 +557,7 @@ final class NoiseWriter {
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerHgv());
+				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(hgv.getId()));
 				bw.newLine();
 			}
 			

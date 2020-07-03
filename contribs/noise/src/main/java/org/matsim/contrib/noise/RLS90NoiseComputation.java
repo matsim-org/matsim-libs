@@ -89,7 +89,7 @@ class RLS90NoiseComputation implements NoiseEmissionStrategy {
 
 
 
-    private double calculateMittelungspegelLm(int n, double p) {
+    static double calculateMittelungspegelLm(int n, double p) {
 
         //	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
         //  L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
@@ -108,7 +108,7 @@ class RLS90NoiseComputation implements NoiseEmissionStrategy {
         return mittelungspegel;
     }
 
-    private double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double p) {
+    static double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double p) {
 
         //  v ... speed in kilometers per hour
         // 	p ... share of hdv, in percentage points
@@ -201,5 +201,4 @@ class RLS90NoiseComputation implements NoiseEmissionStrategy {
         }
         return new Tuple<>(vCar, vHdv);
     }
-
 }

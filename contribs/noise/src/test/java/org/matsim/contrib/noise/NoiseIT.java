@@ -521,9 +521,9 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 		
-		Map<Id<Link>, Integer> amountOfVehiclesPerLink = new HashMap<Id<Link>, Integer>();
+		Map<Id<Link>, Integer> amountOfVehiclesPerLink = new HashMap<>();
 		
-		for(NoiseEventCaused event: noiseCalculation.getTimeTracker().getNoiseEventsCaused()){
+		for(NoiseEventCaused event: noiseCalculation.getTimeTracker().getDamageCalculation().getNoiseEventsCaused()){
 			
 			if(event.getTimeBinEndTime() >= endTime - 3600 && event.getTimeBinEndTime() <= endTime){
 				
@@ -558,8 +558,8 @@ public class NoiseIT {
 			double p = 0;
 			int n = amountOfVehiclesPerLink.size();
 			
-			double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
-			double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
+			double mittelungspegel = RLS90NoiseComputation.calculateMittelungspegelLm(n, p);
+			double Dv = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 			double noiseEmission = mittelungspegel + Dv;
 			
 			Assert.assertEquals("Wrong amount of emission!", noiseEmission, emissionsPerLink.get(linkId), MatsimTestUtils.EPSILON);
@@ -857,7 +857,7 @@ public class NoiseIT {
 
 		boolean tested = false;
 		int counter = 0;
-		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
+		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getDamageCalculation().getNoiseEventsCaused()) {
 			tested = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
@@ -907,7 +907,7 @@ public class NoiseIT {
 		
 		boolean tested2 = false;
 		int counter2 = 0;
-		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
+		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getDamageCalculation().getNoiseEventsAffected()) {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
@@ -1000,7 +1000,7 @@ public class NoiseIT {
 
 		boolean tested = false;
 		int counter = 0;
-		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getNoiseEventsCaused()) {
+		for (NoiseEventCaused event : noiseCalculation.getTimeTracker().getDamageCalculation().getNoiseEventsCaused()) {
 			tested = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
@@ -1024,7 +1024,7 @@ public class NoiseIT {
 		
 		boolean tested2 = false;
 		int counter2 = 0;
-		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getNoiseEventsAffected()) {
+		for (NoiseEventAffected event : noiseCalculation.getTimeTracker().getDamageCalculation().getNoiseEventsAffected()) {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
@@ -1190,9 +1190,9 @@ public class NoiseIT {
 		double expectedEhgv = 48.1;
 				
 		Assert.assertEquals("Error in deviation term for speed correction (car)", expectedEcar, eCar, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in deviation term for speed correction (car)", expectedEcar, NoiseEquations.calculateLCar(vCar), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in deviation term for speed correction (car)", expectedEcar, RLS90NoiseComputation.calculateLCar(vCar), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in deviation term for speed correction (hgv)", expectedEhgv, eHgv, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in deviation term for speed correction (hgv)", expectedEhgv, NoiseEquations.calculateLHdv(vHgv), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in deviation term for speed correction (hgv)", expectedEhgv, RLS90NoiseComputation.calculateLHdv(vHgv), MatsimTestUtils.EPSILON);
 				
 		Assert.assertTrue("Error in deviation term for speed correction (eCar > eHgv)", eCar < eHgv);
 		
@@ -1231,7 +1231,7 @@ public class NoiseIT {
 				}
 				
 				Assert.assertEquals("Error while calculating Mittelungspegel for " + nCars + " car(s) and " + nHgvs + " hgv(s)!", expectedMittelungspegel, mittelungspegel, MatsimTestUtils.EPSILON);
-				Assert.assertEquals("Error while calculating Mittelungspegel for " + nCars + " car(s) and " + nHgvs + " hgv(s)!", expectedMittelungspegel, NoiseEquations.calculateMittelungspegelLm(n, p), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Error while calculating Mittelungspegel for " + nCars + " car(s) and " + nHgvs + " hgv(s)!", expectedMittelungspegel, RLS90NoiseComputation.calculateMittelungspegelLm(n, p), MatsimTestUtils.EPSILON);
 				
 				//test speed correction
 				double speedCorrection = expectedEcar - 37.3 + 10 * Math.log10( (100 + ( Math.pow(10, 0.1*(expectedEhgv - expectedEcar)) - 1 ) * pInPercent ) / (100 + 8.23*pInPercent) );
@@ -1244,7 +1244,7 @@ public class NoiseIT {
 				else if( p == 1) expectedSpeedCorrection = 1.14798298974089;
 				
 				Assert.assertEquals("Error while calculating speed correction term for p = " + p + "!", expectedSpeedCorrection, speedCorrection, MatsimTestUtils.EPSILON);
-				Assert.assertEquals("Error while calculating speed correction term for p = " + p + "!", expectedSpeedCorrection, NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHgv, p), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("Error while calculating speed correction term for p = " + p + "!", expectedSpeedCorrection, RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHgv, p), MatsimTestUtils.EPSILON);
 
 			}
 			
@@ -1367,16 +1367,16 @@ public class NoiseIT {
 		
 		double p = ( (double) nHGV / (double) (nCar + nHGV));	
 					
-		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+		double mittelungspegel = RLS90NoiseComputation.calculateMittelungspegelLm(n, p);
 		Assert.assertEquals("Wrong mittelungspegel for n="+ n + " and p=" + p + "!", 69.22567453336540, mittelungspegel, MatsimTestUtils.EPSILON);
 		
-		double lCar = NoiseEquations.calculateLCar(vCar);
+		double lCar = RLS90NoiseComputation.calculateLCar(vCar);
 		Assert.assertEquals("Wrong LCar for vCar="+ vCar + "!", 27.70000000425900, lCar, MatsimTestUtils.EPSILON);
 		
-		double lHGV = NoiseEquations.calculateLHdv(vHGV);
+		double lHGV = RLS90NoiseComputation.calculateLHdv(vHGV);
 		Assert.assertEquals("Wrong LHGV for vHGV="+ vHGV + "!", 6.60145932205085, lHGV, MatsimTestUtils.EPSILON);
 
-		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
+		double dV = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
 		Assert.assertEquals("Wrong Dv!", -10.772415234056300, dV, MatsimTestUtils.EPSILON);
 		
 		double emission = mittelungspegel + dV;
@@ -1386,8 +1386,8 @@ public class NoiseIT {
 		
 		int nPlusOneCar = (nCar+1 + nHGV) * 10;
 		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
-		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
-		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
+		double mittelungspegelPlusOneCar = RLS90NoiseComputation.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);
+		double dVPlusOneCar = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
 		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
 		Assert.assertEquals("Wrong emission!", 58.4896140186478, emissionPlusOneCar, MatsimTestUtils.EPSILON);
 		
@@ -1395,8 +1395,8 @@ public class NoiseIT {
 		
 		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
 		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
-		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
-		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
+		double mittelungspegelPlusOneHGV = RLS90NoiseComputation.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);
+		double dVPlusOneHGV = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
 		Assert.assertEquals("Wrong emission!", 58.4529399949061, emissionPlusOneHGV, MatsimTestUtils.EPSILON);
 
@@ -1415,16 +1415,16 @@ public class NoiseIT {
 		
 		double p = ( (double) nHGV / (double) (nCar + nHGV));	
 					
-		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+		double mittelungspegel = RLS90NoiseComputation.calculateMittelungspegelLm(n, p);
 		Assert.assertEquals("Wrong mittelungspegel for n="+ n + " and p=" + p + "!", 69.22567453336540, mittelungspegel, MatsimTestUtils.EPSILON);
 		
-		double lCar = NoiseEquations.calculateLCar(vCar);
+		double lCar = RLS90NoiseComputation.calculateLCar(vCar);
 		Assert.assertEquals("Wrong LCar for vCar="+ vCar + "!", 28.54933574936720, lCar, MatsimTestUtils.EPSILON);
 		
-		double lHGV = NoiseEquations.calculateLHdv(vHGV);
+		double lHGV = RLS90NoiseComputation.calculateLHdv(vHGV);
 		Assert.assertEquals("Wrong LHGV for vHGV="+ vHGV + "!", 41.56401568399580, lHGV, MatsimTestUtils.EPSILON);
 
-		double dV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
+		double dV = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, p);
 		Assert.assertEquals("Wrong Dv!", -7.689390421466860, dV, MatsimTestUtils.EPSILON);
 		
 		double emission = mittelungspegel + dV;
@@ -1434,8 +1434,8 @@ public class NoiseIT {
 		
 		int nPlusOneCar = (nCar+1 + nHGV) * 10;
 		double pPlusOneCar = ( (double) nHGV / (double) ((nCar + 1) + nHGV));	
-		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);			
-		double dVPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
+		double mittelungspegelPlusOneCar = RLS90NoiseComputation.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);
+		double dVPlusOneCar = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneCar);
 		double emissionPlusOneCar = mittelungspegelPlusOneCar + dVPlusOneCar;
 		Assert.assertEquals("Wrong emission!", 61.5580658162266, emissionPlusOneCar, MatsimTestUtils.EPSILON);
 		
@@ -1443,8 +1443,8 @@ public class NoiseIT {
 		
 		int nPlusOneHGV = (nCar + nHGV + 1) * 10;
 		double pPlusOneHGV = ( (double) (nHGV + 1) / (double) (nCar + (nHGV + 1)));	
-		double mittelungspegelPlusOneHGV = NoiseEquations.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);			
-		double dVPlusOneHGV = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
+		double mittelungspegelPlusOneHGV = RLS90NoiseComputation.calculateMittelungspegelLm(nPlusOneHGV, pPlusOneHGV);
+		double dVPlusOneHGV = RLS90NoiseComputation.calculateGeschwindigkeitskorrekturDv(vCar, vHGV, pPlusOneHGV);
 		double emissionPlusOneHGV = mittelungspegelPlusOneHGV + dVPlusOneHGV;
 		Assert.assertEquals("Wrong emission!", 61.9518310976080, emissionPlusOneHGV, MatsimTestUtils.EPSILON);	
 	}

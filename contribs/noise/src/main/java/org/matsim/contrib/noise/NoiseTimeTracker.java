@@ -75,7 +75,9 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private int cWarn2 = 0;
 
 
+	@Inject
 	private NoiseEmissionStrategy emissionStrategy;
+	@Inject
 	private NoiseDamageCalculation damageCalculation;
 
 	@Override
@@ -231,9 +233,10 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 		for(NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			NoiseReceiverPointImmision immisions = calculateNoiseImmission(rp);
-
-
+			damageCalculation.calculateDamages(rp, immisions);
 		}
+		damageCalculation.finishNoiseDamageCosts();
+
 
 		if (writeOutput()) {
 			NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
@@ -453,5 +456,9 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				this.noiseContext.getIgnoredNetworkModeVehicleIDs().add(event.getVehicleId());
 			}
 		}
+	}
+
+	public NoiseDamageCalculation getDamageCalculation() {
+		return damageCalculation;
 	}
 }

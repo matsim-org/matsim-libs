@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import gnu.trove.map.TObjectDoubleMap;
 import org.matsim.api.core.v01.Id;
@@ -57,17 +58,8 @@ final class NoiseLink {
 	private final Map<Id<? extends NoiseVehicleType>, Double> averageDamageCosts = new HashMap<>();
 
 	private double emission = 0.;
-	
-//	private double emissionPlusOneCar = 0.;
-//	private double emissionPlusOneHGV = 0.;
-//	private double immissionPlusOneCar = 0.;
-//	private double immissionPlusOneHGV = 0.;
-	
 	private double damageCost = 0.; 
-//	private double averageDamageCostPerCar = 0.;
-//	private double averageDamageCostPerHgv = 0.;
-//	private double marginalDamageCostPerCar = 0.;
-//	private double marginalDamageCostPerHgv = 0.;
+
 
 	NoiseLink(Id<Link> linkId) {
 		this.id = linkId;
@@ -85,16 +77,16 @@ final class NoiseLink {
 		this.enteringVehicleIds = enteringVehicleIds;
 	}
 
-	public int getAgentsEntering(Id<NoiseVehicleType> id) {
-		return vehiclesEnteringByType.get(id);
+	public int getAgentsEntering(Id<NoiseVehicleType> typeId) {
+		return vehiclesEnteringByType.computeIfAbsent(typeId, id ->0);
 	}
 
 	public void setAgentsEntering(Id<NoiseVehicleType> id, int agentsEntering) {
 		this.vehiclesEnteringByType.put(id, agentsEntering);
 	}
 
-	int getAgentsLeaving(Id<NoiseVehicleType> id) {
-		return vehiclesLeavingByType.get(id);
+	int getAgentsLeaving(Id<NoiseVehicleType> typeId) {
+		return vehiclesLeavingByType.computeIfAbsent(typeId, id -> 0);
 	}
 
 	void setAgentsLeaving(Id<NoiseVehicleType> id, int agentsLeaving) {
@@ -117,32 +109,32 @@ final class NoiseLink {
 		this.emission = emission;
 	}
 
-	double getEmissionPlusOneVehicle(Id<NoiseVehicleType> id) {
-		return marginalEmissionIncreases.get(id);
+	double getEmissionPlusOneVehicle(Id<NoiseVehicleType> typeId) {
+		return marginalEmissionIncreases.computeIfAbsent(typeId, id -> 0.);
 	}
 
 	void setEmissionPlusOneVehicle(Id<NoiseVehicleType> id, double emissionPlusOneVehicle) {
 		this.marginalEmissionIncreases.put(id, emissionPlusOneVehicle);
 	}
 
-	public double getImmissionPlusOneVehicle(Id<NoiseVehicleType> id) {
-		return marginalImmissionIncreases.get(id);
+	public double getImmissionPlusOneVehicle(Id<NoiseVehicleType> typeId) {
+		return marginalImmissionIncreases.computeIfAbsent(typeId, id -> 0.);
 	}
 
 	public void setImmissionPlusOneCar(Id<NoiseVehicleType> id, double immissionPlusOneVehicle) {
 		this.marginalImmissionIncreases.put(id, immissionPlusOneVehicle);
 	}
 
-	public double getMarginalDamageCostPerVehicle(Id<NoiseVehicleType> id) {
-		return marginalDamageCosts.get(id);
+	public double getMarginalDamageCostPerVehicle(Id<NoiseVehicleType> typeId) {
+		return marginalDamageCosts.computeIfAbsent(typeId, id -> 0.);
 	}
 
 	public void setMarginalDamageCostPerVehicle(Id<NoiseVehicleType> id, double marginalDamageCostPerVehicle) {
 		this.marginalDamageCosts.put(id, marginalDamageCostPerVehicle);
 	}
 
-	double getAverageDamageCostPerVehicle(Id<NoiseVehicleType> id) {
-		return averageDamageCosts.get(id);
+	double getAverageDamageCostPerVehicle(Id<NoiseVehicleType> typeId) {
+		return averageDamageCosts.computeIfAbsent(typeId, id -> 0.);
 	}
 
 	public void setAverageDamageCostPerVehicle(Id<NoiseVehicleType> id, double damageCostPerVehicle) {
@@ -171,6 +163,6 @@ final class NoiseLink {
 	}
 
 	double getTravelTime_sec(Id<NoiseVehicleType> type) {
-		return this.travelTimeByType.get(type);
+		return this.travelTimeByType.computeIfAbsent(type, id -> 0.);
 	}
 }

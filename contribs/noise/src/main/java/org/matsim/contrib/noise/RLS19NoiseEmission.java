@@ -21,7 +21,7 @@ public class RLS19NoiseEmission implements NoiseEmissionStrategy {
 
     @Override
     public void calculateEmission(NoiseLink link) {
-        return 0;
+        return;
     }
 
     /**
@@ -32,9 +32,15 @@ public class RLS19NoiseEmission implements NoiseEmissionStrategy {
      */
     public double calculateLinkNoise() {
 
-        double pLkw1;
-        double pLkw2;
+        double pLkw1 = 0;
+        double pLkw2 = 0;
         final double pPkw = 100 - pLkw1 - pLkw2;
+
+        double vPkw = 0;
+        double vLkw1 = 0;
+        double vLkw2 = 0;
+
+        double m = 0;
 
         double g = 0;
         RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
