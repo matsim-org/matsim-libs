@@ -45,6 +45,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
+	private final String drtSpeedUpMode;
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
@@ -53,6 +54,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
+		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
 		events.addHandler(this);
 	}
@@ -67,7 +69,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(mode)) {
+		if (event.getLegMode().equals(mode) || event.getLegMode().equals(drtSpeedUpMode)) {
 			Double bin = getBinForTime(event.getTime());
 
 			String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
