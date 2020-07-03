@@ -127,7 +127,10 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
 	private boolean computePopulationUnits = true;
-	
+
+    public enum NoiseAllocationApproach {
+        AverageCost, MarginalCost
+    }
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	private String[] hgvIdPrefixes = { "lkw" };
@@ -141,7 +144,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     private String noiseBarriersFilePath = null;
     private String noiseBarriersSourceCrs = null;
 
-    private enum NoiseComputationMethod {RLS90, RLS19};
+    public enum NoiseComputationMethod {RLS90, RLS19};
 
     private NoiseComputationMethod noiseComputationMethod = NoiseComputationMethod.RLS90;
     
@@ -814,13 +817,5 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(NOISE_COMPUTATION_METHOD)
 	public void setNoiseComputationMethod(NoiseComputationMethod noiseComputationMethod) {
 		this.noiseComputationMethod = noiseComputationMethod;
-	}
-
-	/**
-	 * @author ikaddoura
-	 *
-	 */
-	public enum NoiseAllocationApproach {
-			AverageCost, MarginalCost
 	}
 }

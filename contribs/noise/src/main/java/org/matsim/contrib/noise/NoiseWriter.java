@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
+import static org.matsim.contrib.noise.RLS90VehicleType.car;
+
 /**
  * 
  * Contains all methods for writing noise-specific output.
@@ -153,19 +155,19 @@ final class NoiseWriter {
 				
 				int cars = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					cars = noiseContext.getNoiseLinks().get(linkId).getCarAgentsEntering();
+					cars = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(car.getId());
 				}
 				
 				int hgv = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					hgv = noiseContext.getNoiseLinks().get(linkId).getHgvAgentsEntering();
+					hgv = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(RLS90VehicleType.hgv.getId());
 				}
 				
 				double vCar = noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed() * 3.6;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
 					double averageTravelTimeCar_sec = 0.;
-					if (noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() > 0) {
-						averageTravelTimeCar_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() / noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving();	
+					if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(car.getId()) > 0) {
+						averageTravelTimeCar_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(car.getId()) / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(car.getId());
 					}
 					if (averageTravelTimeCar_sec > 0.) {
 						vCar = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeCar_sec );

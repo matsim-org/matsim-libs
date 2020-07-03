@@ -38,44 +38,9 @@ final class NoiseEquations {
 
 	private enum DayTime {NIGHT, DAY, EVENING}
 
-	public static double calculateMittelungspegelLm(int n, double p) {
 
-		//	Der Beurteilungspegel L_r ist bei Straßenverkehrsgeraeuschen gleich dem Mittelungspegel L_m.
-		//  L_r = L_m = 10 * lg(( 1 / T_r ) * (Integral)_T_r(10^(0,1*1(t))dt))
-		//	L_m,e ist der Mittelungspegel im Abstand von 25m von der Achse der Schallausbreitung
 
-		// 	M ... traffic volume
-		// 	p ... share of hdv in %
 
-		if (p > 1) {
-			throw new RuntimeException("p has to be <= 1. For an HGV share of 1%, p should be 0.01. Aborting...");
-		}
-
-		double pInPercentagePoints = p * 100.;
-		double mittelungspegel = 37.3 + 10* Math.log10(n * (1 + (0.082 * pInPercentagePoints)));
-
-		return mittelungspegel;
-	}
-
-	public static double calculateGeschwindigkeitskorrekturDv (double vCar , double vHdv , double p) {
-
-		//  v ... speed in kilometers per hour
-		// 	p ... share of hdv, in percentage points
-
-		if (p > 1) {
-			throw new RuntimeException("p has to be <= 1. For an HGV share of 1%, p should be 0.01. Aborting...");
-		}
-
-		double pInPercentagePoints = p * 100.;
-
-		double lCar = calculateLCar(vCar);
-		double lHdv = calculateLHdv(vHdv);
-
-		double d = lHdv - lCar;
-		double geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10( (100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
-
-		return geschwindigkeitskorrekturDv;
-	}
 
 	/**
 	 * Pegeländerung D_B durch bauliche Maßnahmen (und topografische Gegebenheiten)
@@ -119,17 +84,6 @@ final class NoiseEquations {
 		return resultingNoiseImmission;
 	}
 
-	public static double calculateLCar(double vCar) {
-
-		double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
-		return lCar;
-	}
-
-	public static double calculateLHdv(double vHdv) {
-
-		double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
-		return lHdv;
-	}
 
 	public static double calculateDistanceCorrection(double distance) {
 		double correctionTermDs = 15.8 - (10 * Math.log10(distance)) - (0.0142 * (Math.pow(distance, 0.9)));
