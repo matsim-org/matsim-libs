@@ -609,7 +609,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 
-		final RLS90NoiseImmission rls90NoiseImmission = new RLS90NoiseImmission();
+		final RLS90NoiseImmission rls90NoiseImmission = new RLS90NoiseImmission(noiseCalculation.getNoiseContext(), null);
 
 		for(NoiseReceiverPoint rp : noiseCalculation.getNoiseContext().getReceiverPoints().values()){
 			
@@ -1269,7 +1269,6 @@ public class NoiseIT {
 			
 		}
 
-		RLS90NoiseImmission rls90NoiseImmission = new RLS90NoiseImmission();
 		// test angle correction term
 		for(double angle = 45; angle <= 360; angle += 45){
 			
@@ -1330,7 +1329,7 @@ public class NoiseIT {
 		double expectedResultingNoiseImmission = 41.279204220881;
 		
 		Assert.assertEquals("Error in noise immission calculation!", expectedResultingNoiseImmission, resultingNoiseImmission, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in noise immission calculation!", expectedResultingNoiseImmission, rls90NoiseImmission.calculateResultingNoiseImmission(immissions), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in noise immission calculation!", expectedResultingNoiseImmission, RLS90NoiseImmission.resultingNoiseImmission(immissions), MatsimTestUtils.EPSILON);
 		
 		//test noise damage
 		double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));

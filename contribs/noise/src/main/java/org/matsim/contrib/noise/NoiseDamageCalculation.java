@@ -50,15 +50,15 @@ public class NoiseDamageCalculation {
     }
 
 
-    void calculateDamages(NoiseReceiverPoint rp, NoiseReceiverPointImmision immisions) {
+    void calculateDamages(NoiseReceiverPoint rp) {
         if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
             calculateAffectedAgentUnits(rp);
             if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
                 calculateDamagePerReceiverPoint(rp);
             }
             if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
-                computeAverageDamageCost(rp, immisions);
-                calculateMarginalDamageCost(rp, immisions);
+                computeAverageDamageCost(rp);
+                calculateMarginalDamageCost(rp);
             }
         }
         calculateCostsPerVehiclePerLinkPerTimeInterval();
@@ -136,7 +136,7 @@ public class NoiseDamageCalculation {
 
 //		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 
-        double noiseImmission = rp.getCurrentImmission();
+        double noiseImmission = rp.getCurrentImmission().immission;
         double affectedAgentUnits = rp.getAffectedAgentUnits();
 
         double damageCost = NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, currentTimeBinEndTime, annualCostRate, timeBinsSize);
@@ -182,15 +182,15 @@ public class NoiseDamageCalculation {
     /*
      * Noise allocation approach: AverageCost
      */
-    private void computeAverageDamageCost(NoiseReceiverPoint rp, NoiseReceiverPointImmision immisions) {
-        calculateCostSharesPerLinkPerTimeInterval(rp, immisions);
+    private void computeAverageDamageCost(NoiseReceiverPoint rp) {
+        calculateCostSharesPerLinkPerTimeInterval(rp);
 //		calculateCostsPerVehiclePerLinkPerTimeInterval();
     }
 
     /*
      * Noise allocation approach: AverageCost
      */
-    private void calculateCostSharesPerLinkPerTimeInterval(NoiseReceiverPoint rp, NoiseReceiverPointImmision immisions) {
+    private void calculateCostSharesPerLinkPerTimeInterval(NoiseReceiverPoint rp) {
 
         Map<Id<Link>, Double> linkId2costShare = new HashMap<Id<Link>, Double>();
 
@@ -198,13 +198,13 @@ public class NoiseDamageCalculation {
 
 
         if (rp.getDamageCosts() != 0.) {
-            for (Id<Link> linkId : immisions.getLinkId2IsolatedImmission().keySet()) {
+            for (Id<Link> linkId : rp.getCurrentImmission().getLinkId2IsolatedImmission().keySet()) {
 
-                double noiseImmission = immisions.getLinkId2IsolatedImmission().get(linkId);
+                double linkImmission = rp.getCurrentImmission().getLinkId2IsolatedImmission().get(linkId);
                 double costs = 0.;
 
-                if (!(noiseImmission == 0.)) {
-                    double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(noiseImmission, rp.getCurrentImmission());
+                if (!(linkImmission == 0.)) {
+                    double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(linkImmission, rp.getCurrentImmission().immission);
                     costs = costShare * rp.getDamageCosts();
                 }
                 linkId2costShare.put(linkId, costs);
@@ -383,14 +383,14 @@ public class NoiseDamageCalculation {
     /*
      * Noise allocation approach: MarginalCost
      */
-    private void calculateMarginalDamageCost(NoiseReceiverPoint rp, NoiseReceiverPointImmision immision) {
+    private void calculateMarginalDamageCost(NoiseReceiverPoint rp) {
 //		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 
         if (rp.getAffectedAgentUnits() != 0.) {
-            for (Id<Link> thisLink : immision.getLinkId2IsolatedImmission().keySet()) {
+            for (Id<Link> thisLink : rp.getCurrentImmission().getLinkId2IsolatedImmission().keySet()) {
 
-                double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneVehicle(car.getId()).get(thisLink));
-                double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneVehicle(hgv.getId()).get(thisLink));
+                double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission().immission, rp.getCurrentImmission().getLinkId2IsolatedImmission().get(thisLink), rp.getCurrentImmission().getLinkId2IsolatedImmissionPlusOneVehicle().get(car.getId()).get(thisLink));
+                double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission().immission, rp.getCurrentImmission().getLinkId2IsolatedImmission().get(thisLink), rp.getCurrentImmission().getLinkId2IsolatedImmissionPlusOneVehicle().get(hgv.getId()).get(thisLink));
 
                 double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
                 double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();

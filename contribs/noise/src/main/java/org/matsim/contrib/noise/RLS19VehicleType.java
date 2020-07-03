@@ -2,7 +2,7 @@ package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.Id;
 
-public enum RLS19VehicleType implements NoiseVehicleType {
+enum RLS19VehicleType implements NoiseVehicleType {
 
     /**
      * Personenkraftwagen, Personenkraftwagen mit Anhaenger und Lieferwagen ( m < 3.5t).

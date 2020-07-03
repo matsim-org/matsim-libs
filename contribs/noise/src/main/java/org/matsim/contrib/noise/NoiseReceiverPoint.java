@@ -53,7 +53,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private Map<Id<Link>, Double> linkId2Correction = null;
 
 	// time-specific information
-	private double currentImmission = 0.;
+	private ImmissionInfo immissionInfo = null;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
@@ -104,16 +104,19 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return linkId2Correction.getOrDefault(linkId, 0.);
 	}
 
-	public double getCurrentImmission() {
-		return currentImmission;
+	/**
+	 * deliberately public for outside access
+	 */
+	public ImmissionInfo getCurrentImmission() {
+		return immissionInfo;
 	}
 
-	void setCurrentImmission(double currentImmission, double time) {
-		this.currentImmission = currentImmission;
+	void setCurrentImmission(ImmissionInfo currentImmission, double time) {
+		this.immissionInfo = currentImmission;
 
 		if(time <= 24 * 3600.) {
 
-			double adjustedImmision = currentImmission;
+			double adjustedImmision = currentImmission.immission;
 
 			if (time > 19 * 3600. && time <= 23 * 3600.) {
 				adjustedImmision += 5;
@@ -125,9 +128,9 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 			aggregatedImmissionTermLden += Math.pow(10, adjustedImmision / 10.);
 
 			if (time > 6 * 3600. && time <= 9 * 3600.) {
-				aggregatedImmissionTerm69 += Math.pow(10, currentImmission / 10.);
+				aggregatedImmissionTerm69 += Math.pow(10, currentImmission.immission / 10.);
 			} else if (time > 16 * 3600. && time <= 19 * 3600.) {
-				aggregatedImmissionTerm1619 += Math.pow(10, currentImmission / 10.);
+				aggregatedImmissionTerm1619 += Math.pow(10, currentImmission.immission / 10.);
 			}
 		}
 	}
@@ -165,7 +168,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 //				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
 //				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
 //				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
-				+ ", finalImmission=" + currentImmission
+				+ ", finalImmission=" + immissionInfo.immission
 				+ ", affectedAgentUnits=" + affectedAgentUnits
 				+ ", damageCosts=" + damageCosts 
 				+ ", damageCostsPerAffectedAgentUnit=" + damageCostsPerAffectedAgentUnit + "]";
@@ -174,14 +177,14 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
+		this.immissionInfo = null;
 		aggregatedImmissionTermLden = 0;
 		aggregatedImmissionTerm69 = 0;
 		aggregatedImmissionTerm1619 = 0;
 	}
 	
 	void resetTimeInterval() {
-//		linkId2IsolatedImmission.clear();
-		currentImmission = 0;
+		this.immissionInfo = null;
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
 		this.setDamageCostsPerAffectedAgentUnit(0.);

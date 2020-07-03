@@ -7,8 +7,11 @@ import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -26,14 +29,22 @@ final class ShieldingContext {
     private final STRtree noiseBarriers;
     private final static double GROUND_HEIGHT = 0.5;
 
-    ShieldingContext(Collection<? extends NoiseBarrier> noiseBarriers) {
+    @Inject
+    ShieldingContext(Config config) {
+        NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
         this.noiseBarriers = new STRtree();
-        for (NoiseBarrier barrier : noiseBarriers) {
-            try {
-                this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
-            } catch (IllegalArgumentException e) {
-                logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
+        if(noiseParams.isConsiderNoiseBarriers()) {
+            final Collection<FeatureNoiseBarrierImpl> barriers
+                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(),
+                    noiseParams.getNoiseBarriersSourceCRS(), config.global().getCoordinateSystem());
+
+            for (NoiseBarrier barrier : barriers) {
+                try {
+                    this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
+                }
             }
         }
     }
