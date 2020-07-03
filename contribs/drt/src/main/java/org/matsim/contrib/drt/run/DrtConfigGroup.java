@@ -617,12 +617,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
-	@StringGetter(DRT_SPEED_UP_MODE)
 	public String getDrtSpeedUpMode() {
 		return drtSpeedUpMode;
 	}
 
-	@StringSetter(DRT_SPEED_UP_MODE)
 	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
 		this.drtSpeedUpMode = drtSpeedUpMode;
 	}
