@@ -69,18 +69,20 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private int cWarn1 = 0;
 	private int cWarn2 = 0;
 
-	private NoiseEmission emission;
-	private NoiseImmission immissionModule;
-	private NoiseDamageCalculation damageCalculation;
+	private final NoiseEmission emission;
+	private final NoiseImmission immissionModule;
+	private final NoiseDamageCalculation damageCalculation;
+    private final NoiseVehicleIdentifier vehicleIdentifier;
 
-	@Inject
+    @Inject
 	NoiseTimeTracker(NoiseContext context, NoiseEmission emission, NoiseImmission immissionModule,
-					 NoiseDamageCalculation damageCalculation) {
+					 NoiseDamageCalculation damageCalculation, NoiseVehicleIdentifier vehicleIdentifier) {
 		this.noiseContext = context;
 		this.emission = emission;
 		this.immissionModule = immissionModule;
 		this.damageCalculation = damageCalculation;
-		setRelevantLinkInfo();
+        this.vehicleIdentifier = vehicleIdentifier;
+        setRelevantLinkInfo();
 	}
 
 	private void setRelevantLinkInfo() {
@@ -286,21 +288,8 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
 			}
 
-			boolean isHGV = false;
-			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixesArray()) {
-				if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
-					isHGV = true;
-					break;
-				}
-			}
-
-			if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
-				// HGV or Bus
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(hgv.getId());
-			} else {
-				// Car
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(car.getId());
-			}
+            Id<NoiseVehicleType> noiseVehicleType = vehicleIdentifier.identifyVehicle(event.getVehicleId());
+			this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(noiseVehicleType);
 		}
 	}
 
@@ -326,9 +315,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				}
 			}
 			if (isBus) {
-				if (!this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
-					this.noiseContext.getBusVehicleIDs().add(event.getVehicleId());
-				}
+                this.noiseContext.getBusVehicleIDs().add(event.getVehicleId());
 
 			} else {
 				if (cWarn2 == 0) {

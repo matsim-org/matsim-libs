@@ -42,6 +42,7 @@ public final class NoiseComputationModule extends AbstractModule {
 			case RLS90:
 				this.bind(NoiseEmission.class).to(RLS90NoiseEmission.class).asEagerSingleton();
 				this.bind(NoiseImmission.class).to(RLS90NoiseImmission.class).asEagerSingleton();
+				this.bind(NoiseVehicleIdentifier.class).to(RLS90NoiseVehicleIdentifier.class).asEagerSingleton();
 				this.bind(ShieldingContext.class).in(Singleton.class);
 				break;
 			case RLS19:

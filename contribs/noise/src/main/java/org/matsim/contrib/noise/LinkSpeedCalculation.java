@@ -48,6 +48,9 @@ final class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEven
     @Inject
     private NoiseContext noiseContext;
 
+    @Inject
+    private NoiseVehicleIdentifier vehicleIdentifier;
+
     private Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
 
     @Override
@@ -63,34 +66,7 @@ final class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEven
 
             double travelTime = event.getTime() - this.vehicleId2enterTime.get(event.getVehicleId());
 
-            final NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
-
-			final Id<NoiseVehicleType> id;
-			switch (noiseParams.getNoiseComputationMethod()) {
-				case RLS90:
-					boolean isHGV = false;
-					for (String hgvPrefix : noiseParams.getHgvIdPrefixesArray()) {
-						if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
-							isHGV = true;
-							break;
-						}
-					}
-
-                    if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
-                        // HGV or Bus
-                        id = RLS90VehicleType.hgv.getId();
-                    } else {
-                        id = RLS90VehicleType.car.getId();
-                    }
-                    break;
-                case RLS19:
-					Vehicle vehicle = VehicleUtils.findVehicle(event.getVehicleId(), noiseContext.getScenario());
-					String typeString = (String) vehicle.getType().getAttributes().getAttribute("RLS19Type");
-					id = RLS19VehicleType.valueOf(typeString).getId();
-					break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + noiseParams.getNoiseComputationMethod());
-            }
+			final Id<NoiseVehicleType> id = vehicleIdentifier.identifyVehicle(event.getVehicleId());
 
 			if (noiseLink != null) {
 				double travelTimeSum = noiseLink.getTravelTime_sec(id) + travelTime;
