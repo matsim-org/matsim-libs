@@ -43,7 +43,7 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     private double flowCapacityFactor = 1.0;
 
     @Positive
-    private int stuckTime = 15;
+    private int stuckTime = 10;
 
     public HermesConfigGroup() {
         super(NAME);

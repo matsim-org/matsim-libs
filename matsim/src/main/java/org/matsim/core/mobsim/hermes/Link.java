@@ -57,7 +57,7 @@ public class Link {
 				}
 				return true;
 			} else {
-				if (array.length == maxcapacity) {
+				if (array.length >= maxcapacity) {
 					return false;
 				}
 				// expand array
@@ -165,9 +165,20 @@ public class Link {
     	this.lastFlowUpdate = 0;
     }
 
-    public boolean push(Agent agent) {
-    	return queue.push(agent);
-    }
+	public boolean push(Agent agent, int timestep) {
+		if( queue.push(agent)){
+			lastPush = timestep;
+			return true;
+		}
+		else if ((lastPush + stuckTimePeriod) < timestep){
+			boolean result = queue.forcePush(agent);
+			lastPush= timestep;
+			return result;
+		}
+		else {
+			return false;
+		}
+	}
 
     public void pop() {
         queue.pop();

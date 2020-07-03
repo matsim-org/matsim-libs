@@ -107,7 +107,7 @@ public class Realm {
         int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
 
-        if (next.push(agent)) {
+        if (next.push(agent,secs)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
             if (currLinkId != next.id() && next.queue().peek() == agent) {
