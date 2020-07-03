@@ -155,7 +155,7 @@ public class ScenarioImporter {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
-            hermes_links[link_id] = new Link(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy);
+            hermes_links[link_id] = new Link(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy, scenario.getConfig().hermes().getStuckTime());
         }
     }
 
