@@ -79,6 +79,10 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
 
+	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
+	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
+
+
 	@Positive
 	private int interval = 1800;// [s]
 
@@ -105,6 +109,9 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	@Nullable
 	private String rebalancingZonesShapeFile = null;
+
+	@NotNull
+	private String drtSpeedUpMode = "";
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);
@@ -138,6 +145,10 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
+		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
+		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
+		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
+		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -284,6 +295,16 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public MinCostFlowRebalancingParams setRebalancingZonesShapeFile(String rebalancingZonesShapeFile) {
 		this.rebalancingZonesShapeFile = rebalancingZonesShapeFile;
 		return this;
+	}
+
+	@StringGetter(DRT_SPEED_UP_MODE)
+	public String getDrtSpeedUpMode() {
+		return drtSpeedUpMode;
+	}
+
+	@StringSetter(DRT_SPEED_UP_MODE)
+	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
+		this.drtSpeedUpMode = drtSpeedUpMode;
 	}
 
 }
