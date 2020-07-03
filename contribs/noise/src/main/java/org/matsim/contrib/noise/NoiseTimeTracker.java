@@ -296,17 +296,10 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 			if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
 				// HGV or Bus
-
-				int hgvs = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getAgentsEntering(hgv.getId());
-				hgvs++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setAgentsEntering(hgv.getId(), hgvs);
-
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(hgv.getId());
 			} else {
 				// Car
-
-				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getAgentsEntering(car.getId());
-				cars++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setAgentsEntering(car.getId(), cars);
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(car.getId());
 			}
 		}
 	}

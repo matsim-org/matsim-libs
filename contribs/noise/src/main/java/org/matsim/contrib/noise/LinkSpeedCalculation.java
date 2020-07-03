@@ -95,13 +95,12 @@ final class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEven
 			if (noiseLink != null) {
 				double travelTimeSum = noiseLink.getTravelTime_sec(id) + travelTime;
 				noiseLink.setTravelTime(id, travelTimeSum);
-				int agents = noiseLink.getAgentsLeaving(id) + 1;
-				noiseLink.setAgentsLeaving(id, agents);
+				noiseLink.addLeavingAgent(id);
 
 			} else {
 				noiseLink = new NoiseLink(event.getLinkId());
 				noiseLink.setTravelTime(id, travelTime);
-				noiseLink.setAgentsLeaving(id, 1);
+				noiseLink.addLeavingAgent(id);
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
 			}
         } else {

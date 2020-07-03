@@ -22,16 +22,16 @@
  */
 package org.matsim.contrib.noise;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-
-import gnu.trove.map.TObjectDoubleMap;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -48,8 +48,8 @@ final class NoiseLink {
 
 	private final Map<Id<? extends NoiseVehicleType>, Double> travelTimeByType = new HashMap<>();
 
-	private final Map<Id<? extends NoiseVehicleType>, Integer> vehiclesEnteringByType = new HashMap<>();
-	private final Map<Id<? extends NoiseVehicleType>, Integer> vehiclesLeavingByType = new HashMap<>();
+	private final Multiset<Id<? extends NoiseVehicleType>> vehiclesEnteringByType = HashMultiset.create();
+	private final Multiset<Id<? extends NoiseVehicleType>> vehiclesLeavingByType = HashMultiset.create();
 
 	private final Map<Id<? extends NoiseVehicleType>, Double> marginalEmissionIncreases = new HashMap<>();
 	private final Map<Id<? extends NoiseVehicleType>, Double> marginalImmissionIncreases = new HashMap<>();
@@ -78,19 +78,19 @@ final class NoiseLink {
 	}
 
 	public int getAgentsEntering(Id<NoiseVehicleType> typeId) {
-		return vehiclesEnteringByType.computeIfAbsent(typeId, id ->0);
+		return vehiclesEnteringByType.count(typeId);
 	}
 
-	public void setAgentsEntering(Id<NoiseVehicleType> id, int agentsEntering) {
-		this.vehiclesEnteringByType.put(id, agentsEntering);
+	public void addEnteringAgent(Id<NoiseVehicleType> id) {
+		this.vehiclesEnteringByType.add(id);
 	}
 
 	int getAgentsLeaving(Id<NoiseVehicleType> typeId) {
-		return vehiclesLeavingByType.computeIfAbsent(typeId, id -> 0);
+		return vehiclesLeavingByType.count(typeId);
 	}
 
-	void setAgentsLeaving(Id<NoiseVehicleType> id, int agentsLeaving) {
-		this.vehiclesLeavingByType.put(id, agentsLeaving);
+	void addLeavingAgent(Id<NoiseVehicleType> id) {
+		this.vehiclesLeavingByType.add(id);
 	}
 
 	double getDamageCost() {
