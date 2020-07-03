@@ -2,7 +2,7 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.Iterator;
 
-public class Link {
+public class HLink {
 
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
@@ -146,7 +146,7 @@ public class Link {
 	private int lastPush;
 	private final int stuckTimePeriod;
 
-    public Link(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity, int stuckTimePeriod) {
+    public HLink(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity, int stuckTimePeriod) {
         this.id = id;
         this.length = length;
         this.velocity = velocity;

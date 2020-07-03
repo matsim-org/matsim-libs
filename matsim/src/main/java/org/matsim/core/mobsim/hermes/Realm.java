@@ -22,10 +22,10 @@ public class Realm {
 	private final ScenarioImporter si;
     // Global array of links.
     // Note: the id of the link is its index in the array.
-    private final Link[] links;
+    private final HLink[] links;
     // Internal realm links on hold until a specific timestamp (in seconds).
     // Internal means that the source and destination realm of are the same.
-    private final ArrayList<ArrayDeque<Link>> delayedLinksByWakeupTime;
+    private final ArrayList<ArrayDeque<HLink>> delayedLinksByWakeupTime;
     // Agents on hold until a specific timestamp (in seconds).
     private final ArrayList<ArrayDeque<Agent>> delayedAgentsByWakeupTime;
     // Agents waiting in pt stations. Should be used as follows:
@@ -74,7 +74,7 @@ public class Realm {
         delayedAgentsByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
     }
 
-    private void add_delayed_link(Link link, int until) {
+    private void add_delayed_link(HLink link, int until) {
         if (HermesConfigGroup.DEBUG_REALMS)
             log(secs, String.format("link %d delayed until %d size %d peek agent %d", link.id(), until, link.queue().size(), link.queue().peek().id));
         delayedLinksByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(link);
@@ -99,7 +99,7 @@ public class Realm {
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
         int linkid = Agent.getLinkPlanEntry(planentry);
         int velocity = Agent.getVelocityPlanEntry(planentry);
-        Link next = links[linkid];
+        HLink next = links[linkid];
         int prev_finishtime = agent.linkFinishTime;
         // this ensures that if no velocity is provided for the vehicle, we use the link
         velocity = velocity == 0 ? next.velocity() : velocity;
@@ -253,7 +253,7 @@ public class Realm {
         return 1;
     }
 
-    protected int processLinks(Link link) {
+    protected int processLinks(HLink link) {
         int routed = 0;
         Agent agent = link.queue().peek();
         int curr_flow = link.flow(secs);
@@ -286,7 +286,7 @@ public class Realm {
     public void run() throws Exception {
     	int routed = 0;
         Agent agent = null;
-        Link link = null;
+        HLink link = null;
 
         while (secs != HermesConfigGroup.SIM_STEPS) {
             if (secs % 3600 == 0){
@@ -360,7 +360,7 @@ public class Realm {
         }
     }
 
-    ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
+    ArrayList<ArrayDeque<HLink>> delayedLinks() { return this.delayedLinksByWakeupTime; }
     ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
     EventArray getSortedEvents() { return this.sorted_events; }
 }
