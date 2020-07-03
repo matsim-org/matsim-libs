@@ -175,6 +175,9 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	/**
 	 * we have eight zones, 2 rows 4 columns.
+	 * order of zones:
+	 *	2	4	6	8
+	 *	1	3	5	7
 	 *
 	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
 	 *    That should lead to half of the drt vehicles rebalanced to the left column when using ActivityLocationBasedZonalDemandAggregator.
