@@ -42,6 +42,8 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -59,7 +61,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void EqualVehicleDensityZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensityZonalDemandAggregator);
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensityZonalDemandAggregator, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 0; ii < 16 * 3600; ii+=1800){
@@ -77,7 +79,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void PreviousIterationZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator);
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
@@ -94,16 +96,16 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void ActivityLocationBasedZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.ActivityLocationBasedZonalDemandAggregator);
+	public void PreviousIterationZonalDemandAggregatorWithSpeedUpModeTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator, "drt_teleportation");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
 			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 0, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 3, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 0, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 0, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 0, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 3, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 5", 0, demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 0, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 0, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
@@ -111,7 +113,25 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		}
 	}
 
-	private Controler setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType aggregatorType) {
+	@Test
+	public void ActivityLocationBasedZonalDemandAggregatorTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.ActivityLocationBasedZonalDemandAggregator, "");
+		controler.run();
+		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
+			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 0, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 3, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 0, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 3, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 5", 0, demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 0, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 0, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 3, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+		}
+	}
+
+	private Controler setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType aggregatorType, String drtSpeedUpModeForRebalancingConfigParams) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
@@ -121,6 +141,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		rebalancingParams.setCellSize(500);
 		rebalancingParams.setTargetAlpha(1);
 		rebalancingParams.setTargetBeta(0);
+		rebalancingParams.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfigParams);
 		drtCfg.addParameterSet(rebalancingParams);
 		rebalancingParams.setZonalDemandAggregatorType(aggregatorType);
 
@@ -130,6 +151,20 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		config.qsim().setStartTime(0.);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		PlansCalcRouteConfigGroup.ModeRoutingParams pseudoDrtSpeedUpModeRoutingParams = new PlansCalcRouteConfigGroup.ModeRoutingParams("drt_teleportation");
+		pseudoDrtSpeedUpModeRoutingParams.setBeelineDistanceFactor(1.3);
+		pseudoDrtSpeedUpModeRoutingParams.setTeleportedModeSpeed(8.0);
+		config.plansCalcRoute().addModeRoutingParams(pseudoDrtSpeedUpModeRoutingParams);
+
+		// if adding a new mode (drtSpeedUpMode), some default modes are deleted, so re-insert them...
+		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
+		walkRoutingParams.setBeelineDistanceFactor(1.3);
+		walkRoutingParams.setTeleportedModeSpeed(3.0 / 3.6);
+		config.plansCalcRoute().addModeRoutingParams(walkRoutingParams);
+
+		PlanCalcScoreConfigGroup.ModeParams pseudoDrtSpeedUpModeScoreParams = new PlanCalcScoreConfigGroup.ModeParams("drt_teleportation");
+		config.planCalcScore().addModeParams(pseudoDrtSpeedUpModeScoreParams);
 
 		//this is the wrong way around (create controler before manipulating scenario...
 		Controler controler = DrtControlerCreator.createControler(config, false);
@@ -185,6 +220,24 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 			plan.addLeg(factory.createLeg(TransportMode.drt));
 			plan.addActivity(factory.createActivityFromLinkId("dummy", right2));
+
+			person.addPlan(plan);
+			population.addPerson(person);
+		}
+
+		Id<Link> center1 = Id.createLinkId(147);
+		Id<Link> center2 = Id.createLinkId(315);
+
+		for(int i = 1; i < 100; i++){
+			Person person = factory.createPerson(Id.createPersonId("centerColumn_" + i));
+
+			Plan plan = factory.createPlan();
+			Activity dummy1 = factory.createActivityFromLinkId("dummy", center1);
+			dummy1.setEndTime(i * 10 * 60);
+			plan.addActivity(dummy1);
+
+			plan.addLeg(factory.createLeg("drt_teleportation"));
+			plan.addActivity(factory.createActivityFromLinkId("dummy", center2));
 
 			person.addPlan(plan);
 			population.addPerson(person);
