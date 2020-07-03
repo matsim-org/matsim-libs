@@ -49,6 +49,7 @@ public class ScenarioImporter {
     // Array of agents that participate in the simulation.
     // Note: in order to make MATSim Agent ids, some positions in the array might be null.
     protected Agent[] hermes_agents;
+	private static int spaceCapWarningCount = 0;
 
     protected Realm realm;
 
@@ -160,8 +161,28 @@ public class ScenarioImporter {
     }
 
 	private int calcStorageCapacity(Network network, org.matsim.api.core.v01.network.Link matsim_link, int lanes) {
-		int storageCapacityGuess = Math.max(1, (int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
-		return storageCapacityGuess;
+		int storageCapacity = Math.max(1, (int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
+		double freespeedTravelTime = matsim_link.getLength() / matsim_link.getFreespeed();
+
+		if (Double.isNaN(freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+		}
+
+		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
+		double tempStorageCapacity = freespeedTravelTime * matsim_link.getFlowCapacityPerSec();
+
+		if (storageCapacity < Math.ceil(tempStorageCapacity)) {
+			if (spaceCapWarningCount <= 10) {
+				log.warn("Link " + matsim_link.getId() + " too small: enlarge storage capacity from: " + storageCapacity
+						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
+				if (spaceCapWarningCount == 10) {
+					log.warn("Additional warnings of this type are suppressed.");
+				}
+				spaceCapWarningCount++;
+			}
+			storageCapacity = (int) Math.ceil(tempStorageCapacity);
+		}
+		return storageCapacity;
 	}
 
 	private void initRoutesStations() {
