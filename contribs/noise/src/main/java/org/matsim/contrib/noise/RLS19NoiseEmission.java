@@ -97,9 +97,9 @@ class RLS19NoiseEmission implements NoiseEmission {
         double singlePkwEmission
                 = calculateSingleVehicleEmission(pkw, vPkw, g, intersectionType, intersectionDistance);
         double singleLkw1Emission
-                = calculateSingleVehicleEmission(RLS19VehicleType.lkw1, vLkw1, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(lkw1, vLkw1, g, intersectionType, intersectionDistance);
         double singleLkw2Emission
-                = calculateSingleVehicleEmission(RLS19VehicleType.lkw2, vLkw2, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(lkw2, vLkw2, g, intersectionType, intersectionDistance);
 
         double partPkw = calculateVehicleTypeNoise(100 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
         double partLkw1 = calculateVehicleTypeNoise(pLkw1, vLkw1, singleLkw1Emission);

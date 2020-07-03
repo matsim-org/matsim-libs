@@ -70,8 +70,7 @@ class RLS90NoiseImmission implements NoiseImmission {
         return info;
     }
 
-    @Override
-    public double calculateIsolatedLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
+    private double calculateIsolatedLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
 
         double correction = rp.getLinkCorrection(noiseLink.getId());
 
@@ -85,15 +84,8 @@ class RLS90NoiseImmission implements NoiseImmission {
         return noiseImmission;
     }
 
-
-    @Override
-    public double calculateResultingNoiseImmission(Collection<Double> collection){
-        double resultingNoiseImmission = resultingNoiseImmission(collection);
-        return resultingNoiseImmission;
-    }
-
-    static double resultingNoiseImmission(Collection<Double> collection) {
-        double resultingNoiseImmission = 0.;
+    static double calculateResultingNoiseImmission(Collection<Double> collection){
+        double resultingNoiseImmission1 = 0.;
 
         if (collection.size() > 0) {
             double sumTmp = 0.;
@@ -102,17 +94,17 @@ class RLS90NoiseImmission implements NoiseImmission {
                     sumTmp = sumTmp + (Math.pow(10, (0.1 * noiseImmission)));
                 }
             }
-            resultingNoiseImmission = 10 * Math.log10(sumTmp);
-            if (resultingNoiseImmission < 0) {
-                resultingNoiseImmission = 0.;
+            resultingNoiseImmission1 = 10 * Math.log10(sumTmp);
+            if (resultingNoiseImmission1 < 0) {
+                resultingNoiseImmission1 = 0.;
             }
         }
+        double resultingNoiseImmission = resultingNoiseImmission1;
         return resultingNoiseImmission;
     }
 
 
-    @Override
-    public double calculateIsolatedLinkImmissionPlusOneVehicle(NoiseReceiverPoint rp, NoiseLink noiseLink, NoiseVehicleType type) {
+    private double calculateIsolatedLinkImmissionPlusOneVehicle(NoiseReceiverPoint rp, NoiseLink noiseLink, NoiseVehicleType type) {
         double plusOne = 0;
         if (!(noiseLink.getEmissionPlusOneVehicle(type.getId()) == 0.)) {
             double correction = rp.getLinkCorrection(noiseLink.getId());

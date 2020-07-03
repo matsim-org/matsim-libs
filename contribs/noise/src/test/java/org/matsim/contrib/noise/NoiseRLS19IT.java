@@ -22,11 +22,6 @@
  */
 package org.matsim.contrib.noise;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -62,13 +57,17 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
- * @author ikaddoura
+ * @author nkuehnel
  *
  */
-
-public class NoiseIT {
-	private static final Logger log = Logger.getLogger( NoiseIT.class );
+public class NoiseRLS19IT {
+	private static final Logger log = Logger.getLogger( NoiseRLS19IT.class );
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -91,6 +90,7 @@ public class NoiseIT {
 		
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
+		noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
 
 		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , new AbstractModule(){
 			@Override public void install(){
@@ -190,7 +190,7 @@ public class NoiseIT {
 		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
-		noiseParameters.setReceiverPointGap(250.);	
+		noiseParameters.setReceiverPointGap(250.);
 		
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
@@ -198,6 +198,7 @@ public class NoiseIT {
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
+		noiseParameters.setNoiseComputationMethod(NoiseConfigGroup.NoiseComputationMethod.RLS19);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
