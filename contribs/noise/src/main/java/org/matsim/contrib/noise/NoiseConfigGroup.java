@@ -134,9 +134,9 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	private String[] hgvIdPrefixes = { "lkw" };
-	private Set<String> busIdIdentifier = new HashSet<String>();
-	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
-	private Set<String> networkModesToIgnore = new HashSet<String>();
+	private Set<String> busIdIdentifier = new HashSet<>();
+	private Set<Id<Link>> tunnelLinkIDs = new HashSet<>();
+	private Set<String> networkModesToIgnore = new HashSet<>();
 	
 	private double noiseTollFactor = 1.0;
 
@@ -144,7 +144,16 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     private String noiseBarriersFilePath = null;
     private String noiseBarriersSourceCrs = null;
 
-    public enum NoiseComputationMethod {RLS90, RLS19};
+    public enum NoiseComputationMethod {
+        RLS90(RLS90VehicleType.values()),
+        RLS19(RLS19VehicleType.values());
+
+        NoiseComputationMethod(NoiseVehicleType[] vehicleTypes) {
+            this.noiseVehiclesTypes = vehicleTypes;
+        }
+
+        final NoiseVehicleType[] noiseVehiclesTypes;
+    }
 
     private NoiseComputationMethod noiseComputationMethod = NoiseComputationMethod.RLS90;
     

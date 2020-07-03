@@ -20,11 +20,9 @@ final class NoiseReceiverPointImmision {
 	private static final Logger log = Logger.getLogger(NoiseReceiverPointImmision.class);
 	
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<>(0); 
+	private Map<Id<NoiseVehicleType>, Map<Id<Link>, Double>> linkId2IsolatedImmissionPlusOneVehicle = new HashMap<>(0);
 
 	NoiseReceiverPointImmision() {
-
 	}
 
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
@@ -35,25 +33,15 @@ final class NoiseReceiverPointImmision {
 		this.linkId2IsolatedImmission.put(linkId, isolatedImmission);
 	}
 	
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneCar() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneCar);
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneVehicle(Id<NoiseVehicleType> vehicleTypeId) {
+		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneVehicle.computeIfAbsent(vehicleTypeId, type -> new HashMap<>(0)));
 	}
 
-	public void setLinkId2IsolatedImmissionPlusOneCar(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar) {
-		this.linkId2IsolatedImmissionPlusOneCar = linkId2IsolatedImmissionPlusOneCar;
+	public void setLinkId2IsolatedImmissionPlusOneVehicle(Id<NoiseVehicleType> vehicleType,
+			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneVehicle) {
+		this.linkId2IsolatedImmissionPlusOneVehicle.put(vehicleType, linkId2IsolatedImmissionPlusOneVehicle);
 	}
-
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneHGV() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneHGV);
-	}
-
-	public void setLinkId2IsolatedImmissionPlusOneHGV(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV) {
-		this.linkId2IsolatedImmissionPlusOneHGV = linkId2IsolatedImmissionPlusOneHGV;
-	}
-
-
+	
 	////////////////////////////////////////////////////////////////////////////////
 }
 

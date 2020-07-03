@@ -40,10 +40,11 @@ public final class NoiseComputationModule extends AbstractModule {
 
 		switch (noiseParameters.getNoiseComputationMethod()) {
 			case RLS90:
-				this.bind(NoiseEmissionStrategy.class).to(RLS90NoiseComputation.class).asEagerSingleton();
+				this.bind(NoiseEmission.class).to(RLS90NoiseEmission.class).asEagerSingleton();
+				this.bind(NoiseImmission.class).to(RLS90NoiseImmission.class).asEagerSingleton();
 				break;
 			case RLS19:
-				this.bind(NoiseEmissionStrategy.class).to(RLS19NoiseEmission.class).asEagerSingleton();
+				this.bind(NoiseEmission.class).to(RLS19NoiseEmission.class).asEagerSingleton();
 				break;
 			default:
 				throw new IllegalStateException("Unrecognized noise computation method: " + noiseParameters.getNoiseComputationMethod());

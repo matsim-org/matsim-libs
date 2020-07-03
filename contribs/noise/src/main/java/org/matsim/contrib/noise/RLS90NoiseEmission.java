@@ -12,15 +12,15 @@ import org.matsim.core.utils.collections.Tuple;
 import static org.matsim.contrib.noise.RLS90VehicleType.car;
 import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
 
-class RLS90NoiseComputation implements NoiseEmissionStrategy {
+class RLS90NoiseEmission implements NoiseEmission {
 
-    private final static Logger log = Logger.getLogger(RLS90NoiseComputation.class);
+    private final static Logger log = Logger.getLogger(RLS90NoiseEmission.class);
 
     private final NoiseConfigGroup noiseParams;
     private final Network network;
 
     @Inject
-    RLS90NoiseComputation(Scenario scenario) {
+    RLS90NoiseEmission(Scenario scenario) {
         noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
         network = scenario.getNetwork();
     }

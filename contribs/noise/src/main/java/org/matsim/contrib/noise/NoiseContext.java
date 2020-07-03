@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -197,17 +196,18 @@ final class NoiseContext {
 								projectedDistance = minimumDistance;
 								log.warn("Distance between " + linkId + " and " + nrp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
 							}
-							double correctionTermDs = NoiseEquations.calculateDistanceCorrection(projectedDistance);
+							double correctionTermDs = RLS90NoiseImmission.calculateDistanceCorrection(projectedDistance);
 							double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
-							nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
-							nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
+							double correction = correctionTermAngle + correctionTermDs;
+
 							if (noiseParams.isConsiderNoiseBarriers()) {
 								Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
 										candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
 								double correctionTermShielding =
 										shielding.determineShieldingCorrection(nrp, candidateLink, projectedSourceCoord);
-								nrp.setLinkId2ShieldingCorrection(linkId, correctionTermShielding);
+								correction -= correctionTermShielding;
 							}
+							nrp.setLinkId2Correction(linkId, correction);
 						}
 					}
 				});
@@ -340,7 +340,7 @@ final class NoiseContext {
 		}
 					
 //		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
-        return NoiseEquations.calculateAngleCorrection(angle);
+        return RLS90NoiseImmission.calculateAngleCorrection(angle);
 	}
 	
 	final Scenario getScenario() {

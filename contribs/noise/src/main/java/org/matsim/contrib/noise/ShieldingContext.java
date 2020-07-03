@@ -118,7 +118,7 @@ final class ShieldingContext {
             double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
                     + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
 
-            correctionTermShielding = NoiseEquations.calculateShieldingCorrection(
+            correctionTermShielding = RLS90NoiseImmission.calculateShieldingCorrection(
                     rpPoint.distance(projectedPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
         }
         return correctionTermShielding;

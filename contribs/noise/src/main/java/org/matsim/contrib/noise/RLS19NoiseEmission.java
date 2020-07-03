@@ -1,6 +1,6 @@
 package org.matsim.contrib.noise;
 
-public class RLS19NoiseEmission implements NoiseEmissionStrategy {
+public class RLS19NoiseEmission implements NoiseEmission {
 
     enum RLS19IntersectionType {
 

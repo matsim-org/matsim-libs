@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,8 +40,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -76,7 +73,9 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 
 	@Inject
-	private NoiseEmissionStrategy emissionStrategy;
+	private NoiseEmission emission;
+	@Inject
+	private NoiseImmission immissionModule;
 	@Inject
 	private NoiseDamageCalculation damageCalculation;
 
@@ -328,83 +327,45 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private NoiseReceiverPointImmision calculateNoiseImmission(NoiseReceiverPoint rp) {
 		NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
 		NoiseReceiverPointImmision immision = new NoiseReceiverPointImmision();
-		
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-					
-//			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
-			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneCar = new HashMap<Id<Link>, Double>();
-			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>();
-			
-			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
-				double distanceCorrection = rp.getLinkId2distanceCorrection().get(linkId);
-				double angleCorrection = rp.getLinkId2angleCorrection().get(linkId);
-				double shieldingCorrection = 0.;
-				if(noiseParams.isConsiderNoiseBarriers()) {
-					shieldingCorrection = rp.getLinkId2ShieldingCorrection().get(linkId);
-				}
 
+			Map<Id<NoiseVehicleType>, Map<Id<Link>, Double>> linkId2isolatedImmissionPlusOne = new HashMap<>();
+
+			for(Id<Link> linkId : rp.getRelevantLinks()) {
+				double noiseImmission = 0;
 				if (noiseParams.getTunnelLinkIDsSet().contains(linkId)) {
 					immision.setLinkId2IsolatedImmission(linkId, 0.);
-					linkId2isolatedImmissionPlusOneCar.put(linkId, 0.);
-					linkId2isolatedImmissionPlusOneHGV.put(linkId, 0.);
-								 			
+					linkId2isolatedImmissionPlusOne.computeIfAbsent(car.getId(), type -> new HashMap<>()).put(linkId, 0.);
+					linkId2isolatedImmissionPlusOne.computeIfAbsent(hgv.getId(), type -> new HashMap<>()).put(linkId, 0.);
+
 			 	} else {
-				
-			 		double noiseImmission = 0.;
-			 		double noiseImmissionPlusOneCar = 0.;
-			 		double noiseImmissionPlusOneHGV = 0.;
 			 		NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
 			 		if (noiseLink != null) {
-						if (!(noiseLink.getEmission() == 0.)) {
-							noiseImmission = noiseLink.getEmission()
-									+ distanceCorrection + angleCorrection - shieldingCorrection;
-							
-							if (noiseImmission < 0.) {
-								noiseImmission = 0.;
+			 			noiseImmission = immissionModule.calculateIsolatedLinkImmission(rp, noiseLink);
+			 			for(NoiseVehicleType vehicleType: noiseParams.getNoiseComputationMethod().noiseVehiclesTypes) {
+			 				double immissionPlusOne = immissionModule.calculateIsolatedLinkImmissionPlusOneVehicle(rp, noiseLink, vehicleType);
+							if (immissionPlusOne < 0.) {
+								immissionPlusOne = 0.;
 							}
-						}
-						
-						if (!(noiseLink.getEmissionPlusOneVehicle(car.getId()) == 0.)) {
-							noiseImmissionPlusOneCar = noiseLink.getEmissionPlusOneVehicle(car.getId())
-									+ distanceCorrection + angleCorrection - shieldingCorrection;
-							
-							if (noiseImmissionPlusOneCar < 0.) {
-								noiseImmissionPlusOneCar = 0.;
+							if (immissionPlusOne < noiseImmission) {
+								throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one "
+										+ vehicleType.getId() + immissionPlusOne + ". This should not happen. Aborting...");
 							}
-						}
-						
-						if (!(noiseLink.getEmissionPlusOneVehicle(hgv.getId()) == 0.)) {
-							noiseImmissionPlusOneHGV = noiseLink.getEmissionPlusOneVehicle(hgv.getId())
-									+ distanceCorrection + angleCorrection - shieldingCorrection;
-							
-							if (noiseImmissionPlusOneHGV < 0.) {
-								noiseImmissionPlusOneHGV = 0.;
-							}
-						}
+							linkId2isolatedImmissionPlusOne.computeIfAbsent(vehicleType.getId(), type -> new HashMap<>()).put(linkId, immissionPlusOne);
 
+						}
 					}
-			 		
-			 		if (noiseImmissionPlusOneCar < noiseImmission || noiseImmissionPlusOneHGV < noiseImmission) {
-						throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one car: " + noiseImmissionPlusOneCar + " - noise immission plus one hgv: " + noiseImmissionPlusOneHGV + ". This should not happen. Aborting..."); 
-					}
-			 		
 			 		immision.setLinkId2IsolatedImmission(linkId, noiseImmission);
-					linkId2isolatedImmissionPlusOneCar.put(linkId, noiseImmissionPlusOneCar);
-					linkId2isolatedImmissionPlusOneHGV.put(linkId, noiseImmissionPlusOneHGV);
 			 	}
 			}
-			
-			double finalNoiseImmission = 0.;
+
+			double finalNoiseImmission;
 			Map<Id<Link>, Double> linkId2isolatedImmission = immision.getLinkId2IsolatedImmission();
-			if (linkId2isolatedImmission != null && !linkId2isolatedImmission.isEmpty()) {
-				finalNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmission.values());
-			}
-			
+			finalNoiseImmission = immissionModule.calculateResultingNoiseImmission(linkId2isolatedImmission.values());
+
 			rp.setCurrentImmission(finalNoiseImmission, this.noiseContext.getCurrentTimeBinEndTime());
-			immision.setLinkId2IsolatedImmissionPlusOneCar(linkId2isolatedImmissionPlusOneCar);
-			immision.setLinkId2IsolatedImmissionPlusOneHGV(linkId2isolatedImmissionPlusOneHGV);
+			immision.setLinkId2IsolatedImmissionPlusOneVehicle(car.getId(), linkId2isolatedImmissionPlusOne.getOrDefault(car.getId(), new HashMap<>()));
+			immision.setLinkId2IsolatedImmissionPlusOneVehicle(hgv.getId(), linkId2isolatedImmissionPlusOne.getOrDefault(hgv.getId(), new HashMap<>()));
 			return immision;
-//		}
 	}
 	
 	/*
@@ -417,7 +378,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
                 noiseLink = new NoiseLink(linkId);
                 this.noiseContext.getNoiseLinks().put(linkId, noiseLink );
             }
-			emissionStrategy.calculateEmission(noiseLink);
+			emission.calculateEmission(noiseLink);
 		}
 	}
 
@@ -425,14 +386,6 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime().orElse(0))) {
 			processTimeBin();			
 		}
-	}
-
-	public final boolean isUseCompression() {
-		return this.useCompression;
-	}
-
-	public final void setUseCompression(boolean useCompression) {
-		this.useCompression = useCompression;
 	}
 
 	@Override
@@ -451,14 +404,13 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore() != null) {
-			if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore().contains(event.getNetworkMode())) {
-				this.noiseContext.getIgnoredNetworkModeVehicleIDs().add(event.getVehicleId());
-			}
+		this.noiseContext.getNoiseParams().getNetworkModesToIgnore();
+		if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore().contains(event.getNetworkMode())) {
+			this.noiseContext.getIgnoredNetworkModeVehicleIDs().add(event.getVehicleId());
 		}
 	}
 
-	public NoiseDamageCalculation getDamageCalculation() {
+	NoiseDamageCalculation getDamageCalculation() {
 		return damageCalculation;
 	}
 }

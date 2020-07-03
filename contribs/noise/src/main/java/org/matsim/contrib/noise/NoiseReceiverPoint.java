@@ -22,11 +22,7 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
  * 
  * Extends the basic information of a receiver point towards data required for the computation of noise.
  * 
- * @author ikaddoura
+ * @author ikaddoura, nkuehnel
  *
  */
 public class NoiseReceiverPoint extends ReceiverPoint {
@@ -45,7 +41,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	public NoiseReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
 		super(id, coord);
 	}
-
 
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = null;//new HashMap<>(0);
 
@@ -55,10 +50,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	 */
 	private boolean initialized = false;
 
-	// initialization
-	private Map<Id<Link>, Double> linkId2distanceCorrection = null;//new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2angleCorrection = null;//new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2ShieldingCorrection = null;
+	private Map<Id<Link>, Double> linkId2Correction = null;
 
 	// time-specific information
 	private double currentImmission = 0.;
@@ -89,47 +81,27 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		}
 		infos.add(info);
 	}
-	
-	Map<Id<Link>, Double> getLinkId2distanceCorrection() {
-		if(linkId2distanceCorrection == null) {
-			linkId2distanceCorrection = new HashMap<>();
+
+	Collection<Id<Link>> getRelevantLinks() {
+		if(linkId2Correction == null) {
+			return Collections.emptySet();
+		} else {
+			return linkId2Correction.keySet();
 		}
-		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	synchronized void setLinkId2distanceCorrection(Id<Link> linkId, Double distanceCorrection) {
-		if(linkId2distanceCorrection == null) {
-			linkId2distanceCorrection = new HashMap<>();
+	synchronized void setLinkId2Correction(Id<Link> linkId, Double correction) {
+		if(linkId2Correction== null) {
+			linkId2Correction = new HashMap<>();
 		}
-		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
+		this.linkId2Correction.put(linkId, correction);
 	}
 
-	Map<Id<Link>, Double> getLinkId2angleCorrection() {
-		if(linkId2angleCorrection== null) {
-			linkId2angleCorrection = new HashMap<>();
+	double getLinkCorrection(Id<Link> linkId) {
+		if(linkId2Correction == null) {
+			return 0;
 		}
-		return Collections.unmodifiableMap(linkId2angleCorrection);
-	}
-
-	synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
-		if(linkId2angleCorrection== null) {
-			linkId2angleCorrection = new HashMap<>();
-		}
-		this.linkId2angleCorrection.put(linkId, angleCorrection);
-	}
-
-	synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
-		if(linkId2ShieldingCorrection== null) {
-			linkId2ShieldingCorrection = new HashMap<>();
-		}
-		this.linkId2ShieldingCorrection.put(linkId, shieldingCorrection);
-	}
-
-	Map<Id<Link>, Double> getLinkId2ShieldingCorrection() {
-		if(linkId2ShieldingCorrection == null) {
-			linkId2ShieldingCorrection = new HashMap<>();
-		}
-		return Collections.unmodifiableMap(linkId2ShieldingCorrection);
+		return linkId2Correction.getOrDefault(linkId, 0.);
 	}
 
 	public double getCurrentImmission() {
@@ -188,8 +160,8 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	@Override
 	public String toString() {
 		return "NoiseReceiverPoint [personId2actInfos=" + personId2actInfos
-				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
-				+ ", linkId2angleCorrection=" + linkId2angleCorrection
+//				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
+//				+ ", linkId2angleCorrection=" + linkId2angleCorrection
 //				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
 //				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
 //				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
@@ -216,8 +188,8 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	/**
-	 * @return the German L_DEN, where "L" stands for "Laerm" (=noise), and DEN for  DayEveningNight.  It is some weighted average according to the German
-	 * norm.
+	 * @return the L_DEN (day (D) - evening (E) - night (N) level (L).
+	 * A weighted average with added penalties for night and evening noise levels.
 	 */
 	public double getLden() {
 		return 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
