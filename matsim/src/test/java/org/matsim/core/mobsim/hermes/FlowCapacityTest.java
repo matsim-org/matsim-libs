@@ -32,8 +32,6 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDriving() {
 		Fixture f = new Fixture();
-		f.config.hermes().setFlowCapacityFactor(0.1);
-		f.config.hermes().setStorageCapacityFactor(0.1);
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 12000; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));

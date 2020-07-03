@@ -139,10 +139,12 @@ public class ScenarioImporter {
             int speed = Math.max(1, (int) Math.round(matsim_link.getFreespeed()));
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
             int storageCapacity = calcStorageCapacity(network, matsim_link, lanes);
-            int link_id  = matsim_link.getId().index();
+
+
+			int link_id  = matsim_link.getId().index();
             int flowCapactiy, flowPeriod;
 
-			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().flowCapacityFactor;
+			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().getFlowCapacityFactor();
 			if (effectiveflowCapacityPerSec < 1) {
             	flowPeriod = (int) (1 / effectiveflowCapacityPerSec);
             	flowCapactiy = 1;
@@ -156,12 +158,12 @@ public class ScenarioImporter {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
-            hermes_links[link_id] = new HLink(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy);
+            hermes_links[link_id] = new HLink(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy,scenario.getConfig().hermes().getStuckTime());
         }
     }
 
 	private int calcStorageCapacity(Network network, org.matsim.api.core.v01.network.Link matsim_link, int lanes) {
-		int storageCapacity = Math.max(1, (int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
+		int storageCapacity = Math.max(1, (int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().getStorageCapacityFactor())));
 		double freespeedTravelTime = matsim_link.getLength() / matsim_link.getFreespeed();
 
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -251,11 +253,12 @@ public class ScenarioImporter {
             // TODO - I should advance agents in a proper way!
             switch (type) {
                 case Agent.LinkType:
+                	//this could only happen for agents starting their day on a leg.
                     int linkid = Agent.getLinkPlanEntry(planentry);
                     int velocity = Agent.getVelocityPlanEntry(planentry);
                     HLink link = hermes_links[linkid];
                     agent.linkFinishTime = link.length() / Math.min(velocity, link.velocity());
-                    link.push(agent);
+                    link.push(agent,0);
                     break;
                 case Agent.SleepForType:
                 case Agent.SleepUntilType:

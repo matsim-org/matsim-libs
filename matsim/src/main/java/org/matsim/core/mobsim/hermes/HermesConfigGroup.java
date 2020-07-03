@@ -23,21 +23,27 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final int MAX_EVENTS_AGENT = 65536;
 
 
+
     // Number of simulation steps
     public static int SIM_STEPS = 30*60*60;
     // Number of ticks that are added to every agent advancing links.
     public static final int LINK_ADVANCE_DELAY = 1;
     private static final String FLOW_CAPACITY_FACTOR = "flowCapacityFactor";
     private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
+    private static final String STUCKTIMEPARAM = "stuckTime";
+    private static final String STUCKTIMEPARAMDESC = "time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
     public static final boolean DEBUG_REALMS = false;
     public static final boolean DEBUG_EVENTS = false;
     public static final boolean CONCURRENT_EVENT_PROCESSING = true;
 
     @Positive
-    public double storageCapacityFactor = 1.0;
+    private double storageCapacityFactor = 1.0;
 
     @Positive
-    public double flowCapacityFactor = 1.0;
+    private double flowCapacityFactor = 1.0;
+
+    @Positive
+    private int stuckTime = 15;
 
     public HermesConfigGroup() {
         super(NAME);
@@ -45,6 +51,16 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
 
     public int getEndTime() {
         return SIM_STEPS;
+    }
+
+    @StringGetter(STUCKTIMEPARAM)
+    public int getStuckTime() {
+        return stuckTime;
+    }
+
+    @StringSetter(STUCKTIMEPARAM)
+    public void setStuckTime(int stuckTime) {
+        this.stuckTime = stuckTime;
     }
 
     @StringSetter(FLOW_CAPACITY_FACTOR)
@@ -81,6 +97,7 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> comments = super.getComments();
         comments.put(END_TIME, "Simulation End Time");
+        comments.put(STUCKTIMEPARAM,STUCKTIMEPARAMDESC);
         return comments;
     }
 

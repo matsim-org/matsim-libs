@@ -1,8 +1,10 @@
 package org.matsim.core.mobsim.hermes;
 
 import java.util.Iterator;
+import org.matsim.core.gbl.Gbl;
 
 public class HLink {
+
 
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
@@ -11,7 +13,8 @@ public class HLink {
 		// the storage
 		private Agent[] array;
 		// the max capacity of the queue
-		private final int maxcapacity;
+		private int maxcapacity;
+		private final int maxPhysicalCapacity;
 		// Pop/peak from head
 		private int head;
 		// Push to tail
@@ -21,6 +24,7 @@ public class HLink {
 
 		public AgentQueue(int maxcapacity, int initialcapacity) {
 			this.maxcapacity = maxcapacity;
+			this.maxPhysicalCapacity = maxcapacity;
 			this.array = new Agent[initialcapacity];
 		}
 
@@ -31,14 +35,27 @@ public class HLink {
 			return number;
 		}
 
+		public boolean forcePush(Agent agent){
+			maxcapacity++;
+			boolean result = push(agent);
+			return result;
+		}
+
 		public boolean push(Agent agent) {
+
 	        if (size == 0) {
 			    array[tail] = agent;
 	            size += 1;
+				if (size<=maxPhysicalCapacity){
+					maxcapacity = maxPhysicalCapacity;
+				}
                 return true;
 	        } else if (array.length > size) {
 	            array[tail = inc(tail)] = agent;
 	            size += 1;
+				if (size<=maxPhysicalCapacity){
+					maxcapacity = maxPhysicalCapacity;
+				}
                 return true;
 	        } else {
 			    if (array.length == maxcapacity) {
@@ -55,6 +72,9 @@ public class HLink {
                 // push
                 array[tail = inc(tail)] = agent;
                 size += 1;
+				if (size<=maxPhysicalCapacity){
+					maxcapacity = maxPhysicalCapacity;
+				}
                 return true;
 			}
 		}
@@ -124,14 +144,19 @@ public class HLink {
     private final int flowCapacity;
     // When (which timestep) flow was updated the last time.
     private int lastFlowUpdate;
+    private int lastPush;
+	private final int stuckTimePeriod;
 
-    public HLink(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity) {
+
+	public HLink(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity, int stuckTimePeriod) {
         this.id = id;
         this.length = length;
         this.velocity = velocity;
         this.flowPeriod = flowPeriod;
         this.flowCapacity = flowCapacity;
         this.lastFlowUpdate = 0;
+        this.lastPush = 0;
+        this.stuckTimePeriod = stuckTimePeriod;
         // We do not preallocate using the capacity because it leads to huge memory waste.
         //this.queue = new AgentQueue(Math.max(1, capacity));
         this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
@@ -142,8 +167,19 @@ public class HLink {
     	this.lastFlowUpdate = 0;
     }
 
-    public boolean push(Agent agent) {
-    	return queue.push(agent);
+    public boolean push(Agent agent, int timestep) {
+    	if( queue.push(agent)){
+			lastPush = timestep;
+    		return true;
+		}
+    	else if ((lastPush + stuckTimePeriod) < timestep){
+			boolean result = queue.forcePush(agent);
+			lastPush= timestep;
+    		return result;
+		}
+    	else {
+    		return false;
+    	}
     }
 
     public void pop() {
