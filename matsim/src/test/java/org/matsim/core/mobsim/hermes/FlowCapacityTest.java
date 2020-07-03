@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.hermes.HermesTest.Fixture;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -31,7 +32,8 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDriving() {
 		Fixture f = new Fixture();
-
+		f.config.hermes().setFlowCapacityFactor(0.1);
+		f.config.hermes().setStorageCapacityFactor(0.1);
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 12000; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
@@ -61,11 +63,14 @@ public class FlowCapacityTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
 		events.addHandler(vAnalyzer);
+		var v = new EventWriterXML("events.xml");
+		events.addHandler(v);
+
 
 		/* run sim */
 		Hermes sim = HermesTest.createHermes(f, events);
 		sim.run();
-
+		v.closeFile();
 		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 		System.out.println("#vehicles 3-4: " + Integer.toString(volume[3]));
