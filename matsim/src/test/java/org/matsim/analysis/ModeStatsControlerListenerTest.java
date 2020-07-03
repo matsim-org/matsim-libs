@@ -377,6 +377,14 @@ public class ModeStatsControlerListenerTest {
 		//Remove one person
 		population.getPersons().remove(Id.create("2", Person.class));
 
+		// Change mode of one trip of person 3
+		PlanElement pe = population.getPersons().get(Id.create("3", Person.class)).getSelectedPlan().getPlanElements().get(3);
+		Leg leg = (Leg) pe;
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) - 1);
+		// add a new mode which did not occur before
+		leg.setMode(TransportMode.ride);
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) + 1);
+
 		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
 		modStatListner.notifyIterationEnds(event1);
 
@@ -398,9 +406,6 @@ public class ModeStatsControlerListenerTest {
 		readAndcompareValues(modesIter0, 0);
 		readAndcompareValues(modesIter1, 1);
 		readAndcompareValues(person1modes, 2);
-
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false);
-		modStatListner.notifyShutdown(eventShutdown);
 	}
 
 	//(no: of trips in a mode) / (total no: of trips) ---> should match with the text file
