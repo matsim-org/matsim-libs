@@ -137,11 +137,11 @@ public class ScenarioImporter {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
             int speed = Math.max(1, (int) Math.round(matsim_link.getFreespeed()));
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
-            int storageCapacity = Math.max(1,(int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
+            int storageCapacity = Math.max(1,(int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().getStorageCapacityFactor())));
             int link_id  = matsim_link.getId().index();
             int flowCapactiy, flowPeriod;
 
-			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().flowCapacityFactor;
+			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().getFlowCapacityFactor();
 			if (effectiveflowCapacityPerSec < 1) {
             	flowPeriod = (int) (1 / effectiveflowCapacityPerSec);
             	flowCapactiy = 1;
