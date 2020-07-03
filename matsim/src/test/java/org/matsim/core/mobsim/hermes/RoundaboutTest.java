@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.hermes;
 
 import java.util.List;
+import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
@@ -28,6 +29,7 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.testcases.MatsimTestUtils;
 
 public class RoundaboutTest {
 
@@ -35,6 +37,11 @@ public class RoundaboutTest {
 	public static final Coord C_START = new Coord(0, 60);
 	public static final Coord B_START = new Coord(60, 0);
 	public static final Coord A_START = new Coord(0, -60);
+
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
+
 
 	@Test
 	public void testRoundaboutBehavior(){
@@ -55,6 +62,8 @@ public class RoundaboutTest {
 	private Config createConfig() {
 
 		Config config = ConfigUtils.createConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
