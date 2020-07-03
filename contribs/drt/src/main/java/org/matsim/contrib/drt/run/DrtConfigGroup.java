@@ -112,7 +112,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk";
+	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
 	static final String ESTIMATED_DRT_SPEED_EXP =
@@ -142,6 +142,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+
+	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
+	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
@@ -204,6 +207,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
+
+	@NotNull
+	private String drtSpeedUpMode = "";
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -281,6 +287,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
+		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -608,6 +615,16 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public DrtConfigGroup setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
 		return this;
+	}
+
+	@StringGetter(DRT_SPEED_UP_MODE)
+	public String getDrtSpeedUpMode() {
+		return drtSpeedUpMode;
+	}
+
+	@StringSetter(DRT_SPEED_UP_MODE)
+	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
+		this.drtSpeedUpMode = drtSpeedUpMode;
 	}
 
 	public double getAdvanceRequestPlanningHorizon() {

@@ -131,17 +131,17 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		}
 	}
 
-	private Controler setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType aggregatorType, String drtSpeedUpModeForRebalancingConfigParams) {
+	private Controler setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType aggregatorType, String drtSpeedUpModeForRebalancingConfiguration) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
+		drtCfg.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfiguration);
 		MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
 		rebalancingParams.setCellSize(500);
 		rebalancingParams.setTargetAlpha(1);
 		rebalancingParams.setTargetBeta(0);
-		rebalancingParams.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfigParams);
 		drtCfg.addParameterSet(rebalancingParams);
 		rebalancingParams.setZonalDemandAggregatorType(aggregatorType);
 

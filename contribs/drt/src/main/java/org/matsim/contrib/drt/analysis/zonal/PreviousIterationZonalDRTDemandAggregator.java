@@ -54,7 +54,7 @@ public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAgg
 	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
-		drtSpeedUpMode = drtCfg.getMinCostFlowRebalancing().get().getDrtSpeedUpMode();
+		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
 		events.addHandler(this);
 	}
