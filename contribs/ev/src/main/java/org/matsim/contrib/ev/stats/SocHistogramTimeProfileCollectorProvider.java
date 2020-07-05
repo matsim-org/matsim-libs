@@ -32,6 +32,8 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -67,18 +69,19 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 	}
 
 	public static ProfileCalculator createSocHistogramCalculator(final ElectricFleet evFleet) {
-		String[] header = { "0+", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
+		ImmutableList<String> header = ImmutableList.of("0+", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+",
+				"0.8+", "0.9+");
 		return TimeProfiles.createProfileCalculator(header, () -> {
-			UniformHistogram histogram = new UniformHistogram(0.1, header.length);
+			UniformHistogram histogram = new UniformHistogram(0.1, header.size());
 			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
 				histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
 			}
 
-			Long[] values = new Long[header.length];
-			for (int b = 0; b < header.length; b++) {
-				values[b] = histogram.getCount(b);
+			ImmutableMap.Builder<String, Double> builder = ImmutableMap.builder();
+			for (int b = 0; b < header.size(); b++) {
+				builder.put(header.get(b), (double)histogram.getCount(b));
 			}
-			return values;
+			return builder.build();
 		});
 	}
 }

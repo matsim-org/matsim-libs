@@ -19,11 +19,8 @@
 
 package org.matsim.contrib.util;
 
-import java.util.function.Function;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -40,7 +37,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 		Coord getCoord(T object);
 
-		Object[] calculate(T object);
+		double[] calculate(T object);
 	}
 
 	private final Iterable<T> monitoredObjects;
@@ -49,7 +46,6 @@ public class XYDataCollector<T extends Identifiable<T>>
 	private final String outputFile;
 	private final MatsimServices matsimServices;
 
-	private Function<Object[], String[]> valuesToStringsConverter = TimeProfiles::combineValuesIntoStrings;
 	private CompactCSVWriter writer;
 
 	public XYDataCollector(Iterable<T> monitoredObjects, XYDataCalculator<T> calculator, int interval,
@@ -63,8 +59,8 @@ public class XYDataCollector<T extends Identifiable<T>>
 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		String file = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),
-				outputFile);
+		String file = matsimServices.getControlerIO()
+				.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 		writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy.gz"));
 		writer.writeNext("time", "id", "x", "y", calculator.getHeader());
 	}
@@ -75,14 +71,16 @@ public class XYDataCollector<T extends Identifiable<T>>
 			String time = (int)e.getSimulationTime() + "";
 			for (T o : monitoredObjects) {
 				Coord coord = calculator.getCoord(o);
-				writer.writeNext(time, o.getId() + "", coord.getX() + "", coord.getY() + "",
-						valuesToStringsConverter.apply(calculator.calculate(o)));
+				CSVLineBuilder builder = new CSVLineBuilder().add(time)
+						.add(o.getId() + "")
+						.add(coord.getX() + "")
+						.add(coord.getY() + "");
+				for (Double value : calculator.calculate(o)) {
+					builder.add(value + "");
+				}
+				writer.writeNext(builder);
 			}
 		}
-	}
-
-	public void setValuesToStringsConverter(Function<Object[], String[]> valuesToStringsConverter) {
-		this.valuesToStringsConverter = valuesToStringsConverter;
 	}
 
 	@Override
