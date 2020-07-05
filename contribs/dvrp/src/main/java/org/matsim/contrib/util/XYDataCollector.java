@@ -62,7 +62,7 @@ public class XYDataCollector<T extends Identifiable<T>>
 		String file = matsimServices.getControlerIO()
 				.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 		writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".xy.gz"));
-		writer.writeNext("time", "id", "x", "y", calculator.getHeader());
+		writer.writeNext(new CSVLineBuilder().addAll("time", "id", "x", "y").addAll(calculator.getHeader()));
 	}
 
 	@Override
@@ -71,10 +71,8 @@ public class XYDataCollector<T extends Identifiable<T>>
 			String time = (int)e.getSimulationTime() + "";
 			for (T o : monitoredObjects) {
 				Coord coord = calculator.getCoord(o);
-				CSVLineBuilder builder = new CSVLineBuilder().add(time)
-						.add(o.getId() + "")
-						.add(coord.getX() + "")
-						.add(coord.getY() + "");
+				CSVLineBuilder builder = new CSVLineBuilder().addAll(time, o.getId() + "", coord.getX() + "",
+						coord.getY() + "");
 				for (Double value : calculator.calculate(o)) {
 					builder.add(value + "");
 				}

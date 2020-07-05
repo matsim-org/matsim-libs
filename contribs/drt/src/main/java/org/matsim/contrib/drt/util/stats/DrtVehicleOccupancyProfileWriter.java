@@ -29,6 +29,7 @@ import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
@@ -65,7 +66,8 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
 		calculator.consolidate();
 
-		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonOperatingVehicleProfiles().entrySet().stream(),
+		ImmutableMap<String, double[]> profiles = Stream.concat(
+				calculator.getNonOperatingVehicleProfiles().entrySet().stream(),
 				EntryStream.of(calculator.getVehicleOccupancyProfiles())
 						.map(e -> Pair.of(e.getKey() + " pax", e.getValue())))
 				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
@@ -75,9 +77,9 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
 			String[] profileHeader = profiles.keySet().toArray(new String[0]);
-			writer.writeNext("time", profileHeader);
-			timeDiscretizer.forEach(
-					(bin, time) -> writer.writeNext(Time.writeTime(time, timeFormat), getCells(profiles, bin)));
+			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
+			timeDiscretizer.forEach((bin, time) -> writer.writeNext(
+					new CSVLineBuilder().add(Time.writeTime(time, timeFormat)).addAll(cells(profiles, bin))));
 		}
 
 		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
@@ -87,8 +89,8 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		}
 	}
 
-	private String[] getCells(Map<String, double[]> profiles, int idx) {
-		return profiles.values().stream().map(values -> values[idx] + "").toArray(String[]::new);
+	private Stream<String> cells(Map<String, double[]> profiles, int idx) {
+		return profiles.values().stream().map(values -> values[idx] + "");
 	}
 
 	private DefaultTableXYDataset createXYDataset(TimeDiscretizer timeDiscretizer, Map<String, double[]> profiles) {
