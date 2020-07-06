@@ -56,7 +56,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  * @author mrieser
  */
-public class ModeStatsControlerListener implements StartupListener, IterationEndsListener, 
+public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener,
 ShutdownListener {
 
 	public static final String FILENAME_MODESTATS = "modestats";
@@ -189,7 +189,7 @@ ShutdownListener {
 
 	}
 
-	public Map<String, Map<Integer, Double>> getModeHistories() {
+	public final Map<String, Map<Integer, Double>> getModeHistories() {
 		return Collections.unmodifiableMap( this.modeHistories ) ;
 	}
 
