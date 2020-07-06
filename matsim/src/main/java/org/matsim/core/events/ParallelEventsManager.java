@@ -52,30 +52,36 @@ public final class ParallelEventsManager implements EventsManager {
 	private int iteration = 0;
 	private final BlockingQueue<EventArray> eventQueue;
 
-	// TODO - this should be configurable as it can have performance impact on large sims.
-	private final int eventsQueueSize = 65536;
+	private final int eventsQueueSize;
 	//private final int eventsQueueSize = 1048576 * 32;
 	private final int eventsArraySize;
 
 	@Inject
 	ParallelEventsManager(Config config) {
-		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true);
+		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true, config.parallelEventHandling().getEventsQueueSize());
+
 	}
 
 	public ParallelEventsManager(final boolean syncOnTimeSteps) {
-		this(syncOnTimeSteps, true, -1);
+		this(syncOnTimeSteps, 65536);
 	}
 
-	public ParallelEventsManager(final boolean syncOnTimeSteps, final int numOfThreads) {
-		this(syncOnTimeSteps, false, numOfThreads);
+	public ParallelEventsManager(final boolean syncOnTimeSteps, int eventsQueueSize) {
+		this(syncOnTimeSteps, true, -1,eventsQueueSize);
+
 	}
 
-	/*package*/ ParallelEventsManager(final boolean syncOnTimeSteps, final boolean oneThreadPerHandler, final int numOfThreads) {
+	public ParallelEventsManager(final boolean syncOnTimeSteps, final int numOfThreads, int eventsQueueSize) {
+		this(syncOnTimeSteps, false, numOfThreads, eventsQueueSize);
+	}
+
+	/*package*/ ParallelEventsManager(final boolean syncOnTimeSteps, final boolean oneThreadPerHandler, final int numOfThreads,final int eventsQueueSize) {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
 		this.numOfThreads = numOfThreads;
 		this.eventsHandlers = new ArrayList<EventHandler>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
+		this.eventsQueueSize = eventsQueueSize;
 		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
 		this.uncaughtExceptionHandler = new ExceptionHandler();
 	}
