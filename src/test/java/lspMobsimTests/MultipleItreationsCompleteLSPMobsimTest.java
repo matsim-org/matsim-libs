@@ -167,8 +167,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		LSPUtils.LogisticsSolutionElementBuilder secondReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondReloadingElementId );
 		secondReloadingElementBuilder.setResource(secondReloadingPointAdapter);
 		LogisticsSolutionElement secondReloadElement = secondReloadingElementBuilder.build();
-		
-		DistributionCarrierScheduler distriutionScheduler = new DistributionCarrierScheduler();
+
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
@@ -195,7 +194,7 @@ public class MultipleItreationsCompleteLSPMobsimTest {
 		
 		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
 		DistributionCarrierAdapter.Builder distributionAdapterBuilder = DistributionCarrierAdapter.Builder.newInstance(distributionAdapterId, network);
-		distributionAdapterBuilder.setDistributionScheduler(distriutionScheduler);
+		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		distributionAdapterBuilder.setCarrier(carrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		Resource distributionAdapter = distributionAdapterBuilder.build();

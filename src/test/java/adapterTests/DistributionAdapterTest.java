@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +27,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.usecase.DistributionCarrierAdapter;
-import lsp.usecase.DistributionCarrierScheduler;
 
 
 
@@ -36,7 +36,6 @@ public class DistributionAdapterTest {
 		//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
 		
 		private Network network;
-		private DistributionCarrierScheduler scheduler;
 		private org.matsim.vehicles.VehicleType distributionType;
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
@@ -51,8 +50,7 @@ public class DistributionAdapterTest {
 	        Scenario scenario = ScenarioUtils.createScenario(config);
 	        new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 	        this.network = scenario.getNetwork();
-			
-			scheduler = new DistributionCarrierScheduler();
+
 			Id<Carrier> carrierId = Id.create("DistributionCarrier", Carrier.class);
 			Id<VehicleType> vehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 			CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
@@ -79,7 +77,7 @@ public class DistributionAdapterTest {
 			
 			Id<Resource> adapterId = Id.create("DistributionCarrierAdapter", Resource.class);
 			DistributionCarrierAdapter.Builder builder = DistributionCarrierAdapter.Builder.newInstance(adapterId, network);
-			builder.setDistributionScheduler(scheduler);
+			builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 			builder.setCarrier(distributionCarrier);
 			builder.setLocationLinkId(distributionLinkId);
 			distributionAdapter = builder.build();

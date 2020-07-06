@@ -34,9 +34,9 @@ import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
-public class DistributionCarrierScheduler extends ResourceScheduler {
+/*package-private*/ class DistributionCarrierScheduler extends ResourceScheduler {
 
-	class LSPCarrierPair{
+	static class LSPCarrierPair{
 		private ShipmentTuple tuple;
 		private CarrierService service;
 		
@@ -53,7 +53,7 @@ public class DistributionCarrierScheduler extends ResourceScheduler {
 	private ArrayList<LSPCarrierPair>pairs;
 
 	
-	public DistributionCarrierScheduler(){
+	DistributionCarrierScheduler(){
 		this.pairs = new ArrayList<LSPCarrierPair>();
 	}
 	

@@ -196,8 +196,7 @@ import lsp.resources.Resource;
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		DistributionCarrierScheduler distriutionScheduler = new DistributionCarrierScheduler();
-		distributionAdapterBuilder.setDistributionScheduler(distriutionScheduler);
+		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		Resource distributionAdapter = distributionAdapterBuilder.build();
 		
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP

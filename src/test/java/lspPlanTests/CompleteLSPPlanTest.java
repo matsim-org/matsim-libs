@@ -150,8 +150,7 @@ public class CompleteLSPPlanTest {
 		LSPUtils.LogisticsSolutionElementBuilder secondReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(secondReloadingElementId );
 		secondReloadingElementBuilder.setResource(secondReloadingPointBuilder.build());
 		LogisticsSolutionElement secondReloadElement = secondReloadingElementBuilder.build();
-		
-		DistributionCarrierScheduler distriutionScheduler = new DistributionCarrierScheduler();
+
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
@@ -178,7 +177,7 @@ public class CompleteLSPPlanTest {
 		
 		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
 		DistributionCarrierAdapter.Builder distributionAdapterBuilder = DistributionCarrierAdapter.Builder.newInstance(distributionAdapterId, network);
-		distributionAdapterBuilder.setDistributionScheduler(distriutionScheduler);
+		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		distributionAdapterBuilder.setCarrier(carrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		
