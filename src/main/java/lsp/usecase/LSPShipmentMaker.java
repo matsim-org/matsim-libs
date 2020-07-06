@@ -14,46 +14,46 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class LSPShipmentMaker {
+class LSPShipmentMaker {
 
 	public static void main (String[]args){
-	
-	Network network = NetworkUtils.createNetwork();
-	MatsimNetworkReader reader = new MatsimNetworkReader(network);
-	reader.readFile("D:/Working_Copies_Dissertation/Code_Dissertation/logistics/scenarios/2regions/2regions-network.xml");
-	Random random = new Random(1);
-	ArrayList<LSPShipment> shipments = new ArrayList<LSPShipment>();
 
-	for(int i = 0; i < 8; i++){	
-		ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
-		builder.setServiceTime(180);
-		builder.setCapacityDemand(1);
-		TimeWindow startTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
-		builder.setStartTimeWindow(startTimeWindow);
-		TimeWindow endTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
-		builder.setEndTimeWindow(endTimeWindow);
-		Id<Link>fromLinkId= null;
-		Id<Link>toLinkId = null;
-		while (fromLinkId == null || toLinkId == null){
-			List<Link> linkList = new ArrayList<Link>(network.getLinks().values());
-			Collections.shuffle(linkList);
-			Link link = linkList.get(0);
-			
-			if(link.getCoord().getX()<4){
-				fromLinkId = link.getId();
-				builder.setFromLinkId(fromLinkId);	
+		Network network = NetworkUtils.createNetwork();
+		MatsimNetworkReader reader = new MatsimNetworkReader(network);
+		reader.readFile("D:/Working_Copies_Dissertation/Code_Dissertation/logistics/scenarios/2regions/2regions-network.xml");
+		Random random = new Random(1);
+		ArrayList<LSPShipment> shipments = new ArrayList<LSPShipment>();
+
+		for(int i = 0; i < 8; i++){
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
+			builder.setServiceTime(180);
+			builder.setCapacityDemand(1);
+			TimeWindow startTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
+			builder.setStartTimeWindow(startTimeWindow);
+			TimeWindow endTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
+			builder.setEndTimeWindow(endTimeWindow);
+			Id<Link>fromLinkId= null;
+			Id<Link>toLinkId = null;
+			while (fromLinkId == null || toLinkId == null){
+				List<Link> linkList = new ArrayList<Link>(network.getLinks().values());
+				Collections.shuffle(linkList);
+				Link link = linkList.get(0);
+
+				if(link.getCoord().getX()<4){
+					fromLinkId = link.getId();
+					builder.setFromLinkId(fromLinkId);
+				}
+				if(link.getCoord().getX()>14){
+					toLinkId = link.getId();
+					builder.setToLinkId(toLinkId);
+				}
+
 			}
-			if(link.getCoord().getX()>14){
-				toLinkId = link.getId();
-				builder.setToLinkId(toLinkId);
-			}
-			
+			shipments.add(builder.build());
 		}
-		shipments.add(builder.build());
-	}
-	
-	for(LSPShipment shipment : shipments){	
-		System.out.println(shipment.getFromLinkId() + " "+ shipment.getToLinkId());
-	}
+
+		for(LSPShipment shipment : shipments){
+			System.out.println(shipment.getFromLinkId() + " "+ shipment.getToLinkId());
+		}
 	}
 }
