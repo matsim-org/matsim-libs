@@ -44,7 +44,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -241,7 +241,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config1.xml";
 		
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -323,7 +323,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config2.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
@@ -409,7 +409,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config);
 		Controler controler = new Controler( scenario );
@@ -477,7 +477,7 @@ public class AdvancedMarginalCongestionPricingIT {
 		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
 
 		Config config = ConfigUtils.loadConfig( configFile ) ;
-		config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		Controler controler = new Controler( scenario );
