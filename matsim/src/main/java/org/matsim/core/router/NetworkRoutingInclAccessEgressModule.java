@@ -22,6 +22,7 @@ package org.matsim.core.router;
 import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +41,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -70,16 +72,18 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
 	private final Scenario scenario;
-	private final RoutingModule accessEgressToNetworkRouter;
+	private final RoutingModule accessToNetworkRouter;
+	private final RoutingModule egressFromNetworkRouter;
 	private final Config config;
 	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
-	private AccessEgressWalkType accessEgressWalkType;
+	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 
 	NetworkRoutingInclAccessEgressModule(
 			final String mode,
 			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
-			final RoutingModule accessEgressToNetworkRouter) {
+			final RoutingModule accessToNetworkRouter,
+			final RoutingModule egressFromNetworkRouter) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
@@ -88,11 +92,15 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.scenario = scenario;
 		this.populationFactory = scenario.getPopulation().getFactory();
 		this.config = scenario.getConfig();
-		this.accessEgressToNetworkRouter = accessEgressToNetworkRouter;
-		this.accessEgressWalkType = config.plansCalcRoute().getAccessEgressWalkType();
-		if (accessEgressWalkType.equals(AccessEgressWalkType.none)) {
+		this.accessToNetworkRouter = accessToNetworkRouter;
+		this.egressFromNetworkRouter = egressFromNetworkRouter;
+		this.accessEgressType = config.plansCalcRoute().getAccessEgressType();
+		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
+		} else if ( accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) ) {
+			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
+					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress " );
 		}
 	}
 
@@ -118,8 +126,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === access:
 		{
-			now = addAccessLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result, populationFactory, mode,
+			List<? extends PlanElement> accessTrip = computeAccessTripFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, populationFactory, mode,
 					scenario.getConfig());
+			if(accessTrip == null ) return null; //access trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
+			for (PlanElement planElement : accessTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
+			}
+			result.addAll(accessTrip);
 		}
 
 		// === compute the network leg:
@@ -134,34 +147,35 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === egress:
 		{
-			addEgressLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result, populationFactory, mode,
+			List<PlanElement> egressTrip = computeEgressTripFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result.get(result.size() - 1), populationFactory, mode,
 					scenario.getConfig());
+			if(egressTrip == null ) return null; //egress trip could not get routed so we return null for the entire trip => will lead to the tripRouter to call fallbackRoutingModule
+			result.addAll(egressTrip);
 		}
 
 		return result;
 	}
 
-	private void addEgressLegFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
-			final Link egressActLink, double now, final List<PlanElement> result,
-			final PopulationFactory populationFactory, final String stageActivityType,
-			Config config) {
+	private List<PlanElement> computeEgressTripFromLinkToFacilityIfNecessary(final Facility toFacility, final Person person,
+																final Link egressActLink, double departureTime, PlanElement previousPlanElement,
+																final PopulationFactory populationFactory, final String stageActivityType,
+																Config config) {
 
 		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
 		if (isNotNeedingBushwhackingLeg(toFacility)) {
-			return;
+			Collections.emptyList();
 		}
 
 		Coord startCoord = egressActLink.getToNode().getCoord();
 		Gbl.assertNotNull(startCoord);
-
 		final Id<Link> startLinkId = egressActLink.getId();
 
+		List<PlanElement> egressTrip = new ArrayList<>();
 		// check whether we already have an identical interaction activity directly before
-		PlanElement lastPlanElement = result.get(result.size() - 1);
-		if (lastPlanElement instanceof Leg) {
+		if (previousPlanElement instanceof Leg) {
 			final Activity interactionActivity = createInteractionActivity(startCoord, startLinkId, stageActivityType);
-			result.add(interactionActivity);
+			egressTrip.add(interactionActivity);
 		} else {
 			// don't add another (interaction) activity
 			// TODO: assuming that this is an interaction activity, e.g. walk - drt interaction - walk
@@ -175,30 +189,32 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (mode.equals(TransportMode.walk)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
-			egressLeg.setDepartureTime(now);
-			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
+			egressLeg.setDepartureTime(departureTime);
+			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 
-			result.add(egressLeg);
-		} else if (accessEgressWalkType.equals(AccessEgressWalkType.constantTimeToLink)) {
+			egressTrip.add(egressLeg);
+		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
-			egressLeg.setDepartureTime(now);
-			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config);
+			egressLeg.setDepartureTime(departureTime);
+			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			double egressTime = NetworkUtils.getLinkEgressTime(egressActLink, mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId()));
 			egressLeg.setTravelTime(egressTime);
 			egressLeg.getRoute().setTravelTime(egressTime);
-			result.add(egressLeg);
+			egressTrip.add(egressLeg);
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
-			List<? extends PlanElement> egressTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
-			if (this.accessEgressWalkType.equals(AccessEgressWalkType.walkToLinkPlusConstant)){
-				double accessTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ egressActLink.getId().toString()));
-				Leg leg0 = TripStructureUtils.getLegs(egressTrip).get(0);
-				double travelTime = leg0.getTravelTime().seconds()+accessTime;
+			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+			if(networkRoutedEgressTrip == null) return null;
+			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
+				double egressTime = NetworkUtils.getLinkEgressTime(egressActLink,mode).orElseThrow(()->new RuntimeException("Egress Time not set for link "+ egressActLink.getId().toString()));
+				Leg leg0 = TripStructureUtils.getLegs(networkRoutedEgressTrip).get(0);
+				double travelTime = leg0.getTravelTime().seconds()+egressTime;
 				leg0.setTravelTime(travelTime);
 				leg0.getRoute().setTravelTime(travelTime);
 			}
-			result.addAll(egressTrip);
+			egressTrip.addAll(networkRoutedEgressTrip);
 		}
+		return egressTrip;
 	}
 
 	private static boolean isNotNeedingBushwhackingLeg(Facility toFacility) {
@@ -210,68 +226,65 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return toFacility instanceof LinkWrapperFacility;
 	}
 
-	private double addAccessLegFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
-			final Link accessActLink, double now, final List<PlanElement> result,
-			final PopulationFactory populationFactory, final String stageActivityType,
-			Config config) {
+	private List<? extends PlanElement> computeAccessTripFromFacilityToLinkIfNecessary(final Facility fromFacility, final Person person,
+																  final Link accessActLink, double departureTime,
+																  final PopulationFactory populationFactory, final String stageActivityType,
+																  Config config) {
 		if (isNotNeedingBushwhackingLeg(fromFacility)) {
-			return now;
+			return Collections.emptyList();
 		}
 
 		Coord endCoord = accessActLink.getToNode().getCoord();
 		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
 		Gbl.assertNotNull(endCoord);
+		List<PlanElement> accessTrip = new ArrayList<>();
 
 		if (mode.equals(TransportMode.walk)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
-			accessLeg.setDepartureTime(now);
+			accessLeg.setDepartureTime(departureTime);
 
 			Id<Link> startLinkId = fromFacility.getLinkId();
 			if (startLinkId == null) {
 				startLinkId = accessActLink.getId();
 			}
 
-			now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory,
 					config);
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
-			result.add(accessLeg);
-		} else if (accessEgressWalkType.equals(AccessEgressWalkType.constantTimeToLink)) {
+			accessTrip.add(accessLeg);
+		} else if (accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.walk);
-			accessLeg.setDepartureTime(now);
+			accessLeg.setDepartureTime(departureTime);
 			Id<Link> startLinkId = fromFacility.getLinkId();
 			if (startLinkId == null) {
 				startLinkId = accessActLink.getId();
 			}
-			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
+			routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, departureTime, startLinkId, accessActLink.getId(), populationFactory,
 					config);
 
 			double accessTime = NetworkUtils.getLinkAccessTime(accessActLink, mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
 			accessLeg.setTravelTime(accessTime);
 			accessLeg.getRoute().setTravelTime(accessTime);
-			result.add(accessLeg);
-			now += accessTime;
+			accessTrip.add(accessLeg);
+//			now += accessTime;
 		} else {
 			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
-			List<? extends PlanElement> accessTrip = accessEgressToNetworkRouter.calcRoute(fromFacility, toFacility, now, person);
-			if (this.accessEgressWalkType.equals(AccessEgressWalkType.walkToLinkPlusConstant)){
+			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
+			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
 				double accessTime = NetworkUtils.getLinkAccessTime(accessActLink,mode).orElseThrow(()->new RuntimeException("Access Time not set for link "+ accessActLink.getId().toString()));
-				Leg leg0 = TripStructureUtils.getLegs(accessTrip).get(0);
+				Leg leg0 = TripStructureUtils.getLegs(networkRoutedAccessTrip).get(0);
 				double travelTime = leg0.getTravelTime().seconds()+accessTime;
 				leg0.setTravelTime(travelTime);
 				leg0.getRoute().setTravelTime(travelTime);
 			}
-			for (PlanElement planElement : accessTrip) {
-				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
-			}
-
-			result.addAll(accessTrip);
+			accessTrip.addAll(networkRoutedAccessTrip);
 		}
 
 		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType);
-		result.add(interactionActivity);
-
-		return now;
+		accessTrip.add(interactionActivity);
+		return accessTrip;
 	}
 
 	private static Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink, final String mode) {
@@ -280,7 +293,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return act;
 	}
 
-	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+	private static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config) {
 		final ModeRoutingParams params;
 		ModeRoutingParams tmp;
@@ -296,10 +309,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			params.setTeleportedModeSpeed(2.0);
 		}
 
-		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
+		routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
 	}
 
-	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+	static void routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
@@ -327,7 +340,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setRoute(route);
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
-		return travTime;
 	}
 
 	@Override
