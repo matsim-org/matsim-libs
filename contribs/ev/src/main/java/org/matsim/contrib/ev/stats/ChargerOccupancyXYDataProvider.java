@@ -50,11 +50,18 @@ public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> 
 				"charger_occupancy_absolute", matsimServices);
 	}
 
+	private static final String PLUGS_ID = "plugs";
+	private static final String PLUGGED_ID = "plugged";
+	private static final String QUEUED_ID = "queued";
+	private static final String ASSIGNED_ID = "assigned";
+	private static final String RELATIVE_SUFFIX = "_rel";
+
 	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(
 			final ChargingInfrastructure chargingInfrastructure, boolean relative) {
 		String[] header = relative ?
-				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } :
-				new String[] { "plugs", "plugged", "queued", "assigned" };
+				new String[] { PLUGS_ID, PLUGGED_ID + RELATIVE_SUFFIX, QUEUED_ID + RELATIVE_SUFFIX,
+						ASSIGNED_ID + RELATIVE_SUFFIX } :
+				new String[] { PLUGS_ID, PLUGGED_ID, QUEUED_ID, ASSIGNED_ID };
 
 		return XYDataCollectors.createCalculator(header, charger -> {
 			ChargingLogic logic = charger.getLogic();
@@ -62,14 +69,14 @@ public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> 
 			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic ?
 					((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size() :
 					0;
-			return new String[] { charger.getPlugCount() + "", //
+			return new double[] { charger.getPlugCount(), //
 					getValue(logic.getPluggedVehicles().size(), plugs, relative),
 					getValue(logic.getQueuedVehicles().size(), plugs, relative),
 					getValue(assignedCount, plugs, relative) };
 		});
 	}
 
-	private static String getValue(int count, int plugs, boolean relative) {
-		return relative ? ((double)count / plugs) + "" : count + "";
+	private static double getValue(int count, int plugs, boolean relative) {
+		return relative ? (double)count / plugs : count;
 	}
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.event.EventUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -207,7 +208,7 @@ public class NoiseIT {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
-		EventsManager events = new ParallelEventsManager(false, 1);
+		EventsManager events = new ParallelEventsManager(false,1,65536);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
