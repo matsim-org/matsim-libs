@@ -44,7 +44,7 @@ public class ScenarioImporter {
     protected int[] line_of_route;
 
     // Array of links that define the network.
-    protected Link[] hermes_links;
+    protected HLink[] hermes_links;
 
     // Array of agents that participate in the simulation.
     // Note: in order to make MATSim Agent ids, some positions in the array might be null.
@@ -102,7 +102,7 @@ public class ScenarioImporter {
     		public void run() {
     	    	// reset links
     	    	for (int i = 0; i < hermes_links.length; i++) {
-    	    	    Link link = hermes_links[i];
+    	    	    HLink link = hermes_links[i];
     	    	    if (link != null) {
                     link.reset();
                 }
@@ -131,17 +131,17 @@ public class ScenarioImporter {
         Network network = scenario.getNetwork();
         Collection<? extends org.matsim.api.core.v01.network.Link> matsim_links =
             network.getLinks().values();
-        hermes_links = new Link[Id.getNumberOfIds(org.matsim.api.core.v01.network.Link.class)];
+        hermes_links = new HLink[Id.getNumberOfIds(org.matsim.api.core.v01.network.Link.class)];
 
         for (org.matsim.api.core.v01.network.Link matsim_link : matsim_links) {
             int length = Math.max(1, (int) Math.round(matsim_link.getLength()));
             int speed = Math.max(1, (int) Math.round(matsim_link.getFreespeed()));
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
-            int storageCapacity = Math.max(1,(int) (Math.ceil(matsim_link.getLength() / 7.5 * lanes * scenario.getConfig().hermes().storageCapacityFactor)));
+            int storageCapacity = Math.max(1,(int) (Math.ceil(matsim_link.getLength() / network.getEffectiveCellSize() * lanes * scenario.getConfig().hermes().getStorageCapacityFactor())));
             int link_id  = matsim_link.getId().index();
             int flowCapactiy, flowPeriod;
 
-			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().flowCapacityFactor;
+			final double effectiveflowCapacityPerSec = matsim_link.getFlowCapacityPerSec()*scenario.getConfig().hermes().getFlowCapacityFactor();
 			if (effectiveflowCapacityPerSec < 1) {
             	flowPeriod = (int) (1 / effectiveflowCapacityPerSec);
             	flowCapactiy = 1;
@@ -155,7 +155,7 @@ public class ScenarioImporter {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
-            hermes_links[link_id] = new Link(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy);
+            hermes_links[link_id] = new HLink(link_id, storageCapacity, length, speed, flowPeriod, flowCapactiy, scenario.getConfig().hermes().getStuckTime());
         }
     }
 
@@ -227,9 +227,9 @@ public class ScenarioImporter {
                 case Agent.LinkType:
                     int linkid = Agent.getLinkPlanEntry(planentry);
                     int velocity = Agent.getVelocityPlanEntry(planentry);
-                    Link link = hermes_links[linkid];
+                    HLink link = hermes_links[linkid];
                     agent.linkFinishTime = link.length() / Math.min(velocity, link.velocity());
-                    link.push(agent);
+                    link.push(agent,0);
                     break;
                 case Agent.SleepForType:
                 case Agent.SleepUntilType:
@@ -243,7 +243,7 @@ public class ScenarioImporter {
 
         // TODO - couldn't this be folded in the prev loop?
         for (int i = 0; i < hermes_links.length; i++) {
-            Link link = hermes_links[i];
+            HLink link = hermes_links[i];
             if (link != null) {
                 int nextwakeup = link.nexttime();
                 if (nextwakeup > 0) {

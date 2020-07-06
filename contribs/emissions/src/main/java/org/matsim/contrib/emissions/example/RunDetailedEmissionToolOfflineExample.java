@@ -74,7 +74,7 @@ public final class RunDetailedEmissionToolOfflineExample{
 			this.prepareConfig() ;
 		}
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        EventsManager eventsManager = new ParallelEventsManager(false, 1);
+        EventsManager eventsManager = new ParallelEventsManager(false, 1, 65536);
 
 		AbstractModule module = new AbstractModule(){
 			@Override
