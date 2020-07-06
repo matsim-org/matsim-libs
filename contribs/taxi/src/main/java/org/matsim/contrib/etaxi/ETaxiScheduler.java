@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,6 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -91,7 +92,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	@Override
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (((TaxiTaskType)currentTask.getTaskType())) {
+		switch (getBaseType(currentTask)) {
 			case EMPTY_DRIVE:
 				Task nextTask = Schedules.getNextTask(schedule);
 				if (!(nextTask instanceof ETaxiChargingTask)) {

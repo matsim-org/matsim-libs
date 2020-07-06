@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.STAY;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -33,7 +35,6 @@ import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
@@ -47,23 +48,23 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility) {
 		double cellSize = ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getCellSize();
-		return create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime, travelDisutility,
-				new SquareGridSystem(network, cellSize));
+		return create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime,
+				travelDisutility, new SquareGridSystem(network, cellSize));
 	}
 
 	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, ZonalSystem zonalSystem) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility, ZonalSystem zonalSystem) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
 				travelDisutility, ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), idleTaxiRegistry,
 				unplannedRequestRegistry);
-		return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, idleTaxiRegistry,
-				unplannedRequestRegistry, requestInserter);
+		return new RuleBasedTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
+				idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
 	}
 
 	private final TaxiScheduler scheduler;
@@ -71,8 +72,9 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
 	public RuleBasedTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-								  TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, IdleTaxiZonalRegistry idleTaxiRegistry,
-								  UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater,
+			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
+			UnplannedRequestInserter requestInserter) {
 		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, requestInserter);
 
 		this.scheduler = scheduler;
@@ -119,6 +121,6 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	}
 
 	protected boolean isWaitStay(Task task) {
-		return task.getTaskType() == TaxiTaskType.STAY;
+		return STAY.isBaseTypeOf(task);
 	}
 }

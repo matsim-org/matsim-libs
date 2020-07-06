@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskTypes.DEFAULT_TAXI_TYPES;
+
 import java.awt.Color;
 
 import org.jfree.data.xy.DefaultTableXYDataset;
@@ -53,7 +55,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	@Override
 	public MobsimListener get() {
 		ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-				TaxiTimeProfiles.createCurrentTaxiTaskTypeCounter(fleet),
+				TaxiTimeProfiles.createCurrentTaxiTaskTypeCounter(fleet, DEFAULT_TAXI_TYPES),
 				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
 						TaxiRequestStatus.UNPLANNED));
 
@@ -74,9 +76,9 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 		});
 
 		if (matsimServices.getConfig().controler().isCreateGraphs()) {
-		  collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+			collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
 		} else {
-		  collector.setChartTypes();
+			collector.setChartTypes();
 		}
 		return collector;
 	}

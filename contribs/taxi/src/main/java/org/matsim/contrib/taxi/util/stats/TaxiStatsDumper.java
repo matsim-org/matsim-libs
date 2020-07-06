@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskTypes.DEFAULT_TAXI_TYPES;
+
 import java.util.List;
 
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -96,8 +98,7 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 
 	private void writeDetailedStats(List<TaxiStats> taxiStats, int iteration) {
 		String prefix = controlerIO.getIterationFilename(iteration, "taxi_");
-
-		new TaxiStatsWriter(taxiStats).write(prefix + "stats_" + taxiCfg.getMode() + ".txt");
+		new TaxiStatsWriter(taxiStats, DEFAULT_TAXI_TYPES).write(prefix + "stats_" + taxiCfg.getMode() + ".txt");
 		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms_" + taxiCfg.getMode() + ".txt");
 	}
 

@@ -27,11 +27,15 @@ import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.utils.io.IOUtils;
 
+import com.google.common.collect.ImmutableList;
+
 public class TaxiStatsWriter {
 	private final List<TaxiStats> taxiStats;
+	private final ImmutableList<TaxiTaskType> taskTypes;
 
-	public TaxiStatsWriter(List<TaxiStats> taxiStats) {
+	public TaxiStatsWriter(List<TaxiStats> taxiStats, ImmutableList<TaxiTaskType> taskTypes) {
 		this.taxiStats = taxiStats;
+		this.taskTypes = taskTypes;
 	}
 
 	public void write(String file) {
@@ -104,14 +108,14 @@ public class TaxiStatsWriter {
 	private void writeTaskTypeSums(CompactCSVWriter writer) {
 		writer.writeNext("Total duration of tasks by type [h]");
 		CSVLineBuilder headerBuilder = new CSVLineBuilder().add("hour");
-		for (TaxiTaskType t : TaxiTaskType.values()) {
+		for (TaxiTaskType t : taskTypes) {
 			headerBuilder.add(t.name());
 		}
 		writer.writeNext(headerBuilder.add("all"));
 
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
-			for (TaxiTaskType t : TaxiTaskType.values()) {
+			for (TaxiTaskType t : taskTypes) {
 				lineBuilder.addf("%.2f", s.taskTypeDurations.getOrDefault(t, 0.) / 3600);
 			}
 			lineBuilder.addf("%.2f", s.calculateTotalDuration() / 3600);

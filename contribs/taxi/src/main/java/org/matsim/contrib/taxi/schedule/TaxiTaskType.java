@@ -20,14 +20,67 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import java.util.Objects;
+
+import javax.annotation.Nullable;
+
 import org.matsim.contrib.dvrp.schedule.Task;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public enum TaxiTaskType implements Task.TaskType {
-	EMPTY_DRIVE, // not directly related to any customer (although may be related to serving a customer; e.g. a
-	// pickup drive)
-	PICKUP, OCCUPIED_DRIVE, DROPOFF, // serving a customer (TaxiTaskWithRequest)
-	STAY// not directly related to any customer
+public class TaxiTaskType implements Task.TaskType {
+
+	private final String name;
+	// can be null if the task type requires a special handling which is not provided by the standard taxi algorithms
+	// (e.g. e-taxi charging task cannot be handled as 'STAY')
+	@Nullable
+	private final TaxiTaskBaseType baseType;
+
+	private final int hash;
+
+	protected TaxiTaskType(TaxiTaskBaseType baseType) {
+		this.name = baseType.name();
+		this.baseType = baseType;
+		this.hash = Objects.hash(name, baseType);
+	}
+
+	public TaxiTaskType(String name, @Nullable TaxiTaskBaseType baseType) {
+		this.name = name;
+		this.baseType = baseType;
+		this.hash = Objects.hash(name, baseType);
+	}
+
+	public final String name() {
+		return name;
+	}
+
+	@Nullable
+	public final TaxiTaskBaseType getBaseType() {
+		return baseType;
+	}
+
+	@Override
+	public final boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof TaxiTaskType)) {
+			return false;
+		}
+		TaxiTaskType taskType = (TaxiTaskType)o;
+		return hash == taskType.hash && baseType == taskType.baseType && Objects.equals(name, taskType.name);
+	}
+
+	@Override
+	public final int hashCode() {
+		return hash;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("name", name).add("baseType", baseType).toString();
+	}
 }
