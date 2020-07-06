@@ -28,9 +28,11 @@ final class ShieldingContext {
     //obstruction candidates. nkuehnel, mar '20
     private final STRtree noiseBarriers;
     private final static double GROUND_HEIGHT = 0.5;
+    private final ShieldingCorrection shieldingCorrection;
 
     @Inject
-    ShieldingContext(Config config) {
+    ShieldingContext(Config config, ShieldingCorrection shieldingCorrection) {
+        this.shieldingCorrection = shieldingCorrection;
         NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
         this.noiseBarriers = new STRtree();
@@ -50,9 +52,9 @@ final class ShieldingContext {
     }
 
     /**
-     * determines the shielding correction for a receiver point for a given link emission source
+     * determines the shielding value z for a receiver point for a given link emission source
      */
-    double determineShieldingCorrection(ReceiverPoint receiverPoint, Link link, Coord projectedCoord) {
+    double determineShieldingValue(ReceiverPoint receiverPoint, Link link, Coord projectedCoord) {
         double correctionTermShielding = 0;
         final Point rpPoint = GeometryUtils.createGeotoolsPoint(receiverPoint.getCoord());
         final Point projectedPoint = GeometryUtils.createGeotoolsPoint(projectedCoord);
@@ -129,7 +131,7 @@ final class ShieldingContext {
             double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
                     + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
 
-            correctionTermShielding = RLS90NoiseImmission.calculateShieldingCorrection(
+            correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
                     rpPoint.distance(projectedPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
         }
         return correctionTermShielding;

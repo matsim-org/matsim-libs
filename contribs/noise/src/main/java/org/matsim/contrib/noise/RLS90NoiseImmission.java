@@ -85,7 +85,7 @@ class RLS90NoiseImmission implements NoiseImmission {
     }
 
     static double calculateResultingNoiseImmission(Collection<Double> collection){
-        double resultingNoiseImmission1 = 0.;
+        double resultingNoiseImmission = 0.;
 
         if (collection.size() > 0) {
             double sumTmp = 0.;
@@ -94,12 +94,11 @@ class RLS90NoiseImmission implements NoiseImmission {
                     sumTmp = sumTmp + (Math.pow(10, (0.1 * noiseImmission)));
                 }
             }
-            resultingNoiseImmission1 = 10 * Math.log10(sumTmp);
-            if (resultingNoiseImmission1 < 0) {
-                resultingNoiseImmission1 = 0.;
+            resultingNoiseImmission = 10 * Math.log10(sumTmp);
+            if (resultingNoiseImmission < 0) {
+                resultingNoiseImmission = 0.;
             }
         }
-        double resultingNoiseImmission = resultingNoiseImmission1;
         return resultingNoiseImmission;
     }
 
@@ -131,34 +130,9 @@ class RLS90NoiseImmission implements NoiseImmission {
             Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
                     candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
             double correctionTermShielding =
-                    shielding.determineShieldingCorrection(nrp, candidateLink, projectedSourceCoord);
+                    shielding.determineShieldingValue(nrp, candidateLink, projectedSourceCoord);
             correction -= correctionTermShielding;
         }
-        return correction;
-    }
-
-    /**
-     * Pegeländerung D_B durch bauliche Maßnahmen (und topografische Gegebenheiten)
-     * @param s distance between emission source and immission receiver point
-     * @param a distance between emission source and (first) edge of diffraction
-     * @param b distance between (last) edge of diffraction and immission receiver point
-     * @param c sum of distances between edges of diffraction
-     * @return shielding correction term for the given parameters
-     */
-    static double calculateShieldingCorrection(double s, double a, double b, double c) {
-
-        /**
-         * Shielding value (Schirmwert) z: the difference between length of the way from the emission source via the
-         * obstacle to the immission receiver point and direct distance between emission source and immission
-         * receiver point ~ i.e. the additional length that sound has to propagate because of shielding
-         */
-        double z = a + b + c - s;
-
-        //Weather correction for diffracted rays
-        double k = Math.exp(- 1. / 2000. * Math.sqrt( (a*b*s) / (2 * z)) );
-
-        double temp = 5 + ((70 + 0.25 * s) / (1+ 0.2 * z)) * z * Math.pow(k,2);
-        double correction = 7 * Math.log10(temp);
         return correction;
     }
 

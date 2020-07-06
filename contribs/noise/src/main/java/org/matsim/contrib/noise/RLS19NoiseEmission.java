@@ -64,7 +64,10 @@ class RLS19NoiseEmission implements NoiseEmission {
         double vLkw1 = getV(noiseLink, lkw1);
         double vLkw2 = getV(noiseLink, lkw2);
 
-        double emission = calculateEmission(noiseLink, vPkw, vLkw1, vLkw2, nPkw, nLkw1, nLkw2);
+        double emission = 0;
+        if(nPkw + nLkw1 + nLkw2 > 0) {
+            emission = calculateEmission(noiseLink, vPkw, vLkw1, vLkw2, nPkw, nLkw1, nLkw2);
+        }
         noiseLink.setEmission(emission);
 
         double emissionPlusPkw = calculateEmission(noiseLink, vPkw, vLkw1, vLkw2, nPkw + 1, nLkw1, nLkw2);
