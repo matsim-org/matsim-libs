@@ -61,4 +61,44 @@ public class UsecaseUtils {
 		}
 
 
+	public static class DistributionCarrierAdapterBuilder {
+
+		Id<Resource>id;
+		Carrier carrier;
+		Id<Link> locationLinkId;
+		ArrayList<LogisticsSolutionElement> clientElements;
+		DistributionCarrierScheduler distributionHandler;
+		Network network;
+
+			public static DistributionCarrierAdapterBuilder newInstance(Id<Resource> id, Network network){
+				return new DistributionCarrierAdapterBuilder(id,network);
+			}
+
+			private DistributionCarrierAdapterBuilder(Id<Resource> id, Network network){
+				this.id = id;
+				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.network = network;
+			}
+
+			public DistributionCarrierAdapterBuilder setLocationLinkId(Id<Link> locationLinkId){
+				this.locationLinkId = locationLinkId;
+				return this;
+			}
+
+			public DistributionCarrierAdapterBuilder setCarrier(Carrier carrier){
+				this.carrier = carrier;
+				return this;
+			}
+
+
+			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionHandler){
+				this.distributionHandler = distributionHandler;
+				return this;
+			}
+
+			public DistributionCarrierAdapter build(){
+				return new DistributionCarrierAdapter(this);
+			}
+
+		}
 }

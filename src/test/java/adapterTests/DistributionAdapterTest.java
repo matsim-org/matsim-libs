@@ -26,7 +26,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.usecase.DistributionCarrierAdapter;
 
 
 
@@ -40,7 +39,7 @@ public class DistributionAdapterTest {
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;
-		private DistributionCarrierAdapter distributionAdapter;
+		private CarrierResource distributionAdapter;
 		private Id<Link> distributionLinkId;
 		
 		@Before
@@ -76,7 +75,7 @@ public class DistributionAdapterTest {
 			
 			
 			Id<Resource> adapterId = Id.create("DistributionCarrierAdapter", Resource.class);
-			DistributionCarrierAdapter.Builder builder = DistributionCarrierAdapter.Builder.newInstance(adapterId, network);
+			UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
 			builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 			builder.setCarrier(distributionCarrier);
 			builder.setLocationLinkId(distributionLinkId);

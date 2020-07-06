@@ -192,7 +192,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		
 		
 		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
-		DistributionCarrierAdapter.Builder distributionAdapterBuilder = DistributionCarrierAdapter.Builder.newInstance(distributionAdapterId, network);
+		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		distributionAdapterBuilder.setCarrier(carrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);

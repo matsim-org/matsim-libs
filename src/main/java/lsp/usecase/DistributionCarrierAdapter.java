@@ -17,7 +17,7 @@ import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.controler.SimulationTracker;
 
-public class DistributionCarrierAdapter implements CarrierResource {
+/*package-private*/ class DistributionCarrierAdapter implements CarrierResource {
 
 	private Id<Resource>id;
 	private Carrier carrier;
@@ -29,49 +29,8 @@ public class DistributionCarrierAdapter implements CarrierResource {
 	private Collection<Info> infos;
 	private Collection<SimulationTracker> trackers;
 	private EventsManager eventsManager;
-	
-	public static class Builder {
-		
-		private Id<Resource>id;
-		private Carrier carrier;
-		private Id<Link> locationLinkId;
-		private ArrayList<LogisticsSolutionElement> clientElements;
-		private DistributionCarrierScheduler distributionHandler;
-		private Network network;
-			
-			public static Builder newInstance(Id<Resource> id, Network network){
-				return new Builder(id,network);
-			}
-			
-			private Builder(Id<Resource> id, Network network){
-				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
-				this.network = network;
-			}
-			
-			public Builder setLocationLinkId(Id<Link> locationLinkId){
-				this.locationLinkId = locationLinkId;
-				return this;
-			}
-			
-			public Builder setCarrier(Carrier carrier){
-				this.carrier = carrier;
-				return this;
-			}
-			
-			
-			public Builder setDistributionScheduler(DistributionCarrierScheduler distributionHandler){
-				this.distributionHandler = distributionHandler; 
-				return this;
-			}
-			
-			public DistributionCarrierAdapter build(){
-				return new DistributionCarrierAdapter(this);
-			}
-			
-		}
-		
-		private DistributionCarrierAdapter(DistributionCarrierAdapter.Builder builder){
+
+	DistributionCarrierAdapter(UsecaseUtils.DistributionCarrierAdapterBuilder builder){
 			this.id = builder.id;
 			this.locationLinkId = builder.locationLinkId;
 			this.distributionHandler = builder.distributionHandler;
