@@ -8,6 +8,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -52,11 +55,15 @@ public class RoundaboutTest {
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
 		buildRoundaboutNetwork(scenario);
 		buildPopulation(scenario);
-		final int[] eventsCount = new int[1];
+		final int[] eventsCount = new int[2];
 		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler((BasicEventHandler) event -> eventsCount[0]++);
+		controler.getEvents().addHandler((PersonArrivalEventHandler) event -> eventsCount[0]++);
+		controler.getEvents().addHandler((LinkLeaveEventHandler) event -> eventsCount[1]++);
 		controler.run();
-		Assert.equals(eventsCount[0],12800);
+		//400 agents with 3 legs each (incl. access/egress)
+		Assert.equals(1200,eventsCount[0]);
+		//400 agents each traveling on 7 links
+		Assert.equals(7*400,eventsCount[1]);
 	}
 
 	private Config createConfig() {
