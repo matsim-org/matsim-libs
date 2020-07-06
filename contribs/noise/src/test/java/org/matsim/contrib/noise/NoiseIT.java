@@ -208,7 +208,7 @@ public class NoiseIT {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager events = new ParallelEventsManager(false,1,65536);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
