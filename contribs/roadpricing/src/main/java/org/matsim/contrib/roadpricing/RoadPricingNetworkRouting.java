@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -87,7 +86,7 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
-		if (!plansCalcRouteConfigGroup.getAccessEgressWalkType().equals(AccessEgressWalkType.none)) {
+		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
 					routeAlgo, scenario, filteredNetwork, walkRouter );
 		} else {

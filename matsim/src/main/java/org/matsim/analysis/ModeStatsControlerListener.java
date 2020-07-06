@@ -22,13 +22,8 @@ package org.matsim.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.inject.Inject;
 
@@ -61,7 +56,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  * @author mrieser
  */
-public class ModeStatsControlerListener implements StartupListener, IterationEndsListener, 
+public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener,
 ShutdownListener {
 
 	public static final String FILENAME_MODESTATS = "modestats";
@@ -193,4 +188,9 @@ ShutdownListener {
 		}
 
 	}
+
+	public final Map<String, Map<Integer, Double>> getModeHistories() {
+		return Collections.unmodifiableMap( this.modeHistories ) ;
+	}
+
 }
