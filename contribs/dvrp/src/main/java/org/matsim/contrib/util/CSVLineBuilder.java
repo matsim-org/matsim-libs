@@ -42,6 +42,11 @@ public class CSVLineBuilder {
 		return this;
 	}
 
+	public CSVLineBuilder addAll(List<String> cells) {
+		line.addAll(cells);
+		return this;
+	}
+
 	public CSVLineBuilder addAll(Stream<String> cells) {
 		cells.forEach(line::add);
 		return this;

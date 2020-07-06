@@ -19,12 +19,15 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -38,6 +41,9 @@ import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 public class TaxiTimeProfiles {
 	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet, final ScheduleInquiry scheduleInquiry) {
 		return TimeProfiles.createSingleValueCalculator("Idle",
@@ -45,11 +51,13 @@ public class TaxiTimeProfiles {
 	}
 
 	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet) {
-		String[] header = TimeProfiles.combineValuesIntoStrings(TaxiTaskType.values());
+		ImmutableList<String> header = Arrays.stream(TaxiTaskType.values())
+				.map(Objects::toString)
+				.collect(toImmutableList());
 		return TimeProfiles.createProfileCalculator(header, () -> calculateTaxiTaskTypeCounts(fleet));
 	}
 
-	public static Long[] calculateTaxiTaskTypeCounts(Fleet fleet) {
+	public static ImmutableMap<String, Double> calculateTaxiTaskTypeCounts(Fleet fleet) {
 		Map<Task.TaskType, Long> countsByType = fleet.getVehicles()
 				.values()
 				.stream()
@@ -58,8 +66,7 @@ public class TaxiTimeProfiles {
 				.collect(groupingBy(schedule -> schedule.getCurrentTask().getTaskType(), counting()));
 
 		return Arrays.stream(TaxiTaskType.values())
-				.map(type -> countsByType.getOrDefault(type, 0L))
-				.toArray(Long[]::new);
+				.collect(toImmutableMap(Enum::name, type -> (double)countsByType.getOrDefault(type, 0L)));
 	}
 
 	public static ProfileCalculator createRequestsWithStatusCounter(final Collection<? extends Request> requests,

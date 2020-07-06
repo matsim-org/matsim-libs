@@ -79,6 +79,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
 
+
 	@Positive
 	private int interval = 1800;// [s]
 
@@ -138,6 +139,9 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
+		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
+		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
+		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		return map;
 	}
 
