@@ -69,11 +69,11 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	public enum AccessEgressWalkType {@Deprecated none, walkToLink, constantTimeToLink, walkToLinkPlusConstant}
+	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
 
 	private static final String ISINSERTINGACCESSEGRESSWALK = "insertAccessEgressWalk";
 	private static final String ISINSERTINGACCESSEGRESSWALKCMT = "Inserts access and Egress walk legs to main mode routes. Either of [none, walkToLink, constantTimeToLink, walkToLinkPlusConstant], Current default=none ";
-	private AccessEgressWalkType accessEgressWalkType = AccessEgressWalkType.none;
+	private AccessEgressType accessEgressType = AccessEgressType.none;
 
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
@@ -445,7 +445,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.setRoutingRandomness( Double.parseDouble( value ) );
 		}
 //		else if (ISINSERTINGACCESSEGRESSWALK.equals( key ) ) {
-//			this.setInsertingAccessEgressWalk(AccessEgressWalkType.valueOf(value));
+//			this.setInsertingAccessEgressWalk(AccessEgressType.valueOf(value));
 //		}
 //		TODO: uncomment this for release 13.0
 		else {
@@ -459,7 +459,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
-//		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressWalkType().toString()) ;
+//		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressType().toString()) ;
 //TODO: uncomment this for release 13.0
 		return map;
 	}
@@ -561,13 +561,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 
 	@StringGetter(ISINSERTINGACCESSEGRESSWALK)
-	public AccessEgressWalkType getAccessEgressWalkType() {
-		return this.accessEgressWalkType ;
+	public AccessEgressType getAccessEgressType() {
+		return this.accessEgressType;
 	}
 
 	@StringSetter(ISINSERTINGACCESSEGRESSWALK)
-	public void setInsertingAccessEgressWalk( AccessEgressWalkType accessEgressWalkType) {
-		this.accessEgressWalkType = accessEgressWalkType;
+	public void setAccessEgressType(AccessEgressType accessEgressType) {
+		this.accessEgressType = accessEgressType;
 	}
 
 	@StringGetter(RANDOMNESS)
