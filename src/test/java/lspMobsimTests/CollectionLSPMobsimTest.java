@@ -52,8 +52,7 @@ public class CollectionLSPMobsimTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
-		
-		CollectionCarrierScheduler scheduler = new CollectionCarrierScheduler();
+
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
@@ -81,7 +80,7 @@ public class CollectionLSPMobsimTest {
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
-		adapterBuilder.setCollectionScheduler(scheduler);
+		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
 		collectionAdapter = adapterBuilder.build();

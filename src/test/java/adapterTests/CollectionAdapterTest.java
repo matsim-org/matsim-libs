@@ -25,7 +25,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.usecase.CollectionCarrierScheduler;
 
 
 
@@ -35,7 +34,6 @@ public class CollectionAdapterTest {
 	//Man kann sie deshalb ja extra au�erhalb des Builders einsetzen.
 	
 	private Network network;
-	private CollectionCarrierScheduler scheduler;
 	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
@@ -50,8 +48,7 @@ public class CollectionAdapterTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
-		
-		scheduler = new CollectionCarrierScheduler();
+
 		Id<Carrier> carrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
@@ -78,7 +75,7 @@ public class CollectionAdapterTest {
 		
 		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
-		builder.setCollectionScheduler(scheduler);
+		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(collectionCarrier);
 		builder.setLocationLinkId(collectionLinkId);
 		carrierResource = builder.build();

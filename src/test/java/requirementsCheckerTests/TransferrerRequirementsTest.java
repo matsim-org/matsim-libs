@@ -37,7 +37,6 @@ import demand.offer.OfferFactoryImpl;
 import demand.offer.OfferTransferrer;
 import lsp.resources.Resource;
 import lsp.shipment.Requirement;
-import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
 public class TransferrerRequirementsTest {
@@ -56,8 +55,7 @@ public class TransferrerRequirementsTest {
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
         this.network = scenario.getNetwork();
-		
-		CollectionCarrierScheduler redScheduler = new CollectionCarrierScheduler();
+
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
 		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
@@ -83,7 +81,7 @@ public class TransferrerRequirementsTest {
 				
 		Id<Resource> redAdapterId = Id.create("RedCarrierAdapter", Resource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(redAdapterId, network);
-		redAdapterBuilder.setCollectionScheduler(redScheduler);
+		redAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
 		Resource redCollectionAdapter = redAdapterBuilder.build();
@@ -104,8 +102,7 @@ public class TransferrerRequirementsTest {
 		
 		collectionPlan = new LSPPlanWithOfferTransferrer();
 		collectionPlan.addSolution(redOfferSolution);
-	
-		CollectionCarrierScheduler blueScheduler = new CollectionCarrierScheduler();
+
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId);
@@ -121,7 +118,7 @@ public class TransferrerRequirementsTest {
 				
 		Id<Resource> blueAdapterId = Id.create("BlueCarrierAdapter", Resource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(blueAdapterId, network);
-		blueAdapterBuilder.setCollectionScheduler(blueScheduler);
+		blueAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);
 		Resource blueCollectionAdapter = blueAdapterBuilder.build();

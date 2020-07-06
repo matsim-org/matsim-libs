@@ -11,6 +11,10 @@ import java.util.ArrayList;
 
 public class UsecaseUtils {
 
+	public static CollectionCarrierScheduler createDefaultCollectionCarrierScheduler() {
+		return new CollectionCarrierScheduler();
+	}
+
 	public static class CollectionCarrierAdapterBuilder {
 
 		Id<Resource> id;
@@ -51,4 +55,6 @@ public class UsecaseUtils {
 			}
 
 		}
+
+
 }

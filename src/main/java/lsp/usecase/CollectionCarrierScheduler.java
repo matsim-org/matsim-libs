@@ -29,7 +29,7 @@ import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
 
 
-public class CollectionCarrierScheduler extends ResourceScheduler {
+/*package-private*/  class CollectionCarrierScheduler extends ResourceScheduler {
 	
 	class LSPCarrierPair{
 		private ShipmentTuple tuple;
@@ -46,8 +46,8 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 	private CollectionCarrierAdapter adapter;
 	private ArrayList<LSPCarrierPair>pairs;
 
-	
-	public CollectionCarrierScheduler(){
+
+	CollectionCarrierScheduler(){
 		this.pairs = new ArrayList<LSPCarrierPair>();
 	}
 	
