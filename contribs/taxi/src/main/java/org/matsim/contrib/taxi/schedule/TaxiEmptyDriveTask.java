@@ -19,11 +19,15 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
+
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 
 public class TaxiEmptyDriveTask extends DriveTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(EMPTY_DRIVE);
+
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
-		super(TaxiTaskType.EMPTY_DRIVE, path);
+		super(TYPE, path);
 	}
 }

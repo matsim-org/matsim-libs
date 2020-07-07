@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.OCCUPIED_DRIVE;
+
 import java.util.List;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -29,7 +31,6 @@ import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -52,7 +53,8 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, UnplannedRequestInserter requestInserter) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater,
+			UnplannedRequestInserter requestInserter) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
@@ -116,7 +118,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	}
 
 	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
-		return !taxiCfg.isDestinationKnown() && newCurrentTask.getTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
+		return !taxiCfg.isDestinationKnown() && OCCUPIED_DRIVE.isBaseTypeOf(newCurrentTask);
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {

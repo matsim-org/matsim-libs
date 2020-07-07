@@ -109,8 +109,10 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			public TaxiScheduler get() {
 				Fleet fleet = getModalInstance(Fleet.class);
 				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				LeastCostPathCalculator router = new FastAStarLandmarksFactory(getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				LeastCostPathCalculator router = new FastAStarLandmarksFactory(
+						getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
 				return new TaxiScheduler(taxiCfg, fleet, timer, travelTime, router);
 			}
 		}).asEagerSingleton();
