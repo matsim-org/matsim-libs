@@ -81,6 +81,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	
 	private boolean usesDeprecatedSyntax = false ;
 
+	public enum MarginalUtilityOfTimeAsResource { explicit, implicitAsTypicalInLogitModel }
+	private MarginalUtilityOfTimeAsResource marginalUtilityOfTimeAsResource = MarginalUtilityOfTimeAsResource.explicit;
+
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
 
@@ -640,6 +643,29 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
 						+ "so rather aborting here.");
 			}
+		}
+
+		switch( this.marginalUtilityOfTimeAsResource ){
+			case explicit:
+				for( ScoringParameterSet scoringParams : getScoringParametersPerSubpopulation().values() ){
+					Double betaPerf = scoringParams.getPerforming_utils_hr();
+					if ( betaPerf==null ) {
+						throw new RuntimeException( "you have requested marginalUtilityOfTimeAsResource as explicit, but not provided" +
+											    " beta_performing." );
+					}
+				}
+				break;
+			case implicitAsTypicalInLogitModel:
+				for( ScoringParameterSet scoringParams : getScoringParametersPerSubpopulation().values() ){
+					Double betaPerf = scoringParams.getPerforming_utils_hr();
+					if ( betaPerf!=null ) {
+						throw new RuntimeException( "you have requested marginalUtilityOfTimeAsResource as implicit, but have " +
+											    "provided beta_performing." );
+					}
+				}
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + this.marginalUtilityOfTimeAsResource );
 		}
 
 	}
