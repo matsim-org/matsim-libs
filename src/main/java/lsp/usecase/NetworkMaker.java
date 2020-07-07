@@ -1,7 +1,6 @@
 package lsp.usecase;
 
 
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -13,7 +12,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import com.google.common.collect.Sets;
 
-public class NetworkMaker {
+class NetworkMaker {
 
 	public static void main (String[]args){
 		Network network = NetworkUtils.createNetwork();
