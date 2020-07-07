@@ -651,7 +651,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 					Double betaPerf = scoringParams.getPerforming_utils_hr();
 					if ( betaPerf==null ) {
 						throw new RuntimeException( "you have requested marginalUtilityOfTimeAsResource as explicit, but not provided" +
-											    " beta_performing." );
+											    " beta_performing.  The default used to be +6; just set it to " +
+											    "that value if you know what you are doing.  Otherwise, if your " +
+											    "scoring parameters come from a logit model, use other option " +
+											    "implicitAsTypicalInLogitModel." );
 					}
 				}
 				break;
