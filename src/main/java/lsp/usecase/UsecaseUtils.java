@@ -23,6 +23,10 @@ public class UsecaseUtils {
 		return UsecaseUtils.createDefaultMainRunCarrierScheduler();
 	}
 
+	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(ArrayList<Resource> resources) {
+		return new SimpleForwardSolutionScheduler(resources);
+	}
+
 	public static class CollectionCarrierAdapterBuilder {
 
 		Id<Resource> id;

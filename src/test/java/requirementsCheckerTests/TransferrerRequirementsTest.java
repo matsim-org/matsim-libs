@@ -37,7 +37,6 @@ import demand.offer.OfferFactoryImpl;
 import demand.offer.OfferTransferrer;
 import lsp.resources.Resource;
 import lsp.shipment.Requirement;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 
 public class TransferrerRequirementsTest {
 	private Network network;
@@ -149,7 +148,7 @@ public class TransferrerRequirementsTest {
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
 			
-		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		offerLSPBuilder.setSolutionScheduler(simpleScheduler);
 		offerLSP = offerLSPBuilder.build();
 		LSPPlanDecorator decorator = (LSPPlanDecorator)offerLSP.getSelectedPlan();

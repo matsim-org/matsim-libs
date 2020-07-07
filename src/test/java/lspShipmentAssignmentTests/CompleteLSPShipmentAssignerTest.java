@@ -230,7 +230,7 @@ public class CompleteLSPShipmentAssignerTest {
 		resourcesList.add(distributionAdapter);
 
 
-		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 	

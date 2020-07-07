@@ -9,13 +9,13 @@ import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
 
-public class SimpleForwardSolutionScheduler implements SolutionScheduler {
+/*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
 	private LSP lsp;
 	private ArrayList<Resource> resources;
 	private int bufferTime;
 	
-	public SimpleForwardSolutionScheduler(ArrayList<Resource> resources) {
+	SimpleForwardSolutionScheduler(ArrayList<Resource> resources) {
 		this.resources = resources;
 	}
 	

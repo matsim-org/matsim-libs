@@ -138,7 +138,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		resourcesList.add(firstReloadingPointAdapter);
 		
 
-		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();

@@ -234,7 +234,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		resourcesList.add(distributionAdapter);
 
 
-		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
+		simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		simpleScheduler.setBufferTime(300);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
