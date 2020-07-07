@@ -12,7 +12,7 @@ import lsp.eventhandlers.TourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 
-public class MainRunTourStartEventHandler implements TourStartEventHandler {
+/*package-private*/ class MainRunTourStartEventHandler implements TourStartEventHandler {
 
 	private LSPShipment lspShipment;
 	private CarrierService carrierService;

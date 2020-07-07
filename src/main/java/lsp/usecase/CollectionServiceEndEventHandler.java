@@ -10,7 +10,7 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 
-public class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
+class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
