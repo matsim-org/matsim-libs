@@ -93,7 +93,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		collectionBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
-		ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -149,7 +149,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
-		ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         secondSchedulerBuilder.setCapacityNeedFixed(10);
         secondSchedulerBuilder.setCapacityNeedLinear(1);
        

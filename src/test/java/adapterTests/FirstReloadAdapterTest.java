@@ -2,6 +2,7 @@ package adapterTests;
 
 import static org.junit.Assert.*;
 
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -10,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.usecase.ReloadingPoint;
-import lsp.usecase.ReloadingPointScheduler;
 
 
 public class FirstReloadAdapterTest {
@@ -18,22 +18,20 @@ public class FirstReloadAdapterTest {
 	private  Id<Resource> reloadingId;
 	private Id<Link> reloadingLinkId;
 	private ReloadingPoint reloadingPoint;
-	private ReloadingPointScheduler scheduler;
 	
 	@Before
 	public void initialize(){
 		
         
-        ReloadingPointScheduler.Builder schedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+        UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
-        scheduler = schedulerBuilder.build();
-        
-        reloadingId = Id.create("ReloadingPoint1", Resource.class);
+
+		reloadingId = Id.create("ReloadingPoint1", Resource.class);
         reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         ReloadingPoint.Builder reloadingPointBuilder = ReloadingPoint.Builder.newInstance(reloadingId, reloadingLinkId);
-        reloadingPointBuilder.setReloadingScheduler(scheduler);
+        reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
         reloadingPoint = reloadingPointBuilder.build();
 	}
 	

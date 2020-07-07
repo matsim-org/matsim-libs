@@ -3,13 +3,13 @@ package solutionElementTests;
 import static org.junit.Assert.*;
 
 import lsp.LSPUtils;
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import lsp.usecase.ReloadingPoint;
-import lsp.usecase.ReloadingPointScheduler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
@@ -22,7 +22,7 @@ public class SecondReloadElementTest {
 	
 	@Before
 	public void initialize() {
-		ReloadingPointScheduler.Builder schedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
        

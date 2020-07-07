@@ -3,6 +3,7 @@ package lsp.usecase;
 import java.util.ArrayList;
 
 import lsp.shipment.ShipmentUtils;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
@@ -11,45 +12,20 @@ import lsp.resources.Resource;
 import lsp.resources.ResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
 
-public class ReloadingPointScheduler extends ResourceScheduler {
+/*package-private*/ class ReloadingPointScheduler extends ResourceScheduler {
+
+	Logger log = Logger.getLogger(ReloadingPointScheduler.class);
 
 	private ReloadingPoint reloadingPoint;
 	private double capacityNeedLinear;
 	private double capacityNeedFixed;
 	private ReloadingPointEventHandler eventHandler;
 
-	public static class Builder{
-		private double capacityNeedLinear;
-		private double capacityNeedFixed;
-		
-		private Builder(){
-		}
-		
-		public static Builder newInstance(){
-			return new Builder();
-		}
-		
-				
-		public Builder setCapacityNeedLinear(double capacityNeedLinear){
-			this.capacityNeedLinear = capacityNeedLinear;
-			return this;
-		}
-		
-		public Builder setCapacityNeedFixed(double capacityNeedFixed){
-			this.capacityNeedFixed = capacityNeedFixed;
-			return this;
-		}
-	
-		public ReloadingPointScheduler build(){
-			return new ReloadingPointScheduler(this);
-		}
-	}
-	
-	private ReloadingPointScheduler(ReloadingPointScheduler.Builder builder){
+	ReloadingPointScheduler(UsecaseUtils.ReloadingPointSchedulerBuilder builder){
 		this.shipments = new ArrayList<ShipmentTuple>();
-		this.capacityNeedLinear = builder.capacityNeedLinear;
-		this.capacityNeedFixed = builder.capacityNeedFixed;
-		
+		this.capacityNeedLinear = builder.getCapacityNeedLinear();
+		this.capacityNeedFixed = builder.getCapacityNeedFixed();
+
 	}
 	
 	protected void initializeValues(Resource resource) {
@@ -63,9 +39,10 @@ public class ReloadingPointScheduler extends ResourceScheduler {
 			handleWaitingShipment(tupleToBeAssigned);
 		}
 	}
-	
+
+	@Deprecated //TODO Method has no content, KMT Jul'20
 	protected void updateShipments() {
-		
+		log.error("This method is not implemented. Nothing will happen here. ");
 	}
 	
 	

@@ -90,7 +90,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		collectionBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
-		ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -99,8 +99,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);
-        ReloadingPointScheduler reloadScheduler = firstReloadingSchedulerBuilder.build();
-        firstReloadingPointBuilder.setReloadingScheduler(reloadScheduler);
+		firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
         Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
@@ -147,17 +146,16 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
-		ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         secondSchedulerBuilder.setCapacityNeedFixed(10);
         secondSchedulerBuilder.setCapacityNeedLinear(1);
-        ReloadingPointScheduler secondScheduler = secondSchedulerBuilder.build();
-        		
-        Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+
+		Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
         Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         ReloadingPoint.Builder secondReloadingPointBuilder = ReloadingPoint.Builder.newInstance(secondReloadingId, secondReloadingLinkId);
        
-        secondReloadingPointBuilder.setReloadingScheduler(secondScheduler);
+        secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
         Resource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
         
         Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);

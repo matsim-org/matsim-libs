@@ -85,7 +85,7 @@ import lsp.resources.Resource;
         ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);      
         
         //The scheduler for the first reloading point is created
-    	ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+    	UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
         
@@ -149,7 +149,7 @@ import lsp.resources.Resource;
         ReloadingPoint.Builder secondReloadingPointBuilder = ReloadingPoint.Builder.newInstance(secondReloadingId, secondReloadingLinkId);
         
         //The scheduler for the second reloading point is created
-        ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+        UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         secondSchedulerBuilder.setCapacityNeedFixed(10);
         secondSchedulerBuilder.setCapacityNeedLinear(1); 
        

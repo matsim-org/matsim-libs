@@ -91,7 +91,7 @@ public class MainRunLSPMobsimTest {
 		collectionBuilder.setResource(collectionAdapter);
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
-		ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        

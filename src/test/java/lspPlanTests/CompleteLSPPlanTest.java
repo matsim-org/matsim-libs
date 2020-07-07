@@ -76,7 +76,7 @@ public class CompleteLSPPlanTest {
 		collectionBuilder.setResource(collectionAdapterBuilder.build());
 		LogisticsSolutionElement collectionElement = collectionBuilder.build();
 		
-		ReloadingPointScheduler.Builder firstReloadingSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
@@ -132,7 +132,7 @@ public class CompleteLSPPlanTest {
 		mainRunBuilder.setResource( mainRunAdapterBuilder.build());
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
-		ReloadingPointScheduler.Builder secondSchedulerBuilder =  ReloadingPointScheduler.Builder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder secondSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         secondSchedulerBuilder.setCapacityNeedFixed(10);
         secondSchedulerBuilder.setCapacityNeedLinear(1);
        

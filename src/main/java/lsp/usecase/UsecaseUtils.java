@@ -150,6 +150,7 @@ public class UsecaseUtils {
 				return new MainRunCarrierAdapter(this);
 			}
 
+		//--- Getter ---
 		Id<Resource> getId() {
 			return id;
 		}
@@ -178,4 +179,40 @@ public class UsecaseUtils {
 			return network;
 		}
 		}
+
+	public static class ReloadingPointSchedulerBuilder {
+		private double capacityNeedLinear;
+		private double capacityNeedFixed;
+
+		private ReloadingPointSchedulerBuilder(){
+		}
+
+		public static ReloadingPointSchedulerBuilder newInstance(){
+			return new ReloadingPointSchedulerBuilder();
+		}
+
+
+		public ReloadingPointSchedulerBuilder setCapacityNeedLinear(double capacityNeedLinear){
+			this.capacityNeedLinear = capacityNeedLinear;
+			return this;
+		}
+
+		public ReloadingPointSchedulerBuilder setCapacityNeedFixed(double capacityNeedFixed){
+			this.capacityNeedFixed = capacityNeedFixed;
+			return this;
+		}
+
+		public ReloadingPointScheduler build(){
+			return new ReloadingPointScheduler(this);
+		}
+
+		//--- Getter ---
+		double getCapacityNeedLinear() {
+			return capacityNeedLinear;
+		}
+
+		double getCapacityNeedFixed() {
+			return capacityNeedFixed;
+		}
+	}
 }
