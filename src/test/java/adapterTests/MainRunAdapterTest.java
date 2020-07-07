@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -24,7 +25,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.usecase.MainRunCarrierAdapter;
 import lsp.usecase.MainRunCarrierScheduler;
 
 
@@ -41,7 +41,7 @@ public class MainRunAdapterTest {
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;
 	private MainRunCarrierScheduler scheduler;
-	private MainRunCarrierAdapter mainRunAdapter;
+	private CarrierResource mainRunAdapter;
 	
 	@Before
 	public void initialize() {
@@ -64,8 +64,8 @@ public class MainRunAdapterTest {
 				
 		toLinkId = Id.createLinkId("(14 2) (14 3)");
 		fromLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("MainRunVehicle");
-		carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, fromLinkId);
+		Id<Vehicle> collectionVehicleId = Id.createVehicleId("MainRunVehicle");
+		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId);
 		carrierVehicle.setVehicleType(mainRunType);
 				
 		
@@ -80,7 +80,7 @@ public class MainRunAdapterTest {
         
         scheduler = new MainRunCarrierScheduler();
         Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
-        MainRunCarrierAdapter.Builder mainRunBuilder = MainRunCarrierAdapter.Builder.newInstance(mainRunId, network);
+        UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunBuilder.setMainRunCarrierScheduler(scheduler);
         mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));

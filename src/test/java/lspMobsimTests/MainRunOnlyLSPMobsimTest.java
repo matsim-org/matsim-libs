@@ -12,6 +12,7 @@ import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.*;
+import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,10 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.usecase.MainRunCarrierAdapter;
-import lsp.usecase.MainRunCarrierScheduler;
-import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
 import lsp.resources.Resource;
@@ -86,7 +83,7 @@ public class MainRunOnlyLSPMobsimTest {
         
         MainRunCarrierScheduler mainRunScheduler = new MainRunCarrierScheduler();
         Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
-        MainRunCarrierAdapter.Builder mainRunAdapterBuilder = MainRunCarrierAdapter.Builder.newInstance(mainRunId, network);
+        UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunAdapterBuilder.setMainRunCarrierScheduler(mainRunScheduler);
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));

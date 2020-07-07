@@ -125,7 +125,7 @@ import lsp.resources.Resource;
         
 		//The adapter i.e. the main run resource is created
 		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
-        MainRunCarrierAdapter.Builder mainRunAdapterBuilder = MainRunCarrierAdapter.Builder.newInstance(mainRunId, network);
+        UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
         mainRunAdapterBuilder.setCarrier(mainRunCarrier);

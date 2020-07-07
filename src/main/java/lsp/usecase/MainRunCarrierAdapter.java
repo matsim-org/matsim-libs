@@ -16,7 +16,7 @@ import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.controler.SimulationTracker;
 
-public class MainRunCarrierAdapter implements CarrierResource {
+/*package-private*/ class MainRunCarrierAdapter implements CarrierResource {
 
 	private Id<Resource>id;
 	private Carrier carrier;
@@ -29,62 +29,16 @@ public class MainRunCarrierAdapter implements CarrierResource {
 	private Collection<SimulationTracker> trackers;
 	private Collection<Info> infos;
 	private EventsManager eventsManager;
-	
-	
-	public static class Builder {
-		
-		private Id<Resource>id;
-		private Carrier carrier;
-		private Id<Link> fromLinkId;
-		private Id<Link> toLinkId;
-		private ArrayList<LogisticsSolutionElement> clientElements;
-		private MainRunCarrierScheduler mainRunScheduler;
-		private Network network;
-			
-			public static Builder newInstance(Id<Resource> id, Network network){
-				return new Builder(id,network);
-			}
-			
-			private Builder(Id<Resource> id, Network network){
-				this.id = id;
-				this.clientElements = new ArrayList <LogisticsSolutionElement>();
-				this.network = network;
-			}
-			
-			public Builder setFromLinkId(Id<Link> fromLinkId){
-				this.fromLinkId = fromLinkId;
-				return this;
-			}
-			
-			public Builder setToLinkId(Id<Link> toLinkId){
-				this.toLinkId = toLinkId;
-				return this;
-			}
-			
-			public Builder setCarrier(Carrier carrier){
-				this.carrier = carrier;
-				return this;
-			}
-			
-			public Builder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler){
-				this.mainRunScheduler = mainRunScheduler; 
-				return this;
-			}
-			
-			public MainRunCarrierAdapter build(){
-				return new MainRunCarrierAdapter(this);
-			}
-			
-		}
-		
-		private MainRunCarrierAdapter(MainRunCarrierAdapter.Builder builder){
-			this.id = builder.id;
-			this.carrier = builder.carrier;
-			this.fromLinkId = builder.fromLinkId;
-			this.toLinkId = builder.toLinkId;
-			this.clientElements = builder.clientElements;
-			this.mainRunScheduler = builder.mainRunScheduler;
-			this.network = builder.network;
+
+
+	MainRunCarrierAdapter(UsecaseUtils.MainRunCarrierAdapterBuilder builder){
+			this.id = builder.getId();
+			this.carrier = builder.getCarrier();
+			this.fromLinkId = builder.getFromLinkId();
+			this.toLinkId = builder.getToLinkId();
+			this.clientElements = builder.getClientElements();
+			this.mainRunScheduler = builder.getMainRunScheduler();
+			this.network = builder.getNetwork();
 			this.eventHandlers = new ArrayList<EventHandler>();
 			this.infos = new ArrayList<Info>();
 			this.trackers = new ArrayList<SimulationTracker>();

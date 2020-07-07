@@ -101,4 +101,77 @@ public class UsecaseUtils {
 			}
 
 		}
+
+	public static class MainRunCarrierAdapterBuilder {
+
+		private Id<Resource>id;
+		private Carrier carrier;
+		private Id<Link> fromLinkId;
+		private Id<Link> toLinkId;
+		private ArrayList<LogisticsSolutionElement> clientElements;
+		private MainRunCarrierScheduler mainRunScheduler;
+		private Network network;
+
+			public static MainRunCarrierAdapterBuilder newInstance(Id<Resource> id, Network network){
+				return new MainRunCarrierAdapterBuilder(id,network);
+			}
+
+			private MainRunCarrierAdapterBuilder(Id<Resource> id, Network network){
+				this.id = id;
+				this.clientElements = new ArrayList <LogisticsSolutionElement>();
+				this.network = network;
+			}
+
+			public MainRunCarrierAdapterBuilder setFromLinkId(Id<Link> fromLinkId){
+				this.fromLinkId = fromLinkId;
+				return this;
+			}
+
+			public MainRunCarrierAdapterBuilder setToLinkId(Id<Link> toLinkId){
+				this.toLinkId = toLinkId;
+				return this;
+			}
+
+			public MainRunCarrierAdapterBuilder setCarrier(Carrier carrier){
+				this.carrier = carrier;
+				return this;
+			}
+
+			public MainRunCarrierAdapterBuilder setMainRunCarrierScheduler(MainRunCarrierScheduler mainRunScheduler){
+				this.mainRunScheduler = mainRunScheduler;
+				return this;
+			}
+
+			public MainRunCarrierAdapter build(){
+				return new MainRunCarrierAdapter(this);
+			}
+
+		Id<Resource> getId() {
+			return id;
+		}
+
+		Carrier getCarrier() {
+			return carrier;
+		}
+
+		Id<Link> getFromLinkId() {
+			return fromLinkId;
+		}
+
+		Id<Link> getToLinkId() {
+			return toLinkId;
+		}
+
+		ArrayList<LogisticsSolutionElement> getClientElements() {
+			return clientElements;
+		}
+
+		MainRunCarrierScheduler getMainRunScheduler() {
+			return mainRunScheduler;
+		}
+
+		Network getNetwork() {
+			return network;
+		}
+		}
 }

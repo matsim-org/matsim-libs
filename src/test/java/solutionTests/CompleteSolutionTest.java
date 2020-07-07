@@ -127,7 +127,7 @@ public class CompleteSolutionTest {
 
 		MainRunCarrierScheduler mainRunScheduler = new MainRunCarrierScheduler();
 		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
-		MainRunCarrierAdapter.Builder mainRunAdapterBuilder = MainRunCarrierAdapter.Builder.newInstance(mainRunId,
+		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId,
 				network);
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(mainRunScheduler);
 		mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
