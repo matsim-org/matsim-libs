@@ -13,7 +13,7 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 import lsp.controler.SimulationTracker;
 
-public class ReloadingPoint implements Resource {
+/*package-private*/ class ReloadingPoint implements Resource {
 
 	private Id<Resource> id;
 	private Id<Link> locationLinkId;
@@ -24,43 +24,15 @@ public class ReloadingPoint implements Resource {
 	private Collection<SimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
 	private EventsManager eventsManager;
-	
-	public static class Builder {
-		
-		private Id<Resource> id;
-		private Id<Link> locationLinkId;
-		private ReloadingPointScheduler reloadingScheduler;
-		private ArrayList <LogisticsSolutionElement> clientElements;
-		
-		public static Builder newInstance(Id<Resource> id, Id<Link> locationLinkId){
-			return new Builder(id,locationLinkId);
-		}
-		
-		private Builder(Id<Resource> id, Id<Link> locationLinkId){
-			this.id = id;
-			this.clientElements = new ArrayList <LogisticsSolutionElement>();
-			this.locationLinkId = locationLinkId;
-		}
-		
-		public Builder setReloadingScheduler(ReloadingPointScheduler reloadingHandler){
-			this.reloadingScheduler = reloadingHandler; 
-			return this;
-		}
-		
-		public ReloadingPoint build(){
-			return new ReloadingPoint(this);
-		}
-		
-	}
-	
-	private ReloadingPoint(ReloadingPoint.Builder builder){
-		this.id = builder.id;
-		this.locationLinkId = builder.locationLinkId;
-		this.reloadingScheduler = builder.reloadingScheduler;
+
+	ReloadingPoint(UsecaseUtils.ReloadingPointBuilder builder){
+		this.id = builder.getId();
+		this.locationLinkId = builder.getLocationLinkId();
+		this.reloadingScheduler = builder.getReloadingScheduler();
 		reloadingScheduler.setReloadingPoint(this);
 		ReloadingPointTourEndEventHandler eventHandler = new ReloadingPointTourEndEventHandler(this);
 		reloadingScheduler.setEventHandler(eventHandler);
-		this.clientElements = builder.clientElements;
+		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<EventHandler>();
 		this.infos = new ArrayList<Info>();
 		this.trackers = new ArrayList<SimulationTracker>();

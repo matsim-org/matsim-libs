@@ -1,6 +1,7 @@
-package adapterTests;
+package lsp.usecase;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
@@ -13,28 +14,27 @@ import lsp.resources.Resource;
 import lsp.usecase.ReloadingPoint;
 
 
-public class FirstReloadAdapterTest {
+public class SecondReloadAdapterTest {
 
-	private  Id<Resource> reloadingId;
-	private Id<Link> reloadingLinkId;
 	private ReloadingPoint reloadingPoint;
+	private Id<Link> reloadingLinkId;
+	private Id<Resource> reloadingId;
 	
 	@Before
 	public void initialize(){
-		
-        
-        UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+		UsecaseUtils.ReloadingPointSchedulerBuilder schedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
         schedulerBuilder.setCapacityNeedFixed(10);
         schedulerBuilder.setCapacityNeedLinear(1);
 
-		reloadingId = Id.create("ReloadingPoint1", Resource.class);
-        reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
+		reloadingId = Id.create("ReloadingPoint2", Resource.class);
+        reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
-        ReloadingPoint.Builder reloadingPointBuilder = ReloadingPoint.Builder.newInstance(reloadingId, reloadingLinkId);
+        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
         reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
         reloadingPoint = reloadingPointBuilder.build();
+        
 	}
-	
+
 	@Test
 	public void reloadingPointTest() {
 		assertTrue(reloadingPoint.getCapacityNeedFixed() == 10);
@@ -51,4 +51,5 @@ public class FirstReloadAdapterTest {
 		assertTrue(reloadingPoint.getInfos() != null);
 		assertTrue(reloadingPoint.getInfos().isEmpty());
 	}
+
 }

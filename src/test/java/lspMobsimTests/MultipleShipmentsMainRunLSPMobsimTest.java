@@ -100,7 +100,7 @@ public class MultipleShipmentsMainRunLSPMobsimTest {
         Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
-        ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);
+        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
         Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         

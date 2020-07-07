@@ -90,7 +90,7 @@ public class CompleteSolutionTest {
 		Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
 		Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
 
-		ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId,
+		UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId,
 				firstReloadingLinkId);
 		firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
 
@@ -146,7 +146,7 @@ public class CompleteSolutionTest {
 		Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
 		Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
-		ReloadingPoint.Builder secondReloadingPointBuilder = ReloadingPoint.Builder.newInstance(secondReloadingId,
+		UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId,
 				secondReloadingLinkId);
 		secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
 

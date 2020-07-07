@@ -214,7 +214,7 @@ public class UsecaseUtils {
 			return new ReloadingPointScheduler(this);
 		}
 
-		//--- Getter ---
+		//--- Getters ---
 		double getCapacityNeedLinear() {
 			return capacityNeedLinear;
 		}
@@ -222,5 +222,50 @@ public class UsecaseUtils {
 		double getCapacityNeedFixed() {
 			return capacityNeedFixed;
 		}
+	}
+
+	public static class ReloadingPointBuilder {
+
+		private Id<Resource> id;
+		private Id<Link> locationLinkId;
+		private ReloadingPointScheduler reloadingScheduler;
+		private ArrayList <LogisticsSolutionElement> clientElements;
+
+		public static ReloadingPointBuilder newInstance(Id<Resource> id, Id<Link> locationLinkId){
+			return new ReloadingPointBuilder(id,locationLinkId);
+		}
+
+		private ReloadingPointBuilder(Id<Resource> id, Id<Link> locationLinkId){
+			this.id = id;
+			this.clientElements = new ArrayList <LogisticsSolutionElement>();
+			this.locationLinkId = locationLinkId;
+		}
+
+		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingHandler){
+			this.reloadingScheduler = reloadingHandler;
+			return this;
+		}
+
+		public ReloadingPoint build(){
+			return new ReloadingPoint(this);
+		}
+
+		//--- Getters ---
+		Id<Resource> getId() {
+			return id;
+		}
+
+		Id<Link> getLocationLinkId() {
+			return locationLinkId;
+		}
+
+		ReloadingPointScheduler getReloadingScheduler() {
+			return reloadingScheduler;
+		}
+
+		ArrayList<LogisticsSolutionElement> getClientElements() {
+			return clientElements;
+		}
+
 	}
 }

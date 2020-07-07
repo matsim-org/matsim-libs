@@ -12,7 +12,6 @@ import java.util.Random;
 
 import lsp.*;
 import lsp.shipment.*;
-import lsp.usecase.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -104,7 +103,7 @@ public class MainRunLSPSchedulingTest {
         Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
         firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
-        ReloadingPoint.Builder firstReloadingPointBuilder = ReloadingPoint.Builder.newInstance(firstReloadingId, firstReloadingLinkId);
+        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
         firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         

@@ -1,4 +1,4 @@
-package solutionElementTests;
+package lsp.usecase;
 
 import static org.junit.Assert.*;
 
@@ -31,10 +31,10 @@ public class FirstReloadElementTest {
 	        reloadingId = Id.create("ReloadingPoint1", Resource.class);
 	        reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
 	        
-	        ReloadingPoint.Builder reloadingPointBuilder = ReloadingPoint.Builder.newInstance(reloadingId, reloadingLinkId);
+	        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);
 	        reloadingPointBuilder.setReloadingScheduler(schedulerBuilder.build());
 	        point = reloadingPointBuilder.build();
-	        
+
 	        elementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
 			LSPUtils.LogisticsSolutionElementBuilder reloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 			reloadingElementBuilder.setResource(point);
