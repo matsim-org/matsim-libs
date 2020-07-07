@@ -22,7 +22,7 @@ public class ReloadingPoint implements Resource {
 	private ArrayList<EventHandler> eventHandlers;
 	private Collection<Info> infos;
 	private Collection<SimulationTracker> trackers;
-	private ReloadingPointEventHandler eventHandler;
+	private ReloadingPointTourEndEventHandler eventHandler;
 	private EventsManager eventsManager;
 	
 	public static class Builder {
@@ -58,7 +58,7 @@ public class ReloadingPoint implements Resource {
 		this.locationLinkId = builder.locationLinkId;
 		this.reloadingScheduler = builder.reloadingScheduler;
 		reloadingScheduler.setReloadingPoint(this);
-		ReloadingPointEventHandler eventHandler = new ReloadingPointEventHandler(this);
+		ReloadingPointTourEndEventHandler eventHandler = new ReloadingPointTourEndEventHandler(this);
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.clientElements;
 		this.eventHandlers = new ArrayList<EventHandler>();

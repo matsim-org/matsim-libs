@@ -185,7 +185,7 @@ import lsp.resources.ResourceScheduler;
 	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentTuple tuple,  CarrierResource resource){	
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
-				CollectionServiceEventHandler endHandler = new CollectionServiceEventHandler(carrierService, tuple.getShipment(), element, resource);
+				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
 				tuple.getShipment().getEventHandlers().add(endHandler);
 				break;
 			}

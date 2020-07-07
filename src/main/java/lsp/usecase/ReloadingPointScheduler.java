@@ -19,7 +19,7 @@ import lsp.shipment.ShipmentPlanElement;
 	private ReloadingPoint reloadingPoint;
 	private double capacityNeedLinear;
 	private double capacityNeedFixed;
-	private ReloadingPointEventHandler eventHandler;
+	private ReloadingPointTourEndEventHandler eventHandler;
 
 	ReloadingPointScheduler(UsecaseUtils.ReloadingPointSchedulerBuilder builder){
 		this.shipments = new ArrayList<ShipmentTuple>();
@@ -97,7 +97,7 @@ import lsp.shipment.ShipmentPlanElement;
 		this.reloadingPoint = reloadingPoint;
 	}
 	
-	public void setEventHandler(ReloadingPointEventHandler eventHandler) {
+	public void setEventHandler(ReloadingPointTourEndEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 	

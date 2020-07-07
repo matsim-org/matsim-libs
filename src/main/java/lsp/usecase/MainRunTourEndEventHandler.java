@@ -12,7 +12,7 @@ import lsp.eventhandlers.TourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 
-public class MainRunEndEventHandler implements TourEndEventHandler{
+public class MainRunTourEndEventHandler implements TourEndEventHandler{
 
 	private LSPShipment lspShipment;
 	private CarrierService carrierService;
@@ -20,7 +20,7 @@ public class MainRunEndEventHandler implements TourEndEventHandler{
 	private CarrierResource resource;
 	
 	
-	public MainRunEndEventHandler (LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, CarrierResource resource){
+	public MainRunTourEndEventHandler(LSPShipment lspShipment, CarrierService carrierService, LogisticsSolutionElement solutionElement, CarrierResource resource){
 		this.lspShipment=lspShipment;
 		this.carrierService=carrierService;
 		this.solutionElement=solutionElement;

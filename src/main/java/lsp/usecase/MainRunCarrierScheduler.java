@@ -254,7 +254,7 @@ import org.matsim.vehicles.VehicleType;
 	private void addMainRunStartEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
-				MainRunStartEventHandler handler = new MainRunStartEventHandler(tuple.getShipment(), carrierService, element, resource);
+				MainRunTourStartEventHandler handler = new MainRunTourStartEventHandler(tuple.getShipment(), carrierService, element, resource);
 				tuple.getShipment().getEventHandlers().add(handler);
 				break;
 			}
@@ -264,7 +264,7 @@ import org.matsim.vehicles.VehicleType;
 	private void addMainRunEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
-				MainRunEndEventHandler handler = new MainRunEndEventHandler(tuple.getShipment(), carrierService, element,resource);
+				MainRunTourEndEventHandler handler = new MainRunTourEndEventHandler(tuple.getShipment(), carrierService, element,resource);
 				tuple.getShipment().getEventHandlers().add(handler);
 				break;
 			}

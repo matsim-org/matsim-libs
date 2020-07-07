@@ -10,14 +10,14 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 
-public class CollectionServiceEventHandler implements ServiceEndEventHandler {
+public class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
 	private CarrierResource resource;
 	
-	public CollectionServiceEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;

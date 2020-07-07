@@ -299,7 +299,7 @@ import org.matsim.vehicles.VehicleType;
 	private void addDistributionServiceEventHandler(CarrierService carrierService, ShipmentTuple tuple,  CarrierResource resource){	
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
-				DistributionServiceEventHandler handler = new DistributionServiceEventHandler(carrierService, tuple.getShipment(), element, resource);
+				DistributionServiceStartEventHandler handler = new DistributionServiceStartEventHandler(carrierService, tuple.getShipment(), element, resource);
 				tuple.getShipment().getEventHandlers().add(handler);
 				break;
 			}
@@ -309,7 +309,7 @@ import org.matsim.vehicles.VehicleType;
 	private void addDistributionStartEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
-				DistributionStartEventHandler handler = new DistributionStartEventHandler(carrierService, tuple.getShipment(), element, resource);
+				DistributionTourStartEventHandler handler = new DistributionTourStartEventHandler(carrierService, tuple.getShipment(), element, resource);
 				tuple.getShipment().getEventHandlers().add(handler);
 				break;
 			}
