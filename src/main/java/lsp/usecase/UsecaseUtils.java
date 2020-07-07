@@ -20,7 +20,7 @@ public class UsecaseUtils {
 	}
 
 	public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
-		return UsecaseUtils.createDefaultMainRunCarrierScheduler();
+		return new MainRunCarrierScheduler();
 	}
 
 	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(ArrayList<Resource> resources) {
