@@ -239,12 +239,12 @@ public class MatsimJspritFactory {
 
 		VehicleImpl vehicle = vehicleBuilder.build();
 
-		assert carrierVehicle.getEarliestStartTime() == vehicle
-				.getEarliestDeparture() : "carrierVeh must have the same earliestDep as vrpVeh";
-		assert carrierVehicle.getLatestEndTime() == vehicle
-				.getLatestArrival() : "carrierVeh must have the same latestArr as vrpVeh";
-		assert carrierVehicle.getLocation().toString() == vehicle.getStartLocation()
-				.getId() : "locations must be equal";
+		if (carrierVehicle.getEarliestStartTime() != vehicle.getEarliestDeparture())
+			throw new AssertionError("carrierVeh must have the same earliestDep as vrpVeh");
+		if (carrierVehicle.getLatestEndTime() != vehicle.getLatestArrival())
+			throw new AssertionError("carrierVeh must have the same latestArr as vrpVeh");
+		if (carrierVehicle.getLocation().toString() != vehicle.getStartLocation().getId())
+			throw new AssertionError("locations must be equal");
 		return vehicle;
 	}
 
@@ -270,11 +270,12 @@ public class MatsimJspritFactory {
 			FreightUtils.addSkill(carrierVehicle.getType(), skill);
 		}
 
-		assert vehicle.getEarliestDeparture() == carrierVehicle
-				.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
-		assert vehicle.getLatestArrival() == carrierVehicle
-				.getLatestEndTime() : "vehicles must have the same latestEndTime";
-		assert vehicle.getStartLocation().getId() == carrierVehicle.getLocation().toString() : "locs must be the same";
+		if (vehicle.getEarliestDeparture() != carrierVehicle.getEarliestStartTime())
+			throw new AssertionError("vehicles must have the same earliestStartTime");
+		if (vehicle.getLatestArrival() != carrierVehicle.getLatestEndTime())
+			throw new AssertionError("vehicles must have the same latestEndTime");
+		if (vehicle.getStartLocation().getId() != carrierVehicle.getLocation().toString())
+			throw new AssertionError("locs must be the same");
 		return carrierVehicle;
 	}
 
@@ -343,8 +344,9 @@ public class MatsimJspritFactory {
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
 	public static ScheduledTour createTour(VehicleRoute route) {
-		assert route.getDepartureTime() == route.getStart()
-				.getEndTime() : "at this point route.getDepartureTime and route.getStart().getEndTime() must be equal";
+		if (route.getDepartureTime() != route.getStart().getEndTime())
+			throw new AssertionError("at this point route.getDepartureTime and route.getStart().getEndTime() must be equal");
+
 		TourActivities tour = route.getTourActivities();
 		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());
 		double depTime = route.getStart().getEndTime();
@@ -380,8 +382,10 @@ public class MatsimJspritFactory {
 		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocation().getId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, carrierVehicle, depTime);
-		assert route.getDepartureTime() == sTour
-				.getDeparture() : "departureTime of both route and scheduledTour must be equal";
+    
+		if (route.getDepartureTime() != sTour.getDeparture())
+			throw new AssertionError("departureTime of both route and scheduledTour must be equal");
+
 		return sTour;
 	}
 
@@ -428,7 +432,8 @@ public class MatsimJspritFactory {
 			log.debug("act: " + act);
 		}
 		log.debug("end: " + route.getEnd());
-		assert route.getDepartureTime() == scheduledTour.getDeparture() : "departureTimes of both routes must be equal";
+		if (route.getDepartureTime() != scheduledTour.getDeparture())
+			throw new AssertionError("departureTimes of both routes must be equal");
 		return route;
 	}
 
@@ -482,9 +487,12 @@ public class MatsimJspritFactory {
 			} else
 				log.warn("cannot find linkId " + v.getId());
 			Vehicle veh = createVehicle(v, coordinate);
-			assert veh.getEarliestDeparture() == v
-					.getEarliestStartTime() : "earliestDeparture of both vehicles must be equal";
-			assert veh.getLatestArrival() == v.getLatestEndTime() : "latestArrTime of both vehicles must be equal";
+
+			if (veh.getEarliestDeparture() != v.getEarliestStartTime())
+				throw new AssertionError("earliestDeparture of both vehicles must be equal");
+			if (veh.getLatestArrival() != v.getLatestEndTime())
+				throw new AssertionError("latestArrTime of both vehicles must be equal");
+
 			vrpBuilder.addVehicle(veh);
 		}
 

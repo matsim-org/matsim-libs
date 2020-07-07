@@ -150,7 +150,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			}
 			else{
 				TourActivity tourActivity = getTourActivity();
-				assert activity.getLinkId().toString().equals(tourActivity.getLocation().toString()) : "linkId of activity is not equal to linkId of tourActivity. This must not be.";
+				if (!activity.getLinkId().toString().equals(tourActivity.getLocation().toString()))
+					throw new AssertionError("linkId of activity is not equal to linkId of tourActivity. This must not be.");
 				FreightActivity freightActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
 				currentActivity = freightActivity; 
 			}
@@ -219,7 +220,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
-		assert carrierScoringFunction != null : "scoringFunctionFactory is null. this must not be.";
+		Gbl.assertNotNull(carrierScoringFunction); // scoringFunctionFactory is null. this must not be.
 		this.scoringFunction = carrierScoringFunction;
 		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
