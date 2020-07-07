@@ -15,9 +15,9 @@ import lsp.eventhandlers.TourEndEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public class ReloadingPointTourEndEventHandler implements TourEndEventHandler {
+/*package-private*/  class ReloadingPointTourEndEventHandler implements TourEndEventHandler {
 
-	public static class ReloadingPointEventHandlerPair{
+	static class ReloadingPointEventHandlerPair{
 		public LSPShipment shipment;
 		public LogisticsSolutionElement element;
 				
@@ -33,7 +33,7 @@ public class ReloadingPointTourEndEventHandler implements TourEndEventHandler {
 	private Id<Resource> resourceId;
 	private Id<Link> linkId;
 	
-	public ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
+	ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
 		this.reloadingPoint = reloadingPoint;
 		this.linkId = reloadingPoint.getEndLinkId();
 		this.resourceId = reloadingPoint.getId();

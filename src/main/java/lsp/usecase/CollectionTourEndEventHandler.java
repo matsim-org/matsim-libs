@@ -13,14 +13,14 @@ import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 
-public class CollectionTourEndEventHandler implements TourEndEventHandler {
+/*package-private*/ class CollectionTourEndEventHandler implements TourEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
 	private CarrierResource resource;
 	
-	public CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;

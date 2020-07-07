@@ -12,14 +12,14 @@ import lsp.eventhandlers.TourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 
-public class DistributionTourStartEventHandler implements TourStartEventHandler {
+/*package-private*/  class DistributionTourStartEventHandler implements TourStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement element;
 	private CarrierResource resource;
 	
-	public DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.element = element;

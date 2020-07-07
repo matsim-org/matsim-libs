@@ -9,14 +9,14 @@ import lsp.eventhandlers.ServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 
-public class DistributionServiceStartEventHandler implements ServiceStartEventHandler {
+/*package-private*/  class DistributionServiceStartEventHandler implements ServiceStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
 	private CarrierResource resource;
 
-	public DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource) {
+	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
