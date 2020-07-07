@@ -71,7 +71,8 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 			URL context) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
-		this.dispatchFinder = new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility);
+		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime,
+				travelDisutility);
 		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder,
 				params.getRuleBasedTaxiOptimizerParams(), idleTaxiRegistry, unplannedRequestRegistry);
 
@@ -105,7 +106,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 		}
 
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			if (scheduler.isIdle(veh)) {
+			if (scheduler.getScheduleInquiry().isIdle(veh)) {
 				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
 				Zone zone = linkToZone.get(link.getId());
 				if (zone != null) {

@@ -58,7 +58,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
 			TravelTime travelTime, TravelDisutility travelDisutility, ZonalSystem zonalSystem) {
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(scheduler, timer, network, travelTime,
 				travelDisutility, ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), idleTaxiRegistry,
@@ -103,7 +103,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 			if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
 				idleTaxiRegistry.removeVehicle(vehicle);
 			}
-		} else if (scheduler.isIdle(vehicle)) {
+		} else if (scheduler.getScheduleInquiry().isIdle(vehicle)) {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
 			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
