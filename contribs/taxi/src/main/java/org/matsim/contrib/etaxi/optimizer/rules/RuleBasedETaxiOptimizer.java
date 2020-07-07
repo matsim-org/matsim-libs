@@ -19,16 +19,12 @@
 
 package org.matsim.contrib.etaxi.optimizer.rules;
 
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.STAY;
-
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
@@ -127,11 +123,6 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 				chargeIdleUnderchargedVehicles(Stream.of(eTaxi));
 			}
 		}
-	}
-
-	@Override
-	protected boolean isWaitStay(Task task) {
-		return STAY.isBaseTypeOf(task) && !(task instanceof ETaxiChargingTask);
 	}
 
 	private boolean isUndercharged(EvDvrpVehicle v) {

@@ -108,7 +108,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 		} else {
 			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
 				Task previousTask = Schedules.getPreviousTask(schedule);
-				if (isWaitStay(previousTask)) {
+				if (STAY.isBaseTypeOf(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);
 				}
 			}
@@ -117,10 +117,6 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 
 	@Override
 	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
-		return isWaitStay(newCurrentTask);
-	}
-
-	protected boolean isWaitStay(Task task) {
-		return STAY.isBaseTypeOf(task);
+		return STAY.isBaseTypeOf(newCurrentTask);
 	}
 }
