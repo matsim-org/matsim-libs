@@ -127,13 +127,11 @@ public class CompleteLSPShipmentAssignerTest {
 		CarrierCapabilities mainRunCapabilities = collectionCapabilitiesBuilder.build();
 		Carrier mainRunCarrier = CarrierImpl.newInstance(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
-        
-        
-        
-        MainRunCarrierScheduler mainRunScheduler = new MainRunCarrierScheduler();
-        Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+
+
+		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
         UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-        mainRunAdapterBuilder.setMainRunCarrierScheduler(mainRunScheduler);
+        mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
         mainRunAdapterBuilder.setCarrier(collectionCarrier);
@@ -163,13 +161,13 @@ public class CompleteLSPShipmentAssignerTest {
 
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
-		dsitributionVehicleTypeBuilder.setCapacity(10);
-		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		dsitributionVehicleTypeBuilder.setFixCost(49);
-		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		CarrierVehicleType.Builder distributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
+		distributionVehicleTypeBuilder.setCapacity(10);
+		distributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		distributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		distributionVehicleTypeBuilder.setFixCost(49);
+		distributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		org.matsim.vehicles.VehicleType distributionType = distributionVehicleTypeBuilder.build();
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");

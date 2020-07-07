@@ -133,8 +133,7 @@ import lsp.resources.Resource;
         mainRunAdapterBuilder.setCarrier(mainRunCarrier);
         
         //The scheduler for the main run Rescource is created and added to the Resource
-        MainRunCarrierScheduler mainRunScheduler = new MainRunCarrierScheduler();
-        mainRunAdapterBuilder.setMainRunCarrierScheduler(mainRunScheduler);
+		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
         Resource mainRunAdapter = mainRunAdapterBuilder.build();
 
         //The LogisticsSolutionElement for the main run Resource is created

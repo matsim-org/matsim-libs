@@ -22,7 +22,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.MainRunCarrierScheduler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
@@ -66,13 +65,11 @@ public class MainRunElementTest {
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 		carrier = CarrierImpl.newInstance(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
-        
-        
-        
-        MainRunCarrierScheduler scheduler = new MainRunCarrierScheduler();
-        Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+
+
+		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
         UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
-        mainRunAdapterBuilder.setMainRunCarrierScheduler(scheduler);
+        mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
         mainRunAdapterBuilder.setCarrier(carrier);

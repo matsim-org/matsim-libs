@@ -19,6 +19,10 @@ public class UsecaseUtils {
 		return new DistributionCarrierScheduler();
 	}
 
+	public static MainRunCarrierScheduler createDefaultMainRunCarrierScheduler() {
+		return UsecaseUtils.createDefaultMainRunCarrierScheduler();
+	}
+
 	public static class CollectionCarrierAdapterBuilder {
 
 		Id<Resource> id;
