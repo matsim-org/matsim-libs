@@ -52,7 +52,8 @@ enum RLS19VehicleType implements NoiseVehicleType {
         return emissionParameterC;
     }
 
-    Range<Double> getValidSpeedRange() {
+    @Override
+    public Range<Double> getValidSpeedRange() {
         return validSpeedRange;
     }
 

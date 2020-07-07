@@ -1,5 +1,6 @@
 package org.matsim.contrib.noise;
 
+import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -14,6 +15,7 @@ import java.util.*;
 import static org.matsim.contrib.noise.RLS90VehicleType.car;
 import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
 
+
 public class NoiseDamageCalculation {
 
     private final static Logger log = Logger.getLogger(NoiseDamageCalculation.class);
@@ -23,11 +25,13 @@ public class NoiseDamageCalculation {
 
     private String outputDirectory;
 
-
     @Inject
     private NoiseContext noiseContext;
 
     @Inject private EventsManager events;
+
+    @Inject
+    private NoiseEmission emission;
 
 
     private int cWarn3 = 0;
@@ -86,7 +90,8 @@ public class NoiseDamageCalculation {
             NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
         }
 
-        if (this.noiseContext.getNoiseParams().isThrowNoiseEventsAffected()) {
+        final NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
+        if (noiseParams.isThrowNoiseEventsAffected()) {
 
             if (printLog) {
                 log.info("Throwing noise events for the affected agents...");
@@ -97,19 +102,18 @@ public class NoiseDamageCalculation {
             }
         }
 
-        if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
+        if (noiseParams.isComputeCausingAgents()) {
             calculateCostsPerVehiclePerLinkPerTimeInterval();
             if (writeOutput()) {
                 NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
             }
             if (writeOutput()) {
-                NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
-            }
-            if (writeOutput()) {
-                NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
+                for(NoiseVehicleType vehicleType: noiseParams.getNoiseComputationMethod().noiseVehiclesTypes) {
+                    NoiseWriter.writeLinkAvgDamagePerVehicleTypeInfoPerHour(noiseContext, outputDirectory, vehicleType);
+                }
             }
 
-            if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+            if (noiseParams.isThrowNoiseEventsCaused()) {
                 if (printLog) {
                     log.info("Throwing noise events for the causing agents...");
                 }
@@ -118,13 +122,12 @@ public class NoiseDamageCalculation {
                     log.info("Throwing noise events for the causing agents... Done.");
                 }
 
-                if (this.noiseContext.getNoiseParams().isComputeAvgNoiseCostPerLinkAndTime()) {
+                if (noiseParams.isComputeAvgNoiseCostPerLinkAndTime()) {
                     this.noiseContext.storeTimeInterval();
                 }
             }
         }
     }
-
 
     /*
      * Damage cost for each receiver point
@@ -251,9 +254,9 @@ public class NoiseDamageCalculation {
                 nHdvAgents = noiseLink.getAgentsEntering(hgv.getId());
             }
 
-            Tuple<Double, Double> vCarVHdv = getV(linkId, noiseLink);
-            double vCar = vCarVHdv.getFirst();
-            double vHdv = vCarVHdv.getSecond();
+
+            double vCar = getV(linkId, noiseLink, car);
+            double vHdv = getV(linkId, noiseLink, hgv);
 
             double lCar = RLS90NoiseEmission.calculateLCar(vCar);
             double lHdv = RLS90NoiseEmission.calculateLHdv(vHdv);
@@ -287,13 +290,13 @@ public class NoiseDamageCalculation {
         }
     }
 
-    private Tuple<Double, Double> getV(Id<Link> linkId, NoiseLink noiseLink) {
+    private double getV(Id<Link> linkId, NoiseLink noiseLink, NoiseVehicleType type) {
         Link link = noiseContext.getScenario().getNetwork().getLinks().get(linkId);
 
-        double vCar = (link.getFreespeed()) * 3.6;
-        double vHdv = vCar;
+        double velocity = (link.getFreespeed()) * 3.6;
+        double vHdv = velocity;
 
-        double freespeedCar = vCar;
+        double freespeedCar = velocity;
         final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
 
         if (noiseParams.isUseActualSpeedLevel()) {
@@ -301,54 +304,30 @@ public class NoiseDamageCalculation {
             // use the actual speed level if possible
             if (noiseLink != null) {
 
-                // Car
-                if (noiseLink.getTravelTime_sec(car.getId()) == 0.
-                        || noiseLink.getAgentsLeaving(car.getId()) == 0) {
+                if (noiseLink.getTravelTime_sec(type.getId()) == 0.
+                        || noiseLink.getAgentsLeaving(type.getId()) == 0) {
                     // use the maximum speed level
 
                 } else {
                     double averageTravelTimeCar_sec =
-                            noiseLink.getTravelTime_sec(car.getId()) / noiseLink.getAgentsLeaving(car.getId());
-                    vCar = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
-                }
-
-                // HGV
-                if (noiseLink.getTravelTime_sec(hgv.getId()) == 0. || noiseLink.getAgentsLeaving(hgv.getId()) == 0) {
-                    // use the actual car speed level
-                    vHdv = vCar;
-
-                } else {
-                    double averageTravelTimeHGV_sec = noiseLink.getTravelTime_sec(hgv.getId()) / noiseLink.getAgentsLeaving(hgv.getId());
-                    vHdv = 3.6 * (link.getLength() / averageTravelTimeHGV_sec );
+                            noiseLink.getTravelTime_sec(type.getId()) / noiseLink.getAgentsLeaving(type.getId());
+                    velocity = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
                 }
             }
         }
 
-        if (vCar > freespeedCar) {
-            throw new RuntimeException(vCar + " > " + freespeedCar + ". This should not be possible. Aborting...");
+        if (velocity > freespeedCar) {
+            throw new RuntimeException(velocity + " > " + freespeedCar + ". This should not be possible. Aborting...");
         }
 
         if (!noiseParams.isAllowForSpeedsOutsideTheValidRange()) {
-
             // shifting the speed into the allowed range defined by the RLS-90 computation approach
-
-            if (vCar < 30.) {
-                vCar = 30.;
-            }
-
-            if (vHdv < 30.) {
-                vHdv = 30.;
-            }
-
-            if (vCar > 130.) {
-                vCar = 130.;
-            }
-
-            if (vHdv > 80.) {
-                vHdv = 80.;
+            final Range<Double> validSpeedRange = type.getValidSpeedRange();
+            if (!validSpeedRange.contains(velocity)) {
+                velocity = Math.min(Math.max(validSpeedRange.lowerEndpoint(), velocity), validSpeedRange.upperEndpoint());
             }
         }
-        return new Tuple<>(vCar, vHdv);
+        return velocity;
     }
 
     //	/*
@@ -542,4 +521,6 @@ public class NoiseDamageCalculation {
     public void setOutputFilePath(String outputFilePath) {
         this.outputDirectory = outputFilePath;
     }
+
+
 }

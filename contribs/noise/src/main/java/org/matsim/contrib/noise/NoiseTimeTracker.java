@@ -22,9 +22,7 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -42,10 +40,8 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
-import static org.matsim.contrib.noise.RLS90VehicleType.car;
-import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A handler which computes noise emissions, immisions, affected agent units and damages for each receiver point and time interval.
@@ -194,8 +190,9 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
 			}
 			if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
-				NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
-				NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
+				for(NoiseVehicleType type: noiseContext.getNoiseParams().getNoiseComputationMethod().noiseVehiclesTypes) {
+					NoiseWriter.writeLinkMarginalVehicleDamageInfoPerHour(noiseContext, outputDirectory, type);
+				}
 			}
 		}
 	}

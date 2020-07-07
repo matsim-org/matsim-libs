@@ -87,6 +87,17 @@ class RLS90NoiseEmission implements NoiseEmission {
         noiseLink.setEmissionPlusOneVehicle(RLS90VehicleType.hgv.getId(), noiseEmissionPlusOneHgv);
     }
 
+    @Override
+    public double calculateVehicleTypeEmission(NoiseVehicleType vehicleType, double vehicleVelocity, NoiseLink noiseLink) {
+        switch ((RLS90VehicleType) vehicleType) {
+            case car:
+                return calculateLCar(vehicleVelocity);
+            case hgv:
+                return calculateLHdv(vehicleVelocity);
+            default:
+                throw new IllegalStateException("Unexpected value: " + vehicleType);
+        }
+    }
 
 
     static double calculateMittelungspegelLm(int n, double p) {
@@ -129,14 +140,11 @@ class RLS90NoiseEmission implements NoiseEmission {
     }
 
     static double calculateLCar(double vCar) {
-
-        double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
-        return lCar;
+        return 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
     }
 
     static double calculateLHdv(double vHdv) {
-        double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
-        return lHdv;
+        return 23.1 + (12.5 * Math.log10(vHdv));
     }
 
     private Tuple<Double, Double> getV(Id<Link> linkId, NoiseLink noiseLink) {
