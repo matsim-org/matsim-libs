@@ -209,8 +209,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 double distanceCosts = distance*getDistanceParameter(vehicle);
                 if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * distanceCosts;
-        				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
-                assert timeCosts >= 0.0 : "timeCosts must be positive";
+        	double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
+                if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * timeCosts;
 
             }
