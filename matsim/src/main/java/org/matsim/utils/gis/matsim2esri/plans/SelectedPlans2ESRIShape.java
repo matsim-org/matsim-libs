@@ -191,8 +191,8 @@ public class SelectedPlans2ESRIShape {
 			return null;
 		}
 		String mode = leg.getMode();
-		Double depTime = leg.getDepartureTime();
-		Double travTime = leg.getTravelTime();
+		Double depTime = leg.getDepartureTime().seconds();
+		Double travTime = leg.getTravelTime().seconds();
 		Double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();

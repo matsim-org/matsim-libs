@@ -22,6 +22,25 @@
  */
 package org.matsim.contrib.drt.analysis;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -46,27 +65,15 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
  * @author jbischoff
  */
 
 public class DrtTripsAnalyser {
 
-	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime,
-																int endTime, int binSize_s) {
-		LinkedList<DrtTrip> alltrips = new LinkedList<>();
-		alltrips.addAll(trips);
+	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
+			int binSize_s) {
+		LinkedList<DrtTrip> alltrips = new LinkedList<>(trips);
 		Collections.sort(alltrips);
 		DrtTrip currentTrip = alltrips.pollFirst();
 		if (currentTrip.getDepartureTime() > endTime) {
@@ -75,7 +82,7 @@ public class DrtTripsAnalyser {
 		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtTrip> currentList = new ArrayList<>();
-			splitTrips.put(Double.valueOf(time), currentList);
+			splitTrips.put((double)time, currentList);
 			while (currentTrip.getDepartureTime() < time + binSize_s) {
 				currentList.add(currentTrip);
 				currentTrip = alltrips.pollFirst();
@@ -91,14 +98,13 @@ public class DrtTripsAnalyser {
 	}
 
 	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
-													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		double actualstartTime = Math.max(startTime, 0.0);
-		int bins = (int)((endTime - actualstartTime) / timeBinSize);
+		int bins = (int)((endTime - startTime) / timeBinSize);
 
 		for (DrtTrip trip : trips) {
 			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
@@ -165,7 +171,7 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
 			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
-		String value = format.format(waitStats.getValues().length)
+		return format.format(waitStats.getValues().length)
 				+ delimiter
 				+ format.format(waitStats.getMean())
 				+ delimiter
@@ -184,7 +190,6 @@ public class DrtTripsAnalyser {
 				+ format.format(directDistanceStats.getMean())
 				+ delimiter
 				+ format.format(traveltimes.getMean());
-		return value;
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {
@@ -201,12 +206,12 @@ public class DrtTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg,
-									  String fileName, boolean createGraphs) {
+	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg, String fileName,
+			boolean createGraphs) {
 		if (trips == null)
 			return;
 
-		List<String> detours = new ArrayList<String>();
+		List<String> detours = new ArrayList<>();
 		XYSeries distances = new XYSeries("distances");
 		XYSeries travelTimes = new XYSeries("travel times");
 		XYSeries rideTimes = new XYSeries("ride times");
@@ -392,9 +397,8 @@ public class DrtTripsAnalyser {
 				bw.write(header);
 				bw.newLine();
 			}
-			for (Iterator<T> iterator = c.iterator(); iterator.hasNext(); ) {
-
-				bw.write(iterator.next().toString());
+			for (T t : c) {
+				bw.write(t.toString());
 				bw.newLine();
 			}
 			bw.flush();
@@ -468,7 +472,7 @@ public class DrtTripsAnalyser {
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		String result = vehicleDistances.size()
+		return vehicleDistances.size()
 				+ del
 				+ format.format(driven.getSum())
 				+ del
@@ -485,7 +489,6 @@ public class DrtTripsAnalyser {
 				+ format.format(revenue.getMean())
 				+ del
 				+ format.format(d_r_d_t);
-		return result;
 	}
 
 	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {
@@ -526,11 +529,11 @@ public class DrtTripsAnalyser {
 				sum[i - 2] += dist[i];
 			}
 		}
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i <= maxcap; i++) {
-			result = result + ";" + format.format(sum[i]);
+			result.append(";").append(format.format(sum[i]));
 		}
 
-		return result;
+		return result.toString();
 	}
 }

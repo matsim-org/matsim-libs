@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.commons.lang3.event.EventUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -37,7 +38,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -50,6 +50,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
@@ -57,6 +58,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,8 +66,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author ikaddoura
@@ -158,7 +158,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 		runTest2a( config ) ;
 	}
 	@Test
@@ -167,7 +167,7 @@ public class NoiseIT {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 //		{
 //			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
 //			params.setTeleportedModeSpeed( 2.0 );
@@ -209,7 +209,7 @@ public class NoiseIT {
 		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager events = new ParallelEventsManager(false,1,65536);
 				
 		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
 		
@@ -248,10 +248,13 @@ public class NoiseIT {
 				
 			}
 		});
-		
+
+		events.initProcessing();
+
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
-		
+		events.finishProcessing();
+
 		// ############################
 		// test considered agent units
 		// ############################
@@ -316,7 +319,7 @@ public class NoiseIT {
 				double start = 0.;
 				
 				for(Event e : eventsPerPersonId.get(personId)){
-					
+
 					boolean activityEnded = false;
 					
 					PersonActivityInfo actInfo = null;
@@ -411,7 +414,7 @@ public class NoiseIT {
 						affectedPersons = ( unitsThisPersonActivityInfo * noiseParameters.getScaleFactor() );
 						
 						int outOfHomeActIdx = 2 ;
-						if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+						if ( !runConfig.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 							outOfHomeActIdx = 6 ;
 						}
 						Coord coord = actInfo.getActivityType().equals("home") ?
@@ -440,7 +443,7 @@ public class NoiseIT {
 			
 			if(currentTimeSlot == endTime){
 				
-				if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				if ( !runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.48583333333333 /*1.991388888888*/,
 							affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 					// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
@@ -473,7 +476,7 @@ public class NoiseIT {
 					log.warn( "receiverPointId:" + receiverPointId );
 					log.warn( "affected:" + list ) ;
 				}
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("Wrong number of affected persons", expected, actual, MatsimTestUtils.EPSILON);
 				} else {
 					Assert.assertEquals("Wrong number of affected persons", expected, actual, MatsimTestUtils.EPSILON);
@@ -682,7 +685,7 @@ public class NoiseIT {
 			
 		}
 		
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			Assert.assertEquals("Wrong damage!", 0.0664164095284536, 
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		} else {
@@ -736,7 +739,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			Assert.assertEquals("Wrong link's damage contribution!", 0.00079854651258, 
 					damagesPerlinkId.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, 
@@ -787,7 +790,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			Assert.assertEquals("Wrong damage per car per link!", 0.00079854651258 / 2.0, 
 					damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, 
@@ -834,7 +837,7 @@ public class NoiseIT {
 			e.printStackTrace();
 		}
 					
-		if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			Assert.assertEquals("Wrong damage per car per link!", 0.00011994155845965193, 
 					marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong damage per car per link!", 0.008531432493391652, 
@@ -860,7 +863,7 @@ public class NoiseIT {
 			tested = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -870,7 +873,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -879,7 +882,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -888,7 +891,7 @@ public class NoiseIT {
 				}
 				counter++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -910,7 +913,7 @@ public class NoiseIT {
 			tested2 = true;
 
 			if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -919,7 +922,7 @@ public class NoiseIT {
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -928,7 +931,7 @@ public class NoiseIT {
 				}
 				counter2++;
 			} else if (event.getTimeBinEndTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
-				if ( !runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {				
+				if ( !!runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.028225601971719153, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
@@ -958,7 +961,7 @@ public class NoiseIT {
 			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
 			runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
+			runConfig.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.none);
 			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
 			
 			Controler controler = new Controler(runConfig);

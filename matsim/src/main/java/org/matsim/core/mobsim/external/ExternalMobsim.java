@@ -119,8 +119,8 @@ public class ExternalMobsim implements Mobsim {
 		module.addParam("outputFormat", "matsimTXTv1");
 		// deqsim
 		module = extConfig.createModule(CONFIG_MODULE);
-		module.addParam("startTime", Double.toString( simConfig.getStartTime() ) ) ;
-		module.addParam("endTime", Double.toString( simConfig.getEndTime() ) ) ;
+		module.addParam("startTime", Double.toString( simConfig.getStartTime().seconds() ) ) ;
+		module.addParam("endTime", Double.toString( simConfig.getEndTime().seconds() ) ) ;
 
 		new ConfigWriter(extConfig).write(iterationConfigFile);
 	}

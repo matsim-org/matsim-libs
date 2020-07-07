@@ -42,7 +42,9 @@ import java.util.Set;
 
 /**
  * @author dziemke
+ * @deprecated This class is replaced by OsmBicycleReader in the osm-contrib. Use org.matsim.contribs.osm.networkReader.OsmBicycleReader instead
  */
+@Deprecated
 public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private final static Logger LOG = Logger.getLogger(BicycleOsmNetworkReaderV2.class);
 

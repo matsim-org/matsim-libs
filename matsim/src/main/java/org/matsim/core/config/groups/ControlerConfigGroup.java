@@ -69,7 +69,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String COMPRESSION_TYPE = "compressionType";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {qsim, JDEQSim}
+	public enum MobsimType {qsim, JDEQSim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 

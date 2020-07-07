@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.run;
 
+import static org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
@@ -33,16 +35,15 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
@@ -111,7 +112,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk";
+	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
 	static final String ESTIMATED_DRT_SPEED_EXP =
@@ -142,6 +143,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
+	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
+	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
+
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
@@ -155,8 +159,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
-	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
-	// (hence AStarEuclideanOverdoFactor needs to be specified)
+	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
 	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
@@ -181,7 +184,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
-	@NotNull
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
 
 	@Nullable
@@ -193,8 +196,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private boolean plotDetailedCustomerStats = true;
 
 	@Positive
-	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
-			ParallelPathDataProvider.MAX_THREADS);
+	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	@PositiveOrZero
 	private double advanceRequestPlanningHorizon = 0; // beta-feature; planning horizon for advance (prebooked) requests
@@ -202,6 +204,12 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public enum OperationalScheme {
 		stopbased, door2door, serviceAreaBased
 	}
+
+	@NotNull
+	private DrtInsertionSearchParams drtInsertionSearchParams;
+
+	@NotNull
+	private String drtSpeedUpMode = "";
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -211,9 +219,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (Time.isUndefinedTime(config.qsim().getEndTime())
-				&& config.qsim().getSimEndtimeInterpretation()
-				!= QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime) {
+		if (config.qsim().getEndTime().isUndefined()
+				|| config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
 			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
@@ -225,25 +232,25 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
 
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),
-				DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
 
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
-				DrtConfigGroup.TRANSIT_STOP_FILE
+				TRANSIT_STOP_FILE
 						+ " must not be null when "
-						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ OPERATIONAL_SCHEME
 						+ " is "
-						+ DrtConfigGroup.OperationalScheme.stopbased);
+						+ OperationalScheme.stopbased);
 
 		Verify.verify(
 				getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
-				DrtConfigGroup.DRT_SERVICE_AREA_SHAPE_FILE
+				DRT_SERVICE_AREA_SHAPE_FILE
 						+ " must not be null when "
-						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ OPERATIONAL_SCHEME
 						+ " is "
-						+ DrtConfigGroup.OperationalScheme.serviceAreaBased);
+						+ OperationalScheme.serviceAreaBased);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
-				DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+				NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
 
 		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
 			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
@@ -280,6 +287,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
+		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -463,7 +471,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #VEHICLES_FILE_EXP}
 	 */
 	public URL getVehiclesFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+		return vehiclesFile == null ? null : ConfigGroup.getInputFileURL(context, vehiclesFile);
 	}
 
 	/**
@@ -512,7 +520,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
 	public URL getTransitStopsFileUrl(URL context) {
-		return ConfigGroup.getInputFileURL(context, this.transitStopFile);
+		return ConfigGroup.getInputFileURL(context, transitStopFile);
 	}
 
 	/**
@@ -609,6 +617,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
+	public String getDrtSpeedUpMode() {
+		return drtSpeedUpMode;
+	}
+
+	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
+		this.drtSpeedUpMode = drtSpeedUpMode;
+	}
+
 	public double getAdvanceRequestPlanningHorizon() {
 		return advanceRequestPlanningHorizon;
 	}
@@ -618,10 +634,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
-	/**
-	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
-	 * specified
-	 */
+	public DrtInsertionSearchParams getDrtInsertionSearchParams() {
+		return drtInsertionSearchParams;
+	}
+
 	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
 		if (parameterSets.size() > 1) {
@@ -634,9 +650,39 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
-			return new MinCostFlowRebalancingParams();
+		switch (type) {
+			case MinCostFlowRebalancingParams.SET_NAME:
+				return new MinCostFlowRebalancingParams();
+
+			case ExtensiveInsertionSearchParams.SET_NAME:
+				return new ExtensiveInsertionSearchParams();
+
+			case SelectiveInsertionSearchParams.SET_NAME:
+				return new SelectiveInsertionSearchParams();
 		}
+
 		return super.createParameterSet(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams == null,
+					"Remove the existing drtRequestInsertionParams before adding a new one");
+			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof DrtInsertionSearchParams) {
+			Preconditions.checkState(drtInsertionSearchParams != null,
+					"The existing drtRequestInsertionParams is null. Cannot remove it.");
+			drtInsertionSearchParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 }

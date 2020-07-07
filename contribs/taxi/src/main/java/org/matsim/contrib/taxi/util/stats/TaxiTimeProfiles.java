@@ -19,19 +19,30 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
-import org.matsim.contrib.util.LongEnumAdder;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class TaxiTimeProfiles {
 	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet, final ScheduleInquiry scheduleInquiry) {
@@ -40,23 +51,22 @@ public class TaxiTimeProfiles {
 	}
 
 	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet) {
-		String[] header = TimeProfiles.combineValuesIntoStrings(TaxiTaskType.values());
+		ImmutableList<String> header = Arrays.stream(TaxiTaskType.values())
+				.map(Objects::toString)
+				.collect(toImmutableList());
 		return TimeProfiles.createProfileCalculator(header, () -> calculateTaxiTaskTypeCounts(fleet));
 	}
 
-	public static Long[] calculateTaxiTaskTypeCounts(Fleet fleet) {
-		LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
-		for (DvrpVehicle veh : fleet.getVehicles().values()) {
-			if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-				counter.increment((TaxiTaskType)veh.getSchedule().getCurrentTask().getTaskType());
-			}
-		}
+	public static ImmutableMap<String, Double> calculateTaxiTaskTypeCounts(Fleet fleet) {
+		Map<Task.TaskType, Long> countsByType = fleet.getVehicles()
+				.values()
+				.stream()
+				.map(DvrpVehicle::getSchedule)
+				.filter(schedule -> schedule.getStatus() == ScheduleStatus.STARTED)
+				.collect(groupingBy(schedule -> schedule.getCurrentTask().getTaskType(), counting()));
 
-		Long[] counts = new Long[TaxiTaskType.values().length];
-		for (TaxiTaskType e : TaxiTaskType.values()) {
-			counts[e.ordinal()] = counter.getLong(e);
-		}
-		return counts;
+		return Arrays.stream(TaxiTaskType.values())
+				.collect(toImmutableMap(Enum::name, type -> (double)countsByType.getOrDefault(type, 0L)));
 	}
 
 	public static ProfileCalculator createRequestsWithStatusCounter(final Collection<? extends Request> requests,

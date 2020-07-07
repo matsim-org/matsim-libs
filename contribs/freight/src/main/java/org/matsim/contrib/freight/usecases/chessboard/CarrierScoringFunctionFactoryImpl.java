@@ -4,7 +4,6 @@ import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -13,14 +12,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.controler.FreightActivity;
+import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+
+import com.google.inject.Inject;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -203,8 +209,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 double distanceCosts = distance*getDistanceParameter(vehicle);
                 if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * distanceCosts;
-                double timeCosts = leg.getTravelTime()*getTimeParameter(vehicle);
-                if (!(timeCosts >= 0.0)) throw new AssertionError("timeCosts must be positive");
+        				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
+                assert timeCosts >= 0.0 : "timeCosts must be positive";
                 score += (-1) * timeCosts;
 
             }

@@ -48,7 +48,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		public final double socBeforeFinalStay;
 
 		public EVehicleEntry(Entry entry, double socBeforeFinalStay) {
-			super(entry.vehicle, entry.start, entry.startOccupancy, entry.stops);
+			super(entry.vehicle, entry.start, entry.stops);
 			this.socBeforeFinalStay = socBeforeFinalStay;
 		}
 	}

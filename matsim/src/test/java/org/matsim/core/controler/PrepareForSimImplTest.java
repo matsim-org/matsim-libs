@@ -82,6 +82,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("1", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg = pf.createLeg(TransportMode.pt);
 			// ensure routing mode is missing
@@ -109,6 +110,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
+			activity1.setEndTime(10);
 			Leg leg = pf.createLeg(TransportMode.walk);
 			// ensure routing mode is missing
 			TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
@@ -143,6 +145,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("1", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg = pf.createLeg(TransportMode.transit_walk);
 			// ensure routing mode is missing
@@ -170,6 +173,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("2", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg = pf.createLeg("drt67_fallback");
 			// ensure routing mode is missing
@@ -206,6 +210,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("1", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg1 = pf.createLeg(TransportMode.walk);
 			TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
@@ -250,6 +255,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("2", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg1 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg1, "intermodal pt");
@@ -454,6 +460,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("1", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
@@ -510,6 +517,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("2", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg1 = pf.createLeg(TransportMode.non_network_walk);
 			TripStructureUtils.setRoutingMode(leg1, null);
@@ -567,6 +575,7 @@ public class PrepareForSimImplTest {
 			Person person = pf.createPerson(Id.create("3", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			activity1.setEndTime(10);
 			plan.addActivity(activity1);
 			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
@@ -675,6 +684,7 @@ public class PrepareForSimImplTest {
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);
+			activity1.setEndTime(10);
 			Leg leg1 = pf.createLeg("access_walk");
 			TripStructureUtils.setRoutingMode(leg1, null);
 			plan.addLeg(leg1);

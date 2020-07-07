@@ -135,9 +135,9 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
-		Double leaveTime = event.getTime();
+		double leaveTime = event.getTime();
 		Link link = (Link) this.scenario.getNetwork().getLinks().get(linkId);
-		Double linkLength = link.getLength();
+		double linkLength = link.getLength();
 
 		if (linkLength == 0.) {
 			if (zeroLinkLengthWarnCnt == 0 ){

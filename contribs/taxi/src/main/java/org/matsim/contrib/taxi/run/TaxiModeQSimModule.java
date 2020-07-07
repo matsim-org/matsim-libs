@@ -47,7 +47,9 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -70,7 +72,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new VrpAgentSourceQSimModule(getMode()));
 		install(new PassengerEngineQSimModule(getMode()));
 
-		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
+		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 			@Inject
 			private MobsimTimer timer;
 
@@ -95,24 +97,23 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			}
 		});
 
-		bindModal(TaxiScheduler.class).toProvider(
-				new ModalProviders.AbstractProvider<TaxiScheduler>(taxiCfg.getMode()) {
-					@Inject
-					private MobsimTimer timer;
+		bindModal(TaxiScheduler.class).toProvider(new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
+			@Inject
+			private MobsimTimer timer;
 
-					@Inject
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-					private TravelTime travelTime;
+			@Inject
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+			private TravelTime travelTime;
 
-					@Override
-					public TaxiScheduler get() {
-						Fleet fleet = getModalInstance(Fleet.class);
-						Network network = getModalInstance(Network.class);
-						TravelDisutility travelDisutility = getModalInstance(
-								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
-					}
-				}).asEagerSingleton();
+			@Override
+			public TaxiScheduler get() {
+				Fleet fleet = getModalInstance(Fleet.class);
+				Network network = getModalInstance(Network.class);
+				TravelDisutility travelDisutility = getModalInstance(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				LeastCostPathCalculator router = new FastAStarLandmarksFactory(getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
+				return new TaxiScheduler(taxiCfg, fleet, timer, travelTime, router);
+			}
+		}).asEagerSingleton();
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),

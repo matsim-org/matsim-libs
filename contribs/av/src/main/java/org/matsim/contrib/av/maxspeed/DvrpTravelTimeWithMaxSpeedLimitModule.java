@@ -56,7 +56,7 @@ public class DvrpTravelTimeWithMaxSpeedLimitModule extends AbstractModule {
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTimeWithMaxSpeedLimit.class);
 		String mobsimMode = dvrpCfg.getMobsimMode();
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).
-				toProvider(new Provider<TravelTime>() {
+				toProvider(new Provider<>() {
 					@Inject
 					Injector injector;
 					@Inject

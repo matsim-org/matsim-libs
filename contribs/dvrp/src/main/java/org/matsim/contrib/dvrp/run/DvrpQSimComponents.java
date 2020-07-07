@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import java.util.Arrays;
+
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -39,7 +41,7 @@ public class DvrpQSimComponents {
 		};
 	}
 
-	public static QSimComponentsConfigurator activateAllModes(MultiModal<?> multiModal) {
-		return activateModes(multiModal.modes().toArray(String[]::new));
+	public static QSimComponentsConfigurator activateAllModes(MultiModal<?>... multiModal) {
+		return activateModes(Arrays.stream(multiModal).flatMap(MultiModal::modes).toArray(String[]::new));
 	}
 }

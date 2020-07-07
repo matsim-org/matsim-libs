@@ -34,16 +34,15 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -332,15 +331,9 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 				now = end.isDefined() ? end.seconds() : now + ((Activity)pe).getMaximumDuration().seconds();
 			}
 			else if ( pe instanceof Leg ) {
-				final Route r = ((Leg) pe).getRoute();
-				if ( r != null && !Time.isUndefinedTime(r.getTravelTime()) ) {
-					now += r.getTravelTime();
-				}
-				else {
-					now += !Time.isUndefinedTime(((Leg) pe).getTravelTime()) ?
-							((Leg) pe).getTravelTime() :
-							0; // no info: just assume instantaneous. This will give poor results!
-				}
+				Leg leg = (Leg)pe;
+				final OptionalTime tt = PopulationUtils.decideOnTravelTimeForLeg(leg);
+				now += tt.orElse(0);// no info: just assume instantaneous (i.e. 0). This will give poor results!
 			}
 		}
 		return now;

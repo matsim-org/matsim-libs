@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -86,7 +86,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -96,9 +96,8 @@
 					</execution>
 				</executions>
 				<configuration>
-					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<linksource>true</linksource>
-					<additionalparam>-Xdoclint:none</additionalparam>
+					<doclint>none</doclint>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -107,7 +106,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.19</version>
+                    <version>2.19</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -127,6 +126,7 @@
 						<descriptors>
 							<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 						</descriptors>
+						<attach>false</attach>
 					</configuration>
 					<executions>
 						<execution>
@@ -153,6 +153,7 @@
 		<module>commercialTrafficApplications</module>
 		<module>common</module>
 		<module>decongestion</module>
+		<module>discrete_mode_choice</module>
 		<module>drt</module>
 		<module>dvrp</module>
 		<module>ev</module>
@@ -179,10 +180,15 @@
 	</modules>
 	<repositories>
 		<repository>
-			<!-- Geotools is not on Maven central -->
-			<id>geotools</id>
-			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
+			<id>osgeo</id>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 		<repository>
 			<id>matsim</id>
@@ -211,14 +217,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -231,7 +237,7 @@
 			<!--<version>0.10.0</version>-->
 			<!--<version>0.11.0-apr17</version>-->
 			<scope>test</scope>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 		<dependency>
@@ -262,6 +268,9 @@
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
 							<version>3.1.1</version>
+							<configuration>
+								<doclint>none</doclint>
+							</configuration>
 						</plugin>
 					</plugins>
 				</pluginManagement>

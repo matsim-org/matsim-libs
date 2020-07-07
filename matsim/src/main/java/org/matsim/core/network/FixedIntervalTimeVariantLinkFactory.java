@@ -21,34 +21,28 @@
 package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * A link that is able to store time-dependent information, using a fixed interval (i.e. array) data structure underneath.
- * 
- * @author (of documentation) nagel
  *
+ * @author (of documentation) nagel
  */
-public final class FixedIntervalTimeVariantLinkFactory
-    implements LinkFactory
-{
-    private final int interval;
-    private final int maxTime;
+public final class FixedIntervalTimeVariantLinkFactory implements LinkFactory {
+	private final int interval;
+	private final int maxTime;
 
+	public FixedIntervalTimeVariantLinkFactory(int interval, int maxTime) {
+		this.interval = interval;
+		this.maxTime = maxTime;
+	}
 
-    public FixedIntervalTimeVariantLinkFactory(int interval, int maxTime)
-    {
-        this.interval = interval;
-        this.maxTime = maxTime;
-    }
-
-
-    @Override
-    public Link createLink(Id<Link> id, Node from, Node to, Network network, double length,
-            double freespeed, double capacity, double nOfLanes)
-    {
-        return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network,
-                length, freespeed, capacity, nOfLanes, interval, maxTime);
-    }
+	@Override
+	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
+			double capacity, double nOfLanes) {
+		return TimeVariantLinkImpl.createLinkWithFixedIntervalAttributes(id, from, to, network, length, freespeed,
+				capacity, nOfLanes, interval, maxTime);
+	}
 }

@@ -17,101 +17,92 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.util.stats;
 
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+
+import one.util.streamex.EntryStream;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
-public class DrtVehicleOccupancyProfileWriter implements MobsimBeforeCleanupListener {
+public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 	private static final String OUTPUT_FILE = "drt_occupancy_time_profiles";
 
-	private final Fleet fleet;
 	private final MatsimServices matsimServices;
 	private final DrtConfigGroup drtCfg;
+	private final DrtVehicleOccupancyProfileCalculator calculator;
 
-	public DrtVehicleOccupancyProfileWriter(Fleet fleet, MatsimServices matsimServices, DrtConfigGroup drtCfg) {
-		this.fleet = fleet;
+	public DrtVehicleOccupancyProfileWriter(MatsimServices matsimServices, DrtConfigGroup drtCfg,
+			DrtVehicleOccupancyProfileCalculator calculator) {
 		this.matsimServices = matsimServices;
 		this.drtCfg = drtCfg;
+		this.calculator = calculator;
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		DrtVehicleOccupancyProfileCalculator calculator = new DrtVehicleOccupancyProfileCalculator(fleet, 300);
-
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-		calculator.calculate();
+		calculator.consolidate();
+
+		ImmutableMap<String, double[]> profiles = Stream.concat(
+				calculator.getNonOperatingVehicleProfiles().entrySet().stream(),
+				EntryStream.of(calculator.getVehicleOccupancyProfiles())
+						.map(e -> Pair.of(e.getKey() + " pax", e.getValue())))
+				.collect(ImmutableMap.toImmutableMap(Entry::getKey, Entry::getValue));
 
 		String file = filename(OUTPUT_FILE);
 		String timeFormat = timeDiscretizer.getTimeInterval() % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
-			String[] paxHeader = IntStream.rangeClosed(0, calculator.getMaxCapacity())
-					.mapToObj(i -> i + " pax")
-					.toArray(String[]::new);
-			writer.writeNext("time", "stay", paxHeader);
-
-			for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
-				int time = i * timeDiscretizer.getTimeInterval();
-				String idleVehicles = calculator.getIdleVehicleProfile()[i] + "";
-				writer.writeNext(Time.writeTime(time, timeFormat), idleVehicles,
-						getOccupancyValues(calculator.getVehicleOccupancyProfiles(), i));
-			}
+			String[] profileHeader = profiles.keySet().toArray(new String[0]);
+			writer.writeNext(new CSVLineBuilder().add("time").addAll(profileHeader));
+			timeDiscretizer.forEach((bin, time) -> writer.writeNext(
+					new CSVLineBuilder().add(Time.writeTime(time, timeFormat)).addAll(cells(profiles, bin))));
 		}
 
 		if (this.matsimServices.getConfig().controler().isCreateGraphs()) {
-			DefaultTableXYDataset createXYDataset = createXYDataset(calculator);
-			generateImage(createXYDataset, TimeProfileCharts.ChartType.Line);
-			generateImage(createXYDataset, TimeProfileCharts.ChartType.StackedArea);
+			DefaultTableXYDataset xyDataset = createXYDataset(timeDiscretizer, profiles);
+			generateImage(xyDataset, TimeProfileCharts.ChartType.Line);
+			generateImage(xyDataset, TimeProfileCharts.ChartType.StackedArea);
 		}
 	}
 
-	private String[] getOccupancyValues(double[][] vehicleOccupancyProfiles, int idx) {
-		String[] values = new String[vehicleOccupancyProfiles.length];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = vehicleOccupancyProfiles[i][idx] + "";
-		}
-		return values;
+	private Stream<String> cells(Map<String, double[]> profiles, int idx) {
+		return profiles.values().stream().map(values -> values[idx] + "");
 	}
 
-	private DefaultTableXYDataset createXYDataset(DrtVehicleOccupancyProfileCalculator calculator) {
-		TimeDiscretizer timeDiscretizer = calculator.getTimeDiscretizer();
-		double[] idleVehicleProfile = calculator.getIdleVehicleProfile();
-		double[][] vehicleOccupancyProfiles = calculator.getVehicleOccupancyProfiles();
-
-		XYSeries[] seriesArray = new XYSeries[1 + vehicleOccupancyProfiles.length];
-		seriesArray[0] = new XYSeries("stay", false, false);
-		for (int s = 0; s < vehicleOccupancyProfiles.length; s++) {
-			seriesArray[1 + s] = new XYSeries(s + " pax", false, false);
-		}
-
-		for (int i = 0; i < timeDiscretizer.getIntervalCount(); i++) {
-			double hour = ((double)(i * timeDiscretizer.getTimeInterval())) / 3600;
-			seriesArray[0].add(hour, idleVehicleProfile[i]);
-			for (int s = 0; s < vehicleOccupancyProfiles.length; s++) {
-				seriesArray[1 + s].add(hour, vehicleOccupancyProfiles[s][i]);
-			}
-		}
+	private DefaultTableXYDataset createXYDataset(TimeDiscretizer timeDiscretizer, Map<String, double[]> profiles) {
+		List<XYSeries> seriesList = new ArrayList<>(profiles.size());
+		profiles.forEach((name, profile) -> {
+			XYSeries series = new XYSeries(name, true, false);
+			timeDiscretizer.forEach((bin, time) -> series.add(((double)time) / 3600, profile[bin]));
+			seriesList.add(series);
+		});
 
 		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
-		for (int s = seriesArray.length - 1; s >= 0; s--) {
-			dataset.addSeries(seriesArray[s]);
-		}
+		Lists.reverse(seriesList).forEach(dataset::addSeries);
 		return dataset;
 	}
 

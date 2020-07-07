@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -185,11 +184,11 @@ public class TransitRouterCustomDataTest {
 		
 		TransitLine line1 = f.createTransitLine(Id.create("1", TransitLine.class));
 		List<TransitRouteStop> stops = new ArrayList<>();
-		stops.add(f.createTransitRouteStop(f1, Time.getUndefinedTime(), 0.0));
-		stops.add(f.createTransitRouteStop(f2, Time.getUndefinedTime(), 300.0));
-		stops.add(f.createTransitRouteStop(f3, Time.getUndefinedTime(), 600.0));
-		stops.add(f.createTransitRouteStop(f4, Time.getUndefinedTime(), 900.0));
-		stops.add(f.createTransitRouteStop(f5, 1200.0, Time.getUndefinedTime()));
+		stops.add(f.createTransitRouteStopBuilder(f1).departureOffset(0.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f2).departureOffset(300.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f3).departureOffset(600.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f4).departureOffset(900.0).build());
+		stops.add(f.createTransitRouteStopBuilder(f5).arrivalOffset(1200.0).build());
 		TransitRoute route1 = f.createTransitRoute(Id.create("1", TransitRoute.class), null, stops, "pt");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
@@ -197,9 +196,9 @@ public class TransitRouterCustomDataTest {
 		
 		TransitLine line2 = f.createTransitLine(Id.create("2", TransitLine.class));
 		List<TransitRouteStop> stops2 = new ArrayList<>();
-		stops2.add(f.createTransitRouteStop(f1, Time.getUndefinedTime(), 0.0));
-		stops2.add(f.createTransitRouteStop(f3, Time.getUndefinedTime(), 750.0));
-		stops2.add(f.createTransitRouteStop(f5, 1100.0, Time.getUndefinedTime()));
+		stops2.add(f.createTransitRouteStopBuilder(f1).departureOffset(0.0).build());
+		stops2.add(f.createTransitRouteStopBuilder(f3).departureOffset(750.0).build());
+		stops2.add(f.createTransitRouteStopBuilder(f5).arrivalOffset(1100.0).build());
 		TransitRoute route2 = f.createTransitRoute(Id.create("2", TransitRoute.class), null, stops2, "pt");
 		line2.addRoute(route2);
 		schedule.addTransitLine(line2);

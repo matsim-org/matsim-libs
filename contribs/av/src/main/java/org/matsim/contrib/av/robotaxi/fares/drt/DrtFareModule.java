@@ -21,19 +21,18 @@ package org.matsim.contrib.av.robotaxi.fares.drt;/*
  * created by jbischoff, 11.12.2018
  */
 
+import javax.inject.Inject;
+
 import org.matsim.core.controler.AbstractModule;
 
 public class DrtFareModule extends AbstractModule {
-    @Override
-    public void install() {
-        if ((getConfig().getModules().containsKey(DrtFareConfigGroup.GROUP_NAME)) && (getConfig().getModules().containsKey(DrtFaresConfigGroup.GROUP_NAME))) {
-            throw new RuntimeException("Both drtfare and drtfares - config groups are specified. Please use only one of them in your config file and restart");
-        }
-        if (getConfig().getModules().containsKey(DrtFareConfigGroup.GROUP_NAME)) {
-            addEventHandlerBinding().toInstance(new DrtFareHandler(DrtFareConfigGroup.get(getConfig())));
-        } else {
-            DrtFaresConfigGroup drtFaresConfigGroup = DrtFaresConfigGroup.get(getConfig());
-            drtFaresConfigGroup.getDrtFareConfigGroups().forEach(drtFareConfigGroup -> addEventHandlerBinding().toInstance(new DrtFareHandler(drtFareConfigGroup)));
-        }
-    }
+	@Inject
+	private DrtFaresConfigGroup drtFaresConfigGroup;
+
+	@Override
+	public void install() {
+		for (DrtFareConfigGroup drtFareCfg : drtFaresConfigGroup.getDrtFareConfigGroups()) {
+			addEventHandlerBinding().toInstance(new DrtFareHandler(drtFareCfg));
+		}
+	}
 }

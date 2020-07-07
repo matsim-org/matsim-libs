@@ -121,13 +121,13 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 		/* After finishing one tour, vehicles wait the driver rest time and then start the next tour immediately.
 		 * So, headway is a function of the number of vehicles and the time spent on one tour of the TransitRoute.
 		 */
-		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime) / numberOfVehicles;
+		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset().seconds() + this.driverRestTime) / numberOfVehicles;
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j <= endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(transitRoute.getId().toString() + "-" + i, Vehicle.class));
 				transitRoute.addDeparture(departure);
-				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime;
+				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset().seconds() + this.driverRestTime;
 				n++;
 			}
 		}		

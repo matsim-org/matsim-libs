@@ -36,4 +36,9 @@ class HbefaRoadVehicleCategoryKey {
 
         return Objects.hash(hbefaVehicleCategory, hbefaRoadCategory);
     }
+
+    @Override
+    public String toString() {
+        return this.hbefaVehicleCategory + "---" + this.hbefaRoadCategory;
+    }
 }

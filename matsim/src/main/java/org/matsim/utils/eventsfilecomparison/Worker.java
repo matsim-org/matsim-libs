@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.SingleHandlerEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 class Worker extends Thread implements BasicEventHandler{
@@ -55,8 +56,7 @@ class Worker extends Thread implements BasicEventHandler{
 		this.doComparison = doComparison;
 		this.ignoringCoordinates = ignoringCoordinates;
 
-		this.eventsManager = EventsUtils.createEventsManager();
-		this.eventsManager.addHandler(this);
+		this.eventsManager = new SingleHandlerEventsManager(this);
 
 	}
 
@@ -71,6 +71,7 @@ class Worker extends Thread implements BasicEventHandler{
 			this.finished = true;
 			try {
 				this.doComparison.await();
+
 			} catch (InterruptedException e1) {
 				throw new ComparatorInterruptedException(e1);
 			} catch (BrokenBarrierException e1) {

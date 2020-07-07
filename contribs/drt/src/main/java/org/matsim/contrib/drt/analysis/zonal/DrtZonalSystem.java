@@ -93,7 +93,6 @@ public class DrtZonalSystem {
 			Logger.getLogger(getClass()).error("Zone " + zoneId + " not found.");
 			return null;
 		}
-		Coord c = MGC.point2Coord(zone.getCentroid());
-		return c;
+		return MGC.point2Coord(zone.getCentroid());
 	}
 }
