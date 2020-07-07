@@ -892,7 +892,7 @@ public final class NetworkUtils {
 		var x2 = link.getToNode().getCoord().getX();
 		var y2 = link.getToNode().getCoord().getY();
 
-		//trivial cases
+		//"trivial" cases
 		if (x1 == x2 && y1 == y2) {
 			return link.getFromNode().getCoord();
 		}
@@ -900,16 +900,16 @@ public final class NetworkUtils {
 			return (new Coord(x1, coord.getY()));
 		}
 		if (y1 == y2) {
-			return new Coord(coord.getX(), coord.getY());
+			return new Coord(coord.getX(), y1);
 		}
 
 		var x3 = coord.getX();
 		var y3 = coord.getY();
 		// ToNode = FromNode + r*delta(ToNode/FromNode) with r = 1
 		var r = (((y3 - y1) / (y2 - y1)) + ((x1 - x3) / (x1 - x2))) / (1 - ((x2 - x1) / (x1 - x2)));
-		if (r > 1) {
+		if (r >= 1) {
 			return link.getToNode().getCoord();
-		} else if (r < 0) {
+		} else if (r <= 0) {
 			return link.getFromNode().getCoord();
 		} else {
 			var x4 = x1 + r * (x2 - x1);
