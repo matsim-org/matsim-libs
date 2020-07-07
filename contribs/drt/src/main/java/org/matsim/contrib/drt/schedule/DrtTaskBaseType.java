@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,22 +15,26 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.drt.schedule;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
-
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class DrtStayTask extends StayTask {
-	public static final DrtTaskType TYPE = new DrtTaskType(STAY);
+public enum DrtTaskBaseType {
+	STAY, // idle
+	STOP, // stopped to drop off and pick up passengers
+	DRIVE; // driving with/without passengers
 
-	public DrtStayTask(double beginTime, double endTime, Link link) {
-		super(TYPE, beginTime, endTime, link);
+	public static DrtTaskBaseType getBaseType(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().get();
+	}
+
+	public boolean isBaseTypeOf(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
 	}
 }

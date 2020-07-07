@@ -55,6 +55,7 @@ public class TaxiTaskType implements Task.TaskType {
 		this.hash = Objects.hash(name, baseType);
 	}
 
+	@Override
 	public final String name() {
 		return name;
 	}

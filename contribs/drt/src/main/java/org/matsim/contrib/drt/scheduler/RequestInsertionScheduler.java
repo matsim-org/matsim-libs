@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.drt.scheduler;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +33,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -96,9 +98,7 @@ public class RequestInsertionScheduler {
 		Task currentTask = scheduleStatus == ScheduleStatus.PLANNED ? null : schedule.getCurrentTask();
 		Task beforePickupTask;
 
-		if (pickupIdx == 0
-				&& scheduleStatus != ScheduleStatus.PLANNED
-				&& currentTask.getTaskType() == DrtTaskType.DRIVE) {
+		if (pickupIdx == 0 && scheduleStatus != ScheduleStatus.PLANNED && DRIVE.isBaseTypeOf(currentTask)) {
 			LinkTimePair diversion = ((OnlineDriveTaskTracker)currentTask.getTaskTracker()).getDiversionPoint();
 			if (diversion != null) { // divert vehicle
 				beforePickupTask = currentTask;
@@ -122,7 +122,7 @@ public class RequestInsertionScheduler {
 				if (scheduleStatus == ScheduleStatus.PLANNED) {// PLANNED schedule
 					stayTask = (DrtStayTask)schedule.getTasks().get(0);
 					stayTask.setEndTime(stayTask.getBeginTime());// could get later removed with ScheduleTimingUpdater
-				} else if (currentTask.getTaskType() == DrtTaskType.STAY) {
+				} else if (STAY.isBaseTypeOf(currentTask)) {
 					stayTask = (DrtStayTask)currentTask; // ongoing stay task
 					double now = timer.getTimeOfDay();
 					if (stayTask.getEndTime() > now) { // stop stay task; a new stop/drive task can be inserted now

@@ -19,12 +19,14 @@
 
 package org.matsim.contrib.drt.optimizer.depot;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
 import java.util.Comparator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -45,13 +47,13 @@ public class Depots {
 
 		// current task is STAY
 		Task currentTask = schedule.getCurrentTask();
-		if (currentTask.getTaskType() != DrtTaskType.STAY) {
+		if (!STAY.isBaseTypeOf(currentTask)) {
 			return false;
 		}
 
 		// previous task was STOP
 		int previousTaskIdx = currentTask.getTaskIdx() - 1;
-		return (previousTaskIdx >= 0 && schedule.getTasks().get(previousTaskIdx).getTaskType() == DrtTaskType.STOP);
+		return (previousTaskIdx >= 0 && STOP.isBaseTypeOf(schedule.getTasks().get(previousTaskIdx)));
 	}
 
 	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {
