@@ -36,10 +36,10 @@ public enum TaxiTaskBaseType {
 	STAY;
 
 	public static TaxiTaskBaseType getBaseType(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).getBaseType();
+		return ((TaxiTaskType)task.getTaskType()).getBaseType().get();
 	}
 
 	public boolean isBaseTypeOf(Task task) {
-		return ((TaxiTaskType)task.getTaskType()).getBaseType() == this;
+		return ((TaxiTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
 	}
 }

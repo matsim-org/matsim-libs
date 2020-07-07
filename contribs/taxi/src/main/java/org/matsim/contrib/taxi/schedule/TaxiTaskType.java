@@ -21,8 +21,10 @@
 package org.matsim.contrib.taxi.schedule;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 
@@ -34,22 +36,22 @@ import com.google.common.base.MoreObjects;
 public class TaxiTaskType implements Task.TaskType {
 
 	private final String name;
-	// can be null if the task type requires a special handling which is not provided by the standard taxi algorithms
+
+	// can be empty if the task type requires a special handling which is not provided by the standard taxi algorithms
 	// (e.g. e-taxi charging task cannot be handled as 'STAY')
-	@Nullable
-	private final TaxiTaskBaseType baseType;
+	private final Optional<TaxiTaskBaseType> baseType;
 
 	private final int hash;
 
-	protected TaxiTaskType(TaxiTaskBaseType baseType) {
+	protected TaxiTaskType(@NotNull TaxiTaskBaseType baseType) {
 		this.name = baseType.name();
-		this.baseType = baseType;
+		this.baseType = Optional.of(baseType);
 		this.hash = Objects.hash(name, baseType);
 	}
 
 	public TaxiTaskType(String name, @Nullable TaxiTaskBaseType baseType) {
 		this.name = name;
-		this.baseType = baseType;
+		this.baseType = Optional.ofNullable(baseType);
 		this.hash = Objects.hash(name, baseType);
 	}
 
@@ -57,8 +59,7 @@ public class TaxiTaskType implements Task.TaskType {
 		return name;
 	}
 
-	@Nullable
-	public final TaxiTaskBaseType getBaseType() {
+	public final Optional<TaxiTaskBaseType> getBaseType() {
 		return baseType;
 	}
 
@@ -71,7 +72,7 @@ public class TaxiTaskType implements Task.TaskType {
 			return false;
 		}
 		TaxiTaskType taskType = (TaxiTaskType)o;
-		return hash == taskType.hash && baseType == taskType.baseType && Objects.equals(name, taskType.name);
+		return hash == taskType.hash && baseType.equals(taskType.baseType) && Objects.equals(name, taskType.name);
 	}
 
 	@Override

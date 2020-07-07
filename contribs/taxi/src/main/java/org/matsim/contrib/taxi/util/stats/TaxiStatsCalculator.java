@@ -96,7 +96,7 @@ public class TaxiStatsCalculator {
 
 	private static double sumBaseTaskTypeDurations(Map<TaskType, Double> taskTypeDurations, TaxiTaskBaseType baseType) {
 		return EntryStream.of(taskTypeDurations)
-				.filterKeys(taskType -> ((TaxiTaskType)taskType).getBaseType() == baseType)
+				.filterKeys(taskType -> ((TaxiTaskType)taskType).getBaseType().orElse(null) == baseType)
 				.mapToDouble(Map.Entry::getValue)
 				.sum();
 	}
