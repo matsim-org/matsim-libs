@@ -31,7 +31,7 @@ import lsp.resources.ResourceScheduler;
 
 /*package-private*/  class CollectionCarrierScheduler extends ResourceScheduler {
 	
-	class LSPCarrierPair{
+	static class LSPCarrierPair{
 		private ShipmentTuple tuple;
 		private CarrierService service;
 		

@@ -28,7 +28,7 @@ import org.matsim.vehicles.VehicleType;
 
 /*package-private*/  class MainRunCarrierScheduler extends ResourceScheduler {
 
-	class LSPCarrierPair{
+	static class LSPCarrierPair{
 		private ShipmentTuple tuple;
 		private CarrierService service;
 		

@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Id;
 
 /* package-private */ class Schedule implements ShipmentPlan {
 
-	class ScheduleElementComparator implements Comparator<ShipmentPlanElement>{
+	static class ScheduleElementComparator implements Comparator<ShipmentPlanElement>{
 
 		@Override
 		public int compare(ShipmentPlanElement o1, ShipmentPlanElement o2) {

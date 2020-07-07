@@ -13,9 +13,8 @@ import lsp.eventhandlers.ServiceEndEventHandler;
 
 /*package-private*/ class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{
 
-	
-	
-	private class ServiceTuple {
+
+	private static class ServiceTuple {
 		private CarrierService service;
 		private double startTime;
 		
