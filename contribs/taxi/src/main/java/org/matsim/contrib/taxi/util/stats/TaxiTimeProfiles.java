@@ -29,9 +29,10 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskTypes;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 
@@ -44,9 +45,10 @@ public class TaxiTimeProfiles {
 				() -> fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle).count());
 	}
 
-	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet,
-			ImmutableList<TaxiTaskType> taskTypes) {
-		ImmutableList<String> header = taskTypes.stream().map(TaxiTaskType::name).collect(toImmutableList());
+	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet) {
+		ImmutableList<String> header = TaxiTaskTypes.DEFAULT_TAXI_TYPES.stream()
+				.map(Task.TaskType::name)
+				.collect(toImmutableList());
 		return TimeProfiles.createProfileCalculator(header, () -> calculateTaxiTaskTypeCounts(fleet));
 	}
 

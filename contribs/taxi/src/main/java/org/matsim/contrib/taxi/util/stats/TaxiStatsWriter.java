@@ -19,23 +19,24 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.taxi.schedule.TaxiTaskTypes;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
+import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.utils.io.IOUtils;
 
 import com.google.common.collect.ImmutableList;
 
 public class TaxiStatsWriter {
 	private final List<TaxiStats> taxiStats;
-	private final ImmutableList<TaxiTaskType> taskTypes;
 
-	public TaxiStatsWriter(List<TaxiStats> taxiStats, ImmutableList<TaxiTaskType> taskTypes) {
+	public TaxiStatsWriter(List<TaxiStats> taxiStats) {
 		this.taxiStats = taxiStats;
-		this.taskTypes = taskTypes;
 	}
 
 	public void write(String file) {
@@ -106,16 +107,20 @@ public class TaxiStatsWriter {
 	}
 
 	private void writeTaskTypeSums(CompactCSVWriter writer) {
+		ImmutableList<Task.TaskType> taskTypes = TimeProfiles.createExtendedHeader(TaxiTaskTypes.DEFAULT_TAXI_TYPES,
+				taxiStats.stream().flatMap(s -> s.taskTypeDurations.keySet().stream()),
+				Comparator.comparing(Task.TaskType::name));
+
 		writer.writeNext("Total duration of tasks by type [h]");
 		CSVLineBuilder headerBuilder = new CSVLineBuilder().add("hour");
-		for (TaxiTaskType t : taskTypes) {
+		for (Task.TaskType t : taskTypes) {
 			headerBuilder.add(t.name());
 		}
 		writer.writeNext(headerBuilder.add("all"));
 
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
-			for (TaxiTaskType t : taskTypes) {
+			for (Task.TaskType t : taskTypes) {
 				lineBuilder.addf("%.2f", s.taskTypeDurations.getOrDefault(t, 0.) / 3600);
 			}
 			lineBuilder.addf("%.2f", s.calculateTotalDuration() / 3600);

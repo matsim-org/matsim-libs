@@ -20,12 +20,14 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import org.matsim.contrib.dvrp.schedule.Task;
+
 import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class TaxiTaskTypes {
-	public static final ImmutableList<TaxiTaskType> DEFAULT_TAXI_TYPES = ImmutableList.of(TaxiEmptyDriveTask.TYPE,
+	public static final ImmutableList<Task.TaskType> DEFAULT_TAXI_TYPES = ImmutableList.of(TaxiEmptyDriveTask.TYPE,
 			TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE, TaxiStayTask.TYPE);
 }

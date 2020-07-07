@@ -87,12 +87,15 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 				.getIterationFilename(matsimServices.getIterationNumber(), outputFile);
 		String timeFormat = interval % 60 == 0 ? Time.TIMEFORMAT_HHMM : Time.TIMEFORMAT_HHMMSS;
 
+		ImmutableList<String> extendedHeader = TimeProfiles.createExtendedHeader(calculator.getHeader(),
+				timeProfile.stream().flatMap(map -> map.keySet().stream()), String::compareTo);
+
 		try (CompactCSVWriter writer = new CompactCSVWriter(IOUtils.getBufferedWriter(file + ".txt"))) {
-			writer.writeNext(new CSVLineBuilder().add("time").addAll(calculator.getHeader()));
+			writer.writeNext(new CSVLineBuilder().add("time").addAll(extendedHeader));
 
 			for (int i = 0; i < timeProfile.size(); i++) {
 				CSVLineBuilder builder = new CSVLineBuilder().add(Time.writeTime(times.get(i), timeFormat));
-				for (String column : calculator.getHeader()) {
+				for (String column : extendedHeader) {
 					builder.add(timeProfile.get(i).getOrDefault(column, 0.) + "");
 				}
 				writer.writeNext(builder);
@@ -100,12 +103,12 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 		}
 
 		for (ChartType t : chartTypes) {
-			generateImage(t);
+			generateImage(extendedHeader, t);
 		}
 	}
 
-	private void generateImage(ChartType chartType) {
-		JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times, timeProfile, chartType);
+	private void generateImage(ImmutableList<String> extendedHeader, ChartType chartType) {
+		JFreeChart chart = TimeProfileCharts.chartProfile(extendedHeader, times, timeProfile, chartType);
 		if (chartCustomizer != null) {
 			chartCustomizer.accept(chart, chartType);
 		}
