@@ -168,6 +168,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		}
 
 		Coord startCoord = egressActLink.getToNode().getCoord();
+		//TODO: find better start coordinates
 		Gbl.assertNotNull(startCoord);
 		final Id<Link> startLinkId = egressActLink.getId();
 
@@ -191,7 +192,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
-
 			egressTrip.add(egressLeg);
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
@@ -235,7 +235,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		}
 
 		Coord endCoord = accessActLink.getToNode().getCoord();
-		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
+		// TODO: think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
 		Gbl.assertNotNull(endCoord);
 		List<PlanElement> accessTrip = new ArrayList<>();
 
