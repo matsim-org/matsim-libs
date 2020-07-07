@@ -56,14 +56,12 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  * @author mrieser
  */
-public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener,
-ShutdownListener {
+public final class ModeStatsControlerListener implements StartupListener, IterationEndsListener {
 
 	public static final String FILENAME_MODESTATS = "modestats";
 
 	final private Population population;
-	
-	final private BufferedWriter modeOut ;
+
 	final private String modeFileName ;
 
 	private final boolean createPNG;
@@ -73,8 +71,10 @@ ShutdownListener {
 	private int minIteration = 0;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
-	
-	private final Set<String> modes;
+	private int firstIteration = -1;
+
+	// Keep all modes encountered so far in a sorted set to ensure output is written for modes sorted by mode.
+	private final Set<String> modes = new TreeSet<>();
 
 	private final static Logger log = Logger.getLogger(ModeStatsControlerListener.class);
 
@@ -85,18 +85,6 @@ ShutdownListener {
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
 		this.createPNG = controlerConfigGroup.isCreateGraphs();
-		this.modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
-		try {
-			this.modeOut.write("Iteration");
-			this.modes = new TreeSet<>();
-			this.modes.addAll(scoreConfig.getAllModes());
-			for ( String mode : modes ) {
-				this.modeOut.write("\t" + mode);
-			}
-			this.modeOut.write("\n"); ;
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
@@ -111,6 +99,9 @@ ShutdownListener {
 	}
 
 	private void collectModeShareInfo(final IterationEndsEvent event) {
+		if (firstIteration < 0) {
+			firstIteration = event.getIteration();
+		}
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan() ;
 			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
@@ -131,31 +122,50 @@ ShutdownListener {
 		for ( Double val : this.modeCnt.values() ) {
 			sum += val ;
 		}
-		
-		try {
-			this.modeOut.write( String.valueOf(event.getIteration()) ) ;
-			log.info("Mode shares over all " + sum + " trips found. MainModeIdentifier: " + mainModeIdentifier.getClass());
-			for ( String mode : modes ) {
-				Double cnt = this.modeCnt.get(mode) ;
-				double share = 0. ;
-				if ( cnt!=null ) {
-					share = cnt/sum;
-				}
-				log.info("-- mode share of mode " + mode + " = " + share );
-				this.modeOut.write( "\t" + share ) ;
-				
-				Map<Integer, Double> modeHistory = this.modeHistories.get(mode) ;
-				if ( modeHistory == null ) {
-					modeHistory = new TreeMap<>() ;
-					this.modeHistories.put(mode, modeHistory) ;
-				}
-				modeHistory.put( event.getIteration(), share ) ;
-				
+
+		// add new modes not encountered in previous iterations
+		this.modes.addAll(modeCnt.keySet());
+
+		// calculate and save this iteration's mode shares
+		log.info("Mode shares over all " + sum + " trips found. MainModeIdentifier: " + mainModeIdentifier.getClass());
+		for ( String mode : modes ) {
+			Double cnt = this.modeCnt.getOrDefault(mode, 0.0) ;
+			double share = 0. ;
+			if ( cnt!=null ) {
+				share = cnt/sum;
 			}
-			this.modeOut.write("\n");
-			this.modeOut.flush();
+			log.info("-- mode share of mode " + mode + " = " + share );
+
+			Map<Integer, Double> modeHistory = this.modeHistories.get(mode) ;
+			if ( modeHistory == null ) {
+				modeHistory = new TreeMap<>() ;
+				for (int iter = firstIteration; iter < event.getIteration(); iter++) {
+					modeHistory.put(iter, 0.0);
+				}
+				this.modeHistories.put(mode, modeHistory) ;
+			}
+			modeHistory.put( event.getIteration(), share ) ;
+		}
+
+		BufferedWriter modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
+		try {
+			modeOut.write("Iteration");
+			for ( String mode : modes ) {
+				modeOut.write("\t" + mode);
+			}
+			modeOut.write("\n"); ;
+			for (int iter = firstIteration; iter <= event.getIteration(); iter++) {
+				modeOut.write( String.valueOf(iter) ) ;
+				for ( String mode : modes ) {
+					modeOut.write( "\t" + modeHistories.get(mode).get(iter)) ;
+				}
+				modeOut.write( "\n" ) ;
+			}
+			modeOut.flush();
+			modeOut.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+			throw new UncheckedIOException(e);
 		}
 
 
@@ -177,16 +187,6 @@ ShutdownListener {
 			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
 		}
 		modeCnt.clear();
-	}
-
-	@Override
-	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
-		try {
-			this.modeOut.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	public final Map<String, Map<Integer, Double>> getModeHistories() {
