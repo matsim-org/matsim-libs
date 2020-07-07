@@ -217,7 +217,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		completeSolution = completeSolutionBuilder.build();
 		
-		assigner = new DeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);

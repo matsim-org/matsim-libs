@@ -101,7 +101,7 @@ public class MainRunOnlyLSPMobsimTest {
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolution = completeSolutionBuilder.build();
 		
-		assigner = new DeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);;
 		completePlan.addSolution(completeSolution);

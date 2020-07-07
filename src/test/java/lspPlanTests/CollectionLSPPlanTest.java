@@ -22,7 +22,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.resources.Resource;
 
 public class CollectionLSPPlanTest {
@@ -82,7 +81,7 @@ public class CollectionLSPPlanTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 		
-		assigner = new DeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);

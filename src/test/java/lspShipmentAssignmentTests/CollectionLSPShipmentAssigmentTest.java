@@ -90,7 +90,7 @@ public class CollectionLSPShipmentAssigmentTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 		
-		assigner = new DeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);

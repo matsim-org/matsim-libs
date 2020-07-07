@@ -27,6 +27,10 @@ public class UsecaseUtils {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
+	public static DeterministicShipmentAssigner createDeterministicShipmentAssigner() {
+		return new DeterministicShipmentAssigner();
+	}
+
 	public static class CollectionCarrierAdapterBuilder {
 
 		Id<Resource> id;

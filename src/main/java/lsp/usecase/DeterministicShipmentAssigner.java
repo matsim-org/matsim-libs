@@ -5,10 +5,13 @@ import lsp.LogisticsSolution;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 
-public class DeterministicShipmentAssigner implements ShipmentAssigner {
+/*package-private*/ class DeterministicShipmentAssigner implements ShipmentAssigner {
 
 	private LSP lsp;
-	
+
+	DeterministicShipmentAssigner() {
+	}
+
 	public void setLSP(LSP lsp) {
 		this.lsp = lsp;
 	}

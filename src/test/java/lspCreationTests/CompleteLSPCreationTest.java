@@ -205,7 +205,7 @@ public class CompleteLSPCreationTest {
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		
-		assigner = new DeterministicShipmentAssigner();
+		assigner = UsecaseUtils.createDeterministicShipmentAssigner();
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completeSolution  = completeSolutionBuilder.build();
