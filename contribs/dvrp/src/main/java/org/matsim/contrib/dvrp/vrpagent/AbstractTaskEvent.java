@@ -70,7 +70,7 @@ public abstract class AbstractTaskEvent extends Event implements HasPersonId {
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_DVRP_VEHICLE, dvrpVehicleId + "");
-		attr.put(ATTRIBUTE_TASK_TYPE, taskType + "");
+		attr.put(ATTRIBUTE_TASK_TYPE, taskType.name());
 		attr.put(ATTRIBUTE_TASK_INDEX, taskIndex + "");
 		return attr;
 	}

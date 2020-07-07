@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,20 +15,31 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.etaxi;
+package org.matsim.contrib.taxi.schedule;
 
-import org.matsim.contrib.ev.dvrp.ChargingTaskImpl;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.dvrp.schedule.Task;
 
-public class ETaxiChargingTask extends ChargingTaskImpl {
-	public static final TaxiTaskType TYPE = new TaxiTaskType("CHARGING", null);
+/**
+ * Defines the base set of task types supported by the default optimiser
+ *
+ * @author Michal Maciejewski (michalm)
+ */
+public enum TaxiTaskBaseType {
+	// not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+	EMPTY_DRIVE, //
+	// serving a customer (TaxiTaskWithRequest)
+	PICKUP, OCCUPIED_DRIVE, DROPOFF,//
+	// not directly related to any customer
+	STAY;
 
-	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,
-			double totalEnergy) {
-		super(TYPE, beginTime, endTime, charger, ev, totalEnergy);
+	public static TaxiTaskBaseType getBaseType(Task task) {
+		return ((TaxiTaskType)task.getTaskType()).getBaseType().get();
+	}
+
+	public boolean isBaseTypeOf(Task task) {
+		return ((TaxiTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
 	}
 }

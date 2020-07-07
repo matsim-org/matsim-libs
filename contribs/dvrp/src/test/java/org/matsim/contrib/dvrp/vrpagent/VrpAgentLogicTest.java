@@ -50,7 +50,8 @@ import org.mockito.ArgumentCaptor;
  * @author Michal Maciejewski (michalm)
  */
 public class VrpAgentLogicTest {
-	private static class TestTaskType implements TaskType {
+	private enum TestTaskType implements TaskType {
+		TYPE
 	}
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
@@ -92,7 +93,7 @@ public class VrpAgentLogicTest {
 	public void testInitialActivity_planned() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(null);
 
-		StayTask task0 = new StayTask(new TestTaskType(), 10, 90, startLink);
+		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
@@ -104,7 +105,7 @@ public class VrpAgentLogicTest {
 	public void testInitialActivity_started_failure() {
 		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(null);
 
-		StayTask task0 = new StayTask(new TestTaskType(), 10, 90, startLink);
+		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 		vehicle.getSchedule().nextTask();
 
@@ -127,7 +128,7 @@ public class VrpAgentLogicTest {
 	@Test
 	public void testNextAction_planned_started() {
 		double time = 10;
-		StayTask task0 = new StayTask(new TestTaskType(), time, 90, startLink);
+		StayTask task0 = new StayTask(TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
 
 		DynActivity nextActivity = (DynActivity)dynAgentLogic.computeNextAction(null, time);
@@ -138,9 +139,9 @@ public class VrpAgentLogicTest {
 	@Test
 	public void testNextAction_started_started() {
 		double time = 50;
-		StayTask task0 = new StayTask(new TestTaskType(), 10, time, startLink);
+		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
-		StayTask task1 = new StayTask(new TestTaskType(), time, 90, startLink);
+		StayTask task1 = new StayTask(TestTaskType.TYPE, time, 90, startLink);
 		vehicle.getSchedule().addTask(task1);
 		vehicle.getSchedule().nextTask();//current: task0
 
@@ -152,7 +153,7 @@ public class VrpAgentLogicTest {
 	@Test
 	public void testNextAction_started_completed() {
 		double time = 90;
-		StayTask task0 = new StayTask(new TestTaskType(), 10, time, startLink);
+		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, time, startLink);
 		vehicle.getSchedule().addTask(task0);
 		vehicle.getSchedule().nextTask();//current: task0
 

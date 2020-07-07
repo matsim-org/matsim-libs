@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalDouble;
@@ -26,16 +28,16 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.stats.DurationStats;
 
 import com.google.common.collect.ImmutableList;
 
-import one.util.streamex.StreamEx;
+import one.util.streamex.EntryStream;
 
 public class TaxiStatsCalculator {
 	public static final String DAILY_STATS_ID = "daily";
@@ -75,21 +77,28 @@ public class TaxiStatsCalculator {
 	}
 
 	static OptionalDouble calculateEmptyDriveRatio(Map<TaskType, Double> taskTypeDurations) {
-		double empty = taskTypeDurations.getOrDefault(TaxiTaskType.EMPTY_DRIVE, 0.);
-		double occupied = taskTypeDurations.getOrDefault(TaxiTaskType.OCCUPIED_DRIVE, 0.);
+		double empty = sumBaseTaskTypeDurations(taskTypeDurations, EMPTY_DRIVE);
+		double occupied = sumBaseTaskTypeDurations(taskTypeDurations, OCCUPIED_DRIVE);
 		return (empty != 0 || occupied != 0) ? OptionalDouble.of(empty / (empty + occupied)) : OptionalDouble.empty();
 	}
 
 	static OptionalDouble calculateStayRatio(Map<TaskType, Double> taskTypeDurations) {
+		double stay = sumBaseTaskTypeDurations(taskTypeDurations, STAY);
 		double total = taskTypeDurations.values().stream().mapToDouble(Double::doubleValue).sum();
-		Double stay = taskTypeDurations.getOrDefault(TaxiTaskType.STAY, 0.);
 		return total != 0 ? OptionalDouble.of(stay / total) : OptionalDouble.empty();
 	}
 
 	static OptionalDouble calculateOccupiedDriveRatio(Map<TaskType, Double> taskTypeDurations) {
+		double occupied = sumBaseTaskTypeDurations(taskTypeDurations, OCCUPIED_DRIVE);
 		double total = taskTypeDurations.values().stream().mapToDouble(Double::doubleValue).sum();
-		double occupied = taskTypeDurations.getOrDefault(TaxiTaskType.OCCUPIED_DRIVE, 0.);
 		return total != 0 ? OptionalDouble.of(occupied / total) : OptionalDouble.empty();
+	}
+
+	private static double sumBaseTaskTypeDurations(Map<TaskType, Double> taskTypeDurations, TaxiTaskBaseType baseType) {
+		return EntryStream.of(taskTypeDurations)
+				.filterKeys(taskType -> ((TaxiTaskType)taskType).getBaseType().orElse(null) == baseType)
+				.mapToDouble(Map.Entry::getValue)
+				.sum();
 	}
 
 	private static void updateTaskDurations(TaxiStats stats, Map<TaskType, Double> taskTypeDurations) {
@@ -98,12 +107,12 @@ public class TaxiStatsCalculator {
 	}
 
 	private void updatePassengerWaitTimeStats(DvrpVehicle vehicle) {
-		for (Task task : StreamEx.of(vehicle.getSchedule().tasks()).filterBy(Task::getTaskType, TaxiTaskType.PICKUP)) {
+		vehicle.getSchedule().tasks().filter(task -> getBaseType(task) == PICKUP).forEach(task -> {
 			TaxiRequest req = ((TaxiPickupTask)task).getRequest();
 			double waitTime = Math.max(task.getBeginTime() - req.getEarliestStartTime(), 0);
 			int hour = (int)(req.getEarliestStartTime() / 3600);
 			getHourlyStats(hour).passengerWaitTime.addValue(waitTime);
 			dailyStats.passengerWaitTime.addValue(waitTime);
-		}
+		});
 	}
 }
