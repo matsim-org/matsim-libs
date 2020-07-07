@@ -51,8 +51,9 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params,
 			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry) {
-		this(scheduler, timer, new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility), params,
-				idleTaxiRegistry, unplannedRequestRegistry);
+		this(scheduler, timer,
+				new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility),
+				params, idleTaxiRegistry, unplannedRequestRegistry);
 	}
 
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, BestDispatchFinder dispatchFinder,

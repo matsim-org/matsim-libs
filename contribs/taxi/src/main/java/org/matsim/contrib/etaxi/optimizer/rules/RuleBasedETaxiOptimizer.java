@@ -61,10 +61,11 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
 			TravelTime travelTime, TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure,
 			ZonalSystem zonalSystem) {
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, eScheduler);
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem,
+				eScheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
-		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler, network, timer, travelTime,
-				travelDisutility);
+		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler.getScheduleInquiry(), network, timer,
+				travelTime, travelDisutility);
 		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(eScheduler, timer, dispatchFinder,
 				((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
 				idleTaxiRegistry, unplannedRequestRegistry);
@@ -117,7 +118,7 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public void nextTask(DvrpVehicle vehicle) {
 		super.nextTask(vehicle);
 
-		if (eScheduler.isIdle(vehicle)) {
+		if (eScheduler.getScheduleInquiry().isIdle(vehicle)) {
 			EvDvrpVehicle eTaxi = (EvDvrpVehicle)vehicle;
 			if (isUndercharged(eTaxi)) {
 				chargeIdleUnderchargedVehicles(Stream.of(eTaxi));
