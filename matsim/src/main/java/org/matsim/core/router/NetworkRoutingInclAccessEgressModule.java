@@ -167,8 +167,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Collections.emptyList();
 		}
 
-		Coord startCoord = egressActLink.getToNode().getCoord();
-		//TODO: find better start coordinates
+		Coord startCoord = NetworkUtils.findNearestPointOnLink(toFacility.getCoord(),egressActLink);
 		Gbl.assertNotNull(startCoord);
 		final Id<Link> startLinkId = egressActLink.getId();
 
@@ -234,7 +233,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			return Collections.emptyList();
 		}
 
-		Coord endCoord = accessActLink.getToNode().getCoord();
+		Coord endCoord = NetworkUtils.findNearestPointOnLink(fromFacility.getCoord(),accessActLink);
 		// TODO: think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
 		Gbl.assertNotNull(endCoord);
 		List<PlanElement> accessTrip = new ArrayList<>();
