@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,38 +18,23 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.drt.schedule;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
+import org.matsim.contrib.dvrp.schedule.Task;
 
-public class BatteryImpl implements Battery {
-	private final double capacity;
-	private double soc;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public enum DrtTaskBaseType {
+	STAY, // idle
+	STOP, // stopped to drop off and pick up passengers
+	DRIVE; // driving with/without passengers
 
-	public BatteryImpl(double capacity, double soc) {
-		this.capacity = capacity;
-		this.soc = soc;
+	public static DrtTaskBaseType getBaseType(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().get();
 	}
 
-	@Override
-	public double getCapacity() {
-		return capacity;
-	}
-
-	@Override
-	public double getSoc() {
-		return soc;
-	}
-
-	@Override
-	public void setSoc(double soc) {
-		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %s", soc);
-		this.soc = soc;
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this).add("capacity", capacity).add("soc", soc).toString();
+	public boolean isBaseTypeOf(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
 	}
 }
