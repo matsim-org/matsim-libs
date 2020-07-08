@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 public class DrtDriveTask extends DriveTask {
 	public static final DrtTaskType TYPE = new DrtTaskType(DRIVE);
 
-	public DrtDriveTask(VrpPathWithTravelData path) {
-		super(TYPE, path);
+	public DrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType) {
+		super(taskType, path);
 	}
 }
