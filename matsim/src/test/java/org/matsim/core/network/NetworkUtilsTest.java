@@ -159,35 +159,44 @@ public class NetworkUtilsTest {
 		Link plainYLink = NetworkUtils.createLink(Id.createLinkId("plainY"),node1,plainYNode,network,150,1,20,1);
 		Link loop = NetworkUtils.createLink(Id.createLinkId("1-1"),node1,node1,network,150,1,20,1);
 
+		//fromNode
 		Coord tp1 = new Coord(1,1);
 		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp1,link));
+
+		//toNode
 		Coord tp2 = new Coord(100,100);
 		Assert.assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp2,link));
 
+		//on the link
 		Coord tp3 = new Coord(50,50);
 		Assert.assertEquals(tp3,NetworkUtils.findNearestPointOnLink(tp3,link));
 
+		//along the link vector, but before link
 		Coord tp4 = new Coord(-50,-50);
 		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp4,link));
 
+		//along the link vector, but after link ends
 		Coord tp5 = new Coord(150,150);
 		Assert.assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp5,link));
 
+		//off the link, but before link start
 		Coord tp6 = new Coord(1,0);
 		Assert.assertEquals(new Coord(1,1),NetworkUtils.findNearestPointOnLink(tp6,link));
 
+		//off the link, parallel to it
 		Coord tp7 = new Coord(2,1);
 		Assert.assertEquals(new Coord(1.5,1.5),NetworkUtils.findNearestPointOnLink(tp7,link));
 
+		//off the link, parallel to it
 		Coord tp8 = new Coord(30,45);
 		Assert.assertEquals(new Coord(37.5,37.5),NetworkUtils.findNearestPointOnLink(tp8,link));
 
+		//loop link
 		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp8,loop));
+
+		//link is plain in x & y
 		Assert.assertEquals(new Coord(1,45),NetworkUtils.findNearestPointOnLink(tp8,plainXLink));
-
 		Assert.assertEquals(new Coord(30,1),NetworkUtils.findNearestPointOnLink(tp8,plainYLink));
-
-
 
 	}
 }
