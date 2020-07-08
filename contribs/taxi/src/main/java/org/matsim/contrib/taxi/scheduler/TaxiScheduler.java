@@ -46,6 +46,7 @@ import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
@@ -88,7 +89,7 @@ public class TaxiScheduler {
 		}
 
 		Schedule schedule = vehicle.getSchedule();
-		divertOrAppendDrive(schedule, vrpPath);
+		divertOrAppendDrive(schedule, vrpPath, TaxiEmptyDriveTask.TYPE);
 
 		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime())
 				+ taxiCfg.getPickupDuration();
@@ -100,7 +101,7 @@ public class TaxiScheduler {
 		}
 	}
 
-	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath) {
+	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
 		Task lastTask = Schedules.getLastTask(schedule);
 		switch (getBaseType(lastTask)) {
 			case EMPTY_DRIVE:
@@ -108,7 +109,7 @@ public class TaxiScheduler {
 				return;
 
 			case STAY:
-				scheduleDrive(schedule, (TaxiStayTask)lastTask, vrpPath);
+				scheduleDrive(schedule, (TaxiStayTask)lastTask, vrpPath, taskType);
 				return;
 
 			default:
@@ -124,7 +125,8 @@ public class TaxiScheduler {
 		((OnlineDriveTaskTracker)lastTask.getTaskTracker()).divertPath(vrpPath);
 	}
 
-	protected void scheduleDrive(Schedule schedule, TaxiStayTask lastTask, VrpPathWithTravelData vrpPath) {
+	protected void scheduleDrive(Schedule schedule, TaxiStayTask lastTask, VrpPathWithTravelData vrpPath,
+			TaxiTaskType taskType) {
 		switch (lastTask.getStatus()) {
 			case PLANNED:
 				if (lastTask.getBeginTime() == vrpPath.getDepartureTime()) { // waiting for 0 seconds!!!
@@ -145,7 +147,7 @@ public class TaxiScheduler {
 		}
 
 		if (vrpPath.getLinkCount() > 1) {
-			schedule.addTask(new TaxiEmptyDriveTask(vrpPath));
+			schedule.addTask(new TaxiEmptyDriveTask(vrpPath, taskType));
 		}
 	}
 
