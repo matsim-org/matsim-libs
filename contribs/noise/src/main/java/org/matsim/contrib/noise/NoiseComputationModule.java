@@ -37,21 +37,20 @@ public final class NoiseComputationModule extends AbstractModule {
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
 		this.bind(NoiseContext.class).in( Singleton.class );
+		this.bind(ShieldingContext.class).in(Singleton.class);
 
 		switch (noiseParameters.getNoiseComputationMethod()) {
 			case RLS90:
-				this.bind(NoiseEmission.class).to(RLS90NoiseEmission.class).asEagerSingleton();
-				this.bind(NoiseImmission.class).to(RLS90NoiseImmission.class).asEagerSingleton();
-				this.bind(NoiseVehicleIdentifier.class).to(RLS90NoiseVehicleIdentifier.class).asEagerSingleton();
-				this.bind(ShieldingCorrection.class).to(RLS90ShieldingCorrection.class).asEagerSingleton();
-				this.bind(ShieldingContext.class).in(Singleton.class);
+				this.bind(NoiseEmission.class).to(RLS90NoiseEmission.class);
+				this.bind(NoiseImmission.class).to(RLS90NoiseImmission.class);
+				this.bind(NoiseVehicleIdentifier.class).to(RLS90NoiseVehicleIdentifier.class);
+				this.bind(ShieldingCorrection.class).to(RLS90ShieldingCorrection.class);
 				break;
 			case RLS19:
-				this.bind(NoiseEmission.class).to(RLS19NoiseEmission.class).asEagerSingleton();
-				this.bind(NoiseImmission.class).to(RLS19NoiseImmission.class).asEagerSingleton();
-				this.bind(NoiseVehicleIdentifier.class).to(RLS19NoiseVehicleIdentifier.class).asEagerSingleton();
-                this.bind(ShieldingCorrection.class).to(RLS19ShieldingCorrection.class).asEagerSingleton();
-                this.bind(ShieldingContext.class).in(Singleton.class);
+				this.bind(NoiseEmission.class).to(RLS19NoiseEmission.class);
+				this.bind(NoiseImmission.class).to(RLS19NoiseImmission.class);
+				this.bind(NoiseVehicleIdentifier.class).to(RLS19NoiseVehicleIdentifier.class);
+                this.bind(ShieldingCorrection.class).to(RLS19ShieldingCorrection.class);
 				break;
 			default:
 				throw new IllegalStateException("Unrecognized noise computation method: " + noiseParameters.getNoiseComputationMethod());
