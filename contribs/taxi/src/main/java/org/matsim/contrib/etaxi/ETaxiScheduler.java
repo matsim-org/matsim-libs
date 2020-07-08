@@ -48,6 +48,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
+	public static final TaxiTaskType DRIVE_TO_CHARGER = new TaxiTaskType("DRIVE_TO_CHARGER", EMPTY_DRIVE);
 
 	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, LeastCostPathCalculator router) {
@@ -60,7 +61,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	public void scheduleCharging(DvrpVehicle vehicle, ElectricVehicle ev, Charger charger,
 			VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
-		divertOrAppendDrive(schedule, vrpPath);
+		divertOrAppendDrive(schedule, vrpPath, DRIVE_TO_CHARGER);
 
 		ChargingWithQueueingAndAssignmentLogic logic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
 		double chargingEndTime = vrpPath.getArrivalTime() + ChargingEstimations.estimateMaxWaitTimeForNextVehicle(
