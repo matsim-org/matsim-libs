@@ -234,13 +234,9 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		for(NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			final ImmissionInfo immissionInfo = immissionModule.calculateImmission(rp);
 			rp.setCurrentImmission(immissionInfo, this.noiseContext.getCurrentTimeBinEndTime());
-			if(noiseContext.getNoiseParams().getNoiseComputationMethod() != NoiseConfigGroup.NoiseComputationMethod.RLS19) {
 				damageCalculation.calculateDamages(rp);
-			}
 		}
-		if(noiseContext.getNoiseParams().getNoiseComputationMethod() != NoiseConfigGroup.NoiseComputationMethod.RLS19) {
-			damageCalculation.finishNoiseDamageCosts();
-		}
+		damageCalculation.finishNoiseDamageCosts();
 	}
 
 	void computeFinalTimeIntervals() {
