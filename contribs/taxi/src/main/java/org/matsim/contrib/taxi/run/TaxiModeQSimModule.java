@@ -39,6 +39,7 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.scheduler.TaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
@@ -108,10 +109,13 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Override
 			public TaxiScheduler get() {
 				Fleet fleet = getModalInstance(Fleet.class);
+				TaxiScheduleInquiry taxiScheduleInquiry = new TaxiScheduleInquiry(taxiCfg, timer);
 				Network network = getModalInstance(Network.class);
-				TravelDisutility travelDisutility = getModalInstance(TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				LeastCostPathCalculator router = new FastAStarLandmarksFactory(getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
-				return new TaxiScheduler(taxiCfg, fleet, timer, travelTime, router);
+				TravelDisutility travelDisutility = getModalInstance(
+						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
+				LeastCostPathCalculator router = new FastAStarLandmarksFactory(
+						getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
+				return new TaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
 			}
 		}).asEagerSingleton();
 

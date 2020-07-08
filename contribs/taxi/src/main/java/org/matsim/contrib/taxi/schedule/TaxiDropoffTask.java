@@ -19,16 +19,20 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.DROPOFF;
+
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 import com.google.common.base.MoreObjects;
 
 public class TaxiDropoffTask extends StayTask {
+	public static final TaxiTaskType TYPE = new TaxiTaskType(DROPOFF);
+
 	private final TaxiRequest request;
 
 	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
-		super(TaxiTaskType.DROPOFF, beginTime, endTime, request.getToLink());
+		super(TYPE, beginTime, endTime, request.getToLink());
 		this.request = request;
 		request.setDropoffTask(this);
 	}
