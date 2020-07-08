@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.osm.networkReader.SupersonicOsmNetworkReader;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.Matrix;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.list.Lists;
@@ -772,19 +771,6 @@ public class GeneralLib {
 
 		kmzWriter.writeMainKml(mainKml);
 		kmzWriter.close();
-	}
-
-	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) {
-
-		// The previous code set the 'keepPath' option of the OsmNetworkReader to 'true'
-		// this functionality is not available in the new reader at the moment. If the
-		// missing detailed path information breaks the parking code this can easily be implemented
-		// I just don't know anybody who uses this feature on purpose at the moment, janek 4.2020
-		var transformation = new WGS84toCH1903LV03();
-		return new SupersonicOsmNetworkReader.Builder()
-				.setCoordinateTransformation(transformation)
-				.build()
-				.read(osmNetworkFile);
 	}
 
 	// TODO: there are some classes (e.g.
