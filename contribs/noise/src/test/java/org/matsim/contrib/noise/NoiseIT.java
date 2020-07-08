@@ -678,7 +678,7 @@ public class NoiseIT {
 			double noiseImmission = immissionPerReceiverPointId.get(rp.getId());
 			double affectedAgentUnits = consideredAgentsPerReceiverPoint.get(rp.getId()).get(1);
 			
-			Assert.assertEquals("Wrong damage!", NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), damagesPerReceiverPointId.get(rp.getId()),  MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong damage!", NoiseDamageCalculation.calculateDamageCosts(noiseImmission, affectedAgentUnits, endTime, noiseParameters.getAnnualCostRate(), noiseParameters.getTimeBinSizeNoiseComputation()), damagesPerReceiverPointId.get(rp.getId()),  MatsimTestUtils.EPSILON);
 			
 		}
 		
@@ -1360,11 +1360,11 @@ public class NoiseIT {
 		double expectedCostsNight = 0.031590380365211;
 		
 		Assert.assertEquals("Error in damage calculation!", expectedCostsDay, costsDay , MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in damage calculation!", expectedCostsDay, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 7.*3600, annualCostRate, 3600.) , MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsDay, NoiseDamageCalculation.calculateDamageCosts(resultingNoiseImmission, nPersons, 7.*3600, annualCostRate, 3600.) , MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, costsEvening, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 19.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, NoiseDamageCalculation.calculateDamageCosts(resultingNoiseImmission, nPersons, 19.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, costsNight, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);	
+		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseDamageCalculation.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
 	}	
 	
 	// tests the static methods within class "noiseEquations"

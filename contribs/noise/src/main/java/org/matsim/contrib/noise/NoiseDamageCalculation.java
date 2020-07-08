@@ -7,18 +7,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
-
-import static org.matsim.contrib.noise.RLS90VehicleType.car;
-import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class NoiseDamageCalculation {
 
     private final static Logger log = Logger.getLogger(NoiseDamageCalculation.class);
+
+    private enum DayTime {NIGHT, DAY, EVENING}
 
     private static final boolean printLog = false;
     private boolean collectNoiseEvents = true;
@@ -31,8 +32,7 @@ public class NoiseDamageCalculation {
     @Inject private EventsManager events;
 
     @Inject
-    private NoiseEmission emission;
-
+    NoiseVehicleIdentifier noiseVehicleIdentifier;
 
     private int cWarn3 = 0;
     private int cWarn4 = 0;
@@ -137,17 +137,14 @@ public class NoiseDamageCalculation {
         double annualCostRate = this.noiseContext.getNoiseParams().getAnnualCostRate();
         double timeBinsSize = this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation();
 
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
         double noiseImmission = rp.getCurrentImmission().immission;
         double affectedAgentUnits = rp.getAffectedAgentUnits();
 
-        double damageCost = NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, currentTimeBinEndTime, annualCostRate, timeBinsSize);
-        double damageCostPerAffectedAgentUnit = NoiseEquations.calculateDamageCosts(noiseImmission, 1., currentTimeBinEndTime, annualCostRate, timeBinsSize);
+        double damageCost = calculateDamageCosts(noiseImmission, affectedAgentUnits, currentTimeBinEndTime, annualCostRate, timeBinsSize);
+        double damageCostPerAffectedAgentUnit = calculateDamageCosts(noiseImmission, 1., currentTimeBinEndTime, annualCostRate, timeBinsSize);
 
         rp.setDamageCosts(damageCost);
         rp.setDamageCostsPerAffectedAgentUnit(damageCostPerAffectedAgentUnit);
-//		}
     }
 
     private void throwNoiseEventsAffected() {
@@ -237,55 +234,36 @@ public class NoiseDamageCalculation {
      */
     private void calculateCostsPerVehiclePerLinkPerTimeInterval() {
 
+        final NoiseVehicleType[] noiseVehiclesTypes = noiseContext.getNoiseParams().getNoiseComputationMethod().noiseVehiclesTypes;
         for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
-
-            double damageCostPerCar = 0.;
-            double damageCostPerHgv = 0.;
-
             NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
-
-            double damageCostSum = 0.;
-            int nCarAgents = 0;
-            int nHdvAgents = 0;
-
             if (noiseLink != null) {
-                damageCostSum = noiseLink.getDamageCost();
-                nCarAgents = noiseLink.getAgentsEntering(car.getId());
-                nHdvAgents = noiseLink.getAgentsEntering(hgv.getId());
-            }
+                double damageCostSum = noiseLink.getDamageCost();
 
+                int[] counts = new int[noiseVehiclesTypes.length];
+                double[] levels = new double[noiseVehiclesTypes.length];
 
-            double vCar = getV(linkId, noiseLink, car);
-            double vHdv = getV(linkId, noiseLink, hgv);
+                for(int i = 0; i < noiseVehiclesTypes.length; i++) {
+                    NoiseVehicleType type = noiseVehiclesTypes[i];
+                    counts[i] = noiseLink.getAgentsEntering(type.getId());
+                    double v = getV(linkId, noiseLink, type);
+                    levels[i] = RLS90NoiseEmission.calculateLCar(v);
+                }
 
-            double lCar = RLS90NoiseEmission.calculateLCar(vCar);
-            double lHdv = RLS90NoiseEmission.calculateLHdv(vHdv);
+                double[] shares = NoiseEquations.calculateShare(counts, levels);
 
-            double shareCar = 0.;
-            double shareHdv = 0.;
+                NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
 
-            if ((nCarAgents > 0) || (nHdvAgents > 0)) {
-                shareCar = NoiseEquations.calculateShare(nCarAgents, lCar, nHdvAgents, lHdv);
-                shareHdv = NoiseEquations.calculateShare(nHdvAgents, lHdv, nCarAgents, lCar);
-            }
-
-            double damageCostSumCar = shareCar * damageCostSum;
-            double damageCostSumHdv = shareHdv * damageCostSum;
-
-            NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
-            if (!(nCarAgents == 0)) {
-                damageCostPerCar = damageCostSumCar / (nCarAgents * noiseParams.getScaleFactor());
-            }
-
-            if (!(nHdvAgents == 0)) {
-                damageCostPerHgv = damageCostSumHdv / (nHdvAgents * noiseParams.getScaleFactor());
-            }
-
-            if (damageCostPerCar > 0.) {
-                noiseLink.setAverageDamageCostPerVehicle(car.getId(), damageCostPerCar);
-            }
-            if (damageCostPerHgv > 0.) {
-                noiseLink.setAverageDamageCostPerVehicle(hgv.getId(), damageCostPerHgv);
+                for(int i = 0; i < noiseVehiclesTypes.length; i++) {
+                    NoiseVehicleType type = noiseVehiclesTypes[i];
+                    double damageCostSumVehicle = shares[i] * damageCostSum;
+                    if (!(counts[i] == 0)) {
+                        double damageCostPerVehicle = damageCostSumVehicle / (counts[i] * noiseParams.getScaleFactor());
+                        if (damageCostPerVehicle > 0.) {
+                            noiseLink.setAverageDamageCostPerVehicle(type.getId(), damageCostPerVehicle);
+                        }
+                    }
+                }
             }
         }
     }
@@ -363,65 +341,38 @@ public class NoiseDamageCalculation {
      * Noise allocation approach: MarginalCost
      */
     private void calculateMarginalDamageCost(NoiseReceiverPoint rp) {
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 
         if (rp.getAffectedAgentUnits() != 0.) {
             for (Id<Link> thisLink : rp.getCurrentImmission().getLinkId2IsolatedImmission().keySet()) {
+                for(NoiseVehicleType type: noiseContext.getNoiseParams().getNoiseComputationMethod().noiseVehiclesTypes) {
+                    double noiseImmissionPlusOneVehicleThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission().immission, rp.getCurrentImmission().getLinkId2IsolatedImmission().get(thisLink), rp.getCurrentImmission().getLinkId2IsolatedImmissionPlusOneVehicle().get(type.getId()).get(thisLink));
+                    double damageCostsPlusOneVehicleThisLink = calculateDamageCosts(noiseImmissionPlusOneVehicleThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+                    double marginalDamageCostVehicleThisLink = (damageCostsPlusOneVehicleThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
 
-                double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission().immission, rp.getCurrentImmission().getLinkId2IsolatedImmission().get(thisLink), rp.getCurrentImmission().getLinkId2IsolatedImmissionPlusOneVehicle().get(car.getId()).get(thisLink));
-                double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission().immission, rp.getCurrentImmission().getLinkId2IsolatedImmission().get(thisLink), rp.getCurrentImmission().getLinkId2IsolatedImmissionPlusOneVehicle().get(hgv.getId()).get(thisLink));
+                    if (marginalDamageCostVehicleThisLink < 0.0) {
+                        if (Math.abs(marginalDamageCostVehicleThisLink) < 0.0000000001) {
+                            marginalDamageCostVehicleThisLink = 0.;
+                        } else {
+                            if (cWarn3 == 0) {
+                                log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostVehicleThisLink + ".");
+                                log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneVehicleThisLink + " - marginal damage cost car: " + marginalDamageCostVehicleThisLink);
+                                log.warn("Setting the marginal damage cost per car to 0.");
+                                log.warn("This message is only given once.");
+                                cWarn3++;
+                            }
 
-                double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-                double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
-
-                if (marginalDamageCostCarThisLink < 0.0) {
-                    if (Math.abs(marginalDamageCostCarThisLink) < 0.0000000001) {
-                        marginalDamageCostCarThisLink = 0.;
-                    } else {
-                        if (cWarn3 == 0) {
-                            log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostCarThisLink + ".");
-                            log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
-                            log.warn("Setting the marginal damage cost per car to 0.");
-                            log.warn("This message is only given once.");
-                            cWarn3++;
+                            marginalDamageCostVehicleThisLink = 0.;
                         }
-
-                        marginalDamageCostCarThisLink = 0.;
                     }
+                    NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(thisLink);
+                    double marginalDamageCostCarSum = noiseLink.getMarginalDamageCostPerVehicle(type.getId()) + marginalDamageCostVehicleThisLink;
+                    noiseLink.setMarginalDamageCostPerVehicle(type.getId(), marginalDamageCostCarSum);
                 }
-
-                double damageCostsPlusOneHGVThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-                double marginalDamageCostHGVThisLink = (damageCostsPlusOneHGVThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
-
-                if (marginalDamageCostHGVThisLink < 0.0) {
-                    if (Math.abs(marginalDamageCostHGVThisLink) < 0.0000000001) {
-                        marginalDamageCostHGVThisLink = 0.;
-                    } else {
-                        if (cWarn4 == 0) {
-                            log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
-                            log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
-                            log.warn("Setting the marginal damage cost per HGV to 0.");
-                            log.warn("This message is only given once.");
-                            cWarn4++;
-                        }
-
-                        marginalDamageCostHGVThisLink = 0.;
-                    }
-                }
-                NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(thisLink);
-                double marginalDamageCostCarSum = noiseLink.getMarginalDamageCostPerVehicle(car.getId()) + marginalDamageCostCarThisLink;
-                noiseLink.setMarginalDamageCostPerVehicle(car.getId(), marginalDamageCostCarSum);
-
-                double marginalDamageCostHGVSum = noiseLink.getMarginalDamageCostPerVehicle(hgv.getId()) + marginalDamageCostHGVThisLink;
-                noiseLink.setMarginalDamageCostPerVehicle(hgv.getId(), marginalDamageCostHGVSum);
             }
         }
-//		}
     }
 
     private void throwNoiseEventsCaused() {
-        String[] hgvPrefixes = this.noiseContext.getNoiseParams().getHgvIdPrefixesArray();
-        Set<Id<Vehicle>> busVehicleIds = this.noiseContext.getBusVehicleIDs();
         double eventTime = this.noiseContext.getEventTime();
         double currentTimeBinEndTime = this.noiseContext.getCurrentTimeBinEndTime();
         NoiseConfigGroup.NoiseAllocationApproach noiseAllocationApproach = this.noiseContext.getNoiseParams().getNoiseAllocationApproach();
@@ -430,40 +381,20 @@ public class NoiseDamageCalculation {
             NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
             if (noiseLink != null) {
 
-                double amountCar = 0.;
-                double amountHdv = 0.;
+                for (Id<Vehicle> vehicleId : noiseLink.getEnteringVehicleIds()) {
 
-                if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
-                    amountCar = noiseLink.getAverageDamageCostPerVehicle(car.getId());
-                    amountHdv = noiseLink.getAverageDamageCostPerVehicle(hgv.getId());
+                    final Id<NoiseVehicleType> noiseVehicleTypeId = noiseVehicleIdentifier.identifyVehicle(vehicleId);
+                    double amountVehicle;
 
-                } else if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
-                    amountCar = noiseLink.getMarginalDamageCostPerVehicle(car.getId());
-                    amountHdv = noiseLink.getMarginalDamageCostPerVehicle(hgv.getId());
-
-                } else {
-                    throw new RuntimeException("Unknown noise allocation approach. Aborting...");
-                }
-
-                for(Id<Vehicle> vehicleId : noiseLink.getEnteringVehicleIds()) {
-
-                    double amount = 0.;
-
-                    boolean isHGV = false;
-                    for (String hgvPrefix : hgvPrefixes) {
-                        if (vehicleId.toString().startsWith(hgvPrefix)) {
-                            isHGV = true;
-                            break;
-                        }
-                    }
-
-                    if(isHGV || busVehicleIds.contains(vehicleId)) {
-                        amount = amountHdv;
+                    if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
+                        amountVehicle = noiseLink.getAverageDamageCostPerVehicle(noiseVehicleTypeId);
+                    } else if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
+                        amountVehicle = noiseLink.getMarginalDamageCostPerVehicle(noiseVehicleTypeId);
                     } else {
-                        amount = amountCar;
+                        throw new RuntimeException("Unknown noise allocation approach. Aborting...");
                     }
 
-                    if (amount != 0.) {
+                    if (amountVehicle != 0.) {
 
                         if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(vehicleId)) {
                             // skip
@@ -473,19 +404,56 @@ public class NoiseDamageCalculation {
                                     currentTimeBinEndTime,
                                     this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId),
                                     this.noiseContext.getVehicleId2PersonId().get(vehicleId),
-                                    vehicleId, amount, linkId);
+                                    vehicleId, amountVehicle, linkId);
                             events.processEvent(noiseEvent);
 
                             if (this.collectNoiseEvents) {
                                 this.noiseEventsCaused.add(noiseEvent);
                             }
-
-                            totalCausedNoiseCost = totalCausedNoiseCost + amount;
+                            totalCausedNoiseCost = totalCausedNoiseCost + amountVehicle;
                         }
                     }
                 }
             }
         }
+    }
+
+    static double calculateDamageCosts(double noiseImmission, double affectedAgentUnits, double timeInterval, double annualCostRate, double timeBinSize) {
+
+        DayTime daytimeType = DayTime.NIGHT;
+
+        if (timeInterval > 6 * 3600 && timeInterval <= 18 * 3600) {
+            daytimeType = DayTime.DAY;
+        } else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
+            daytimeType = DayTime.EVENING;
+        }
+
+        double lautheitsgewicht = 0;
+
+        switch (daytimeType) {
+            case DAY:
+                if (noiseImmission >= 50) {
+                    lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
+                }
+                break;
+            case EVENING:
+                if (noiseImmission >= 45) {
+                    lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
+                }
+                break;
+            case NIGHT:
+                if (noiseImmission >= 40) {
+                    lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
+                }
+                break;
+            default:
+        }
+
+
+        double laermEinwohnerGleichwert = lautheitsgewicht * affectedAgentUnits;
+        double damageCosts = ( annualCostRate * laermEinwohnerGleichwert / 365. ) * ( timeBinSize / (24.0 * 3600) );
+
+        return damageCosts;
     }
 
     private boolean writeOutput() {

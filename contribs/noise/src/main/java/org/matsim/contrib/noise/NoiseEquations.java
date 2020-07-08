@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.noise;
 
+import org.matsim.core.gbl.Gbl;
+
 import java.util.Collection;
 
 
@@ -36,58 +38,33 @@ final class NoiseEquations {
 
 	private NoiseEquations() {};
 
-	private enum DayTime {NIGHT, DAY, EVENING}
-
-
-    public static double calculateDamageCosts(double noiseImmission, double affectedAgentUnits, double timeInterval, double annualCostRate, double timeBinSize) {
-
-		DayTime daytimeType = DayTime.NIGHT;
-
-		if (timeInterval > 6 * 3600 && timeInterval <= 18 * 3600) {
-			daytimeType = DayTime.DAY;
-		} else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
-			daytimeType = DayTime.EVENING;
-		}
-
-		double lautheitsgewicht = 0;
-
-		switch (daytimeType) {
-			case DAY:
-				if (noiseImmission >= 50) {
-					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
-				}
-				break;
-			case EVENING:
-				if (noiseImmission >= 45) {
-					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
-				}
-				break;
-			case NIGHT:
-				if (noiseImmission >= 40) {
-					lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
-				}
-				break;
-			default:
-		}
-
-
-		double laermEinwohnerGleichwert = lautheitsgewicht * affectedAgentUnits;
-		double damageCosts = ( annualCostRate * laermEinwohnerGleichwert / 365. ) * ( timeBinSize / (24.0 * 3600) );
-
-		return damageCosts;
-	}
-
-	public static double calculateShareOfResultingNoiseImmission (double noiseImmission , double resultingNoiseImmission){
+	static double calculateShareOfResultingNoiseImmission(double noiseImmission, double resultingNoiseImmission){
 		double shareOfResultingNoiseImmission = Math.pow(((Math.pow(10, (0.05 * noiseImmission))) / (Math.pow(10, (0.05 * resultingNoiseImmission)))), 2);
 		return shareOfResultingNoiseImmission;
 	}
 
-	public static double calculateShare(int nVehicleType1, double lVehicleType1, int nVehicleType2, double lVehicleType2) {
-		return ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
+	static double[] calculateShare(int[] counts, double[] levels) {
+		Gbl.assertNotNull(counts);
+		Gbl.assertNotNull(levels);
+		if(counts.length != levels.length) {
+			throw new IllegalArgumentException("Numbers of counts and levels must match!");
+		}
+
+		double sum = 0;
+		double shares[] = new double[counts.length];
+		for(int i = 0; i< counts.length; i++) {
+			final double value = counts[i] * Math.pow(10, 0.1 * levels[i]);
+			sum += value;
+			shares[i] = value;
+		}
+		for(int i = 0; i< counts.length; i++) {
+			shares[i] = shares[i] / sum;
+		}
+		return shares;
 	}
 
-	public static double calculateResultingNoiseImmissionPlusOneVehicle(double finalImmission, double immissionIsolatedLink, double immissionIsolatedLinkPlusOneVehicle) {
-		double noiseImmissionPlusOneVehicle = Double.NEGATIVE_INFINITY;
+	static double calculateResultingNoiseImmissionPlusOneVehicle(double finalImmission, double immissionIsolatedLink, double immissionIsolatedLinkPlusOneVehicle) {
+		double noiseImmissionPlusOneVehicle;
 		if (finalImmission != 0.) {
 			if (immissionIsolatedLink == 0.) {
 				noiseImmissionPlusOneVehicle = 10 * Math.log10( Math.pow(10, (0.1 * immissionIsolatedLinkPlusOneVehicle)) + Math.pow(10, (0.1 * finalImmission)) );
