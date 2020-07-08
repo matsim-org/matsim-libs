@@ -1,13 +1,9 @@
 package org.matsim.contrib.noise;
 
+import com.google.common.collect.Range;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.utils.collections.Tuple;
 
 import static org.matsim.contrib.noise.RLS90VehicleType.car;
 import static org.matsim.contrib.noise.RLS90VehicleType.hgv;
@@ -17,21 +13,19 @@ class RLS90NoiseEmission implements NoiseEmission {
     private final static Logger log = Logger.getLogger(RLS90NoiseEmission.class);
 
     private final NoiseConfigGroup noiseParams;
-    private final Network network;
+    private final NoiseContext noiseContext;
 
     @Inject
-    RLS90NoiseEmission(Scenario scenario) {
-        noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
-        network = scenario.getNetwork();
+    RLS90NoiseEmission(NoiseContext noiseContext) {
+        this.noiseContext = noiseContext;
+        noiseParams = noiseContext.getNoiseParams();
     }
 
     @Override
     public void calculateEmission(NoiseLink noiseLink) {
 
-        Id<Link> linkId = noiseLink.getId();
-        Tuple<Double, Double> vCarVHdv = getV(linkId, noiseLink);
-        double vCar = vCarVHdv.getFirst();
-        double vHdv = vCarVHdv.getSecond();
+        double vCar = getV(noiseLink, car);
+        double vHdv = getV(noiseLink, hgv);
 
         double noiseEmission = 0.;
         double noiseEmissionPlusOneCar = 0.;
@@ -88,17 +82,17 @@ class RLS90NoiseEmission implements NoiseEmission {
     }
 
     @Override
-    public double calculateVehicleTypeEmission(NoiseVehicleType vehicleType, double vehicleVelocity, NoiseLink noiseLink) {
-        switch ((RLS90VehicleType) vehicleType) {
+    public double calculateSingleVehicleLevel(NoiseVehicleType type, NoiseLink noiseLink) {
+        double v = getV(noiseLink, type);
+        switch ((RLS90VehicleType) type) {
             case car:
-                return calculateLCar(vehicleVelocity);
+                return calculateLCar(v);
             case hgv:
-                return calculateLHdv(vehicleVelocity);
+                return calculateLHdv(v);
             default:
-                throw new IllegalStateException("Unexpected value: " + vehicleType);
+                throw new IllegalStateException("Unexpected value: " + type);
         }
     }
-
 
     static double calculateMittelungspegelLm(int n, double p) {
 
@@ -147,66 +141,42 @@ class RLS90NoiseEmission implements NoiseEmission {
         return 23.1 + (12.5 * Math.log10(vHdv));
     }
 
-    private Tuple<Double, Double> getV(Id<Link> linkId, NoiseLink noiseLink) {
-        Link link = network.getLinks().get(linkId);
+    private double getV(NoiseLink noiseLink, NoiseVehicleType type) {
+        Link link = noiseContext.getScenario().getNetwork().getLinks().get(noiseLink.getId());
 
-        double vCar = (link.getFreespeed()) * 3.6;
-        double vHdv = vCar;
+        double velocity = (link.getFreespeed()) * 3.6;
 
-        double freespeedCar = vCar;
+        double freespeedCar = velocity;
+        final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
 
         if (noiseParams.isUseActualSpeedLevel()) {
 
             // use the actual speed level if possible
             if (noiseLink != null) {
 
-                // Car
-                if (noiseLink.getTravelTime_sec(car.getId()) == 0.
-                        || noiseLink.getAgentsLeaving(car.getId()) == 0) {
+                if (noiseLink.getTravelTime_sec(type.getId()) == 0.
+                        || noiseLink.getAgentsLeaving(type.getId()) == 0) {
                     // use the maximum speed level
 
                 } else {
                     double averageTravelTimeCar_sec =
-                            noiseLink.getTravelTime_sec(car.getId()) / noiseLink.getAgentsLeaving(car.getId());
-                    vCar = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
-                }
-
-                // HGV
-                if (noiseLink.getTravelTime_sec(hgv.getId()) == 0. || noiseLink.getAgentsLeaving(hgv.getId()) == 0) {
-                    // use the actual car speed level
-                    vHdv = vCar;
-
-                } else {
-                    double averageTravelTimeHGV_sec = noiseLink.getTravelTime_sec(hgv.getId()) / noiseLink.getAgentsLeaving(hgv.getId());
-                    vHdv = 3.6 * (link.getLength() / averageTravelTimeHGV_sec );
+                            noiseLink.getTravelTime_sec(type.getId()) / noiseLink.getAgentsLeaving(type.getId());
+                    velocity = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
                 }
             }
         }
 
-        if (vCar > freespeedCar) {
-            throw new RuntimeException(vCar + " > " + freespeedCar + ". This should not be possible. Aborting...");
+        if (velocity > freespeedCar) {
+            throw new RuntimeException(velocity + " > " + freespeedCar + ". This should not be possible. Aborting...");
         }
 
         if (!noiseParams.isAllowForSpeedsOutsideTheValidRange()) {
-
             // shifting the speed into the allowed range defined by the RLS-90 computation approach
-
-            if (vCar < 30.) {
-                vCar = 30.;
-            }
-
-            if (vHdv < 30.) {
-                vHdv = 30.;
-            }
-
-            if (vCar > 130.) {
-                vCar = 130.;
-            }
-
-            if (vHdv > 80.) {
-                vHdv = 80.;
+            final Range<Double> validSpeedRange = type.getValidSpeedRange();
+            if (!validSpeedRange.contains(velocity)) {
+                velocity = Math.min(Math.max(validSpeedRange.lowerEndpoint(), velocity), validSpeedRange.upperEndpoint());
             }
         }
-        return new Tuple<>(vCar, vHdv);
+        return velocity;
     }
 }

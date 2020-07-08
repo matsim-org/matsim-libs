@@ -32,7 +32,10 @@ public class NoiseDamageCalculation {
     @Inject private EventsManager events;
 
     @Inject
-    NoiseVehicleIdentifier noiseVehicleIdentifier;
+    private NoiseEmission emission;
+
+    @Inject
+    private NoiseVehicleIdentifier noiseVehicleIdentifier;
 
     private int cWarn3 = 0;
     private int cWarn4 = 0;
@@ -246,8 +249,7 @@ public class NoiseDamageCalculation {
                 for(int i = 0; i < noiseVehiclesTypes.length; i++) {
                     NoiseVehicleType type = noiseVehiclesTypes[i];
                     counts[i] = noiseLink.getAgentsEntering(type.getId());
-                    double v = getV(linkId, noiseLink, type);
-                    levels[i] = RLS90NoiseEmission.calculateLCar(v);
+                    levels[i] = emission.calculateSingleVehicleLevel(type, noiseLink);
                 }
 
                 double[] shares = NoiseEquations.calculateShare(counts, levels);
@@ -266,46 +268,6 @@ public class NoiseDamageCalculation {
                 }
             }
         }
-    }
-
-    private double getV(Id<Link> linkId, NoiseLink noiseLink, NoiseVehicleType type) {
-        Link link = noiseContext.getScenario().getNetwork().getLinks().get(linkId);
-
-        double velocity = (link.getFreespeed()) * 3.6;
-        double vHdv = velocity;
-
-        double freespeedCar = velocity;
-        final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
-
-        if (noiseParams.isUseActualSpeedLevel()) {
-
-            // use the actual speed level if possible
-            if (noiseLink != null) {
-
-                if (noiseLink.getTravelTime_sec(type.getId()) == 0.
-                        || noiseLink.getAgentsLeaving(type.getId()) == 0) {
-                    // use the maximum speed level
-
-                } else {
-                    double averageTravelTimeCar_sec =
-                            noiseLink.getTravelTime_sec(type.getId()) / noiseLink.getAgentsLeaving(type.getId());
-                    velocity = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
-                }
-            }
-        }
-
-        if (velocity > freespeedCar) {
-            throw new RuntimeException(velocity + " > " + freespeedCar + ". This should not be possible. Aborting...");
-        }
-
-        if (!noiseParams.isAllowForSpeedsOutsideTheValidRange()) {
-            // shifting the speed into the allowed range defined by the RLS-90 computation approach
-            final Range<Double> validSpeedRange = type.getValidSpeedRange();
-            if (!validSpeedRange.contains(velocity)) {
-                velocity = Math.min(Math.max(validSpeedRange.lowerEndpoint(), velocity), validSpeedRange.upperEndpoint());
-            }
-        }
-        return velocity;
     }
 
     //	/*
@@ -489,6 +451,4 @@ public class NoiseDamageCalculation {
     public void setOutputFilePath(String outputFilePath) {
         this.outputDirectory = outputFilePath;
     }
-
-
 }

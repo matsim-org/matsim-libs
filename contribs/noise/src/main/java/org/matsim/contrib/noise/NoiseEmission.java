@@ -4,6 +4,5 @@ public interface NoiseEmission {
 
     void calculateEmission(NoiseLink link);
 
-
-    double calculateVehicleTypeEmission(NoiseVehicleType vehicleType, double vehicleVelocity, NoiseLink noiseLink);
+    double calculateSingleVehicleLevel(NoiseVehicleType type, NoiseLink noiseLink);
 }

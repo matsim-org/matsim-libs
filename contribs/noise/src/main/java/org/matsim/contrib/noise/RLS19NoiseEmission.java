@@ -80,7 +80,7 @@ class RLS19NoiseEmission implements NoiseEmission {
     }
 
     @Override
-    public double calculateVehicleTypeEmission(NoiseVehicleType vehicleType, double vehicleVelocity, NoiseLink noiseLink) {
+    public double calculateSingleVehicleLevel(NoiseVehicleType type, NoiseLink noiseLink) {
         double g = 0;
         final Object gradient = network.getLinks().get(noiseLink.getId()).getAttributes().getAttribute("GRADIENT");
         if(gradient != null) {
@@ -89,7 +89,9 @@ class RLS19NoiseEmission implements NoiseEmission {
 
         RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
         double intersectionDistance = 0;
-        return calculateSingleVehicleEmission((RLS19VehicleType) vehicleType, vehicleVelocity, g, intersectionType, intersectionDistance);
+        double vehicleVelocity = getV(noiseLink, (RLS19VehicleType) type);
+        return calculateSingleVehicleEmission((RLS19VehicleType) type, vehicleVelocity, g, intersectionType, intersectionDistance);
+
     }
 
     private double calculateEmission(NoiseLink noiseLink,
