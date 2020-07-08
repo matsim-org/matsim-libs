@@ -164,7 +164,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
 		if (isNotNeedingBushwhackingLeg(toFacility)) {
-			Collections.emptyList();
+			return Collections.emptyList();
 		}
 
 		Coord startCoord = NetworkUtils.findNearestPointOnLink(toFacility.getCoord(),egressActLink);
