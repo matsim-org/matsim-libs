@@ -444,9 +444,9 @@ public class NoiseIT {
 			if(currentTimeSlot == endTime){
 				
 				if ( !runConfig.plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
-					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.48583333333333 /*1.991388888888*/,
+					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 2.3447222222222224,
 							affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
-					// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
+					// result changed after changing where agents are walking to in access/egress (July 20)
 
 					Assert.assertEquals("Wrong number of affected persons at receiver point 0", 0.479722222222222, 
 							affectedPersonsPerReceiverPointTest.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
