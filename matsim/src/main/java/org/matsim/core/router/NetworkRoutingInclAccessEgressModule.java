@@ -164,10 +164,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		log.debug("do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString());
 
 		if (isNotNeedingBushwhackingLeg(toFacility)) {
-			Collections.emptyList();
+			return Collections.emptyList();
 		}
 
-		Coord startCoord = egressActLink.getToNode().getCoord();
+		Coord startCoord = NetworkUtils.findNearestPointOnLink(toFacility.getCoord(),egressActLink);
 		Gbl.assertNotNull(startCoord);
 		final Id<Link> startLinkId = egressActLink.getId();
 
@@ -191,7 +191,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
-
 			egressTrip.add(egressLeg);
 		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.walk);
@@ -202,7 +201,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			egressLeg.getRoute().setTravelTime(egressTime);
 			egressTrip.add(egressLeg);
 		} else {
-			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
+			Facility fromFacility = FacilitiesUtils.wrapLinkAndCoord(egressActLink,startCoord);
 			List<? extends PlanElement> networkRoutedEgressTrip = egressFromNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
 			if(networkRoutedEgressTrip == null) return null;
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
@@ -234,9 +233,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			return Collections.emptyList();
 		}
 
-		Coord endCoord = accessActLink.getToNode().getCoord();
-		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
-		Gbl.assertNotNull(endCoord);
+		Coord endCoord = NetworkUtils.findNearestPointOnLink(fromFacility.getCoord(),accessActLink);
 		List<PlanElement> accessTrip = new ArrayList<>();
 
 		if (mode.equals(TransportMode.walk)) {
@@ -269,7 +266,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			accessTrip.add(accessLeg);
 //			now += accessTime;
 		} else {
-			Facility toFacility = FacilitiesUtils.wrapLink(accessActLink);
+			Facility toFacility = FacilitiesUtils.wrapLinkAndCoord(accessActLink,endCoord);
 			List<? extends PlanElement> networkRoutedAccessTrip = accessToNetworkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
 			if (networkRoutedAccessTrip == null) return null; //no access trip could be computed for accessMode
 			if (this.accessEgressType.equals(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant)){
