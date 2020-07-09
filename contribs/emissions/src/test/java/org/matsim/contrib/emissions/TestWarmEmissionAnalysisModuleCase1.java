@@ -141,7 +141,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	
 	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
-	//the CO2_TOTAL warm Emissions are compared to a given value --> computed by using detail Petrol and the traffic state is freeflow
+	//the CO2_TOTAL warm Emissions are compared to a given value --> computed by using detailed Petrol and traffic state freeflow
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
 		//-- set up tables, event handler, parameters, module
@@ -172,6 +172,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	
 	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
 	//all possible speeds (avg, stop & go , free flow) are tested 
+	//// fot the speed case: > s&g speed, <ff speed
 	@Test
 	public void testCounters1(){
 		setUp();
@@ -190,10 +191,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Link mockLink = createMockLink("link 1", linkLength, PETROL_SPEED_FF / 3.6 );
 
 		// <stop&go speed
-		
 		Double travelTime = linkLength / PETROL_SPEED_SG * 1.2;
-		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle,
-				mockLink, travelTime * 3.6);
+		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, mockLink, travelTime * 3.6);
 		Assert.assertEquals(0, emissionsModule.getFractionOccurences(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences());

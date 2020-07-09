@@ -125,18 +125,8 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	}
 
 
-
-	//@Test
-	//public void testWarmEmissionAnalysisModule_exceptions(){
-
-	/* out-dated
-	 * the constructor aborts if either the
-	 * warm emission analysis module parameter or
-	 * the events mangager is null
-	 * EmissionEfficiencyFactor = 'null' is allowed and therefore not tested here
-	 */
-
-
+	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour tryDetailedThenTechnologyAverageThenAverageTable
+	// for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions are computed using the with two emissionsComputationMethod StopAndGoFraction & AverageSpeed
 	@Test(expected = RuntimeException.class)
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
@@ -161,9 +151,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
 
-//			2020-02-21 19:55:37,509  WARN WarmEmissionAnalysisModule:403 did not find emission factor for efkey=PASSENGER_CAR; PM_non_exhaust; URB; STOPANDGO; PC petrol <1,4L <ECE; petrol (4S); <1,4L
-
-
+			
 			// test result:
 			switch( this.emissionsComputationMethod ) {
 				case StopAndGoFraction:
@@ -220,7 +208,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	}
 
 	
-	//This test creates an 
 	@Test(expected = RuntimeException.class)
 	public void testCounters3(){
 		setUp();
