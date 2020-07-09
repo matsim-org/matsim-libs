@@ -17,8 +17,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.util.stats;
 
-import java.util.Arrays;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.collect.ImmutableMap.toImmutableMap;
+
+import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -44,6 +48,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -62,16 +67,14 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private final TimeDiscretizer timeDiscretizer;
 
-	private final ImmutableMap<Task.TaskType, long[]> nonPassengerServingTaskProfilesInSeconds;
-	private final long[][] vehicleOccupancyProfilesInSeconds;
-
-	private final ImmutableMap<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
-	private final double[][] vehicleOccupancyProfiles;
+	private ImmutableMap<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
+	private ImmutableList<double[]> vehicleOccupancyProfiles;
 
 	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
 	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
+	private final int maxCapacity;
 
 	private final FleetSpecification fleet;
 
@@ -97,21 +100,12 @@ public class DrtVehicleOccupancyProfileCalculator
 		int intervalCount = (int)Math.ceil((analysisEndTime + 1) / timeInterval);
 		timeDiscretizer = new TimeDiscretizer(intervalCount * timeInterval, timeInterval, TimeDiscretizer.Type.ACYCLIC);
 
-		int maxCapacity = fleet.getVehicleSpecifications()
+		maxCapacity = fleet.getVehicleSpecifications()
 				.values()
 				.stream()
 				.mapToInt(DvrpVehicleSpecification::getCapacity)
 				.max()
 				.orElse(0);
-		int occupancyProfilesCount = maxCapacity + 1;
-		vehicleOccupancyProfilesInSeconds = new long[occupancyProfilesCount][timeDiscretizer.getIntervalCount()];
-		nonPassengerServingTaskProfilesInSeconds = nonPassengerServingTaskTypes.stream()
-				.collect(ImmutableMap.toImmutableMap(v -> v, v -> new long[timeDiscretizer.getIntervalCount()]));
-
-		//TODO create and directly return the normalized profiles in consolidate()
-		vehicleOccupancyProfiles = new double[occupancyProfilesCount][timeDiscretizer.getIntervalCount()];
-		nonPassengerServingTaskProfiles = nonPassengerServingTaskTypes.stream()
-				.collect(ImmutableMap.toImmutableMap(v -> v, v -> new double[timeDiscretizer.getIntervalCount()]));
 	}
 
 	public void consolidate() {
@@ -122,20 +116,13 @@ public class DrtVehicleOccupancyProfileCalculator
 		}
 		vehicleStates.clear();
 
-		for (Task.TaskType taskType : nonPassengerServingTaskTypes) {
-			computeNormalizedProfiles(nonPassengerServingTaskProfilesInSeconds.get(taskType),
-					nonPassengerServingTaskProfiles.get(taskType));
-		}
-
-		for (int occupancy = 0; occupancy < vehicleOccupancyProfilesInSeconds.length; occupancy++) {
-			computeNormalizedProfiles(vehicleOccupancyProfilesInSeconds[occupancy],
-					vehicleOccupancyProfiles[occupancy]);
-		}
+		nonPassengerServingTaskProfiles.values().forEach(this::normalizeProfile);
+		vehicleOccupancyProfiles.forEach(this::normalizeProfile);
 	}
 
-	private void computeNormalizedProfiles(long[] profileInSeconds, double[] normalizedProfile) {
-		for (int t = 0; t < timeDiscretizer.getIntervalCount(); t++) {
-			normalizedProfile[t] = (double)profileInSeconds[t] / timeDiscretizer.getTimeInterval();
+	private void normalizeProfile(double[] profile) {
+		for (int i = 0; i < profile.length; i++) {
+			profile[i] /= timeDiscretizer.getTimeInterval();
 		}
 	}
 
@@ -143,7 +130,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		return nonPassengerServingTaskProfiles;
 	}
 
-	public double[][] getVehicleOccupancyProfiles() {
+	public List<double[]> getVehicleOccupancyProfiles() {
 		return vehicleOccupancyProfiles;
 	}
 
@@ -159,13 +146,13 @@ public class DrtVehicleOccupancyProfileCalculator
 		Verify.verify(servingPassengers || state.occupancy == 0,
 				"Vehicles not serving passengers must not be occupied");
 
-		long[] profile = servingPassengers ?
-				vehicleOccupancyProfilesInSeconds[state.occupancy] :
-				nonPassengerServingTaskProfilesInSeconds.get(state.taskType);
+		double[] profile = servingPassengers ?
+				vehicleOccupancyProfiles.get(state.occupancy) :
+				nonPassengerServingTaskProfiles.get(state.taskType);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
 	}
 
-	private void increment(long[] values, double beginTime, double endTime) {
+	private void increment(double[] values, double beginTime, double endTime) {
 		if (beginTime == endTime) {
 			return;
 		}
@@ -179,10 +166,10 @@ public class DrtVehicleOccupancyProfileCalculator
 		}
 
 		// reduce first time bin
-		values[fromIdx] -= (int)beginTime % timeInterval;
+		values[fromIdx] -= beginTime % timeInterval;
 
 		// handle last time bin
-		values[toIdx] += (int)endTime % timeInterval;
+		values[toIdx] += endTime % timeInterval;
 	}
 
 	/* Event handling starts here */
@@ -241,12 +228,10 @@ public class DrtVehicleOccupancyProfileCalculator
 	public void reset(int iteration) {
 		vehicleStates.clear();
 
-		nonPassengerServingTaskProfilesInSeconds.values().forEach(profile -> Arrays.fill(profile, 0));
-		nonPassengerServingTaskProfiles.values().forEach(profile -> Arrays.fill(profile, 0));
-
-		for (int k = 0; k < vehicleOccupancyProfilesInSeconds.length; k++) {
-			Arrays.fill(vehicleOccupancyProfilesInSeconds[k], 0);
-			Arrays.fill(vehicleOccupancyProfiles[k], 0);
-		}
+		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
+				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
+				.collect(toImmutableList());
+		nonPassengerServingTaskProfiles = nonPassengerServingTaskTypes.stream()
+				.collect(toImmutableMap(v -> v, v -> new double[timeDiscretizer.getIntervalCount()]));
 	}
 }
