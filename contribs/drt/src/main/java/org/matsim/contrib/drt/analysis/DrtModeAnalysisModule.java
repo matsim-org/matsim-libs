@@ -25,7 +25,8 @@ package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -46,7 +47,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
-		this(drtCfg, ImmutableSet.of(DrtStayTask.TYPE));
+		this(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE, DrtStopTask.TYPE));
 	}
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg, ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes) {

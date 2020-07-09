@@ -18,8 +18,8 @@
 package org.matsim.contrib.drt.util.stats;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
@@ -49,7 +49,6 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
@@ -67,10 +66,10 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private final TimeDiscretizer timeDiscretizer;
 
-	private ImmutableMap<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
+	private Map<Task.TaskType, double[]> nonPassengerServingTaskProfiles;
 	private ImmutableList<double[]> vehicleOccupancyProfiles;
 
-	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
+	private final ImmutableSet<Task.TaskType> passengerServingTaskTypes;
 	private final Map<Id<DvrpVehicle>, VehicleState> vehicleStates = new IdMap<>(DvrpVehicle.class);
 
 	private final double analysisEndTime;
@@ -79,9 +78,9 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final FleetSpecification fleet;
 
 	public DrtVehicleOccupancyProfileCalculator(FleetSpecification fleet, EventsManager events, int timeInterval,
-			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes) {
+			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		this.fleet = fleet;
-		this.nonPassengerServingTaskTypes = nonPassengerServingTaskTypes;
+		this.passengerServingTaskTypes = passengerServingTaskTypes;
 
 		events.addHandler(this);
 
@@ -89,9 +88,7 @@ public class DrtVehicleOccupancyProfileCalculator
 				.isDefined()) {
 			analysisEndTime = qsimConfig.getEndTime().seconds();
 		} else {
-			analysisEndTime = fleet.getVehicleSpecifications()
-					.values()
-					.stream()
+			analysisEndTime = fleet.getVehicleSpecifications().values().stream()
 					.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
 					.max()
 					.orElse(0);
@@ -142,13 +139,14 @@ public class DrtVehicleOccupancyProfileCalculator
 		Verify.verify(state.taskType != null);
 		Verify.verify(state.occupancy >= 0);
 
-		boolean servingPassengers = !nonPassengerServingTaskTypes.contains(state.taskType);
+		boolean servingPassengers = passengerServingTaskTypes.contains(state.taskType);
 		Verify.verify(servingPassengers || state.occupancy == 0,
 				"Vehicles not serving passengers must not be occupied");
 
 		double[] profile = servingPassengers ?
 				vehicleOccupancyProfiles.get(state.occupancy) :
-				nonPassengerServingTaskProfiles.get(state.taskType);
+				nonPassengerServingTaskProfiles.computeIfAbsent(state.taskType,
+						v -> new double[timeDiscretizer.getIntervalCount()]);
 		increment(profile, Math.min(state.beginTime, endTime), endTime);
 	}
 
@@ -231,7 +229,7 @@ public class DrtVehicleOccupancyProfileCalculator
 		vehicleOccupancyProfiles = IntStream.rangeClosed(0, maxCapacity)
 				.mapToObj(i -> new double[timeDiscretizer.getIntervalCount()])
 				.collect(toImmutableList());
-		nonPassengerServingTaskProfiles = nonPassengerServingTaskTypes.stream()
-				.collect(toImmutableMap(v -> v, v -> new double[timeDiscretizer.getIntervalCount()]));
+
+		nonPassengerServingTaskProfiles = new HashMap<>();
 	}
 }
