@@ -17,7 +17,9 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.util.stats;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,9 +27,14 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -69,6 +76,7 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		ImmutableMap<String, double[]> profiles = Stream.concat(calculator.getNonPassengerServingTaskProfiles()
 						.entrySet()
 						.stream()
+						.sorted(Comparator.comparing(this::mapTaskTypeNameForSorting))
 						.map(e -> Pair.of(e.getKey().name(), e.getValue())),
 				EntryStream.of(calculator.getVehicleOccupancyProfiles())
 						.map(e -> Pair.of(e.getKey() + " pax", e.getValue())))
@@ -91,6 +99,18 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		}
 	}
 
+	private String mapTaskTypeNameForSorting(Entry<Task.TaskType, double[]> typeProfileEntry) {
+		//we want the following order on the plot: STAY, RELOCATE, other
+		Task.TaskType type = typeProfileEntry.getKey();
+		if (type.equals(DrtStayTask.TYPE)) {
+			return "C";
+		} else if (type.equals(EmptyVehicleRelocator.RELOCATE_VEHICLE_TASK_TYPE)) {
+			return "B";
+		} else {
+			return "A" + type.name();
+		}
+	}
+
 	private Stream<String> cells(Map<String, double[]> profiles, int idx) {
 		return profiles.values().stream().map(values -> values[idx] + "");
 	}
@@ -108,10 +128,21 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 		return dataset;
 	}
 
-	private void generateImage(DefaultTableXYDataset createXYDataset, TimeProfileCharts.ChartType chartType) {
-		JFreeChart chart = TimeProfileCharts.chartProfile(createXYDataset, chartType);
+	private void generateImage(DefaultTableXYDataset xyDataset, TimeProfileCharts.ChartType chartType) {
+		JFreeChart chart = TimeProfileCharts.chartProfile(xyDataset, chartType);
+		makeStayTaskSeriesGrey(chart.getXYPlot());
 		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);
+	}
+
+	private void makeStayTaskSeriesGrey(XYPlot plot) {
+		XYDataset dataset = plot.getDataset(0);
+		for (int i = 0; i < dataset.getSeriesCount(); i++) {
+			if (dataset.getSeriesKey(i).equals(DrtStayTask.TYPE.name())) {
+				plot.getRenderer().setSeriesPaint(i, Color.LIGHT_GRAY);
+				return;
+			}
+		}
 	}
 
 	private String filename(String prefix) {
