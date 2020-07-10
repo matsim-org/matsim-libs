@@ -1,5 +1,8 @@
 package org.matsim.core.mobsim.hermes;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -13,10 +16,6 @@ import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class Realm {
 	private final ScenarioImporter si;
@@ -41,7 +40,6 @@ public class Realm {
     private final ParallelEventsManager eventsManager;
     // Current timestamp
     private int secs;
-
     Logger log = Logger.getLogger(Realm.class);
 
     public Realm(ScenarioImporter scenario, EventsManager eventsManager) throws Exception {
@@ -234,8 +232,8 @@ public class Realm {
             case Agent.EgressType:      // The egress event is consumed in the stop.
             default:
                 throw new RuntimeException(String.format(
-                    "unknow plan element type %d, agent %d plan index %d",
-                    type, agent.id, agent.planIndex + 1));
+                        "unknown plan element type %d, agent %d plan index %d",
+                        type, agent.id, agent.planIndex + 1));
         }
     }
 
@@ -305,7 +303,6 @@ public class Realm {
             }
             delayedLinksByWakeupTime.set(secs,null);
             if (HermesConfigGroup.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
-
             if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
                 eventsManager.processEvents(sorted_events);
                 sorted_events = new EventArray();
@@ -331,9 +328,10 @@ public class Realm {
 
             // Fix delay for PT events.
             if (event instanceof VehicleArrivesAtFacilityEvent) {
-			    VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
-			    vaafe.setDelay(vaafe.getTime() - vaafe.getDelay());
-		    }
+                VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
+                vaafe.setTime(vaafe.getDelay());
+
+            }
             else if (event instanceof VehicleDepartsAtFacilityEvent) {
 			    VehicleDepartsAtFacilityEvent vdafe = (VehicleDepartsAtFacilityEvent) event;
 			    vdafe.setDelay(vdafe.getTime() - vdafe.getDelay());
