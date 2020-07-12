@@ -23,6 +23,8 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.base.Preconditions;
+
 /**
  * This class has a multi-iteration scope, whereas {@link PassengerEngine} has only a single-iteration scope.
  * <p>
@@ -31,26 +33,33 @@ import java.util.Map;
  *
  * @author Michal Maciejewski (michalm)
  */
-public class PassengerRequestEventToPassengerEngineForwarder
+public class PassengerRequestEventForwarder
 		implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
-	private final Map<String, PassengerEngine> passengerEngines = new HashMap<>();
+
+	interface PassengerRequestEventListener {
+		void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event);
+
+		void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event);
+	}
+
+	private final Map<String, PassengerRequestEventListener> listeners = new HashMap<>();
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestRejected(event);
+		listeners.get(event.getMode()).notifyPassengerRequestRejected(event);
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestScheduled(event);
+		listeners.get(event.getMode()).notifyPassengerRequestScheduled(event);
 	}
 
-	void registerPassengerEngineEventsHandler(PassengerEngine passengerEngine) {
-		passengerEngines.put(passengerEngine.getMode(), passengerEngine);
+	void registerListenerForMode(String mode, PassengerRequestEventListener listener) {
+		Preconditions.checkState(listeners.put(mode, listener) == null, "Listener for mode: %s already registered");
 	}
 
 	@Override
 	public void reset(int iteration) {
-		passengerEngines.clear();
+		listeners.clear();
 	}
 }

@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -85,7 +86,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			List<String> components = qsimComponentsConfig.getActiveComponents();
 			components.remove(ActivityEngineModule.COMPONENT_NAME);
 			components.add(ActivityEngineWithWakeup.COMPONENT_NAME);
-			//			components.add(  PreplanningEngineQSimModule.COMPONENT_NAME ); // is in dvrp defaults
+			//components.add(  PreplanningEngineQSimModule.COMPONENT_NAME ); // is in dvrp defaults
 			qsimComponentsConfig.setActiveComponents(components);
 		}
 
@@ -99,7 +100,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 					.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
 		}
 
-		//		PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
+		//PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
 
 		// ---
 		// setup controler
@@ -113,14 +114,15 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			@Override
 			public void install() {
 				install(new DvrpModule());
-				install(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), "one_taxi_vehicles.xml")));
+				install(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), "one_taxi_vehicles.xml"),
+						PassengerEngineType.WITH_PREBOOKING));
 				installQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
 						this.addQSimComponentBinding(ActivityEngineWithWakeup.COMPONENT_NAME)
 								.to(ActivityEngineWithWakeup.class)
 								.in(Singleton.class);
-						//						this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
+						//this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 					}
 				});
 			}
@@ -184,44 +186,44 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		//<leg mode="taxi" dep_time="00:15:00" trav_time="00:01:00" arr_time="00:16:00">
 		assertWakeupEvent(wakeupEvents, 1, "passenger_3");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_3", 1402.66, "taxi_3");
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_3", /*1402.66*/ 1401.66, "taxi_3");
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_3", /*1402.66*/ 1401.66, "taxi_3");
 		// (exchanging the sequence of binding of PreplanningEngineQSimModule and DynActivityEngine changes the results :-(. kai, jan'20 (*))
 		assertActivityEndEvent(activityEndEvents, 503, "passenger_3");
 
 		//<leg mode="taxi" dep_time="00:20:00" trav_time="00:01:00" arr_time="00:21:00">
 		assertWakeupEvent(wakeupEvents, 301, "passenger_4");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_4", 1977.8, "taxi_4"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_4", /*1977.8*/ 1976.8, "taxi_4"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_4", /*1977.8*/ 1976.8, "taxi_4"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 1078, "passenger_4");
 
 		//<leg mode="taxi" dep_time="00:25:00" trav_time="00:01:00" arr_time="00:26:00">
 		assertWakeupEvent(wakeupEvents, 601, "passenger_5");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_5", 2503.46, "taxi_5"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_5", /*2503.46*/ 2502.46, "taxi_5"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_5", /*2503.46*/ 2502.46, "taxi_5"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 1604, "passenger_5");
 
 		//<leg mode="taxi" dep_time="00:30:00" trav_time="00:01:00" arr_time="00:31:00">
 		assertWakeupEvent(wakeupEvents, 901, "passenger_6");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_6", 2932.46, "taxi_6"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_6", /*2932.46*/ 2931.46, "taxi_6"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_6", /*2932.46*/ 2931.46, "taxi_6"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 2033, "passenger_6");
 
 		//<leg mode="taxi" dep_time="00:35:00" trav_time="00:01:00" arr_time="00:36:00">
 		assertWakeupEvent(wakeupEvents, 1201, "passenger_7");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_7", 3317.46, "taxi_7"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_7", /*3317.46*/ 3316.46, "taxi_7"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_7", /*3317.46*/ 3316.46, "taxi_7"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 2418, "passenger_7");
 
 		//<leg mode="taxi" dep_time="00:40:00" trav_time="00:01:00" arr_time="00:41:00">
 		assertWakeupEvent(wakeupEvents, 1501, "passenger_8");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_8", 3944.86, "taxi_8"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_8", /*3944.86*/ 3943.86, "taxi_8"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_8", /*3944.86*/ 3943.86, "taxi_8"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 3045, "passenger_8");
 
 		//<leg mode="taxi" dep_time="00:45:00" trav_time="00:01:00" arr_time="00:46:00">
 		assertWakeupEvent(wakeupEvents, 1801, "passenger_9");
 		assertRequestScheduledEvent(requestScheduledEvents, "passenger_9", 4333.53, "taxi_9"); // see (*)
-		//		assertRequestScheduledEvent(requestScheduledEvents, "passenger_9", /*4333.53*/ 4332.53, "taxi_9"); // see (*)
+		//assertRequestScheduledEvent(requestScheduledEvents, "passenger_9", /*4333.53*/ 4332.53, "taxi_9"); // see (*)
 		assertActivityEndEvent(activityEndEvents, 3434, "passenger_9");
 	}
 
