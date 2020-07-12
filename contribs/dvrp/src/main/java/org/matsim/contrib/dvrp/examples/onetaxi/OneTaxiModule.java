@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
@@ -47,10 +48,12 @@ import com.google.inject.Singleton;
  */
 public class OneTaxiModule extends AbstractDvrpModeModule {
 	private final URL fleetSpecificationUrl;
+	private final PassengerEngineType passengerEngineType;
 
-	public OneTaxiModule(URL fleetSpecificationUrl) {
+	public OneTaxiModule(URL fleetSpecificationUrl, PassengerEngineType passengerEngineType) {
 		super(TransportMode.taxi);
 		this.fleetSpecificationUrl = fleetSpecificationUrl;
+		this.passengerEngineType = passengerEngineType;
 	}
 
 	@Override
@@ -68,7 +71,7 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				install(new VrpAgentSourceQSimModule(getMode()));
-				install(new PassengerEngineQSimModule(getMode()));
+				install(new PassengerEngineQSimModule(getMode(), passengerEngineType));
 
 				// optimizer that dispatches taxis
 				bindModal(VrpOptimizer.class).to(OneTaxiOptimizer.class).in(Singleton.class);
