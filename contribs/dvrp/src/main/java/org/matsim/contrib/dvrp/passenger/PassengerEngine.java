@@ -143,10 +143,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
-		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), tripInfo.getOriginalRequest().getPlannedRoute(),
-				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
-				tripInfo.getExpectedBoardingTime(), now);
-		validateAndSubmitRequest(passenger, request, false, tripInfo.getOriginalRequest());
+		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(),
+				tripInfo.getOriginalRequest().getPlannedRoute(), getLink(tripInfo.getPickupLocation().getLinkId()),
+				getLink(tripInfo.getDropoffLocation().getLinkId()), tripInfo.getExpectedBoardingTime(), now);
+		validateAndSubmitRequest(passenger, request, true, tripInfo.getOriginalRequest());
 		advanceRequestStorage.storeRequest(request);
 	}
 
