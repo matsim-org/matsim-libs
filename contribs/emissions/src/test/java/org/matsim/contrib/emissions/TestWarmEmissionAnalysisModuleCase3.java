@@ -80,8 +80,6 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
@@ -115,7 +113,11 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-
+	/*
+	 * this test method creates a diesel vehicle and mock link
+	 * for two cases:  "avg speed = free flow speed" & "avg speed = stop go speed"
+	 * average values are used to calculate the PM warm emissions
+	 */
 	@Test(expected = RuntimeException.class)
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent3(){
 
@@ -146,7 +148,8 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		HandlerToTestEmissionAnalysisModules.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions );
 		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_SG *dieselLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
+		HandlerToTestEmissionAnalysisModules.reset();
+		warmEmissions.clear();
 	}
 
 	@Test(expected = RuntimeException.class)

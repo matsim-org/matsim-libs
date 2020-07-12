@@ -82,8 +82,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
@@ -125,8 +123,11 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	}
 
 
-	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour tryDetailedThenTechnologyAverageThenAverageTable
-	// for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions are computed using the with two emissionsComputationMethod StopAndGoFraction & AverageSpeed
+	/*
+	 * this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour: tryDetailedThenTechnologyAverageThenAverageTable
+	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions are computed using the  two emissionsComputationMethods StopAndGoFraction & AverageSpeed
+	 */
+	
 	@Test(expected = RuntimeException.class)
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
@@ -207,7 +208,11 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		}
 	}
 
-	
+	/*
+	 * this test method creates a vehicle and mock link
+	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop go speed" & "current speed equals stop go speed" the counters are  tested
+	 * average values are used 
+	 */
 	@Test(expected = RuntimeException.class)
 	public void testCounters3(){
 		setUp();
