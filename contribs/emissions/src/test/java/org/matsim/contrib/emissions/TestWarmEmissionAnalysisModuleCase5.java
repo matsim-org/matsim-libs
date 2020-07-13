@@ -81,8 +81,6 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
@@ -114,8 +112,12 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	public TestWarmEmissionAnalysisModuleCase5( EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod ) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
-
-
+	
+	/*
+	 * this test method creates a vehicle and a mock link  (both zero properties)
+	 * the free flow factor is used to calculate and test the PM warm Emissions and HandlerToTestEmissionAnalysisModules Sum 
+	 * detailed values are used 
+	 */
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent5(){
 		//-- set up tables, event handler, parameters, module

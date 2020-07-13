@@ -118,7 +118,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	
 	/*
-	 * this test method creates a vehicle and mock link
+	 * this test method creates a vehicle (lpg properties) and a mock link
 	 * for two cases:  "avg speed = stop go speed" & "avg speed = free flow speed" the PM warm Emissions and the Emissions "sum" are tested
 	 * average values are used 
 	 */

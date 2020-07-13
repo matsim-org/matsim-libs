@@ -125,7 +125,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 	/*
 	 * this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour: tryDetailedThenTechnologyAverageThenAverageTable
-	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions are computed using the  two emissionsComputationMethods StopAndGoFraction & AverageSpeed
+	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
 	 */
 	
 	@Test(expected = RuntimeException.class)
