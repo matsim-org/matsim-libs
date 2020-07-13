@@ -229,7 +229,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ "attempting to travel without vehicles being available.");
 		}
 
-		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
+		if (config.qsim().getNumberOfThreads() > 1) {
+			log.warn("EXPERIMENTAL FEATURE: Running DRT with a multi-threaded QSim");
+		}
 
 		Verify.verify(getMaxWaitTime() >= getStopDuration(),
 				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
