@@ -115,8 +115,7 @@ public class TestWarmEmissionAnalysisModuleCase3{
 
 	/*
 	 * this test method creates a diesel vehicle and mock link
-	 * for two cases:  "avg speed = free flow speed" & "avg speed = stop go speed"
-	 * average values are used to calculate the PM warm emissions
+	 * for two cases:  "avg speed = free flow speed" & "avg speed = stop go speed" the average values are used to calculate the PM warm emissions
 	 */
 	@Test(expected = RuntimeException.class)
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent3(){
@@ -152,6 +151,10 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		warmEmissions.clear();
 	}
 
+	/*
+	 * this test method creates a diesel vehicle and mock link
+	 * for two cases:  "current speed equals free flow speed" & "current speed equals stop go speed" the counters are tested 	
+	*/
 	@Test(expected = RuntimeException.class)
 	public void testCounters4(){
 		setUp();

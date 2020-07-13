@@ -83,8 +83,6 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	private static final Logger log = Logger.getLogger( TestWarmEmissionAnalysisModuleCase4.class );
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
@@ -118,6 +116,12 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	}
 
 
+	
+	/*
+	 * this test method creates a vehicle and mock link
+	 * for two cases:  "avg speed = stop go speed" & "avg speed = free flow speed" the PM warm Emissions and the Emissions "sum" are tested
+	 * average values are used 
+	 */
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4(){
 
@@ -149,8 +153,12 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 	}
-
-
+	
+	/*
+	 * this test method creates a vehicle and mock link
+	 * for two cases:  "avg speed = stop go speed" & "avg speed = free flow speed" the PM warm Emissions are tested
+	 * average values are used 
+	 */
 	@Test
 	public void testCounters2(){
 		setUp();
