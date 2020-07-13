@@ -78,12 +78,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
-						getter.get(EventsManager.class),
-						getter.getModal(DrtRequestAnalyzer.class),
-						getter.getModal(DrtZonalSystem.class))))
-				.asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -121,8 +115,20 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				break;
 		}
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+		{
+			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			addControlerListenerBinding().toProvider(modalProvider(
+					getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
+							getter.getModal(DrtZonalSystem.class),
+							getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+
+			addControlerListenerBinding().toProvider(modalProvider(
+					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
+							getter.get(EventsManager.class),
+							getter.getModal(DrtRequestAnalyzer.class),
+							getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
+		}
+
 	}
 }
