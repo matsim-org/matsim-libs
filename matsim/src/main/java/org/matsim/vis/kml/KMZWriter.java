@@ -62,19 +62,9 @@ public class KMZWriter implements MatsimSomeWriter {
 
 	private final Map<String, String> nonKmlFiles = new HashMap<String, String>();
 
-	private final static Marshaller marshaller;
+	private final Marshaller marshaller;
 
-	private final static ObjectFactory kmlObjectFactory = new ObjectFactory();
-
-	static {
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml.v_2_2_0");
-			marshaller = jaxbContext.createMarshaller();
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		}
-	}
+	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
 
 	/**
 	 * Creates a new kmz-file and a writer for it and opens the file for writing.
@@ -83,8 +73,15 @@ public class KMZWriter implements MatsimSomeWriter {
 	 *          the location of the file to be written.
 	 */
 	public KMZWriter(final String outFilename) {
+		try {
+			marshaller = JAXBContext.newInstance("net.opengis.kml.v_2_2_0").createMarshaller();
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+
 		log.setLevel( Level.INFO ) ;
-		
+
 		String filename = outFilename;
 		if (filename.endsWith(".kml") || filename.endsWith(".kmz")) {
 			filename = filename.substring(0, filename.length() - 4);
