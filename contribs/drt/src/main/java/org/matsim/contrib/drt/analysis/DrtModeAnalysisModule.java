@@ -24,6 +24,8 @@
 package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -80,5 +82,12 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
 						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
+
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
+						getter.get(EventsManager.class),
+						getter.getModal(DrtRequestAnalyzer.class),
+						getter.getModal(DrtZonalSystem.class))))
+				.asEagerSingleton();
 	}
 }
