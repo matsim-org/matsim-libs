@@ -72,15 +72,6 @@ public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, Ac
 				zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
 			}
 		}
-
-		if (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) {
-			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-			if (zone != null) {
-				Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
-				zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
-			}
-		}
-
 	}
 
 	@Override
