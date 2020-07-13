@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -58,7 +58,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 	private InternalInterface internalInterface;
 
-	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
+	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
 
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
@@ -117,7 +117,11 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
 		if (passengerHandler.validateRequest(request, requestValidator, now)) {
-			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
+			synchronized (optimizer) {
+				//optimizer can also reject request if cannot handle it
+				// (async operation, notification comes via the events channel)
+				optimizer.requestSubmitted(request);
+			}
 		}
 	}
 
