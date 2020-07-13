@@ -85,11 +85,13 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 			format.setMinimumIntegerDigits(1);
 			format.setMaximumFractionDigits(2);
 			format.setGroupingUsed(false);
-			bw.append("zone;centerX;centerY;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75");
+			bw.append("zone;centerX;centerY;nRequests;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75");
 			for (Map.Entry<String, DescriptiveStatistics> zoneStatsEntry : zoneStats.entrySet()) {
 				DescriptiveStatistics stats = zoneStatsEntry.getValue();
 				bw.newLine();
 				bw.append(zoneStatsEntry.getKey() +
+						delimiter +
+						format.format(stats.getN()) +
 						delimiter +
 						format.format(stats.getSum()) +
 						delimiter +
@@ -120,8 +122,13 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
 			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
 			String zoneStr = zones.getZoneForLinkId(submission.getFromLinkId());
-			zoneStr += delimiter + zones.getZones().get(zoneStr).getCentroid().getX() +
-					delimiter + zones.getZones().get(zoneStr).getCentroid().getY();
+			if(zoneStr != null){
+				//request submission inside drtServiceArea
+				zoneStr += delimiter + zones.getZones().get(zoneStr).getCentroid().getX() +
+						delimiter + zones.getZones().get(zoneStr).getCentroid().getY();
+			} else {
+				zoneStr= "outsideOfDrtZonalSystem;-;-";
+			}
 			DescriptiveStatistics waitingTimeStats = zoneStats.get(zoneStr);
 			if(waitingTimeStats == null){
 				waitingTimeStats = new DescriptiveStatistics();
