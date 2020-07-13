@@ -22,12 +22,13 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
+import javax.inject.Provider;
+
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Key;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 

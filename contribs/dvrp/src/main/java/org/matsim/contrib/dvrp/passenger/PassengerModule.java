@@ -36,8 +36,8 @@ public final class PassengerModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(PassengerRequestEventToPassengerEngineForwarder.class).asEagerSingleton();
-		addEventHandlerBinding().to(PassengerRequestEventToPassengerEngineForwarder.class);
+		bind(PassengerRequestEventForwarder.class).asEagerSingleton();
+		addEventHandlerBinding().to(PassengerRequestEventForwarder.class);
 		installQSimModule(new PreplanningEngineQSimModule());
 	}
 

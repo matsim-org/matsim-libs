@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiModule;
 import org.matsim.contrib.dvrp.examples.onetruck.OneTruckModule;
+import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.PassengerEngineType;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -51,7 +52,8 @@ public class RunOneTaxiOneTruckExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), taxisFile)));
+		controler.addOverridingModule(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), taxisFile),
+				PassengerEngineType.DEFAULT));
 		controler.addOverridingModule(new OneTruckModule(ConfigGroup.getInputFileURL(config.getContext(), trucksFile)));
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi, TransportMode.truck));
