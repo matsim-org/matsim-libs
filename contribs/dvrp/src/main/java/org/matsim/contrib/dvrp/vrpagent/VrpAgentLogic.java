@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynActivity;
@@ -34,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 /**
  * @author michalm
  */
-public class VrpAgentLogic implements DynAgentLogic {
+public final class VrpAgentLogic implements DynAgentLogic {
 	public static final String BEFORE_SCHEDULE_ACTIVITY_TYPE = "BeforeVrpSchedule";
 	public static final String AFTER_SCHEDULE_ACTIVITY_TYPE = "AfterVrpSchedule";
 
@@ -69,29 +68,48 @@ public class VrpAgentLogic implements DynAgentLogic {
 
 	@Override
 	public DynAction computeNextAction(DynAction oldAction, double now) {
-		Schedule schedule = vehicle.getSchedule();
+		//We need to synchronize the whole method, not only optimizer.nextTask() to address corner cases:
+		// - optimisation executed directly on VrpOptimizer.requestSubmitted()
+		// - VrpOptimizer.nextTask() may make additional decisions base on the state of other vehicles
+		// (e.g. relocation to the best depot if vehicle becomes idle)
+		// Additionally, the effect of task initialisation (DynActionCreator) should be visible to other threads
+		// calling the optimiser/scheduler
 
-		if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
-			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
+		synchronized (optimizer) {
+			Schedule schedule = vehicle.getSchedule();
+			switch (schedule.getStatus()) {
+				case UNPLANNED:
+					return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
+
+				case STARTED:
+					Task task = schedule.getCurrentTask();
+					eventsManager.processEvent(
+							new TaskEndedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+					break;
+
+				case PLANNED:
+					break;
+
+				default:
+					throw new IllegalStateException();
+			}
+
+			optimizer.nextTask(vehicle);
+
+			switch (schedule.getStatus()) {
+				case STARTED:
+					Task task = schedule.getCurrentTask();
+					eventsManager.processEvent(
+							new TaskStartedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
+					return dynActionCreator.createAction(agent, vehicle, now);
+
+				case COMPLETED:
+					return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
+
+				default:
+					throw new IllegalStateException();
+			}
 		}
-
-		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			Task task = schedule.getCurrentTask();
-			eventsManager.processEvent(new TaskEndedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
-
-		}
-		optimizer.nextTask(vehicle);
-		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			Task task = schedule.getCurrentTask();
-			eventsManager.processEvent(
-					new TaskStartedEvent(now, vehicle.getId(), task.getTaskType(), task.getTaskIdx()));
-		}
-
-		if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// no more tasks
-			return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
-		}
-
-		return dynActionCreator.createAction(agent, vehicle, now);
 	}
 
 	private DynActivity createBeforeScheduleActivity() {
