@@ -78,8 +78,9 @@ public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, Ac
 			if(this.fleet.getVehicleSpecifications().containsKey(Id.create(event.getPersonId().toString(), DvrpVehicle.class))){
 				String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 				if (zone != null) {
-					Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
-					zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
+					LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
+					Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
+					zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
 				}
 			}
 		}
@@ -91,8 +92,9 @@ public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, Ac
 			if(this.fleet.getVehicleSpecifications().containsKey(Id.create(event.getPersonId().toString(), DvrpVehicle.class))){
 				String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 				if (zone != null) {
-					Integer oldNrOfVeh = zoneEntries.get(zone).getLast().getSecond();
-					zoneEntries.get(zone).add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
+					LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
+					Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
+					zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
 				}
 			}
 		}
