@@ -83,11 +83,5 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
 						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
-						getter.get(EventsManager.class),
-						getter.getModal(DrtRequestAnalyzer.class),
-						getter.getModal(DrtZonalSystem.class))))
-				.asEagerSingleton();
 	}
 }
