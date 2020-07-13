@@ -39,7 +39,9 @@ public class EventWriterJsonTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		events.finishProcessing();
 
 		Assert.assertEquals("there must be 2 events.", 2, collector.getEvents().size());
 		LinkLeaveEvent event1 = (LinkLeaveEvent) collector.getEvents().get(0);
@@ -69,7 +71,9 @@ public class EventWriterJsonTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		new MatsimEventsReader(events).readStream(bios, ControlerConfigGroup.EventsFileFormat.json);
+		events.finishProcessing();
 
 		Assert.assertEquals("there must be 1 event.", 1, collector.getEvents().size());
 

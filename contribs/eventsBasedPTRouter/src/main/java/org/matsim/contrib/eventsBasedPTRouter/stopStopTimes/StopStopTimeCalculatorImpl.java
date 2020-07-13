@@ -46,11 +46,9 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Map<Id<TransitStopFacility>, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
-					if(map==null) {
-						map = new HashMap<Id<TransitStopFacility>, StopStopTimeData>(2);
-						stopStopTimes.put(route.getStops().get(s).getStopFacility().getId(), map);
-					}
+					Map<Id<TransitStopFacility>, StopStopTimeData> map = stopStopTimes.computeIfAbsent(
+							route.getStops().get(s).getStopFacility().getId(),
+							k -> new HashMap<>(2));
 					map.put(route.getStops().get(s+1).getStopFacility().getId(), new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
 					Map<Id<TransitStopFacility>, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
 					Map<Id<TransitStopFacility>, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId());
@@ -72,7 +70,7 @@ public class StopStopTimeCalculatorImpl implements VehicleArrivesAtFacilityEvent
 							num = 0;
 						}
 					}
-					map2.put(route.getStops().get(s+1).getStopFacility().getId(), stopStopTime+route.getStops().get(s+1).getArrivalOffset()-route.getStops().get(s).getDepartureOffset());
+					map2.put(route.getStops().get(s+1).getStopFacility().getId(), stopStopTime+route.getStops().get(s+1).getArrivalOffset().seconds()-route.getStops().get(s).getDepartureOffset().seconds());
 					map3.put(route.getStops().get(s+1).getStopFacility().getId(), ++num);
 				}
 				for(Departure departure:route.getDepartures().values())

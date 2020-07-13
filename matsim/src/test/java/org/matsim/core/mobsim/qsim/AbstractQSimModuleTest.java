@@ -29,6 +29,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -85,8 +87,11 @@ public class AbstractQSimModuleTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId("person"));
-		person.addPlan(scenario.getPopulation().getFactory().createPlan());
+		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
+		Person person = populationFactory.createPerson(Id.createPersonId("person"));
+		Plan plan =  populationFactory.createPlan();
+		plan.addActivity( populationFactory.createActivityFromLinkId("type", Id.createLinkId("0")));
+		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
 		AtomicLong value = new AtomicLong(0);

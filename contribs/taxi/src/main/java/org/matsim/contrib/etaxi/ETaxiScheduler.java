@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.etaxi;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.EMPTY_DRIVE;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -39,18 +40,19 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
 
 public class ETaxiScheduler extends TaxiScheduler {
+	public static final TaxiTaskType DRIVE_TO_CHARGER = new TaxiTaskType("DRIVE_TO_CHARGER", EMPTY_DRIVE);
 
-	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility) {
-		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
+	public ETaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduleInquiry taxiScheduleInquiry,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, LeastCostPathCalculator router) {
+		super(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
 	}
 
 	// FIXME underestimated due to the ongoing AUX/drive consumption
@@ -59,7 +61,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	public void scheduleCharging(DvrpVehicle vehicle, ElectricVehicle ev, Charger charger,
 			VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
-		divertOrAppendDrive(schedule, vrpPath);
+		divertOrAppendDrive(schedule, vrpPath, DRIVE_TO_CHARGER);
 
 		ChargingWithQueueingAndAssignmentLogic logic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
 		double chargingEndTime = vrpPath.getArrivalTime() + ChargingEstimations.estimateMaxWaitTimeForNextVehicle(
@@ -91,31 +93,22 @@ public class ETaxiScheduler extends TaxiScheduler {
 	// Otherwise, we do not remove stays-at-chargers from schedules.
 	@Override
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
-		Task currentTask = schedule.getCurrentTask();
-		switch (((TaxiTaskType)currentTask.getTaskType())) {
-			case EMPTY_DRIVE:
-				Task nextTask = Schedules.getNextTask(schedule);
-				if (!(nextTask instanceof ETaxiChargingTask)) {
-					return super.countUnremovablePlannedTasks(schedule);
-				}
+		TaxiTaskType currentTaskType = (TaxiTaskType)schedule.getCurrentTask().getTaskType();
 
-				if (taxiCfg.isVehicleDiversion()) {
-					return 0;// though questionable
-				}
+		if (currentTaskType.equals(ETaxiChargingTask.TYPE)) {
+			return 0;
+		} else if (currentTaskType.getBaseType().get() == EMPTY_DRIVE //
+				&& Schedules.getNextTask(schedule).getTaskType().equals(ETaxiChargingTask.TYPE)) {
+			//drive task to charging station
+			if (taxiCfg.isVehicleDiversion()) {
+				return 0;// though questionable
+			}
 
-				// if no diversion and driving to a charger then keep 'charge'
-				return 1;
-
-			case STAY:
-				if (!(currentTask instanceof ETaxiChargingTask)) {
-					return super.countUnremovablePlannedTasks(schedule);
-				}
-
-				return 0;
-
-			default:
-				return super.countUnremovablePlannedTasks(schedule);
+			// if no diversion and driving to a charger then keep 'charge'
+			return 1;
 		}
+
+		return super.countUnremovablePlannedTasks(schedule);
 	}
 
 	// A vehicle doing 'charge' is not considered idle.
@@ -130,7 +123,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 		for (int i = schedule.getTaskCount() - 1; i > newLastTaskIdx; i--) {
 			Task task = tasks.get(i);
 
-			if (!chargingTasksRemovalMode && task instanceof ETaxiChargingTask) {
+			if (!chargingTasksRemovalMode && task.getTaskType().equals(ETaxiChargingTask.TYPE)) {
 				break;// cannot remove -> stop removing
 			}
 
@@ -143,7 +136,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 		}
 
 		Task lastTask = Schedules.getLastTask(schedule);
-		if (lastTask instanceof ETaxiChargingTask) {
+		if (lastTask.getTaskType().equals(ETaxiChargingTask.TYPE)) {
 			// we must append 'wait' because both 'charge' and 'wait' are 'STAY' tasks,
 			// so the standard TaxiScheduler cannot distinguish them and would treat 'charge' as 'wait'
 
@@ -157,7 +150,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 
 	@Override
 	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
-		if (task instanceof ETaxiChargingTask) {
+		if (task.getTaskType().equals(ETaxiChargingTask.TYPE)) {
 			ETaxiChargingTask chargingTask = ((ETaxiChargingTask)task);
 			chargingTask.getChargingLogic().unassignVehicle(chargingTask.getElectricVehicle());
 			vehiclesWithUnscheduledCharging.add(vehicle);

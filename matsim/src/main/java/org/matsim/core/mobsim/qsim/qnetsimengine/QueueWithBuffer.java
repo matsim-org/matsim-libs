@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -154,7 +153,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
 
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	private double bufferLastMovedTime = Time.getUndefinedTime() ;
+	private double bufferLastMovedTime = Double.NEGATIVE_INFINITY ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
@@ -220,14 +219,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.calculateStorageCapacity();
 
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
-
-		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
-			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
-					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
-					+ "(This statement may no longer be correct; I think that the incriminating code was modified.  So please test and remove"
-					+ " the warning if it works. kai, sep'14") ;
-		}
-
 	}
 
 	@Override
@@ -281,14 +272,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private void updateFastFlowAccumulation(){
 		double now = context.getSimTimer().getTimeOfDay() ;
 
+		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		
 		if( this.flowcap_accumulate.getTimeStep() < now
-				&& this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
-				&& isNotOfferingVehicle() ){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 
 			double timeSteps = (now - flowcap_accumulate.getTimeStep()) / context.qsimConfig.getTimeStepSize();
 			double accumulateFlowCap = timeSteps * flowCapacityPerTimeStep;
 			double newFlowCap = Math.min(flowcap_accumulate.getValue() + accumulateFlowCap,
-					flowCapacityPerTimeStep);
+					remainingFlowCapThisTimeStep);
 
 			flowcap_accumulate.setValue(newFlowCap);
 			flowcap_accumulate.setTimeStep( now );
@@ -296,13 +288,23 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void updateSlowFlowAccumulation(){
+		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		
 		if (this.thisTimeStepGreen
-				&& this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep
-				&& isNotOfferingVehicle() ){
+				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
 			double newFlowCap = Math.min(flowcap_accumulate.getValue() + flowCapacityPerTimeStep,
-					flowCapacityPerTimeStep);
+					remainingFlowCapThisTimeStep);
 			flowcap_accumulate.setValue(newFlowCap);
 		}
+	}
+
+	private double subtractSizeOfVehiclesThatAreAlreadyInTheBuffer() {
+		double remainingFlowCapThisTimeStep = flowCapacityPerTimeStep;
+		for (QVehicle veh : buffer) {
+			// Subtract size of vehicles that are already in the buffer (from previous time steps)
+			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh);
+		}
+		return remainingFlowCapThisTimeStep;
 	}
 
 	@Override
@@ -369,7 +371,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		/*
 		 * If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap.
 		 * Example: Assume freeSpeedTravelTime (aka freeTravelDuration) is 2 seconds. Than we need the spaceCap = TWO
-		 * times the flowCap to handle the flowCap.
+		 * times the flowCap per second to handle the flowCap.
 		 *
 		 * Will base these computations (for the time being) on the standard free speed; i.e. reductions in free speed
 		 * will also reduce the maximum flow.
@@ -382,7 +384,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		
 		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
-		double tempStorageCapacity = freespeedTravelTime * flowCapacityPerTimeStep; 
+		double tempStorageCapacity = freespeedTravelTime * unscaledFlowCapacity_s;
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
@@ -693,7 +695,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ) {
-			flowcap_accumulate.setTimeStep(now - 1);
+			flowcap_accumulate.setTimeStep(now - context.qsimConfig.getTimeStepSize());
 		}
 		return veh;
 	}

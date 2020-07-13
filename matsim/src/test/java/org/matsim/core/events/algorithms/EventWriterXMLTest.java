@@ -59,9 +59,11 @@ public class EventWriterXMLTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		// this is already a test: is the XML valid so it can be parsed again?
 		new MatsimEventsReader(events).readFile(filename);
 
+		events.finishProcessing();
 		Assert.assertEquals("there must be 2 events.", 2, collector.getEvents().size());
 		LinkLeaveEvent event1 = (LinkLeaveEvent) collector.getEvents().get(0);
 		LinkLeaveEvent event2 = (LinkLeaveEvent) collector.getEvents().get(1);
@@ -87,9 +89,11 @@ public class EventWriterXMLTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		// this is already a test: is the XML valid so it can be parsed again?
 		new MatsimEventsReader(events).readFile(filename);
 		
+		events.finishProcessing();
 		Assert.assertEquals("there must be 1 event.", 1, collector.getEvents().size());
 	}
 }

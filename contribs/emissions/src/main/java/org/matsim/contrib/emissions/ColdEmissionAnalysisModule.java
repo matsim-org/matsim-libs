@@ -79,6 +79,8 @@ final class ColdEmissionAnalysisModule {
 	private int detailedFallbackTechAverageWarnCnt = 0;
 	private int detailedFallbackAverageTableWarnCnt = 0;
 	private int averageReadingInfoCnt = 0;
+	private int vehInfoWarnHDVCnt = 0;
+	private static final int maxWarnCnt = 3;
 
 	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
 													Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
@@ -146,6 +148,58 @@ final class ColdEmissionAnalysisModule {
 		// translate vehicle information type into factor key.  yyyy maybe combine these two? kai, jan'20
 		HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 		key.setHbefaVehicleCategory( vehicleInformationTuple.getFirst() );
+
+		//HBEFA 3 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//HBEFA 4.1 provide cold start emissions for "pass. car" and Light_Commercial_Vehicles (LCV) only.
+		//see https://www.hbefa.net/e/documents/HBEFA41_Development_Report.pdf (WP 4 , page 23)  kturner, may'20
+		//Mapping everything except "motorcycle" to "pass.car", since this was done in the last years for HGV.
+		//This may can be improved: What should be better set to LGV or zero???? kturner, may'20
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
+			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)){
+			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.URBAN_BUS +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.COACH)){
+			key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.COACH +
+						". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+		}
+		if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)){
+			for ( Pollutant coldPollutant : coldPollutants) {
+				coldEmissionsOfEvent.put( coldPollutant, 0.0 );
+				// yyyyyy todo replace by something more meaningful. kai, jan'20
+			}
+			if(vehInfoWarnHDVCnt < maxWarnCnt) {
+				vehInfoWarnHDVCnt++;
+				logger.warn("HBEFA does not provide cold start emission factors for " +
+						HbefaVehicleCategory.MOTORCYCLE +
+					//	". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+						"Currently, this code is setting the emissions of such vehicles to zero - as it was in the last years" +
+					"Might be necessary to find a better solution for this.  kturner, may'20" );
+				if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+			return coldEmissionsOfEvent;
+		}
 
 		if(this.detailedHbefaColdTable != null){
 			HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();

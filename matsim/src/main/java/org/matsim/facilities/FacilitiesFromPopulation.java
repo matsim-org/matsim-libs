@@ -45,7 +45,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -275,8 +274,8 @@ public final class FacilitiesFromPopulation {
 						log.error("No information for activity type " + actType + " found in given configuration.");
 					}
 				} else {
-					ao.addOpeningTime(new OpeningTimeImpl(params.getOpeningTime().orElse(Time.getUndefinedTime()),
-							params.getClosingTime().orElse(Time.getUndefinedTime())));
+					ao.addOpeningTime(OpeningTimeImpl.createFromOptionalTimes(params.getOpeningTime(),
+							params.getClosingTime()));
 				}
 			}
 		}

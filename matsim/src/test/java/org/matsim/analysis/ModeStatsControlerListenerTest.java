@@ -362,30 +362,39 @@ public class ModeStatsControlerListenerTest {
 		StartupEvent eventStart = new StartupEvent(null);
 		modStatListner.notifyStartup(eventStart);
 
-		HashMap<String, Integer> modes = new HashMap<String, Integer>();
+		HashMap<String, Integer> modesIter0 = new HashMap<String, Integer>();
 
 		IterationEndsEvent event0 = new IterationEndsEvent(null, 0);
 		modStatListner.notifyIterationEnds(event0);
 
 		//Merging 3 maps (modes of 3 persons) to a new single map and adding together the count of each mode of all 3 persons
-		person1modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person2modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person3modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
+		person1modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
+		person2modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
+		person3modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
 
-		readAndcompareValues(modes, 0);
+		readAndcompareValues(modesIter0, 0);
 		
 		//Remove one person
 		population.getPersons().remove(Id.create("2", Person.class));
 
+		// Change mode of one trip of person 3
+		PlanElement pe = population.getPersons().get(Id.create("3", Person.class)).getSelectedPlan().getPlanElements().get(3);
+		Leg leg = (Leg) pe;
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) - 1);
+		// add a new mode which did not occur before
+		leg.setMode(TransportMode.ride);
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) + 1);
+
 		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
 		modStatListner.notifyIterationEnds(event1);
 
-		modes.clear();
-		//Merging 2 maps (modes of 2 persons) to a new single map and adding together the count of each mode of 2 persons
-		person1modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person3modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
+		HashMap<String, Integer> modesIter1 = new HashMap<String, Integer>();
 
-		readAndcompareValues(modes, 1);
+		//Merging 2 maps (modes of 2 persons) to a new single map and adding together the count of each mode of 2 persons
+		person1modes.forEach((k, v) -> modesIter1.merge(k, v, Integer::sum));
+		person3modes.forEach((k, v) -> modesIter1.merge(k, v, Integer::sum));
+
+		readAndcompareValues(modesIter1, 1);
 
 		//Remove one more person
 		population.getPersons().remove(Id.create("3", Person.class));
@@ -393,10 +402,10 @@ public class ModeStatsControlerListenerTest {
 		IterationEndsEvent event2 = new IterationEndsEvent(null, 2);
 		modStatListner.notifyIterationEnds(event2);
 
+		// in the last iteration check whether all iterations can still be found
+		readAndcompareValues(modesIter0, 0);
+		readAndcompareValues(modesIter1, 1);
 		readAndcompareValues(person1modes, 2);
-
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false);
-		modStatListner.notifyShutdown(eventShutdown);
 	}
 
 	//(no: of trips in a mode) / (total no: of trips) ---> should match with the text file

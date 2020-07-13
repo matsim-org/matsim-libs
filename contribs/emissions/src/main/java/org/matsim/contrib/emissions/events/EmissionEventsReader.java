@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
+import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.net.URL;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 
 /**
@@ -53,7 +52,7 @@ public final class EmissionEventsReader implements MatsimReader {
 			Map<String, String> attributes = event.getAttributes();
 			Map<Pollutant, Double> warmEmissions = new LinkedHashMap<>();
 
-			double time = Time.getUndefinedTime();
+			double time = Double.NaN;
 			Id<Link> linkId = null;
 			Id<Vehicle> vehicleId = null;
 
@@ -69,9 +68,9 @@ public final class EmissionEventsReader implements MatsimReader {
 				} else if( WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals( entry.getKey() ) ){
 					vehicleId = Id.createVehicleId( entry.getValue() );
 				} else{
-					String pollutant = entry.getKey();
-					Double value = Double.parseDouble( entry.getValue() );
-					warmEmissions.put( Pollutant.valueOf( pollutant ), value );
+					String pollutant = entry.getKey().equals("NOX") ? "NOx" : entry.getKey(); // the previous versions would write NOX instead of NOx
+					Double value = Double.parseDouble(entry.getValue());
+					warmEmissions.put(Pollutant.valueOf(pollutant), value);
 				}
 			}
 
@@ -83,7 +82,7 @@ public final class EmissionEventsReader implements MatsimReader {
 			Map<String, String> attributes = event.getAttributes();
 			Map<Pollutant, Double> coldEmissions = new LinkedHashMap<>();
 
-			double time = Time.getUndefinedTime();
+			double time = Double.NaN;
 			Id<Link> linkId = null;
 			Id<Vehicle> vehicleId = null;
 
@@ -98,10 +97,10 @@ public final class EmissionEventsReader implements MatsimReader {
 					linkId = Id.createLinkId( entry.getValue() );
 				} else if( ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID.equals( entry.getKey() ) ){
 					vehicleId = Id.createVehicleId( entry.getValue() );
-				} else{
-					String pollutant = entry.getKey();
-					Double value = Double.parseDouble( entry.getValue() );
-					coldEmissions.put( Pollutant.valueOf(pollutant), value );
+				} else {
+					String pollutant = entry.getKey().equals("NOX") ? "NOx" : entry.getKey(); // the previous versions would write NOX instead of NOx
+					Double value = Double.parseDouble(entry.getValue());
+					coldEmissions.put(Pollutant.valueOf(pollutant), value);
 				}
 			}
 			return new ColdEmissionEvent( time, linkId, vehicleId, coldEmissions );

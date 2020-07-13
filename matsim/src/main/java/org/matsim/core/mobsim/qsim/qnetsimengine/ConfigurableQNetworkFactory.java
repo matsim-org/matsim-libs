@@ -95,7 +95,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 
 	@Override
 	public QNodeI createNetsimNode( final Node node ) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context);
+		QNodeImpl.Builder builder = new QNodeImpl.Builder(netsimEngine, context, qsimConfig);
 
 		turnAcceptanceLogic.ifPresent(builder::setTurnAcceptanceLogic);
 

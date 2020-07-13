@@ -18,6 +18,9 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -58,26 +60,28 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		Schedule schedule = vehicle.getSchedule();
-		LinkTimePair start;
+		final LinkTimePair start;
+		final Task startTask;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			Task currentTask = schedule.getCurrentTask();
-			switch (((DrtTaskType)currentTask.getTaskType())) {
+			startTask = schedule.getCurrentTask();
+			switch (getBaseType(startTask)) {
 				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
-					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					if (start == null) { // too late to divert a vehicle
-						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
-					}
+					DrtDriveTask driveTask = (DrtDriveTask)startTask;
+					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
+					start = diversionPoint != null ? diversionPoint : //diversion possible
+							new LinkTimePair(driveTask.getPath().getToLink(),
+									driveTask.getEndTime());// too late for diversion
+
 					break;
 
 				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)currentTask;
+					DrtStopTask stopTask = (DrtStopTask)startTask;
 					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
 					break;
 
 				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)currentTask;
+					DrtStayTask stayTask = (DrtStayTask)startTask;
 					start = new LinkTimePair(stayTask.getLink(), currentTime);
 					break;
 
@@ -85,16 +89,17 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 					throw new RuntimeException();
 			}
 
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
+			nextTaskIdx = startTask.getTaskIdx() + 1;
 		} else { // PLANNED
 			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
+			startTask = null;
 			nextTaskIdx = 0;
 		}
 
-		List<Task> tasks = (List<Task>)schedule.getTasks();
+		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getTaskType() == DrtTaskType.STOP) {
+			if (STOP.isBaseTypeOf(task)) {
 				stopTasks.add((DrtStopTask)task);
 			}
 		}
@@ -106,7 +111,8 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			outputOccupancy -= s.occupancyChange;
 		}
 
-		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
+		return new Entry(vehicle, new VehicleData.Start(startTask, start.link, start.time, outputOccupancy),
+				ImmutableList.copyOf(stops));
 	}
 
 	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {

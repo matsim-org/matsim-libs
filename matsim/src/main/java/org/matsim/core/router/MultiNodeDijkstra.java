@@ -241,7 +241,6 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 			nodes.add(0, tmpLink.getFromNode());
 			tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 		}
-
 		// Ignore the initial time and cost of the start node!
 		DijkstraNodeData startNodeData = getData(nodes.get(0));
 		DijkstraNodeData toNodeData = getData(toNode);

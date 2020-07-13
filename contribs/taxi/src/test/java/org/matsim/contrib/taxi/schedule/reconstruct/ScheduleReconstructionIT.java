@@ -19,17 +19,23 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URL;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -86,7 +92,7 @@ public class ScheduleReconstructionIT {
 			@Override
 			public void install() {
 				bindModal(ScheduleReconstructor.class).toProvider(
-						new ModalProviders.AbstractProvider<ScheduleReconstructor>(taxiCfg.getMode()) {
+						new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 							@Inject
 							private EventsManager eventsManager;
 
@@ -116,8 +122,11 @@ public class ScheduleReconstructionIT {
 			SubmittedTaxiRequestsCollector requestCollector) {
 		Assert.assertNotEquals(fleet, scheduleReconstructor.getFleet());
 		compareVehicles(fleet.getVehicles().values(), scheduleReconstructor.getFleet().getVehicles().values());
-		compareRequests((Collection<TaxiRequest>)requestCollector.getRequests().values(),
-				scheduleReconstructor.taxiRequests.values());
+		compareRequests(sortRequests(requestCollector.getRequests()), sortRequests(scheduleReconstructor.taxiRequests));
+	}
+
+	private List<TaxiRequest> sortRequests(Map<Id<Request>, ? extends TaxiRequest> requestMap) {
+		return requestMap.values().stream().sorted(Comparator.comparing(TaxiRequest::getId)).collect(toList());
 	}
 
 	private void compareVehicles(Collection<? extends DvrpVehicle> originalVehs,
@@ -166,11 +175,12 @@ public class ScheduleReconstructionIT {
 		}
 	}
 
-	private void compareRequests(Collection<TaxiRequest> originalReqs, Collection<TaxiRequest> reconstructedReqs) {
+	private void compareRequests(Collection<? extends TaxiRequest> originalReqs,
+			Collection<? extends TaxiRequest> reconstructedReqs) {
 		Assert.assertNotEquals(originalReqs, reconstructedReqs);
 		Assert.assertEquals(originalReqs.size(), reconstructedReqs.size());
 
-		Iterator<TaxiRequest> rIter = reconstructedReqs.iterator();
+		Iterator<? extends TaxiRequest> rIter = reconstructedReqs.iterator();
 		for (TaxiRequest o : originalReqs) {
 			TaxiRequest r = rIter.next();
 

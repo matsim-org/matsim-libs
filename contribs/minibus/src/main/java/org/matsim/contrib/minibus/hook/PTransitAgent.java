@@ -125,7 +125,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getArrivalOffset();
+				return routeStop.getArrivalOffset().seconds();
 			}
 		}
 
@@ -137,7 +137,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> accessStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getDepartureOffset();
+				return routeStop.getDepartureOffset().seconds();
 			}
 		}
 

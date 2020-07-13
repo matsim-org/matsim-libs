@@ -32,13 +32,12 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.controler.PrepareForSimUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -99,7 +98,7 @@ public class QSimSignalTest implements
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(true );
@@ -115,10 +114,7 @@ public class QSimSignalTest implements
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
 		
-		runQSimWithSignals(scenario, false);
-
-		// if this code is reached, no exception has been thrown
-		Assert.fail("The simulation should abort because of intergreens violation.");
+		Assert.assertFalse("The simulation should abort because of intergreens violation.", runQSimWithSignals(scenario, false));
 	}
 	
 	/**
@@ -147,15 +143,13 @@ public class QSimSignalTest implements
 	/**
 	 * Tests the setup with two conflicting directions showing green together
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testConflictingDirectionsAbortOneAgentDriving() {
 		//configure and load test scenario with data about conflicting directions
 		Scenario scenario = new Fixture().createAndLoadTestScenarioTwoSignals(true );
 
 		runQSimWithSignals(scenario, false);
-		
-		// if this code is reached, no exception has been thrown
-		Assert.fail("The simulation should abort because of intergreens violation.");
+		Assert.assertFalse("The simulation should abort because of intergreens violation.", runQSimWithSignals(scenario, false));
 	}
 	
 	/**
@@ -177,7 +171,7 @@ public class QSimSignalTest implements
 
 	
 	
-	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
+	private boolean runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException {
 //		/*
 //		 * this is the old version how to build an injector without a controler and
 //		 * still be able to add a SignalsModule. A new version using Sebastians
@@ -209,7 +203,7 @@ public class QSimSignalTest implements
 		 * new version how to create a qsim without a controler and still be able to add
 		 * the SignalsModule. see comment above.
 		 */
-		EventsManager events = EventsUtils.createEventsManager();
+		ParallelEventsManager events = new ParallelEventsManager(false);
 		if (handleEvents){
 			events.addHandler(this);
 		}
@@ -221,6 +215,7 @@ public class QSimSignalTest implements
 				.addOverridingQSimModule( new SignalsQSimModule() )
 				.build(scenario, events)
 				.run();
+		return !events.hadException();
 	}
 
 

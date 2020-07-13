@@ -102,7 +102,9 @@ public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra impleme
 			links.add(((RoutingNetworkLink) tmpLink).getLink());
 			nodes.add(((RoutingNetworkNode) tmpLink.getFromNode()).getNode());
 		}
-		
+		if (nodes.get(nodes.size() -1) == toNode) {
+			throw new RuntimeException("constructPath didn't found a path, wrong nodes were given");
+		}
 		NodeData toNodeData = getData(toNode);
 		Path path = new Path(nodes, links, startTime - arrivalTime, toNodeData.getCost());
 

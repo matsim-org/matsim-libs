@@ -19,15 +19,14 @@
 
 package org.matsim.pt.transitSchedule;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Default implementation of {@link org.matsim.pt.transitSchedule.api.MinimalTransferTimes}
@@ -40,7 +39,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 
 	@Override
 	public double set(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double seconds) {
-		if (Double.isNaN(seconds) || Time.isUndefinedTime(seconds)) {
+		if (Double.isNaN(seconds)) {
 			return remove(fromStop, toStop);
 		}
 		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.computeIfAbsent(fromStop, key -> new ConcurrentHashMap<>());

@@ -234,7 +234,11 @@ public class CourtesyEventsTest {
 						}
 				});
 
+		eventManager.initProcessing();
+
 		for ( Event e : events ) eventManager.processEvent( e );
+
+		eventManager.finishProcessing();
 
 		Assert.assertEquals(
 				"wrong number of events in "+collected,

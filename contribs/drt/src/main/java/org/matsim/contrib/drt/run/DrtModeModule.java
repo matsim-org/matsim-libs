@@ -52,7 +52,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -93,6 +93,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
+		//this is a customised version of DvrpModeRoutingModule.install()
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
 				DvrpRoutingModuleProvider.Stage.MAIN)
@@ -114,7 +115,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					.asEagerSingleton();
 		}
 
-		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
+		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
@@ -141,15 +142,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
 
-		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
-		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 		private final DrtConfigGroup drtCfg;
 
 		private DrtRouteCreatorProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
+			leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(drtCfg.getNumberOfThreads());
 		}
 
 		@Override

@@ -43,13 +43,13 @@ public class ChargingWithQueueingAndAssignmentLogic extends ChargingWithQueueing
 
 	public void assignVehicle(ElectricVehicle ev) {
 		if (assignedVehicles.put(ev.getId(), ev) != null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Vehicle is already assigned: " + ev.getId());
 		}
 	}
 
 	public void unassignVehicle(ElectricVehicle ev) {
 		if (assignedVehicles.remove(ev.getId()) == null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("Vehicle was not assigned: " + ev.getId());
 		}
 	}
 

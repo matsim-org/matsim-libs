@@ -18,7 +18,8 @@
 
 package org.matsim.contrib.drt.scheduler;
 
-import org.matsim.contrib.drt.schedule.DrtTaskType;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
+
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -48,6 +49,6 @@ public class DrtScheduleInquiry implements ScheduleInquiry {
 
 		Task currentTask = schedule.getCurrentTask();
 		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
-				&& currentTask.getTaskType() == DrtTaskType.STAY;
+				&& STAY.isBaseTypeOf(currentTask);
 	}
 }

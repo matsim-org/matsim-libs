@@ -11,7 +11,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
 public class ZoneXmlWriter extends MatsimXmlWriter {
-	private Map<Id<Zone>, Zone> zones;
+	private final Map<Id<Zone>, Zone> zones;
 
 	public ZoneXmlWriter(Map<Id<Zone>, Zone> zones) {
 		this.zones = zones;
@@ -20,7 +20,7 @@ public class ZoneXmlWriter extends MatsimXmlWriter {
 	public void write(String file) {
 		openFile(file);
 		writeDoctype("zones", "http://matsim.org/files/dtd/zones_v1.dtd");
-		writeStartTag("zones", Collections.<Tuple<String, String>>emptyList());
+		writeStartTag("zones", Collections.emptyList());
 		writeZones();
 		writeEndTag("zones");
 		close();

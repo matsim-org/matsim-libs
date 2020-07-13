@@ -57,7 +57,6 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -194,7 +193,7 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, newAct, mainMode, now, person );
 
 		// (2) there should be no access leg even with access/egress routing
-		Gbl.assertIf( ! (((Leg)newTripElements.get(1)).getRoute() instanceof NetworkRoute) );
+		Gbl.assertIf( (((Leg)newTripElements.get(0)).getRoute() instanceof NetworkRoute) );
 
 		// (3) modify current route within current leg:
 		replaceRemainderOfCurrentRoute(currentLeg, newTripElements, agent);
@@ -335,7 +334,7 @@ public final class EditTrips {
 			if (driver instanceof TransitDriverAgentImpl) { // this is ugly, but there seems to be no other way to find out the scheduled arrival time. Maybe add to interface?
 				TransitDriverAgentImpl driverImpl = (TransitDriverAgentImpl) driver;
 				double departureFirstTransitRouteStop = driverImpl.getDeparture().getDepartureTime();
-				double arrivalOffsetNextTransitRouteStop = driverImpl.getTransitRoute().getStop(currentOrNextStop).getArrivalOffset();
+				double arrivalOffsetNextTransitRouteStop = driverImpl.getTransitRoute().getStop(currentOrNextStop).getArrivalOffset().seconds();
 				reRoutingTime = departureFirstTransitRouteStop + arrivalOffsetNextTransitRouteStop;
 			} else {
 				throw new RuntimeException("transit driver is not a TransitDriverAgentImpl, not implemented!");

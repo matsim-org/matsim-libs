@@ -23,7 +23,10 @@ package org.matsim.contrib.ev.infrastructure;/*
  * created by jbischoff, 23.08.2018
  */
 
-import com.google.common.primitives.Doubles;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.discharging.LTHDriveEnergyConsumption;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -31,9 +34,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.vehicles.VehicleType;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.primitives.Doubles;
 
 /**
  * This class reads Energy consumption files from CSV as used in the IDEAS project between TU Berlin and LTH Lund.
@@ -42,10 +43,7 @@ import java.util.List;
  */
 public class LTHConsumptionModelReader {
 
-	private final Id<VehicleType> vehicleTypeId;
-
 	public LTHConsumptionModelReader(Id<VehicleType> vehicleTypeId) {
-		this.vehicleTypeId = vehicleTypeId;
 	}
 
 	public LTHDriveEnergyConsumption.Factory readURL(URL fileUrl) {
