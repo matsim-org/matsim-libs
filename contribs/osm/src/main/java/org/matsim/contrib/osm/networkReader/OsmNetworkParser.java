@@ -22,14 +22,14 @@ class OsmNetworkParser {
 	private static NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
 
 	private final CoordinateTransformation transformation;
-	private final ConcurrentMap<String, LinkProperties> linkProperties;
+	private final Map<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
 	final ExecutorService executor;
 	Map<Long, ProcessedOsmWay> ways;
 	Map<Long, ProcessedOsmNode> nodes;
 	Map<Long, List<ProcessedOsmWay>> nodeReferences;
 
-	OsmNetworkParser(CoordinateTransformation transformation, ConcurrentMap<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
+	OsmNetworkParser(CoordinateTransformation transformation, Map<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
 		this.transformation = transformation;
 		this.linkProperties = linkProperties;
 		this.linkFilter = linkFilter;

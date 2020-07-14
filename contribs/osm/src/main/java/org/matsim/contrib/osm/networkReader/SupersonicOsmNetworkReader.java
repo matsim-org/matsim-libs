@@ -196,7 +196,7 @@ public class SupersonicOsmNetworkReader {
         link.setLength(segment.getLength());
         link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
         link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), direction, properties));
-        link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
+        link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
         afterLinkCreated.accept(link, segment.getTags(), direction);
@@ -231,11 +231,9 @@ public class SupersonicOsmNetworkReader {
 
     private double getFreespeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
         if (tags.containsKey(OsmTags.MAXSPEED)) {
-            double speed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
-            double urbanSpeedFactor = speed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
-            return speed * urbanSpeedFactor;
+            return LinkProperties.calculateSpeedIfSpeedTag(parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties));
         } else {
-            return calculateSpeedIfNoSpeedTag(properties, linkLength);
+            return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
         }
     }
 
@@ -250,26 +248,6 @@ public class SupersonicOsmNetworkReader {
             //System.out.println("Could not parse maxspeed tag: " + tag + " ignoring it");
         }
         return properties.freespeed;
-    }
-
-    /*
-     * For links with unknown max speed we assume that links with a length of less than 300m are urban links. For urban
-     * links with a length of 0m the speed is 10km/h. For links with a length of 300m the speed is the default freespeed
-     * property for that highway type. For links with a length between 0 and 300m the speed is interpolated linearly.
-     *
-     * All links longer than 300m the default freesped property is assumed
-     */
-    private double calculateSpeedIfNoSpeedTag(LinkProperties properties, double linkLength) {
-        if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
-                && linkLength < 300) {
-            return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
-        }
-        return properties.freespeed;
-    }
-
-    private double getLaneCapacity(double linkLength, LinkProperties properties) {
-        double capacityFactor = linkLength < 100 ? 2 : 1;
-        return properties.laneCapacity * capacityFactor;
     }
 
     private double getNumberOfLanes(Map<String, String> tags, Direction direction, LinkProperties properties) {
@@ -324,7 +302,7 @@ public class SupersonicOsmNetworkReader {
 
     public static abstract class AbstractBuilder<T> {
 
-        ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+        Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
         BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
         Predicate<Long> preserveNodeWithId = id -> false;
         AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {

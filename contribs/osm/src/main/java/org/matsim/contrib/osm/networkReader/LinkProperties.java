@@ -1,9 +1,13 @@
 package org.matsim.contrib.osm.networkReader;
 
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * Holds MATSim internal link properties mapped to OSM hierarchy levels.
+ */
 public class LinkProperties {
 
 	public static final int LEVEL_MOTORWAY = 1;
@@ -101,7 +105,10 @@ public class LinkProperties {
         return new LinkProperties(LEVEL_LIVING_STREET, 1, 10 / 3.6, 300, false);
 	}
 
-    static ConcurrentMap<String, LinkProperties> createLinkProperties() {
+	/**
+	 * Creates default link properties.
+	 */
+    public static Map<String, LinkProperties> createLinkProperties() {
 		ConcurrentMap<String, LinkProperties> result = new ConcurrentHashMap<>();
 		result.put(OsmTags.MOTORWAY, createMotorway());
 		result.put(OsmTags.MOTORWAY_LINK, createMotorwayLink());
@@ -117,5 +124,37 @@ public class LinkProperties {
 		result.put(OsmTags.RESIDENTIAL, createResidential());
 		result.put(OsmTags.LIVING_STREET, createLivingStreet());
 		return result;
+	}
+
+
+	/**
+	 * Lane capacity adjusted if link might be a crossing.
+	 */
+	public static double getLaneCapacity(double linkLength, LinkProperties properties) {
+		double capacityFactor = linkLength < 100 ? 2 : 1;
+		return properties.laneCapacity * capacityFactor;
+	}
+
+    /**
+     * Calculate free speed of a link based on heuristic if it is an urban link.
+     */
+	public static double calculateSpeedIfSpeedTag(double maxSpeed) {
+        double urbanSpeedFactor = maxSpeed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
+        return maxSpeed * urbanSpeedFactor;
+    }
+
+	/**
+	 * For links with unknown max speed we assume that links with a length of less than 300m are urban links. For urban
+	 * links with a length of 0m the speed is 10km/h. For links with a length of 300m the speed is the default freespeed
+	 * property for that highway type. For links with a length between 0 and 300m the speed is interpolated linearly.
+	 *
+	 * All links longer than 300m the default freesped property is assumed
+	 */
+	public static double calculateSpeedIfNoSpeedTag(double linkLength, LinkProperties properties) {
+		if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
+				&& linkLength < 300) {
+			return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
+		}
+		return properties.freespeed;
 	}
 }
