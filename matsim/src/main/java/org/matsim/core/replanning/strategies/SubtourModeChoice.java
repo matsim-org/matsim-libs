@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
@@ -37,11 +38,12 @@ public class SubtourModeChoice implements Provider<PlanStrategy> {
 	@Inject private GlobalConfigGroup globalConfigGroup;
 	@Inject private SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup;
 	@Inject private ActivityFacilities facilities;
+	@Inject private PermissibleModesCalculator permissibleModesCalculator;
 
-    @Override
+	@Override
 	public PlanStrategy get() {
 		PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<>());
-		builder.addStrategyModule(new org.matsim.core.replanning.modules.SubtourModeChoice(tripRouterProvider, globalConfigGroup, subtourModeChoiceConfigGroup));
+		builder.addStrategyModule(new org.matsim.core.replanning.modules.SubtourModeChoice(globalConfigGroup, subtourModeChoiceConfigGroup));
 		builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup));
 		return builder.build();
 	}

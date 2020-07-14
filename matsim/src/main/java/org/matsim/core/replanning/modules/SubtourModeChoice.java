@@ -21,8 +21,6 @@
 package org.matsim.core.replanning.modules;
 
 
-import javax.inject.Provider;
-
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
@@ -30,7 +28,6 @@ import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 
 /**
@@ -52,45 +49,30 @@ import org.matsim.core.router.TripStructureUtils;
  * 
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
-	
-	private final double probaForChangeSingleTripMode ;
-	
-	public enum Behavior { fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes }
-	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes ;
+
+	private final double probaForChangeSingleTripMode;
+
+	public enum Behavior {fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes}
+
+	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes;
 
 	private PermissibleModesCalculator permissibleModesCalculator;
-	
+
 	private final String[] chainBasedModes;
 	private final String[] modes;
-	
-	public SubtourModeChoice(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup,
-							 SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+
+	public SubtourModeChoice(GlobalConfigGroup globalConfigGroup,
+			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
 				subtourModeChoiceConfigGroup.considerCarAvailability(),
-				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
-				tripRouterProvider
+				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode()
 		);
-		this.setBehavior( subtourModeChoiceConfigGroup.getBehavior() );
+		this.setBehavior(subtourModeChoiceConfigGroup.getBehavior());
 	}
 
-	@Deprecated // tripRouterProvider element no longer necessary
-	public SubtourModeChoice(
-			final int numberOfThreads,
-			final String[] modes,
-			final String[] chainBasedModes,
-			final boolean considerCarAvailability,
-			double probaForChangeSingleTripMode,
-			Provider<TripRouter> tripRouterProvider) {
-		this(numberOfThreads,
-				modes,
-				chainBasedModes,
-				considerCarAvailability,
-				probaForChangeSingleTripMode);
-	}
-	
-	public SubtourModeChoice(
+	SubtourModeChoice(
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
@@ -100,7 +82,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
 		this.permissibleModesCalculator =
-			new PermissibleModesCalculatorImpl(
+				new PermissibleModesCalculatorImpl(
 					this.modes,
 					considerCarAvailability);
 		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;

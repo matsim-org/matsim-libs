@@ -19,21 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.router.TripRouter;
-
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd
@@ -70,8 +68,8 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
-					new SubtourModeChoice(
-							tripRouterProvider, sc.getConfig().global(), sc.getConfig().subtourModeChoice()) ) );
+						new SubtourModeChoice(
+								sc.getConfig().global(), sc.getConfig().subtourModeChoice())));
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
