@@ -30,6 +30,8 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentif
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.TripRouter;
 
@@ -57,7 +59,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 
 	@Override
 	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
+		final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
 		// Why the hell did I put this here???
 		//strategy.addStrategyModule(
@@ -65,17 +67,17 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		//			sc.getConfig(),
 		//			planRoutingAlgorithmFactory,
 		//			tripRouterFactory ) );
-
+		PermissibleModesCalculator permissibleModesCalculator = new PermissibleModesCalculatorImpl(sc.getConfig());
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 						new SubtourModeChoice(
-								sc.getConfig().global(), sc.getConfig().subtourModeChoice())));
+								sc.getConfig().global(), sc.getConfig().subtourModeChoice(), permissibleModesCalculator)));
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
 				(VehicleRessources) sc.getScenarioElement(
-					VehicleRessources.ELEMENT_NAME );
-		if ( vehicles != null ) {
+						VehicleRessources.ELEMENT_NAME);
+		if (vehicles != null) {
 			strategy.addStrategyModule(
 					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
 							sc.getConfig(),
