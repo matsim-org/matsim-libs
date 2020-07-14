@@ -20,6 +20,7 @@
 package org.matsim.contrib.emissions.utils;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -520,6 +521,19 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
 	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
+	}
+
+	@Override
+	protected final void checkConsistency(Config config){
+		switch (this.emissionsComputationMethod){
+			case StopAndGoFraction:
+				break;
+			case AverageSpeed:
+				log.warn("This setting of emissionsComputationMethod. "+ EmissionsComputationMethod.AverageSpeed + " is not covered by many test cases.");
+				break;
+			default:
+				throw new IllegalStateException("Unexpected value: " + this.emissionsComputationMethod);
+		}
 	}
 
 }
