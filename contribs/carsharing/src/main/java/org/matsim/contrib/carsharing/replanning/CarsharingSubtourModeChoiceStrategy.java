@@ -28,10 +28,9 @@ public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 		this.strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice());
 		CarsharingSubTourPermissableModesCalculator cpmc =
 				new CarsharingSubTourPermissableModesCalculator(scenario, scenario.getConfig().subtourModeChoice().getModes(), memberships);
-		smc.setPermissibleModesCalculator(cpmc);
+		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice(), cpmc);
 
 		addStrategyModule(smc);
 		addStrategyModule(new ReRoute(scenario, tripRouterProvider));

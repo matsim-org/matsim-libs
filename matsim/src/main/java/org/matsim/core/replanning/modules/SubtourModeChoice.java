@@ -20,13 +20,11 @@
 
 package org.matsim.core.replanning.modules;
 
-
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
-import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 
@@ -46,7 +44,7 @@ import org.matsim.core.router.TripStructureUtils;
  * If the plan initially violates this constraint, this module may (!) repair it. 
  * 
  * @author michaz
- * 
+ *
  */
 public class SubtourModeChoice extends AbstractMultithreadedModule {
 
@@ -56,18 +54,18 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	private Behavior behavior = Behavior.fromSpecifiedModesToSpecifiedModes;
 
-	private PermissibleModesCalculator permissibleModesCalculator;
+	private final PermissibleModesCalculator permissibleModesCalculator;
 
 	private final String[] chainBasedModes;
 	private final String[] modes;
 
 	public SubtourModeChoice(GlobalConfigGroup globalConfigGroup,
-			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup) {
+			SubtourModeChoiceConfigGroup subtourModeChoiceConfigGroup, PermissibleModesCalculator permissibleModesCalculator) {
 		this(globalConfigGroup.getNumberOfThreads(),
 				subtourModeChoiceConfigGroup.getModes(),
 				subtourModeChoiceConfigGroup.getChainBasedModes(),
-				subtourModeChoiceConfigGroup.considerCarAvailability(),
-				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode()
+				subtourModeChoiceConfigGroup.getProbaForRandomSingleTripMode(),
+				permissibleModesCalculator
 		);
 		this.setBehavior(subtourModeChoiceConfigGroup.getBehavior());
 	}
@@ -76,15 +74,12 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 			final int numberOfThreads,
 			final String[] modes,
 			final String[] chainBasedModes,
-			final boolean considerCarAvailability,
-			double probaForChangeSingleTripMode) {
+			double probaForChangeSingleTripMode,
+			PermissibleModesCalculator permissibleModesCalculator) {
 		super(numberOfThreads);
 		this.modes = modes.clone();
 		this.chainBasedModes = chainBasedModes.clone();
-		this.permissibleModesCalculator =
-				new PermissibleModesCalculatorImpl(
-					this.modes,
-					considerCarAvailability);
+		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.probaForChangeSingleTripMode = probaForChangeSingleTripMode;
 	}
 	
@@ -110,12 +105,5 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 		return chooseRandomLegMode;
 	}
 
-	/**
-	 * Decides if a person may use a certain mode of transport. Can be used for car ownership.
-	 * 
-	 */
-	public void setPermissibleModesCalculator(PermissibleModesCalculator permissibleModesCalculator) {
-		this.permissibleModesCalculator = permissibleModesCalculator;
-	}
 
 }
