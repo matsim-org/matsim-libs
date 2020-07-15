@@ -31,7 +31,7 @@ class OsmSignalsParser extends OsmNetworkParser {
 		return signalizedNodes;
 	}
 
-	OsmSignalsParser(CoordinateTransformation transformation, ConcurrentMap<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
+	OsmSignalsParser(CoordinateTransformation transformation, Map<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
 		super(transformation, linkProperties, linkFilter, executor);
 	}
 
