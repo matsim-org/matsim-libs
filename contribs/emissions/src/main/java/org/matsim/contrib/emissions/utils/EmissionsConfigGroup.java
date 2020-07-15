@@ -527,6 +527,11 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	protected final void checkConsistency(Config config){
 		switch (this.emissionsComputationMethod){
 			case StopAndGoFraction:
+				log.info("Please note, that with setting of emissionsComputationMethod "+ EmissionsComputationMethod.StopAndGoFraction+ "" +
+						" the emission factors for both freeFlow and StopAndGo fractions are looked up independently and are " +
+						"therefore following the fallback behaviour set in " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR +
+						" independently. --> Depending on the input, it may be, that e.g. for ff the detailed value is taken, while for the stopAndGo part " +
+						"a less detailed value is used, because the value with the same level of detail is missing.");
 				break;
 			case AverageSpeed:
 				log.warn("This setting of emissionsComputationMethod. "+ EmissionsComputationMethod.AverageSpeed + " is not covered by many test cases.");
