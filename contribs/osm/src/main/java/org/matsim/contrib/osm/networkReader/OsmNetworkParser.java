@@ -127,43 +127,4 @@ class OsmNetworkParser {
 				.filter(way -> linkFilter.test(coord, way.getLinkProperties().hierachyLevel))
 				.collect(Collectors.toList());
 	}
-
-/*
-	static NodesAndWays parse(Path inputFile, ConcurrentMap<String, LinkProperties> linkPropertiesMap, CoordinateTransformation transformation, BiPredicate<Coord, Integer> linkFilter) {
-
-		log.info("start reading ways");
-
-		ExecutorService executor = Executors.newWorkStealingPool();
-		WaysPbfParser waysParser = new WaysPbfParser(executor, linkPropertiesMap);
-
-		try (InputStream fileInputStream = new FileInputStream(inputFile.toFile())) {
-			BufferedInputStream input = new BufferedInputStream(fileInputStream);
-			waysParser.parse(input);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		log.info("finished reading ways.");
-		log.info("Kept " + NumberFormat.getNumberInstance(Locale.US).format(waysParser.getWays().size()) + "/" +
-				NumberFormat.getNumberInstance(Locale.US).format(waysParser.getCounter()) + " ways");
-		log.info("Marked " + NumberFormat.getNumberInstance(Locale.US).format(waysParser.getNodes().size()) + " nodes to be kept");
-		log.info("starting to read nodes");
-
-		NodesPbfParser nodesParser = new NodesPbfParser(executor, linkFilter, waysParser.getNodes(), transformation);
-
-		try (InputStream fileInputStream = new FileInputStream(inputFile.toFile())) {
-
-			BufferedInputStream input = new BufferedInputStream(fileInputStream);
-			nodesParser.parse(input);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		log.info("finished reading nodes");
-		log.info("Kept " + NumberFormat.getNumberInstance(Locale.US).format(nodesParser.getNodes().size()) + "/"
-				+ NumberFormat.getNumberInstance(Locale.US).format(nodesParser.getCount()) + " nodes");
-
-		return new NodesAndWays(nodesParser.getNodes(), waysParser.getWays());
-	}
-	*/
 }
