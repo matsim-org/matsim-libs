@@ -11,15 +11,14 @@ import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 class OsmNetworkParser {
 
-	private static Logger log = Logger.getLogger(OsmNetworkParser.class);
-	private static NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
+	private static final Logger log = Logger.getLogger(OsmNetworkParser.class);
+	private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
 
 	private final CoordinateTransformation transformation;
 	private final Map<String, LinkProperties> linkProperties;
@@ -85,7 +84,7 @@ class OsmNetworkParser {
 			ProcessedOsmNode result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
 			this.nodes.put(result.getId(), result);
 
-			if (nodes.size() % 10000 == 0) {
+			if (nodes.size() % 100000 == 0) {
 				log.info("Added " + numberFormat.format(nodes.size()) + " nodes");
 			}
 		}
