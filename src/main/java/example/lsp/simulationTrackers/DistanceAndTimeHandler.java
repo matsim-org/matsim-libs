@@ -5,10 +5,10 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 
-import lsp.events.LSPFreightLinkEnterEvent;
-import lsp.events.LSPFreightLinkLeaveEvent;
+import org.matsim.contrib.freight.controler.LSPFreightLinkEnterEvent;
+import org.matsim.contrib.freight.controler.LSPFreightLinkLeaveEvent;
 import lsp.eventhandlers.LSPLinkLeaveEventHandler;
-import lsp.events.LSPFreightVehicleLeavesTrafficEvent;
+import org.matsim.contrib.freight.controler.LSPFreightVehicleLeavesTrafficEvent;
 import lsp.eventhandlers.LSPVehicleLeavesTrafficEventHandler;
 import lsp.eventhandlers.LSPLinkEnterEventHandler;
 

@@ -2,10 +2,11 @@ package lsp.controler;
 
 import com.google.inject.Provides;
 import lsp.LSPs;
-import lsp.events.LSPEventCreator;
+import org.matsim.contrib.freight.controler.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.controler.LSPCarrierTracker;
 import org.matsim.core.controler.AbstractModule;
 
 import java.util.Collection;
@@ -51,7 +52,7 @@ public class LSPModule extends AbstractModule {
 	}
 	
 	@Provides
-	LSPCarrierTracker provideCarrierResourceTracker( LSPControlerListenerImpl lSPControlerListener ) {
+	LSPCarrierTracker provideCarrierResourceTracker(LSPControlerListenerImpl lSPControlerListener ) {
         return lSPControlerListener.getCarrierResourceTracker();
     }
 

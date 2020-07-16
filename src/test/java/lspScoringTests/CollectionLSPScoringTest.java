@@ -2,7 +2,7 @@ package lspScoringTests;
 
 import lsp.*;
 import lsp.controler.LSPModule;
-import lsp.events.LSPEventUtils;
+import org.matsim.contrib.freight.controler.LSPEventUtils;
 import lsp.functions.LSPInfoFunction;
 import lsp.functions.LSPInfoFunctionUtils;
 import lsp.functions.LSPInfoFunctionValue;

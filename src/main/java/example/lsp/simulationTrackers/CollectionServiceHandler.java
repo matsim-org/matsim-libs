@@ -6,9 +6,9 @@ import java.util.Collection;
 import lsp.eventhandlers.LSPServiceEndEventHandler;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import lsp.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.controler.LSPServiceStartEvent;
 import lsp.eventhandlers.LSPServiceStartEventHandler;
-import lsp.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.controler.LSPServiceEndEvent;
 
 
 /*package-private*/ class CollectionServiceHandler implements LSPServiceStartEventHandler, LSPServiceEndEventHandler {

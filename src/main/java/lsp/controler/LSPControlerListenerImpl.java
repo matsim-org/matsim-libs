@@ -10,6 +10,9 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.controler.LSPCarrierTracker;
+import org.matsim.contrib.freight.controler.LSPEventCreator;
+import org.matsim.contrib.freight.controler.LSPFreightControlerListener;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -31,14 +34,13 @@ import lsp.LSPPlan;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
-import lsp.events.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.resources.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
 
 
-class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+public class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 ReplanningListener, IterationEndsListener, IterationStartsListener{
 
 	

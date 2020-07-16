@@ -2,7 +2,7 @@ package lspScoringTests;
 
 import java.util.Random;
 
-import lsp.events.LSPServiceEndEvent;
+import org.matsim.contrib.freight.controler.LSPServiceEndEvent;
 import lsp.eventhandlers.LSPServiceEndEventHandler;
 
 public class TipEventHandler implements LSPServiceEndEventHandler {

@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import lsp.events.LSPEventUtils;
+import org.matsim.contrib.freight.controler.LSPEventUtils;
 import lsp.resources.LSPResource;
 
 public class MainRunLSPMobsimTest {
