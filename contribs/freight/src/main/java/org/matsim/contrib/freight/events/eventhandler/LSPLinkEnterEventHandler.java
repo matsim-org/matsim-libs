@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.eventhandler;
+package org.matsim.contrib.freight.events.eventhandler;
 
 import org.matsim.core.events.handler.EventHandler;
 
