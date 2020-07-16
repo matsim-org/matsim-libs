@@ -108,5 +108,6 @@ env:
      - MODULE=contribs/hybridsim
      - MODULE=contribs/otfvis
      - MODULE=contribs/osm
+     - MODULE=contribs/discrete_mode_choice
   global:
     - MAVEN_OPTS="-Xmx2g"

@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.discrete_mode_choice.test_utils.PlanBuilder;
@@ -21,9 +20,9 @@ import org.matsim.contribs.discrete_mode_choice.components.tour_finder.TourFinde
 import org.matsim.contribs.discrete_mode_choice.components.utils.home_finder.FirstActivityHomeFinder;
 import org.matsim.contribs.discrete_mode_choice.components.utils.home_finder.HomeFinder;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel;
-import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.FallbackBehaviour;
 import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceModel.NoFeasibleChoiceException;
+import org.matsim.contribs.discrete_mode_choice.model.DiscreteModeChoiceTrip;
 import org.matsim.contribs.discrete_mode_choice.model.constraints.CompositeTourConstraintFactory;
 import org.matsim.contribs.discrete_mode_choice.model.filters.CompositeTourFilter;
 import org.matsim.contribs.discrete_mode_choice.model.mode_availability.CarModeAvailability;
@@ -40,6 +39,8 @@ import org.matsim.contribs.discrete_mode_choice.model.utilities.RandomSelector;
 import org.matsim.contribs.discrete_mode_choice.model.utilities.UtilitySelectorFactory;
 import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.EndTimeThenDurationInterpreter;
 import org.matsim.contribs.discrete_mode_choice.replanning.time_interpreter.TimeInterpreter;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
@@ -362,11 +363,12 @@ public class SubtourModeChoiceReplacementTest {
 			boolean considerCarAvailability, boolean allowSingleLegs, int samples) {
 		double singleLegProbability = allowSingleLegs ? 0.5 : 0.0;
 
-		String[] availableModes = modes.toArray(new String[] {});
-		String[] chainBasedModes = constrainedModes.toArray(new String[] {});
-
-		PermissibleModesCalculator permissibleModesCalculator = new PermissibleModesCalculatorImpl(availableModes,
-				considerCarAvailability);
+		String[] availableModes = modes.toArray(new String[]{});
+		String[] chainBasedModes = constrainedModes.toArray(new String[]{});
+		Config config = ConfigUtils.createConfig();
+		config.subtourModeChoice().setModes(availableModes);
+		config.subtourModeChoice().setConsiderCarAvailability(considerCarAvailability);
+		PermissibleModesCalculator permissibleModesCalculator = new PermissibleModesCalculatorImpl(config);
 		Random rng = new Random(0);
 		SubtourModeChoice.Behavior behavior = SubtourModeChoice.Behavior.fromSpecifiedModesToSpecifiedModes;
 
