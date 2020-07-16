@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.events;
+package org.matsim.contrib.freight.events.eventsCreator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;

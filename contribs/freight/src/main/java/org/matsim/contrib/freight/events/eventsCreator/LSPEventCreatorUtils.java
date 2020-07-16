@@ -1,9 +1,9 @@
-package org.matsim.contrib.freight.events;
+package org.matsim.contrib.freight.events.eventsCreator;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public final class LSPEventUtils {
+public final class LSPEventCreatorUtils {
 
 	public static Collection<LSPEventCreator> getStandardEventCreators(){
 		ArrayList<LSPEventCreator> creators = new ArrayList<>();
