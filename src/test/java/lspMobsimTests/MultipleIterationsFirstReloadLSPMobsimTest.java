@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import lsp.events.EventUtils;
+import lsp.events.LSPEventUtils;
 import lsp.resources.Resource;
 
 public class MultipleIterationsFirstReloadLSPMobsimTest {
@@ -197,7 +197,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);

@@ -1,16 +1,16 @@
 package lsp.usecase;
 
+import lsp.eventhandlers.LSPServiceEndEventHandler;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import lsp.events.ServiceEndEvent;
-import lsp.eventhandlers.ServiceEndEventHandler;
+import lsp.events.LSPServiceEndEvent;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 
-class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
+class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
@@ -32,14 +32,14 @@ class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
 	}
 
 	@Override
-	public void handleEvent(ServiceEndEvent event) {
+	public void handleEvent(LSPServiceEndEvent event) {
 		if(event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()){
 			logTransport(event);
 			logLoad(event);
 		}	
 	}
 
-	private void logLoad(ServiceEndEvent event){
+	private void logLoad(LSPServiceEndEvent event){
 		ShipmentUtils.LoggedShipmentLoadBuilder builder  =  ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setStartTime(event.getTime() - event.getService().getServiceDuration());
 		builder.setEndTime(event.getTime());
@@ -53,7 +53,7 @@ class CollectionServiceEndEventHandler implements ServiceEndEventHandler {
 		lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentLoad);
 	}
 
-	private void logTransport(ServiceEndEvent event){
+	private void logTransport(LSPServiceEndEvent event){
 		ShipmentUtils.LoggedShipmentTransportBuilder builder  =  ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setLogisticsSolutionElement(solutionElement);

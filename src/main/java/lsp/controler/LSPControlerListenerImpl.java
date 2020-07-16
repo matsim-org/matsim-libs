@@ -31,7 +31,7 @@ import lsp.LSPPlan;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
-import lsp.events.EventCreator;
+import lsp.events.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.resources.CarrierResource;
 import lsp.scoring.LSPScoringModule;
@@ -47,7 +47,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 	private LSPs lsps;
 	private LSPReplanningModule replanningModule;
 	private LSPScoringModule scoringModule;
-	private Collection<EventCreator> creators;
+	private Collection<LSPEventCreator> creators;
 	
 	private ArrayList <EventHandler> registeredHandlers;
 	
@@ -56,7 +56,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 	@Inject Network network;
 
 	
-	@Inject LSPControlerListenerImpl( LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators ) {
+	@Inject LSPControlerListenerImpl( LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators ) {
 	        this.lsps = lsps;
 	        this.replanningModule = replanningModule;
 	        this.scoringModule = scoringModule;

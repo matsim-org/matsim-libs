@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import lsp.events.EventUtils;
+import lsp.events.LSPEventUtils;
 import lsp.resources.Resource;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
@@ -176,7 +176,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		Controler controler = new Controler(config);
 
 		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps),
-				EventUtils.getStandardEventCreators());
+				LSPEventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);

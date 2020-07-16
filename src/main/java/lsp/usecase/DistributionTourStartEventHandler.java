@@ -7,12 +7,12 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import lsp.events.TourStartEvent;
-import lsp.eventhandlers.TourStartEventHandler;
+import lsp.events.LSPTourStartEvent;
+import lsp.eventhandlers.LSPTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 
-/*package-private*/  class DistributionTourStartEventHandler implements TourStartEventHandler {
+/*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
@@ -34,7 +34,7 @@ import lsp.resources.CarrierResource;
 	}
 
 	@Override
-	public void handleEvent(TourStartEvent event) {
+	public void handleEvent(LSPTourStartEvent event) {
 		for(TourElement tourElement : event.getTour().getTourElements()){
 			if(tourElement instanceof ServiceActivity){
 				ServiceActivity serviceActivity = (ServiceActivity) tourElement;
@@ -47,7 +47,7 @@ import lsp.resources.CarrierResource;
 
 	}
 
-	private void logLoad(TourStartEvent event){
+	private void logLoad(LSPTourStartEvent event){
 		ShipmentUtils.LoggedShipmentLoadBuilder builder = ShipmentUtils.LoggedShipmentLoadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getTour().getStartLinkId());
@@ -61,7 +61,7 @@ import lsp.resources.CarrierResource;
 		lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentLoad);
 	}
 	
-	private void logTransport(TourStartEvent event){
+	private void logTransport(LSPTourStartEvent event){
 		ShipmentUtils.LoggedShipmentTransportBuilder builder = ShipmentUtils.LoggedShipmentTransportBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setFromLinkId(event.getTour().getStartLinkId());

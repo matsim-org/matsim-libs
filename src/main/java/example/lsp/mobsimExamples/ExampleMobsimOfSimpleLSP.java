@@ -30,7 +30,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import lsp.events.EventUtils;
+import lsp.events.LSPEventUtils;
 import lsp.resources.Resource;
 
 /*package-private*/ class ExampleMobsimOfSimpleLSP {
@@ -168,7 +168,7 @@ import lsp.resources.Resource;
 		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventUtils.getStandardEventCreators());
 		
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(module);

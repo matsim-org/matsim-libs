@@ -33,7 +33,7 @@ import org.matsim.vehicles.VehicleType;
 
 
 import lsp.controler.LSPModule;
-import lsp.events.EventUtils;
+import lsp.events.LSPEventUtils;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
 
@@ -182,7 +182,7 @@ import lsp.shipment.LSPShipment;
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), EventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventUtils.getStandardEventCreators());
 
 	  //Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);

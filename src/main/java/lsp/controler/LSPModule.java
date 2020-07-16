@@ -2,7 +2,7 @@ package lsp.controler;
 
 import com.google.inject.Provides;
 import lsp.LSPs;
-import lsp.events.EventCreator;
+import lsp.events.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -17,11 +17,11 @@ public class LSPModule extends AbstractModule {
 	private LSPs lsps;
 	private LSPReplanningModule replanningModule;
 	private LSPScoringModule scoringModule;
-	private Collection<EventCreator> creators;
+	private Collection<LSPEventCreator> creators;
 	
 	private FreightConfigGroup carrierConfig = new FreightConfigGroup();
 	
-	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators) {
+	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators) {
 	   this.lsps = lsps;
 	   this.replanningModule = replanningModule;
 	   this.scoringModule = scoringModule;
@@ -46,7 +46,7 @@ public class LSPModule extends AbstractModule {
 	}
 
 	@Provides
-	Collection<EventCreator> provideEventCreators(){
+	Collection<LSPEventCreator> provideEventCreators(){
 		return this.creators;
 	}
 	

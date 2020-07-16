@@ -5,17 +5,17 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 
-import lsp.events.FreightLinkEnterEvent;
-import lsp.events.FreightLinkLeaveEvent;
+import lsp.events.LSPFreightLinkEnterEvent;
+import lsp.events.LSPFreightLinkLeaveEvent;
 import lsp.eventhandlers.LSPLinkLeaveEventHandler;
-import lsp.events.FreightVehicleLeavesTrafficEvent;
+import lsp.events.LSPFreightVehicleLeavesTrafficEvent;
 import lsp.eventhandlers.LSPVehicleLeavesTrafficEventHandler;
 import lsp.eventhandlers.LSPLinkEnterEventHandler;
 
 
 /*package-private*/ class DistanceAndTimeHandler implements LSPLinkEnterEventHandler, LSPVehicleLeavesTrafficEventHandler, LSPLinkLeaveEventHandler{
 
-	private Collection<FreightLinkEnterEvent> events;
+	private Collection<LSPFreightLinkEnterEvent> events;
 	private double distanceCosts;
 	private double timeCosts;
 	private Network network;
@@ -27,7 +27,7 @@ import lsp.eventhandlers.LSPLinkEnterEventHandler;
 	
 	
 	@Override
-	public void handleEvent(FreightLinkEnterEvent event) {
+	public void handleEvent(LSPFreightLinkEnterEvent event) {
 		events.add(event);
 		
 	}
@@ -39,8 +39,8 @@ import lsp.eventhandlers.LSPLinkEnterEventHandler;
 
 
 	@Override
-	public void handleEvent(FreightVehicleLeavesTrafficEvent leaveEvent) {
-		for(FreightLinkEnterEvent enterEvent : events) {
+	public void handleEvent(LSPFreightVehicleLeavesTrafficEvent leaveEvent) {
+		for(LSPFreightLinkEnterEvent enterEvent : events) {
 			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) && 
 			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
 				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();
@@ -55,8 +55,8 @@ import lsp.eventhandlers.LSPLinkEnterEventHandler;
 
 
 	@Override
-	public void handleEvent(FreightLinkLeaveEvent leaveEvent) {
-		for(FreightLinkEnterEvent enterEvent : events) {
+	public void handleEvent(LSPFreightLinkLeaveEvent leaveEvent) {
+		for(LSPFreightLinkEnterEvent enterEvent : events) {
 			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) &&
 			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
 				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();

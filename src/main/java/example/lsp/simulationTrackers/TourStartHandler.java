@@ -1,9 +1,9 @@
 package example.lsp.simulationTrackers;
 
-import lsp.events.TourStartEvent;
-import lsp.eventhandlers.TourStartEventHandler;
+import lsp.events.LSPTourStartEvent;
+import lsp.eventhandlers.LSPTourStartEventHandler;
 
-/*package-private*/ class TourStartHandler implements TourStartEventHandler{
+/*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {
 
 	private double vehicleFixedCosts;
 		
@@ -13,7 +13,7 @@ import lsp.eventhandlers.TourStartEventHandler;
 	}
 
 	@Override
-	public void handleEvent(TourStartEvent event) {
+	public void handleEvent(LSPTourStartEvent event) {
 		vehicleFixedCosts = vehicleFixedCosts + event.getVehicle().getVehicleType().getCostInformation().getFix();
 	}
 
