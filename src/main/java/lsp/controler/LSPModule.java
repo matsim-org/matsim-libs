@@ -2,7 +2,7 @@ package lsp.controler;
 
 import com.google.inject.Provides;
 import lsp.LSPs;
-import org.matsim.contrib.freight.events.LSPEventCreator;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
