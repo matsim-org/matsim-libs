@@ -3,11 +3,11 @@ package example.lsp.simulationTrackers;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.contrib.freight.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 import org.matsim.contrib.freight.events.LSPServiceStartEvent;
-import org.matsim.contrib.freight.eventhandler.LSPServiceStartEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 
 
