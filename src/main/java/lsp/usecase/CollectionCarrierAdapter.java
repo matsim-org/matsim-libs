@@ -15,7 +15,7 @@ import lsp.functions.Info;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import lsp.controler.SimulationTracker;
+import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class CollectionCarrierAdapter implements CarrierResource {
 
@@ -27,7 +27,7 @@ import lsp.controler.SimulationTracker;
 	private Network network;
 	private Collection<EventHandler> eventHandlers;
 	private Collection<Info> infos;
-	private Collection<SimulationTracker> trackers;
+	private Collection<LSPSimulationTracker> trackers;
 	private EventsManager eventsManager;
 
 	CollectionCarrierAdapter(UsecaseUtils.CollectionCarrierAdapterBuilder builder){
@@ -39,7 +39,7 @@ import lsp.controler.SimulationTracker;
 		this.network = builder.network;
 		this.eventHandlers = new ArrayList<EventHandler>();
 		this.infos = new ArrayList<Info>();
-		this.trackers = new ArrayList<SimulationTracker>();
+		this.trackers = new ArrayList<LSPSimulationTracker>();
 	}
 	
 	
@@ -111,7 +111,7 @@ import lsp.controler.SimulationTracker;
 
 	
 	@Override
-	public void addSimulationTracker(SimulationTracker tracker) {
+	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 		this.infos.addAll(tracker.getInfos());		
@@ -119,7 +119,7 @@ import lsp.controler.SimulationTracker;
 
 
 	@Override
-	public Collection<SimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
 	}
 

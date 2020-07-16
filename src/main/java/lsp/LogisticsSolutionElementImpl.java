@@ -9,7 +9,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.Info;
 import lsp.resources.Resource;
-import lsp.controler.SimulationTracker;
+import lsp.controler.LSPSimulationTracker;
 
 
 
@@ -24,7 +24,7 @@ import lsp.controler.SimulationTracker;
 	private WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
 	private Collection<Info> infos;
-	private Collection<SimulationTracker> trackers;
+	private Collection<LSPSimulationTracker> trackers;
 	private Collection<EventHandler> handlers;
 	private EventsManager eventsManager;
 
@@ -97,7 +97,7 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public void addSimulationTracker(SimulationTracker tracker) {
+	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		trackers.add(tracker);
 		infos.addAll(tracker.getInfos());
 		handlers.addAll(tracker.getEventHandlers());
@@ -113,7 +113,7 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public Collection<SimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
 	}
 

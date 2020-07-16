@@ -8,9 +8,9 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
-import lsp.controler.SimulationTracker;
+import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class LinearCostTracker implements SimulationTracker{
+/*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
 
 	private Collection<EventHandler> eventHandlers;
 	private Collection<Info> infos;

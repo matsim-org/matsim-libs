@@ -7,13 +7,13 @@ import org.matsim.api.core.v01.network.Network;
 
 import lsp.events.FreightLinkEnterEvent;
 import lsp.events.FreightLinkLeaveEvent;
-import lsp.eventhandlers.FreightLinkLeaveEventHandler;
+import lsp.eventhandlers.LSPLinkLeaveEventHandler;
 import lsp.events.FreightVehicleLeavesTrafficEvent;
-import lsp.eventhandlers.FreightVehicleLeavesTrafficEventHandler;
-import lsp.eventhandlers.FreightLinkEnterEventHandler;
+import lsp.eventhandlers.LSPVehicleLeavesTrafficEventHandler;
+import lsp.eventhandlers.LSPLinkEnterEventHandler;
 
 
-/*package-private*/ class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, FreightVehicleLeavesTrafficEventHandler, FreightLinkLeaveEventHandler {
+/*package-private*/ class DistanceAndTimeHandler implements LSPLinkEnterEventHandler, LSPVehicleLeavesTrafficEventHandler, LSPLinkLeaveEventHandler{
 
 	private Collection<FreightLinkEnterEvent> events;
 	private double distanceCosts;

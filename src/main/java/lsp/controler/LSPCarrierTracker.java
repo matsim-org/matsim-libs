@@ -37,28 +37,28 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import lsp.events.EventCreator;
-import lsp.controler.CarrierResourceAgent.CarrierDriverAgent;
+import lsp.controler.LSPCarrierAgent.CarrierDriverAgent;
 
 
 
-public final class CarrierResourceTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+public final class LSPCarrierTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		       LinkEnterEventHandler,
  LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler,  PersonLeavesVehicleEventHandler{
 
 	
-	private final FreightControlerListener listener;
+	private final LSPFreightControlerListener listener;
 	
 	private final Carriers carriers;
 
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private final Collection<CarrierResourceAgent> carrierResourceAgents = new ArrayList<CarrierResourceAgent>();
+	private final Collection<LSPCarrierAgent> carrierResourceAgents = new ArrayList<LSPCarrierAgent>();
 	
-	private final Map<Id<Person>, CarrierResourceAgent> driverAgentMap = new HashMap<Id<Person>, CarrierResourceAgent>();
+	private final Map<Id<Person>, LSPCarrierAgent> driverAgentMap = new HashMap<Id<Person>, LSPCarrierAgent>();
 
 	private final Collection<EventCreator> eventCreators;
 	
-	public CarrierResourceTracker(Carriers carriers, Network network,  FreightControlerListener listener, Collection<EventCreator> creators) {
+	public LSPCarrierTracker( Carriers carriers, Network network, LSPFreightControlerListener listener, Collection<EventCreator> creators ) {
 		this.carriers = carriers;
 		this.eventCreators = creators;
 		createCarrierResourceAgents();
@@ -67,7 +67,7 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 
 	private void createCarrierResourceAgents() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			CarrierResourceAgent carrierResourceAgent = new CarrierResourceAgent(this, carrier, delegate);
+			LSPCarrierAgent carrierResourceAgent = new LSPCarrierAgent(this, carrier, delegate);
 			carrierResourceAgents.add(carrierResourceAgent);
 		}
 	}
@@ -78,10 +78,10 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 	 * @return collection of plans
 	 * @see Plan , CarrierPlan
 	 */
-	public Collection<MobSimVehicleRoute> createPlans() {
-		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<>();
-		for (CarrierResourceAgent carrierResourceAgent : carrierResourceAgents) {
-			List<MobSimVehicleRoute> plansForCarrier = carrierResourceAgent.createFreightDriverPlans();
+	public Collection<LSPMobSimVehicleRoute> createPlans() {
+		List<LSPMobSimVehicleRoute> vehicleRoutes = new ArrayList<>();
+		for ( LSPCarrierAgent carrierResourceAgent : carrierResourceAgents) {
+			List<LSPMobSimVehicleRoute> plansForCarrier = carrierResourceAgent.createFreightDriverPlans();
 			vehicleRoutes.addAll(plansForCarrier);
 		}
 		return vehicleRoutes;
@@ -107,21 +107,21 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 		
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(delegate.getDriverOfVehicle(event.getVehicleId()));
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(delegate.getDriverOfVehicle(event.getVehicleId() ) );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
@@ -129,23 +129,23 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
-	private CarrierResourceAgent getCarrierResourceAgent(Id<Person> driverId) {
+	private LSPCarrierAgent getCarrierResourceAgent( Id<Person> driverId ) {
 		if(driverAgentMap.containsKey(driverId)){
 			return driverAgentMap.get(driverId);
 		}
-		for(CarrierResourceAgent ca : carrierResourceAgents){
+		for( LSPCarrierAgent ca : carrierResourceAgents){
 			if(ca.getDriverIds().contains(driverId)){
 				driverAgentMap.put(driverId, ca);
 				return ca;
@@ -155,7 +155,7 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 	}
 	
 	public CarrierDriverAgent getDriver(Id<Person> driverId){
-		CarrierResourceAgent carrierAgent = getCarrierResourceAgent(driverId);
+		LSPCarrierAgent carrierAgent = getCarrierResourceAgent(driverId );
 		if(carrierAgent == null) throw new IllegalStateException("missing carrier agent. cannot find carrierAgent to driver " + driverId);
 		return carrierAgent.getDriver(driverId);
 	}
@@ -163,7 +163,7 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
@@ -171,28 +171,28 @@ public final class CarrierResourceTracker implements ActivityStartEventHandler, 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(delegate.getDriverOfVehicle(event.getVehicleId()));
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(delegate.getDriverOfVehicle(event.getVehicleId() ) );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);	
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		CarrierResourceAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId());
+		LSPCarrierAgent carrierResourceAgent = getCarrierResourceAgent(event.getPersonId() );
 		if(carrierResourceAgent == null) return;
 		carrierResourceAgent.handleEvent(event);
 	}

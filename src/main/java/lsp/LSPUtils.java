@@ -4,7 +4,7 @@ import lsp.functions.Info;
 import lsp.replanning.LSPReplanner;
 import lsp.resources.Resource;
 import lsp.scoring.LSPScorer;
-import lsp.controler.SimulationTracker;
+import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -85,7 +85,7 @@ public class LSPUtils{
 		Collection<LogisticsSolutionElement> elements;
 		Collection<Info> solutionInfos;
 		Collection<EventHandler> eventHandlers;
-		Collection<SimulationTracker>trackers;
+		Collection<LSPSimulationTracker>trackers;
 
 		public static LogisticsSolutionBuilder newInstance( Id<LogisticsSolution>id ){
 			return new LogisticsSolutionBuilder(id);
@@ -95,7 +95,7 @@ public class LSPUtils{
 			this.elements = new ArrayList<LogisticsSolutionElement>();
 			this.solutionInfos = new ArrayList<Info>();
 			this.eventHandlers = new ArrayList<EventHandler>();
-			this.trackers = new ArrayList<SimulationTracker>();
+			this.trackers = new ArrayList<LSPSimulationTracker>();
 			this.id = id;
 		}
 
@@ -114,7 +114,7 @@ public class LSPUtils{
 			return this;
 		}
 
-		public LogisticsSolutionBuilder addTracker( SimulationTracker tracker ) {
+		public LogisticsSolutionBuilder addTracker( LSPSimulationTracker tracker ) {
 			trackers.add(tracker);
 			return this;
 		}

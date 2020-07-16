@@ -11,7 +11,7 @@ import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
 
-public interface SimulationTracker extends AfterMobsimListener {
+public interface LSPSimulationTracker extends AfterMobsimListener {
 
 	public Collection<EventHandler> getEventHandlers();
 	public Collection<Info> getInfos();

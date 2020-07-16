@@ -43,16 +43,15 @@ import javax.inject.Inject;
 import java.util.Collection;
 
 @Deprecated public // replace by something that just adds the necessary elements to the default mobsim, rather than replacing the mobsim.  kai/kai, jun'20
-class FreightQSimFactory implements Provider<Mobsim> {
-	private static final Logger log = Logger.getLogger( FreightQSimFactory.class ) ;
+class LSPQSimFactory implements Provider<Mobsim> {
+	private static final Logger log = Logger.getLogger( LSPQSimFactory.class ) ;
 
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
-	private final CarrierResourceTracker carrierResourceTracker;
+	private final LSPCarrierTracker carrierResourceTracker;
 	private final FreightConfigGroup carrierConfig;
 
-	@Inject
-	FreightQSimFactory( Scenario scenario, EventsManager eventsManager, CarrierResourceTracker carrierResourceTracker, FreightConfigGroup carrierConfig ) {
+	@Inject LSPQSimFactory( Scenario scenario, EventsManager eventsManager, LSPCarrierTracker carrierResourceTracker, FreightConfigGroup carrierConfig ) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.carrierResourceTracker = carrierResourceTracker;
@@ -65,8 +64,8 @@ class FreightQSimFactory implements Provider<Mobsim> {
 		qSimBuilder.useDefaults() ;
 		final QSim sim = qSimBuilder.build(scenario, eventsManager);
 		
-		Collection<MobSimVehicleRoute> vRoutes = carrierResourceTracker.createPlans();
-		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
+		Collection<LSPMobSimVehicleRoute> vRoutes = carrierResourceTracker.createPlans();
+		LSPAgentSource agentSource = new LSPAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);
 		if (carrierConfig.getTimeWindowHandling()!= TimeWindowHandling.ignore) {
 			log.warn("You are requesting (per config) something different from TimeWindowHandling.ignore, but have no implementation for this.  Throwing an " +

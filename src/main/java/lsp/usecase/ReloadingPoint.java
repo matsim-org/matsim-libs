@@ -11,7 +11,7 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.functions.Info;
 import lsp.LogisticsSolutionElement;
 import lsp.resources.Resource;
-import lsp.controler.SimulationTracker;
+import lsp.controler.LSPSimulationTracker;
 
 /*package-private*/ class ReloadingPoint implements Resource {
 
@@ -21,7 +21,7 @@ import lsp.controler.SimulationTracker;
 	private ArrayList <LogisticsSolutionElement> clientElements;
 	private ArrayList<EventHandler> eventHandlers;
 	private Collection<Info> infos;
-	private Collection<SimulationTracker> trackers;
+	private Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
 	private EventsManager eventsManager;
 
@@ -35,7 +35,7 @@ import lsp.controler.SimulationTracker;
 		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<EventHandler>();
 		this.infos = new ArrayList<Info>();
-		this.trackers = new ArrayList<SimulationTracker>();
+		this.trackers = new ArrayList<LSPSimulationTracker>();
 		eventHandlers.add(eventHandler);
 	}
 	
@@ -87,14 +87,14 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public void addSimulationTracker(SimulationTracker tracker) {
+	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 		this.infos.addAll(tracker.getInfos());	
 	}
 
 	@Override
-	public Collection<SimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
 	}
 

@@ -40,9 +40,9 @@ public class LSPModule extends AbstractModule {
 			 bind(LSPScoringModule.class).toInstance(scoringModule);
 		}
 		
-		bind(LSPControlerListener.class).asEagerSingleton();
-		addControlerListenerBinding().to(LSPControlerListener.class);
-		bindMobsim().toProvider(FreightQSimFactory.class);
+		bind( LSPControlerListenerImpl.class ).asEagerSingleton();
+		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
+		bindMobsim().toProvider( LSPQSimFactory.class );
 	}
 
 	@Provides
@@ -51,7 +51,7 @@ public class LSPModule extends AbstractModule {
 	}
 	
 	@Provides
-    CarrierResourceTracker provideCarrierResourceTracker(LSPControlerListener lSPControlerListener) {
+	LSPCarrierTracker provideCarrierResourceTracker( LSPControlerListenerImpl lSPControlerListener ) {
         return lSPControlerListener.getCarrierResourceTracker();
     }
 

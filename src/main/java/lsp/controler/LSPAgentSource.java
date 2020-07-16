@@ -47,11 +47,11 @@ import org.matsim.vehicles.VehicleUtils;
  * this template use File | Settings | File Templates.
  * 
  */
-class FreightAgentSource implements AgentSource {
+class LSPAgentSource implements AgentSource {
 
-	private static Logger log = Logger.getLogger(FreightAgentSource.class);
+	private static Logger log = Logger.getLogger( LSPAgentSource.class );
 	
-	private Collection<MobSimVehicleRoute> vehicleRoutes;
+	private Collection<LSPMobSimVehicleRoute> vehicleRoutes;
 	
 	private Collection<MobsimAgent> mobSimAgents;
 
@@ -59,7 +59,7 @@ class FreightAgentSource implements AgentSource {
 
 	private QSim qsim;
 
-	FreightAgentSource( Collection<MobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim ) {
+	LSPAgentSource( Collection<LSPMobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim ) {
 		this.vehicleRoutes = vehicleRoutes;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
@@ -68,7 +68,7 @@ class FreightAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for ( MobSimVehicleRoute vRoute : vehicleRoutes) {
+		for ( LSPMobSimVehicleRoute vRoute : vehicleRoutes) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
 			Vehicle vehicle = null;
 			if(vRoute.getVehicle() == null){

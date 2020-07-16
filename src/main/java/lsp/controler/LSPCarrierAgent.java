@@ -51,7 +51,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
-class CarrierResourceAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, LinkLeaveEventHandler, 
+class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, LinkLeaveEventHandler,
 							VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, PersonLeavesVehicleEventHandler {
 
 	
@@ -204,7 +204,7 @@ class CarrierResourceAgent implements ActivityStartEventHandler, ActivityEndEven
 
 	private final Carrier carrier;
 
-	private final CarrierResourceTracker tracker;
+	private final LSPCarrierTracker tracker;
 
 	private Collection<Id<Person>> driverIds = new ArrayList<>();
 
@@ -216,7 +216,7 @@ class CarrierResourceAgent implements ActivityStartEventHandler, ActivityEndEven
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 
-	CarrierResourceAgent(CarrierResourceTracker carrierResourceTracker, Carrier carrier, Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
+	LSPCarrierAgent( LSPCarrierTracker carrierResourceTracker, Carrier carrier, Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
 		this.tracker = carrierResourceTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
@@ -235,11 +235,11 @@ class CarrierResourceAgent implements ActivityStartEventHandler, ActivityEndEven
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
-	List<MobSimVehicleRoute> createFreightDriverPlans() {
+	List<LSPMobSimVehicleRoute> createFreightDriverPlans() {
 		clear();
 		System.out.flush();
 		System.err.flush() ;
-		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
+		List<LSPMobSimVehicleRoute> routes = new ArrayList<LSPMobSimVehicleRoute>();
 		//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
@@ -277,7 +277,7 @@ class CarrierResourceAgent implements ActivityStartEventHandler, ActivityEndEven
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			MobSimVehicleRoute mobsimRoute = new MobSimVehicleRoute(plan, vehicle);
+			LSPMobSimVehicleRoute mobsimRoute = new LSPMobSimVehicleRoute(plan, vehicle);
 			routes.add(mobsimRoute);
 			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
