@@ -122,7 +122,7 @@ public class DistributionAdapterTest {
 					ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 					if(vehicles.size() == 1) {
 						assertTrue(vehicles.get(0) == distributionCarrierVehicle);
-						assertTrue(distributionCarrierVehicle.getVehicleType() == distributionType);
+						assertTrue(distributionCarrierVehicle.getType() == distributionType);
 						assertTrue(distributionCarrierVehicle.getLocation() == distributionLinkId);
 					}
 				}

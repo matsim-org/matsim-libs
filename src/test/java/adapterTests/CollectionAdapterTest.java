@@ -121,7 +121,7 @@ public class CollectionAdapterTest {
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertTrue(vehicles.get(0) == collectionCarrierVehicle);
-					assertTrue(collectionCarrierVehicle.getVehicleType() == collectionType);
+					assertTrue(collectionCarrierVehicle.getType() == collectionType);
 					assertTrue(collectionCarrierVehicle.getLocation() == collectionLinkId);
 				}
 			}

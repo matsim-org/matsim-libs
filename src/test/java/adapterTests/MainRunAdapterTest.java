@@ -123,7 +123,7 @@ public class MainRunAdapterTest {
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertTrue(vehicles.get(0) == carrierVehicle);
-					assertTrue(carrierVehicle.getVehicleType() == mainRunType);
+					assertTrue(carrierVehicle.getType() == mainRunType);
 					assertTrue(carrierVehicle.getLocation() == fromLinkId);
 				}
 			}

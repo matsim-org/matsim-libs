@@ -9,6 +9,7 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.events.LSPServiceStartEvent;
 import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
 import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.vehicles.Vehicle;
 
 
 /*package-private*/ class CollectionServiceHandler implements LSPServiceStartEventHandler, LSPServiceEndEventHandler {
@@ -56,7 +57,7 @@ import org.matsim.contrib.freight.events.LSPServiceEndEvent;
 		for(ServiceTuple tuple : tuples) {
 			if(tuple.getService() == event.getService()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
-				loadingCosts = serviceDuration * event.getVehicle().getVehicleType().getCostInformation().getPerTimeUnit();
+				loadingCosts = serviceDuration * ((Vehicle) event.getVehicle()).getType().getCostInformation().getPerTimeUnit();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
 				tuples.remove(tuple);
 				break;
