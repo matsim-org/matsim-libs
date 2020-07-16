@@ -1,6 +1,6 @@
 package example.lsp.simulationTrackers;
 
-import org.matsim.contrib.freight.controler.LSPTourStartEvent;
+import org.matsim.contrib.freight.events.LSPTourStartEvent;
 import lsp.eventhandlers.LSPTourStartEventHandler;
 
 /*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {

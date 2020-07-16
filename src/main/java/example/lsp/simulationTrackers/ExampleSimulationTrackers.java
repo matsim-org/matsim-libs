@@ -30,7 +30,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.controler.LSPEventUtils;
+import org.matsim.contrib.freight.events.LSPEventUtils;
 import lsp.functions.LSPInfo;
 import lsp.functions.LSPInfoFunctionValue;
 import lsp.resources.LSPResource;
