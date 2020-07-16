@@ -173,7 +173,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	
 	
 	/*
-	* this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
+	* this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
 	* the counters for all possible combinations of avg, stop go and free flow speed are tested
 	* for the case: > s&g speed, <ff speed ; the different ComputationMethods are tested as well
 	 */
