@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Random;
 
+import demand.decoratedLSP.*;
 import lsp.*;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
@@ -25,11 +26,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import demand.decoratedLSP.LSPDecorator;
-import demand.decoratedLSP.LSPPlanDecorator;
-import demand.decoratedLSP.LSPPlanWithOfferTransferrer;
-import demand.decoratedLSP.LSPWithOffers;
-import demand.decoratedLSP.LogisticsSolutionWithOffers;
 import demand.demandObject.DemandObject;
 import demand.demandObject.DemandObjectImpl;
 import demand.offer.Offer;
@@ -40,8 +36,8 @@ import lsp.shipment.Requirement;
 
 public class TransferrerRequirementsTest {
 	private Network network;
-	private LogisticsSolutionWithOffers blueOfferSolution;
-	private LogisticsSolutionWithOffers redOfferSolution;
+	private LogisticsSolutionDecorator blueOfferSolution;
+	private LogisticsSolutionDecorator redOfferSolution;
 	private OfferTransferrer transferrer;
 	private LSPPlanDecorator collectionPlan;
 	private LSPDecorator offerLSP;
@@ -91,7 +87,7 @@ public class TransferrerRequirementsTest {
 		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
 		
 		Id<LogisticsSolution> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionWithOffers.Builder redOfferSolutionBuilder = LogisticsSolutionWithOffers.Builder.newInstance(redCollectionSolutionId);
+		DecoratedLSPUtils.LogisticsSolutionDecoratorImpl_wOffersBuilder redOfferSolutionBuilder = DecoratedLSPUtils.LogisticsSolutionDecoratorImpl_wOffersBuilder.newInstance(redCollectionSolutionId);
 		redOfferSolutionBuilder.addSolutionElement(redCollectionElement);
 		redOfferSolution = redOfferSolutionBuilder.build();
 		redOfferSolution.getInfos().add(new RedInfo());
@@ -128,7 +124,7 @@ public class TransferrerRequirementsTest {
 		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
 		
 		Id<LogisticsSolution> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionWithOffers.Builder blueOfferSolutionBuilder = LogisticsSolutionWithOffers.Builder.newInstance(blueCollectionSolutionId);
+		DecoratedLSPUtils.LogisticsSolutionDecoratorImpl_wOffersBuilder blueOfferSolutionBuilder = DecoratedLSPUtils.LogisticsSolutionDecoratorImpl_wOffersBuilder.newInstance(blueCollectionSolutionId);
 		blueOfferSolutionBuilder.addSolutionElement(blueCollectionElement);
 		blueOfferSolution = blueOfferSolutionBuilder.build();
 		blueOfferSolution.getInfos().add(new BlueInfo());
