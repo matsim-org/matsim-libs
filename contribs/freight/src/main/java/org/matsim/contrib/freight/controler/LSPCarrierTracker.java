@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.events.LSPEventCreator;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.contrib.freight.controler.LSPCarrierAgent.CarrierDriverAgent;
 

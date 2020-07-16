@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;

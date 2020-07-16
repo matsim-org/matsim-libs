@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.controler;
+package org.matsim.contrib.freight.events;
 
 import java.util.Map;
 
