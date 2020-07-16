@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 
-public final class LSPShipmentPickedUpEventCreator implements LSPEventCreator {
+/*package-private*/  final class LSPShipmentPickedUpEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,

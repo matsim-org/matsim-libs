@@ -10,7 +10,7 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-public final class LSPServiceStartEventCreator implements LSPEventCreator {
+/*package-private*/  final class LSPServiceStartEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,

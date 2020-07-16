@@ -9,7 +9,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 
-public final class LSPTourEndEventCreator implements LSPEventCreator {
+/*package-private*/ final class LSPTourEndEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,

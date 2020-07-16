@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 
-public final class LSPFreightLinkEnterEventCreator implements LSPEventCreator {
+/*package-private*/ final class LSPFreightLinkEnterEventCreator implements LSPEventCreator {
 
 	@Override
 	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
