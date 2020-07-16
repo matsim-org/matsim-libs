@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.LSPCarrierTracker;
-import org.matsim.contrib.freight.controler.LSPEventCreator;
+import org.matsim.contrib.freight.events.LSPEventCreator;
 import org.matsim.contrib.freight.controler.LSPFreightControlerListener;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
