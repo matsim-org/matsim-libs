@@ -1,6 +1,6 @@
 package lsp.shipment;
 
-import demand.utilityFunctions.UtilityFunction;
+import demand.UtilityFunction;
 import lsp.LogisticsSolutionElement;
 import lsp.functions.Info;
 import lsp.resources.Resource;
