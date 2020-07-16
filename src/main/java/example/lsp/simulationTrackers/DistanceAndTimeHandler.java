@@ -7,10 +7,10 @@ import org.matsim.api.core.v01.network.Network;
 
 import org.matsim.contrib.freight.events.LSPFreightLinkEnterEvent;
 import org.matsim.contrib.freight.events.LSPFreightLinkLeaveEvent;
-import lsp.eventhandlers.LSPLinkLeaveEventHandler;
+import org.matsim.contrib.freight.eventhandler.LSPLinkLeaveEventHandler;
 import org.matsim.contrib.freight.events.LSPFreightVehicleLeavesTrafficEvent;
-import lsp.eventhandlers.LSPVehicleLeavesTrafficEventHandler;
-import lsp.eventhandlers.LSPLinkEnterEventHandler;
+import org.matsim.contrib.freight.eventhandler.LSPVehicleLeavesTrafficEventHandler;
+import org.matsim.contrib.freight.eventhandler.LSPLinkEnterEventHandler;
 
 
 /*package-private*/ class DistanceAndTimeHandler implements LSPLinkEnterEventHandler, LSPVehicleLeavesTrafficEventHandler, LSPLinkLeaveEventHandler{
