@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
-import lsp.resources.Resource;
+import lsp.functions.LSPInfo;
+import lsp.resources.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
 
@@ -19,11 +19,11 @@ import lsp.controler.LSPSimulationTracker;
 	//die beiden nicht im Builder. Die koennen erst in der Solution als ganzes gesetzt werden
 	private LogisticsSolutionElement previousElement;
 	private LogisticsSolutionElement nextElement;
-	private Resource resource;
+	private LSPResource resource;
 	private WaitingShipments incomingShipments;
 	private WaitingShipments outgoingShipments;
 	private LogisticsSolution solution;
-	private Collection<Info> infos;
+	private Collection<LSPInfo> infos;
 	private Collection<LSPSimulationTracker> trackers;
 	private Collection<EventHandler> handlers;
 	private EventsManager eventsManager;
@@ -55,7 +55,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Resource getResource() {
+	public LSPResource getResource() {
 		return resource;
 	}
 
@@ -104,7 +104,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 

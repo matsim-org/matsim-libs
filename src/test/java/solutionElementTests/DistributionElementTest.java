@@ -3,7 +3,7 @@ package solutionElementTests;
 import static org.junit.Assert.assertTrue;
 
 import lsp.LSPUtils;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class DistributionElementTest {
 
@@ -33,7 +33,7 @@ public class DistributionElementTest {
 	private CarrierVehicle carrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;
-	private CarrierResource adapter;
+	private LSPCarrierResource adapter;
 	private LogisticsSolutionElement distributionElement;
 	
 	
@@ -69,7 +69,7 @@ public class DistributionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 		
 		
-		Id<Resource> adapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 		builder.setCarrier(carrier);

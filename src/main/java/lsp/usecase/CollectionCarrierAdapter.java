@@ -11,22 +11,22 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class CollectionCarrierAdapter implements CarrierResource {
+/*package-private*/ class CollectionCarrierAdapter implements LSPCarrierResource {
 
-	private Id<Resource>id;
+	private Id<LSPResource>id;
 	private Carrier carrier;
 	private Id<Link> locationLinkId;
 	private ArrayList<LogisticsSolutionElement> clientElements;
 	private CollectionCarrierScheduler collectionScheduler;
 	private Network network;
 	private Collection<EventHandler> eventHandlers;
-	private Collection<Info> infos;
+	private Collection<LSPInfo> infos;
 	private Collection<LSPSimulationTracker> trackers;
 	private EventsManager eventsManager;
 
@@ -38,7 +38,7 @@ import lsp.controler.LSPSimulationTracker;
 		this.carrier = builder.carrier;
 		this.network = builder.network;
 		this.eventHandlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<Info>();
+		this.infos = new ArrayList<LSPInfo>();
 		this.trackers = new ArrayList<LSPSimulationTracker>();
 	}
 	
@@ -83,7 +83,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Id<Resource> getId() {
+	public Id<LSPResource> getId() {
 		return id;
 	}
 
@@ -105,7 +105,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 

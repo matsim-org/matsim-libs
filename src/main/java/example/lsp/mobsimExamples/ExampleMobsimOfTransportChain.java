@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.events.LSPEventUtils;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 /*package-private*/ class ExampleMobsimOfTransportChain {
 
@@ -63,14 +63,14 @@ import lsp.resources.Resource;
 		collectionCarrier.setCarrierCapabilities(capabilities);
 		
 		//The collection adapter i.e. the Resource is created
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(collectionCarrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 		
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -80,7 +80,7 @@ import lsp.resources.Resource;
 
 		
 		//The first reloading adapter i.e. the Resource is created
-        Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
+        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         
@@ -91,7 +91,7 @@ import lsp.resources.Resource;
         
         //The scheduler is added to the Resource and the Resource is created
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         //The SolutionElement for the first reloading point is created
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
@@ -126,7 +126,7 @@ import lsp.resources.Resource;
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
         
 		//The adapter i.e. the main run resource is created
-		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
         UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
@@ -134,7 +134,7 @@ import lsp.resources.Resource;
         
         //The scheduler for the main run Rescource is created and added to the Resource
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-        Resource mainRunAdapter = mainRunAdapterBuilder.build();
+        LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
 
         //The LogisticsSolutionElement for the main run Resource is created
         Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
@@ -144,7 +144,7 @@ import lsp.resources.Resource;
 		
 		
 		//The second reloading adapter i.e. the Resource is created       
-        Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+        Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId, secondReloadingLinkId);
         
@@ -155,7 +155,7 @@ import lsp.resources.Resource;
        
         //The scheduler is added to the Resource and the Resource is created
         secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
-        Resource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
+        LSPResource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
         
         //The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
         Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);
@@ -189,14 +189,14 @@ import lsp.resources.Resource;
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 		
 		//The distribution adapter i.e. the Resource is created
-		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setCarrier(distributionCarrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		Resource distributionAdapter = distributionAdapterBuilder.build();
+		LSPResource distributionAdapter = distributionAdapterBuilder.build();
 		
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
@@ -238,7 +238,7 @@ import lsp.resources.Resource;
 		completeLSPBuilder.setId(completeLSPId);
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);

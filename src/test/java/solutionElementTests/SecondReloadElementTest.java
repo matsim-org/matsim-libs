@@ -10,13 +10,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class SecondReloadElementTest {
 
-	private  Id<Resource> reloadingId;
+	private  Id<LSPResource> reloadingId;
 	private  Id<Link> reloadingLinkId;
-	private Resource point;
+	private LSPResource point;
 	private LogisticsSolutionElement reloadElement;
 	
 	@Before
@@ -26,7 +26,7 @@ public class SecondReloadElementTest {
         schedulerBuilder.setCapacityNeedLinear(1);
        
         
-        reloadingId = Id.create("ReloadingPoint2", Resource.class);
+        reloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         reloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         
         UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);

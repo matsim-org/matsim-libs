@@ -8,19 +8,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class ReloadingPoint implements Resource {
+/*package-private*/ class ReloadingPoint implements LSPResource {
 
-	private Id<Resource> id;
+	private Id<LSPResource> id;
 	private Id<Link> locationLinkId;
 	private ReloadingPointScheduler reloadingScheduler;
 	private ArrayList <LogisticsSolutionElement> clientElements;
 	private ArrayList<EventHandler> eventHandlers;
-	private Collection<Info> infos;
+	private Collection<LSPInfo> infos;
 	private Collection<LSPSimulationTracker> trackers;
 	private ReloadingPointTourEndEventHandler eventHandler;
 	private EventsManager eventsManager;
@@ -34,7 +34,7 @@ import lsp.controler.LSPSimulationTracker;
 		reloadingScheduler.setEventHandler(eventHandler);
 		this.clientElements = builder.getClientElements();
 		this.eventHandlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<Info>();
+		this.infos = new ArrayList<LSPInfo>();
 		this.trackers = new ArrayList<LSPSimulationTracker>();
 		eventHandlers.add(eventHandler);
 	}
@@ -60,7 +60,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Id<Resource> getId() {
+	public Id<LSPResource> getId() {
 		return id;
 	}
 
@@ -82,7 +82,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 

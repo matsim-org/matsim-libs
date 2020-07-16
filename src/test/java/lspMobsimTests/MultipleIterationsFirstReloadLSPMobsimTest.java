@@ -36,7 +36,7 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.events.LSPEventUtils;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class MultipleIterationsFirstReloadLSPMobsimTest {
 	private Network network;
@@ -48,8 +48,8 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 	private LogisticsSolutionElement collectionElement;
 	private LogisticsSolutionElement firstReloadElement;
 	private LSP lsp;	
-	private Resource collectionAdapter;
-	private Resource firstReloadingPointAdapter;
+	private LSPResource collectionAdapter;
+	private LSPResource firstReloadingPointAdapter;
 	private int numberOfShipments;
 	
 	@Before
@@ -85,7 +85,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 		
 		
-		Id<Resource> collectionAdapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
@@ -102,7 +102,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
         
-        Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
+        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
@@ -133,7 +133,7 @@ public class MultipleIterationsFirstReloadLSPMobsimTest {
 		completeLSPBuilder.setInitialPlan(completePlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		

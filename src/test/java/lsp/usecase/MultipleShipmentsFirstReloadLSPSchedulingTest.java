@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 	private Network network;
@@ -41,10 +41,10 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 	private LSPPlan completePlan;
 	private SolutionScheduler simpleScheduler;
 	private LSP lsp;	
-	private Resource firstReloadingPointAdapter;
+	private LSPResource firstReloadingPointAdapter;
 	private LogisticsSolutionElement firstReloadElement;
 	private LogisticsSolutionElement collectionElement;
-	private Resource collectionAdapter;
+	private LSPResource collectionAdapter;
 	
 	@Before
 	public void initialize() {
@@ -79,7 +79,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 		
 		
-		Id<Resource> collectionAdapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		collectionAdapterBuilder.setCarrier(collectionCarrier);
@@ -96,7 +96,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
         firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
        
         
-        Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
+        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
@@ -127,7 +127,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 		completeLSPBuilder.setInitialPlan(completePlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(collectionLSPId);
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		

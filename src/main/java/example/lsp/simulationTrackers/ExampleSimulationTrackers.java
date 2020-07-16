@@ -31,9 +31,9 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.events.LSPEventUtils;
-import lsp.functions.Info;
-import lsp.functions.InfoFunctionValue;
-import lsp.resources.Resource;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunctionValue;
+import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /*package-private*/ class ExampleSimulationTrackers {
@@ -66,14 +66,14 @@ import lsp.shipment.LSPShipment;
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Adapter i.e. the Resource is created
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -107,7 +107,7 @@ import lsp.shipment.LSPShipment;
 		collectionLSPBuilder.setId(collectionLSPId);
 
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -191,11 +191,11 @@ import lsp.shipment.LSPShipment;
 		controler.run();
 
 		//Retrieve cost info from lsp
-		Info costInfo;
-		for(Info info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
+		LSPInfo costInfo;
+		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
 			if(info.getName() == "cost_function") {
 				costInfo = info;
-				for(InfoFunctionValue value : costInfo.getFunction().getValues()){
+				for(LSPInfoFunctionValue value : costInfo.getFunction().getValues()){
 					System.out.println(value.getName() + " " + value.getValue());
 				}
 			}

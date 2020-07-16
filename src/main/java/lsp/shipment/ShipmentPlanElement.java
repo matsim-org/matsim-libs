@@ -3,13 +3,13 @@ package lsp.shipment;
 import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public interface ShipmentPlanElement {
 	
 	public LogisticsSolutionElement getSolutionElement();
 	
-	public Id<Resource> getResourceId();
+	public Id<LSPResource> getResourceId();
 	
 	public String getElementType();
 	

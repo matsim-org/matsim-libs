@@ -1,9 +1,9 @@
 package example.lsp.simulationTrackers;
 
-import lsp.functions.Info;
-import lsp.functions.InfoFunction;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunction;
 
-/*package-private*/ class CostInfo extends Info {
+/*package-private*/ class CostInfo extends LSPInfo {
 
 private CostInfoFunction costFunction;
 	
@@ -18,7 +18,7 @@ private CostInfoFunction costFunction;
 	}
 
 	@Override
-	public InfoFunction getFunction() {
+	public LSPInfoFunction getFunction() {
 		return costFunction;
 	}
 

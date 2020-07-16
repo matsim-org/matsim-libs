@@ -4,11 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
@@ -21,7 +20,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private ArrayList<LSPPlan> plans; 
 	private SolutionScheduler solutionScheduler;
 	private LSPPlan selectedPlan;
-	private Collection<Resource> resources;
+	private Collection<LSPResource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
 	private Attributes attributes = new Attributes();
@@ -137,7 +136,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 	@Override
-	public Collection<Resource> getResources() {
+	public Collection<LSPResource> getResources() {
 		return resources;
 	}
 

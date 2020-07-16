@@ -8,11 +8,11 @@ import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentTuple;
-import lsp.resources.Resource;
-import lsp.resources.ResourceScheduler;
+import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
 
-/*package-private*/ class ReloadingPointScheduler extends ResourceScheduler {
+/*package-private*/ class ReloadingPointScheduler extends LSPResourceScheduler {
 
 	Logger log = Logger.getLogger(ReloadingPointScheduler.class);
 
@@ -28,7 +28,7 @@ import lsp.shipment.ShipmentPlanElement;
 
 	}
 	
-	protected void initializeValues(Resource resource) {
+	protected void initializeValues(LSPResource resource) {
 		if(resource.getClass() == ReloadingPoint.class){
 			this.reloadingPoint = (ReloadingPoint) resource;
 		}

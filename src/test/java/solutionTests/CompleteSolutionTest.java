@@ -24,7 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class CompleteSolutionTest {
 
@@ -69,7 +69,7 @@ public class CompleteSolutionTest {
 		Carrier collectionCarrier = CarrierImpl.newInstance(collectionCarrierId);
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 
-		Id<Resource> collectionAdapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> collectionAdapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder collectionAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder
 				.newInstance(collectionAdapterId, network);
 		collectionAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
@@ -87,7 +87,7 @@ public class CompleteSolutionTest {
 		firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
 		firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
 
-		Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
+		Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
 		Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
 
 		UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId,
@@ -125,7 +125,7 @@ public class CompleteSolutionTest {
 		Carrier mainRunCarrier = CarrierImpl.newInstance(collectionCarrierId);
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
-		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
 		UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId,
 				network);
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
@@ -143,7 +143,7 @@ public class CompleteSolutionTest {
 		secondSchedulerBuilder.setCapacityNeedFixed(10);
 		secondSchedulerBuilder.setCapacityNeedLinear(1);
 
-		Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+		Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
 		Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
 
 		UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId,
@@ -182,7 +182,7 @@ public class CompleteSolutionTest {
 		Carrier carrier = CarrierImpl.newInstance(distributionCarrierId);
 		carrier.setCarrierCapabilities(distributionCapabilities);
 
-		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder
 				.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());

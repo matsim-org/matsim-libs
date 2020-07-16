@@ -1,8 +1,8 @@
 package lsp;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.replanning.LSPReplanner;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.scoring.LSPScorer;
 import lsp.controler.LSPSimulationTracker;
 import org.matsim.api.core.v01.Id;
@@ -26,7 +26,7 @@ public class LSPUtils{
 		Id<LSP> id;
 		SolutionScheduler solutionScheduler;
 		LSPPlan initialPlan;
-		Collection<Resource> resources;
+		Collection<LSPResource> resources;
 		LSPScorer scorer;
 		LSPReplanner replanner;
 
@@ -37,7 +37,7 @@ public class LSPUtils{
 		}
 
 		private LSPBuilder(){
-			this.resources = new ArrayList<Resource>();
+			this.resources = new ArrayList<LSPResource>();
 
 		}
 
@@ -83,7 +83,7 @@ public class LSPUtils{
 	public static class LogisticsSolutionBuilder{
 		Id<LogisticsSolution> id;
 		Collection<LogisticsSolutionElement> elements;
-		Collection<Info> solutionInfos;
+		Collection<LSPInfo> solutionInfos;
 		Collection<EventHandler> eventHandlers;
 		Collection<LSPSimulationTracker>trackers;
 
@@ -93,7 +93,7 @@ public class LSPUtils{
 
 		private LogisticsSolutionBuilder( Id<LogisticsSolution> id ){
 			this.elements = new ArrayList<LogisticsSolutionElement>();
-			this.solutionInfos = new ArrayList<Info>();
+			this.solutionInfos = new ArrayList<LSPInfo>();
 			this.eventHandlers = new ArrayList<EventHandler>();
 			this.trackers = new ArrayList<LSPSimulationTracker>();
 			this.id = id;
@@ -104,7 +104,7 @@ public class LSPUtils{
 			return this;
 		}
 
-		public LogisticsSolutionBuilder addInfo( Info info ) {
+		public LogisticsSolutionBuilder addInfo( LSPInfo info ) {
 			solutionInfos.add(info);
 			return this;
 		}
@@ -146,7 +146,7 @@ public class LSPUtils{
 
 	public static class LogisticsSolutionElementBuilder{
 		Id<LogisticsSolutionElement>id;
-		Resource resource;
+		LSPResource resource;
 		WaitingShipments incomingShipments;
 		WaitingShipments outgoingShipments;
 
@@ -161,7 +161,7 @@ public class LSPUtils{
 		}
 
 
-		public LogisticsSolutionElementBuilder setResource( Resource resource ){
+		public LogisticsSolutionElementBuilder setResource( LSPResource resource ){
 			this.resource = resource;
 			return this;
 		}

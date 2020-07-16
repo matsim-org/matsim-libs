@@ -24,12 +24,12 @@ import com.graphhopper.jsprit.core.util.Solutions;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentTuple;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
-import lsp.resources.ResourceScheduler;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 
 
-/*package-private*/  class CollectionCarrierScheduler extends ResourceScheduler {
+/*package-private*/  class CollectionCarrierScheduler extends LSPResourceScheduler {
 	
 	static class LSPCarrierPair{
 		private ShipmentTuple tuple;
@@ -77,7 +77,7 @@ import lsp.resources.ResourceScheduler;
 	}*/
 	
 	
-	public void initializeValues(Resource resource){
+	public void initializeValues(LSPResource resource){
 		this.pairs = new ArrayList<LSPCarrierPair>();
 		if(resource.getClass() == CollectionCarrierAdapter.class){
 			this.adapter = (CollectionCarrierAdapter) resource;
@@ -182,7 +182,7 @@ import lsp.resources.ResourceScheduler;
 		tuple.getShipment().getSchedule().addPlanElement(id, load);
 	}
 	
-	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentTuple tuple,  CarrierResource resource){	
+	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentTuple tuple,  LSPCarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
@@ -193,7 +193,7 @@ import lsp.resources.ResourceScheduler;
 		
 	}
 	
-	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
+	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, LSPCarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource);

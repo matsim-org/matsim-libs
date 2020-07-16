@@ -10,7 +10,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import demand.UtilityFunction;
 import lsp.LogisticsSolution;
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 
 /* package-private */ class LSPShipmentImpl implements LSPShipment {
 
@@ -26,7 +26,7 @@ import lsp.functions.Info;
 	private ArrayList<EventHandler> eventHandlers;
 	private ArrayList<Requirement> requirements;
 	private ArrayList<UtilityFunction> utilityFunctions;
-	private ArrayList<Info> infos;
+	private ArrayList<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
@@ -49,7 +49,7 @@ import lsp.functions.Info;
 			this.utilityFunctions.add(utilityFunction);
 		}
 		this.infos = new ArrayList<>();
-		for(Info info : builder.getInfos()) {
+		for(LSPInfo info : builder.getInfos()) {
 			this.infos.add(info);
 		}
 	}
@@ -119,7 +119,7 @@ import lsp.functions.Info;
 
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 

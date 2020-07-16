@@ -3,19 +3,17 @@ package lsp.usecase;
 import static org.junit.Assert.*;
 
 import lsp.LSPUtils;
-import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import lsp.usecase.ReloadingPoint;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class FirstReloadElementTest {
 	
-	private Id<Resource> reloadingId;
+	private Id<LSPResource> reloadingId;
 	private Id<Link> reloadingLinkId;
 	private ReloadingPoint point;
 	private LogisticsSolutionElement reloadingElement;
@@ -28,7 +26,7 @@ public class FirstReloadElementTest {
 	        schedulerBuilder.setCapacityNeedLinear(1);
 	       
 	        
-	        reloadingId = Id.create("ReloadingPoint1", Resource.class);
+	        reloadingId = Id.create("ReloadingPoint1", LSPResource.class);
 	        reloadingLinkId = Id.createLinkId("(4 2) (4 3)");
 	        
 	        UsecaseUtils.ReloadingPointBuilder reloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(reloadingId, reloadingLinkId);

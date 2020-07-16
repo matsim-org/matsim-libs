@@ -7,17 +7,17 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.events.LSPServiceEndEvent;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 	
-	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	public CollectionServiceEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
@@ -82,7 +82,7 @@ class CollectionServiceEndEventHandler implements LSPServiceEndEventHandler {
 	}
 
 
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resource.getId();
 	}
 

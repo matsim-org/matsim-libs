@@ -34,14 +34,14 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.events.LSPEventUtils;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 public class CollectionLSPMobsimTest {
 	private Network network;
 	private LSP collectionLSP;	
 	private Carrier carrier;
-	private Resource collectionAdapter;
+	private LSPResource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
 	
 	@Before
@@ -78,7 +78,7 @@ public class CollectionLSPMobsimTest {
 		carrier.setCarrierCapabilities(capabilities);
 		
 		
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
@@ -104,7 +104,7 @@ public class CollectionLSPMobsimTest {
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		collectionLSPBuilder.setId(collectionLSPId);
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
@@ -174,7 +174,7 @@ public class CollectionLSPMobsimTest {
 					
 			//Das muss besser in den SchedulingTest rein
 			assertTrue(collectionLSP.getResources().iterator().next() == collectionAdapter);
-			CarrierResource carrierResource = (CarrierResource) collectionAdapter;
+			LSPCarrierResource carrierResource = (LSPCarrierResource) collectionAdapter;
 			assertTrue(carrierResource.getCarrier() == carrier);
 			assertTrue(carrier.getServices().size() == 1);
 			

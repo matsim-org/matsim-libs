@@ -24,8 +24,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 
 
@@ -39,7 +39,7 @@ public class DistributionAdapterTest {
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;
-		private CarrierResource distributionAdapter;
+		private LSPCarrierResource distributionAdapter;
 		private Id<Link> distributionLinkId;
 		
 		@Before
@@ -74,7 +74,7 @@ public class DistributionAdapterTest {
 			distributionCarrier.setCarrierCapabilities(capabilities);
 			
 			
-			Id<Resource> adapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+			Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 			UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
 			builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 			builder.setCarrier(distributionCarrier);
@@ -87,8 +87,8 @@ public class DistributionAdapterTest {
 		public void testCollectionAdapter() {
 			assertTrue(distributionAdapter.getClientElements() != null);
 			assertTrue(distributionAdapter.getClientElements().isEmpty());
-			assertTrue(CarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
-			if(CarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
+			assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
+			if(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
 				assertTrue(Carrier.class.isAssignableFrom(distributionAdapter.getClassOfResource()));
 				assertTrue(distributionAdapter.getCarrier() == distributionCarrier);
 			}

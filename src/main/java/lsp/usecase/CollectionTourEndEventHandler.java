@@ -10,17 +10,17 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import lsp.events.LSPTourEndEvent;
 import lsp.eventhandlers.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 /*package-private*/ class CollectionTourEndEventHandler implements LSPTourEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 	
-	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
@@ -100,7 +100,7 @@ import lsp.resources.Resource;
 	}
 
 
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resource.getId();
 	}
 

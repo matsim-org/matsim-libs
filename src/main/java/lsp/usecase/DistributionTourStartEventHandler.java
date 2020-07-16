@@ -10,16 +10,16 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import lsp.events.LSPTourStartEvent;
 import lsp.eventhandlers.LSPTourStartEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 
 /*package-private*/  class DistributionTourStartEventHandler implements LSPTourStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement element;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 	
-	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	DistributionTourStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.element = element;
@@ -102,7 +102,7 @@ import lsp.resources.CarrierResource;
 	}
 
 
-	public CarrierResource getResource() {
+	public LSPCarrierResource getResource() {
 		return resource;
 	}
 

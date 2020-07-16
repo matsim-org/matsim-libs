@@ -7,16 +7,16 @@ import org.matsim.contrib.freight.carrier.CarrierService;
 import lsp.events.LSPServiceStartEvent;
 import lsp.eventhandlers.LSPServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 
 /*package-private*/  class DistributionServiceStartEventHandler implements LSPServiceStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 
-	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource) {
+	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
@@ -73,7 +73,7 @@ import lsp.resources.CarrierResource;
 		return solutionElement;
 	}
 
-	public CarrierResource getResource() {
+	public LSPCarrierResource getResource() {
 		return resource;
 	}
 

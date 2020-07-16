@@ -3,19 +3,19 @@ package example.lsp.simulationTrackers;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import lsp.functions.InfoFunction;
-import lsp.functions.InfoFunctionValue;
+import lsp.functions.LSPInfoFunction;
+import lsp.functions.LSPInfoFunctionValue;
 
 
 
-/*package-private*/ class CostInfoFunction implements InfoFunction {
+/*package-private*/ class CostInfoFunction implements LSPInfoFunction {
 
 	private FixedCostFunctionValue fixedValue;
 	private LinearCostFunctionValue linearValue;
-	private Collection<InfoFunctionValue<?>> values;
+	private Collection<LSPInfoFunctionValue<?>> values;
 	
 	public CostInfoFunction() {
-		values = new ArrayList<InfoFunctionValue<?>>();
+		values = new ArrayList<LSPInfoFunctionValue<?>>();
 		fixedValue = new FixedCostFunctionValue();
 		linearValue = new LinearCostFunctionValue();
 		values.add(fixedValue);
@@ -24,7 +24,7 @@ import lsp.functions.InfoFunctionValue;
 	}
 	
 	@Override
-	public Collection<InfoFunctionValue<?>> getValues() {
+	public Collection<LSPInfoFunctionValue<?>> getValues() {
 		return values;
 	}
 

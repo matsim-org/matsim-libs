@@ -31,7 +31,7 @@ import demand.demandObject.DemandObjectImpl;
 import demand.offer.Offer;
 import demand.offer.OfferFactoryImpl;
 import demand.offer.OfferTransferrer;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.shipment.Requirement;
 
 public class TransferrerRequirementsTest {
@@ -74,12 +74,12 @@ public class TransferrerRequirementsTest {
 		Carrier redCarrier = CarrierImpl.newInstance(redCarrierId);
 		redCarrier.setCarrierCapabilities(redCapabilities);
 				
-		Id<Resource> redAdapterId = Id.create("RedCarrierAdapter", Resource.class);
+		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder redAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(redAdapterId, network);
 		redAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource redCollectionAdapter = redAdapterBuilder.build();
+		LSPResource redCollectionAdapter = redAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId );
@@ -111,12 +111,12 @@ public class TransferrerRequirementsTest {
 		Carrier blueCarrier = CarrierImpl.newInstance(blueCarrierId);
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 				
-		Id<Resource> blueAdapterId = Id.create("BlueCarrierAdapter", Resource.class);
+		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder blueAdapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(blueAdapterId, network);
 		blueAdapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource blueCollectionAdapter = blueAdapterBuilder.build();
+		LSPResource blueCollectionAdapter = blueAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId );
@@ -140,7 +140,7 @@ public class TransferrerRequirementsTest {
 		offerLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		offerLSPBuilder.setId(collectionLSPId);
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(redCollectionAdapter);
 		resourcesList.add(blueCollectionAdapter);
 			

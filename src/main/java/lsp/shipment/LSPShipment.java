@@ -9,7 +9,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import demand.UtilityFunction;
 import lsp.LogisticsSolution;
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 
 public interface LSPShipment {
 
@@ -37,7 +37,7 @@ public interface LSPShipment {
 	
 	public Collection<UtilityFunction> getUtilityFunctions();
 	
-	public Collection<Info> getInfos();
+	public Collection<LSPInfo> getInfos();
 	
 	public Id<LogisticsSolution> getSolutionId();
 	

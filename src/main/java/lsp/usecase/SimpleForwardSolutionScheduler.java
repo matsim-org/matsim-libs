@@ -6,24 +6,24 @@ import lsp.LSP;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.SolutionScheduler;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
 	private LSP lsp;
-	private ArrayList<Resource> resources;
+	private ArrayList<LSPResource> resources;
 	private int bufferTime;
 	
-	SimpleForwardSolutionScheduler(ArrayList<Resource> resources) {
+	SimpleForwardSolutionScheduler(ArrayList<LSPResource> resources) {
 		this.resources = resources;
 	}
 	
 	@Override
 	public void scheduleSolutions() {
 		insertShipmentsAtBeginning();
-		for(Resource resource : resources) {
-			for(Resource lspResource : lsp.getResources()) {
+		for(LSPResource resource : resources) {
+			for(LSPResource lspResource : lsp.getResources()) {
 				if(lspResource == resource) {
 					lspResource.schedule(bufferTime);
 				}

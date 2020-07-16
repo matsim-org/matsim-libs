@@ -20,13 +20,13 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
 import lsp.LogisticsSolutionElement;
 import lsp.ShipmentTuple;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
-import lsp.resources.ResourceScheduler;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 import org.matsim.vehicles.VehicleType;
 
 
-/*package-private*/  class MainRunCarrierScheduler extends ResourceScheduler {
+/*package-private*/  class MainRunCarrierScheduler extends LSPResourceScheduler {
 
 	static class LSPCarrierPair{
 		private ShipmentTuple tuple;
@@ -48,7 +48,7 @@ import org.matsim.vehicles.VehicleType;
 		this.pairs = new ArrayList<LSPCarrierPair>();
 	}
 	
-	protected void initializeValues(Resource resource) {
+	protected void initializeValues(LSPResource resource) {
 		this.pairs = new ArrayList<LSPCarrierPair>();
 		if(resource.getClass() == MainRunCarrierAdapter.class){
 			this.adapter = (MainRunCarrierAdapter) resource;
@@ -251,7 +251,7 @@ import org.matsim.vehicles.VehicleType;
 		tuple.getShipment().getSchedule().addPlanElement(id, unload);
 	}
 	
-	private void addMainRunStartEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
+	private void addMainRunStartEventHandler(CarrierService carrierService, ShipmentTuple tuple, LSPCarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				MainRunTourStartEventHandler handler = new MainRunTourStartEventHandler(tuple.getShipment(), carrierService, element, resource);
@@ -261,7 +261,7 @@ import org.matsim.vehicles.VehicleType;
 		}
 	}
 
-	private void addMainRunEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
+	private void addMainRunEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, LSPCarrierResource resource){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				MainRunTourEndEventHandler handler = new MainRunTourEndEventHandler(tuple.getShipment(), carrierService, element,resource);

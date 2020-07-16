@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 
@@ -18,7 +18,7 @@ import lsp.controler.LSPSimulationTracker;
 	private LSP lsp;
 	private Collection<LogisticsSolutionElement> solutionElements; 
 	private Collection<LSPShipment> shipments;
-	private Collection<Info> solutionInfos;
+	private Collection<LSPInfo> solutionInfos;
 	private Collection<EventHandler> eventHandlers;
 	private Collection<LSPSimulationTracker>trackers;
 	private EventsManager eventsManager;
@@ -68,7 +68,7 @@ import lsp.controler.LSPSimulationTracker;
 	}
 	
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return solutionInfos;
 	}
 

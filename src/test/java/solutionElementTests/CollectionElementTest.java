@@ -3,7 +3,7 @@ package solutionElementTests;
 import static org.junit.Assert.*;
 
 import lsp.LSPUtils;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class CollectionElementTest {
 
@@ -33,7 +33,7 @@ public class CollectionElementTest {
 	private CarrierCapabilities capabilities;
 	private Carrier carrier; 
 	private LogisticsSolutionElement collectionElement;
-	private CarrierResource carrierAdapter;
+	private LSPCarrierResource carrierAdapter;
 	
 	@Before
 	public void initialize() {
@@ -68,7 +68,7 @@ public class CollectionElementTest {
 		carrier.setCarrierCapabilities(capabilities);
 		
 		
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(carrier);

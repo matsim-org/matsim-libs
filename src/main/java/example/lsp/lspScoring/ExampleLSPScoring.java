@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
-import lsp.functions.InfoFunctionUtils;
+import lsp.functions.LSPInfoFunctionUtils;
 import lsp.replanning.LSPReplanningUtils;
 import lsp.scoring.LSPScoringModulsUtils;
 import lsp.shipment.ShipmentUtils;
@@ -32,8 +32,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
 import lsp.events.LSPEventUtils;
-import lsp.functions.InfoFunction;
-import lsp.resources.Resource;
+import lsp.functions.LSPInfoFunction;
+import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /* Example for customized scoring. Each customer that is visited will give a random tip between zero and five
@@ -72,14 +72,14 @@ import lsp.shipment.LSPShipment;
 		carrier.setCarrierCapabilities(capabilities);
 		
 		//The Adapter i.e. the Resource is created
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(carrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 		
 		//The adapter is now inserted into the only LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -105,7 +105,7 @@ import lsp.shipment.LSPShipment;
 		collectionLSPBuilder.setId(collectionLSPId);
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
@@ -116,7 +116,7 @@ import lsp.shipment.LSPShipment;
 		TipEventHandler handler = new TipEventHandler();
 		
 		//Create Info for the SimulationTracker which the scorer needs
-		InfoFunction function = InfoFunctionUtils.createDefaultInfoFunction();
+		LSPInfoFunction function = LSPInfoFunctionUtils.createDefaultInfoFunction();
 		TipInfo info = new TipInfo(function);
 		
 		//Create SimulationTracker for the information that the Scorer needs

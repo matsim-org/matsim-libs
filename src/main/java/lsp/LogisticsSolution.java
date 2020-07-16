@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.shipment.LSPShipment;
 import lsp.controler.LSPSimulationTracker;
 
@@ -25,7 +25,7 @@ public interface LogisticsSolution {
 	
 	public void assignShipment(LSPShipment shipment);
 	
-	public Collection<Info> getInfos();
+	public Collection<LSPInfo> getInfos();
 	
     public Collection <EventHandler> getEventHandlers();
         

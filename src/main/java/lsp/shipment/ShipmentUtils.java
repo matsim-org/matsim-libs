@@ -2,8 +2,8 @@ package lsp.shipment;
 
 import demand.UtilityFunction;
 import lsp.LogisticsSolutionElement;
-import lsp.functions.Info;
-import lsp.resources.Resource;
+import lsp.functions.LSPInfo;
+import lsp.resources.LSPResource;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -26,7 +26,7 @@ public class ShipmentUtils{
 		private double serviceTime;
 		private ArrayList<Requirement> requirements;
 		private ArrayList<UtilityFunction> utilityFunctions;
-		private ArrayList<Info> infos;
+		private ArrayList<LSPInfo> infos;
 
 		public static LSPShipmentBuilder newInstance( Id<LSPShipment> id ){
 			return new LSPShipmentBuilder(id);
@@ -35,7 +35,7 @@ public class ShipmentUtils{
 		private LSPShipmentBuilder( Id<LSPShipment> id ){
 			this.requirements = new ArrayList<Requirement>();
 			this.utilityFunctions = new ArrayList<UtilityFunction>();
-			this.infos = new ArrayList<Info>();
+			this.infos = new ArrayList<LSPInfo>();
 			this.id = id;
 		}
 
@@ -79,7 +79,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LSPShipmentBuilder addInfo( Info info ) {
+		public LSPShipmentBuilder addInfo( LSPInfo info ) {
 			infos.add(info);
 			return this;
 		}
@@ -126,7 +126,7 @@ public class ShipmentUtils{
 			return utilityFunctions;
 		}
 
-		public ArrayList<Info> getInfos() {
+		public ArrayList<LSPInfo> getInfos() {
 			return infos;
 		}
 
@@ -136,7 +136,7 @@ public class ShipmentUtils{
 		private double startTime;
 		private double endTime;
 		private LogisticsSolutionElement element;
-		private Id<Resource> resourceId;
+		private Id<LSPResource> resourceId;
 		private Id<Link> linkId;
 
 		private LoggedShipmentHandleBuilder(){
@@ -161,7 +161,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LoggedShipmentHandleBuilder setResourceId(Id<Resource> resourceId){
+		public LoggedShipmentHandleBuilder setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -189,7 +189,7 @@ public class ShipmentUtils{
 			return element;
 		}
 
-		public Id<Resource> getResourceId() {
+		public Id<LSPResource> getResourceId() {
 			return resourceId;
 		}
 
@@ -202,7 +202,7 @@ public class ShipmentUtils{
 		private double startTime;
 		private double endTime;
 		private LogisticsSolutionElement element;
-		private Id<Resource> resourceId;
+		private Id<LSPResource> resourceId;
 		private Id<Carrier> carrierId;
 		private Id<Link> linkId;
 
@@ -228,7 +228,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LoggedShipmentLoadBuilder setResourceId(Id<Resource> resourceId){
+		public LoggedShipmentLoadBuilder setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -261,7 +261,7 @@ public class ShipmentUtils{
 			return element;
 		}
 
-		public Id<Resource> getResourceId() {
+		public Id<LSPResource> getResourceId() {
 			return resourceId;
 		}
 
@@ -277,7 +277,7 @@ public class ShipmentUtils{
 	public static class LoggedShipmentTransportBuilder {
 		private double startTime;
 		private LogisticsSolutionElement element;
-		private Id<Resource> resourceId;
+		private Id<LSPResource> resourceId;
 		private Id<Link> fromLinkId;
 		private Id<Link> toLinkId;
 		private Id<Carrier> carrierId;
@@ -299,7 +299,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LoggedShipmentTransportBuilder setResourceId(Id<Resource> resourceId){
+		public LoggedShipmentTransportBuilder setResourceId(Id<LSPResource> resourceId){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -332,7 +332,7 @@ public class ShipmentUtils{
 			return element;
 		}
 
-		public Id<Resource> getResourceId() {
+		public Id<LSPResource> getResourceId() {
 			return resourceId;
 		}
 
@@ -353,7 +353,7 @@ public class ShipmentUtils{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
-		Id<Resource> resourceId;
+		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
 		CarrierService carrierService;
@@ -380,7 +380,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public ScheduledShipmentUnloadBuilder setResourceId( Id<Resource> resourceId ){
+		public ScheduledShipmentUnloadBuilder setResourceId( Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -409,7 +409,7 @@ public class ShipmentUtils{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
-		Id<Resource> resourceId;
+		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> fromLinkId;
 		Id<Link> toLinkId;
@@ -437,7 +437,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public ScheduledShipmentTransportBuilder setResourceId( Id<Resource> resourceId ){
+		public ScheduledShipmentTransportBuilder setResourceId( Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -471,7 +471,7 @@ public class ShipmentUtils{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
-		Id<Resource> resourceId;
+		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
 		CarrierService carrierService;
@@ -498,7 +498,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public ScheduledShipmentLoadBuilder setResourceId( Id<Resource> resourceId ){
+		public ScheduledShipmentLoadBuilder setResourceId( Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -527,7 +527,7 @@ public class ShipmentUtils{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
-		Id<Resource> resourceId;
+		Id<LSPResource> resourceId;
 		private Id<Link> linkId;
 
 		private ScheduledShipmentHandleBuilder(){
@@ -552,7 +552,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public ScheduledShipmentHandleBuilder setResourceId( Id<Resource> resourceId ){
+		public ScheduledShipmentHandleBuilder setResourceId( Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
 			return this;
 		}
@@ -571,7 +571,7 @@ public class ShipmentUtils{
 		double startTime;
 		double endTime;
 		LogisticsSolutionElement element;
-		Id<Resource> resourceId;
+		Id<LSPResource> resourceId;
 		Id<Carrier> carrierId;
 		Id<Link> linkId;
 
@@ -597,7 +597,7 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LoggedShipmentUnloadBuilder setResourceId( Id<Resource> resourceId ){
+		public LoggedShipmentUnloadBuilder setResourceId( Id<LSPResource> resourceId ){
 			this.resourceId = resourceId;
 			return this;
 		}

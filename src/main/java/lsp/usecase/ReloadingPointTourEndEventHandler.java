@@ -13,7 +13,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import lsp.events.LSPTourEndEvent;
 import lsp.eventhandlers.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 /*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
 
@@ -30,7 +30,7 @@ import lsp.resources.Resource;
 	
 	private HashMap<CarrierService, ReloadingPointEventHandlerPair> servicesWaitedFor;
 	private ReloadingPoint reloadingPoint;
-	private Id<Resource> resourceId;
+	private Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 	
 	ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
@@ -165,7 +165,7 @@ import lsp.resources.Resource;
 		return reloadingPoint;
 	}
 
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

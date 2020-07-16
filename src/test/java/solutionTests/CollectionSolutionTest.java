@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 import lsp.*;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 import lsp.usecase.UsecaseUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +25,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public class CollectionSolutionTest {
 
 	private Network network;
 	private Carrier carrier;
-	private CarrierResource carrierAdapter;
+	private LSPCarrierResource carrierAdapter;
 	private LogisticsSolutionElement collectionElement; 
 	private LogisticsSolution collectionSolution;
 	
@@ -66,7 +66,7 @@ public class CollectionSolutionTest {
 		carrier = CarrierImpl.newInstance(carrierId);
 		carrier.setCarrierCapabilities(capabilities);
 
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId,
 				network);
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());

@@ -25,7 +25,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.LSP;
 import lsp.LSPPlan;
 import lsp.LSPs;
@@ -33,7 +33,7 @@ import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.events.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
 
@@ -141,11 +141,11 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 		for(LSP lsp : lsps.getLSPs().values()) {
 			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for(Info info : element.getInfos()) {
+					for(LSPInfo info : element.getInfos()) {
 						info.update();
 					}
 				}
-				for(Info info : solution.getInfos()) {
+				for(LSPInfo info : solution.getInfos()) {
 					info.update();
 				}			
 			}
@@ -159,9 +159,9 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 			LSPPlan selectedPlan = lsp.getSelectedPlan();
 			for(LogisticsSolution solution : selectedPlan.getSolutions()) {
 				for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-					if(element.getResource() instanceof CarrierResource) {
+					if(element.getResource() instanceof LSPCarrierResource) {
 						
-						CarrierResource carrierResource = (CarrierResource) element.getResource();
+						LSPCarrierResource carrierResource = (LSPCarrierResource) element.getResource();
 						Carrier carrier = carrierResource.getCarrier();
 						if(!carriers.getCarriers().containsKey(carrier.getId())) {
 							carriers.addCarrier(carrier);
