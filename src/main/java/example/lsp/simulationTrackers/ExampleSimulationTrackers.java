@@ -30,7 +30,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
-import org.matsim.contrib.freight.events.LSPEventUtils;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreatorUtils;
 import lsp.functions.LSPInfo;
 import lsp.functions.LSPInfoFunctionValue;
 import lsp.resources.LSPResource;
@@ -179,7 +179,7 @@ import lsp.shipment.LSPShipment;
 		ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventCreatorUtils.getStandardEventCreators());
 
 		//Start the Mobsim one iteration is sufficient for tracking
 		Controler controler = new Controler(config);

@@ -1,6 +1,6 @@
 package lsp.usecase;
 
-import org.matsim.contrib.freight.eventhandler.LSPServiceEndEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
