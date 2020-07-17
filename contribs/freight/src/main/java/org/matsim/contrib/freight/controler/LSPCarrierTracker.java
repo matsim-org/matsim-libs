@@ -78,10 +78,10 @@ public final class LSPCarrierTracker implements ActivityStartEventHandler, Activ
 	 * @return collection of plans
 	 * @see Plan , CarrierPlan
 	 */
-	public Collection<LSPMobSimVehicleRoute> createPlans() {
-		List<LSPMobSimVehicleRoute> vehicleRoutes = new ArrayList<>();
+	public Collection<MobSimVehicleRoute> createPlans() {
+		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<>();
 		for ( LSPCarrierAgent carrierResourceAgent : carrierResourceAgents) {
-			List<LSPMobSimVehicleRoute> plansForCarrier = carrierResourceAgent.createFreightDriverPlans();
+			List<MobSimVehicleRoute> plansForCarrier = carrierResourceAgent.createFreightDriverPlans();
 			vehicleRoutes.addAll(plansForCarrier);
 		}
 		return vehicleRoutes;

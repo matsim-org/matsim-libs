@@ -4,13 +4,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.vehicles.Vehicle;
 
 
-class MobSimVehicleRoute {
+public class MobSimVehicleRoute{
 
 	private Plan plan;
 	
 	private Vehicle vehicle;
 
-	public MobSimVehicleRoute(Plan plan, Vehicle vehicle) {
+	public MobSimVehicleRoute( Plan plan, Vehicle vehicle ) {
 		super();
 		this.plan = plan;
 		this.vehicle = vehicle;

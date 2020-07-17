@@ -51,7 +51,7 @@ public class LSPAgentSource implements AgentSource {
 
 	private static Logger log = Logger.getLogger( LSPAgentSource.class );
 	
-	private Collection<LSPMobSimVehicleRoute> vehicleRoutes;
+	private Collection<MobSimVehicleRoute> vehicleRoutes;
 	
 	private Collection<MobsimAgent> mobSimAgents;
 
@@ -59,7 +59,7 @@ public class LSPAgentSource implements AgentSource {
 
 	private QSim qsim;
 
-	public LSPAgentSource(Collection<LSPMobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim) {
+	public LSPAgentSource( Collection<MobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim ) {
 		this.vehicleRoutes = vehicleRoutes;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
@@ -68,7 +68,7 @@ public class LSPAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for ( LSPMobSimVehicleRoute vRoute : vehicleRoutes) {
+		for ( MobSimVehicleRoute vRoute : vehicleRoutes) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
 			Vehicle vehicle = null;
 			if(vRoute.getVehicle() == null){

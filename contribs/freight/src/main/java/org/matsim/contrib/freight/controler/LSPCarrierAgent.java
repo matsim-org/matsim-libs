@@ -234,11 +234,11 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
-	List<LSPMobSimVehicleRoute> createFreightDriverPlans() {
+	List<MobSimVehicleRoute> createFreightDriverPlans() {
 		clear();
 		System.out.flush();
 		System.err.flush() ;
-		List<LSPMobSimVehicleRoute> routes = new ArrayList<LSPMobSimVehicleRoute>();
+		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
 		//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
@@ -276,7 +276,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			LSPMobSimVehicleRoute mobsimRoute = new LSPMobSimVehicleRoute(plan, vehicle);
+			MobSimVehicleRoute mobsimRoute = new MobSimVehicleRoute(plan, vehicle);
 			routes.add(mobsimRoute);
 			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
