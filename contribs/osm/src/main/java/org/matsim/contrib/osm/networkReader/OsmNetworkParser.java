@@ -72,6 +72,10 @@ class OsmNetworkParser {
 
 		if (nodeReferences.containsKey(osmNode.getId())) {
 
+			if (osmNode.getId() == 51414415 || osmNode.getId() == 51414416) {
+				log.info("stop it");
+			}
+
 			List<ProcessedOsmWay> waysThatReferenceNode = nodeReferences.get(osmNode.getId());
 			Coord transformedCoord = transformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
 
