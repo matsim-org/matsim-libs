@@ -75,6 +75,16 @@ class OsmNetworkParser {
 			List<ProcessedOsmWay> waysThatReferenceNode = nodeReferences.get(osmNode.getId());
 			Coord transformedCoord = transformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
 
+			// 'testWhetherReferencingLinksAreInFilter' may be expensive because it might include a test whether the
+			// supplied coordinate is within a shape. Therefore we want to test as few cases as possible. Two cases are tested anyway:
+			//   1. if more than one way references this node, this node is an intersection and a possible end node for a
+			//      matsim link.
+			//   2. if this node is either the start- or end node of a referencing way which makes it a candidate for a node
+			//      in a matsim link as well
+			//
+			// if a way has both ends outside the filter and no intersections within the filter it will not be included
+			// in the final network. I think this is unlikely in real world scenarios, so I think we can live with this
+			// to achieve faster execution
 			List<ProcessedOsmWay> filteredReferencingLinks;
 			if (waysThatReferenceNode.size() > 1 || isEndNodeOfReferencingLink(osmNode, waysThatReferenceNode.get(0)))
 				filteredReferencingLinks = testWhetherReferencingLinksAreInFilter(transformedCoord, waysThatReferenceNode);

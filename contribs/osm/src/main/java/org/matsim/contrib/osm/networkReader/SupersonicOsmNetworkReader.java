@@ -121,7 +121,11 @@ public class SupersonicOsmNetworkReader {
     }
 
     private boolean isCreateSegment(ProcessedOsmNode from, ProcessedOsmNode to, ProcessedOsmWay way) {
-        return (to.isIntersection() || to.getId() == way.getEndNodeId() || preserveNodeWithId.test(to.getId()))
+
+        // if the user wants to have this node, then he should get it no matter what the other conditions are.
+        if (preserveNodeWithId.test(to.getId())) return true;
+
+        return (to.isIntersection() || to.getId() == way.getEndNodeId())
                 && (to.isWayReferenced(way.getId()) || from.isWayReferenced(way.getId()));
     }
 
