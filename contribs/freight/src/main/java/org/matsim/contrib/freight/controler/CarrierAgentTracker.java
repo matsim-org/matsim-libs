@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -86,10 +87,10 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 	 * @return collection of plans
 	 * @see Plan, CarrierPlan
 	 */
-	Collection<MobSimVehicleRoute> createPlans() {
-		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<MobSimVehicleRoute>();
+	Collection<Plan> createPlans() {
+		List<Plan> vehicleRoutes = new ArrayList<>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
-			List<MobSimVehicleRoute> plansForCarrier = carrierAgent.createFreightDriverPlans();
+			List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
 			vehicleRoutes.addAll(plansForCarrier);
 		}
 		return vehicleRoutes;
