@@ -35,7 +35,7 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup.TimeWindowHandling;
 import org.matsim.contrib.freight.controler.LSPAgentSource;
 import org.matsim.contrib.freight.controler.LSPCarrierTracker;
-import org.matsim.contrib.freight.controler.LSPMobSimVehicleRoute;
+import org.matsim.contrib.freight.controler.MobSimVehicleRoute;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -67,7 +67,7 @@ class LSPQSimFactory implements Provider<Mobsim> {
 		qSimBuilder.useDefaults() ;
 		final QSim sim = qSimBuilder.build(scenario, eventsManager);
 		
-		Collection<LSPMobSimVehicleRoute> vRoutes = carrierResourceTracker.createPlans();
+		Collection<MobSimVehicleRoute> vRoutes = carrierResourceTracker.createPlans();
 		LSPAgentSource agentSource = new LSPAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);
 		if (carrierConfig.getTimeWindowHandling()!= TimeWindowHandling.ignore) {
