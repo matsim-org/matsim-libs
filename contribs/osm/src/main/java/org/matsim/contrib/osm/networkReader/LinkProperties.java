@@ -139,7 +139,7 @@ public class LinkProperties {
      * Calculate free speed of a link based on heuristic if it is an urban link.
      */
 	public static double calculateSpeedIfSpeedTag(double maxSpeed) {
-        double urbanSpeedFactor = maxSpeed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
+        double urbanSpeedFactor = maxSpeed < 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
         return maxSpeed * urbanSpeedFactor;
     }
 
@@ -147,13 +147,14 @@ public class LinkProperties {
 	 * For links with unknown max speed we assume that links with a length of less than 300m are urban links. For urban
 	 * links with a length of 0m the speed is 10km/h. For links with a length of 300m the speed is the default freespeed
 	 * property for that highway type. For links with a length between 0 and 300m the speed is interpolated linearly.
+	 * (2.778m/s ~ 10km/h)
 	 *
 	 * All links longer than 300m the default freesped property is assumed
 	 */
 	public static double calculateSpeedIfNoSpeedTag(double linkLength, LinkProperties properties) {
 		if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
-				&& linkLength < 300) {
-			return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
+				&& linkLength <= 300) {
+			return ((2.7778 + (properties.freespeed - 2.7778) / 300 * linkLength));
 		}
 		return properties.freespeed;
 	}
