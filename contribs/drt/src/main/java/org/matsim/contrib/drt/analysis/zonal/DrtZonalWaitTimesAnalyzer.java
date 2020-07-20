@@ -71,7 +71,7 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		String fileName = event.getServices().getControlerIO()
-				.getIterationFilename(event.getIteration(), "zonalWaitTimeComparison" + "_" + drtCfg.getMode() + ".csv");
+				.getIterationFilename(event.getIteration(), "waitStats" + "_" + drtCfg.getMode() + "_zonal.csv");
 		write(fileName);
 	}
 
