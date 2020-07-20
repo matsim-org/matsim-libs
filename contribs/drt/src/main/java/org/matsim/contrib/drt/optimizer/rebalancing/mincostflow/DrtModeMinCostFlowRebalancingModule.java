@@ -28,10 +28,19 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.analysis.zonal.*;
+import org.matsim.contrib.drt.analysis.zonal.ActivityLocationBasedZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.AdaptiveRealTimeRebalancingZonalAggregator;
+import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
+import org.matsim.contrib.drt.analysis.zonal.EqualVehicleDensityZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -58,8 +67,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 			if (params.getRebalancingZonesGeneration()
 					.equals(MinCostFlowRebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
+				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
+						.loadPreparedGeometries(params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
 				Map<String, Geometry> zones = new HashMap<>();
 				for (int i = 0; i < preparedGeometries.size(); i++) {
 					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
@@ -68,8 +77,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 
 			if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
+				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
+						.loadPreparedGeometries(drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
 				Network modalNetwork = getter.getModal(Network.class);
 				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
 						params.getCellSize(), preparedGeometries);
@@ -78,55 +87,66 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
-
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
+								getter.getModal(MinCostRelocationCalculator.class), params)))
+						.asEagerSingleton();
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
-								params))).asEagerSingleton();
+								params)))
+						.asEagerSingleton();
 
-				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
-						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Network.class)))).asEagerSingleton();
+				bindModal(MinCostRelocationCalculator.class)
+						.toProvider(modalProvider(getter -> new AggregatedMinCostRelocationCalculator(
+								getter.getModal(DrtZonalSystem.class), getter.getModal(Network.class))))
+						.asEagerSingleton();
 			}
 		});
 
 		switch (params.getZonalDemandAggregatorType()) {
-			case PreviousIterationZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
-								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
-				break;
-			case ActivityLocationBasedZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
-								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
-				break;
-			case EqualVehicleDensityZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
-				break;
+		case PreviousIterationZonalDemandAggregator:
+			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+					getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
+							getter.getModal(DrtZonalSystem.class), drtCfg)))
+					.asEagerSingleton();
+			break;
+		case ActivityLocationBasedZonalDemandAggregator:
+			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+					getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+							getter.getModal(DrtZonalSystem.class), drtCfg)))
+					.asEagerSingleton();
+			break;
+		case EqualVehicleDensityZonalDemandAggregator:
+			bindModal(ZonalDemandAggregator.class)
+					.toProvider(modalProvider(getter -> new EqualVehicleDensityZonalDemandAggregator(
+							getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class))))
+					.asEagerSingleton();
+			break;
+		case AdaptiveRealTimeRebalancingZonalAggregator:
+			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+					getter -> new AdaptiveRealTimeRebalancingZonalAggregator(getter.getModal(DrtZonalSystem.class),
+							getter.getModal(Fleet.class), getter.getModal(DrtScheduleInquiry.class))))
+					.asEagerSingleton();
+			break;
 		}
 
 		{
-			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			// this is rather analysis - but depends on DrtZonalSystem so it can not be
+			// moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
 			addControlerListenerBinding().toProvider(modalProvider(
 					getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
-							getter.getModal(DrtZonalSystem.class),
-							getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+							getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class))))
+					.asEagerSingleton();
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
-							getter.get(EventsManager.class),
-							getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class))))
+			addControlerListenerBinding()
+					.toProvider(modalProvider(
+							getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.get(EventsManager.class),
+									getter.getModal(DrtRequestAnalyzer.class), getter.getModal(DrtZonalSystem.class))))
 					.asEagerSingleton();
 		}
 

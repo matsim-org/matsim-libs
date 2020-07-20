@@ -39,7 +39,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
-		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
+		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator, AdaptiveRealTimeRebalancingZonalAggregator}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
