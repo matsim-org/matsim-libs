@@ -29,7 +29,6 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ActivityLocationBasedZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.AdaptiveRealTimeRebalancingZonalAggregator;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
@@ -40,7 +39,6 @@ import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -125,12 +123,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			bindModal(ZonalDemandAggregator.class)
 					.toProvider(modalProvider(getter -> new EqualVehicleDensityZonalDemandAggregator(
 							getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class))))
-					.asEagerSingleton();
-			break;
-		case AdaptiveRealTimeRebalancingZonalAggregator:
-			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-					getter -> new AdaptiveRealTimeRebalancingZonalAggregator(getter.getModal(DrtZonalSystem.class),
-							getter.getModal(Fleet.class), getter.getModal(DrtScheduleInquiry.class))))
 					.asEagerSingleton();
 			break;
 		}

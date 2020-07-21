@@ -130,6 +130,24 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 3, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
 		}
 	}
+	
+	@Test
+	public void AdaptiveRealTimeRebalancingZonalAggregatorTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.AdaptiveRealTimeRebalancingZonalAggregator, "");
+		controler.run();
+		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		for(double ii = 0; ii < 16 * 3600; ii+=1800){
+			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 1, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 1, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 1, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 1, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 5", 1, demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 1, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 1, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 1, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+		}
+	}
 
 	private Controler setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType aggregatorType, String drtSpeedUpModeForRebalancingConfiguration) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "eight_shared_taxi_config.xml");

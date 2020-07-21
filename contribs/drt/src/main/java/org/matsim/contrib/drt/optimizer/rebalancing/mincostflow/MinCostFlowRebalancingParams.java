@@ -33,13 +33,15 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import com.google.common.base.Verify;
 
 /**
+ * 
  * @author michalm
  */
+// TODO change this based on the algorithm!!!
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
-		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator, AdaptiveRealTimeRebalancingZonalAggregator}
+		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
