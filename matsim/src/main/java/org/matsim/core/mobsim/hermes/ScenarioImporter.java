@@ -419,42 +419,49 @@ public class ScenarioImporter {
 
             events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
             if (route instanceof NetworkRoute){
-				processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
+				if (scenario.getConfig().hermes().getMainModes().contains(leg.getMode())) {
+					processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
+				} else {
+					handleTeleport(id, flatplan, events, (Leg) element, route, mode);
+				}
 			}
             else if (route instanceof TransitPassengerRoute) {
 				processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
 
-			} else if (route instanceof GenericRouteImpl){
-				double routeTravelTime = route.getTravelTime().orElse(0.0);
-				double legTravelTime = ((Leg)element ).getTravelTime().orElse(0.0);
-				int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
-				flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
-				events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
+			} else if (route instanceof GenericRouteImpl) {
+				handleTeleport(id, flatplan, events, (Leg) element, route, mode);
 			} else {
             	throw new RuntimeException("Route type not supported by Hermes: "+route.getRouteType() + "\n Person:" + id+"\n Leg"+leg+"\n Leg"+route);
 			}
 
+			events.add(new PersonArrivalEvent(0, id, route.getEndLinkId(), leg.getMode()));
 
-            events.add(new PersonArrivalEvent(0, id, route.getEndLinkId(), leg.getMode()));
+		} else if (element instanceof Activity) {
+			processPlanActivity(id, flatplan, events, (Activity) element);
+		} else {
+			throw new RuntimeException("Unknown plan element " + element);
+		}
+	}
 
-        } else if (element instanceof Activity) {
-            processPlanActivity(id, flatplan, events, (Activity) element);
-        } else {
-            throw new RuntimeException ("Unknown plan element " + element);
-        }
-    }
+	private void handleTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
+		double routeTravelTime = route.getTravelTime().orElse(0.0);
+		double legTravelTime = element.getTravelTime().orElse(0.0);
+		int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
+		flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
+		events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
+	}
 
-    private void generateAgent(
-            int agent_id,
-            int capacity,
-            PlanArray flatplan,
-            EventArray events) {
+	private void generateAgent(
+			int agent_id,
+			int capacity,
+			PlanArray flatplan,
+			EventArray events) {
 
-        if (events.size() >= HermesConfigGroup.MAX_EVENTS_AGENT) {
-            throw new RuntimeException("exceeded maximum number of agent events");
-        }
+		if (events.size() >= HermesConfigGroup.MAX_EVENTS_AGENT) {
+			throw new RuntimeException("exceeded maximum number of agent events");
+		}
 
-        hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);
+		hermes_agents[agent_id] = new Agent(agent_id, capacity, flatplan, events);
     }
 
 
