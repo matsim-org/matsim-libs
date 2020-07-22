@@ -93,7 +93,7 @@ public class SwissRailRaptorInVehicleCostTest {
 
 	private void runTest(Fixture f, RaptorInVehicleCostCalculator inVehCostCalcualtor, Id<TransitLine> expectedTransitLine) {
 		ExecutionData executionData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(executionData);
+		ExecutionTracker tracker = new ExecutionTracker(executionData, f.scenario);
 		fillExecutionTracker(f, tracker);
 
 		SwissRailRaptorData raptorData = SwissRailRaptorData.create(

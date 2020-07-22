@@ -4,6 +4,7 @@ import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -11,13 +12,19 @@ import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Collections;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -30,7 +37,7 @@ public class ExecutionTrackerTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		ExecutionData execData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(execData);
+		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
 		events.addHandler(tracker);
 
 		f.generateEvents(events);
@@ -106,7 +113,7 @@ public class ExecutionTrackerTest {
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		ExecutionData execData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(execData);
+		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
 		events.addHandler(tracker);
 		
 		f.generateEvents(events);
@@ -168,6 +175,18 @@ public class ExecutionTrackerTest {
 		Id<Person> pax6 = Id.create("pax6", Person.class);
 		Id<Person> pax7 = Id.create("pax7", Person.class);
 		Id<Person> pax8 = Id.create("pax8", Person.class);
+
+		Scenario scenario;
+
+		public Fixture() {
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			TransitSchedule schedule = this.scenario.getTransitSchedule();
+			TransitScheduleFactory factory = schedule.getFactory();
+			TransitLine line = factory.createTransitLine(this.line1);
+			schedule.addTransitLine(line);
+			TransitRoute route = factory.createTransitRoute(this.route1, null, Collections.emptyList(), "bus");
+			line.addRoute(route);
+		}
 
 		public void generateEvents(EventsManager events) {
 

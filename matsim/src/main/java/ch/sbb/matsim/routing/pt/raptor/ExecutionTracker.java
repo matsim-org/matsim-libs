@@ -5,6 +5,7 @@ import ch.sbb.matsim.routing.pt.raptor.ExecutionData.LineData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.RouteData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.StopData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.VehicleData;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -17,6 +18,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 
@@ -30,18 +32,26 @@ import javax.inject.Inject;
 public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private final ExecutionData data;
+	private final Scenario scenario;
 
 	private final static VehicleData DUMMY_VEHDATA = new VehicleData(null, null, null);
 
 	@Inject
-	public ExecutionTracker(ExecutionData data) {
+	public ExecutionTracker(ExecutionData data, Scenario scenario) {
 		this.data = data;
+		this.scenario = scenario;
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		// store information about the current service of the transit vehicle
 		this.data.vehicleData.put(event.getVehicleId(), new VehicleData(event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId()));
+		LineData line = this.data.lineData.computeIfAbsent(event.getTransitLineId(), id -> new LineData());
+		RouteData route = line.routeData.computeIfAbsent(event.getTransitRouteId(), id -> new RouteData(
+				this.scenario.getTransitSchedule().getTransitLines().get(event.getTransitLineId()).getRoutes().get(event.getTransitRouteId())
+		));
+		Vehicle vehicle = this.scenario.getTransitVehicles().getVehicles().get(event.getVehicleId());
+		route.vehicles.put(event.getDepartureId(), vehicle);
 	}
 
 	@Override
@@ -55,8 +65,8 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 		// if nobody entered, store the departure time as latest time
 		VehicleData vehData = this.data.vehicleData.get(event.getVehicleId());
 		if (vehData != null) {
-			LineData line = this.data.lineData.computeIfAbsent(vehData.lineId, id -> new LineData());
-			RouteData route = line.routeData.computeIfAbsent(vehData.routeId, id -> new RouteData());
+			LineData line = this.data.lineData.get(vehData.lineId);
+			RouteData route = line.routeData.get(vehData.routeId);
 			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
 			DepartureData dep = stop.getOrCreate(vehData.departureId);
 			dep.vehDepTime = event.getTime();
@@ -75,10 +85,11 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 		if (vehData != null) {
 			vehData.currentPaxCount++;
 			double waitStart = this.data.waitingStarttimes.remove(event.getPersonId());
-			LineData line = this.data.lineData.computeIfAbsent(vehData.lineId, id -> new LineData());
-			RouteData route = line.routeData.computeIfAbsent(vehData.routeId, id -> new RouteData());
+			LineData line = this.data.lineData.get(vehData.lineId);
+			RouteData route = line.routeData.get(vehData.routeId);
 			StopData stop = route.stopData.computeIfAbsent(vehData.stopFacilityId, id -> new StopData());
 			stop.getOrCreate(vehData.departureId).addWaitingPerson(waitStart);
+			this.data.lastUsedDeparturePerPerson.put(event.getPersonId(), vehData.departureId);
 		}
 	}
 

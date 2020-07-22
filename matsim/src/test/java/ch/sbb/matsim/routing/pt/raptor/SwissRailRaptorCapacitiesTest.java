@@ -94,7 +94,7 @@ public class SwissRailRaptorCapacitiesTest {
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
 		srrConfig.setUseCapacityConstraints(true);
 		executionData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(executionData);
+		ExecutionTracker tracker = new ExecutionTracker(executionData, f.scenario);
 
 		raptorData = SwissRailRaptorData.create(
 				f.scenario.getTransitSchedule(), null,

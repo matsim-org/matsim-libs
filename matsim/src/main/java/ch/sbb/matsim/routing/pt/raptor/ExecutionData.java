@@ -30,6 +30,7 @@ public class ExecutionData {
 	final IdMap<TransitLine, LineData> lineData = new IdMap<>(TransitLine.class);
 	final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
 	final Map<Id<Person>, Double> waitingStarttimes = new HashMap<>();
+	final Map<Id<Person>, Id<Departure>> lastUsedDeparturePerPerson = new HashMap<>();
 	private CacheData cache = null;
 
 	public void reset() {
@@ -37,6 +38,7 @@ public class ExecutionData {
 		this.vehicleData.clear();
 		this.waitingStarttimes.clear();
 		this.lineData.clear();
+		this.lastUsedDeparturePerPerson.clear();
 		this.cache = null;
 	}
 
@@ -87,6 +89,26 @@ public class ExecutionData {
 		return null;
 	}
 
+	public RouteData getRouteData(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute) {
+		LineData line = this.lineData.get(transitLine);
+		if (line == null) {
+			return null;
+		}
+		return line.routeData.get(transitRoute);
+	}
+
+	public Vehicle getVehicle(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<Departure> departure) {
+		LineData line = this.lineData.get(transitLine);
+		if (line == null) {
+			return null;
+		}
+		RouteData route = line.routeData.get(transitRoute);
+		if (route == null) {
+			return null;
+		}
+		return route.vehicles.get(departure);
+	}
+
 	public int getNextAvailableDeparture(SwissRailRaptorData data, SwissRailRaptorData.RRouteStop routeStop, double time) {
 		CacheData cache = getCache(data);
 
@@ -107,6 +129,10 @@ public class ExecutionData {
 			return -1;
 		}
 		return offset + pos;
+	}
+
+	public Id<Departure> getLastUsedDeparture(Id<Person> personId) {
+		return this.lastUsedDeparturePerPerson.get(personId);
 	}
 
 	private CacheData getCache(SwissRailRaptorData data) {
@@ -175,6 +201,12 @@ public class ExecutionData {
 
 	static class RouteData {
 		Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<>();
+		Map<Id<Departure>, Vehicle> vehicles = new HashMap<>();
+		final TransitRoute route;
+
+		public RouteData(TransitRoute route) {
+			this.route = route;
+		}
 	}
 
 	static class StopData {
