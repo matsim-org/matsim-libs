@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.AdaptiveRealTimeRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -649,13 +650,25 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				Optional.empty() :
 				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
 	}
+	
+	public Optional<AdaptiveRealTimeRebalancingParams> getAdaptiveRealTimeRebalancing() {
+		Collection<? extends ConfigGroup> parameterSets = getParameterSets(AdaptiveRealTimeRebalancingParams.SET_NAME);
+		if (parameterSets.size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		return parameterSets.isEmpty() ?
+				Optional.empty() :
+				Optional.of((AdaptiveRealTimeRebalancingParams)parameterSets.iterator().next());
+	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		switch (type) {
 			case MinCostFlowRebalancingParams.SET_NAME:
 				return new MinCostFlowRebalancingParams();
-
+			case AdaptiveRealTimeRebalancingParams.SET_NAME:
+				return new AdaptiveRealTimeRebalancingParams();
+				
 			case ExtensiveInsertionSearchParams.SET_NAME:
 				return new ExtensiveInsertionSearchParams();
 

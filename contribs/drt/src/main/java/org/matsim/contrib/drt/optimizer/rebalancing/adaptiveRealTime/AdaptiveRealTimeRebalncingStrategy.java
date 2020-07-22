@@ -10,32 +10,23 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostRelocationCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.zone.ZonalSystem;
 
 public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
-
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
-	private final MinCostFlowRebalancingParams params; // TODO: perhaps create a general parameter file for various
-														// rebalancing algorithms
-	private final RebalancingTargetCalculator rebalancingTargetCalculator; // TODO remove this after the parameter fies
-																			// is updated
+	private final AdaptiveRealTimeRebalancingParams params;
 
 	private final List<Pair<String, Integer>> supply = new ArrayList<>();
 	private final List<Pair<String, Integer>> demand = new ArrayList<>();
 	private final Map<String, Integer> targetMap = new HashMap<>();
 
-	public AdaptiveRealTimeRebalncingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
-			DrtZonalSystem zonalSystem, Fleet fleet, MinCostRelocationCalculator minCostRelocationCalculator,
-			MinCostFlowRebalancingParams params) {
-		this.rebalancingTargetCalculator = rebalancingTargetCalculator;
+	public AdaptiveRealTimeRebalncingStrategy(DrtZonalSystem zonalSystem, Fleet fleet,
+			MinCostRelocationCalculator minCostRelocationCalculator, AdaptiveRealTimeRebalancingParams params) {
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
@@ -45,19 +36,20 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		// initialization each time this function is called
-		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem, params);
+		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		supply.clear();
 		demand.clear();
 		targetMap.clear();
 		// Get idling vehicles in each zone
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-				.groupRebalancableVehicles(rebalancableVehicles, time);
+				.groupRebalancableVehicles(rebalancableVehicles, time, params.getMinServiceTime());
 		if (rebalancableVehiclesPerZone.isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		// Get soon idle vehicle for each zone
-		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(time);
+		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(time,
+				params.getMaxTimeBeforeIdle(), params.getMinServiceTime());
 
 		// calculate real time target of each zone
 		calculateRealTimeRebalanceTarget(targetMap, fleet, zonalSystem, rebalancableVehicles);
@@ -75,6 +67,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 			}
 		}
 
+		System.err.println("we are here!!!"); // TODO delete this line after running properly
 		// calculate using min cost flow method
 		return minCostRelocationCalculator.calcRelocations(supply, demand, rebalancableVehiclesPerZone);
 	}
