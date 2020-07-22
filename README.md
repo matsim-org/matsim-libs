@@ -1,4 +1,3 @@
-# freight-dfg17 project 
+# freight-dfg17 project
 
-Repository to store private files. Public source code should be put into the freight contribution on github:
-https://github.com/matsim-org/matsim-libs/tree/master/contribs/freight
+Repository related to DFG freight project.  Code not ready to be used by outsiders.
