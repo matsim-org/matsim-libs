@@ -103,7 +103,7 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 		});
 		
 		
-		// TODO remove this part
+		// TODO change this part
 		switch (params.getZonalDemandAggregatorType()) {
 		case PreviousIterationZonalDemandAggregator:
 			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
