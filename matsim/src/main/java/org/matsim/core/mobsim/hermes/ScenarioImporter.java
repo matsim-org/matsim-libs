@@ -423,14 +423,14 @@ public class ScenarioImporter {
 				if (scenario.getConfig().hermes().getMainModes().contains(leg.getMode())) {
 					processPlanNetworkRoute(person, flatplan, events, leg, (NetworkRoute) route);
 				} else {
-					handleTeleport(id, flatplan, events, (Leg) element, route, mode);
+					processTeleport(id, flatplan, events, (Leg) element, route, mode);
 				}
 			}
             else if (route instanceof TransitPassengerRoute) {
 				processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
 
 			} else if (route instanceof GenericRouteImpl) {
-				handleTeleport(id, flatplan, events, (Leg) element, route, mode);
+				processTeleport(id, flatplan, events, (Leg) element, route, mode);
 			} else {
             	throw new RuntimeException("Route type not supported by Hermes: "+route.getRouteType() + "\n Person:" + id+"\n Leg"+leg+"\n Leg"+route);
 			}
@@ -444,7 +444,7 @@ public class ScenarioImporter {
 		}
 	}
 
-	private void handleTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
+	private void processTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
 		double routeTravelTime = route.getTravelTime().orElse(0.0);
 		double legTravelTime = element.getTravelTime().orElse(0.0);
 		int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
