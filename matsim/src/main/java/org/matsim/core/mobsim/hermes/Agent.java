@@ -1,9 +1,8 @@
 package org.matsim.core.mobsim.hermes;
 
-import org.matsim.core.events.EventArray;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.matsim.core.events.EventArray;
 
 public class Agent {
 
@@ -90,22 +89,19 @@ public class Agent {
     private int capacity;
 
     // Number of passegers that are currently being transported.
-    private int passagersInside;
+    private int passengersInside;
 
     // Array of passagers on this vehicle.
-    private ArrayList<ArrayList<Agent>> passagersByStop;
+    private ArrayList<ArrayList<Agent>> passengersByStop;
 
-    public Agent(int id, PlanArray plan, EventArray events) {
+    public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this.id = id;
         this.plan = plan;
         this.events = events;
-    }
-    public Agent(int id, int capacity, PlanArray plan, EventArray events) {
-        this(id, plan, events);
         this.capacity = capacity;
-        this.passagersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
+        this.passengersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
         for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-            this.passagersByStop.add(new ArrayList<>());
+            this.passengersByStop.add(new ArrayList<>());
         }
     }
 
@@ -125,22 +121,28 @@ public class Agent {
     public long currPlan() { return this.plan.get(planIndex); }
     public long prevPlan() { return this.plan.get(planIndex - 1); }
     public boolean finished() { return planIndex >= (plan.size() - 1); }
-    public int capacity() { return this.capacity; }
-    public boolean isVehicle() { return this.passagersByStop == null; }
+
+    public int capacity() {
+        return this.capacity;
+    }
+
+    public boolean isVehicle() {
+        return this.passengersByStop == null;
+    }
 
     public ArrayList<Agent> egress(int stopidx) {
-        ArrayList<Agent> ret = passagersByStop.get(stopidx);
-        passagersInside -= ret.size();
-        passagersByStop.set(stopidx, new ArrayList<>());
+        ArrayList<Agent> ret = passengersByStop.get(stopidx);
+        passengersInside -= ret.size();
+        passengersByStop.set(stopidx, new ArrayList<>());
         return ret;
     }
 
     public boolean access(int stopidx, Agent agent) {
-        if (passagersInside == capacity) {
+        if (passengersInside == capacity) {
             return false;
         } else {
-            passagersByStop.get(stopidx).add(agent);
-            passagersInside++;
+            passengersByStop.get(stopidx).add(agent);
+            passengersInside++;
             return true;
         }
     }
@@ -188,7 +190,7 @@ public class Agent {
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    private static long prepapreLinkEntryElement(long linkid, long velocity) {
+    private static long prepareLinkEntryElement(long linkid, long velocity) {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
@@ -226,15 +228,15 @@ public class Agent {
         eventsIndex = 0;
         linkFinishTime = 0;
         if (capacity > 0) {
-            passagersInside = 0;
+            passengersInside = 0;
             for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-                this.passagersByStop.get(i).clear();
+                this.passengersByStop.get(i).clear();
             }
         }
     }
 
     public static long prepareLinkEntry(int eventid, int linkid, int velocity) {
-        return preparePlanEventEntry(LinkType, eventid, prepapreLinkEntryElement(linkid, velocity));
+        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity));
     }
 
     public static long prepareSleepForEntry(int eventid, int element) {
