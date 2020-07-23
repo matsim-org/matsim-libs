@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.drt.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
 import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
 
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -37,7 +38,7 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 
 	@Override
 	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		switch (((DrtTaskType)task.getTaskType())) {
+		switch (getBaseType(task)) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
@@ -60,8 +61,7 @@ public class DrtStayTaskEndTimeCalculator implements ScheduleTimingUpdater.StayT
 						.mapToDouble(DrtRequest::getEarliestStartTime)
 						.max()
 						.orElse(Double.NEGATIVE_INFINITY); //TODO REMOVE_STAY_TASK ?? @michal
-				double duration = stopDuration;
-				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
+				return Math.max(newBeginTime + stopDuration, maxEarliestPickupTime);
 			}
 
 			default:

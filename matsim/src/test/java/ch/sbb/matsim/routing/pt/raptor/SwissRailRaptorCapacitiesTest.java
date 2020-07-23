@@ -259,10 +259,10 @@ public class SwissRailRaptorCapacitiesTest {
 			{ // fast line
 				TransitLine fastLine = sf.createTransitLine(this.fastLineId);
 				List<TransitRouteStop> fastStops = new ArrayList<>();
-				fastStops.add(sf.createTransitRouteStop(this.stopA, Time.getUndefinedTime(), 0.0));
-				fastStops.add(sf.createTransitRouteStop(this.stopB, 5 * 60 - 30, 5 * 60));
-				fastStops.add(sf.createTransitRouteStop(this.stopC, 10 * 60 - 30, 10 * 60));
-				fastStops.add(sf.createTransitRouteStop(this.stopD, 15 * 60 - 30, Time.getUndefinedTime()));
+				fastStops.add(sf.createTransitRouteStopBuilder(this.stopA).departureOffset(0.0).build());
+				fastStops.add(sf.createTransitRouteStopBuilder(this.stopB).arrivalOffset(5 * 60 - 30).departureOffset(5 * 60).build());
+				fastStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(10 * 60 - 30).departureOffset(10 * 60).build());
+				fastStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(15 * 60 - 30).build());
 
 				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
 
@@ -278,10 +278,10 @@ public class SwissRailRaptorCapacitiesTest {
 			{ // slow line
 				TransitLine slowLine = sf.createTransitLine(this.slowLineId);
 				List<TransitRouteStop> slowStops = new ArrayList<>();
-				slowStops.add(sf.createTransitRouteStop(this.stopA, Time.getUndefinedTime(), 0.0));
-				slowStops.add(sf.createTransitRouteStop(this.stopB, 7 * 60 - 30, 7 * 60));
-				slowStops.add(sf.createTransitRouteStop(this.stopC, 14 * 60 - 30, 14 * 60));
-				slowStops.add(sf.createTransitRouteStop(this.stopD, 21 * 60 - 30, Time.getUndefinedTime()));
+				slowStops.add(sf.createTransitRouteStopBuilder(this.stopA).departureOffset(0.0).build());
+				slowStops.add(sf.createTransitRouteStopBuilder(this.stopB).arrivalOffset(7 * 60 - 30).departureOffset(7 * 60).build());
+				slowStops.add(sf.createTransitRouteStopBuilder(this.stopC).arrivalOffset(14 * 60 - 30).departureOffset(14 * 60).build());
+				slowStops.add(sf.createTransitRouteStopBuilder(this.stopD).arrivalOffset(21 * 60 - 30).build());
 
 				NetworkRoute route = RouteUtils.createNetworkRoute(List.of(linkAA.getId(), linkAB.getId(), linkBC.getId(), linkCD.getId()), network);
 

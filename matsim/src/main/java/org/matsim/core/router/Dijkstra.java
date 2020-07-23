@@ -20,6 +20,11 @@
 
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,13 +38,7 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Implementation of <a
@@ -205,9 +204,7 @@ import java.util.Set;
 	 * @param toNode
 	 *            The Node at which the route should end.
 	 * @param startTime
-	 *            The time at which the route should start. <i>Note:</i> Using
-	 *            {@link Time#getUndefinedTime()} does not imply "time is not relevant",
-	 *            rather, {@link Path#travelTime} will return {@link Double#NaN}.
+	 *            The time at which the route should start.
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.api.core.v01.network.Node, org.matsim.api.core.v01.network.Node, double, org.matsim.api.core.v01.population.Person, org.matsim.vehicles.Vehicle)
 	 */
 	@SuppressWarnings("unchecked")

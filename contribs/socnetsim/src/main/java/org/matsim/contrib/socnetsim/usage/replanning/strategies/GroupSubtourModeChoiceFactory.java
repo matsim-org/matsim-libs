@@ -19,21 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.router.TripRouter;
-
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
 import org.matsim.contrib.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
+import org.matsim.core.replanning.modules.SubtourModeChoice;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd
@@ -59,7 +59,7 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 
 	@Override
 	public GroupPlanStrategy get() {
-		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
+		final GroupPlanStrategy strategy = instantiateStrategy(sc.getConfig());
 
 		// Why the hell did I put this here???
 		//strategy.addStrategyModule(
@@ -67,17 +67,17 @@ public class GroupSubtourModeChoiceFactory extends AbstractConfigurableSelection
 		//			sc.getConfig(),
 		//			planRoutingAlgorithmFactory,
 		//			tripRouterFactory ) );
-
+		PermissibleModesCalculator permissibleModesCalculator = new PermissibleModesCalculatorImpl(sc.getConfig());
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
-					new SubtourModeChoice(
-							tripRouterProvider, sc.getConfig().global(), sc.getConfig().subtourModeChoice()) ) );
+						new SubtourModeChoice(
+								sc.getConfig().global(), sc.getConfig().subtourModeChoice(), permissibleModesCalculator)));
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
 				(VehicleRessources) sc.getScenarioElement(
-					VehicleRessources.ELEMENT_NAME );
-		if ( vehicles != null ) {
+						VehicleRessources.ELEMENT_NAME);
+		if (vehicles != null) {
 			strategy.addStrategyModule(
 					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
 							sc.getConfig(),

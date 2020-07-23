@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.ev.dvrp.ETask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
@@ -48,7 +48,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		public final double socBeforeFinalStay;
 
 		public EVehicleEntry(Entry entry, double socBeforeFinalStay) {
-			super(entry.vehicle, entry.start, entry.startOccupancy, entry.stops);
+			super(entry.vehicle, entry.start, entry.stops);
 			this.socBeforeFinalStay = socBeforeFinalStay;
 		}
 	}
@@ -71,7 +71,8 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		int taskCount = schedule.getTaskCount();
 		if (taskCount > 1) {
 			Task oneBeforeLast = schedule.getTasks().get(taskCount - 2);
-			if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED && oneBeforeLast instanceof ChargingTask) {
+			if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED && oneBeforeLast.getTaskType()
+					.equals(EDrtChargingTask.TYPE)) {
 				return null;
 			}
 		}

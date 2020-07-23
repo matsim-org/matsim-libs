@@ -46,7 +46,7 @@ public class EmissionGridAnalyzer {
     private final double smoothingRadius;
     private final double countScaleFactor;
 
-    private static GeometryFactory factory = new GeometryFactory();
+    private static final GeometryFactory factory = new GeometryFactory();
     private final GridType gridType;
     private final double gridSize;
     private final Network network;
@@ -186,7 +186,9 @@ public class EmissionGridAnalyzer {
         EmissionEventsReader eventsReader = new EmissionEventsReader(eventsManager);
         EmissionsOnLinkEventHandler handler = new EmissionsOnLinkEventHandler(binSize);
         eventsManager.addHandler(handler);
+        eventsManager.initProcessing();
         eventsReader.readFile(eventsFile);
+        eventsManager.finishProcessing();
         return handler.getTimeBins();
     }
 

@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
@@ -81,9 +81,8 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
-					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.
 					     Property value seems to magically default to false -->
 					<!--<skipTests>${skip.surefire.tests}</skipTests>-->
@@ -182,6 +181,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
@@ -236,10 +236,15 @@
 
 	<repositories>
 		<repository>
-            <!-- Geotools is not on Maven central -->
 			<id>osgeo</id>
-			<name>Geotools repository</name>
-			<url>http://download.osgeo.org/webdav/geotools</url>
+			<name>OSGeo Release Repository</name>
+			<url>https://repo.osgeo.org/repository/release/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
         <repository>
             <id>matsim</id>
@@ -256,17 +261,17 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-1.2-api</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -315,7 +320,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

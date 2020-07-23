@@ -35,6 +35,7 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.ev.dvrp.ChargingActivity;
+import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.OfflineETaskTracker;
 import org.matsim.contrib.ev.dvrp.tracker.OnlineEDriveTaskTracker;
@@ -55,9 +56,9 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		if (task instanceof EDrtChargingTask) {
+		if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
 			task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle)vehicle, timer));
-			return new ChargingActivity((EDrtChargingTask)task);
+			return new ChargingActivity((ChargingTask)task);
 		} else {
 			DynAction dynAction = drtActionCreator.createAction(dynAgent, vehicle, now);
 			if (task.getTaskTracker() == null) {

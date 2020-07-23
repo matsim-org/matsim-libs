@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
  * @author michalm
  */
 public class VehicleAssignmentProblem<D> {
-	public static interface AssignmentCost<D> {
+	public interface AssignmentCost<D> {
 		double calc(VehicleData.Entry departure, DestEntry<D> dest, PathData pathData);
 	}
 

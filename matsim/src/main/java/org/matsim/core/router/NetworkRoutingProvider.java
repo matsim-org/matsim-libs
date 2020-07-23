@@ -123,17 +123,17 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 						travelTime);
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
-		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
+		if ( !plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			/* 
 			 * All network modes should fall back to the TransportMode.walk RoutingModule for access/egress to the Network.
 			 * However, TransportMode.walk cannot fallback on itself for access/egress to the Network, so don't pass an
 			 * accessEgressToNetworkRouter RoutingModule.
 			 */
+			//null only works because walk is hardcoded and treated uniquely in the routing module. tschlenther june '20
 			if (mode.equals(TransportMode.walk)) {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null ) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, null);
 			} else {
-				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork,
-						walkRouter) ;
+				return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork, walkRouter) ;
 			}
 			
 		} else {

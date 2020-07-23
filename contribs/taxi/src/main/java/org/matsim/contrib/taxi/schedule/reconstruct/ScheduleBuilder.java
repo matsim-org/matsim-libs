@@ -59,7 +59,7 @@ public class ScheduleBuilder {
 		if (currentRequest != null) {
 			tasks.add(new TaxiOccupiedDriveTask(vrpPath, currentRequest));
 		} else {
-			tasks.add(new TaxiEmptyDriveTask(vrpPath));
+			tasks.add(new TaxiEmptyDriveTask(vrpPath, TaxiEmptyDriveTask.TYPE));
 		}
 	}
 

@@ -1,6 +1,13 @@
 package org.matsim.api.core.v01;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 /**
@@ -8,12 +15,14 @@ import java.util.function.BiConsumer;
  */
 public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
+	private static final int INCREMENT = 100;
+	private static final float INCREMENT_FACTOR = 1.5f;
 	private Class<T> idClass;
 	private int size = 0;
 	private Object[] data;
 
 	public IdMap(Class<T> idClass) {
-		this(idClass, Math.max(Id.getNumberOfIds(idClass), 100));
+		this(idClass, Math.max(Id.getNumberOfIds(idClass), INCREMENT));
 	}
 
 	public IdMap(Class<T> idClass, int size) {
@@ -144,7 +153,8 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
 	private void ensureCapacity(int index) {
 		if (index >= this.data.length) {
-			Object[] tmp = new Object[index + 100];
+			int newSize = Math.max(index + INCREMENT, (int)(data.length * INCREMENT_FACTOR));
+			Object[] tmp = new Object[newSize];
 			System.arraycopy(this.data, 0, tmp, 0, this.data.length);
 			this.data = tmp;
 		}

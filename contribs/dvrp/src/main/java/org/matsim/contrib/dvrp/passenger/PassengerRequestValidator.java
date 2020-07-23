@@ -35,6 +35,9 @@ public interface PassengerRequestValidator {
 	 * constraints.
 	 * <p>
 	 * Preferred format for causes: underscores instead of spaces.
+	 * <p>
+	 * Thread safety: This method can be called concurrently from multiple QSim worker threads.
+	 * Prefer stateless implementation, otherwise provide other ways to achieve thread-safety.
 	 *
 	 * @param request to be validated
 	 * @return set containing causes of constraint violations. An empty set means the request fulfills all

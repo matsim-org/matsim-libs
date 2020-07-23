@@ -34,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -79,8 +78,8 @@ public class TransitScheduleIOTest {
 					new Id[]{Id.create("aboveGround", Link.class), Id.create("belowSky", Link.class)},
 					Id.create("sky", Link.class));
 			List<TransitRouteStop> stops = new ArrayList<>();
-			TransitRouteStop rStop1 = f.createTransitRouteStop(stop1, Time.getUndefinedTime(), 0.0);
-			TransitRouteStop rStop2 = f.createTransitRouteStop(stop1, 9999.9, Time.getUndefinedTime());
+			TransitRouteStop rStop1 = f.createTransitRouteStopBuilder(stop1).departureOffset(0.0).build();
+			TransitRouteStop rStop2 = f.createTransitRouteStopBuilder(stop1).arrivalOffset(9999.9).build();
 			stops.add(rStop1);
 			stops.add(rStop2);
 			TransitRoute route1a = f.createTransitRoute(Id.create("upwards", TransitRoute.class), netRoute, stops, "elevator");

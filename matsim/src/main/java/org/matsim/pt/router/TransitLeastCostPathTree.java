@@ -39,7 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -299,7 +298,7 @@ public class TransitLeastCostPathTree {
 				}
 
 				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
-						Time.getUndefinedTime(),null,null);
+						Double.NEGATIVE_INFINITY,null,null);
 
 				downstreamLink = null;
 			} else {

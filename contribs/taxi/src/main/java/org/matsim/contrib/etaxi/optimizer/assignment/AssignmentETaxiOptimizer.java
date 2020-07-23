@@ -79,7 +79,8 @@ import com.google.common.collect.Maps;
 public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public static AssignmentETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
-			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, ChargingInfrastructure chargingInfrastructure) {
+			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
+			ChargingInfrastructure chargingInfrastructure) {
 		MultiNodePathCalculator multiNodeRouter = (MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(
 				true).createPathCalculator(network, travelDisutility, travelTime);
 		BackwardMultiNodePathCalculator backwardMultiNodeRouter = (BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(
@@ -87,8 +88,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility,
 				travelTime);
 		return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, travelTime, eScheduler,
-				scheduleTimingUpdater,
-				chargingInfrastructure, multiNodeRouter, backwardMultiNodeRouter, router);
+				scheduleTimingUpdater, chargingInfrastructure, multiNodeRouter, backwardMultiNodeRouter, router);
 	}
 
 	private final AssignmentETaxiOptimizerParams params;
@@ -102,9 +102,10 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging;
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			MobsimTimer timer, TravelTime travelTime, ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
-			ChargingInfrastructure chargingInfrastructure, MultiNodePathCalculator multiNodeRouter,
-			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
+			MobsimTimer timer, TravelTime travelTime, ETaxiScheduler eScheduler,
+			ScheduleTimingUpdater scheduleTimingUpdater, ChargingInfrastructure chargingInfrastructure,
+			MultiNodePathCalculator multiNodeRouter, BackwardMultiNodePathCalculator backwardMultiNodeRouter,
+			LeastCostPathCalculator router) {
 		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
 				new AssignmentRequestInserter(fleet, timer, travelTime, eScheduler,
 						((AssignmentETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getAssignmentTaxiOptimizerParams(),
@@ -188,7 +189,7 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 	public void nextTask(DvrpVehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			if (schedule.getCurrentTask() instanceof ETaxiChargingTask) {
+			if (schedule.getCurrentTask().getTaskType().equals(ETaxiChargingTask.TYPE)) {
 				if (scheduledForCharging.remove(vehicle.getId()) == null) {
 					throw new IllegalStateException();
 				}
@@ -205,14 +206,17 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		double chargingPlanningHorizon = 10 * 60;// 10 minutes (should be longer than socCheckTimeStep)
 		double maxDepartureTime = timer.getTimeOfDay() + chargingPlanningHorizon;
 		Stream<DvrpVehicle> vehiclesBelowMinSocLevel = fleet.getVehicles()
-				.values().stream().filter(v -> isChargingSchedulable((EvDvrpVehicle)v, eScheduler, maxDepartureTime));
+				.values()
+				.stream()
+				.filter(v -> isChargingSchedulable((EvDvrpVehicle)v, eScheduler.getScheduleInquiry(),
+						maxDepartureTime));
 
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
 		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
 				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
 
-		return new VehicleData(timer.getTimeOfDay(), eScheduler, leastChargedVehicles.stream());
+		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}
 
 	// TODO MIN_RELATIVE_SOC should depend on %idle

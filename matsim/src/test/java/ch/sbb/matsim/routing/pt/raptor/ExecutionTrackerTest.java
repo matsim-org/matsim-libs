@@ -40,6 +40,7 @@ public class ExecutionTrackerTest {
 		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
 		events.addHandler(tracker);
 
+		events.initProcessing();
 		f.generateEvents(events);
 
 		DepartureData data;
@@ -115,9 +116,10 @@ public class ExecutionTrackerTest {
 		ExecutionData execData = new ExecutionData();
 		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
 		events.addHandler(tracker);
-		
+
+		events.initProcessing();
 		f.generateEvents(events);
-		
+
 		DepartureData data;
 		data = execData.getDepartureData(f.line1, f.route1, f.stop1, f.dep0);
 		Assert.assertEquals(0, data.paxCountAtDeparture);

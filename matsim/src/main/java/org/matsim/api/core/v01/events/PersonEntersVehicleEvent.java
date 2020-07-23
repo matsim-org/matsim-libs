@@ -37,7 +37,7 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id<Person> personId;
-	private final Id<Vehicle> vehicleId;
+	private Id<Vehicle> vehicleId;
 
 	public PersonEntersVehicleEvent(final double time, final Id<Person> personId, final Id<Vehicle> vehicleId) {
 		super(time);
@@ -48,7 +48,11 @@ public class PersonEntersVehicleEvent extends Event implements HasPersonId {
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
-	
+
+	public void setVehicleId(Id<Vehicle> vehicleId) {
+		this.vehicleId = vehicleId;
+	}
+
 	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;

@@ -17,7 +17,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 
@@ -96,7 +95,7 @@ public final class RaptorUtils {
 
     public static List<Leg> convertRouteToLegs(RaptorRoute route) {
         List<Leg> legs = new ArrayList<>(route.parts.size());
-        double lastArrivalTime = Time.getUndefinedTime();
+        double lastArrivalTime = Double.NaN;
         for (RaptorRoute.RoutePart part : route.parts) {
             if (part.planElements != null) {
                 for (PlanElement pe : part.planElements) {

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,11 +41,13 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DrtStopTask extends StayTask {
+	public static final DrtTaskType TYPE = new DrtTaskType(STOP);
+
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
 	public DrtStopTask(double beginTime, double endTime, Link link) {
-		super(DrtTaskType.STOP, beginTime, endTime, link);
+		super(TYPE, beginTime, endTime, link);
 	}
 
 	/**

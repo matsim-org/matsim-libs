@@ -50,7 +50,7 @@ public class ElectricFleetModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ElectricFleet.class).toProvider(new Provider<ElectricFleet>() {
+				bind(ElectricFleet.class).toProvider(new Provider<>() {
 					@Inject
 					private ElectricFleetSpecification fleetSpecification;
 					@Inject

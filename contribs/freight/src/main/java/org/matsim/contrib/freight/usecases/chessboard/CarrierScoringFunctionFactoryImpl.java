@@ -81,14 +81,14 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 TimeWindow tw = ((FreightActivity) act).getTimeWindow();
                 if(actStartTime > tw.getEnd()){
                     double penalty_score = (-1)*(actStartTime - tw.getEnd())*missedTimeWindowPenalty;
-                    assert penalty_score <= 0.0 : "penalty score must be negative";
+                    if (!(penalty_score <= 0.0)) throw new AssertionError("penalty score must be negative");
 //                    log.info("penalty " + penalty_score);
                     score += penalty_score;
 
                 }
 				double actTimeCosts = (act.getEndTime().seconds() -actStartTime)*timeParameter;
 //                log.info("actCosts " + actTimeCosts);
-                assert actTimeCosts >= 0.0 : "actTimeCosts must be positive";
+                if (!(actTimeCosts >= 0.0)) throw new AssertionError("actTimeCosts must be positive");
                 score += actTimeCosts*(-1);
             }
         }
@@ -207,10 +207,10 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 }
 
                 double distanceCosts = distance*getDistanceParameter(vehicle);
-                assert distanceCosts >= 0.0 : "distanceCosts must be positive";
+                if (!(distanceCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * distanceCosts;
-				double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
-                assert timeCosts >= 0.0 : "timeCosts must be positive";
+        	double timeCosts = leg.getTravelTime().seconds() *getTimeParameter(vehicle);
+                if (!(timeCosts >= 0.0)) throw new AssertionError("distanceCosts must be positive");
                 score += (-1) * timeCosts;
 
             }

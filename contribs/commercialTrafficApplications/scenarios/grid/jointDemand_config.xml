@@ -453,8 +453,6 @@
         <param name="usePersonIdForMissingVehicleId" value="true"/>
         <!-- If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, flows are updated only if an agent wants to enter the link or an agent is added to buffer. Default is true. -->
         <param name="usingFastCapacityUpdate" value="true"/>
-        <!-- if the qsim should use as many runners as there are threads (Christoph's dissertation version) or more of them, together with a thread pool (seems to be faster in some situations, but is not tested). -->
-        <param name="usingThreadpool" value="true"/>
         <!-- Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: teleport wait exception  -->
         <param name="vehicleBehavior" value="teleport"/>
         <!-- If vehicles should all be the same default vehicle, or come from the vehicles file, or something else.  Possible values:  defaultVehicle modeVehicleTypesFromVehiclesData fromVehiclesData -->

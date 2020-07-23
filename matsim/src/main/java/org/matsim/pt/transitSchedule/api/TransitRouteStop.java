@@ -20,6 +20,7 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Describes the stop within a route of a transit line. Specifies also at
@@ -33,9 +34,9 @@ public interface TransitRouteStop {
 
 	public abstract void setStopFacility(final TransitStopFacility stopFacility);
 
-	public abstract double getDepartureOffset();
+	public abstract OptionalTime getDepartureOffset();
 
-	public abstract double getArrivalOffset();
+	public abstract OptionalTime getArrivalOffset();
 
 	/**
 	 * Specifies if a driver should wait until the specified departure time
@@ -59,4 +60,15 @@ public interface TransitRouteStop {
 	 */
 	public abstract boolean isAwaitDepartureTime();
 
+	interface Builder<B extends Builder<B>> {
+		Builder<B> stop(TransitStopFacility val);
+
+		Builder<B> departureOffset(double val);
+
+		Builder<B> arrivalOffset(double val);
+
+		Builder<B> awaitDepartureTime(boolean val);
+
+		TransitRouteStop build();
+	}
 }

@@ -28,11 +28,8 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 	
 	@Override
 	protected void configureQSim() {
-		if(this.getConfig().qsim().isUsingThreadpool()) {
-			bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).asEagerSingleton();
-		}else {
-			bind(QNetsimEngineI.class).to(QNetsimEngineWithBarriers.class).asEagerSingleton();
-		}
+		bind(QNetsimEngineI.class).to(QNetsimEngineWithThreadpool.class).asEagerSingleton();
+
 		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
 
 		if ( this.getConfig().qsim().isUseLanes() ) {

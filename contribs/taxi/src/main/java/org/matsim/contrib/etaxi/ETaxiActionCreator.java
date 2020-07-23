@@ -43,7 +43,7 @@ public class ETaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		return task instanceof ETaxiChargingTask ?
+		return task.getTaskType().equals(ETaxiChargingTask.TYPE) ?
 				new ChargingActivity((ETaxiChargingTask)task) :
 				taxiActionCreator.createAction(dynAgent, vehicle, now);
 	}

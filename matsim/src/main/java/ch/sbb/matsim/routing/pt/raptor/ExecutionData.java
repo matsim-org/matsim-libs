@@ -278,13 +278,6 @@ public class ExecutionData {
 				this.latestWaitStart = startWaitTime;
 			}
 		}
-
-		double getLatestWaitStart() {
-			if (Double.isFinite(this.latestWaitStart)) {
-				return this.latestWaitStart;
-			}
-			return Time.getUndefinedTime();
-		}
 	}
 
 	static class VehicleData {

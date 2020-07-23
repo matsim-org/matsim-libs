@@ -72,7 +72,7 @@ public final class MatsimVehicleReader implements MatsimReader{
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 			if ( VehicleSchemaV1Names.VEHICLEDEFINITIONS.equalsIgnoreCase( name ) ) {
 				String str = atts.getValue( "xsi:schemaLocation" );
-				log.info("Found following schemeLocation in vehicle definition file: " + str);
+				log.info("Found following schemaLocation in vehicle definition file: " + str);
 				if ( str.contains( "vehicleDefinitions_v1.0.xsd" ) ){
 					delegate = new VehicleReaderV1( vehicles );
 				} else if ( str.contains( "vehicleDefinitions_v2.0.xsd" ) ) {

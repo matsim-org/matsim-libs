@@ -4,6 +4,17 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -13,7 +24,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
@@ -26,15 +36,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author mrieser / SBB
@@ -121,7 +122,7 @@ public class SwissRailRaptorData {
         boolean useModeMapping = staticConfig.isUseModeMappingForPassengers();
         for (TransitLine line : schedule.getTransitLines().values()) {
             List<TransitRoute> transitRoutes = new ArrayList<>(line.getRoutes().values());
-            transitRoutes.sort((tr1, tr2) -> Double.compare(getEarliestDeparture(tr1).getDepartureTime(), getEarliestDeparture(tr2).getDepartureTime())); // sort routes by earliest departure for additional performance gains
+            transitRoutes.sort(Comparator.comparingDouble(tr -> getEarliestDeparture(tr).getDepartureTime())); // sort routes by earliest departure for additional performance gains
             for (TransitRoute route : transitRoutes) {
                 int indexFirstDeparture = indexDeparture;
                 String mode = TransportMode.pt;
@@ -507,12 +508,8 @@ public class SwissRailRaptorData {
             this.stopFacilityIndex = stopFacilityIndex;
             this.distanceAlongRoute = distanceAlongRoute;
             // "normalize" the arrival and departure offsets, make sure they are always well defined.
-            this.arrivalOffset = (int) (isUndefinedTime(routeStop.getArrivalOffset()) ? routeStop.getDepartureOffset() : routeStop.getArrivalOffset());
-            this.departureOffset = (int) (isUndefinedTime(routeStop.getDepartureOffset()) ? routeStop.getArrivalOffset() : routeStop.getDepartureOffset());
-        }
-
-        private static boolean isUndefinedTime(double time) {
-            return Time.isUndefinedTime(time) || Double.isNaN(time);
+            this.arrivalOffset = (int) routeStop.getArrivalOffset().or(routeStop::getDepartureOffset).seconds();
+            this.departureOffset = (int) routeStop.getDepartureOffset().or(routeStop::getArrivalOffset).seconds();
         }
     }
 

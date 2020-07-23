@@ -73,41 +73,41 @@ cache:
 
 env:
   matrix:
-    - MODULE=matsim                        
-    # sorted from longest to shortest (to minimise the overall test stage duration)
-    - MODULE=contribs/vsp
-    - MODULE=contribs/common
-    - MODULE=contribs/taxi
-    - MODULE=contribs/minibus
-    - MODULE=contribs/signals
-    - MODULE=contribs/bicycle
-    - MODULE=contribs/cadytsIntegration
-    - MODULE=contribs/carsharing
-    - MODULE=contribs/commercialTrafficApplications
-    - MODULE=contribs/drt
-    - MODULE=contribs/locationchoice
-    - MODULE=contribs/av
-    - MODULE=contribs/ev
-    - MODULE=contribs/dvrp
-    - MODULE=contribs/emissions
-    - MODULE=contribs/decongestion
-    - MODULE=contribs/noise
-    - MODULE=contribs/accidents
-    - MODULE=contribs/freight
-    - MODULE=contribs/parking
-    - MODULE=contribs/matrixbasedptrouter
-    - MODULE=contribs/accessibility
-    - MODULE=contribs/integration
-    - MODULE=contribs/multimodal
-    - MODULE=contribs/protobuf
-    - MODULE=contribs/socnetsim
-    - MODULE=contribs/pseudosimulation
-    - MODULE=contribs/roadpricing
-    - MODULE=contribs/analysis
-    - MODULE=contribs/eventsBasedPTRouter
-    - MODULE=contribs/hybridsim
-    - MODULE=contribs/otfvis
-    - MODULE=contribs/osm
+     - MODULE=matsim
+     # sorted from longest to shortest (to minimise the overall test stage duration)
+     - MODULE=contribs/vsp
+     - MODULE=contribs/common
+     - MODULE=contribs/taxi
+     - MODULE=contribs/minibus
+     - MODULE=contribs/signals
+     - MODULE=contribs/bicycle
+     - MODULE=contribs/cadytsIntegration
+     - MODULE=contribs/carsharing
+     - MODULE=contribs/commercialTrafficApplications
+     - MODULE=contribs/drt
+     - MODULE=contribs/locationchoice
+     - MODULE=contribs/av
+     - MODULE=contribs/ev
+     - MODULE=contribs/dvrp
+     - MODULE=contribs/emissions
+     - MODULE=contribs/decongestion
+     - MODULE=contribs/noise
+     - MODULE=contribs/accidents
+     - MODULE=contribs/freight
+     - MODULE=contribs/parking
+     - MODULE=contribs/matrixbasedptrouter
+     - MODULE=contribs/accessibility
+     - MODULE=contribs/integration
+     - MODULE=contribs/multimodal
+     - MODULE=contribs/protobuf
+     - MODULE=contribs/socnetsim
+     - MODULE=contribs/pseudosimulation
+     - MODULE=contribs/roadpricing
+     - MODULE=contribs/analysis
+     - MODULE=contribs/eventsBasedPTRouter
+     - MODULE=contribs/hybridsim
+     - MODULE=contribs/otfvis
+     - MODULE=contribs/osm
+     - MODULE=contribs/discrete_mode_choice
   global:
     - MAVEN_OPTS="-Xmx2g"
-

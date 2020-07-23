@@ -19,6 +19,13 @@
 
 package org.matsim.contrib.minibus.operator;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -28,11 +35,14 @@ import org.matsim.contrib.minibus.routeProvider.PRouteProvider;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * 
@@ -131,11 +141,11 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 		// current planned headway in case number of vehicles is not changed
 		double departureOffset = 0.0;
 		if (longestRouteH != null) {
-			departureOffset += longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset();
+			departureOffset += longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset().seconds();
 		}
 		
 		if (longestRouteR != null) {
-			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset();
+			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset().seconds();
 		}
 		
 		double headway = departureOffset / vehicleIds.size(); 

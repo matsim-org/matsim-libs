@@ -23,6 +23,10 @@
 package org.matsim.core.replanning.strategies;
 
 import com.google.inject.TypeLiteral;
+import java.util.HashSet;
+import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -30,16 +34,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.population.algorithms.PermissibleModesCalculator;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DefaultPlanStrategiesModule extends AbstractModule {
     private static final Logger log = Logger.getLogger( DefaultPlanStrategiesModule.class );
@@ -108,7 +109,8 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
             addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute).toProvider(TimeAllocationMutatorReRoute.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.SubtourModeChoice)) {
-            addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice).toProvider(SubtourModeChoice.class);
+			bind(PermissibleModesCalculator.class).to(PermissibleModesCalculatorImpl.class);
+			addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice).toProvider(SubtourModeChoice.class);
         }
         if (usedStrategyNames.contains(DefaultStrategy.ChangeTripMode)) {
             addPlanStrategyBinding(DefaultStrategy.ChangeTripMode).toProvider(ChangeTripMode.class);
