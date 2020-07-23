@@ -1,9 +1,8 @@
 package org.matsim.core.mobsim.hermes;
 
-import org.matsim.core.events.EventArray;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.matsim.core.events.EventArray;
 
 public class Agent {
 
@@ -188,7 +187,7 @@ public class Agent {
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    private static long prepapreLinkEntryElement(long linkid, long velocity) {
+    private static long prepareLinkEntryElement(long linkid, long velocity) {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
@@ -234,7 +233,7 @@ public class Agent {
     }
 
     public static long prepareLinkEntry(int eventid, int linkid, int velocity) {
-        return preparePlanEventEntry(LinkType, eventid, prepapreLinkEntryElement(linkid, velocity));
+        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity));
     }
 
     public static long prepareSleepForEntry(int eventid, int element) {
