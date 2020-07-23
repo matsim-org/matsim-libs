@@ -19,13 +19,25 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.contrib.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.IdleDynActivity;
+import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -40,11 +52,8 @@ import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -113,7 +122,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Activity act = (Activity) currentPlanElement;
 		//TODO: assume something different regarding initial parking location
 
-		return new IdleDynActivity(act.getType(), act.getEndTime());
+		return new IdleDynActivity(act.getType(), act.getEndTime().seconds());
 	}
 
 	@Override
@@ -209,14 +218,16 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
-		double endTime =nextPlannedActivity.getEndTime() ;
-        if (Time.isUndefinedTime(endTime)) {
-            if (Time.isUndefinedTime(nextPlannedActivity.getMaximumDuration())) {
+		final double endTime;
+		if (nextPlannedActivity.getEndTime().isUndefined()) {
+			if (nextPlannedActivity.getMaximumDuration().isUndefined()) {
                 endTime = Double.POSITIVE_INFINITY;
                 //last activity of a day
             } else {
-                endTime = now + nextPlannedActivity.getMaximumDuration();
+				endTime = now + nextPlannedActivity.getMaximumDuration().seconds();
             }
+		} else {
+			endTime = nextPlannedActivity.getEndTime().seconds();
 		}
 		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
@@ -263,7 +274,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
 		}
 		else if (currentLeg.getMode().equals(TransportMode.pt)) {
-			if (currentLeg.getRoute() instanceof ExperimentalTransitRoute){
+			if (currentLeg.getRoute() instanceof TransitPassengerRoute){
 				throw new IllegalStateException ("not yet implemented");
 			}
 			else {

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -71,7 +71,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
-		if (!stops.isPresent()) {
+		if (stops.isEmpty()) {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
 					+ ") and routing mode "
@@ -131,14 +131,7 @@ public class DvrpRoutingModule implements RoutingModule {
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility, double now) {
-		Activity activity = scenario.getPopulation()
-				.getFactory()
-				.createActivityFromCoord(PlanCalcScoreConfigGroup.createStageActivityType(mode),
-						stopFacility.getCoord());
-		activity.setMaximumDuration(0);
-		activity.setStartTime(now);
-		activity.setEndTime(now);
-		activity.setLinkId(stopFacility.getLinkId());
-		return activity;
+		return PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(stopFacility.getCoord(),
+				stopFacility.getLinkId(), mode);
 	}
 }

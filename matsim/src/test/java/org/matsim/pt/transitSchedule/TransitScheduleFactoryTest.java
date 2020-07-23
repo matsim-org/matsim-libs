@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -71,7 +70,7 @@ public class TransitScheduleFactoryTest {
 		Id<TransitRoute> id = Id.create(2, TransitRoute.class);
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(Id.create(3, Link.class), Id.create(4, Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
+		TransitRouteStop stop1 = new TransitRouteStopImpl.Builder().arrivalOffset(50).departureOffset(60).build();
 		stops.add(stop1);
 		String mode = TransportMode.pt;
 		TransitRoute tRoute = builder.createTransitRoute(id, route, stops, mode);
@@ -90,8 +89,8 @@ public class TransitScheduleFactoryTest {
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
 		Assert.assertEquals(stopFacility, stop.getStopFacility());
-		Assert.assertEquals(arrivalOffset, stop.getArrivalOffset(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(departureOffset, stop.getDepartureOffset(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(arrivalOffset, stop.getArrivalOffset().seconds(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(departureOffset, stop.getDepartureOffset().seconds(), MatsimTestUtils.EPSILON);
 	}
 
 	@Test

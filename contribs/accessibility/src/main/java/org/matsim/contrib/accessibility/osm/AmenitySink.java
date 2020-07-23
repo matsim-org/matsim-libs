@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.accessibility.osm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -46,6 +43,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
+
+import java.util.HashMap;
+import java.util.Map;
 
 class AmenitySink implements Sink {
 	private final Logger log = Logger.getLogger(AmenitySink.class);
@@ -370,7 +370,7 @@ class AmenitySink implements Sink {
 	
 
 	@Override
-	public void release() {
+	public void close() {
 
 	}
 

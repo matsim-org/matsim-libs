@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -80,14 +81,16 @@ public class RandomizingTimeDistanceTravelDisutilityTest {
 	
 	public NetworkRoute computeRoute(double sigma) {
 		Fixture f = new Fixture();
-		PlanCalcScoreConfigGroup planCalcScoreCfg = new PlanCalcScoreConfigGroup();
+//		PlanCalcScoreConfigGroup planCalcScoreCfg = new PlanCalcScoreConfigGroup();
+		Config config = ConfigUtils.createConfig();
+		PlanCalcScoreConfigGroup planCalcScoreCfg = config.planCalcScore();
 		ModeParams modeParams = new ModeParams(TransportMode.car);
 		modeParams.setMonetaryDistanceRate(-0.1);
 		planCalcScoreCfg.addModeParams(modeParams);
+		config.plansCalcRoute().setRoutingRandomness( sigma );
 		
-		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, planCalcScoreCfg);
-		factory.setSigma(sigma);
-		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(f.s.getNetwork());
+		RandomizingTimeDistanceTravelDisutilityFactory factory = new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
+                TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder(f.s.getNetwork());
 		TravelTimeCalculator calculator = builder.build();	
 		
 		TravelTime travelTime = calculator.getLinkTravelTimes();

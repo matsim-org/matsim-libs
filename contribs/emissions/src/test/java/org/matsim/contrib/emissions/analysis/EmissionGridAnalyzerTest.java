@@ -1,6 +1,8 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.CSVRecord;
 import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
@@ -8,26 +10,21 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.spatial.Grid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.Pollutant;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.contrib.emissions.utils.TestUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,59 +33,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class EmissionGridAnalyzerTest {
 
-    private static Logger logger = Logger.getLogger(EmissionGridAnalyzerTest.class);
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-    private static double getRandomValue(double upperBounds) {
-        return Math.random() * upperBounds;
-    }
-
-    private static void writeWarmEventsToFile( Path eventsFile, Network network, Pollutant pollutant, double pollutionPerEvent, int fromTime, int toTime ) {
-
-        EventsManager eventsManager = EventsUtils.createEventsManager();
-        EventWriter writer = new EventWriterXML(eventsFile.toString());
-        eventsManager.addHandler(writer);
-
-        network.getLinks().values().forEach(link -> {
-            for (int i = fromTime; i <= toTime; i++) {
-                eventsManager.processEvent( createWarmEmissionEvent(i, link, pollutant , pollutionPerEvent ) );
-            }
-        });
-        writer.closeFile();
-    }
-
-
-    private static Network createRandomNetwork(int numberOfLinks, double maxX, double maxY) {
-
-        Network network = NetworkUtils.createNetwork();
-
-        for (long i = 0; i < numberOfLinks; i++) {
-
-            Link link = createRandomLink(network.getFactory(), maxX, maxY);
-            network.addNode(link.getFromNode());
-            network.addNode(link.getToNode());
-            network.addLink(link);
-        }
-        return network;
-    }
-
-    private static Link createRandomLink(NetworkFactory factory, double maxX, double maxY) {
-        Node fromNode = createRandomNode(factory, maxX, maxY);
-        Node toNode = createRandomNode(factory, maxX, maxY);
-        return factory.createLink(Id.createLinkId(UUID.randomUUID().toString()), fromNode, toNode);
-    }
-
-    private static Node createRandomNode(NetworkFactory factory, double maxX, double maxY) {
-        Coord coord = new Coord(getRandomValue(maxX), getRandomValue(maxY));
-        return factory.createNode(Id.createNodeId(UUID.randomUUID().toString()), coord);
-    }
-
-    private static WarmEmissionEvent createWarmEmissionEvent( double time, Link link, Pollutant pollutant, double pollutionPerEvent ) {
-        Map<Pollutant, Double> emissions = new HashMap<>();
-        emissions.put(pollutant, pollutionPerEvent);
-        return new WarmEmissionEvent(time, link.getId(), Id.createVehicleId(UUID.randomUUID().toString()), emissions);
-    }
 
     private Geometry createRect(double maxX, double maxY) {
         return new GeometryFactory().createPolygon(new Coordinate[]{
@@ -117,9 +63,9 @@ public class EmissionGridAnalyzerTest {
 
         final Pollutant pollutant = HC;
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
-        Network network = createRandomNetwork(100, 1000, 1000);
-        writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99 );
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        Network network = TestUtils.createRandomNetwork(100, 1000, 1000);
+        TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, 1, 99);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withGridSize(100)
@@ -150,7 +96,7 @@ public class EmissionGridAnalyzerTest {
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
         network.addNode(to);
         network.addLink(network.getFactory().createLink(Id.createLinkId("link"), from, to));
-        writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time );
+        TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(5)
@@ -189,7 +135,7 @@ public class EmissionGridAnalyzerTest {
         Node to = network.getFactory().createNode(Id.createNodeId("to"), new Coord(6, 6));
         network.addNode(to);
         network.addLink(network.getFactory().createLink(Id.createLinkId("link"), from, to));
-        writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1 );
+        TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(5)
@@ -233,7 +179,7 @@ public class EmissionGridAnalyzerTest {
         Node to2 = network.getFactory().createNode(Id.createNodeId("to2"), new Coord(3, 3));
         network.addNode(to2);
         network.addLink(network.getFactory().createLink(Id.createLinkId("link2"), from2, to2));
-        writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time );
+        TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(5)
@@ -275,7 +221,7 @@ public class EmissionGridAnalyzerTest {
         Node to2 = network.getFactory().createNode(Id.createNodeId("to2"), new Coord(3, 3));
         network.addNode(to2);
         network.addLink(network.getFactory().createLink(Id.createLinkId("link2"), from2, to2));
-        writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1 );
+        TestUtils.writeWarmEventsToFile(eventsFile, network, pollutant, pollutionPerEvent, time, time + 1);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(5)
@@ -303,9 +249,9 @@ public class EmissionGridAnalyzerTest {
     public void process_withBoundaries() {
 
         final double pollutionPerEvent = 1;
-        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
-        Network network = createRandomNetwork(100, 1000, 1000);
-        writeWarmEventsToFile(eventsFile, network, NOx, pollutionPerEvent, 1, 99 );
+        Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        Network network = TestUtils.createRandomNetwork(100, 1000, 1000);
+        TestUtils.writeWarmEventsToFile(eventsFile, network, NOx, pollutionPerEvent, 1, 99);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withBounds(createRect(100, 100))
@@ -329,9 +275,9 @@ public class EmissionGridAnalyzerTest {
 
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
-        final Network network = createRandomNetwork(1, 1000, 1000);
-        writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3 );
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Network network = TestUtils.createRandomNetwork(1, 1000, 1000);
+        TestUtils.writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(200)
@@ -350,10 +296,10 @@ public class EmissionGridAnalyzerTest {
 
         final double pollutionPerEvent = 1;
         final int time = 1;
-        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
-        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".json");
-        final Network network = createRandomNetwork(1, 1000, 1000);
-        writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3 );
+        final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
+        final Path jsonFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".json");
+        final Network network = TestUtils.createRandomNetwork(1, 1000, 1000);
+        TestUtils.writeWarmEventsToFile(eventsFile, network, NO2, pollutionPerEvent, time, time + 3);
 
         EmissionGridAnalyzer analyzer = new EmissionGridAnalyzer.Builder()
                 .withSmoothingRadius(100)
@@ -367,5 +313,84 @@ public class EmissionGridAnalyzerTest {
         byte[] jsonFileData = Files.readAllBytes(jsonFile);
 
         assertTrue(jsonFileData.length > 0);
+    }
+
+    @Test
+    public void process_regression() throws IOException {
+
+        var network = NetworkUtils.readNetwork("./scenarios/sampleScenario/sample_network.xml");
+        var analyzer = new EmissionGridAnalyzer.Builder()
+                .withGridSize(10)
+                .withTimeBinSize(1000000) // aiming for single time bin
+                .withNetwork(network)
+                .withSmoothingRadius(50)
+                .withGridType(EmissionGridAnalyzer.GridType.Square)
+                .build();
+
+        var map = analyzer.process(testUtils.getInputDirectory() + "output_events.emissions.xml.gz");
+        writeGridToCSV(map, testUtils.getOutputDirectory() + "actual-pollution.csv");
+
+        // have this complicated comparison here, since due to rounding errors some values are not exactly the same, thus
+        // simply comparing the checksum of the file or the read in String is not sufficient
+        assertCsvValuesAreSame(Paths.get(testUtils.getInputDirectory() + "expected-pollution.csv"), Paths.get(testUtils.getOutputDirectory() + "actual-pollution.csv"));
+    }
+
+    private void writeGridToCSV(TimeBinMap<Grid<Map<Pollutant, Double>>> bins, String outputPath) {
+
+        var pollutants = Pollutant.values();
+
+        try (CSVPrinter printer = new CSVPrinter(new FileWriter(outputPath), CSVFormat.TDF)) {
+
+            //print header with all possible pollutants
+            printer.print("timeBinStartTime");
+            printer.print("x");
+            printer.print("y");
+
+            for (var p : pollutants) {
+                printer.print(p.toString());
+            }
+            printer.println();
+
+            //print values if pollutant was not present just print 0 instead
+            for (TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin : bins.getTimeBins()) {
+                final double timeBinStartTime = bin.getStartTime();
+                for (Grid.Cell<Map<Pollutant, Double>> cell : bin.getValue().getCells()) {
+
+                    printer.print(timeBinStartTime);
+                    printer.print(cell.getCoordinate().x);
+                    printer.print(cell.getCoordinate().y);
+
+                    for (var p : pollutants) {
+                        if (cell.getValue().containsKey(p)) {
+                            printer.print(cell.getValue().get(p));
+                        } else {
+                            printer.print(0);
+                        }
+                    }
+                    printer.println();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void assertCsvValuesAreSame(Path expected, Path acutal) throws IOException {
+
+        try (FileReader expectedReader = new FileReader(expected.toString()); var actualReader = new FileReader(acutal.toString())) {
+
+            var actualIterator = CSVFormat.TDF.withFirstRecordAsHeader().parse(actualReader).iterator();
+
+            for (CSVRecord expectedRecord : CSVFormat.TDF.withFirstRecordAsHeader().parse(expectedReader)) {
+                var actualRecord = actualIterator.next();
+                for (var i = 0; i < expectedRecord.size(); i++) {
+
+                    var expectedNumber = Double.parseDouble(expectedRecord.get(i));
+                    var actualNumber = Double.parseDouble(actualRecord.get(i));
+
+                    assertEquals(expectedNumber, actualNumber, 0.000001);
+                }
+            }
+        }
     }
 }

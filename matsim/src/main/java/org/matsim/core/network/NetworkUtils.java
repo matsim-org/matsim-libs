@@ -20,23 +20,31 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.*;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -45,22 +53,21 @@ import java.util.*;
  */
 public final class NetworkUtils {
 
-    private static Logger log = Logger.getLogger(NetworkUtils.class);
+	private static final Logger log = Logger.getLogger(NetworkUtils.class);
+	public static Network createNetwork(Config config) {
+		return createNetwork(config.network());
+	}
 
-    public static Network createNetwork(Config config) {
-        return createNetwork(config.network());
-    }
 
+	public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
+		Network network = new NetworkImpl();
 
-    public static Network createNetwork(NetworkConfigGroup networkConfigGroup) {
-        Network network = new NetworkImpl();
-        
-        if (networkConfigGroup.isTimeVariantNetwork()) {
-            network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
-        }
-        
-        return network;
-    }
+		if (networkConfigGroup.isTimeVariantNetwork()) {
+			network.getFactory().setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
+		}
+
+		return network;
+	}
 
 
 	/**
@@ -95,12 +102,7 @@ public final class NetworkUtils {
 	 */
 	public static Node[] getSortedNodes(final Network network) {
 		Node[] nodes = network.getNodes().values().toArray(new Node[network.getNodes().size()]);
-		Arrays.sort(nodes, new Comparator<Node>() {
-			@Override
-			public int compare(Node o1, Node o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		});
+		Arrays.sort(nodes, Comparator.comparing(Identifiable::getId));
 		return nodes;
 	}
 	
@@ -135,12 +137,7 @@ public final class NetworkUtils {
 	 */
 	public static Link[] getSortedLinks(final Network network) {
 		Link[] links = network.getLinks().values().toArray(new Link[network.getLinks().size()]);
-		Arrays.sort(links, new Comparator<Link>() {
-			@Override
-			public int compare(Link o1, Link o2) {
-				return o1.getId().compareTo(o2.getId());
-			}
-		});
+		Arrays.sort(links, Comparator.comparing(Identifiable::getId));
 		return links;
 	}
 	
@@ -255,7 +252,7 @@ public final class NetworkUtils {
 					// Works anyways, since (it seems to me) that that state (mode!=null, hasEmptyModes==true) can never be reached.
 					// ???  kai, feb'15
 				}
-			} else if (modes.size() == 0) {
+			} else {
 				if (mode != null) {
 					// i.e. we have no mode restriction on the current link, but a mode restriction on some other link. => multi-modal:
 					return true;
@@ -507,16 +504,16 @@ public final class NetworkUtils {
 		TreeMap<Double, Link> outLinksByOrientation = new TreeMap<>();
 
 		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
-			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
+			if (!(outLink.getToNode().equals(inLink.getFromNode()))) {
 				Coord coordOutLink = getVector(outLink);
 				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
 				double thetaDiff = thetaOutLink - thetaInLink;
-				if (thetaDiff < -Math.PI){
+				if (thetaDiff < -Math.PI) {
 					thetaDiff += 2 * Math.PI;
-				} else if (thetaDiff > Math.PI){
+				} else if (thetaDiff > Math.PI) {
 					thetaDiff -= 2 * Math.PI;
 				}
-				outLinksByOrientation.put(Double.valueOf(-thetaDiff), outLink);
+				outLinksByOrientation.put(-thetaDiff, outLink);
 			}
 		}
 		return outLinksByOrientation;
@@ -801,8 +798,37 @@ public final class NetworkUtils {
 		new MatsimNetworkReader(network).readFile(string);
 	}
 
+	public static OptionalTime getLinkAccessTime(Link link, String routingMode){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		Object o = link.getAttributes().getAttribute(attribute);
+		if (o!=null){
+			return OptionalTime.defined((double) o);
+		}
+		else return OptionalTime.undefined();
+	}
+
+	public static void setLinkAccessTime(Link link, String routingMode, double accessTime){
+		String attribute = NetworkRoutingInclAccessEgressModule.ACCESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		link.getAttributes().putAttribute(attribute,accessTime);
+	}
+
+	public static OptionalTime getLinkEgressTime(Link link, String routingMode){
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		Object o = link.getAttributes().getAttribute(attribute);
+		if (o!=null){
+			return OptionalTime.defined((double) o);
+		}
+		else return OptionalTime.undefined();
+	}
+
+	public static void setLinkEgressTime(Link link, String routingMode, double egressTime){
+		String attribute = NetworkRoutingInclAccessEgressModule.EGRESSTIMELINKATTRIBUTEPREFIX+routingMode;
+		link.getAttributes().putAttribute(attribute,egressTime);
+	}
+
+
 	public static Network readNetwork(String string) {
-		Network network = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getNetwork();
+		Network network = createNetwork();
 		new MatsimNetworkReader(network).readFile(string);
 		return network;
 	}
@@ -835,9 +861,13 @@ public final class NetworkUtils {
 		return true;
 	}
 
+	public static NetworkCollector getCollector() {
+		return new NetworkCollector();
+	}
+
 	private static boolean testLinksAreEqual(Link expected, Link actual) {
 
-		return expected.getAllowedModes().stream().allMatch(mode -> actual.getAllowedModes().contains(mode))
+		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
 				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
 				&& expected.getFreespeed() == actual.getFreespeed()
@@ -847,5 +877,16 @@ public final class NetworkUtils {
 
 	private static boolean testNodesAreEqual(Node expected, Node actual) {
 		return expected.getCoord().equals(actual.getCoord());
+	}
+
+	/**
+	 * Returns the closest point to on a link from a Point (either its orthogonal projection or the link's to and from node)
+	 * @param coord  Coord to check from
+	 * @param link the link
+	 * @return the closest Point as Coord
+	 */
+	public static Coord findNearestPointOnLink(Coord coord, Link link) {
+		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+
 	}
 }

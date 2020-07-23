@@ -31,7 +31,6 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.SymbolAxis;
-import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.StandardXYBarPainter;
@@ -41,7 +40,6 @@ import org.jfree.data.gantt.TaskSeriesCollection;
 import org.jfree.data.gantt.XYTaskDataset;
 import org.jfree.data.time.SimpleTimePeriod;
 import org.jfree.data.time.TimePeriod;
-import org.jfree.data.xy.XYDataset;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -89,7 +87,7 @@ public class ScheduleCharts {
 
 	@SuppressWarnings("serial")
 	private static class ChartTask extends org.jfree.data.gantt.Task {
-		private Task vrpTask;
+		private final Task vrpTask;
 
 		private ChartTask(String description, TimePeriod duration, Task vrpTask) {
 			super(description, duration);
@@ -110,12 +108,7 @@ public class ScheduleCharts {
 			setShadowVisible(false);
 			setDrawBarOutline(true);
 
-			setDefaultToolTipGenerator(new XYToolTipGenerator() {
-				@Override
-				public String generateToolTip(XYDataset dataset, int series, int item) {
-					return getTask(series, item).getDescription();
-				}
-			});
+			setDefaultToolTipGenerator((dataset, series, item) -> getTask(series, item).getDescription());
 		}
 
 		@Override
@@ -124,13 +117,12 @@ public class ScheduleCharts {
 		}
 
 		private ChartTask getTask(int series, int item) {
-			ChartTask chartTask = (ChartTask)tsc.getSeries(series).get(item);
-			return chartTask;
+			return (ChartTask)tsc.getSeries(series).get(item);
 		}
 
 	}
 
-	public static interface PaintSelector {
+	public interface PaintSelector {
 		Paint select(Task task);
 	}
 
@@ -146,7 +138,7 @@ public class ScheduleCharts {
 		throw new IllegalStateException();
 	};
 
-	public static interface DescriptionCreator {
+	public interface DescriptionCreator {
 		String create(Task task);
 	}
 

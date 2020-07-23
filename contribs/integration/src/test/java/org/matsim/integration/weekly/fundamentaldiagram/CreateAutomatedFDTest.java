@@ -76,6 +76,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -439,7 +440,7 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Double getExpectedTravelTime() {
+		public OptionalTime getExpectedTravelTime() {
 			throw new RuntimeException("not implemented");
 		}
 

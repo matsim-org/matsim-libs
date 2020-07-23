@@ -41,7 +41,7 @@ public class TaxiRequest implements PassengerRequest {
 		RIDE, // on board
 		DROPOFF, // being dropped off
 		PERFORMED, // completed
-		REJECTED; // rejected by the DISPATCHER
+		REJECTED // rejected by the DISPATCHER
 	}
 
 	private final Id<Request> id;

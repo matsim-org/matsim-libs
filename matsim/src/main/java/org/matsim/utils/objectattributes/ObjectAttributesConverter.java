@@ -24,6 +24,7 @@
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
+import org.matsim.api.core.v01.Coord;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import java.util.Set;
 
 /**
  * Object that converts arbitrary objects to and from strings based on the logic defined by {@AttributeConverter}s
+ *
  * @author thibautd
  */
 public class ObjectAttributesConverter {
@@ -47,13 +49,16 @@ public class ObjectAttributesConverter {
 	}
 
 	public ObjectAttributesConverter() {
-		this.converters.put(String.class.getName(), new StringConverter() );
-		this.converters.put(Integer.class.getName(), new IntegerConverter() );
-		this.converters.put(Float.class.getName(), new FloatConverter() );
-		this.converters.put(Double.class.getName(), new DoubleConverter() );
-		this.converters.put(Boolean.class.getName(), new BooleanConverter() );
-		this.converters.put(Long.class.getName(), new LongConverter() );
+		this.converters.put(String.class.getName(), new StringConverter());
+		this.converters.put(Integer.class.getName(), new IntegerConverter());
+		this.converters.put(Float.class.getName(), new FloatConverter());
+		this.converters.put(Double.class.getName(), new DoubleConverter());
+		this.converters.put(Boolean.class.getName(), new BooleanConverter());
+		this.converters.put(Long.class.getName(), new LongConverter());
 		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
+		this.converters.put(Map.class.getName(), new StringStringMapConverter());
+		this.converters.put(Coord.class.getName(), new CoordConverter());
+		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 	}
 
 	public Object convert(String className, String value) {
@@ -85,7 +90,10 @@ public class ObjectAttributesConverter {
 	}
 
 	public String convertToString(Object o) {
-		AttributeConverter converter = getConverter(o.getClass().getName());
+
+		// obviously this will not work this way if we have more generic conversion, but good for now, janek (Mar, 2020)
+		var className = isStringStringMap(o) ? Map.class.getName() : o.getClass().getName();
+		AttributeConverter converter = getConverter(className);
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
@@ -115,5 +123,15 @@ public class ObjectAttributesConverter {
 	 */
 	public AttributeConverter removeAttributeConverter(final Class<?> clazz) {
 		return this.converters.remove(clazz.getName());
+	}
+
+	private boolean isStringStringMap(Object o) {
+
+		// very ugly test for maps
+		if (o instanceof Map && ((Map) o).size() > 0) {
+			Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
+			return firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String;
+		}
+		return false;
 	}
 }

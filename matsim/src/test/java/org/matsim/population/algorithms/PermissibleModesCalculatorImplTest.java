@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +33,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PermissibleModesCalculator;
@@ -101,36 +102,37 @@ public class PermissibleModesCalculatorImplTest {
 
 	@Test
 	public void testWhenConsideringCarAvailability() throws Exception {
-		final List<String> modesWithCar = Arrays.asList( TransportMode.car , "rail" , "plane" );
-		final List<String> modesWithoutCar = Arrays.asList( "rail" , "plane" );
+		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
+		final List<String> modesWithoutCar = Arrays.asList("rail", "plane");
+		Config config = ConfigUtils.createConfig();
+		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
+		config.subtourModeChoice().setConsiderCarAvailability(true);
 
 		final PermissibleModesCalculator calculatorWithCarAvailability =
-			new PermissibleModesCalculatorImpl(
-					modesWithCar.toArray( new String[0] ),
-					true);
+				new PermissibleModesCalculatorImpl(config);
 
 		for (Fixture f : fixtures) {
 			assertListsAreCompatible(
 					f.name,
 					f.carAvail ? modesWithCar : modesWithoutCar,
-					calculatorWithCarAvailability.getPermissibleModes( f.plan ) );
+					calculatorWithCarAvailability.getPermissibleModes(f.plan));
 		}
 	}
 
 	@Test
 	public void testWhenNotConsideringCarAvailability() throws Exception {
-		final List<String> modesWithCar = Arrays.asList( TransportMode.car , "rail" , "plane" );
-
+		final List<String> modesWithCar = Arrays.asList(TransportMode.car, "rail", "plane");
+		Config config = ConfigUtils.createConfig();
+		config.subtourModeChoice().setModes(modesWithCar.toArray(new String[0]));
+		config.subtourModeChoice().setConsiderCarAvailability(false);
 		final PermissibleModesCalculator calculatorWithCarAvailability =
-			new PermissibleModesCalculatorImpl(
-					modesWithCar.toArray( new String[0] ),
-					false);
+				new PermissibleModesCalculatorImpl(config);
 
 		for (Fixture f : fixtures) {
 			assertListsAreCompatible(
 					f.name,
 					modesWithCar,
-					calculatorWithCarAvailability.getPermissibleModes( f.plan ) );
+					calculatorWithCarAvailability.getPermissibleModes(f.plan));
 		}
 	}
 

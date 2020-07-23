@@ -31,7 +31,7 @@ import java.util.Map;
  * @author dgrether
  *
  */
-public class VisSignalGroup {
+public final class VisSignalGroup {
 
 	private String id;
 	private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();

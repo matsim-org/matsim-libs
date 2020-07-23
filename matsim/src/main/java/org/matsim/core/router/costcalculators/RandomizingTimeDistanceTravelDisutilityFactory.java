@@ -21,12 +21,14 @@
 package org.matsim.core.router.costcalculators;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A factory for a disutility that leads to randomized Pareto search.  Starting point is to have something like disutility(link) = alpha * time + beta *
@@ -42,21 +44,28 @@ import java.util.Set;
 public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 	private static final Logger log = Logger.getLogger( RandomizingTimeDistanceTravelDisutilityFactory.class ) ;
 
-	private static int wrnCnt = 0 ;
-	private static int normalisationWrnCnt = 0;
+	private static final AtomicInteger wrnCnt = new AtomicInteger(0);
+	private static final AtomicInteger normalisationWrnCnt = new AtomicInteger(0);
 
 	private final String mode;
-	private double sigma = 3. ;
+	private final double sigma;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
-	public RandomizingTimeDistanceTravelDisutilityFactory(final String mode, PlanCalcScoreConfigGroup cnScoringGroup ) {
+	public RandomizingTimeDistanceTravelDisutilityFactory( final String mode, Config config ) {
+		// NOTE: It is difficult to get rid of this constructor completely, since "mode" needs to be passed in.  One could still get all other
+		// material from injection, but there are many uses of this class outside injection.
+
 		this.mode = mode;
-		this.cnScoringGroup = cnScoringGroup;
+		this.cnScoringGroup = config.planCalcScore();
+		this.sigma = config.plansCalcRoute().getRoutingRandomness();
 	}
 
 	@Override
-	public TravelDisutility createTravelDisutility(
-			final TravelTime travelTime) {
+	public TravelDisutility createTravelDisutility( final TravelTime travelTime) {
+		// yyyy This here should honor subpopulations.  It is really not so difficult; something like cnScoringGroup.getScoringParameters( "subpop"
+		// ).getMarginalUtilityOfMoney(); That line, or some variant of it, would need to be in the TravelDisutility directly. And I am quite unsure what is the status of
+		// the "default" subpopulation anyways ... I seem to recall that Thibaut wanted to get rid of that.  The following method at least outputs
+		// a warning.  However, we know by now that few people think about such warnings. kai, mar'20
 		logWarningsIfNecessary( cnScoringGroup );
 
 		final PlanCalcScoreConfigGroup.ModeParams params = cnScoringGroup.getModes().get( mode ) ;
@@ -72,8 +81,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		double normalization = 1;
 		if ( sigma != 0. ) {
 			normalization = 1. / Math.exp(this.sigma * this.sigma / 2);
-			if (normalisationWrnCnt < 10) {
-				normalisationWrnCnt++;
+			if (normalisationWrnCnt.getAndIncrement() < 10) {
 				log.info(" sigma: " + this.sigma + "; resulting normalization: " + normalization);
 			}
 		}
@@ -87,8 +95,7 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 	}
 
 	private void logWarningsIfNecessary(final PlanCalcScoreConfigGroup cnScoringGroup) {
-		if ( wrnCnt < 1 ) {
-			wrnCnt++ ;
+		if ( wrnCnt.getAndIncrement() < 1 ) {
 			if ( cnScoringGroup.getModes().get( mode ).getMonetaryDistanceRate() > 0. ) {
 				log.warn("Monetary distance cost rate needs to be NEGATIVE to produce the normal " +
 						"behavior; just found positive.  Continuing anyway.") ;
@@ -113,8 +120,4 @@ public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDis
 		}
 	}
 
-	public RandomizingTimeDistanceTravelDisutilityFactory setSigma(double val ) {
-		this.sigma = val ;
-		return this;
-	}
 }

@@ -39,11 +39,11 @@ class VehicularDepartureHandler implements DepartureHandler {
 
 	private final VehicleBehavior vehicleBehavior;
 
-	private final QNetsimEngine qNetsimEngine;
+	private final QNetsimEngineI qNetsimEngine;
 
 	private final Collection<String> transportModes;
 
-	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
+	VehicularDepartureHandler(QNetsimEngineI qNetsimEngine, VehicleBehavior vehicleBehavior, QSimConfigGroup qsimConfig) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
 		this.transportModes =qsimConfig.getMainModes();

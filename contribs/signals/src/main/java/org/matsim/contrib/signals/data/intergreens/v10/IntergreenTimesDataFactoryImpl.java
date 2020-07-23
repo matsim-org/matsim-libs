@@ -27,7 +27,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class IntergreenTimesDataFactoryImpl implements IntergreenTimesDataFactory {
+final class IntergreenTimesDataFactoryImpl implements IntergreenTimesDataFactory {
 
 	@Override
 	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id<SignalSystem> signalSystemId) {

@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
@@ -28,8 +30,18 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarrierUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("lightVehicle"));
-		assertNotNull(v.getType() );
-		
+
+		VehicleType vehicleTypeLoaded = v.getType();
+		assertNotNull(vehicleTypeLoaded);
+
+		assertEquals("light", vehicleTypeLoaded.getId().toString());
+		assertEquals(15, vehicleTypeLoaded.getCapacity().getOther(), EPSILON);
+		assertEquals(20, vehicleTypeLoaded.getCostInformation().getFixedCosts(), EPSILON);
+		assertEquals(0.35, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), EPSILON);
+		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), EPSILON);
+
+		assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
+		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), EPSILON);
 	}
 	
 	@Test
@@ -37,17 +49,19 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 		CarrierVehicle v = CarrierUtils.getCarrierVehicle(testCarrier,Id.createVehicleId("mediumVehicle"));
-		assertNotNull(v.getType() );
+
+		VehicleType vehicleTypeLoaded = v.getType();
+		assertNotNull(vehicleTypeLoaded);
+
+		assertEquals("medium", vehicleTypeLoaded.getId().toString());
+		assertEquals(30, vehicleTypeLoaded.getCapacity().getOther(), EPSILON);
+		assertEquals(50, vehicleTypeLoaded.getCostInformation().getFixedCosts(), EPSILON);
+		assertEquals(0.4, vehicleTypeLoaded.getCostInformation().getCostsPerMeter(), EPSILON);
+		assertEquals(30, vehicleTypeLoaded.getCostInformation().getCostsPerSecond(), EPSILON);
+
+		assertEquals("gasoline", vehicleTypeLoaded.getEngineInformation().getFuelType().toString());
+		assertEquals(0.02, VehicleUtils.getFuelConsumption(vehicleTypeLoaded), EPSILON);
 		
 	}
 
-//	private CarrierVehicle getVehicle(String vehicleName) {
-//		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
-//		Carrier testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
-//		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-//			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-//		}
-//		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-//		return null;
-//	}
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.core.scoring;
 
+import java.util.Collections;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -29,18 +31,31 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
+import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public class EventsToLegsTest {
@@ -73,6 +88,8 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, Id.createLinkId("l3"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -113,6 +130,8 @@ public class EventsToLegsTest {
 
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId1, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -129,6 +148,8 @@ public class EventsToLegsTest {
 		//driver leaves out vehicle after 10 seconds, no driving at all
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 0.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -149,8 +170,71 @@ public class EventsToLegsTest {
 				new VehicleLeavesTrafficEvent(25.0, agentId1, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 500.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
-
+	
+	@Test
+	public void testCreatesTransitPassengerRoute() {
+		Config config = ConfigUtils.createConfig();
+		config.transit().setUseTransit(true);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		Network network = scenario.getNetwork();
+		NetworkFactory networkFactory = network.getFactory();
+		
+		Node node1 = networkFactory.createNode(Id.createNodeId("node1"), new Coord(0.0, 0.0));
+		Node node2 = networkFactory.createNode(Id.createNodeId("node2"), new Coord(0.0, 0.0));
+		network.addNode(node1);
+		network.addNode(node2);
+		
+		Id<Link> accessLinkId = Id.createLinkId("accessLink");
+		Link accessLink = networkFactory.createLink(accessLinkId, node1, node2);
+		network.addLink(accessLink);
+		
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory scheduleFactory = schedule.getFactory();
+		
+		Id<TransitStopFacility> accessFacilityId = Id.create("accessFacility", TransitStopFacility.class);
+		TransitStopFacility accessFacility = scheduleFactory.createTransitStopFacility(accessFacilityId, new Coord(0.0, 0.0), false);
+		accessFacility.setLinkId(accessLinkId);
+		schedule.addStopFacility(accessFacility);
+		
+		Id<TransitLine> transitLineId = Id.create("testLineId", TransitLine.class);
+		TransitLine transitLine = scheduleFactory.createTransitLine(transitLineId);
+		schedule.addTransitLine(transitLine);
+		
+		Id<TransitRoute> transitRouteId = Id.create("testRouteId", TransitRoute.class);
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(accessLinkId, Collections.emptyList(), accessLinkId);
+		TransitRoute transitRoute = scheduleFactory.createTransitRoute(transitRouteId, networkRoute, Collections.emptyList(), "bus");
+		transitLine.addRoute(transitRoute);
+		
+		Id<Departure> departureId = Id.create("departureId", Departure.class);
+		Departure departure = scheduleFactory.createDeparture(departureId, 0.0);
+		transitRoute.addDeparture(departure);
+		
+		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
+		RememberingLegHandler lh = new RememberingLegHandler();
+		eventsToLegs.addLegHandler(lh);
+		
+		Id<Person> transitDriverId = Id.createPersonId("transitDriver");
+		Id<Vehicle> transitVehiceId = Id.createVehicleId("transitVehicle");
+		
+		Id<Person> passengerId = Id.createPersonId("passenger");
+		
+		eventsToLegs.handleEvent(new TransitDriverStartsEvent(0.0, transitDriverId, transitVehiceId, transitLineId, transitRouteId, departureId));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, passengerId, accessLinkId, "pt"));
+		eventsToLegs.handleEvent(new VehicleArrivesAtFacilityEvent(50.0, transitVehiceId, accessFacilityId, 0.0));
+		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(100.0, passengerId, transitVehiceId));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(1000.0, passengerId, accessLinkId, "pt"));
+		
+		Assert.assertEquals(10.0, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-3);
+		Assert.assertEquals(1000.0 - 10.0, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-3);
+		Assert.assertTrue(lh.handledLeg.getLeg().getRoute() instanceof TransitPassengerRoute);
+		
+		TransitPassengerRoute route = (TransitPassengerRoute) lh.handledLeg.getLeg().getRoute();
+		Assert.assertEquals(100.0, route.getBoardingTime().seconds(), 1e-3);
+	}
 
 	private static Scenario createTriangularNetwork() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -183,9 +267,9 @@ public class EventsToLegsTest {
 	private void assertLeg(RememberingLegHandler lh, double departureTime, double travelTime, double distance,
 			String mode) {
 		Assert.assertNotNull(lh.handledLeg);
-		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime(), 1e-9);
-		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime(), 1e-9);
+		Assert.assertEquals(departureTime, lh.handledLeg.getLeg().getDepartureTime().seconds(), 1e-9);
+		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getTravelTime().seconds(), 1e-9);
+		Assert.assertEquals(travelTime, lh.handledLeg.getLeg().getRoute().getTravelTime().seconds(), 1e-9);
 		Assert.assertEquals(distance, lh.handledLeg.getLeg().getRoute().getDistance(), 1e-9);
 		Assert.assertEquals(mode, lh.handledLeg.getLeg().getMode());
 	}

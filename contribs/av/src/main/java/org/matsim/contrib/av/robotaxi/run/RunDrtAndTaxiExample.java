@@ -23,7 +23,6 @@ package org.matsim.contrib.av.robotaxi.run;
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
@@ -33,7 +32,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -56,10 +54,9 @@ public class RunDrtAndTaxiExample {
 		controler.addOverridingModule(new MultiModeDrtModule());
 		controler.addOverridingModule(new MultiModeTaxiModule());
 
-		String taxiMode = TaxiConfigGroup.getSingleModeTaxiConfig(controler.getConfig()).getMode();
-		String drtMode = DrtConfigGroup.getSingleModeDrtConfig(controler.getConfig()).getMode();
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiMode, drtMode));
+		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeTaxiConfigGroup.get(config),
+				MultiModeDrtConfigGroup.get(config)));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

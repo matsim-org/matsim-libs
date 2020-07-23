@@ -45,6 +45,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -53,9 +54,10 @@ public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
 		ChargingEndEventHandler, MobsimScopeEventHandler {
 
-	public static final String CHARGING_IDENTIFIER = " charging interaction";
-	private Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
-	private Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
+	public static final String CHARGING_IDENTIFIER = " charging";
+	public static final String CHARGING_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(CHARGING_IDENTIFIER);
+	private final Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final ElectricFleet electricFleet;
@@ -77,7 +79,7 @@ public class VehicleChargingHandler
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().endsWith(CHARGING_IDENTIFIER)) {
+		if (event.getActType().endsWith(CHARGING_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);
@@ -97,7 +99,7 @@ public class VehicleChargingHandler
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().endsWith(CHARGING_IDENTIFIER)) {
+		if (event.getActType().endsWith(CHARGING_INTERACTION)) {
 			Id<Vehicle> vehicleId = lastVehicleUsed.get(event.getPersonId());
 			if (vehicleId != null) {
 				Id<ElectricVehicle> evId = Id.create(vehicleId, ElectricVehicle.class);

@@ -20,8 +20,11 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
-import com.google.inject.Provider;
-import com.google.inject.Provides;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -34,13 +37,15 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 
 /**
  * Save waiting times of agents while mobsim is running
@@ -77,7 +82,7 @@ public class WaitTimeCalculatorSerializable implements
 
 	//Constructors
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds()));
 	}
 
 	public WaitTimeCalculatorSerializable(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
@@ -98,17 +103,17 @@ public class WaitTimeCalculatorSerializable implements
 						double endTime = timeSlot * (i + 1);
 						if (endTime > 24 * 3600)
 							endTime -= 24 * 3600;
-						cacheWaitTimes[i] = Time.UNDEFINED_TIME;
+						cacheWaitTimes[i] = Double.NaN;
 						SORTED_DEPARTURES:
 						for (double departure : sortedDepartures) {
-							double arrivalTime = departure + (stop.getArrivalOffset() != Time.UNDEFINED_TIME ? stop.getArrivalOffset() : stop.getDepartureOffset());
+							double arrivalTime = departure + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
 							if (arrivalTime >= endTime) {
 								cacheWaitTimes[i] = arrivalTime - endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
-						if (cacheWaitTimes[i] == Time.UNDEFINED_TIME)
-							cacheWaitTimes[i] = sortedDepartures[0] + 24 * 3600 + (stop.getArrivalOffset() != Time.UNDEFINED_TIME ? stop.getArrivalOffset() : stop.getDepartureOffset()) - endTime;
+						if (Double.isNaN(cacheWaitTimes[i]))
+							cacheWaitTimes[i] = sortedDepartures[0] + 24 * 3600 + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds() - endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId().toString(), cacheWaitTimes);
 				}

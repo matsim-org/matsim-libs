@@ -19,14 +19,19 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -34,7 +39,7 @@ import org.matsim.facilities.OpeningTime;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import java.util.*;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 
 // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
@@ -122,21 +127,21 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 			 * assume A <= D
 			 */
 
-			double[] openingInterval = this.getOpeningInterval(act);
-			double openingTime = openingInterval[0];
-			double closingTime = openingInterval[1];
+			OptionalTime[] openingInterval = this.getOpeningInterval(act);
+			OptionalTime openingTime = openingInterval[0];
+			OptionalTime closingTime = openingInterval[1];
 
 			double activityStart = arrivalTime;
 			double activityEnd = departureTime;
 
-			if ((openingTime >=  0) && (arrivalTime < openingTime)) {
-				activityStart = openingTime;
+			if (openingTime.isDefined() && arrivalTime < openingTime.seconds()) {
+				activityStart = openingTime.seconds();
 			}
-			if ((closingTime >= 0) && (closingTime < departureTime)) {
-				activityEnd = closingTime;
+			if (closingTime.isDefined() && closingTime.seconds() < departureTime) {
+				activityEnd = closingTime.seconds();
 			}
-			if ((openingTime >= 0) && (closingTime >= 0)
-					&& ((openingTime > departureTime) || (closingTime < arrivalTime))) {
+			if (openingTime.isDefined() && closingTime.isDefined()
+					&& (openingTime.seconds() > departureTime || closingTime.seconds() < arrivalTime)) {
 				// agent could not perform action
 				activityStart = departureTime;
 				activityEnd = departureTime;
@@ -155,77 +160,76 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 		Gbl.assertNotNull( this.plan );
 		Gbl.assertNotNull( this.plan.getPerson() );
 
-		final Double attribute = (Double) this.prefs.getAttribute( this.plan.getPerson().getId().toString(), "latestStartTime_" + act.getType() );
-		Gbl.assertNotNull( attribute );
+		final OptionalTime latestStartTime = (OptionalTime) this.prefs.getAttribute( this.plan.getPerson().getId().toString(), "latestStartTime_" + act.getType() );
 
-		double latestStartTime = attribute;
-			if ((latestStartTime >= 0) && (activityStart > latestStartTime)) {
-				tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime);
-			}
+		//double latestStartTime = attribute;
+		if (latestStartTime.isDefined() && (latestStartTime.seconds() >= 0) && (activityStart > latestStartTime.seconds())) {
+			tmpScore += this.params.marginalUtilityOfLateArrival_s * (activityStart - latestStartTime.seconds());
+		}
 
-			// utility of performing an action, duration is >= 1, thus log is no problem
-			double typicalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "typicalDuration_" + act.getType());			
-			// initialize zero utility durations here for better code readability, because we only need them here
-			double zeroUtilityDuration;
-			if (this.zeroUtilityDurations.containsKey(act.getType())) {
-				zeroUtilityDuration = this.zeroUtilityDurations.get(act.getType());
-			} else {
-				zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DCActivityScoringFunction.DEFAULT_PRIORITY);
-				this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
-			}
-			
-			// disutility if stopping too early
-			double earliestEndTime = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "earliestEndTime_" + act.getType());	
-			if ((earliestEndTime >= 0) && (activityEnd < earliestEndTime)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime - activityEnd);
-			}
+		// utility of performing an action, duration is >= 1, thus log is no problem
+		OptionalTime typicalDuration = (OptionalTime)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "typicalDuration_" + act.getType());
+		// initialize zero utility durations here for better code readability, because we only need them here
+		double zeroUtilityDuration;
+		if (this.zeroUtilityDurations.containsKey(act.getType())) {
+			zeroUtilityDuration = this.zeroUtilityDurations.get(act.getType());
+		} else {
+			zeroUtilityDuration = (typicalDuration.seconds() / 3600.0) * Math.exp( -10.0 / (typicalDuration.seconds() / 3600.0) / DCActivityScoringFunction.DEFAULT_PRIORITY);
+			this.zeroUtilityDurations.put(act.getType(), zeroUtilityDuration);
+		}
 
-			// disutility if going to away to late
-			if (activityEnd < departureTime) {
-				tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
-			}
+		// disutility if stopping too early
+		OptionalTime earliestEndTime = (OptionalTime)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "earliestEndTime_" + act.getType());
+		if (earliestEndTime.isDefined() && (earliestEndTime.seconds() >= 0) && (activityEnd < earliestEndTime.seconds())) {
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (earliestEndTime.seconds() - activityEnd);
+		}
 
-			// disutility if duration was too short
-			double minimalDuration = (Double)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "minimalDuration_" + act.getType());	
-			if ((minimalDuration >= 0) && (duration < minimalDuration)) {
-				tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration - duration);
-			}
+		// disutility if going to away to late
+		if (activityEnd < departureTime) {
+			tmpScore += this.params.marginalUtilityOfWaiting_s * (departureTime - activityEnd);
+		}
 
-			if (duration > 0) {
-				
-				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-						* Math.log((duration / 3600.0) / zeroUtilityDuration);
-				
-				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
-				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+		// disutility if duration was too short
+		OptionalTime minimalDuration = (OptionalTime)this.prefs.getAttribute(this.plan.getPerson().getId().toString(), "minimalDuration_" + act.getType());
+		if (minimalDuration.isDefined() && (minimalDuration.seconds() >= 0) && (duration < minimalDuration.seconds())) {
+			tmpScore += this.params.marginalUtilityOfEarlyDeparture_s * (minimalDuration.seconds() - duration);
+		}
 
-				if (this.dcContext.getScaleEpsilon().isFlexibleType( act.getType() ) &&
-						this.dccg.getRestraintFcnExp() > 0.0 &&
-						this.dccg.getRestraintFcnFactor() > 0.0) {
-					
-						/* Penalty due to facility load: --------------------------------------------
-						 * Store the temporary score to reduce it in finish() proportionally
-						 * to score and dep. on facility load.
-						 * TODO: maybe checking if activity is movable for this person (discussion)
-						 */
-						this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
-									this.dcContext.getFacilityPenalties().get(act.getFacilityId()), tmpScore));
-						//---------------------------------------------------------------------------
-				}
-			} else {
-				tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+		if (duration > 0) {
+			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration.seconds()
+					* Math.log((duration / 3600.0) / zeroUtilityDuration);
+
+			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
+			tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
+
+			if (this.dcContext.getScaleEpsilon().isFlexibleType( act.getType() ) &&
+					this.dccg.getRestraintFcnExp() > 0.0 &&
+					this.dccg.getRestraintFcnFactor() > 0.0) {
+
+					/* Penalty due to facility load: --------------------------------------------
+					 * Store the temporary score to reduce it in finish() proportionally
+					 * to score and dep. on facility load.
+					 * TODO: maybe checking if activity is movable for this person (discussion)
+					 */
+					this.penalty.add(new ScoringPenalty(activityStart, activityEnd,
+								this.dcContext.getFacilityPenalties().get(act.getFacilityId()), tmpScore));
+					//---------------------------------------------------------------------------
 			}
+		} else {
+			tmpScore += 2*this.params.marginalUtilityOfLateArrival_s*Math.abs(duration);
+		}
+
 		return tmpScore;
 	}
 	
 	
 	@Override
 	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-	protected double[] getOpeningInterval(Activity act) {
+	protected OptionalTime[] getOpeningInterval(Activity act) {
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		OptionalTime[] openInterval = {OptionalTime.undefined(), OptionalTime.undefined()};
 		boolean foundAct = false;
 
 		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16
@@ -250,12 +254,16 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one wed/wkday/wk open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Double.MAX_VALUE;
-					openInterval[1] = Double.MIN_VALUE;
+					double opening = Double.MAX_VALUE;
+					double closing = Double.MIN_VALUE;
+
 					for (OpeningTime opentime : opentimes) {
-						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+						opening = Math.min(opening, opentime.getStartTime());
+						closing = Math.max(closing, opentime.getEndTime());
 					}
+
+					openInterval[0] = OptionalTime.defined(opening);
+					openInterval[1] = OptionalTime.defined(closing);
 				}
 			}
 		}

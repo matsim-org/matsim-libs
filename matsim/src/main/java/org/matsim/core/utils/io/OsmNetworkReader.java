@@ -76,8 +76,11 @@ import java.util.function.Supplier;
  * multiple overlapping areas can be specified, each with a different denseness, e.g. one only containing motorways,
  * a second one containing every link down to footways.
  *
+ * @deprecated The OsmNetworkReader has been moved to the osm-contrib. Use org.matsim.contribs.osm.networkReader.SupersonicOsmNetworkReader instead.
+ *
  * @author mrieser, aneumann
  */
+@Deprecated
 public class OsmNetworkReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReader.class);

@@ -19,53 +19,60 @@
 
 package org.matsim.contrib.util.timeprofile;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.DoubleSupplier;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class TimeProfiles {
 	public static ProfileCalculator combineProfileCalculators(final ProfileCalculator... calculators) {
-		CSVLineBuilder builder = new CSVLineBuilder();
-		for (ProfileCalculator pc : calculators) {
-			builder.addAll(pc.getHeader());
-		}
-
-		return createProfileCalculator(builder.build(), () -> {
-			List<Object> values = new ArrayList<>();
-			for (ProfileCalculator pc : calculators) {
-				values.addAll(Arrays.asList(pc.calcValues()));
-			}
-			return values.toArray();
-		});
+		return createProfileCalculator(Arrays.stream(calculators)
+						.flatMap(c -> c.getHeader().stream())
+						.collect(ImmutableList.toImmutableList()),//
+				() -> Arrays.stream(calculators)
+						.flatMap(c -> c.calcValues().entrySet().stream())
+						.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
 	}
 
-	public static String[] combineValuesIntoStrings(Object... values) {
-		String[] strings = new String[values.length];
-		for (int i = 0; i < values.length; i++) {
-			strings[i] = values[i] + "";
-		}
-		return strings;
+	public static ProfileCalculator createSingleValueCalculator(String header, DoubleSupplier valueSupplier) {
+		return createProfileCalculator(ImmutableList.of(header),
+				() -> ImmutableMap.of(header, valueSupplier.getAsDouble()));
 	}
 
-	public static ProfileCalculator createSingleValueCalculator(String header, Supplier<Object> valueSupplier) {
-		return createProfileCalculator(new String[] { header }, () -> new Object[] { valueSupplier.get() });
-	}
-
-	public static ProfileCalculator createProfileCalculator(String[] header, Supplier<Object[]> valueSupplier) {
+	public static ProfileCalculator createProfileCalculator(ImmutableList<String> header,
+			Supplier<ImmutableMap<String, Double>> valueSupplier) {
 		return new ProfileCalculator() {
 			@Override
-			public String[] getHeader() {
+			public ImmutableList<String> getHeader() {
 				return header;
 			}
 
 			@Override
-			public Object[] calcValues() {
+			public ImmutableMap<String, Double> calcValues() {
 				return valueSupplier.get();
 			}
 		};
+	}
+
+	public static <T> ImmutableList<T> createExtendedHeader(ImmutableList<T> defaultColumns, Stream<T> columns,
+			Comparator<T> comparator) {
+		Set<T> defaultHeader = new HashSet<>(defaultColumns);
+		List<T> additionalColumns = columns.filter(Predicate.not(defaultHeader::contains))
+				.distinct()
+				.sorted(comparator)
+				.collect(Collectors.toList());
+		return ImmutableList.<T>builder().addAll(defaultColumns).addAll(additionalColumns).build();
 	}
 }

@@ -146,7 +146,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-	public void writeStats(final java.io.Writer out) throws UncheckedIOException {
+	public void writeStats(final BufferedWriter out) throws UncheckedIOException {
 		try {
 		boolean first = true;
 		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
@@ -158,15 +158,15 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 				for (int i = 0; i < counts.length; i++) {
 					out.write("\t" + (i*SLOT_SIZE/60) + "+");
 				}
-				out.write("\n");
+				out.newLine();;
 			}
 			out.write(key);
             for (int count : counts) {
                 out.write("\t" + count);
             }
-			out.write("\n");
+			out.newLine();;
 		}
-		out.write("\n");
+		out.newLine();;
 		if (this.sumTrips == 0) {
 			out.write("average trip duration: no trips!");
 		} else {
@@ -174,7 +174,7 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 					+ (this.sumTripDurations / this.sumTrips) + " seconds = "
 					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
 		}
-		out.write("\n");
+		out.newLine();;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {

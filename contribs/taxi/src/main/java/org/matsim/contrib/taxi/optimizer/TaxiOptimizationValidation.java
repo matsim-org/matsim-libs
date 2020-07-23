@@ -21,16 +21,16 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 
 public class TaxiOptimizationValidation {
-	public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler, Fleet fleet,
+	public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduleInquiry taxiScheduleInquiry, Fleet fleet,
 			Stream<? extends Request> requests) {
-		if (fleet.getVehicles().values().stream().filter(taxiScheduler::isIdle).count() > 0
+		if (fleet.getVehicles().values().stream().anyMatch(taxiScheduleInquiry::isIdle)
 				&& TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) > 0) {
 			throw new IllegalStateException("idle vehicles and unplanned requests");
 		}

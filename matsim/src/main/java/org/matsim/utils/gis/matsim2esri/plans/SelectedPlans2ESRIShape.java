@@ -170,8 +170,8 @@ public class SelectedPlans2ESRIShape {
 	private SimpleFeature getActFeature(final String id, final Activity act) {
 		String type = act.getType();
 		String linkId = act.getLinkId().toString();
-		Double startTime = act.getStartTime();
-		Double endTime = act.getEndTime();
+		Double startTime = act.getStartTime().seconds();
+		Double endTime = act.getEndTime().seconds();
 		double rx = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		double ry = MatsimRandom.getRandom().nextDouble() * this.actBlurFactor;
 		Coord cc = this.network.getLinks().get(act.getLinkId()).getCoord();
@@ -191,8 +191,8 @@ public class SelectedPlans2ESRIShape {
 			return null;
 		}
 		String mode = leg.getMode();
-		Double depTime = leg.getDepartureTime();
-		Double travTime = leg.getTravelTime();
+		Double depTime = leg.getDepartureTime().seconds();
+		Double travTime = leg.getTravelTime().seconds();
 		Double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network);
 
 		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();

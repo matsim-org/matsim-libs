@@ -21,11 +21,9 @@
 
 package org.matsim.deprecated.scoring;
 
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * 
@@ -40,17 +38,17 @@ import org.matsim.core.utils.misc.Time;
 public abstract class ScoringFunctionAdapter implements ScoringFunction {
 
     public final void handleActivity(Activity activity) {
-        if (activity.getStartTime() != Time.UNDEFINED_TIME) {
-            startActivity(activity.getStartTime(), activity);
+		if (activity.getStartTime().isDefined()) {
+            startActivity(activity.getStartTime().seconds(), activity);
         }
-        if (activity.getEndTime() != Time.UNDEFINED_TIME) {
-            endActivity(activity.getEndTime(), activity);
+        if (activity.getEndTime().isDefined()) {
+			endActivity(activity.getEndTime().seconds(), activity);
         }
     }
 
     public final void handleLeg(Leg leg) {
-        startLeg(leg.getDepartureTime(), leg);
-        endLeg(leg.getDepartureTime() + leg.getTravelTime());
+		startLeg(leg.getDepartureTime().seconds(), leg);
+		endLeg(leg.getDepartureTime().seconds() + leg.getTravelTime().seconds());
     }
 
     /**

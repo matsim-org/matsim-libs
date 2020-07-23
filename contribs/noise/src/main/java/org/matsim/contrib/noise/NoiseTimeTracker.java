@@ -22,10 +22,14 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -926,7 +930,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	}
 
 	void computeFinalTimeIntervals() {
-		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime())) {
+		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime().orElse(0))) {
 			processTimeBin();			
 		}
 	}

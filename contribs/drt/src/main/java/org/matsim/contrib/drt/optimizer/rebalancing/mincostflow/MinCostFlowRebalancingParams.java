@@ -18,19 +18,30 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import java.net.URL;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import com.google.common.base.Verify;
 
 /**
  * @author michalm
  */
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
+
+	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
+		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
+
+	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
@@ -58,6 +69,17 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
 
+	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
+	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be either PreviousIterationZonalDemandAggregator, ActivityLocationBasedZonalDemandAggregator or EqualVehicleDensityZonalDemandAggregator";
+
+	public static final String REBALANCING_ZONES_GENERATION = "rebalancingZonesGeneration";
+	static final String REBALANCING_ZONES_GENERATION_EXP = "Logic for generation of zones for demand estimation while rebalancing. Value can be GridFromNetwork or ShapeFile Default is GridFromNetwork";
+
+	private static final String REBALANCING_ZONES_SHAPE_FILE = "rebalancingZonesShapeFile";
+	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
+			+ "Used with rebalancingZonesGeneration=ShapeFile";
+
+
 	@Positive
 	private int interval = 1800;// [s]
 
@@ -76,6 +98,15 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	@Positive
 	private double cellSize = Double.NaN;// [m]
 
+	@NotNull
+	private MinCostFlowRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
+
+	@NotNull
+	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;
+
+	@Nullable
+	private String rebalancingZonesShapeFile = null;
+
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);
 	}
@@ -89,6 +120,14 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 					+ " must be greater than "
 					+ MinCostFlowRebalancingParams.MAX_TIME_BEFORE_IDLE);
 		}
+
+		Verify.verify(
+				getRebalancingZonesGeneration() != RebalancingZoneGeneration.ShapeFile || getRebalancingZonesShapeFile() != null,
+				REBALANCING_ZONES_SHAPE_FILE
+						+ " must not be null when "
+						+ REBALANCING_ZONES_GENERATION
+						+ " is "
+						+ RebalancingZoneGeneration.ShapeFile);
 	}
 
 	@Override
@@ -100,6 +139,9 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
+		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
+		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
+		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		return map;
 	}
 
@@ -198,4 +240,54 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public void setCellSize(double cellSize) {
 		this.cellSize = cellSize;
 	}
+
+	/**
+	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 */
+	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	public ZonalDemandAggregatorType getZonalDemandAggregatorType() {
+		return zonalDemandAggregatorType;
+	}
+
+	/**
+	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 */
+	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	public void setZonalDemandAggregatorType(ZonalDemandAggregatorType aggregatorType) { this.zonalDemandAggregatorType = aggregatorType; }
+
+	/**
+	 * @return -- {@value #REBALANCING_ZONES_GENERATION_EXP}
+	 */
+	@StringGetter(REBALANCING_ZONES_GENERATION)
+	public RebalancingZoneGeneration getRebalancingZonesGeneration() {
+		return rebalancingZonesGeneration;
+	}
+
+	/**
+	 * @param rebalancingZonesGeneration -- {@value #REBALANCING_ZONES_GENERATION_EXP}
+	 */
+	@StringSetter(REBALANCING_ZONES_GENERATION)
+	public void setRebalancingZonesGeneration(RebalancingZoneGeneration rebalancingZonesGeneration) { this.rebalancingZonesGeneration = rebalancingZonesGeneration; }
+
+	/**
+	 * @return {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
+	 */
+	@StringGetter(REBALANCING_ZONES_SHAPE_FILE)
+	public String getRebalancingZonesShapeFile() {
+		return rebalancingZonesShapeFile;
+	}
+
+	public URL getRebalancingZonesShapeFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, rebalancingZonesShapeFile);
+	}
+
+	/**
+	 * @param rebalancingZonesShapeFile -- {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
+	 */
+	@StringSetter(REBALANCING_ZONES_SHAPE_FILE)
+	public MinCostFlowRebalancingParams setRebalancingZonesShapeFile(String rebalancingZonesShapeFile) {
+		this.rebalancingZonesShapeFile = rebalancingZonesShapeFile;
+		return this;
+	}
+
 }

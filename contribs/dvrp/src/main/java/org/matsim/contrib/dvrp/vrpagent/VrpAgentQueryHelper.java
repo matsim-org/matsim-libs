@@ -114,7 +114,7 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 	}
 
 	private final class VrpSchedulePlan implements Plan {
-		private List<PlanElement> unmodifiablePlanElements;
+		private final List<PlanElement> unmodifiablePlanElements;
 
 		private VrpSchedulePlan(DvrpVehicle vehicle) {
 			unmodifiablePlanElements = Collections.unmodifiableList(initPlanElements(vehicle));

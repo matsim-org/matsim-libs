@@ -189,7 +189,7 @@ public final class EventsReaderJson {
 			this.events.processEvent(new VehicleLeavesTrafficEvent(time, 
 					Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_DRIVER).asText(), Person.class),
 					Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_LINK).asText(), Link.class),
-					o.has(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) ? null : Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
+					o.has(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE) ? Id.create(o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class) : null,
 					o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_NETWORKMODE).asText(),
 					o.get(VehicleLeavesTrafficEvent.ATTRIBUTE_POSITION).asDouble()
 					));
@@ -200,7 +200,7 @@ public final class EventsReaderJson {
 					time, 
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
-					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? null : Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class),
+					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
 					o.get(ActivityEndEvent.ATTRIBUTE_ACTTYPE).asText()));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null;
@@ -209,14 +209,26 @@ public final class EventsReaderJson {
 				double yy = o.get(Event.ATTRIBUTE_Y).asDouble();
 				coord = new Coord(xx, yy);
 			}
-			this.events.processEvent(new ActivityStartEvent(
+			try {
+				this.events.processEvent(new ActivityStartEvent(
 					time,
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
-					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? null : Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class),
+					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
 					o.get(ActivityStartEvent.ATTRIBUTE_ACTTYPE).asText(),
 					coord));
-		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+				boolean hasFacility = o.has(HasFacilityId.ATTRIBUTE_FACILITY);
+				this.events.processEvent(new ActivityStartEvent(
+					time,
+					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
+					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
+					hasFacility ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
+					o.get(ActivityStartEvent.ATTRIBUTE_ACTTYPE).asText(),
+					coord));
+			}
+	} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = o.path(PersonArrivalEvent.ATTRIBUTE_LEGMODE).asText(null);
 			String mode = legMode == null ? null : legMode.intern();
 			this.events.processEvent(new PersonArrivalEvent(

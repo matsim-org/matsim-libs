@@ -65,7 +65,7 @@ public class ChargingInfrastructureModule extends AbstractModule {
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				bind(ChargingInfrastructure.class).toProvider(new Provider<ChargingInfrastructure>() {
+				bind(ChargingInfrastructure.class).toProvider(new Provider<>() {
 					@Inject
 					@Named(CHARGERS)
 					private Network network;

@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.benchmark;
 import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
@@ -92,7 +91,7 @@ public class RunTaxiBenchmark {
 		Scenario scenario = new ScenarioBuilder(config).build();
 
 		if (config.network().isTimeVariantNetwork()) {
-			((Network)scenario.getNetwork()).getFactory()
+			scenario.getNetwork().getFactory()
 					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
 		}
 

@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -62,13 +62,13 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 
 	@Override
 	public boolean getExitAtStop(final TransitStopFacility stop) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId().equals(stop.getId());
 	}
 
 	@Override
 	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
-		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		TransitPassengerRoute route = (TransitPassengerRoute) getCurrentLeg().getRoute();
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
@@ -125,7 +125,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getArrivalOffset();
+				return routeStop.getArrivalOffset().seconds();
 			}
 		}
 
@@ -137,7 +137,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> accessStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
-				return routeStop.getDepartureOffset();
+				return routeStop.getDepartureOffset().seconds();
 			}
 		}
 
@@ -169,7 +169,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	@Override
 	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+		if (!(leg.getRoute() instanceof TransitPassengerRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
@@ -177,7 +177,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
             return route.getAccessStopId();
 		}
 	}
@@ -185,7 +185,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	@Override
 	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		Leg leg = getCurrentLeg();
-		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+		if (!(leg.getRoute() instanceof TransitPassengerRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
 			log.info("route: "
 					+ leg.getRoute().getClass().getCanonicalName()
@@ -193,7 +193,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 					+ leg.getRoute().getRouteDescription());
 			return null;
 		} else {
-			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 			return route.getEgressStopId();
 		}
 	}

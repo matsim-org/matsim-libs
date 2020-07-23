@@ -22,7 +22,11 @@
  */
 package org.matsim.contrib.av.robotaxi.fares.drt;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -32,10 +36,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Inject;
 
 /**
  * @author jbischoff
@@ -54,9 +55,9 @@ public class DrtFareHandler
     private final double minFarePerTrip;
     private final double timeFare_sec;
     private final double dailyFee;
-    Set<Id<Person>> dailyFeeCharged = new HashSet<>();
-    Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
-    private String mode;
+    final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+    final Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
+    private final String mode;
 
     /**
      * @params drtFareConfigGroup: DrtFareConfigGroup for the specific mode

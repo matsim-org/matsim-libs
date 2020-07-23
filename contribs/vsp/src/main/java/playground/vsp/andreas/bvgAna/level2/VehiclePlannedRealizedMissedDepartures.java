@@ -26,7 +26,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMap;
 import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
@@ -69,10 +69,10 @@ public class VehiclePlannedRealizedMissedDepartures {
 	 * @return The number of missed vehicles, if positive. Negative number, if the agent could get some vehicles earlier. Zero, if the agent took the vehicle as scheduled.
 	 */
 	public int getNumberOfMissedVehicles(Id stopId, double plannedDepartureTime, double realizedDepartureTime, Id lineId, Id routeId){
-		Tuple<Double, Integer> plannedDeparture = this.getNextDepartureTime(stopId, plannedDepartureTime, lineId, routeId, this.planned);
-		Tuple<Double, Integer> realizedDeparture = this.getNextDepartureTime(stopId, realizedDepartureTime, lineId, routeId, this.realized);
+		Tuple<OptionalTime, Integer> plannedDeparture = this.getNextDepartureTime(stopId, plannedDepartureTime, lineId, routeId, this.planned);
+		Tuple<OptionalTime, Integer> realizedDeparture = this.getNextDepartureTime(stopId, realizedDepartureTime, lineId, routeId, this.realized);
 
-		int numberOfMissedVehicles = realizedDeparture.getSecond().intValue() - plannedDeparture.getSecond().intValue();
+		int numberOfMissedVehicles = realizedDeparture.getSecond() - plannedDeparture.getSecond();
 
 		if(log.getLevel() == Level.DEBUG){
 			double delay = realizedDepartureTime - plannedDepartureTime;
@@ -94,7 +94,7 @@ public class VehiclePlannedRealizedMissedDepartures {
 	 * @return Returns the next planned departure time in the future for a given stop and time.
 	 */
 	public double getNextPlannedDepartureTime(Id stopId, double time, Id lineId, Id routeId){
-		return this.getNextDepartureTime(stopId, time, lineId, routeId, this.planned).getFirst().doubleValue();
+		return this.getNextDepartureTime(stopId, time, lineId, routeId, this.planned).getFirst().seconds();
 	}
 
 	/**
@@ -105,22 +105,22 @@ public class VehiclePlannedRealizedMissedDepartures {
 	 * @return Returns the next realized departure time in the future for a given stop and time.
 	 */
 	public double getNextRealizedDepartureTime(Id stopId, double time, Id lineId, Id routeId){
-		return this.getNextDepartureTime(stopId, time, lineId, routeId, this.realized).getFirst().doubleValue();
+		return this.getNextDepartureTime(stopId, time, lineId, routeId, this.realized).getFirst().seconds();
 	}
 
-	private Tuple<Double, Integer> getNextDepartureTime(Id stopId, double time, Id lineId, Id routeId, String type){
+	private Tuple<OptionalTime, Integer> getNextDepartureTime(Id stopId, double time, Id lineId, Id routeId, String type){
 		this.log.debug("TransitAgent.getEnterTransitRoute only checks for line id and stops to come ignoring route id. Agent probably too fast in simulation compared to plan.");
 		TreeMap<Id, StopId2RouteId2DelayAtStopMapData> possibleRoutes = this.stopId2Route2DelayAtStopMap.get(stopId);
-		Tuple<Double, Integer> closestDepartureTimeAndSlot = new Tuple<Double, Integer>(new Double(Double.POSITIVE_INFINITY), new Integer(Integer.MIN_VALUE));
-
 		if (possibleRoutes == null) {
 			/* this could happen if a stop is served only by few lines (e.g. night-buses), but the simulation
 			 * stops before ever a single vehicle could reach that stop
 			 */
-			return new Tuple<Double, Integer>(new Double(Time.UNDEFINED_TIME), 1);
+			return new Tuple<>(OptionalTime.undefined(), 1);
 		}
-		for (StopId2RouteId2DelayAtStopMapData delayContainer : possibleRoutes.values()) {
 
+		Tuple<OptionalTime, Integer> closestDepartureTimeAndSlot = new Tuple<>(OptionalTime.defined(Double.POSITIVE_INFINITY), Integer.MIN_VALUE);
+
+		for (StopId2RouteId2DelayAtStopMapData delayContainer : possibleRoutes.values()) {
 			if(delayContainer.getLineId().toString().equalsIgnoreCase(lineId.toString()) && delayContainer.getRouteId().toString().equalsIgnoreCase(routeId.toString())){
 				ArrayList<Double> departures;
 				if(type.equalsIgnoreCase(this.planned)){
@@ -134,16 +134,16 @@ public class VehiclePlannedRealizedMissedDepartures {
 					return null;
 				}
 				for (int i = 0; i < departures.size(); i++) {
-					if(departures.get(i).doubleValue() > time){
-						if(departures.get(i).doubleValue() < closestDepartureTimeAndSlot.getFirst().doubleValue()){
-							closestDepartureTimeAndSlot = new Tuple<Double, Integer>(new Double(departures.get(i).doubleValue()), new Integer(i));
+					if(departures.get(i) > time){
+						if(departures.get(i) < closestDepartureTimeAndSlot.getFirst().seconds()){
+							closestDepartureTimeAndSlot = new Tuple<OptionalTime, Integer>(OptionalTime.defined(departures.get(i)), i);
 						}
 					}
 				}
 			}
 		}
 
-		if(closestDepartureTimeAndSlot.getFirst().doubleValue() == Double.POSITIVE_INFINITY){
+		if(closestDepartureTimeAndSlot.getFirst().seconds() == Double.POSITIVE_INFINITY){
 			this.log.warn("Could not find next " + type + " departure time for stop " + stopId + ", line " + lineId + " route " + routeId + " and time " + time + "s. Returning positive Inf");
 		}
 		return closestDepartureTimeAndSlot;

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * Helps to work on plans with complex trips.
@@ -54,7 +54,7 @@ import org.matsim.core.gbl.Gbl;
 public final class TripStructureUtils {
 	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
 
-	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
+	public enum StageActivityHandling {StagesAsNormalActivities, ExcludeStageActivities}
 
 	private TripStructureUtils() {}
 
@@ -114,9 +114,7 @@ public final class TripStructureUtils {
 		return getTrips( plan.getPlanElements());
 	}
 
-	// for contrib socnetsim only
-	// I think now that we should actually keep this.  kai, jan'20
-	@Deprecated
+
 	public static List<Trip> getTrips( final Plan plan, final Predicate<String> isStageActivity) {
 		return getTrips( plan.getPlanElements(), isStageActivity);
 	}
@@ -125,9 +123,7 @@ public final class TripStructureUtils {
 		return getTrips(planElements, TripStructureUtils::isStageActivityType ) ;
 	}
 
-	// for contrib socnetsim only
-	// I think now that we should actually keep this.  kai, jan'20
-	@Deprecated
+
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements,
 			final Predicate<String> isStageActivity ) {
@@ -323,7 +319,7 @@ public final class TripStructureUtils {
 	 * @param trip
 	 * @return the departure time of the first leg of the trip
 	 */
-	public static double getDepartureTime(Trip trip) {
+	public static OptionalTime getDepartureTime(Trip trip) {
 		// does this always make sense?
 		Leg leg = (Leg) trip.getTripElements().get(0);
 		return leg.getDepartureTime();
@@ -486,11 +482,8 @@ public final class TripStructureUtils {
 		private static boolean areChildrenCompatible(
 				final List<Subtour> children2,
 				final List<Subtour> children3) {
-			if ( children2.size() != children3.size() ) return false;
+			return children2.size() == children3.size();// should check more, but risk of infinite recursion...
 
-			// should check more, but risk of infinite recursion...
-
-			return true;
 		}
 
 		@Override
@@ -561,7 +554,7 @@ public final class TripStructureUtils {
 		}
 	}
 
-	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
+	// if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
 	public static MainModeIdentifier getRoutingModeIdentifier() {
 		return new RoutingModeMainModeIdentifier();
 	}

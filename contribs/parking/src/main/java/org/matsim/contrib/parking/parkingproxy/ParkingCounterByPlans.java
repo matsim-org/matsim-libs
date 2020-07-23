@@ -19,9 +19,9 @@
 package org.matsim.contrib.parking.parkingproxy;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
 
 /**
  * <b>For some reason not working at the moment</b></br>
@@ -75,7 +75,7 @@ class ParkingCounterByPlans implements IterationStartsListener, PenaltyGenerator
 		for (Person p : event.getServices().getScenario().getPopulation().getPersons().values()) {
 			for (LegActPair walkActPair : this.egressFinder.findEgressWalks(p.getSelectedPlan())) {
 				carCounter.handleArrival(
-						(int) walkActPair.leg.getDepartureTime(),
+						(int)walkActPair.leg.getDepartureTime().seconds(),
 						walkActPair.act.getCoord().getX(),
 						walkActPair.act.getCoord().getY(),
 						carWeight
@@ -83,7 +83,8 @@ class ParkingCounterByPlans implements IterationStartsListener, PenaltyGenerator
 			}
 			for (LegActPair walkActPair : this.egressFinder.findAccessWalks(p.getSelectedPlan())) {
 				carCounter.handleDeparture(
-						(int) (walkActPair.leg.getDepartureTime() + walkActPair.leg.getTravelTime()),
+						(int) (walkActPair.leg.getDepartureTime().seconds() + walkActPair.leg.getTravelTime()
+								.seconds()),
 						walkActPair.act.getCoord().getX(),
 						walkActPair.act.getCoord().getY(),
 						carWeight

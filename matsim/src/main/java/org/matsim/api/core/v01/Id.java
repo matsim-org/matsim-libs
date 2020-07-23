@@ -46,6 +46,11 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	private final static ConcurrentMap<Class<?>, ConcurrentMap<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
 	private final static ConcurrentMap<Class<?>, List<Id<?>>> cacheIndex = new ConcurrentHashMap<>();
 
+	public static void flush() {
+		cacheId.clear();
+		cacheIndex.clear();
+	}
+
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
 	}

@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
  * @author tkohl / Senozon
  *
  */
-class ParkingVehiclesCountEventHandler
+final class ParkingVehiclesCountEventHandler
 		implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, TransitDriverStartsEventHandler,
 		PenaltyGenerator {
 
@@ -62,7 +62,7 @@ class ParkingVehiclesCountEventHandler
 	 * @param network The used network. Necessary to look up link-ids
 	 * @param carWeight the weight of a single car; usually the inverse of the scenario percentage, i.e. 100 in case of 1pct scenario
 	 */
-	public ParkingVehiclesCountEventHandler(MovingEntityCounter carCounter, Network network, int carWeight) {
+	ParkingVehiclesCountEventHandler( MovingEntityCounter carCounter, Network network, int carWeight ) {
 		this.carCounter = carCounter;
 		this.network = network;
 		this.carWeight = carWeight;

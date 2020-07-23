@@ -4,18 +4,6 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -24,6 +12,18 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
 
 /**
  * The actual RAPTOR implementation, based on Delling et al, Round-Based Public Transit Routing.
@@ -175,7 +175,7 @@ public class SwissRailRaptorCore {
                 } else if (isIntermodalAccess) {
                     // there is no more departure, but we start here by intermodal access, so still register to allow transfers to other (non-)intermodal stops.
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, Double.NaN, Time.getUndefinedTime(), arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, Double.NaN, Double.NaN, arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
 
                     /* okay, the following is not very nice...
                      * ... see long comment above, it's the same
@@ -820,23 +820,18 @@ public class SwissRailRaptorCore {
             if (pe.initialStop != null && pe.initialStop.planElements != null) {
                 raptorRoute.addPlanElements(time, travelTime, pe.initialStop.planElements);
             } else if (pe.isTransfer) {
-                boolean differentFromTo = (fromStop == null || toStop == null) || (fromStop != toStop);
-                // do not create a transfer-leg if we stay at the same stop facility
-                if (differentFromTo) {
-                	// add (peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && to catch case of only access and egress 
-                	// legs without a real leg in between which was previously caught above by 
-                	// pes.size() == 2 && pes.get(0).isTransfer && pes.get(1).isTransfer
-                	//
-                	// in case of peCount < 2 there should be no effect, because peCount-2 < 0 and i will be 0, so i!=peCount - 2
-                	// TODO check
-                    if ((peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && i == peCount - 2 && !isIntermodal(pes.get(i+1).initialStop)) {
-                        // the second last element is a transfer, skip it so it gets merged into the egress_walk
-                        // but it can only be merged if it is not intermodal...
-                        continue;
-                    }
-                    String mode = TransportMode.walk;
-                    raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);
+                // add (peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && to catch case of only access and egress
+                // legs without a real leg in between which was previously caught above by
+                // pes.size() == 2 && pes.get(0).isTransfer && pes.get(1).isTransfer
+                //
+                // in case of peCount < 2 there should be no effect, because peCount-2 < 0 and i will be 0, so i!=peCount - 2
+                if ((peCount > 2 || peCount == 2 && !pes.get(0).isTransfer) && i == peCount - 2 && !isIntermodal(pes.get(i+1).initialStop)) {
+                    // the second last element is a transfer, skip it so it gets merged into the egress_walk
+                    // but it can only be merged if it is not intermodal...
+                    continue;
                 }
+                String mode = TransportMode.walk;
+                raptorRoute.addNonPt(fromStop, toStop, time, travelTime, pe.distance, mode);
             } else {
                 TransitLine line = pe.toRouteStop.line;
                 TransitRoute route = pe.toRouteStop.route;

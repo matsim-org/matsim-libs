@@ -1,5 +1,7 @@
 package org.matsim.contrib.carsharing.replanning;
 
+import com.google.inject.Inject;
+import javax.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -12,11 +14,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
-import com.google.inject.Inject;
 import org.matsim.core.router.TripRouter;
-
-import javax.inject.Provider;
 
 /**
  * Uses a TripsToLegModule to simplify trips before running subtour
@@ -27,16 +25,15 @@ public class CarsharingSubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 	@Inject
 	public CarsharingSubtourModeChoiceStrategy(final Scenario scenario, Provider<TripRouter> tripRouterProvider, MembershipContainer memberships) {
-		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
+		this.strategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubtourModeChoice smc = new SubtourModeChoice(tripRouterProvider, scenario.getConfig().global(), scenario.getConfig().subtourModeChoice());
-		CarsharingSubTourPermissableModesCalculator cpmc = 
+		CarsharingSubTourPermissableModesCalculator cpmc =
 				new CarsharingSubTourPermissableModesCalculator(scenario, scenario.getConfig().subtourModeChoice().getModes(), memberships);
-		smc.setPermissibleModesCalculator(cpmc);
-		
-		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(scenario, tripRouterProvider) );
+		SubtourModeChoice smc = new SubtourModeChoice(scenario.getConfig().global(), scenario.getConfig().subtourModeChoice(), cpmc);
+
+		addStrategyModule(smc);
+		addStrategyModule(new ReRoute(scenario, tripRouterProvider));
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {

@@ -40,7 +40,7 @@ public class TaxiToRequestAssignmentCostProvider {
 		TOTAL_WAIT_TIME, //
 		// DEPk + TTki - T0i
 
-		DSE;//
+		DSE//
 		// balance between demand (ARRIVAL_TIME) and supply (PICKUP_TIME)
 	}
 

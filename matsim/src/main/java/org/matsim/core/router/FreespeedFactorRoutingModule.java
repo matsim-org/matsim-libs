@@ -20,24 +20,18 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+
+import java.util.Arrays;
+import java.util.List;
 
 public final class FreespeedFactorRoutingModule implements RoutingModule {
 
@@ -111,7 +105,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 			}
 			
 			// now correct the travel time:
-			double travelTimeLastLink = toLink.getLength() / speed ;
+			double travelTimeLastLink = toLink.getLength() / speed;
 			
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.params.getTeleportedModeFreespeedFactor());
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
@@ -137,7 +131,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		Leg r = (leg);
-		r.setTravelTime( depTime + travTime - r.getDepartureTime() ); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
+		r.setTravelTime( depTime + travTime - r.getDepartureTime().seconds()); // yy something needs to be done once there are alternative implementations of the interface.  kai, apr'10
 		return travTime;
 	}
 

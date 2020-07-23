@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -65,7 +64,7 @@ public class DelayTracker {
 		}
 		
 		if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-			double scheduledTime = d.departureTime + (stop.getArrivalOffset() == Time.UNDEFINED_TIME ? stop.getDepartureOffset() : stop.getArrivalOffset());
+			double scheduledTime = d.departureTime + stop.getArrivalOffset().or(stop::getDepartureOffset).seconds();
 			return arrivalTime - scheduledTime;
 		}
 		return Double.NaN;
@@ -76,7 +75,7 @@ public class DelayTracker {
 		TransitRouteStop stop = d.stops.get(d.idx);
 		d.idx++;
 		if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-			double scheduledTime = d.departureTime + stop.getDepartureOffset();
+			double scheduledTime = d.departureTime + stop.getDepartureOffset().seconds();
 			return departureTime - scheduledTime;
 		}
 		return Double.NaN;

@@ -179,7 +179,7 @@ public abstract class AbstractModule implements Module {
 	 */
 	@Deprecated
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
-		return bind(carTravelDisutilityFactoryKey());
+		return addTravelDisutilityFactoryBinding( TransportMode.car );
 	}
 
 	@SuppressWarnings("static-method")

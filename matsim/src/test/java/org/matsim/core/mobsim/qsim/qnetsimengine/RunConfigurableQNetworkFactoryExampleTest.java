@@ -41,7 +41,7 @@ public class RunConfigurableQNetworkFactoryExampleTest {
 			config.controler().setLastIteration(5);
 			RunConfigurableQNetworkFactoryExample.run(config);
 		} catch ( Exception ee ) {
-			throw new RuntimeException("something went wrong") ;
+			throw new RuntimeException("something went wrong", ee);
 		}
 		
 		

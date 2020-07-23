@@ -56,7 +56,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 	public AbstractFeatureType createPTLinkFeature(final Coord from, final Coord to, Leg leg, StyleType networkStyle) {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
-		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
+		folder.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime().seconds()) + ", dist: " + dist);
 
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		if(leg.getRoute() != null){
@@ -125,7 +125,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 	public AbstractFeatureType createWalkLinkFeature(final Coord from, final Coord to, Leg leg, StyleType networkStyle) {
 		PlacemarkType p = this.kmlObjectFactory.createPlacemarkType();
 		double dist = (leg.getRoute() instanceof NetworkRoute ? RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) leg.getRoute(), this.network) : Double.NaN);
-		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime()) + ", dist: " + dist);
+		p.setName(leg.getMode() + " mode, dur: " + Time.writeTime(leg.getTravelTime().seconds()) + ", dist: " + dist);
 
 		if(leg.getRoute() != null){
 			if(( leg.getRoute()).getRouteDescription().equalsIgnoreCase("")){
@@ -216,7 +216,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 		buffer.append(STARTUL);
 		buffer.append(STARTLI);
 		buffer.append("StartTime: ");
-		buffer.append(Time.writeTime(act.getStartTime()));
+		buffer.append(Time.writeTime(act.getStartTime().seconds()));
 		buffer.append(ENDLI);
 //		buffer.append(STARTLI);
 //		buffer.append("Duration: ");
@@ -224,7 +224,7 @@ public class MyFeatureFactory extends NetworkFeatureFactory{
 //		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("EndTime: ");
-		buffer.append(Time.writeTime(act.getEndTime()));
+		buffer.append(Time.writeTime(act.getEndTime().seconds()));
 		buffer.append(ENDLI);
 		buffer.append(STARTLI);
 		buffer.append("X: ");

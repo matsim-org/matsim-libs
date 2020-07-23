@@ -32,7 +32,6 @@ import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -153,7 +152,7 @@ public class AStarLandmarks extends AStarEuclidean {
 		double[] estTravelTimes = new double[actLandmarkCount];
 		this.activeLandmarkIndexes = new int[actLandmarkCount];
 		for (int i = 0; i < estTravelTimes.length; i++) {
-			estTravelTimes[i] = Time.UNDEFINED_TIME;
+			estTravelTimes[i] = Double.NEGATIVE_INFINITY;
 		}
 		double tmpTravTime;
 		for (int i = 0; i < this.landmarks.length; i++) {

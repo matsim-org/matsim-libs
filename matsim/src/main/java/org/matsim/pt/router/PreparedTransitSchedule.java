@@ -68,7 +68,7 @@ public class PreparedTransitSchedule {
 	
 	public double getNextDepartureTime(final TransitRoute route, final TransitRouteStop stop, final double depTime) {
 	
-		double earliestDepartureTimeAtTerminus = depTime - stop.getDepartureOffset();
+		double earliestDepartureTimeAtTerminus = depTime - stop.getDepartureOffset().seconds();
 		// This shifts my time back to the terminus.
 	
 		if (earliestDepartureTimeAtTerminus >= TransitRouterNetworkTravelTimeAndDisutility.MIDNIGHT) {
@@ -103,7 +103,7 @@ public class PreparedTransitSchedule {
 		double bestDepartureTime = cache[pos];
 		// (departure time at terminus)
 	
-		bestDepartureTime += stop.getDepartureOffset();
+		bestDepartureTime += stop.getDepartureOffset().seconds();
 		// (resulting departure time at stop)
 		
 		while (bestDepartureTime < depTime) {

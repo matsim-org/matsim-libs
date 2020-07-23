@@ -2,7 +2,6 @@ package org.matsim.contrib.drt.config;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.run.DrtConfigGroup;

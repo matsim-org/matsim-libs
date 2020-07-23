@@ -23,6 +23,7 @@ package org.matsim.core.population;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -30,8 +31,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	private Route route = null;
 
-	private double depTime = Time.getUndefinedTime();
-	private double travTime = Time.getUndefinedTime();
+	private OptionalTime depTime = OptionalTime.undefined();
+	private OptionalTime travTime = OptionalTime.undefined();
 	private String mode;
 
 	private final Attributes attributes = new Attributes();
@@ -54,23 +55,33 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final double getDepartureTime() {
+	public final OptionalTime getDepartureTime() {
 		return this.depTime;
 	}
 
 	@Override
 	public final void setDepartureTime(final double depTime) {
-		this.depTime = depTime;
+		this.depTime = OptionalTime.defined(depTime);
 	}
 
 	@Override
-	public final double getTravelTime() {
+	public void setDepartureTimeUndefined() {
+		this.depTime = OptionalTime.undefined();
+	}
+
+	@Override
+	public final OptionalTime getTravelTime() {
 		return this.travTime;
 	}
 
 	@Override
 	public final void setTravelTime(final double travTime) {
-		this.travTime = travTime;
+		this.travTime = OptionalTime.defined(travTime);
+	}
+
+	@Override
+	public void setTravelTimeUndefined() {
+		this.travTime = OptionalTime.undefined();
 	}
 
 	@Override
@@ -85,12 +96,25 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "leg [mode=" + this.getMode() + "]" +
-				"[depTime=" + Time.writeTime(this.getDepartureTime()) + "]" +
-				"[travTime=" + Time.writeTime(this.getTravelTime()) + "]" +
-				"[arrTime=" + Time.writeTime(this.getDepartureTime() + this.getTravelTime()) + "]" +
-				"[route=" + this.route + "]";
+		return "leg [mode="
+				+ this.getMode()
+				+ "]"
+				+ "[depTime="
+				+ Time.writeTime(this.getDepartureTime())
+				+ "]"
+				+ "[travTime="
+				+ Time.writeTime(this.getTravelTime())
+				+ "]"
+				+ "[arrTime="
+				+ (depTime.isDefined() && travTime.isDefined()?
+				Time.writeTime(depTime.seconds() + travTime.seconds()) :
+				Time.writeTime(OptionalTime.undefined()))
+				+ "]"
+				+ "[route="
+				+ this.route
+				+ "]";
 	}
+
 
 	@Override
 	public Attributes getAttributes() {

@@ -34,10 +34,9 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 
 /**
  * @author jbischoff
@@ -61,7 +60,7 @@ public class DrtFareHandlerTest {
         tccg.setMode(TransportMode.drt);
 
         final MutableDouble fare = new MutableDouble(0);
-        EventsManager events = EventsUtils.createEventsManager();
+        ParallelEventsManager events = new ParallelEventsManager(false);
         DrtFareHandler tfh = new DrtFareHandler(tccg, events);
         events.addHandler(tfh);
         events.addHandler(new PersonMoneyEventHandler() {
@@ -74,21 +73,24 @@ public class DrtFareHandlerTest {
             public void reset(int iteration) {
             }
         });
+        events.initProcessing();
         Id<Person> p1 = Id.createPersonId("p1");
 
         events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), TransportMode.drt));
         events.processEvent(new DrtRequestSubmittedEvent(0.0, TransportMode.drt, Id.create(0, Request.class), p1, Id.createLinkId("12"), Id.createLinkId("23"), 240, 1000));
         events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), TransportMode.drt));
+        events.flush();
 
         //fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
 		Assert.assertEquals(-4.0, fare.getValue(), 0);
-        
+
         // test minFarePerTrip
         events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("45"), TransportMode.drt));
         events.processEvent(new DrtRequestSubmittedEvent(0.0, TransportMode.drt, Id.create(0, Request.class), p1, Id.createLinkId("45"), Id.createLinkId("56"), 24, 100));
         events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("56"), TransportMode.drt));
-        
-        /* 
+        events.finishProcessing();
+
+        /*
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
          * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
          */
