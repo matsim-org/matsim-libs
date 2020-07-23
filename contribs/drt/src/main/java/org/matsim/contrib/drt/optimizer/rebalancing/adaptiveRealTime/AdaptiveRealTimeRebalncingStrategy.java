@@ -75,6 +75,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		}
 
 		System.err.println("we are here!!!"); // TODO delete this line after running properly
+		
 		// calculate using min cost flow method
 		return minCostRelocationCalculator.calcRelocations(supply, demand, rebalancableVehiclesPerZone);
 	}
