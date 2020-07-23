@@ -64,13 +64,13 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 
 		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
 		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-			this.raptorData = SwissRailRaptorData.create(schedule, raptorConfig, ptNetwork, null);
+			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
 
 		DefaultRaptorParametersForPerson parametersForPerson = new DefaultRaptorParametersForPerson(scenario.getConfig());
 		DefaultRaptorStopFinder defaultRaptorStopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
 		LeastCostRaptorRouteSelector routeSelector = new LeastCostRaptorRouteSelector();
 
-		this.raptor = new SwissRailRaptor(raptorData, parametersForPerson, routeSelector, defaultRaptorStopFinder);
+		this.raptor = new SwissRailRaptor(raptorData, parametersForPerson, routeSelector, defaultRaptorStopFinder, new DefaultRaptorInVehicleCostCalculator());
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.scenario = scenario;
 
