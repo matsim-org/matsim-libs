@@ -14,6 +14,12 @@ import org.matsim.core.router.MainModeIdentifier;
  */
 public class SwissRailRaptorModule extends AbstractModule {
 
+    private final ExecutionData executionData = new ExecutionData();
+
+    public ExecutionData getExecutionData() {
+        return this.executionData;
+    }
+
     @Override
     public void install() {
         if (getConfig().transit().isUseTransit()) {
@@ -45,13 +51,14 @@ public class SwissRailRaptorModule extends AbstractModule {
             }
             bind(RaptorStopFinder.class).to(DefaultRaptorStopFinder.class);
 
-            bind(ExecutionData.class).asEagerSingleton();
-            if (srrConfig.isUseCapacityConstraints()) {
+            boolean useCapacityConstraints = srrConfig.isUseCapacityConstraints();
+            bind(ExecutionData.class).toInstance(this.executionData);
+            if (useCapacityConstraints) {
                 addEventHandlerBinding().to(ExecutionTracker.class);
             }
             
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
-            bind(RaptorInVehicleCostCalculator.class).to(DefaultRaptorInVehicleCostCalculator.class);
+            bind(RaptorInVehicleCostCalculator.class).to(useCapacityConstraints ? CapacityDependentInVehicleCostCalculator.class : DefaultRaptorInVehicleCostCalculator.class);
         }
 
     }
