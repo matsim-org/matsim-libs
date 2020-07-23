@@ -89,10 +89,10 @@ public class Agent {
     private int capacity;
 
     // Number of passegers that are currently being transported.
-    private int passagersInside;
+    private int passangersInside;
 
     // Array of passagers on this vehicle.
-    private ArrayList<ArrayList<Agent>> passagersByStop;
+    private ArrayList<ArrayList<Agent>> passangersByStop;
 
     public Agent(int id, PlanArray plan, EventArray events) {
         this.id = id;
@@ -102,9 +102,9 @@ public class Agent {
     public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this(id, plan, events);
         this.capacity = capacity;
-        this.passagersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
+        this.passangersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
         for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-            this.passagersByStop.add(new ArrayList<>());
+            this.passangersByStop.add(new ArrayList<>());
         }
     }
 
@@ -124,22 +124,28 @@ public class Agent {
     public long currPlan() { return this.plan.get(planIndex); }
     public long prevPlan() { return this.plan.get(planIndex - 1); }
     public boolean finished() { return planIndex >= (plan.size() - 1); }
-    public int capacity() { return this.capacity; }
-    public boolean isVehicle() { return this.passagersByStop == null; }
+
+    public int capacity() {
+        return this.capacity;
+    }
+
+    public boolean isVehicle() {
+        return this.passangersByStop == null;
+    }
 
     public ArrayList<Agent> egress(int stopidx) {
-        ArrayList<Agent> ret = passagersByStop.get(stopidx);
-        passagersInside -= ret.size();
-        passagersByStop.set(stopidx, new ArrayList<>());
+        ArrayList<Agent> ret = passangersByStop.get(stopidx);
+        passangersInside -= ret.size();
+        passangersByStop.set(stopidx, new ArrayList<>());
         return ret;
     }
 
     public boolean access(int stopidx, Agent agent) {
-        if (passagersInside == capacity) {
+        if (passangersInside == capacity) {
             return false;
         } else {
-            passagersByStop.get(stopidx).add(agent);
-            passagersInside++;
+            passangersByStop.get(stopidx).add(agent);
+            passangersInside++;
             return true;
         }
     }
@@ -225,9 +231,9 @@ public class Agent {
         eventsIndex = 0;
         linkFinishTime = 0;
         if (capacity > 0) {
-            passagersInside = 0;
+            passangersInside = 0;
             for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-                this.passagersByStop.get(i).clear();
+                this.passangersByStop.get(i).clear();
             }
         }
     }
