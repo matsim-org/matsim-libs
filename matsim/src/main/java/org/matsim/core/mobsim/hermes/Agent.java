@@ -94,13 +94,10 @@ public class Agent {
     // Array of passagers on this vehicle.
     private ArrayList<ArrayList<Agent>> passengersByStop;
 
-    public Agent(int id, PlanArray plan, EventArray events) {
+    public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this.id = id;
         this.plan = plan;
         this.events = events;
-    }
-    public Agent(int id, int capacity, PlanArray plan, EventArray events) {
-        this(id, plan, events);
         this.capacity = capacity;
         this.passengersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
         for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
