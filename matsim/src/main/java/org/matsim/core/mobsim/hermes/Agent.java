@@ -64,7 +64,7 @@ public class Agent {
     // Possible headers (binary format) and corresponding payload:
     // <0000> SleepForType    | 4 bits unused | 16 bit event id  | 8 bits unused   | 32 bit sleep for a number of second
     // <0001> SleepUntilType  | 4 bits unused | 16 bit event id  | 8 bits unused   | 32 bit speep until a specific time
-    // <0010> LinkType        | 4 bits unused | 16 bit event id  | 32 bit link id  | 8 bit velocity
+    // <0010> LinkType        | 4 bits PCEcategory | 16 bit event id  | 32 bit link id  | 8 bit velocity
     // <0111> WaitType        | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
     // <0011> AccessType      | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
     // <0100> EgressType      | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
@@ -157,8 +157,18 @@ public class Agent {
     public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000Fl); }
     public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFl); }
     public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFl); }
-    public static int getLinkPlanEntry      (long plan) { return (int)((plan >>  8) & 0x00000000FFFFFFFFl); }
-    public static int getVelocityPlanEntry  (long plan) { return (int)( plan        & 0x00000000000000FFl); }
+
+    public static int getLinkPlanEntry(long plan) {
+        return (int) ((plan >> 8) & 0x00000000FFFFFFFFl);
+    }
+
+    public static int getLinkPCEEntry(long plan) {
+        return (int) ((plan >> 56) & 0x000000000000000Fl);
+    }
+
+    public static int getVelocityPlanEntry(long plan) {
+        return (int) (plan & 0x00000000000000FFl);
+    }
     public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFl); }
     public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFl); }
     public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFl); }
@@ -200,8 +210,8 @@ public class Agent {
 
         // Checking for velocities that are too low.
         velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
-
-        return (linkid << 8) | velocity;
+        long pce = 12;
+        return (pce << 56) | (linkid << 8) | velocity;
     }
 
     public static long prepareStopDelay(long type, long departure, long element) {
