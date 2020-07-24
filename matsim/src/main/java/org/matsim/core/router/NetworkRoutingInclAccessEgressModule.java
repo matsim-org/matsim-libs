@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -77,6 +76,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Config config;
 	public static final String ACCESSTIMELINKATTRIBUTEPREFIX = "accesstime_";
 	public static final String EGRESSTIMELINKATTRIBUTEPREFIX = "egresstime_";
+	private static boolean hasWarnedAccessEgress = false;
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 
 	NetworkRoutingInclAccessEgressModule(
@@ -98,9 +98,10 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		if (accessEgressType.equals(AccessEgressType.none)) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems");
-		} else if ( accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) ) {
+		} else if (accessEgressType.equals(AccessEgressType.walkConstantTimeToLink) && !hasWarnedAccessEgress) {
+			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
-					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress " );
+					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress ");
 		}
 	}
 
