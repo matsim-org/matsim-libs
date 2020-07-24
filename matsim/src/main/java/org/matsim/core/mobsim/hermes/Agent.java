@@ -154,25 +154,16 @@ public class Agent {
         return getStopPlanEntry(plan.get(planIndex + 2));
     }
 
-    public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000Fl); }
-    public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFl); }
-    public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFl); }
-
-    public static int getLinkPlanEntry(long plan) {
-        return (int) ((plan >> 8) & 0x00000000FFFFFFFFl);
-    }
-
-    public static int getLinkPCEEntry(long plan) {
-        return (int) ((plan >> 56) & 0x000000000000000Fl);
-    }
-
-    public static int getVelocityPlanEntry(long plan) {
-        return (int) (plan & 0x00000000000000FFl);
-    }
-    public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFl); }
-    public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFl); }
-    public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFl); }
-    public static int getSleepPlanEntry     (long plan) { return (int)( plan        & 0x00000000FFFFFFFFl); }
+    public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000FL); }
+    public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFL); }
+    public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFL); }
+    public static int getLinkPlanEntry      (long plan) {return (int) ((plan >> 8) & 0x00000000FFFFFFFFL); }
+    public static int getLinkPCEEntry       (long plan) {return (int) ((plan >> 56) & 0x000000000000000FL); }
+    public static int getVelocityPlanEntry  (long plan) {return (int) (plan & 0x00000000000000FFL); }
+    public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFL); }
+    public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFL); }
+    public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFL); }
+    public static int getSleepPlanEntry     (long plan) { return (int)( plan        & 0x00000000FFFFFFFFL); }
 
     private static void validatePlanEntry(long planEntry) {
         int event = Agent.getPlanEvent(planEntry);
