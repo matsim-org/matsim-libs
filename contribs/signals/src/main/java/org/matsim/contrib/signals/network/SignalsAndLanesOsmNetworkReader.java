@@ -1926,8 +1926,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = null;
 					LOG.warn("Lane-Tag was Null " + directionsPerLane[j] + " -> at link "+id.toString());
 				} else {
-					tempDir = null;
-					LOG.warn("Could not read Turnlanes: " + directionsPerLane[j] + " -> at link "+id.toString());
+					//Add here tempDir = 99 -> decide later what happens than with this
+//					tempDir = null;
+					tempDir = 99;
+					LOG.warn("Could not read Turnlanes: \"" + directionsPerLane[j] + "\" -> at link "+id.toString());
 				}
 				tempLane.push(tempDir);
 			}
@@ -1937,6 +1939,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// fills up Stack with dummy Lanes if size of Stack does not match
 		// number of Lanes
 		Stack<Integer> tempLane = new Stack<Integer>();
+		if(turnLaneStack.size() < nofLanes) LOG.warn("Number of Lanes does not match the number of tags at link"
+				+ id.toString()+"\n Tags:"+turnLaneStack.size()+"\n Lanes: "+nofLanes);
 		while (turnLaneStack.size() < nofLanes) {
 			tempLane.push(null);
 			turnLaneStack.push(tempLane);
@@ -2215,8 +2219,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 				lane.setAlignment(0);
-				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
-				//sbraun
+				//sbraun 24072020 change break to continue-
+				// if there are unreadable tags in between than the the other lanes remain unconsidered
+				//then remove dummy lane logic in laneStack
 				break;
 			}
 			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
@@ -2453,8 +2458,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else
 					lane.setAlignment(2);
 			}
-			if (tempDir == 0 || tempDir == 4 || tempDir == -5) { // lane directions that have to lead to a forward link
+			if (tempDir == 0 || tempDir == 4 || tempDir == -5 || tempDir == 99) { // lane directions that have to lead to a forward link
 																	// (through, merge_to_left,merge_to_right)
+																	//sbraun24072020: added 99 -> a direction which has been not understood previously
 				alignmentAnte = lane.getAlignment(); // look for the most "forward" link (closest to 180° or pi) and
 														// take it
 
