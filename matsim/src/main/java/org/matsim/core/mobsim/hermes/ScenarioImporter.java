@@ -380,6 +380,7 @@ public class ScenarioImporter {
 		Id<org.matsim.api.core.v01.network.Link> endLId = netroute.getEndLinkId();
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getVehicles().getVehicles();
 		Vehicle v = vehicles.get(VehicleUtils.getVehicleId(person, leg.getMode()));
+		int pcuCategory = this.vehicleTypeMapping.get(v.getType().getId());
 		Id<Vehicle> vid = v == null ? Id.createVehicleId("v" + person.getId()) : v.getId();
 		int velocity = v == null ?
 				HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
@@ -392,12 +393,12 @@ public class ScenarioImporter {
 		for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
 			int linkId = linkid.index();
             events.add(new LinkEnterEvent(0, vid, linkid));
-            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity, 0));
+            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity, pcuCategory));
             events.add(new LinkLeaveEvent(0, vid, linkid));
         }
         if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
             events.add(new LinkEnterEvent(0, vid, endLId));
-            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity, 0));
+            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity, pcuCategory));
         }
         events.add(new VehicleLeavesTrafficEvent(0, id, endLId, vid, leg.getMode(), 1));
         events.add(new PersonLeavesVehicleEvent(0, id, vid));
@@ -529,11 +530,12 @@ public class ScenarioImporter {
 		TransitRouteStop next = trs.get(0);
 		int stopidx = 0;
 		int rid = tr.getId().index();
-		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
 		Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
 		int endid = nr.getEndLinkId().index();
+		int pcuCategory = deterministicPt?0:vehicleTypeMapping.get(v.getType().getId());
+		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
 		List<Double> averageSpeedbetweenStops = calculateSpeedsBetweenStops(tr);
 		int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 
@@ -571,7 +573,7 @@ public class ScenarioImporter {
         for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
             int linkid = link.index();
 			flatevents.add(new LinkEnterEvent(0, v.getId(), link));
-			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, 0));
+			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
             // Adding link and possibly a stop.
             if (next.getStopFacility().getLinkId().equals(link)) {
                 flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
@@ -589,7 +591,7 @@ public class ScenarioImporter {
 
         // Adding last link and possibly the last stop.
 		flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
-		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, 0));
+		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
         if (next.getStopFacility().getLinkId().equals(nr.getEndLinkId())) {
             flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
             flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
