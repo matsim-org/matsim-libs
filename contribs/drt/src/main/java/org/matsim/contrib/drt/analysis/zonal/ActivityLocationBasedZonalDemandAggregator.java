@@ -45,7 +45,7 @@ import org.matsim.pt.PtConstants;
  *
  * @author tschlenther
  */
-public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
+public final class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
