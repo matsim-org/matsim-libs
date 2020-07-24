@@ -40,12 +40,12 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
- * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
+ * Aggregates all activity ends per zone and time bin in every iteration and returns the numbers from the previous iteration
  * as expected demand for the current iteration. This will lead to rebalancing target locations related to activity volume per zone.
  *
  * @author tschlenther
  */
-public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
+public final class TimeDependentActivityBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
@@ -53,7 +53,7 @@ public class ActivityLocationBasedZonalDemandAggregator implements ZonalDemandAg
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO =  new MutableInt(0);
 
-	public ActivityLocationBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public TimeDependentActivityBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
 		//self-registration

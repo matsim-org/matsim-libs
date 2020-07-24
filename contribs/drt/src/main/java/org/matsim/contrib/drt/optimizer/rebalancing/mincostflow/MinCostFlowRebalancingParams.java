@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -38,8 +39,10 @@ import com.google.common.base.Verify;
 public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
-	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
-		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
+	public enum ZonalDemandAggregatorType {PreviousIteration,
+		TimeDependentActivityBased,
+		EqualVehicleDensity,
+		FirstActivityCount}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
@@ -70,7 +73,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
 
 	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be either PreviousIterationZonalDemandAggregator, ActivityLocationBasedZonalDemandAggregator or EqualVehicleDensityZonalDemandAggregator";
+	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be one of either [PreviousIteration, TimeDependentActivityBased, EqualVehicleDensity, FirstActivityCount] Current default is PreviousIteration";
 
 	public static final String REBALANCING_ZONES_GENERATION = "rebalancingZonesGeneration";
 	static final String REBALANCING_ZONES_GENERATION_EXP = "Logic for generation of zones for demand estimation while rebalancing. Value can be GridFromNetwork or ShapeFile Default is GridFromNetwork";
@@ -99,7 +102,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private double cellSize = Double.NaN;// [m]
 
 	@NotNull
-	private MinCostFlowRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
+	private MinCostFlowRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIteration;
 
 	@NotNull
 	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;
