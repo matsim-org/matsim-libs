@@ -57,6 +57,7 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 
 	@Override
 	public void install() {
+		System.out.println("Adaptive Real Time Rebalancing Algorithm is now being installed!");
 		AdaptiveRealTimeRebalancingParams params = drtCfg.getAdaptiveRealTimeRebalancing().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 

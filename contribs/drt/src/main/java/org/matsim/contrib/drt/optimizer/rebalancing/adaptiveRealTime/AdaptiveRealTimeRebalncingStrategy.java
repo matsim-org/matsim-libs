@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,18 +39,25 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		this.fleet = fleet;
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
 		this.params = params;
+		System.out.println("Adaptive Real Time Rebalancing Strategy (pbject) has been created");
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
+		System.err.println("Adaptive Real Time Rebalancing Strategy is used"); // TODO delete this line after running
+																				// properly
+
 		// initialization each time this function is called
 		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		supply.clear();
 		demand.clear();
 		targetMap.clear();
+		List<? extends DvrpVehicle> rebalancableVehiclesList = rebalancableVehicles.collect(Collectors.toList());
+		int numAvailableVehicles = rebalancableVehiclesList.size();
+
 		// Get idling vehicles in each zone
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-				.groupRebalancableVehicles(rebalancableVehicles, time, params.getMinServiceTime());
+				.groupRebalancableVehicles(rebalancableVehiclesList.stream(), time, params.getMinServiceTime());
 		if (rebalancableVehiclesPerZone.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -59,7 +67,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 				params.getMaxTimeBeforeIdle(), params.getMinServiceTime());
 
 		// calculate real time target of each zone
-		calculateRealTimeRebalanceTarget(targetMap, fleet, zonalSystem, rebalancableVehicles);
+		calculateRealTimeRebalanceTarget(targetMap, fleet, zonalSystem, numAvailableVehicles);
 
 		// calculate supply and demand for each zone
 		for (String z : zonalSystem.getZones().keySet()) {
@@ -74,20 +82,17 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 			}
 		}
 
-		System.err.println("we are here!!!"); // TODO delete this line after running properly
-		
 		// calculate using min cost flow method
 		return minCostRelocationCalculator.calcRelocations(supply, demand, rebalancableVehiclesPerZone);
 	}
 
 	private void calculateRealTimeRebalanceTarget(Map<String, Integer> targetMap, Fleet fleet,
-			DrtZonalSystem zonalSystem, Stream<? extends DvrpVehicle> rebalancableVehicles) {
+			DrtZonalSystem zonalSystem, int numAvailableVehicles) {
 		// TODO enable different methods for real time target generation by adding
 		// switch and corresponding parameter entry in the parameter file
 
 		// First implementation: Simply evenly distribute the rebalancable (i.e. idling
 		// and have enough service time) accross the network
-		int numAvailableVehicles = (int) rebalancableVehicles.count();
 		int targetValue = (int) Math.floor(numAvailableVehicles / zonalSystem.getZones().keySet().size());
 		for (String z : zonalSystem.getZones().keySet()) {
 			targetMap.put(z, targetValue);

@@ -40,7 +40,7 @@ import com.google.common.base.Verify;
 public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "AdaptiveRealTimeRebalncingStrategy";
 
-	public enum ZonalDemandAggregatorType {PreviousIterationZonalDRTDemandAggregator,
+	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
 		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
@@ -101,7 +101,7 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 	private double cellSize = Double.NaN;// [m]
 
 	@NotNull
-	private AdaptiveRealTimeRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDRTDemandAggregator;
+	private AdaptiveRealTimeRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
 
 	@NotNull
 	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;

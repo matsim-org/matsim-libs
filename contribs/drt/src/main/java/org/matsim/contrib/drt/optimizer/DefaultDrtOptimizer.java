@@ -29,6 +29,7 @@ import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.AdaptiveRealTimeRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -75,8 +76,11 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
-		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
-				.map(MinCostFlowRebalancingParams::getInterval)
+//		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
+//				.map(MinCostFlowRebalancingParams::getInterval)
+//				.orElse(null);
+		rebalancingInterval = drtCfg.getAdaptiveRealTimeRebalancing()
+				.map(AdaptiveRealTimeRebalancingParams::getInterval)
 				.orElse(null);
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
@@ -101,6 +105,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
+		System.out.println("Rebalance Fleet now");
 		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles()
 				.values()
 				.stream()
