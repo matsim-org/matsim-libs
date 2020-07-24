@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author jbischoff
  */
-public class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
+public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;

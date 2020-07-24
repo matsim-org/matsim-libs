@@ -52,6 +52,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class ScenarioImporter {
 
@@ -336,30 +337,27 @@ public class ScenarioImporter {
     }
 
     private void processPlanNetworkRoute(
-            Id<Person> id,
-            PlanArray flatplan,
-            EventArray events,
-            Leg leg,
-            NetworkRoute netroute) {
-        Id<org.matsim.api.core.v01.network.Link> startLId = netroute.getStartLinkId();
-        Id<org.matsim.api.core.v01.network.Link> endLId = netroute.getEndLinkId();
-        Map<Id<Vehicle>, Vehicle> vehicles = scenario.getVehicles().getVehicles();
-        Vehicle v = vehicles.get(netroute.getVehicleId());
-        Id<Vehicle> vid = v == null ?
-                leg.getMode().equals("freight") ?
-                    Id.createVehicleId(id.toString() + "_" + leg.getMode()) :
-                    Id.createVehicleId(id.toString()) :
-                v.getId();
-        int velocity = v == null ?
-                HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
-        int egressId = endLId.index();
-        events.add(new PersonEntersVehicleEvent(0, id, vid));
-        events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
-        if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
-            events.add(new LinkLeaveEvent(0, vid, startLId));
-        }
-        for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
-            int linkId = linkid.index();
+			Person person,
+			PlanArray flatplan,
+			EventArray events,
+			Leg leg,
+			NetworkRoute netroute) {
+		var id = person.getId();
+		Id<org.matsim.api.core.v01.network.Link> startLId = netroute.getStartLinkId();
+		Id<org.matsim.api.core.v01.network.Link> endLId = netroute.getEndLinkId();
+		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getVehicles().getVehicles();
+		Vehicle v = vehicles.get(VehicleUtils.getVehicleId(person, leg.getMode()));
+		Id<Vehicle> vid = v == null ? Id.createVehicleId("v" + person.getId()) : v.getId();
+		int velocity = v == null ?
+				HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
+		int egressId = endLId.index();
+		events.add(new PersonEntersVehicleEvent(0, id, vid));
+		events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
+		if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
+			events.add(new LinkLeaveEvent(0, vid, startLId));
+		}
+		for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
+			int linkId = linkid.index();
             events.add(new LinkEnterEvent(0, vid, linkid));
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity));
             events.add(new LinkLeaveEvent(0, vid, linkid));
@@ -406,30 +404,33 @@ public class ScenarioImporter {
     }
 
     private void processPlanElement(
-            Id<Person> id,
-            PlanArray flatplan,
-            EventArray events,
-            PlanElement element) {
-        if (element instanceof Leg) {
-            Leg leg = (Leg) element;
-            Route route = leg.getRoute();
-            String mode = leg.getMode();
+			Person person,
+			PlanArray flatplan,
+			EventArray events,
+			PlanElement element) {
+		var id = person.getId();
+		if (element instanceof Leg) {
+			Leg leg = (Leg) element;
+			Route route = leg.getRoute();
+			String mode = leg.getMode();
 
-            if (route == null) return;
+			if (route == null) {
+				return;
+			}
 
-            events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
-            if (route instanceof NetworkRoute){
+			events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
+			if (route instanceof NetworkRoute) {
 				if (scenario.getConfig().hermes().getMainModes().contains(leg.getMode())) {
-					processPlanNetworkRoute(id, flatplan, events, leg, (NetworkRoute) route);
+					processPlanNetworkRoute(person, flatplan, events, leg, (NetworkRoute) route);
 				} else {
-					handleTeleport(id, flatplan, events, (Leg) element, route, mode);
+					processTeleport(id, flatplan, events, (Leg) element, route, mode);
 				}
 			}
             else if (route instanceof TransitPassengerRoute) {
 				processPlanTransitRoute(id, flatplan, events, (TransitPassengerRoute) route);
 
 			} else if (route instanceof GenericRouteImpl) {
-				handleTeleport(id, flatplan, events, (Leg) element, route, mode);
+				processTeleport(id, flatplan, events, (Leg) element, route, mode);
 			} else {
             	throw new RuntimeException("Route type not supported by Hermes: "+route.getRouteType() + "\n Person:" + id+"\n Leg"+leg+"\n Leg"+route);
 			}
@@ -443,7 +444,7 @@ public class ScenarioImporter {
 		}
 	}
 
-	private void handleTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
+	private void processTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
 		double routeTravelTime = route.getTravelTime().orElse(0.0);
 		double legTravelTime = element.getTravelTime().orElse(0.0);
 		int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
@@ -611,7 +612,7 @@ public class ScenarioImporter {
         	PlanArray plan = hermes_agents[hermes_id].plan();
         	EventArray events = hermes_agents[hermes_id].events();
             for (PlanElement element: person.getSelectedPlan().getPlanElements()) {
-                processPlanElement(person.getId(), plan, events, element);
+				processPlanElement(person, plan, events, element);
             }
         });
     }
