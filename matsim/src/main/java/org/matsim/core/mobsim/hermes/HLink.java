@@ -4,6 +4,9 @@ import java.util.Iterator;
 
 public class HLink {
 
+	private double currentCapacity;
+	private final int initialCapacity;
+
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
 	// Java's implementation of ArrayDequeue.
@@ -138,7 +141,8 @@ public class HLink {
     // Queues of agents on this link. Boundary links use both queues.
     private final AgentQueue queue;
     // Number of time steps necessary to reset the flow.
-    private final int flowPeriod;
+    private final int initialFlowPeriod;
+    private int nextFlowPeriod;
     // Number of vehicles that can leave the link per time period.
     private final int flowCapacity;
     // When (which timestep) flow was updated the last time.
@@ -150,11 +154,15 @@ public class HLink {
         this.id = id;
         this.length = length;
         this.velocity = velocity;
-        this.flowPeriod = flowPeriod;
+        this.initialFlowPeriod = flowPeriod;
+        this.nextFlowPeriod = initialFlowPeriod;
         this.flowCapacity = flowCapacity;
         this.lastFlowUpdate = 0;
         this.stuckTimePeriod = stuckTimePeriod;
         this.lastPush = 0;
+        this.initialCapacity = capacity;
+        this.currentCapacity = capacity;
+
         // We do not preallocate using the capacity because it leads to huge memory waste.
         //this.queue = new AgentQueue(Math.max(1, capacity));
         this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
@@ -165,14 +173,23 @@ public class HLink {
     	this.lastFlowUpdate = 0;
     }
 
-	public boolean push(Agent agent, int timestep) {
-		if( queue.push(agent)){
-			lastPush = timestep;
-			return true;
+	public boolean push(Agent agent, int timestep, double storageCapacityPCU) {
+		//avoid long vehicles not being able to enter a short link
+    	double effectiveStorageCapacity = Math.max(storageCapacityPCU,initialCapacity);
+    	//if (currentCapacity-effectiveStorageCapacity>=0) {
+			if (queue.push(agent)) {
+				lastPush = timestep;
+				currentCapacity = currentCapacity - effectiveStorageCapacity;
+				return true;
+		//	} else
+		//	{
+		//		throw new RuntimeException("should not happen?");
+		//	}
 		}
 		else if ((lastPush + stuckTimePeriod) < timestep){
 			boolean result = queue.forcePush(agent);
 			lastPush= timestep;
+			currentCapacity = currentCapacity - effectiveStorageCapacity;
 			return result;
 		}
 		else {
@@ -180,8 +197,9 @@ public class HLink {
 		}
 	}
 
-    public void pop() {
+    public void pop(double storageCapacityPCE) {
         queue.pop();
+        currentCapacity += storageCapacityPCE;
     }
 
     public int nexttime () {
@@ -196,9 +214,10 @@ public class HLink {
         return this.length;
     }
 
-    public int flow(int timestep) {
-    	if (timestep - lastFlowUpdate >= flowPeriod) {
+    public int flow(int timestep, double flowCapacityPCE) {
+    	if (timestep - lastFlowUpdate >= nextFlowPeriod) {
     		lastFlowUpdate = timestep;
+			nextFlowPeriod = (int) (initialFlowPeriod * flowCapacityPCE);
     		return flowCapacity;
     	} else {
     		return 0;

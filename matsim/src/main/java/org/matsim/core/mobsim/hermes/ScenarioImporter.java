@@ -299,7 +299,7 @@ public class ScenarioImporter {
                     int velocity = Agent.getVelocityPlanEntry(planentry);
                     HLink link = hermes_links[linkid];
                     agent.linkFinishTime = link.length() / Math.min(velocity, link.velocity());
-                    link.push(agent,0);
+                    link.push(agent,0, getStorageCapacityPCE(Agent.getLinkPCEEntry(planentry)));
                     break;
                 case Agent.SleepForType:
                 case Agent.SleepUntilType:
