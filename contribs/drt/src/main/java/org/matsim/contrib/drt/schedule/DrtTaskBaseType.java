@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,39 +18,23 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.passenger;
+package org.matsim.contrib.drt.schedule;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
- * This class has a multi-iteration scope, whereas {@link PassengerEngine} has only a single-iteration scope.
- * <p>
- * PassengerRequestEventToPassengerEngineForwarder is registered at {@link org.matsim.core.api.experimental.events.EventsManager}
- * and forwards events to PassengerEngine
- *
  * @author Michal Maciejewski (michalm)
  */
-public class PassengerRequestEventToPassengerEngineForwarder
-		implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler {
-	private final Map<String, PassengerEngine> passengerEngines = new HashMap<>();
+public enum DrtTaskBaseType {
+	STAY, // idle
+	STOP, // stopped to drop off and pick up passengers
+	DRIVE; // driving with/without passengers
 
-	@Override
-	public void handleEvent(PassengerRequestRejectedEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestRejected(event);
+	public static DrtTaskBaseType getBaseType(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().get();
 	}
 
-	@Override
-	public void handleEvent(PassengerRequestScheduledEvent event) {
-		passengerEngines.get(event.getMode()).notifyPassengerRequestScheduled(event);
-	}
-
-	void registerPassengerEngineEventsHandler(PassengerEngine passengerEngine) {
-		passengerEngines.put(passengerEngine.getMode(), passengerEngine);
-	}
-
-	@Override
-	public void reset(int iteration) {
-		passengerEngines.clear();
+	public boolean isBaseTypeOf(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
 	}
 }

@@ -96,7 +96,6 @@ public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupLis
 
 	private void writeDetailedStats(List<TaxiStats> taxiStats, int iteration) {
 		String prefix = controlerIO.getIterationFilename(iteration, "taxi_");
-
 		new TaxiStatsWriter(taxiStats).write(prefix + "stats_" + taxiCfg.getMode() + ".txt");
 		new TaxiHistogramsWriter(taxiStats).write(prefix + "histograms_" + taxiCfg.getMode() + ".txt");
 	}

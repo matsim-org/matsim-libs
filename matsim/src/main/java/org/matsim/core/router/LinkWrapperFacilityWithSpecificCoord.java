@@ -1,9 +1,11 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
+ * LinkWrapperFacility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +19,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.passenger;
+ package org.matsim.core.router;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import java.util.Map;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
+/*
+ * Wraps a Link into a Facility with a specific coordinate.
+ * Useful for, e.g., Access and egress leg distance calculations
+ */
+public final class LinkWrapperFacilityWithSpecificCoord implements Facility, Identifiable<ActivityFacility> {
 
-class AdvanceRequestStorage {
-	private final Multimap<Id<Person>, PassengerRequest> advanceRequests = ArrayListMultimap.create();
+	private final Link wrappedLink;
+	private final Coord wrappedCoord;
 
-	void storeRequest(PassengerRequest request) {
-		advanceRequests.put(request.getPassengerId(), request);
+	public LinkWrapperFacilityWithSpecificCoord(final Link linkToWrap, final Coord coordToWrap) {
+		wrappedLink = linkToWrap;
+		wrappedCoord = coordToWrap;
 	}
 
-	//XXX it should be enough to provide only requestId
-	boolean removeRequest(Id<Person> passengerId, Id<Request> requestId) {
-		return advanceRequests.get(passengerId).removeIf(req -> req.getId().equals(requestId));
+	@Override
+	public Coord getCoord() {
+		return wrappedCoord;
 	}
 
-	List<PassengerRequest> retrieveRequests(Id<Person> passengerId, Id<Link> fromLinkId, Id<Link> toLinkId) {
-		Collection<PassengerRequest> allRequests = advanceRequests.get(passengerId);
-		List<PassengerRequest> filteredRequests = advanceRequests.get(passengerId)
-				.stream()
-				.filter(r -> r.getFromLink().getId().equals(fromLinkId) && r.getToLink().getId().equals(toLinkId))
-				.collect(Collectors.toList());
-		allRequests.removeAll(filteredRequests);
-		return filteredRequests;
+	@Override
+	public Id<ActivityFacility> getId() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Id<Link> getLinkId() {
+		return wrappedLink.getId();
+	}
+
+	@Override
+	public String toString() {
+		return "[LinkWrapperFacilityWithSpecificCoord: wrappedLink="+ wrappedLink +", wrapped Coord: "+wrappedCoord+"]";
 	}
 }

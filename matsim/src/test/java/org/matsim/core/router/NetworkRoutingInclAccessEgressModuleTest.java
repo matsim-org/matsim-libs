@@ -15,7 +15,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -37,6 +38,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     private static final double SLOW_SPEED = 10 / 3.6;
     private static final double FAST_SPEED = 100 / 3.6;
     private static final Coord HOME = new Coord(0, 0);
+    private static final Coord NEARHOME = new Coord(10, 10);
     private static final Coord WORK = new Coord(11100, 0);
     private static final String FAST_MODE = "fast-mode";
     private static final String SLOW_MODE = "slow-mode";
@@ -103,7 +105,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         config.controler().setLastIteration(0);
         config.controler().setOutputDirectory(utils.getOutputDirectory());
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
         final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
         homeParams.setTypicalDuration(1);
@@ -262,7 +264,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
@@ -283,19 +285,21 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLinkPlusConstant);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLinkPlusTimeConstant);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         // add persons
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        Activity h = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+        h.setCoord(NEARHOME);
         scenario.getPopulation().addPerson(person);
 
         Controler controler = createControler(scenario);
         controler.run();
         var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
         Assert.equals(3,legs.size());
-        Assert.equals(153.0,legs.get(0).getTravelTime().seconds());
+        Assert.equals(90.0,legs.get(0).getTravelTime().seconds());
         Assert.equals(180.0,legs.get(2).getTravelTime().seconds());
     }
 
@@ -304,7 +308,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.walkConstantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
@@ -319,7 +323,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.constantTimeToLink);
+        config.plansCalcRoute().setAccessEgressType(AccessEgressType.walkConstantTimeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkEgressTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
@@ -329,24 +333,26 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
     @Test
-    public void calcAccessTimeFromDistanceToNode() {
+    public void calcAccessTimeFromDistanceToLink() {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.walkToLink);
+        config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);
         // add persons
         Person person = createPerson("slow-person", TransportMode.car, scenario.getPopulation().getFactory());
+        Activity h = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+        h.setCoord(NEARHOME);
         scenario.getPopulation().addPerson(person);
 
         Controler controler = createControler(scenario);
         controler.run();
         var legs = TripStructureUtils.getLegs(person.getSelectedPlan());
         Assert.equals(3,legs.size());
-        //the agent needs to walk along the whole link, as its home is on the from node
-        Assert.equals(78.0,legs.get(0).getTravelTime().seconds());
+        //the agent starts at the fromNode
+        Assert.equals(15.0,legs.get(0).getTravelTime().seconds());
         //the agent is lucky: work location is at the to-node
         Assert.equals(0.0,legs.get(2).getTravelTime().seconds());
     }
@@ -356,7 +362,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
 
         Config config = createConfig();
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
-        config.plansCalcRoute().setInsertingAccessEgressWalk(AccessEgressWalkType.none);
+        config.plansCalcRoute().setAccessEgressType(AccessEgressType.none);
         Scenario scenario = createScenario(config);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(START_LINK)),TransportMode.car,75);
         NetworkUtils.setLinkAccessTime(scenario.getNetwork().getLinks().get(Id.createLinkId(END_LINK)),TransportMode.car,180);

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,25 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.passenger;
+package org.matsim.contrib.taxi.schedule;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.contrib.dvrp.schedule.Task;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.optimizer.Request;
+import com.google.common.collect.ImmutableList;
 
-public class AwaitingPickupStorage {
-	// passenger's request id -> driver's stay task
-	private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
-
-	public void storeAwaitingPickup(Id<Request> requestId, PassengerPickupActivity pickupActivity) {
-		awaitingPickups.put(requestId, pickupActivity);
-	}
-
-	public PassengerPickupActivity retrieveAwaitingPickup(Id<Request> requestId) {
-		return awaitingPickups.remove(requestId);
-	}
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class TaxiTaskTypes {
+	public static final ImmutableList<Task.TaskType> DEFAULT_TAXI_TYPES = ImmutableList.of(TaxiEmptyDriveTask.TYPE,
+			TaxiPickupTask.TYPE, TaxiOccupiedDriveTask.TYPE, TaxiDropoffTask.TYPE, TaxiStayTask.TYPE);
 }

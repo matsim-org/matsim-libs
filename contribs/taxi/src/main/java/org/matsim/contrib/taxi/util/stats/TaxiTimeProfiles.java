@@ -19,12 +19,10 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
+import static com.google.common.collect.ImmutableList.toImmutableList;
+import static java.util.stream.Collectors.*;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -34,9 +32,12 @@ import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskTypes;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 public class TaxiTimeProfiles {
 	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet, final ScheduleInquiry scheduleInquiry) {
@@ -45,21 +46,21 @@ public class TaxiTimeProfiles {
 	}
 
 	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet) {
-		String[] header = TimeProfiles.combineValuesIntoStrings(TaxiTaskType.values());
+		ImmutableList<String> header = TaxiTaskTypes.DEFAULT_TAXI_TYPES.stream()
+				.map(Task.TaskType::name)
+				.collect(toImmutableList());
 		return TimeProfiles.createProfileCalculator(header, () -> calculateTaxiTaskTypeCounts(fleet));
 	}
 
-	public static Long[] calculateTaxiTaskTypeCounts(Fleet fleet) {
-		Map<Task.TaskType, Long> countsByType = fleet.getVehicles()
+	public static ImmutableMap<String, Double> calculateTaxiTaskTypeCounts(Fleet fleet) {
+		return fleet.getVehicles()
 				.values()
 				.stream()
 				.map(DvrpVehicle::getSchedule)
 				.filter(schedule -> schedule.getStatus() == ScheduleStatus.STARTED)
-				.collect(groupingBy(schedule -> schedule.getCurrentTask().getTaskType(), counting()));
-
-		return Arrays.stream(TaxiTaskType.values())
-				.map(type -> countsByType.getOrDefault(type, 0L))
-				.toArray(Long[]::new);
+				.collect(collectingAndThen(
+						groupingBy(schedule -> schedule.getCurrentTask().getTaskType().name(), summingDouble(e -> 1)),
+						ImmutableMap::copyOf));
 	}
 
 	public static ProfileCalculator createRequestsWithStatusCounter(final Collection<? extends Request> requests,

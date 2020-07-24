@@ -1,5 +1,9 @@
 package org.matsim.core.mobsim.hermes;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Map;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -10,20 +14,17 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class Realm {
 	private final ScenarioImporter si;
     // Global array of links.
     // Note: the id of the link is its index in the array.
-    private final Link[] links;
+    private final HLink[] links;
     // Internal realm links on hold until a specific timestamp (in seconds).
     // Internal means that the source and destination realm of are the same.
-    private final ArrayList<ArrayDeque<Link>> delayedLinksByWakeupTime;
+    private final ArrayList<ArrayDeque<HLink>> delayedLinksByWakeupTime;
     // Agents on hold until a specific timestamp (in seconds).
     private final ArrayList<ArrayDeque<Agent>> delayedAgentsByWakeupTime;
     // Agents waiting in pt stations. Should be used as follows:
@@ -39,6 +40,7 @@ public class Realm {
     private final ParallelEventsManager eventsManager;
     // Current timestamp
     private int secs;
+    Logger log = Logger.getLogger(Realm.class);
 
     public Realm(ScenarioImporter scenario, EventsManager eventsManager) throws Exception {
     	this.si = scenario;
@@ -59,9 +61,9 @@ public class Realm {
         }
     }
 
-    public static void log(int time, String s) {
+    public void log(int time, String s) {
         if (HermesConfigGroup.DEBUG_REALMS) {
-            System.out.println(String.format("ETHZ [ time = %d ] %s", time, s));
+            log.debug(String.format("ETHZ [ time = %d ] %s", time, s));
         }
     }
 
@@ -70,7 +72,7 @@ public class Realm {
         delayedAgentsByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
     }
 
-    private void add_delayed_link(Link link, int until) {
+    private void add_delayed_link(HLink link, int until) {
         if (HermesConfigGroup.DEBUG_REALMS)
             log(secs, String.format("link %d delayed until %d size %d peek agent %d", link.id(), until, link.queue().size(), link.queue().peek().id));
         delayedLinksByWakeupTime.get(Math.min(until, HermesConfigGroup.SIM_STEPS + 1)).add(link);
@@ -95,7 +97,7 @@ public class Realm {
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
         int linkid = Agent.getLinkPlanEntry(planentry);
         int velocity = Agent.getVelocityPlanEntry(planentry);
-        Link next = links[linkid];
+        HLink next = links[linkid];
         int prev_finishtime = agent.linkFinishTime;
         // this ensures that if no velocity is provided for the vehicle, we use the link
         velocity = velocity == 0 ? next.velocity() : velocity;
@@ -103,7 +105,7 @@ public class Realm {
         int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
 
-        if (next.push(agent)) {
+        if (next.push(agent,secs)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
             if (currLinkId != next.id() && next.queue().peek() == agent) {
@@ -230,8 +232,8 @@ public class Realm {
             case Agent.EgressType:      // The egress event is consumed in the stop.
             default:
                 throw new RuntimeException(String.format(
-                    "unknow plan element type %d, agent %d plan index %d",
-                    type, agent.id, agent.planIndex + 1));
+                        "unknown plan element type %d, agent %d plan index %d",
+                        type, agent.id, agent.planIndex + 1));
         }
     }
 
@@ -249,7 +251,7 @@ public class Realm {
         return 1;
     }
 
-    protected int processLinks(Link link) {
+    protected int processLinks(HLink link) {
         int routed = 0;
         Agent agent = link.queue().peek();
         int curr_flow = link.flow(secs);
@@ -282,20 +284,25 @@ public class Realm {
     public void run() throws Exception {
     	int routed = 0;
         Agent agent = null;
-        Link link = null;
+        HLink link = null;
 
         while (secs != HermesConfigGroup.SIM_STEPS) {
+            if (secs % 3600 == 0){
+                log.info("Hermes running at " + Time.writeTime(secs));
+            }
             while ((agent = delayedAgentsByWakeupTime.get(secs).poll()) != null) {
                 if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing agent %d", agent.id));
                 routed += processAgentActivities(agent);
+
             }
+            delayedAgentsByWakeupTime.set(secs,null);
+
             while ((link = delayedLinksByWakeupTime.get(secs).poll()) != null) {
                 if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing link %d", link.id()));
                 routed += processLinks(link);
             }
-
+            delayedLinksByWakeupTime.set(secs,null);
             if (HermesConfigGroup.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
-
             if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
                 eventsManager.processEvents(sorted_events);
                 sorted_events = new EventArray();
@@ -321,9 +328,10 @@ public class Realm {
 
             // Fix delay for PT events.
             if (event instanceof VehicleArrivesAtFacilityEvent) {
-			    VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
-			    vaafe.setDelay(vaafe.getTime() - vaafe.getDelay());
-		    }
+                VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
+                vaafe.setTime(vaafe.getDelay());
+
+            }
             else if (event instanceof VehicleDepartsAtFacilityEvent) {
 			    VehicleDepartsAtFacilityEvent vdafe = (VehicleDepartsAtFacilityEvent) event;
 			    vdafe.setDelay(vdafe.getTime() - vdafe.getDelay());
@@ -350,9 +358,7 @@ public class Realm {
         }
     }
 
-    public int time() { return this.secs; }
-    public Link[] links() { return this.links; }
-    public ArrayList<ArrayDeque<Link>> delayedLinks() { return this.delayedLinksByWakeupTime; }
-    public ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
-    public EventArray getSortedEvents() { return this.sorted_events; }
+    ArrayList<ArrayDeque<HLink>> delayedLinks() { return this.delayedLinksByWakeupTime; }
+    ArrayList<ArrayDeque<Agent>> delayedAgents() { return this.delayedAgentsByWakeupTime; }
+    EventArray getSortedEvents() { return this.sorted_events; }
 }

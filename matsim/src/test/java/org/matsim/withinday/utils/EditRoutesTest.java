@@ -38,7 +38,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.PopulationUtils;
@@ -83,7 +84,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -143,7 +144,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		int scndAct = 2 ;
 		int scndCarLeg = 3 ; // 3-->9
 		int thrdAct = 4 ;
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3
 			scndAct = 6 ;
 			scndCarLeg = 9 ; // 3-->9
@@ -220,7 +221,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		createScenario();
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -268,7 +269,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -292,7 +293,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -312,7 +313,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -333,7 +334,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -352,7 +353,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -371,7 +372,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -390,7 +391,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -409,7 +410,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}
@@ -430,7 +431,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		int firstCarLeg = 1 ; // 1-->3	
 		int scndCarLeg = 3 ; // 3-->9
-		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			firstCarLeg = 3 ; // 1-->3	
 			scndCarLeg = 9 ; // 3-->9
 		}

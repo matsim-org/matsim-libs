@@ -20,6 +20,7 @@
 package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.ev.dvrp.ETask;
 
@@ -29,8 +30,8 @@ import org.matsim.contrib.ev.dvrp.ETask;
 public class EDrtDriveTask extends DrtDriveTask implements ETask {
 	private final double consumedEnergy;
 
-	public EDrtDriveTask(VrpPathWithTravelData path, double consumedEnergy) {
-		super(path);
+	public EDrtDriveTask(VrpPathWithTravelData path, DrtTaskType taskType, double consumedEnergy) {
+		super(path, taskType);
 		this.consumedEnergy = consumedEnergy;
 	}
 

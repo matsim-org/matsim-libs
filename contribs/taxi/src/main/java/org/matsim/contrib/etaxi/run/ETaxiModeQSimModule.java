@@ -43,6 +43,7 @@ import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
 import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
@@ -110,12 +111,13 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Override
 			public ETaxiScheduler get() {
 				Fleet fleet = getModalInstance(Fleet.class);
+				TaxiScheduleInquiry taxiScheduleInquiry = new TaxiScheduleInquiry(taxiCfg, timer);
 				Network network = getModalInstance(Network.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 				LeastCostPathCalculator router = new FastAStarLandmarksFactory(
 						getConfig().global()).createPathCalculator(network, travelDisutility, travelTime);
-				return new ETaxiScheduler(taxiCfg, fleet, timer, travelTime, router);
+				return new ETaxiScheduler(taxiCfg, fleet, taxiScheduleInquiry, travelTime, router);
 			}
 		}).asEagerSingleton();
 

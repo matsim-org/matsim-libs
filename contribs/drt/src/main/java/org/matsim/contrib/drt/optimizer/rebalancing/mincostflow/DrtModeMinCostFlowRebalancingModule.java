@@ -27,13 +27,9 @@ import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.ActivityLocationBasedZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.EqualVehicleDensityZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -83,6 +79,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
+
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
@@ -102,25 +99,44 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		});
 
 		switch (params.getZonalDemandAggregatorType()) {
-			case PreviousIterationZonalDemandAggregator:
+			case PreviousIteration:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
-			case ActivityLocationBasedZonalDemandAggregator:
+			case TimeDependentActivityBased:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+						getter -> new TimeDependentActivityBasedZonalDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
-			case EqualVehicleDensityZonalDemandAggregator:
+			case EqualVehicleDensity:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
+			case FirstActivityCount:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new FirstActivityCountAsZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.get(Population.class)))).asEagerSingleton();
+				break;
+			default:
+				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType=" + params.getZonalDemandAggregatorType());
 		}
 
-		addControlerListenerBinding().toProvider(modalProvider(
-				getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+		{
+			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			addControlerListenerBinding().toProvider(modalProvider(
+					getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
+							getter.getModal(DrtZonalSystem.class),
+							getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+
+			addControlerListenerBinding().toProvider(modalProvider(
+					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
+							getter.get(EventsManager.class),
+							getter.getModal(DrtRequestAnalyzer.class),
+							getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
+		}
+
 	}
 }

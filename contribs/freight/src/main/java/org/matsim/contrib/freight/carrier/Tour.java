@@ -10,6 +10,7 @@ import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -99,7 +100,7 @@ public class Tour {
 		 * @throws IllegalStateException if leg is null or if previous element is not an activity.
 		 */
 		public Builder addLeg(Leg leg) {
-			assertIsNotNull(leg);
+			Gbl.assertNotNull(leg);
 			if (!previousElementIsActivity) {
 				throw new IllegalStateException("cannot add leg, since last tour element is not an activity.");
 			}
@@ -125,8 +126,8 @@ public class Tour {
 		 */
 		@Deprecated
 		public Builder insertLegAtBeginning(Leg leg) {
-			assertIsNotNull(leg);
-//			if (!previousElementIsActivity) {
+			Gbl.assertNotNull(leg);
+			//			if (!previousElementIsActivity) {
 //				throw new RuntimeException(
 //						"cannot add leg, since last tour element is not an activity.");
 //			}
@@ -135,13 +136,6 @@ public class Tour {
 			return this;
 		}
 
-		private void assertIsNotNull(Object o) {
-			if (o == null) {
-				throw new IllegalStateException("leg cannot be null");
-			}
-
-		}
-		
 		/**
 		 * Schedules a the pickup of the shipment right at the beginning of the tour.
 		 * 
@@ -151,7 +145,7 @@ public class Tour {
 		 */
 		@Deprecated
 		public Builder schedulePickupAtBeginning(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
+			Gbl.assertNotNull(shipment);
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
 				throw new IllegalStateException("Trying to deliver something which was already picked up.");
@@ -172,7 +166,7 @@ public class Tour {
 		 * @throws IllegalStateException if shipment is null or if shipment has already been picked up or if last element is not a leg.
 		 */
 		public Builder schedulePickup(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
+			Gbl.assertNotNull(shipment);
 			Log.debug("Pickup to get scheduled: " + shipment.toString());
 			boolean wasNew = openPickups.add(shipment);
 			if (!wasNew) {
@@ -201,7 +195,7 @@ public class Tour {
 		 * @throws IllegalStateException if shipment is null or if shipment has not been picked up yet or if last element is not a leg.
 		 */
 		public Builder scheduleDelivery(CarrierShipment shipment) {
-			assertIsNotNull(shipment);
+			Gbl.assertNotNull(shipment);
 			Log.debug("Delivery to get scheduled: " + shipment.toString());
 			Log.debug("OpenPickups: " + openPickups.toString());
 			boolean wasOpen = openPickups.remove(shipment);

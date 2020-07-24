@@ -34,14 +34,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
 
 	private final EventsManager eventsManager;
-	private PreplanningEngine preplanningEngine;
-	private ActivityEngine delegate;
+	private final PreplanningEngine preplanningEngine;
+	private final ActivityEngine delegate;
 
 	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500,
 			Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));

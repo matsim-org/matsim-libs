@@ -42,7 +42,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressWalkType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -146,7 +146,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -228,7 +228,7 @@ public class TollTravelCostCalculatorTest {
 		commonRouterData.run(network);
 		
 		int carLegIndex = 1 ;
-		if (! config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if (! config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 
@@ -320,7 +320,7 @@ public class TollTravelCostCalculatorTest {
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
 
 		int carLegIndex = 1 ;
-		if ( !config.plansCalcRoute().getAccessEgressWalkType().equals(AccessEgressWalkType.none) ) {
+		if ( !config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			carLegIndex = 3 ;
 		}
 

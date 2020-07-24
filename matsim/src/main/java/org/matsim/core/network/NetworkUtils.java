@@ -20,6 +20,15 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,16 +38,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.*;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -49,7 +54,6 @@ import org.matsim.core.utils.misc.OptionalTime;
 public final class NetworkUtils {
 
 	private static final Logger log = Logger.getLogger(NetworkUtils.class);
-
 	public static Network createNetwork(Config config) {
 		return createNetwork(config.network());
 	}
@@ -873,5 +877,16 @@ public final class NetworkUtils {
 
 	private static boolean testNodesAreEqual(Node expected, Node actual) {
 		return expected.getCoord().equals(actual.getCoord());
+	}
+
+	/**
+	 * Returns the closest point to on a link from a Point (either its orthogonal projection or the link's to and from node)
+	 * @param coord  Coord to check from
+	 * @param link the link
+	 * @return the closest Point as Coord
+	 */
+	public static Coord findNearestPointOnLink(Coord coord, Link link) {
+		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+
 	}
 }

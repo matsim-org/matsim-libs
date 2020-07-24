@@ -26,7 +26,6 @@ import static org.matsim.contrib.util.stats.TimeBinSamples.taskSamples;
 import org.junit.Test;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -58,7 +57,6 @@ public class TimeBinSamplesTest {
 	}
 
 	private Task task(double beginTime, double endTime) {
-		return new StayTask(new TaskType() {
-		}, beginTime, endTime, null);
+		return new StayTask(() -> "name", beginTime, endTime, null);
 	}
 }

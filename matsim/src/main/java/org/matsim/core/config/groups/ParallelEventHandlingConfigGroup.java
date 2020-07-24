@@ -44,7 +44,13 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 	
 	private final static String ONE_THREAD_PER_HANDLER = "oneThreadPerHandler"; 
 	private Boolean oneThreadPerHandler = false;
-	
+
+	private final static String EVENTS_QUEUE_SIZE = "eventsQueueSize";
+	private final static String EVENTS_QUEUE_SIZE_COMMENT = "Size of the events Queue. Increase for very large scenarios";
+	private int eventsQueueSize = 65536 * 2 ;
+
+
+
 	private boolean locked = false;
 
 	public ParallelEventHandlingConfigGroup() {
@@ -60,6 +66,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 				+ "before the next time step is simulated. E.g. neccessary when within-day replanning is used.");
 		comments.put(ONE_THREAD_PER_HANDLER, "If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the " + NUMBER_OF_THREADS + " option! "
 				+ "This feature is still experimental!");
+		comments.put(EVENTS_QUEUE_SIZE,EVENTS_QUEUE_SIZE_COMMENT);
 		return comments;
 	}
 
@@ -98,7 +105,17 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 			throw new RuntimeException("it is too late in the control flow to modify this parameter");
 		}
 	}
-	
+
+	@StringSetter(EVENTS_QUEUE_SIZE)
+	public void setEventsQueueSize(int eventsQueueSize) {
+		this.eventsQueueSize = eventsQueueSize;
+	}
+
+	@StringGetter(EVENTS_QUEUE_SIZE)
+	public int getEventsQueueSize() {
+		return eventsQueueSize;
+	}
+
 	@StringGetter( SYNCHRONIZE_ON_SIMSTEPS )
 	public Boolean getSynchronizeOnSimSteps() {
 		return this.synchronizeOnSimSteps;

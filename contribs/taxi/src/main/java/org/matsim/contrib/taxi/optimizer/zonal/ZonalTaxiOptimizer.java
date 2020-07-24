@@ -49,7 +49,7 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, ZonalSystem zonalSystem, URL context) {
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		ZonalRequestInserter requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
 				travelDisutility, ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), idleTaxiRegistry,
