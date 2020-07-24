@@ -27,6 +27,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -98,21 +99,28 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		});
 
 		switch (params.getZonalDemandAggregatorType()) {
-			case PreviousIterationZonalDemandAggregator:
+			case PreviousIteration:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
-			case TimeDependentActivityBasedZonalDemandAggregator:
+			case TimeDependentActivityBased:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new TimeDependentActivityBasedZonalDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
-			case EqualVehicleDensityZonalDemandAggregator:
+			case EqualVehicleDensity:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
+			case FirstActivityCount:
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new FirstActivityCountAsZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.get(Population.class)))).asEagerSingleton();
+				break;
+			default:
+				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType=" + params.getZonalDemandAggregatorType());
 		}
 
 		{

@@ -61,7 +61,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void EqualVehicleDensityZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensityZonalDemandAggregator, "");
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensity, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 0; ii < 16 * 3600; ii+=1800){
@@ -79,7 +79,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void PreviousIterationZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator, "");
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIteration, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
@@ -97,7 +97,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void PreviousIterationZonalDemandAggregatorWithSpeedUpModeTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator, "drt_teleportation");
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.PreviousIteration, "drt_teleportation");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
@@ -115,7 +115,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void ActivityLocationBasedZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.TimeDependentActivityBasedZonalDemandAggregator, "");
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.TimeDependentActivityBased, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){

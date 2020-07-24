@@ -55,7 +55,7 @@ public final class FirstActivityCountAsZonalDemandAggregator implements ZonalDem
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO =  new MutableInt(0);
 
-	public FirstActivityCountAsZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, Population population) {
+	public FirstActivityCountAsZonalDemandAggregator(DrtZonalSystem zonalSystem, Population population) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
