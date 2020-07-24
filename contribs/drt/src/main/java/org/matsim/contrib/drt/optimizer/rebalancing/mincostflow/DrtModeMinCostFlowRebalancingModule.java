@@ -103,9 +103,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
-			case ActivityLocationBasedZonalDemandAggregator:
+			case TimeDependentActivityBasedZonalDemandAggregator:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+						getter -> new TimeDependentActivityBasedZonalDemandAggregator(getter.get(EventsManager.class),
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				break;
 			case EqualVehicleDensityZonalDemandAggregator:

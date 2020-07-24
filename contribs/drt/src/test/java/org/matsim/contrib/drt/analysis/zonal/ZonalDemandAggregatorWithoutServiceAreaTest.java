@@ -115,7 +115,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 	@Test
 	public void ActivityLocationBasedZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.ActivityLocationBasedZonalDemandAggregator, "");
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.TimeDependentActivityBasedZonalDemandAggregator, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 1800; ii < 16 * 3600; ii+=1800){
@@ -180,7 +180,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	 *	1	3	5	7
 	 *
 	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
-	 *    That should lead to half of the drt vehicles rebalanced to the left column when using ActivityLocationBasedZonalDemandAggregator.
+	 *    That should lead to half of the drt vehicles rebalanced to the left column when using TimeDependentActivityBasedZonalDemandAggregator.
 	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
 	 * 	  That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDRTDemandAggregator.
 	 * 3) in the center, there is nothing happening.
