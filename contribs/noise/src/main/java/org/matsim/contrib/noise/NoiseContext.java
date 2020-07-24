@@ -24,7 +24,6 @@ package org.matsim.contrib.noise;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.locationtech.jts.algorithm.Angle;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,12 +32,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains the grid and further noise-specific information.

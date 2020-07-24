@@ -31,8 +31,8 @@ class RLS90NoiseEmission implements NoiseEmission {
         double noiseEmissionPlusOneCar = 0.;
         double noiseEmissionPlusOneHgv = 0.;
 
-        int n_car= noiseLink.getAgentsEntering(car.getId());
-        int n_hgv =  noiseLink.getAgentsEntering(RLS90VehicleType.hgv.getId());
+        int n_car= noiseLink.getAgentsEntering(car);
+        int n_hgv =  noiseLink.getAgentsEntering(RLS90VehicleType.hgv);
 
         int n = n_car + n_hgv;
 
@@ -77,8 +77,8 @@ class RLS90NoiseEmission implements NoiseEmission {
         }
 
         noiseLink.setEmission(noiseEmission);
-        noiseLink.setEmissionPlusOneVehicle(car.getId(), noiseEmissionPlusOneCar);
-        noiseLink.setEmissionPlusOneVehicle(RLS90VehicleType.hgv.getId(), noiseEmissionPlusOneHgv);
+        noiseLink.setEmissionPlusOneVehicle(car, noiseEmissionPlusOneCar);
+        noiseLink.setEmissionPlusOneVehicle(RLS90VehicleType.hgv, noiseEmissionPlusOneHgv);
     }
 
     @Override
@@ -154,13 +154,13 @@ class RLS90NoiseEmission implements NoiseEmission {
             // use the actual speed level if possible
             if (noiseLink != null) {
 
-                if (noiseLink.getTravelTime_sec(type.getId()) == 0.
-                        || noiseLink.getAgentsLeaving(type.getId()) == 0) {
+                if (noiseLink.getTravelTime_sec(type) == 0.
+                        || noiseLink.getAgentsLeaving(type) == 0) {
                     // use the maximum speed level
 
                 } else {
                     double averageTravelTimeCar_sec =
-                            noiseLink.getTravelTime_sec(type.getId()) / noiseLink.getAgentsLeaving(type.getId());
+                            noiseLink.getTravelTime_sec(type) / noiseLink.getAgentsLeaving(type);
                     velocity = 3.6 * (link.getLength() / averageTravelTimeCar_sec );
                 }
             }

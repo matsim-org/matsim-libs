@@ -49,13 +49,13 @@ class RLS19NoiseEmission implements NoiseEmission {
     @Override
     public void calculateEmission(NoiseLink noiseLink) {
 
-        int nPkw = (int) ((noiseLink.getAgentsEntering(pkw.getId())
+        int nPkw = (int) ((noiseLink.getAgentsEntering(pkw)
                 * (noiseParams.getScaleFactor()))
                 * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
-        int nLkw1 = (int) ((noiseLink.getAgentsEntering(lkw1.getId())
+        int nLkw1 = (int) ((noiseLink.getAgentsEntering(lkw1)
                 * (noiseParams.getScaleFactor()))
                 * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
-        int nLkw2 = (int) ((noiseLink.getAgentsEntering(lkw2.getId())
+        int nLkw2 = (int) ((noiseLink.getAgentsEntering(lkw2)
                 * (noiseParams.getScaleFactor()))
                 * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
 
@@ -74,9 +74,9 @@ class RLS19NoiseEmission implements NoiseEmission {
         double emissionPlusLkw1 = calculateEmission(noiseLink, vPkw, vLkw1, vLkw2, nPkw, nLkw1 +1, nLkw2);
         double emissionPlusLkw2= calculateEmission(noiseLink, vPkw, vLkw1, vLkw2, nPkw, nLkw1, nLkw2 + 1);
 
-        noiseLink.setEmissionPlusOneVehicle(pkw.getId(), emissionPlusPkw);
-        noiseLink.setEmissionPlusOneVehicle(lkw1.getId(), emissionPlusLkw1);
-        noiseLink.setEmissionPlusOneVehicle(lkw2.getId(), emissionPlusLkw2);
+        noiseLink.setEmissionPlusOneVehicle(pkw, emissionPlusPkw);
+        noiseLink.setEmissionPlusOneVehicle(lkw1, emissionPlusLkw1);
+        noiseLink.setEmissionPlusOneVehicle(lkw2, emissionPlusLkw2);
     }
 
     @Override
@@ -119,7 +119,7 @@ class RLS19NoiseEmission implements NoiseEmission {
         double singleLkw2Emission
                 = calculateSingleVehicleEmission(lkw2, vLkw2, g, intersectionType, intersectionDistance);
 
-        double partPkw = calculateVehicleTypeNoise(100 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
+        double partPkw = calculateVehicleTypeNoise(1 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
         double partLkw1 = calculateVehicleTypeNoise(pLkw1, vLkw1, singleLkw1Emission);
         double partLkw2 = calculateVehicleTypeNoise(pLkw2, vLkw2, singleLkw2Emission);
 
@@ -234,9 +234,13 @@ class RLS19NoiseEmission implements NoiseEmission {
 
         // use the actual speed level if possible
         if (noiseParams.isUseActualSpeedLevel()) {
-            if (noiseLink.getTravelTime_sec(type.getId()) == 0. || noiseLink.getAgentsLeaving(type.getId()) == 0) {
+            if (noiseLink.getTravelTime_sec(type) == 0.
+                    || noiseLink.getAgentsLeaving(type) == 0) {
+                // use the maximum speed level
+
+            } else {
                 double averageTravelTime_sec =
-                        noiseLink.getTravelTime_sec(type.getId()) / noiseLink.getAgentsLeaving(type.getId());
+                        noiseLink.getTravelTime_sec(type) / noiseLink.getAgentsLeaving(type);
                 v = 3.6 * (link.getLength() / averageTravelTime_sec);
             }
         }

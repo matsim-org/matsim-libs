@@ -5,7 +5,14 @@ import org.matsim.api.core.v01.Id;
 
 enum RLS90VehicleType implements NoiseVehicleType  {
 
-    car(30,130), hgv(30,80);
+    /**
+     * pkw
+     */
+    car(30,130),
+    /**
+     * lkw
+     */
+    hgv(30,80);
 
     private final Range<Double> validSpeedRange;
 

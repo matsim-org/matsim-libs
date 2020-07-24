@@ -24,6 +24,8 @@ package org.matsim.contrib.noise;
 
 import java.util.*;
 
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -50,10 +52,13 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	 */
 	private boolean initialized = false;
 
-	private Map<Id<Link>, Double> linkId2Correction = null;
+	private TObjectDoubleMap<Id<Link>> linkId2Correction = null;
+	private TObjectDoubleMap<Id<Link>> linkId2IsolatedImmission = null;
 
 	// time-specific information
-	private ImmissionInfo immissionInfo = null;
+	private double currentImmission = 0;
+	private Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> linkId2IsolatedImmissionPlusOneVehicle = null;
+
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
@@ -90,9 +95,9 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		}
 	}
 
-	synchronized void setLinkId2Correction(Id<Link> linkId, Double correction) {
+	synchronized void setLinkId2Correction(Id<Link> linkId, double correction) {
 		if(linkId2Correction== null) {
-			linkId2Correction = new HashMap<>();
+			linkId2Correction = new TObjectDoubleHashMap<>();
 		}
 		this.linkId2Correction.put(linkId, correction);
 	}
@@ -101,22 +106,26 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		if(linkId2Correction == null) {
 			return 0;
 		}
-		return linkId2Correction.getOrDefault(linkId, 0.);
+		if(linkId2Correction.containsKey(linkId)) {
+			return linkId2Correction.get(linkId);
+		} else {
+			return 0;
+		}
 	}
 
 	/**
 	 * deliberately public for outside access
 	 */
-	public ImmissionInfo getCurrentImmission() {
-		return immissionInfo;
+	public double getCurrentImmission() {
+		return currentImmission;
 	}
 
-	void setCurrentImmission(ImmissionInfo currentImmission, double time) {
-		this.immissionInfo = currentImmission;
+	void setCurrentImmission(double currentImmission, double time) {
+		this.currentImmission = currentImmission;
 
 		if(time <= 24 * 3600.) {
 
-			double adjustedImmision = currentImmission.immission;
+			double adjustedImmision = currentImmission;
 
 			if (time > 19 * 3600. && time <= 23 * 3600.) {
 				adjustedImmision += 5;
@@ -128,9 +137,9 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 			aggregatedImmissionTermLden += Math.pow(10, adjustedImmision / 10.);
 
 			if (time > 6 * 3600. && time <= 9 * 3600.) {
-				aggregatedImmissionTerm69 += Math.pow(10, currentImmission.immission / 10.);
+				aggregatedImmissionTerm69 += Math.pow(10, currentImmission / 10.);
 			} else if (time > 16 * 3600. && time <= 19 * 3600.) {
-				aggregatedImmissionTerm1619 += Math.pow(10, currentImmission.immission / 10.);
+				aggregatedImmissionTerm1619 += Math.pow(10, currentImmission / 10.);
 			}
 		}
 	}
@@ -168,7 +177,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 //				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
 //				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
 //				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
-				+ ", finalImmission=" + immissionInfo.immission
+				+ ", finalImmission=" + currentImmission
 				+ ", affectedAgentUnits=" + affectedAgentUnits
 				+ ", damageCosts=" + damageCosts 
 				+ ", damageCostsPerAffectedAgentUnit=" + damageCostsPerAffectedAgentUnit + "]";
@@ -177,14 +186,18 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
-		this.immissionInfo = null;
+		this.currentImmission = 0;
+		this.linkId2IsolatedImmission = null;
+		this.linkId2IsolatedImmissionPlusOneVehicle = null;
 		aggregatedImmissionTermLden = 0;
 		aggregatedImmissionTerm69 = 0;
 		aggregatedImmissionTerm1619 = 0;
 	}
 	
 	void resetTimeInterval() {
-		this.immissionInfo = null;
+		this.currentImmission = 0;
+		this.linkId2IsolatedImmission = null;
+		this.linkId2IsolatedImmissionPlusOneVehicle = null;
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
 		this.setDamageCostsPerAffectedAgentUnit(0.);
@@ -212,5 +225,21 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 
 	boolean isInitialized() {
 		return initialized;
+	}
+
+	void setLinkId2IsolatedImmissionPlusOneVehicle(Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> linkId2IsolatedImmissionPlusOneVehicle) {
+		this.linkId2IsolatedImmissionPlusOneVehicle = linkId2IsolatedImmissionPlusOneVehicle;
+	}
+
+	void setLinkId2IsolatedImmission(TObjectDoubleMap<Id<Link>> linkId2IsolatedImmission) {
+		this.linkId2IsolatedImmission = linkId2IsolatedImmission;
+	}
+
+	Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> getLinkId2IsolatedImmissionPlusOneVehicle() {
+		return linkId2IsolatedImmissionPlusOneVehicle;
+	}
+
+	TObjectDoubleMap<Id<Link>> getLinkId2IsolatedImmission() {
+		return linkId2IsolatedImmission;
 	}
 }

@@ -127,7 +127,8 @@ final class NoiseWriter {
 		}
 	}
 
-	static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, boolean useCompression) {
+	static void writeNoiseEmissionStatsPerHour(NoiseContext noiseContext, String outputPath, boolean useCompression,
+											   Set<NoiseVehicleType> vehicleTypes) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 
 		String outputPathEmissions = outputPath + "emissions/";
@@ -139,17 +140,16 @@ final class NoiseWriter {
 			fileName += ".gz" ;
 		}
 		File file = new File(fileName);
-		final NoiseVehicleType[] noiseVehiclesTypes = noiseContext.getNoiseParams().getNoiseComputationMethod().noiseVehiclesTypes;
 
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 
 			StringJoiner joiner = new StringJoiner(";");
 			joiner.add("Link Id");
-			for(NoiseVehicleType vehicleType: noiseVehiclesTypes) {
+			for(NoiseVehicleType vehicleType: vehicleTypes) {
 				joiner.add("Demand (" + vehicleType.getId().toString().toUpperCase() + ") "+ Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			}
-			for(NoiseVehicleType vehicleType: noiseVehiclesTypes) {
+			for(NoiseVehicleType vehicleType: vehicleTypes) {
 				joiner.add("v" + vehicleType.getId().toString().toUpperCase() + " "+ Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			}
 			joiner.add("Noise Emission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
@@ -161,19 +161,19 @@ final class NoiseWriter {
 
 				joiner = new StringJoiner(";");
 				joiner.add(linkId.toString());
-				for(NoiseVehicleType vehicleType: noiseVehiclesTypes) {
+				for(NoiseVehicleType vehicleType: vehicleTypes) {
 					int vehicles = 0;
 					if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-						vehicles = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(vehicleType.getId());
+						vehicles = noiseContext.getNoiseLinks().get(linkId).getAgentsEntering(vehicleType);
 					}
 					joiner.add(String.valueOf(vehicles * noiseContext.getNoiseParams().getScaleFactor()));
 				}
-				for(NoiseVehicleType vehicleType: noiseVehiclesTypes) {
+				for(NoiseVehicleType vehicleType: vehicleTypes) {
 					double v = noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed() * 3.6;
 					if (noiseContext.getNoiseLinks().containsKey(linkId)) {
 						double averageTravelTime_sec = 0.;
-						if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType.getId()) > 0) {
-							averageTravelTime_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(vehicleType.getId()) / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType.getId());
+						if (noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType) > 0) {
+							averageTravelTime_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTime_sec(vehicleType) / noiseContext.getNoiseLinks().get(linkId).getAgentsLeaving(vehicleType);
 						}
 						if (averageTravelTime_sec > 0.) {
 							v = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTime_sec );
@@ -228,7 +228,7 @@ final class NoiseWriter {
 
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 
-				bw.write(rp.getId() + ";" + rp.getCurrentImmission().immission + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 
@@ -416,7 +416,7 @@ final class NoiseWriter {
 
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 
-				bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(vehicleType.getId()));
+				bw.write(link.getId() + ";" + link.getAverageDamageCostPerVehicle(vehicleType));
 				bw.newLine();
 			}
 
@@ -463,7 +463,7 @@ final class NoiseWriter {
 
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 
-				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(vehicleType.getId()));
+				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerVehicle(vehicleType));
 				bw.newLine();
 			}
 

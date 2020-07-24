@@ -145,14 +145,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     private String noiseBarriersSourceCrs = null;
 
     public enum NoiseComputationMethod {
-        RLS90(RLS90VehicleType.values()),
-        RLS19(RLS19VehicleType.values());
-
-        NoiseComputationMethod(NoiseVehicleType[] vehicleTypes) {
-            this.noiseVehiclesTypes = vehicleTypes;
-        }
-
-        final NoiseVehicleType[] noiseVehiclesTypes;
+        RLS90,RLS19
     }
 
     private NoiseComputationMethod noiseComputationMethod = NoiseComputationMethod.RLS90;

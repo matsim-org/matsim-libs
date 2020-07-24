@@ -53,7 +53,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
-	private static final boolean printLog = false;
+	private static final boolean printLog = true;
 	
 	private NoiseContext noiseContext;
 
@@ -69,16 +69,19 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private final NoiseImmission immissionModule;
 	private final NoiseDamageCalculation damageCalculation;
     private final NoiseVehicleIdentifier vehicleIdentifier;
+	private final Set<NoiseVehicleType> vehicleTypes;
 
-    @Inject
+	@Inject
 	NoiseTimeTracker(NoiseContext context, NoiseEmission emission, NoiseImmission immissionModule,
-					 NoiseDamageCalculation damageCalculation, NoiseVehicleIdentifier vehicleIdentifier) {
+					 NoiseDamageCalculation damageCalculation, NoiseVehicleIdentifier vehicleIdentifier,
+					 Set<NoiseVehicleType> vehicleTypes) {
 		this.noiseContext = context;
 		this.emission = emission;
 		this.immissionModule = immissionModule;
 		this.damageCalculation = damageCalculation;
         this.vehicleIdentifier = vehicleIdentifier;
-        setRelevantLinkInfo();
+		this.vehicleTypes = vehicleTypes;
+		setRelevantLinkInfo();
 	}
 
 	private void setRelevantLinkInfo() {
@@ -156,10 +159,14 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		updateActivityInformation();
 		// Compute noise emissions, immissions, affected agent units and damages for the current time interval.
 		computeNoiseForCurrentTimeInterval();
+
+		log.info("# Finished time interval " + Time.writeTime(this.noiseContext.getCurrentTimeBinEndTime(), Time.TIMEFORMAT_HHMMSS) + " #");
+
 		// Set the current time bin to the next one ( current time bin = current time bin + time bin size ).
 		updateCurrentTimeInterval();
 		// Reset all time-specific information from the previous time interval.
 		resetCurrentTimeIntervalInfo();
+
 	}
 
 	private void updateActivityInformation() {
@@ -184,13 +191,14 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		calculateNoiseImmissionsAndDamages();
 
 		if (writeOutput()) {
-			NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory, useCompression);
+			log.info("Writing to files...");
+			NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory, useCompression, vehicleTypes);
 			NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 			if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
 				NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
 			}
 			if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
-				for(NoiseVehicleType type: noiseContext.getNoiseParams().getNoiseComputationMethod().noiseVehiclesTypes) {
+				for(NoiseVehicleType type: vehicleTypes) {
 					NoiseWriter.writeLinkMarginalVehicleDamageInfoPerHour(noiseContext, outputDirectory, type);
 				}
 			}
@@ -217,6 +225,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	 * Emission
 	 */
 	private void calculateNoiseEmission() {
+		Counter cnt = new Counter("calculate link noise emission # ");
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
 			NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
             if(noiseLink == null) {
@@ -224,18 +233,27 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
                 this.noiseContext.getNoiseLinks().put(linkId, noiseLink );
             }
 			emission.calculateEmission(noiseLink);
+			cnt.incCounter();
 		}
+		cnt.printCounter();
 	}
 
 	/**
 	 * Immissions and damages
 	 */
 	private void calculateNoiseImmissionsAndDamages() {
-		for(NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			final ImmissionInfo immissionInfo = immissionModule.calculateImmission(rp);
-			rp.setCurrentImmission(immissionInfo, this.noiseContext.getCurrentTimeBinEndTime());
-				damageCalculation.calculateDamages(rp);
-		}
+		Counter cnt = new Counter("process noise receiver point # ");
+		this.noiseContext.getReceiverPoints().values().parallelStream().forEach( rp -> {
+			immissionModule.calculateImmission(rp, this.noiseContext.getCurrentTimeBinEndTime());
+			damageCalculation.calculateDamages(rp);
+            cnt.incCounter();
+
+            //free up memory
+            rp.setLinkId2IsolatedImmission(null);
+            rp.setLinkId2IsolatedImmissionPlusOneVehicle(null);
+		});
+		cnt.printCounter();
+		log.info("Done processing receiver points.");
 		damageCalculation.finishNoiseDamageCosts();
 	}
 
@@ -285,7 +303,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
 			}
 
-            Id<NoiseVehicleType> noiseVehicleType = vehicleIdentifier.identifyVehicle(event.getVehicleId());
+            NoiseVehicleType noiseVehicleType = vehicleIdentifier.identifyVehicle(event.getVehicleId());
 			this.noiseContext.getNoiseLinks().get(event.getLinkId()).addEnteringAgent(noiseVehicleType);
 		}
 	}

@@ -24,8 +24,6 @@ package org.matsim.contrib.noise;
 
 import org.matsim.core.gbl.Gbl;
 
-import java.util.Collection;
-
 
 /**
  *

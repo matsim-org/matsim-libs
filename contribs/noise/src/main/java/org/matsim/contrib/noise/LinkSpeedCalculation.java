@@ -32,12 +32,9 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.contrib.noise.NoiseContext;
-import org.matsim.contrib.noise.NoiseLink;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
-import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author ikaddoura
@@ -66,7 +63,7 @@ final class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEven
 
             double travelTime = event.getTime() - this.vehicleId2enterTime.get(event.getVehicleId());
 
-			final Id<NoiseVehicleType> id = vehicleIdentifier.identifyVehicle(event.getVehicleId());
+			final NoiseVehicleType id = vehicleIdentifier.identifyVehicle(event.getVehicleId());
 
 			if (noiseLink != null) {
 				double travelTimeSum = noiseLink.getTravelTime_sec(id) + travelTime;

@@ -5,5 +5,5 @@ import org.matsim.vehicles.Vehicle;
 
 public interface NoiseVehicleIdentifier {
 
-    Id<NoiseVehicleType> identifyVehicle(Id<Vehicle> id);
+    NoiseVehicleType identifyVehicle(Id<Vehicle> id);
 }

@@ -16,7 +16,7 @@ class RLS90NoiseVehicleIdentifier implements NoiseVehicleIdentifier {
     }
 
     @Override
-    public Id<NoiseVehicleType> identifyVehicle(Id<Vehicle> vehicleId) {
+    public NoiseVehicleType identifyVehicle(Id<Vehicle> vehicleId) {
         boolean isHGV = false;
         for (String hgvPrefix : noiseParams.getHgvIdPrefixesArray()) {
             if (vehicleId.toString().startsWith(hgvPrefix)) {
@@ -27,9 +27,9 @@ class RLS90NoiseVehicleIdentifier implements NoiseVehicleIdentifier {
 
         if (isHGV || this.noiseContext.getBusVehicleIDs().contains(vehicleId)) {
             // HGV or Bus
-            return RLS90VehicleType.hgv.getId();
+            return RLS90VehicleType.hgv;
         } else {
-            return RLS90VehicleType.car.getId();
+            return RLS90VehicleType.car;
         }
     }
 }

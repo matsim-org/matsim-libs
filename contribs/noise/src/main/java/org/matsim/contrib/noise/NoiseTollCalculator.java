@@ -46,11 +46,11 @@ class NoiseTollCalculator implements TravelDisutility {
             if (isHGV) {
 
                 if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
-                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(hgv.getId());
+                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(hgv);
 
                 } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
-                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(hgv.getId());
+                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(hgv);
 
                 } else {
                     throw new RuntimeException("Unknown noise allocation approach. Aborting...");
@@ -59,11 +59,11 @@ class NoiseTollCalculator implements TravelDisutility {
             } else {
 
                 if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
-                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(car.getId());
+                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(car);
 
                 } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
-                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(car.getId());
+                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(car);
 
                 } else {
                     throw new RuntimeException("Unknown noise allocation approach. Aborting...");
