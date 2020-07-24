@@ -40,7 +40,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
- * Aggregates all activity ends per iteration and returns the numbers from the previous iteration
+ * Aggregates all activity ends per zone and time bin in every iteration and returns the numbers from the previous iteration
  * as expected demand for the current iteration. This will lead to rebalancing target locations related to activity volume per zone.
  *
  * @author tschlenther
