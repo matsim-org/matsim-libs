@@ -191,7 +191,7 @@ public class Agent {
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    private static long prepareLinkEntryElement(long linkid, long velocity) {
+    private static long prepareLinkEntryElement(long linkid, long velocity, long pcecategory) {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
@@ -201,8 +201,7 @@ public class Agent {
 
         // Checking for velocities that are too low.
         velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
-        long pce = 12;
-        return (pce << 56) | (linkid << 8) | velocity;
+        return (pcecategory << 56) | (linkid << 8) | velocity;
     }
 
     public static long prepareStopDelay(long type, long departure, long element) {
@@ -236,8 +235,8 @@ public class Agent {
         }
     }
 
-    public static long prepareLinkEntry(int eventid, int linkid, int velocity) {
-        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity));
+    public static long prepareLinkEntry(int eventid, int linkid, int velocity, int pcecategory) {
+        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity, pcecategory));
     }
 
     public static long prepareSleepForEntry(int eventid, int element) {

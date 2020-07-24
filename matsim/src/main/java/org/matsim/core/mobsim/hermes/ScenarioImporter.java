@@ -359,12 +359,12 @@ public class ScenarioImporter {
 		for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
 			int linkId = linkid.index();
             events.add(new LinkEnterEvent(0, vid, linkid));
-            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity));
+            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity, 0));
             events.add(new LinkLeaveEvent(0, vid, linkid));
         }
         if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
             events.add(new LinkEnterEvent(0, vid, endLId));
-            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity));
+            flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity, 0));
         }
         events.add(new VehicleLeavesTrafficEvent(0, id, endLId, vid, leg.getMode(), 1));
         events.add(new PersonLeavesVehicleEvent(0, id, vid));
@@ -538,7 +538,7 @@ public class ScenarioImporter {
         for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
             int linkid = link.index();
 			flatevents.add(new LinkEnterEvent(0, v.getId(), link));
-			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity));
+			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, 0));
             // Adding link and possibly a stop.
             if (next.getStopFacility().getLinkId().equals(link)) {
                 flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
@@ -556,7 +556,7 @@ public class ScenarioImporter {
 
         // Adding last link and possibly the last stop.
 		flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
-		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity));
+		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, 0));
         if (next.getStopFacility().getLinkId().equals(nr.getEndLinkId())) {
             flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
             flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
