@@ -11,14 +11,14 @@ public class AgentTest {
 			for (int lid = 1; lid < HermesConfigGroup.MAX_LINK_ID; lid *= 8) {
 				for (int j = 0; j < 255; j++) {
 					for (int i = 0; i < 15; i++) {
-						long flatplanentry = Agent.prepareLinkEntry(eventid, 100, j, i);
+						long flatplanentry = Agent.prepareLinkEntry(eventid, lid, j, i);
 						int testedEventId = Agent.getPlanEvent(flatplanentry);
 						int testedVelocity = Agent.getVelocityPlanEntry(flatplanentry);
 						int testedLinkId = Agent.getLinkPlanEntry(flatplanentry);
 						int testedPCECat = Agent.getLinkPCEEntry(flatplanentry);
 						Assert.equals(j, testedVelocity);
 						Assert.equals(eventid, testedEventId);
-						Assert.equals(100, testedLinkId);
+						Assert.equals(lid, testedLinkId);
 						Assert.equals(i, testedPCECat);
 					}
 				}
