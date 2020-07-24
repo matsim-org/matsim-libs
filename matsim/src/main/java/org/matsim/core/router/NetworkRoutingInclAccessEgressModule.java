@@ -357,7 +357,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) {
-				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + " for mode " + mode + ".");
 			}
 
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
