@@ -21,6 +21,8 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final int MAX_STOP_ROUTE_ID = 65536;
     // Maximum vehicle velocity (limited to 8 bits in the plan)
     public static final int MAX_VEHICLE_VELOCITY = 255;
+    // Maximum vehicle PCE types (limited to 4 bits)
+    public static final int MAX_VEHICLE_PCETYPES = 15;
     // Maximum number of events per agent (limited to 16 bits in the plan)
     public static final int MAX_EVENTS_AGENT = 65536;
 
@@ -40,7 +42,7 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     private static final String MAINMODESPARAMDESC = "[comma-separated list] Modes that are handled in the mobsim along links. By default: car";
     private Set<String> mainModes = Set.of(TransportMode.car);
 
-    private static final String DETPTDESC = "treats PT as deterministic. Everything will run on time.";
+    private static final String DETPTDESC = "treats PT as deterministic. PT vehicles will run with a steady speed. Should be used with separate network layers for PT and other network modes.";
     private boolean deterministicPt = false;
     public static final boolean DEBUG_REALMS = false;
     public static final boolean DEBUG_EVENTS = false;

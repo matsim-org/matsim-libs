@@ -87,22 +87,55 @@ public class ScenarioImporter {
 	// Agents waiting in pt stations. Should be used as follows:
 	// agent_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
 	protected ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
-
+	private double[] flowCapacityPCEs;
+	private double[] storageCapacityPCEs;
+	private Map<Id<VehicleType>,Integer> vehicleTypeMapping = new HashMap<>();
     protected final EventsManager eventsManager;
 
     private ScenarioImporter(Scenario scenario, EventsManager eventsManager) {
 		this.deterministicPt = scenario.getConfig().hermes().isDeterministicPt();
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
+		generateVehicleCategories();
 		generateLinks();
-
 		generatePT();
-
 		generateAgents();
 
 	}
 
-    public static void flush() {
+	private void generateVehicleCategories() {
+    	int vehicleTypes = scenario.getVehicles().getVehicleTypes().size() + (deterministicPt?1:scenario.getTransitVehicles().getVehicleTypes().size());
+		if (vehicleTypes >= HermesConfigGroup.MAX_VEHICLE_PCETYPES) {
+			throw new RuntimeException(
+					"Too many vehicle types defined. A maximum of " + HermesConfigGroup.MAX_VEHICLE_PCETYPES + " is supported. Try using deterministic PT or reduce the number of vehicle types.");
+		}
+		flowCapacityPCEs = new double[vehicleTypes];
+		storageCapacityPCEs = new double[vehicleTypes];
+		int i = 0;
+		if (deterministicPt){
+			flowCapacityPCEs[i] = 1.0;
+			storageCapacityPCEs[i] = 1.0;
+			i++;
+		} else {
+			for (VehicleType t : scenario.getTransitVehicles().getVehicleTypes().values()){
+				//deliberately now scaling of capacities here, as pt frequencies are not usually reduced
+				flowCapacityPCEs[i] = t.getPcuEquivalents() * t.getFlowEfficiencyFactor();
+				storageCapacityPCEs[i] = t.getPcuEquivalents();
+				vehicleTypeMapping.put(t.getId(),i);
+				i++;
+			}
+		}
+		for (VehicleType t : scenario.getVehicles().getVehicleTypes().values()){
+			//downscaling of vehicles = Upscaling of PCUs
+			flowCapacityPCEs[i] = t.getPcuEquivalents() * t.getFlowEfficiencyFactor() / scenario.getConfig().hermes().getFlowCapacityFactor();
+			storageCapacityPCEs[i] = t.getPcuEquivalents() /  scenario.getConfig().hermes().getStorageCapacityFactor();
+			vehicleTypeMapping.put(t.getId(),i);
+			i++;
+		}
+
+	}
+
+	public static void flush() {
     	instance = null;
     }
 
