@@ -23,6 +23,14 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
+//TODO testing
+/**
+ * 
+ * @author Chengqi Lu This strategy is based on the Plus One Rebalancing
+ *         Algorithm in AMoDeus. At each rebalancing period, the algorithm will
+ *         send idling vehicles to the departure places of the request departed 
+ *         during the time period
+ */
 public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDepartureEventHandler {
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
@@ -41,18 +49,20 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDe
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
+		System.out.println("Rebalance fleet now: Plus One Rebalancing Algorithm is used"); //TODO delete after testing
 		// Initialization
 		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
-
+		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(Collectors.toList());
+		
 		// Get idling vehicles in each zone
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-				.groupRebalancableVehicles(rebalancableVehicles, time, params.getMinServiceTime());
+				.groupRebalancableVehicles(rebalancableVehicleList.stream(), time, params.getMinServiceTime());
 		if (rebalancableVehiclesPerZone.isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		// calculate the matching result
-		List<Relocation> relocations = matching(rebalancableVehicles.collect(Collectors.toList()), targetMap, network);
+		List<Relocation> relocations = matching(rebalancableVehicleList, targetMap, network);
 		// clear the target map for next rebalancing cycle
 		targetMap.clear();
 		return relocations;

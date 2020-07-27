@@ -93,6 +93,8 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		// First implementation: Simply evenly distribute the rebalancable (i.e. idling
 		// and have enough service time) accross the network
 		int targetValue = (int) Math.floor(numAvailableVehicles / zonalSystem.getZones().keySet().size());
+		if (targetValue < 1)
+			System.err.println("Attention: Not enough idling vehicle to perform rebalance!");
 		for (String z : zonalSystem.getZones().keySet()) {
 			targetMap.put(z, targetValue);
 		}
