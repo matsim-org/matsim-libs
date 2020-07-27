@@ -39,12 +39,11 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		this.fleet = fleet;
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
 		this.params = params;
-		System.out.println("Adaptive Real Time Rebalancing Strategy (pbject) has been created");
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		System.err.println("Adaptive Real Time Rebalancing Strategy is used"); // TODO delete this line after running
+		System.out.println("Adaptive Real Time Rebalancing Strategy is used"); // TODO delete this line after running
 																				// properly
 
 		// initialization each time this function is called
