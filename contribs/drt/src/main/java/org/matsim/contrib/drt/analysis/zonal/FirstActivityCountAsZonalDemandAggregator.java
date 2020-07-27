@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
 
 /**
  * Approximates population size per zone by counting first activites per zone in the selected plans.
@@ -48,6 +49,8 @@ import java.util.function.ToIntFunction;
  * @author tschlenther
  */
 public final class FirstActivityCountAsZonalDemandAggregator implements ZonalDemandAggregator {
+
+	private static Logger log = Logger.getLogger(FirstActivityCountAsZonalDemandAggregator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
@@ -62,15 +65,23 @@ public final class FirstActivityCountAsZonalDemandAggregator implements ZonalDem
 	}
 
 	private void countFirstActsPerZone(Population population) {
+		log.info("start counting how many first activities each rebalancing zone has");
+		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons().size());
+		log.info("this might take a while...");
+
 		population.getPersons().values().stream()
 				.map(person -> person.getSelectedPlan().getPlanElements().get(0))
 				.forEach(element -> {
 					if (! (element instanceof Activity) ) throw new RuntimeException("first plan element is not an activity");
 					Activity activity = (Activity) element;
 					String zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
-					Integer oldDemandValue = this.zonalDemand.get(zone);
-					this.zonalDemand.put(zone, oldDemandValue + 1);
+					if (zone != null){
+						Integer oldDemandValue = this.zonalDemand.get(zone);
+						this.zonalDemand.put(zone, oldDemandValue + 1);
+					}
 				});
+
+		log.info("nr of persons that have their first activity inside the service area = " + this.zonalDemand.values().stream().collect(Collectors.summingInt(Integer::intValue)));
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
