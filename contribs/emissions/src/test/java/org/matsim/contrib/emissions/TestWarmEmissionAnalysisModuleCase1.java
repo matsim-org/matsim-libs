@@ -86,13 +86,10 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
-
 	private WarmEmissionAnalysisModule emissionsModule;
 
 	// emission factors for tables - no duplicates!
@@ -119,14 +116,11 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	}
 
 	private void setUp() {
-
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
-
 		TestWarmEmissionAnalysisModule.fillAverageTable( avgHbefaWarmTable );
 		fillDetailedTable( detailedHbefaWarmTable );
-		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(
-				avgHbefaWarmTable );
+		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
@@ -134,7 +128,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-
 		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
@@ -142,6 +135,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	
 	//this test method creates a mock link and mock vehicle with a complete vehicleTypId --> detailed values are used
 	//the CO2_TOTAL warm Emissions are compared to a given value --> computed by using detailed Petrol and traffic state freeflow
+	//the "Sum" of all emissions is tested
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
 		//-- set up tables, event handler, parameters, module
@@ -149,20 +143,19 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		// case 1 - data in both tables -> use detailed
 		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
 		double linkLength = 200.;
-
 		Link mockLink = createMockLink("link 1", linkLength, PETROL_SPEED_FF / 3.6 );
-
 		Id<VehicleType> vehicleTypeId = Id.create( PASSENGER_CAR + ";"+ PETROL_TECHNOLOGY +";"+ PETROL_SIZE_CLASS +";"+ PETROL_CONCEPT, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( vehicle, mockLink, linkLength / PETROL_SPEED_FF * 3.6 );
-		Assert.assertEquals( DETAILED_PETROL_FACTOR_FF *linkLength/1000., warmEmissions.get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(DETAILED_PETROL_FACTOR_FF *linkLength/1000., warmEmissions.get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
 
 		HandlerToTestEmissionAnalysisModules.reset();
 
 		emissionsModule.throwWarmEmissionEvent(leaveTime, mockLink.getId(), vehicleId, warmEmissions );
 		Assert.assertEquals( pollutants.size() * DETAILED_PETROL_FACTOR_FF *linkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+
 		HandlerToTestEmissionAnalysisModules.reset();
 		warmEmissions.clear();
 	}
@@ -175,7 +168,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	/*
 	* this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
 	* the counters for all possible combinations of avg, stop go and free flow speed are tested
-	* for the case: > s&g speed, <ff speed ; the different ComputationMethods are tested as well
+	* for the cases: > s&g speed, <ff speed ; the different ComputationMethods are tested as well
 	 */
 	@Test
 	public void testCounters1(){
@@ -263,7 +256,12 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception", exceptionThrown);
 		emissionsModule.reset();
 	}
-	
+
+
+	/*
+	 * this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
+	 *
+	 */
 
 	@Test
 	public void testCounters5(){
@@ -282,11 +280,9 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Link inconLink = createMockLink("link incon", inconff, inconffavgSpeed / 3.6 );
 
 		// average speed equals free flow speed from table
-		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( inconffVehicle, inconLink,
-				inconff / PETROL_SPEED_FF * 3.6 );
+		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( inconffVehicle, inconLink, inconff / PETROL_SPEED_FF * 3.6 );
 
 		switch( emissionsComputationMethod ) {
-			// the following may be different for the wrong reasons, see comments in the ...Event2 method above.  kai, jan'20
 			case StopAndGoFraction:
 				Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
 				break;
