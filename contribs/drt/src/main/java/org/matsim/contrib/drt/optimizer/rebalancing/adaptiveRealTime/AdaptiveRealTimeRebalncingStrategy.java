@@ -58,6 +58,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
 				.groupRebalancableVehicles(rebalancableVehiclesList.stream(), time, params.getMinServiceTime());
 		if (rebalancableVehiclesPerZone.isEmpty()) {
+			System.out.println("There is no rebalancable Vehicle!");
 			return Collections.emptyList();
 		}
 
@@ -93,6 +94,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		// First implementation: Simply evenly distribute the rebalancable (i.e. idling
 		// and have enough service time) accross the network
 		int targetValue = (int) Math.floor(numAvailableVehicles / zonalSystem.getZones().keySet().size());
+		System.out.println("There are "+ Integer.toString(zonalSystem.getZones().keySet().size()) + " zones");
 		if (targetValue < 1)
 			System.err.println("Attention: Not enough idling vehicle to perform rebalance!");
 		for (String z : zonalSystem.getZones().keySet()) {

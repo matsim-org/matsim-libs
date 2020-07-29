@@ -80,12 +80,12 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 //		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
 //				.map(MinCostFlowRebalancingParams::getInterval)
 //				.orElse(null);
-		rebalancingInterval = drtCfg.getAdaptiveRealTimeRebalancing()
-				.map(AdaptiveRealTimeRebalancingParams::getInterval)
-				.orElse(null);
-//		rebalancingInterval = drtCfg.getPlusOneRebalancing()
-//				.map(PlusOneRebalancingParams::getInterval)
+//		rebalancingInterval = drtCfg.getAdaptiveRealTimeRebalancing()
+//				.map(AdaptiveRealTimeRebalancingParams::getInterval)
 //				.orElse(null);
+		rebalancingInterval = drtCfg.getPlusOneRebalancing()
+				.map(PlusOneRebalancingParams::getInterval)
+				.orElse(null);
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
 	}
@@ -109,7 +109,6 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		System.out.println("Rebalance Fleet now");
 		Stream<? extends DvrpVehicle> rebalancableVehicles = fleet.getVehicles()
 				.values()
 				.stream()

@@ -86,10 +86,10 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class)
-						.toProvider(modalProvider(
-								getter -> new PlusOneRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-										getter.getModal(Fleet.class), getter.getModal(Network.class), params)))
+				bindModal(RebalancingStrategy.class).toProvider(
+						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(Fleet.class), getter.getModal(Network.class), params,
+								getter.get(EventsManager.class))))
 						.asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class)

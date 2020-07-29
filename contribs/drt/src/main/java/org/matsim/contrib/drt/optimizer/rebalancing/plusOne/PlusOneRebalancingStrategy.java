@@ -22,13 +22,17 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-//TODO testing
+//TODO Using Passenger Request Scheduled event, instead of Person Departure event, 
+//will make this implementation more equivalent to the original algorithm in AMoDeus. 
+//However, the passenger request scheduled event does not have departure link at this moment. 
+
 /**
  * 
  * @author Chengqi Lu This strategy is based on the Plus One Rebalancing
  *         Algorithm in AMoDeus. At each rebalancing period, the algorithm will
- *         send idling vehicles to the departure places of the request departed 
+ *         send idling vehicles to the departure places of the request departed
  *         during the time period
  */
 public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDepartureEventHandler {
@@ -40,20 +44,22 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDe
 	private final Map<Id<Link>, Integer> targetMap = new HashMap<>();
 
 	public PlusOneRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
-			PlusOneRebalancingParams params) {
+			PlusOneRebalancingParams params, EventsManager events) {
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
 		this.params = params;
 		this.network = network;
+		events.addHandler(this);
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		System.out.println("Rebalance fleet now: Plus One Rebalancing Algorithm is used"); //TODO delete after testing
+		System.out.println("Rebalance fleet now: Plus One Rebalancing Algorithm is used"); // TODO delete after testing
+		System.out.println("There are " + Integer.toString(targetMap.keySet().size()) + " entries in target map");
 		// Initialization
 		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(Collectors.toList());
-		
+
 		// Get idling vehicles in each zone
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
 				.groupRebalancableVehicles(rebalancableVehicleList.stream(), time, params.getMinServiceTime());
