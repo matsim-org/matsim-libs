@@ -259,7 +259,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 
 	/*
-	 * this test method creates a mock link and mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
+	 * this test method creates a incoff mock link and incoff mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
 	 *
 	 */
 
