@@ -3,7 +3,6 @@ package org.matsim.contrib.noise;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -16,7 +15,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
- * Separate from {@link NoiseContext} for better testability.
+ * Separate from {@link NoiseContextImpl} for better testability.
  *
  * @author nkuehnel
  */
@@ -43,7 +42,23 @@ final class ShieldingContext {
 
             for (NoiseBarrier barrier : barriers) {
                 try {
-                    this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
+                    this.noiseBarriers.insert(barrier.getGeometry().getGeometry().getEnvelopeInternal(), barrier);
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
+                }
+            }
+        }
+    }
+
+    ShieldingContext(Collection<FeatureNoiseBarrierImpl> barriers, Config config, ShieldingCorrection shieldingCorrection) {
+        this.shieldingCorrection = shieldingCorrection;
+        NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+
+        this.noiseBarriers = new STRtree();
+        if(noiseParams.isConsiderNoiseBarriers()) {
+            for (NoiseBarrier barrier : barriers) {
+                try {
+                    this.noiseBarriers.insert(barrier.getGeometry().getGeometry().getEnvelopeInternal(), barrier);
                 } catch (IllegalArgumentException e) {
                     logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
                 }
@@ -149,9 +164,8 @@ final class ShieldingContext {
         for (NoiseBarrier noiseBarrier : candidates) {
             //prepared geometry for repeated geometry relate-checks reduces run-time by 30%,
             //nkuehnel, mar '20
-            final PreparedGeometry prepare = PreparedGeometryFactory.prepare(noiseBarrier.getGeometry());
-            if (isObstructing(receiver, source, fromLineOfSight, toLineOfSight, prepare)) {
-                Geometry intersection = directLineOfSight.intersection(noiseBarrier.getGeometry());
+            if (isObstructing(receiver, source, fromLineOfSight, toLineOfSight, noiseBarrier.getGeometry())) {
+                Geometry intersection = directLineOfSight.intersection(noiseBarrier.getGeometry().getGeometry());
                 for (Coordinate coordinate : intersection.getCoordinates()) {
                     coordinate.z = noiseBarrier.getHeight();
                     final double distance = receiver.getCoordinate().distance(coordinate);
