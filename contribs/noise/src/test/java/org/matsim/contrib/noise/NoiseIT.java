@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.lang3.event.EventUtils;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -103,7 +102,7 @@ public class NoiseIT {
 		} );;
 
 //		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseContext noiseContext = injector.getInstance( NoiseContext.class ) ;
+		NoiseContext noiseContext = injector.getInstance( NoiseContextImpl.class ) ;
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);

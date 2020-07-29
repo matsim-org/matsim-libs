@@ -15,7 +15,11 @@ import java.util.Map;
 
 import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
-public class RLS19NoiseImmission implements NoiseImmission {
+/**
+ * Calculates noise immissions and correction terms based on the RLS 19 guideline.
+ * @author nkuehnel
+ */
+class RLS19NoiseImmission implements NoiseImmission {
 
     private final static Logger log = Logger.getLogger(RLS19NoiseImmission.class);
 
@@ -102,7 +106,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
             shielding = this.shielding.determineShieldingValue(nrp, candidateLink, projectedSourceCoord);
         }
 
-        double dampeningCorrection = geometricDivergence + airDampeningFactor + groundDampening + shielding;
+        double dampeningCorrection = geometricDivergence + airDampeningFactor + Math.max(groundDampening, shielding);
 
         //TODO: implement reflection - if someone is looking for a (bachelor) thesis...
         double firstReflectionCorrection = 0;
@@ -139,6 +143,4 @@ public class RLS19NoiseImmission implements NoiseImmission {
         }
         return plusOne;
     }
-
-
 }

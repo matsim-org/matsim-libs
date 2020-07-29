@@ -88,7 +88,7 @@ public final class NoiseOfflineCalculation{
 				  }
 			  }) ;
 
-		noiseContext = injector.getInstance( NoiseContext.class ) ;
+		noiseContext = injector.getInstance( NoiseContextImpl.class ) ;
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 
 		EventsManager events = injector.getInstance( EventsManager.class ) ;
