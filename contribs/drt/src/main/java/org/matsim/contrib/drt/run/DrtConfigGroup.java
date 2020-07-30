@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.AdaptiveRealTimeRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingParams;
@@ -663,6 +664,15 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				: Optional.of((PlusOneRebalancingParams) parameterSets.iterator().next());
 	}
 
+	public Optional<FeedforwardRebalancingParams> getFeedforwardRebalancing() {
+		Collection<? extends ConfigGroup> parameterSets = getParameterSets(FeedforwardRebalancingParams.SET_NAME);
+		if (parameterSets.size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		return parameterSets.isEmpty() ? Optional.empty()
+				: Optional.of((FeedforwardRebalancingParams) parameterSets.iterator().next());
+	}
+
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		switch (type) {
@@ -672,6 +682,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			return new AdaptiveRealTimeRebalancingParams();
 		case PlusOneRebalancingParams.SET_NAME:
 			return new PlusOneRebalancingParams();
+		case FeedforwardRebalancingParams.SET_NAME:
+			return new FeedforwardRebalancingParams();
 
 		case ExtensiveInsertionSearchParams.SET_NAME:
 			return new ExtensiveInsertionSearchParams();

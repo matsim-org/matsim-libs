@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.DrtModeAdapativeRealTimeRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
@@ -95,6 +96,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			install(new DrtModeAdapativeRealTimeRebalanceModule(drtCfg));
 		} else if (drtCfg.getPlusOneRebalancing().isPresent()) {
 			install(new DrtModePlusOneRebalanceModule(drtCfg));
+		} else if (drtCfg.getFeedforwardRebalancing().isPresent()) {
+			install(new DrtModeFeedforwardRebalanceModule(drtCfg));
 		} else {
 			System.err.println("Attention: No rebalancing algorithm is used!");
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();

@@ -38,7 +38,7 @@ import com.google.common.base.Verify;
  */
 // TODO change this based on the algorithm!!!
 public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "AdaptiveRealTimeRebalncingStrategy";
+	public static final String SET_NAME = "FeedforwardRebalancingStrategy";
 
 	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
 		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
@@ -47,7 +47,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
+			+ " Must be positive. Default is 300 s. Expects an Integer Value";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -83,7 +83,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 
 
 	@Positive
-	private int interval = 1800;// [s]
+	private int interval = 300;// [s]
 
 	@Positive
 	private double minServiceTime = 2 * interval;// [s]

@@ -29,6 +29,7 @@ import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.AdaptiveRealTimeRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingParams;
@@ -83,9 +84,13 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 //		rebalancingInterval = drtCfg.getAdaptiveRealTimeRebalancing()
 //				.map(AdaptiveRealTimeRebalancingParams::getInterval)
 //				.orElse(null);
-		rebalancingInterval = drtCfg.getPlusOneRebalancing()
-				.map(PlusOneRebalancingParams::getInterval)
+//		rebalancingInterval = drtCfg.getPlusOneRebalancing()
+//				.map(PlusOneRebalancingParams::getInterval)
+//				.orElse(null);
+		rebalancingInterval = drtCfg.getFeedforwardRebalancing()
+				.map(FeedforwardRebalancingParams::getInterval)
 				.orElse(null);
+		
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
 	}

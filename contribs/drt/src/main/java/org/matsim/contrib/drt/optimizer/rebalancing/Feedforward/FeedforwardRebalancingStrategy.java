@@ -59,14 +59,18 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy, Pass
 		rebalanceInterval = params.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		scale = rebalanceInterval / timeBinSize;
+		
+		prepareZoneNetDepartureMap(); //TODO Does this work properly?
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		// assign rebalnace vehicles based on the rebalance plan
+		System.out.println("Rebalance fleet now: Feedforward Rebalancing Strategy is used");
+		
 		double timeBin = Math.floor(time / timeBinSize);
+		List<Relocation> relocationList = new ArrayList<>();
 		if (rebalancePlanCore.containsKey(timeBin)) {
-			List<Relocation> relocations = new ArrayList<>();
 			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
 					.groupRebalancableVehicles(rebalancableVehicles, timeBin, params.getMinServiceTime());
 			// Generate relocations based on the "rebalancePlanCore"
@@ -84,19 +88,19 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy, Pass
 						// TODO change to "send to random link in a node"
 						Link destinationLink = NetworkUtils.getNearestLink(network,
 								zonalSystem.getZoneCentroid(arrivalZoneId));
-						relocations.add(new Relocation(rebalancableVehiclesPerZone.get(departureZoneId).get(0),
+						relocationList.add(new Relocation(rebalancableVehiclesPerZone.get(departureZoneId).get(0),
 								destinationLink));
 						rebalancableVehiclesPerZone.get(departureZoneId).remove(0);
 					}
 				}
 			}
-			return relocations;
 		}
-		return null;
+		return relocationList;
 	}
 
 	@Override
 	public void reset(int iteration) {
+		System.err.println("resetting: iteration number = " + Integer.toString(iteration));
 		// For the first iteration, there will be no rebalnace plan (a dummy plan, with
 		// all entry equals 0, will be generated)
 		// From the second iteration, rebalance plan will be generated based on the data
@@ -139,7 +143,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy, Pass
 	}
 
 	private void prepareZoneNetDepartureMap() {
-		zoneNetDepartureMap.clear();
+		System.out.println("Now preparing the Departure recorder");
 		for (int i = 0; i < (3600 / timeBinSize) * simulationEndTime; i++) {
 			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
 			for (String zone : zonalSystem.getZones().keySet()) {
