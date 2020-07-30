@@ -260,7 +260,9 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	/*
 	 * this test method creates a incoff mock link and incoff mock vehicle (petrol technology) with a complete vehicleTypId --> detailed values are used
-	 *
+	 * for the computationMethod "Stop and Go" and "averageSpeed" the free flow occurences are tested
+	 * the counters (StopGoOccurences, KmCounter, WarmEmissionEventCounter) are tested
+	 * for the case average speed equals wrong free flow speed the counters are tested
 	 */
 
 	@Test
@@ -305,17 +307,20 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Assert.assertEquals(0, emissionsModule.getStopGoOccurences() );
 		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
 
+		//@KMT is there the need for adding a test here?
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, inconLink, 2*inconff/(PETROL_SPEED_FF + PETROL_SPEED_SG)*3.6 );
 	}
 
 
-	//ToDo set to ignore
+
 	@Test
-	@Ignore
 	public void testCounters1fractional(){
 		setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
+
 		// yyyyyy !!!!!!
+
+		//@KMT the reset is not needed the look up behaviour seems still to be fractionStopGo
 
 		emissionsModule.reset();
 
@@ -393,6 +398,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 		emissionsModule.reset();
 		emissionsModule.getEcg().setEmissionsComputationMethod(AverageSpeed );
+		//@KMT it seems to me that copying the counters from above and chaning the expected values??
 		// yyyyyy !!!!!!
 
 	}
