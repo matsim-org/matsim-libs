@@ -372,6 +372,8 @@ public class Plans {
 		act19.setLinkId(link1);
 		plan.addActivity(act19);
 
+		plan.setScore(123.0);
+
 		return plan;
 	}
 
@@ -521,6 +523,8 @@ public class Plans {
 		actp2_9.setLinkId(link1);
 		plan2.addActivity(actp2_9);
 
+		plan2.setScore(234.0);
+
 		return plan2;
 	}
 
@@ -638,6 +642,8 @@ public class Plans {
 		actp3_8.setFacilityId(Id.create("id1", ActivityFacility.class));
 		actp3_8.setLinkId(link1);
 		plan3.addActivity(actp3_8);
+
+		plan3.setScore(345.67);
 
 		return plan3;
 	}
@@ -762,6 +768,8 @@ public class Plans {
 		actp4_8.setFacilityId(Id.create("id1", ActivityFacility.class));
 		actp4_8.setLinkId(link1);
 		plan4.addActivity(actp4_8);
+
+		// do not set score (test
 
 		return plan4;
 	}
