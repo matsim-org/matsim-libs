@@ -72,7 +72,7 @@ public class SkillsIT {
 			Assert.fail("Should run integration test without exception.");
 		}
 		Assert.assertEquals("Wrong number of vehicles.", 1L, solutionWithSameSkills.getRoutes().size());
-		Assert.assertEquals("Wrong carrier score.", 1044.2985507246377, solutionWithSameSkills.getCost(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong carrier score.", 1044.0985507246377, solutionWithSameSkills.getCost(), MatsimTestUtils.EPSILON);
 	}
 
 	private VehicleRoutingProblemSolution generateCarrierPlans(Scenario scenario) {
