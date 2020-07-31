@@ -84,9 +84,15 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class).toProvider(
-						modalProvider(getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Fleet.class), getter.getModal(Network.class), params,
+				bindModal(RebalancingStrategy.class)
+						.toProvider(modalProvider(
+								getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
+										getter.getModal(Fleet.class), getter.getModal(Network.class), params)))
+						.asEagerSingleton();
+				
+				//TODO is this the correct way to do that? I want to create the object PreviousIterationDepartureRecoder
+				bindModal(PreviousIterationDepartureRecorder.class).toProvider(modalProvider(
+						getter -> new PreviousIterationDepartureRecorder(getter.getModal(DrtZonalSystem.class), params,
 								getter.get(EventsManager.class))))
 						.asEagerSingleton();
 			}
