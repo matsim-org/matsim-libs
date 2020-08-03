@@ -48,23 +48,14 @@ public class HLink {
 			if (size == 0) {
 				array[tail] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			} else if (array.length > size) {
 				array[tail = inc(tail)] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			} else {
-				if (array.length >= maxcapacity) {
-					return false;
-				}
 				// expand array
-				Agent[] narray = new Agent[Math.min(maxcapacity, array.length * 2)];
+				Agent[] narray = new Agent[array.length * 2];
 				for (int i = head, left = size, dst = 0; left > 0; i = inc(i), left--, dst++) {
 					narray[dst] = array[i];
 				}
@@ -74,9 +65,6 @@ public class HLink {
 				// push
 				array[tail = inc(tail)] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			}
 		}
@@ -175,16 +163,16 @@ public class HLink {
 
 	public boolean push(Agent agent, int timestep, double storageCapacityPCU) {
 		//avoid long vehicles not being able to enter a short link
-    	double effectiveStorageCapacity = Math.max(storageCapacityPCU,initialCapacity);
-    	//if (currentCapacity-effectiveStorageCapacity>=0) {
+    	double effectiveStorageCapacity = Math.min(storageCapacityPCU,initialCapacity);
+    	if (currentCapacity-effectiveStorageCapacity>=0) {
 			if (queue.push(agent)) {
 				lastPush = timestep;
 				currentCapacity = currentCapacity - effectiveStorageCapacity;
 				return true;
-		//	} else
-		//	{
-		//		throw new RuntimeException("should not happen?");
-		//	}
+			} else
+			{
+				throw new RuntimeException("should not happen?");
+			}
 		}
 		else if ((lastPush + stuckTimePeriod) < timestep){
 			boolean result = queue.forcePush(agent);
