@@ -1,6 +1,7 @@
 package org.matsim.core.mobsim.hermes;
 
 import java.util.List;
+import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.util.Assert;
@@ -30,6 +31,9 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class RoundaboutTest {
 
@@ -92,6 +96,12 @@ public class RoundaboutTest {
 
 	private void buildPopulation(Scenario scenario) {
 		List<Tuple<Coord,Coord>> startEndRelations = List.of(new Tuple<>(A_START,D_START),new Tuple<>(B_START,A_START),new Tuple<>(C_START,B_START),new Tuple<>(D_START,C_START));
+
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av",VehicleType.class));
+		av.setFlowEfficiencyFactor(0.2);
+		av.setPcuEquivalents(10.0);
+		scenario.getVehicles().addVehicleType(av);
+
 		final PopulationFactory factory = scenario.getPopulation().getFactory();
 		int a = 0;
 		for (var startEndRelation :  startEndRelations){
@@ -103,11 +113,16 @@ public class RoundaboutTest {
 				Activity h = factory.createActivityFromCoord("home",startEndRelation.getFirst());
 				h.setEndTime(8*3600+i);
 				Leg l = factory.createLeg(TransportMode.car);
-
 				Activity w = factory.createActivityFromCoord("work",startEndRelation.getSecond());
 				plan.addActivity(h);
 				plan.addLeg(l);
 				plan.addActivity(w);
+				if (a == 3){
+					// a single branch gets a super flowy AV
+					Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()),av);
+					scenario.getVehicles().addVehicle(vehicle);
+					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(TransportMode.car,vehicle.getId()));
+				}
 			}
 			a++;
 		}
