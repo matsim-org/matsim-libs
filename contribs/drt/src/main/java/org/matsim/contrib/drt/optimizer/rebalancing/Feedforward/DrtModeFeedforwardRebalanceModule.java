@@ -91,8 +91,8 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 						.asEagerSingleton();
 				
 				//TODO is this the correct way to do that? I want to create the object PreviousIterationDepartureRecoder
-				bindModal(PreviousIterationDepartureRecorder.class).toProvider(modalProvider(
-						getter -> new PreviousIterationDepartureRecorder(getter.getModal(DrtZonalSystem.class), params,
+				bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
+						getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), params,
 								getter.get(EventsManager.class))))
 						.asEagerSingleton();
 			}

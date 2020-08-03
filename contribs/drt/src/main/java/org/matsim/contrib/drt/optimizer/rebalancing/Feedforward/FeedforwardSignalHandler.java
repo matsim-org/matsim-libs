@@ -21,24 +21,24 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-public class PreviousIterationDepartureRecorder implements PassengerRequestScheduledEventHandler,
+public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler,
 		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 	private final DrtZonalSystem zonalSystem;
 
 	private final Map<Double, Map<String, MutableInt>> zoneNetDepartureMap = new HashMap<>();
 	private final static Map<Double, List<Triple<String, String, Integer>>> REBALANCE_PLAN_CORE = new HashMap<>();
-	private final Map<Id<Person>, Triple<Double, String, String>> temporaryStoragePlace = new HashMap<>();
-
-	// temporary parameter (to be moved to the parameter file) //TODO
-	private final int timeBinSize = 900; // size of time bin in second
+	private final Map<Id<Person>, Triple<Double, String, String>> potentialDRTTripsMap = new HashMap<>();
+	
+	private final int timeBinSize;
+	
+	// temporary parameter (to be gotten from the parameter file) //TODO
 	private final int simulationEndTime = 30; // simulation ending time in hour
 
 	/** Constructor */
-	public PreviousIterationDepartureRecorder(DrtZonalSystem zonalSystem, FeedforwardRebalancingParams params,
+	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem, FeedforwardRebalancingParams params,
 			EventsManager events) {
 		this.zonalSystem = zonalSystem;
-		
-		
+		timeBinSize = params.getTimeBinSize();
 		prepareZoneNetDepartureMap();
 		events.addHandler(this);
 	}
@@ -48,42 +48,42 @@ public class PreviousIterationDepartureRecorder implements PassengerRequestSched
 		// If a request is rejected, remove the request info from the temporary storage
 		// place
 		Id<Person> personId = event.getPersonId();
-		temporaryStoragePlace.remove(personId);
+		potentialDRTTripsMap.remove(personId);
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		// When the request is scheduled (i.e. accepted), add this travel information to
-		// the permanent database;
-		// Then remove the travel information from the temporary storage place
+		// the database;
+		// Then remove the travel information from the potential trips Map
 		Id<Person> personId = event.getPersonId();
-		double timeBin = temporaryStoragePlace.get(personId).getLeft();
-		String departureZoneId = temporaryStoragePlace.get(personId).getMiddle();
-		String arrivalZoneId = temporaryStoragePlace.get(personId).getRight();
+		double timeBin = potentialDRTTripsMap.get(personId).getLeft();
+		String departureZoneId = potentialDRTTripsMap.get(personId).getMiddle();
+		String arrivalZoneId = potentialDRTTripsMap.get(personId).getRight();
 
 		zoneNetDepartureMap.get(timeBin).get(departureZoneId).increment();
 		zoneNetDepartureMap.get(timeBin).get(arrivalZoneId).decrement();
-		temporaryStoragePlace.remove(personId);
+		potentialDRTTripsMap.remove(personId);
 	}
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
 		// Here, we get a potential DRT trip. We will first note it down in the
-		// temporary data base
+		// temporary data base (Potential DRT Trips Map)
 		Id<Person> personId = event.getPersonId();
 		double timeBin = Math.floor(event.getTime() / timeBinSize);
 		String departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
 		String arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
-		temporaryStoragePlace.put(personId, Triple.of(timeBin, departureZoneId, arrivalZoneId));
+		potentialDRTTripsMap.put(personId, Triple.of(timeBin, departureZoneId, arrivalZoneId));
 	}
 
 	@Override
 	public void reset(int iteration) {
-		System.err.println("resetting: iteration number = " + Integer.toString(iteration));
+		System.out.println("resetting: iteration number = " + Integer.toString(iteration));
 		if (iteration > 0) { // TODO if reset is not called at iteration 0, then we can remove this check
 			calculateRebalancePlan(true);
 		} else {
-			calculateRebalancePlan(false); // No need to calculate at iteration 0 (i.e. first iteration)
+			calculateRebalancePlan(false);
 		}
 		prepareZoneNetDepartureMap();
 	}
@@ -101,6 +101,7 @@ public class PreviousIterationDepartureRecorder implements PassengerRequestSched
 
 	private void calculateRebalancePlan(boolean calculateOrNot) {
 		REBALANCE_PLAN_CORE.clear();
+		int progressCounter = 0;
 		if (calculateOrNot) {
 			System.out.println("Start calculating rebalnace plan now");
 			for (double timeBin : zoneNetDepartureMap.keySet()) {
@@ -117,23 +118,20 @@ public class PreviousIterationDepartureRecorder implements PassengerRequestSched
 				List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
 						this::calcStraightLineDistance).solve(supply, demand);
 				REBALANCE_PLAN_CORE.put(timeBin, interZonalRelocations);
+				progressCounter += 1;
 				System.out.println("Calculating: "
-						+ Double.toString((timeBin + 1) * timeBinSize / simulationEndTime / 36) + "% complete");
+						+ Double.toString(progressCounter * timeBinSize / simulationEndTime / 36) + "% complete");
 			}
 			System.out.println("Rebalance plan calculation is now complete! ");
-
-		} else {
-			System.out
-					.println("Attention: No rebalance plan is pre-calculated (this is normal for the first iteration)");
-		}
+		} 
 	}
 
 	private int calcStraightLineDistance(String zone1, String zone2) {
 		return (int) DistanceUtils.calculateDistance(zonalSystem.getZoneCentroid(zone1),
 				zonalSystem.getZoneCentroid(zone2));
 	}
-	
-	public static Map<Double, List<Triple<String, String, Integer>>> getRebalancePlanCore () {
+
+	public static Map<Double, List<Triple<String, String, Integer>>> getRebalancePlanCore() {
 		return REBALANCE_PLAN_CORE;
 	}
 

@@ -22,25 +22,25 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final Network network;
 	private final VehicleInfoCollector vehicleInfoCollector;
 
+	private final int timeBinSize;
 	private final double rebalanceInterval;
 	private final double scale;
 	private final Random rnd = new Random(1234);
-	// temporary parameter (to be moved to the parameter file) //TODO
-	private final int timeBinSize = 900; // size of time bin in second
+	
 	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore;
 
-	// TODO testing
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
 			FeedforwardRebalancingParams params) {
 		this.network = network;
 		this.zonalSystem = zonalSystem;
 		this.params = params;
+		timeBinSize = params.getTimeBinSize();
 
 		rebalanceInterval = params.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		scale = rebalanceInterval / timeBinSize;
 
-		rebalancePlanCore = PreviousIterationDepartureRecorder.getRebalancePlanCore();
+		rebalancePlanCore = FeedforwardSignalHandler.getRebalancePlanCore();
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				if (vehicleToSend > numVehiclesInZone) {
 					vehicleToSend = numVehiclesInZone;
 				}
-				
+
 				if (vehicleToSend > 0) {
 					for (int i = 0; i < vehicleToSend; i++) {
 						// TODO change to "send to random link in a node"

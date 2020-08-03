@@ -36,12 +36,8 @@ import com.google.common.base.Verify;
  * 
  * @author michalm, Chengqi Lu
  */
-// TODO change this based on the algorithm!!!
 public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "FeedforwardRebalancingStrategy";
-
-	public enum ZonalDemandAggregatorType {PreviousIterationZonalDemandAggregator,
-		ActivityLocationBasedZonalDemandAggregator, EqualVehicleDensityZonalDemandAggregator}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
@@ -59,20 +55,9 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 			"Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
 					+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)";
 
-	public static final String TARGET_ALPHA = "targetAlpha";
-	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
-
-	public static final String TARGET_BETA = "targetBeta";
-	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
-
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
-
-	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be either PreviousIterationZonalDemandAggregator, ActivityLocationBasedZonalDemandAggregator or EqualVehicleDensityZonalDemandAggregator";
 
 	public static final String REBALANCING_ZONES_GENERATION = "rebalancingZonesGeneration";
 	static final String REBALANCING_ZONES_GENERATION_EXP = "Logic for generation of zones for demand estimation while rebalancing. Value can be GridFromNetwork or ShapeFile Default is GridFromNetwork";
@@ -80,35 +65,33 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	private static final String REBALANCING_ZONES_SHAPE_FILE = "rebalancingZonesShapeFile";
 	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
+	
+	public static final String TIME_BIN_SIZE = "timeBinSize";
+	static final String TIME_BIN_SIZE_EXP = "Specifies the time bin size of the feedforward signal. Within each time bin, constant DRT demand flow is assumed"
+			+ " Must be positive. Default is 900 s. Expects an Integer Value";
 
 
 	@Positive
 	private int interval = 300;// [s]
 
 	@Positive
-	private double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 3600 ;// [s]
 
 	@PositiveOrZero
-	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
-
-	@PositiveOrZero
-	private double targetAlpha = Double.NaN;
-
-	@PositiveOrZero
-	private double targetBeta = Double.NaN;
+	private double maxTimeBeforeIdle = 900;// [s], if 0 then soon-idle vehicle will not be considered
 
 	@Positive
 	private double cellSize = Double.NaN;// [m]
-
-	@NotNull
-	private FeedforwardRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
 
 	@NotNull
 	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;
 
 	@Nullable
 	private String rebalancingZonesShapeFile = null;
-
+	
+	@Positive
+	private int timeBinSize = 900; // [s]
+	
 	public FeedforwardRebalancingParams() {
 		super(SET_NAME);
 	}
@@ -138,12 +121,10 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		map.put(INTERVAL, INTERVAL_EXP);
 		map.put(MIN_SERVICE_TIME, MIN_SERVICE_TIME_EXP);
 		map.put(MAX_TIME_BEFORE_IDLE, MAX_TIME_BEFORE_IDLE_EXP);
-		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
-		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
-		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
 		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
 		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
+		map.put(TIME_BIN_SIZE, TIME_BIN_SIZE_EXP);
 		return map;
 	}
 
@@ -196,38 +177,6 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return -- {@value #TARGET_ALPHA_EXP}
-	 */
-	@StringGetter(TARGET_ALPHA)
-	public double getTargetAlpha() {
-		return targetAlpha;
-	}
-
-	/**
-	 * @param targetAlpha -- {@value #TARGET_ALPHA_EXP}
-	 */
-	@StringSetter(TARGET_ALPHA)
-	public void setTargetAlpha(double targetAlpha) {
-		this.targetAlpha = targetAlpha;
-	}
-
-	/**
-	 * @return -- {@value #TARGET_BETA_EXP}
-	 */
-	@StringGetter(TARGET_BETA)
-	public double getTargetBeta() {
-		return targetBeta;
-	}
-
-	/**
-	 * @param targetBeta -- {@value #TARGET_BETA_EXP}
-	 */
-	@StringSetter(TARGET_BETA)
-	public void setTargetBeta(double targetBeta) {
-		this.targetBeta = targetBeta;
-	}
-
-	/**
 	 * @return -- {@value #CELL_SIZE_EXP}
 	 */
 	@StringGetter(CELL_SIZE)
@@ -242,20 +191,6 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public void setCellSize(double cellSize) {
 		this.cellSize = cellSize;
 	}
-
-	/**
-	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
-	 */
-	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public ZonalDemandAggregatorType getZonalDemandAggregatorType() {
-		return zonalDemandAggregatorType;
-	}
-
-	/**
-	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
-	 */
-	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public void setZonalDemandAggregatorType(ZonalDemandAggregatorType aggregatorType) { this.zonalDemandAggregatorType = aggregatorType; }
 
 	/**
 	 * @return -- {@value #REBALANCING_ZONES_GENERATION_EXP}
@@ -282,7 +217,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public URL getRebalancingZonesShapeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, rebalancingZonesShapeFile);
 	}
-
+	
 	/**
 	 * @param rebalancingZonesShapeFile -- {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
 	 */
@@ -290,6 +225,22 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public FeedforwardRebalancingParams setRebalancingZonesShapeFile(String rebalancingZonesShapeFile) {
 		this.rebalancingZonesShapeFile = rebalancingZonesShapeFile;
 		return this;
+	}
+	
+	/**
+	 * @return timeBinSize -- {@value #TIME_BIN_SIZE_EXP}
+	 */
+	@StringGetter(TIME_BIN_SIZE)
+	public int getTimeBinSize() {
+		return timeBinSize;
+	}
+	
+	/**
+	 * @param timeBinSize -- {@value #TIME_BIN_SIZE_EXP}
+	 */
+	@StringSetter(TIME_BIN_SIZE)
+	public void setTimeBinSize(int timeBinSize) {
+		this.timeBinSize = timeBinSize;
 	}
 
 }
