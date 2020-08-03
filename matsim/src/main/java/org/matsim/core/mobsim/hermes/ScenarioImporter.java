@@ -127,7 +127,7 @@ public class ScenarioImporter {
 		}
 		for (VehicleType t : scenario.getVehicles().getVehicleTypes().values()){
 			//downscaling of vehicles = Upscaling of PCUs
-			flowCapacityPCEs[i] = t.getPcuEquivalents() * t.getFlowEfficiencyFactor() / scenario.getConfig().hermes().getFlowCapacityFactor();
+			flowCapacityPCEs[i] = t.getPcuEquivalents() /( t.getFlowEfficiencyFactor() * scenario.getConfig().hermes().getFlowCapacityFactor());
 			storageCapacityPCEs[i] = t.getPcuEquivalents() /  scenario.getConfig().hermes().getStorageCapacityFactor();
 			vehicleTypeMapping.put(t.getId(),i);
 			i++;
