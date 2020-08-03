@@ -98,29 +98,6 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 						.asEagerSingleton();
 			}
 		});
-		
-		
-		// TODO change this part
-//		switch (params.getZonalDemandAggregatorType()) {
-//		case PreviousIterationZonalDRTDemandAggregator:
-//			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-//					getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
-//							getter.getModal(DrtZonalSystem.class), drtCfg)))
-//					.asEagerSingleton();
-//			break;
-//		case ActivityLocationBasedZonalDemandAggregator:
-//			bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-//					getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
-//							getter.getModal(DrtZonalSystem.class), drtCfg)))
-//					.asEagerSingleton();
-//			break;
-//		case EqualVehicleDensityZonalDemandAggregator:
-//			bindModal(ZonalDemandAggregator.class)
-//					.toProvider(modalProvider(getter -> new EqualVehicleDensityZonalDemandAggregator(
-//							getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class))))
-//					.asEagerSingleton();
-//			break;
-//		}
 
 		{
 			// this is rather analysis - but depends on DrtZonalSystem so it can not be

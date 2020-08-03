@@ -33,10 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostRelocationCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -87,14 +84,8 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(
-						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Fleet.class), getter.getModal(Network.class), params,
+						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class), params,
 								getter.get(EventsManager.class))))
-						.asEagerSingleton();
-
-				bindModal(MinCostRelocationCalculator.class)
-						.toProvider(modalProvider(getter -> new AggregatedMinCostRelocationCalculator(
-								getter.getModal(DrtZonalSystem.class), getter.getModal(Network.class))))
 						.asEagerSingleton();
 			}
 		});

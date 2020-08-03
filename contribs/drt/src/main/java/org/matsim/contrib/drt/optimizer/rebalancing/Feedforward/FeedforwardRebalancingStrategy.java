@@ -16,6 +16,16 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.core.network.NetworkUtils;
 
+/**
+ * @author Chengqi Lu This strategy is created based on the Feedforward Fluidic
+ *         rebalancing algorithm in AMoDeus. The algorithm send rebalancing
+ *         vehicles based on the DRT demand flow of previous iteration. This
+ *         strategy is comparable to the MinCostFlowRebalancing Strategy with
+ *         Previous Iteration Zonal DRT Demand Aggregator. But, instead of
+ *         setting a rebalance target for each zone, the concept of flow is
+ *         used. Important: At least 2 iterations are needed in order to make
+ *         this strategy function properly.
+ */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final DrtZonalSystem zonalSystem;
 	private final FeedforwardRebalancingParams params;
@@ -26,8 +36,17 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final double rebalanceInterval;
 	private final double scale;
 	private final Random rnd = new Random(1234);
-	
+
 	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore;
+
+	// TODO Potential further extension
+	// 1. Add minimum number of vehicles (including soon arrival vehicles) for each
+	// zone (can be various values for different zones and/or at different time of
+	// the day)
+	// 2. Read the data from previous iteration with some lead (e.g. 10 min), in
+	// order to compensate for the average time it take vehicles to reach the
+	// rebalance destination
+	// 3. Make the strength of feedforward signal adjustable (e.g. from 0% - 100%). 
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
 			FeedforwardRebalancingParams params) {

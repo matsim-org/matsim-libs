@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -11,22 +10,20 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
-
-//TODO Using Passenger Request Scheduled event, instead of Person Departure event, 
-//will make this implementation more equivalent to the original algorithm in AMoDeus. 
-//However, the passenger request scheduled event does not have departure link at this moment. 
 
 /**
  * 
@@ -35,57 +32,32 @@ import org.matsim.core.api.experimental.events.EventsManager;
  *         send idling vehicles to the departure places of the request departed
  *         during the time period
  */
-public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDepartureEventHandler {
-	private final DrtZonalSystem zonalSystem;
-	private final Fleet fleet;
-	private final PlusOneRebalancingParams params;
+public class PlusOneRebalancingStrategy implements RebalancingStrategy, PassengerRequestScheduledEventHandler,
+		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 	private final Network network;
 
 	private final Map<Id<Link>, Integer> targetMap = new HashMap<>();
+	private final Map<Id<Person>, Id<Link>> potentialDRTTripsMap = new HashMap<>();
 
-	public PlusOneRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
+	public PlusOneRebalancingStrategy(Network network,
 			PlusOneRebalancingParams params, EventsManager events) {
-		this.zonalSystem = zonalSystem;
-		this.fleet = fleet;
-		this.params = params;
 		this.network = network;
 		events.addHandler(this);
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		System.out.println("Rebalance fleet now: Plus One Rebalancing Algorithm is used"); // TODO delete after testing
-		System.out.println("There are " + Integer.toString(targetMap.keySet().size()) + " entries in target map");
-		// Initialization
-		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
+		// Get Rebalancable Vehicles
 		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(Collectors.toList());
-
-		// Get idling vehicles in each zone
-		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-				.groupRebalancableVehicles(rebalancableVehicleList.stream(), time, params.getMinServiceTime());
-		if (rebalancableVehiclesPerZone.isEmpty()) {
-			return Collections.emptyList();
-		}
 
 		// calculate the matching result
 		List<Relocation> relocations = matching(rebalancableVehicleList, targetMap, network);
+		
 		// clear the target map for next rebalancing cycle
 		targetMap.clear();
+		
+		// Return relocations
 		return relocations;
-	}
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals("drt")) { // TODO get the string from drt config file
-			Id<Link> departureLink = event.getLinkId();
-			if (targetMap.containsKey(departureLink)) {
-				int newValue = targetMap.get(departureLink) + 1;
-				targetMap.put(departureLink, newValue);
-			} else {
-				targetMap.put(departureLink, 1);
-			}
-
-		}
 	}
 
 	private List<Relocation> matching(List<? extends DvrpVehicle> rebalancableVehicles,
@@ -107,7 +79,6 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDe
 
 	private DvrpVehicle findNearestVehicle(Link destinationLink, List<? extends DvrpVehicle> rebalancableVehicles) {
 		// First implementation: find the closest vehicles for each link.
-
 		// TODO upgrade the matching with more advanced matching algorithm (e.g.
 		// bipartite matching)
 		if (rebalancableVehicles.isEmpty()) {
@@ -117,6 +88,28 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, PersonDe
 		return rebalancableVehicles.stream().min(Comparator.comparing(
 				v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(), toCoord)))
 				.get();
+	}
+
+	@Override
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		potentialDRTTripsMap.put(event.getPersonId(), event.getFromLinkId());
+	}
+
+	@Override
+	public void handleEvent(PassengerRequestScheduledEvent event) {
+		Id<Person> personId = event.getPersonId();
+		Id<Link> departureLink = potentialDRTTripsMap.get(personId);
+		if (targetMap.containsKey(departureLink)) {
+			int newValue = targetMap.get(departureLink) + 1;
+			targetMap.put(departureLink, newValue);
+		} else {
+			targetMap.put(departureLink, 1);
+		}
+	}
+	
+	@Override
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		potentialDRTTripsMap.remove(event.getPersonId());
 	}
 
 }

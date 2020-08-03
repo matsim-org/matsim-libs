@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime;
+package org.matsim.contrib.drt.optimizer.rebalancing.toolbox;
 
 import java.util.ArrayList;
 import java.util.Collections;

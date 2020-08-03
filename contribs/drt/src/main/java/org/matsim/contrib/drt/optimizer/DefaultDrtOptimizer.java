@@ -84,12 +84,12 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 //		rebalancingInterval = drtCfg.getAdaptiveRealTimeRebalancing()
 //				.map(AdaptiveRealTimeRebalancingParams::getInterval)
 //				.orElse(null);
-//		rebalancingInterval = drtCfg.getPlusOneRebalancing()
-//				.map(PlusOneRebalancingParams::getInterval)
-//				.orElse(null);
-		rebalancingInterval = drtCfg.getFeedforwardRebalancing()
-				.map(FeedforwardRebalancingParams::getInterval)
+		rebalancingInterval = drtCfg.getPlusOneRebalancing()
+				.map(PlusOneRebalancingParams::getInterval)
 				.orElse(null);
+//		rebalancingInterval = drtCfg.getFeedforwardRebalancing()
+//				.map(FeedforwardRebalancingParams::getInterval)
+//				.orElse(null);
 		
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
