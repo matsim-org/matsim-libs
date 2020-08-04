@@ -40,7 +40,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		this.zonalSystem = zonalSystem;
 		timeBinSize = params.getTimeBinSize();
 		prepareZoneNetDepartureMap();
-		events.addHandler(this);
+//		events.addHandler(this);
 	}
 
 	@Override

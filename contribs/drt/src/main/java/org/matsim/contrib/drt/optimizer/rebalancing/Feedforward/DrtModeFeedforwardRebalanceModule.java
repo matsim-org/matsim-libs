@@ -90,14 +90,19 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 										getter.getModal(Fleet.class), getter.getModal(Network.class), params)))
 						.asEagerSingleton();
 				
-				//TODO is this the correct way to do that? I want to create the object PreviousIterationDepartureRecoder
-				bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
-						getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), params,
-								getter.get(EventsManager.class))))
-						.asEagerSingleton();
+
 			}
 		});
 
+		
+		//Create PreviousIterationDepartureRecoder (this will be created only once)
+		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
+				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), params,
+						getter.get(EventsManager.class))))
+				.asEagerSingleton();
+		
+		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));
+		
 		// this is rather analysis - but depends on DrtZonalSystem so it can not be
 		// moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
 		addControlerListenerBinding()
