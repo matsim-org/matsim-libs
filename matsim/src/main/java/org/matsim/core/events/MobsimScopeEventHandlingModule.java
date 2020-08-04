@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +18,42 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev;
+package org.matsim.core.events;
 
-import org.matsim.core.events.handler.EventHandler;
+import java.util.Set;
+
+import javax.inject.Inject;
+
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+
+import com.google.inject.multibindings.Multibinder;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface MobsimScopeEventHandler extends EventHandler {
+public class MobsimScopeEventHandlingModule extends AbstractModule {
 	@Override
-	default void reset(int iteration) {
-		throw new IllegalStateException("This handler should have been unregistered on AfterMobsimEvent");
+	public void install() {
+		bind(MobsimScopeEventHandling.class).asEagerSingleton();
+		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
+
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				Multibinder.newSetBinder(binder(), MobsimScopeEventHandler.class);
+				bind(MobsimScopeEventHandlerRegistrator.class).asEagerSingleton();
+			}
+		});
+	}
+
+	static class MobsimScopeEventHandlerRegistrator {
+		@Inject
+		MobsimScopeEventHandlerRegistrator(MobsimScopeEventHandling eventHandling,
+				Set<MobsimScopeEventHandler> eventHandlersDeclaredByModules) {
+			for (MobsimScopeEventHandler eventHandler : eventHandlersDeclaredByModules) {
+				eventHandling.addMobsimScopeHandler(eventHandler);
+			}
+		}
 	}
 }
