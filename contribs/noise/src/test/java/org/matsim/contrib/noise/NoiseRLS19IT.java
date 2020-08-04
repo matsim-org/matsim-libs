@@ -110,7 +110,7 @@ public class NoiseRLS19IT {
         final double basePkwEmission = emission.calculateBaseVehicleTypeEmission(RLS19VehicleType.pkw, 40);
         Assert.assertEquals("Wrong base pkw emission!", 97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON);
 
-        final double singleVehicleEmission =
+        double singleVehicleEmission =
                 emission.calculateSingleVehicleEmission(RLS19VehicleType.pkw, 40, 0,
                         RLS19NoiseEmission.RLS19IntersectionType.other, 0);
         Assert.assertEquals("Wrong single pkw emission!", 97.70334139531323, singleVehicleEmission, MatsimTestUtils.EPSILON);

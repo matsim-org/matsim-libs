@@ -1,6 +1,7 @@
 package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.algorithm.RobustLineIntersector;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.locationtech.jts.index.strtree.STRtree;
@@ -35,7 +36,7 @@ final class ShieldingContext {
         NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
         this.noiseBarriers = new STRtree();
-        if(noiseParams.isConsiderNoiseBarriers()) {
+        if (noiseParams.isConsiderNoiseBarriers()) {
             final Collection<FeatureNoiseBarrierImpl> barriers
                     = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(),
                     noiseParams.getNoiseBarriersSourceCRS(), config.global().getCoordinateSystem());
@@ -55,7 +56,7 @@ final class ShieldingContext {
         NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
         this.noiseBarriers = new STRtree();
-        if(noiseParams.isConsiderNoiseBarriers()) {
+        if (noiseParams.isConsiderNoiseBarriers()) {
             for (NoiseBarrier barrier : barriers) {
                 try {
                     this.noiseBarriers.insert(barrier.getGeometry().getGeometry().getEnvelopeInternal(), barrier);
@@ -85,7 +86,7 @@ final class ShieldingContext {
         NavigableMap<Double, Coordinate> edgeCandidates = getObstructionEdges(rpPoint, projectedPoint, projectedLineOfSight, fromLineOfSight, toLineOfSight);
         edgeCandidates.put(projectedLineOfSight.getLength(), projectedPoint.getCoordinate());
 
-        if(!edgeCandidates.isEmpty()) {
+        if (!edgeCandidates.isEmpty()) {
             Coordinate lastFixedEdge = rpPoint.getCoordinate();
             Coordinate tmpEdge = rpPoint.getCoordinate();
             double currentHeight = GROUND_HEIGHT;
@@ -94,7 +95,7 @@ final class ShieldingContext {
 
             double distToCurrentEdge = 0;
             while (lastFixedEdge != projectedPoint.getCoordinate()) {
-                if(edgeCandidates.isEmpty()) {
+                if (edgeCandidates.isEmpty()) {
                     logger.warn("Skipping obstacle as distance appears to be 0.");
                     return correctionTermShielding;
                 }
@@ -120,7 +121,7 @@ final class ShieldingContext {
 
             consideredEdges.remove(projectedPoint.getCoordinate());
 
-            if(consideredEdges.isEmpty()) {
+            if (consideredEdges.isEmpty()) {
                 return correctionTermShielding;
             }
 
@@ -133,7 +134,7 @@ final class ShieldingContext {
 
             Iterator<Coordinate> it = consideredEdges.iterator();
             Coordinate edgeTemp = it.next();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Coordinate edge = it.next();
                 double xyDiff = edgeTemp.distance(edge);
                 double zDiff = edgeTemp.z - edge.z;
@@ -162,11 +163,11 @@ final class ShieldingContext {
 
         ConcurrentSkipListMap<Double, Coordinate> edgeCandidates = new ConcurrentSkipListMap<>();
         for (NoiseBarrier noiseBarrier : candidates) {
-            //prepared geometry for repeated geometry relate-checks reduces run-time by 30%,
-            //nkuehnel, mar '20
             if (isObstructing(receiver, source, fromLineOfSight, toLineOfSight, noiseBarrier.getGeometry())) {
-                Geometry intersection = directLineOfSight.intersection(noiseBarrier.getGeometry().getGeometry());
-                for (Coordinate coordinate : intersection.getCoordinates()) {
+                //direct implementation intersects() and intersection() here is up to 15x faster than
+                //using intersects() and intersection() directly on the jts geometry. nkuehnel, aug '20
+                final Set<Coordinate> intersections = intersection((Polygon) noiseBarrier.getGeometry().getGeometry(), directLineOfSight.getCoordinates());
+                for (Coordinate coordinate : intersections) {
                     coordinate.z = noiseBarrier.getHeight();
                     final double distance = receiver.getCoordinate().distance(coordinate);
                     edgeCandidates.put(distance, coordinate);
@@ -183,13 +184,13 @@ final class ShieldingContext {
      * 2) the direct projected line of sight must intersect the barrier
      * 3) the line of sight from receiver to the from-Node of the link intersects the barrier
      * 4) the line of sight from receiver to the to-Node of the link intersects the barrier
-     *
+     * <p>
      * Uses prepared geometry for the barrier polygon to cache intersection graphs.
      */
-    private boolean isObstructing(Geometry receiver, Geometry source, Geometry fromLineOfSight,
-                                  Geometry toLineOfSight, PreparedGeometry barrier) {
-        return barrier.intersects(fromLineOfSight)
-                && barrier.intersects(toLineOfSight)
+    private boolean isObstructing(Geometry receiver, Geometry source, LineString fromLineOfSight,
+                                  LineString toLineOfSight, PreparedGeometry barrier) {
+        return intersects((Polygon) barrier.getGeometry(), fromLineOfSight)
+                && intersects((Polygon) barrier.getGeometry(), toLineOfSight)
                 && !barrier.contains(receiver)
                 && !barrier.contains(source);
     }
@@ -199,5 +200,67 @@ final class ShieldingContext {
         lineOfSightCoords[0] = receiver.getCoordinate();
         lineOfSightCoords[1] = source.getCoordinate();
         return new GeometryFactory().createLineString(lineOfSightCoords);
+    }
+
+
+    private Set<Coordinate> intersection(Polygon polygon, Coordinate[] coords) {
+
+        Set<Coordinate> externalIntersections = intersection(polygon.getExteriorRing(), coords);
+
+        Set<Coordinate> internalIntersections = null;
+        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+            Set<Coordinate> intersects = intersection(polygon.getInteriorRingN(i), coords);
+            if (!intersects.isEmpty()) {
+                if (internalIntersections == null) {
+                    internalIntersections = new HashSet<>();
+                }
+                internalIntersections.addAll(intersects);
+            }
+        }
+
+        if(internalIntersections != null) {
+            externalIntersections.addAll(internalIntersections);
+        }
+
+        return externalIntersections;
+    }
+
+    private Set<Coordinate> intersection(LineString ring, Coordinate[] coords) {
+        final RobustLineIntersector intersector = new RobustLineIntersector();
+
+        Set<Coordinate> intersections = null;
+        for (int i = 1; i < ring.getNumPoints(); ++i) {
+            Coordinate p1 = ring.getCoordinateN(i);
+            Coordinate p2 = ring.getCoordinateN(i - 1);
+            intersector.computeIntersection(coords[0], coords[1], p1, p2);
+            if (intersector.hasIntersection()) {
+                if (intersections == null) {
+                    intersections = new HashSet<>();
+                }
+                for (int j = 0; j < intersector.getIntersectionNum(); j++) {
+                    intersections.add(intersector.getIntersection(j));
+                }
+            }
+        }
+        return intersections == null ? Collections.emptySet() : intersections;
+    }
+
+
+    private static boolean intersects(Polygon polygon, LineString string) {
+        if (!polygon.getEnvelopeInternal().intersects(string.getEnvelopeInternal())) {
+            return false;
+        }
+        final RobustLineIntersector intersector = new RobustLineIntersector();
+        Coordinate[] coords = string.getCoordinates();
+        final LineString ring = polygon.getExteriorRing();
+        for (int i = 1; i < ring.getNumPoints(); ++i) {
+            Coordinate p1 = ring.getCoordinateN(i);
+            Coordinate p2 = ring.getCoordinateN(i - 1);
+            intersector.computeIntersection(coords[0], coords[1], p1, p2);
+            if (intersector.hasIntersection()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
