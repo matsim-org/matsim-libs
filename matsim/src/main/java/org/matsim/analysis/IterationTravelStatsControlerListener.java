@@ -70,6 +70,8 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     @Inject
     TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
 
+    Logger log = Logger.getLogger(IterationTravelStatsControlerListener.class);
+
 	@Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
@@ -102,25 +104,35 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         attributes.remove("vehicles");
         List<String> header = new ArrayList<>();
         header.add("person");
+        header.add("executed_score");
         header.add("first_act_x");
         header.add("first_act_y");
+        header.add("first_act_type");
         header.addAll(attributes);
         try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputDirectoryHierarchy.getOutputFilename(Controler.DefaultFiles.personscsv)),
                 CSVFormat.DEFAULT.withDelimiter(config.global().getDefaultDelimiter().charAt(0)).withHeader(header.stream().toArray(String[]::new)))) {
             for (Person p : scenario.getPopulation().getPersons().values()) {
+                if (p.getSelectedPlan() == null) {
+                    log.error("Found person without a selected plan: " + p.getId().toString() + " will not be added to output_persons.csv");
+                    continue;
+                }
                 List<String> line = new ArrayList<>();
                 line.add(p.getId().toString());
+                line.add(p.getSelectedPlan().getScore() == null ? "null" : p.getSelectedPlan().getScore().toString());
                 String x = "";
                 String y = "";
+                String actType = "";
                 if (p.getSelectedPlan().getPlanElements().size() > 0) {
                     Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
                     if (firstAct.getCoord() != null) {
                         x = Double.toString(firstAct.getCoord().getX());
                         y = Double.toString(firstAct.getCoord().getY());
                     }
+                    actType = firstAct.getType();
                 }
                 line.add(x);
                 line.add(y);
+                line.add(actType);
                 for (String attribute : attributes) {
                     Object value = p.getAttributes().getAttribute(attribute);
                     String result = value != null ? String.valueOf(value) : "";
