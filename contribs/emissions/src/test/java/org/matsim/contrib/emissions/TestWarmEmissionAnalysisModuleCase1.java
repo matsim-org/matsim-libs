@@ -266,8 +266,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	@Test
 	public void testCounters5(){
-		setUp();
-		emissionsModule.reset();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 1 - data in both tables -> use detailed
 		// free flow velocity inconsistent -> different value in table
@@ -314,14 +314,11 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	@Test
 	public void testCounters1fractional(){
-		setUp();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
 
 		// yyyyyy !!!!!!
-
-		//@KMT the reset is not needed the look up behaviour seems still to be fractionStopGo
-
-		emissionsModule.reset();
 
 		/*
 		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop go and free flow speed
@@ -407,9 +404,10 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	@Test
 	@Ignore
 	public void testCounters6(){
-		setUp();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
-		emissionsModule.reset();
+
 
 		// case 1 - data in both tables -> use detailed
 		// free flow velocity inconsistent -> different value in table
@@ -445,8 +443,9 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	@Test
 	public void testCounters8(){
-		setUp();
-		emissionsModule.reset();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
+
 
 		// test summing up of counters
 
