@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-public class RoundaboutTest {
+public class HermesRoundaboutTest {
 
 	public static final Coord D_START = new Coord(-60, 0);
 	public static final Coord C_START = new Coord(0, 60);
