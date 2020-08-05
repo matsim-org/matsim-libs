@@ -51,6 +51,8 @@ public class RoundaboutTest {
 	public void testRoundaboutBehavior(){
 		final Config config = createConfig();
 		config.controler().setMobsim("hermes");
+//		config.controler().setMobsim("qsim");
+
 
 		config.parallelEventHandling().setOneThreadPerHandler(true);
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
@@ -98,8 +100,8 @@ public class RoundaboutTest {
 		List<Tuple<Coord,Coord>> startEndRelations = List.of(new Tuple<>(A_START,D_START),new Tuple<>(B_START,A_START),new Tuple<>(C_START,B_START),new Tuple<>(D_START,C_START));
 
 		VehicleType av = VehicleUtils.createVehicleType(Id.create("av",VehicleType.class));
-		av.setFlowEfficiencyFactor(0.2);
-		av.setPcuEquivalents(10.0);
+		av.setFlowEfficiencyFactor(2.0);
+		av.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(av);
 
 		final PopulationFactory factory = scenario.getPopulation().getFactory();

@@ -158,7 +158,9 @@ public class Agent {
     public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFL); }
     public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFL); }
     public static int getLinkPlanEntry      (long plan) {return (int) ((plan >> 8) & 0x00000000FFFFFFFFL); }
-    public static int getLinkPCEEntry       (long plan) {return (int) ((plan >> 56) & 0x000000000000000FL); }
+    public static int getLinkPCEEntry       (long plan) {
+        return (int) ((plan >> 56) & 0x000000000000000FL);
+    }
     public static int getVelocityPlanEntry  (long plan) {return (int) (plan & 0x00000000000000FFL); }
     public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFL); }
     public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFL); }
@@ -236,7 +238,8 @@ public class Agent {
     }
 
     public static long prepareLinkEntry(int eventid, int linkid, int velocity, int pcecategory) {
-        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity, pcecategory));
+        long l = preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity, pcecategory));
+        return l;
     }
 
     public static long prepareSleepForEntry(int eventid, int element) {

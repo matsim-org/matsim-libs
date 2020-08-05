@@ -959,8 +959,7 @@ public class HermesTest {
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
-			this.config.qsim().setFlowCapFactor(1.0);
-			this.config.qsim().setStorageCapFactor(1.0);
+
 
 			/* build network */
 			this.network = this.scenario.getNetwork();

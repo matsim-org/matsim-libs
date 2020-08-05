@@ -15,7 +15,6 @@ public class HLink {
 		private Agent[] array;
 		// the max capacity of the queue
 		private int maxcapacity;
-		private final int maxPhysicalCapacity;
 
 		// Pop/peak from head
 		private int head;
@@ -26,7 +25,6 @@ public class HLink {
 
 		public AgentQueue(int maxcapacity, int initialcapacity) {
 			this.maxcapacity = maxcapacity;
-			this.maxPhysicalCapacity = maxcapacity;
 			this.array = new Agent[initialcapacity];
 		}
 
@@ -128,28 +126,28 @@ public class HLink {
     private final int velocity;
     // Queues of agents on this link. Boundary links use both queues.
     private final AgentQueue queue;
-    // Number of time steps necessary to reset the flow.
-    private final int initialFlowPeriod;
-    private int nextFlowPeriod;
-    // Number of vehicles that can leave the link per time period.
-    private final int flowCapacity;
+    // Number of vehicles that can leave the link per time second.
+    private final float flowCapacityPerS;
+    private float flowLeftInTimestep;
+    private int lastUpdate;
     // When (which timestep) flow was updated the last time.
-    private int lastFlowUpdate;
+    private int nextFreeFlowSlot;
 	private int lastPush;
 	private final int stuckTimePeriod;
 
-    public HLink(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity, int stuckTimePeriod) {
+    public HLink(int id, int capacity, int length, int velocity,  float flowCapacityperSecond, int stuckTimePeriod) {
         this.id = id;
         this.length = length;
         this.velocity = velocity;
-        this.initialFlowPeriod = flowPeriod;
-        this.nextFlowPeriod = initialFlowPeriod;
-        this.flowCapacity = flowCapacity;
-        this.lastFlowUpdate = 0;
+        this.flowCapacityPerS = flowCapacityperSecond;
         this.stuckTimePeriod = stuckTimePeriod;
         this.lastPush = 0;
+        this.lastUpdate = 0;
+        this.nextFreeFlowSlot = 0;
         this.initialCapacity = capacity;
         this.currentCapacity = capacity;
+        this.flowLeftInTimestep = flowCapacityperSecond;
+
 
         // We do not preallocate using the capacity because it leads to huge memory waste.
         //this.queue = new AgentQueue(Math.max(1, capacity));
@@ -158,7 +156,7 @@ public class HLink {
 
     public void reset() {
     	queue.clear();
-    	this.lastFlowUpdate = 0;
+    	this.nextFreeFlowSlot = 0;
     }
 
 	public boolean push(Agent agent, int timestep, double storageCapacityPCU) {
@@ -202,13 +200,24 @@ public class HLink {
         return this.length;
     }
 
-    public int flow(int timestep, double flowCapacityPCE) {
-    	if (timestep - lastFlowUpdate >= nextFlowPeriod) {
-    		lastFlowUpdate = timestep;
-			nextFlowPeriod = (int) (initialFlowPeriod * flowCapacityPCE);
-    		return flowCapacity;
+    public boolean flow(int timestep, float requestedFlow) {
+    	if (timestep  >= nextFreeFlowSlot) {
+			// if requestedFlow<flowCapacityPerS, more than one vehicle can pass per timestep
+			if (lastUpdate == timestep){
+				if (flowLeftInTimestep >= 0) {
+					flowLeftInTimestep-=requestedFlow;
+					nextFreeFlowSlot = timestep + (int) Math.floor( requestedFlow / flowCapacityPerS);
+					return true;
+				} else return false;
+			} else {
+				flowLeftInTimestep=flowLeftInTimestep+flowCapacityPerS-requestedFlow;
+				lastUpdate = timestep;
+				nextFreeFlowSlot = timestep + (int) Math.floor( requestedFlow / flowCapacityPerS);
+				return true;
+			}
+
     	} else {
-    		return 0;
+    		return false;
     	}
     }
 

@@ -254,19 +254,16 @@ public class Realm {
     protected int processLinks(HLink link) {
         int routed = 0;
         Agent agent = link.queue().peek();
-        double flowCapacityPCE = si.getFlowCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan()));
-        int curr_flow = link.flow(secs,flowCapacityPCE);
-
-        while (agent.linkFinishTime <= secs && curr_flow > 0) {
+        while (agent.linkFinishTime <= secs && link.flow(secs,si.getFlowCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan())))) {
             boolean finished = agent.finished();
             // if finished, install times on last event.
             if (finished) {
                 setEventTime(agent, agent.events().size() - 1, secs, true);
             }
             if (finished || processAgent(agent, link.id())) {
-                double storageCapacityPCE = si.getStorageCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan()));
+                int linkPCEEntry1 = Agent.getLinkPCEEntry(agent.currPlan());
+                double storageCapacityPCE = si.getStorageCapacityPCE(linkPCEEntry1);
                 link.pop(storageCapacityPCE);
-                curr_flow -= 1;
                 routed += 1;
                 if ((agent = link.queue().peek()) == null) {
                     break;
