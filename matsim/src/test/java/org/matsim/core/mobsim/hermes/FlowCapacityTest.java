@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
 import java.util.Map;
@@ -26,6 +44,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Tests different aspects of flow capacity in Hermes
+ *
+ */
 public class FlowCapacityTest {
 
 	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
@@ -103,11 +125,12 @@ public class FlowCapacityTest {
 		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
 		Assert.assertEquals(2996, volume[8]); // all the rest
 
-	}	/**
-	 * Tests that the flow capacity can be reached (but not exceeded) by
-	 * agents driving over a link.
+	}
+
+	/**
+	 * Tests downscaling of flow capacity works
 	 *
-	 * @author mrieser
+	 * @author jfbischoff
 	 */
 
 	@Test
@@ -161,6 +184,12 @@ public class FlowCapacityTest {
 		Assert.assertEquals(299, volume[8]); // all the rest
 
 	}
+
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working
+	 *
+	 * @author jfbischoff
+	 */
 
 	@Test
 	public void testFlowCapacityDrivingFlowEfficiencyFactors() {
@@ -218,6 +247,11 @@ public class FlowCapacityTest {
 
 	}
 
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working also in combination with downscaling
+	 *
+	 * @author jfbischoff
+	 */
 
 	@Test
 	public void testFlowCapacityDrivingFlowEfficiencyFactorsWithDownscaling() {
@@ -274,6 +308,12 @@ public class FlowCapacityTest {
 		Assert.assertEquals(799, volume[7]); // all the rest
 		Assert.assertEquals(0, volume[8]); // nothing
 	}
+
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working with downscaling and a value <1 for flow efficiency
+	 *
+	 * @author jfbischoff
+	 */
 
 	@Test
 	public void testFlowCapacityEfficiencyFactorWithLowValueAndDownscaling() {
