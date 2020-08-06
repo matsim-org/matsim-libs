@@ -62,6 +62,7 @@ public class StorageCapacityTest {
 	 */
 	@Test
 	public void testStorageCapacity() {
+		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -110,6 +111,7 @@ public class StorageCapacityTest {
 	 */
 	@Test
 	public void testStorageCapacityDownscaling() {
+		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		config.hermes().setFlowCapacityFactor(0.1);
@@ -161,6 +163,7 @@ public class StorageCapacityTest {
 	 */
 	@Test
 	public void testStorageCapacityWithVaryingPCUs() {
+		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
 		Scenario scenario = ScenarioUtils.createScenario(config);

@@ -67,10 +67,10 @@ public class HermesRoundaboutTest {
 
 	@Test
 	public void testRoundaboutBehavior(){
+		ScenarioImporter.flush();
 		final Config config = createConfig();
 		config.controler().setMobsim("hermes");
-//		config.controler().setMobsim("qsim");
-
+		//		config.controler().setMobsim("qsim");
 
 		config.parallelEventHandling().setOneThreadPerHandler(true);
 		MutableScenario scenario = ScenarioUtils.createMutableScenario(config);

@@ -186,10 +186,10 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDrivingFlowEfficiencyFactors() {
 		Fixture f = new Fixture();
+		ScenarioImporter.flush();
 
-
-		VehicleType av = VehicleUtils.createVehicleType(Id.create("av",VehicleType.class));
-	    av.setFlowEfficiencyFactor(2.0);
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
+		av.setFlowEfficiencyFactor(2.0);
 		f.scenario.getVehicles().addVehicleType(av);
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 12000; i++) {
@@ -248,9 +248,9 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDrivingFlowEfficiencyFactorsWithDownscaling() {
 		Fixture f = new Fixture();
+		ScenarioImporter.flush();
 
-
-		VehicleType av = VehicleUtils.createVehicleType(Id.create("av",VehicleType.class));
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
 		av.setFlowEfficiencyFactor(2.0);
 		f.scenario.getVehicles().addVehicleType(av);
 		f.config.hermes().setFlowCapacityFactor(0.1);
@@ -310,9 +310,9 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityEfficiencyFactorWithLowValueAndDownscaling() {
 		Fixture f = new Fixture();
+		ScenarioImporter.flush();
 
-
-		VehicleType tractor = VehicleUtils.createVehicleType(Id.create("tractor",VehicleType.class));
+		VehicleType tractor = VehicleUtils.createVehicleType(Id.create("tractor", VehicleType.class));
 		tractor.setFlowEfficiencyFactor(0.5);
 		f.scenario.getVehicles().addVehicleType(tractor);
 		f.config.hermes().setFlowCapacityFactor(0.1);
@@ -373,6 +373,7 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture();
+		ScenarioImporter.flush();
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
