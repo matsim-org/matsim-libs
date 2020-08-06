@@ -121,7 +121,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent5(){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 6 - data in detailed table, stop go speed zero
 		// use free flow factor to calculate emissions
@@ -148,8 +148,8 @@ public class TestWarmEmissionAnalysisModuleCase5{
 
 
 
-	private void setUp() {
-
+	private WarmEmissionAnalysisModule setUp() {
+		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
@@ -165,7 +165,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
 

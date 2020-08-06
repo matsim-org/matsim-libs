@@ -159,10 +159,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		HandlerToTestEmissionAnalysisModules.reset();
 		warmEmissions.clear();
 	}
-
-	
-	
-	
 	
 	
 	/*
@@ -333,7 +329,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 		Link mockLink = createMockLink("link 1", linkLength, PETROL_SPEED_FF / 3.6 );
 
-
 		// <stop&go speed
 		Double travelTime = linkLength/ PETROL_SPEED_SG *1.2;
 		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( vehicle, mockLink, travelTime * 3.6 );
@@ -408,7 +403,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		WarmEmissionAnalysisModule emissionsModule = setUp();
 		emissionsModule.getEcg().setEmissionsComputationMethod(StopAndGoFraction );
 
-
 		// case 1 - data in both tables -> use detailed
 		// free flow velocity inconsistent -> different value in table
 		Id<Vehicle> inconffVehicleId = Id.create("vehicle 7", Vehicle.class);
@@ -445,7 +439,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	public void testCounters8(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
-
 
 		// test summing up of counters
 

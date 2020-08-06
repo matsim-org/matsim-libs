@@ -88,8 +88,6 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
-
-	private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
 
 	// emission factors for tables - no duplicates!
@@ -126,7 +124,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4(){
 
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 4 - data in average table
 		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
@@ -150,7 +148,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		HandlerToTestEmissionAnalysisModules.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
 		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_FF *lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
+		warmEmissions.clear();
 
 	}
 	
@@ -161,8 +159,8 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	 */
 	@Test
 	public void testCounters2(){
-		setUp();
-		emissionsModule.reset();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// ff und sg not part of the detailed table -> use average table
 		Id<Vehicle> vehicleId = Id.create("vehicle 4", Vehicle.class);
@@ -193,12 +191,11 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		Assert.assertEquals(lpgLinkLength/1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals(1, emissionsModule.getStopGoOccurences() );
 		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
-		emissionsModule.reset();
 	}
 
 
-	private void setUp() {
-
+	private WarmEmissionAnalysisModule setUp() {
+		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
@@ -230,7 +227,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
 

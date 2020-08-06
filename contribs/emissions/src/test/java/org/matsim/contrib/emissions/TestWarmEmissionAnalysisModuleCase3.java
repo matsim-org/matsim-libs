@@ -121,7 +121,7 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent3(){
 
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
 		Id<Vehicle> dieselVehicleId = Id.create("veh 3", Vehicle.class);
@@ -157,8 +157,8 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	*/
 	@Test(expected = RuntimeException.class)
 	public void testCounters4(){
-		setUp();
-		emissionsModule.reset();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
 		Id<Vehicle> dieselVehicleId = Id.create("vehicle 3", Vehicle.class);
@@ -192,8 +192,8 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		emissionsModule.reset();
 	}
 
-	private void setUp() {
-
+	private WarmEmissionAnalysisModule setUp() {
+		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
@@ -209,7 +209,7 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
 
