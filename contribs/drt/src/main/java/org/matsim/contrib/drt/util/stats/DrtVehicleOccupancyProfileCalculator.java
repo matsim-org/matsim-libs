@@ -75,11 +75,11 @@ public class DrtVehicleOccupancyProfileCalculator
 	private final double analysisEndTime;
 	private final int maxCapacity;
 
-	private final FleetSpecification fleet;
+	private final String dvrpMode;
 
-	public DrtVehicleOccupancyProfileCalculator(FleetSpecification fleet, EventsManager events, int timeInterval,
-			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
-		this.fleet = fleet;
+	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, EventsManager events,
+			int timeInterval, QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
+		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
 
 		events.addHandler(this);
@@ -88,7 +88,9 @@ public class DrtVehicleOccupancyProfileCalculator
 				.isDefined()) {
 			analysisEndTime = qsimConfig.getEndTime().seconds();
 		} else {
-			analysisEndTime = fleet.getVehicleSpecifications().values().stream()
+			analysisEndTime = fleet.getVehicleSpecifications()
+					.values()
+					.stream()
 					.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
 					.max()
 					.orElse(0);
@@ -174,29 +176,31 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	@Override
 	public void handleEvent(TaskStartedEvent event) {
-		if (event.getTaskIndex() == 0) {
-			if (fleet.getVehicleSpecifications().containsKey(event.getDvrpVehicleId())) {
-				VehicleState state = new VehicleState();
-				state.taskType = event.getTaskType();
-				state.beginTime = event.getTime();
-				vehicleStates.put(event.getDvrpVehicleId(), state);
-			}
-		} else {
-			VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
-			if (state != null) {
-				state.taskType = event.getTaskType();
-				state.beginTime = event.getTime();
-			}
+		if (!event.getDvrpMode().equals(dvrpMode)) {
+			return;
 		}
+
+		final VehicleState state;
+		if (event.getTaskIndex() == 0) {
+			state = new VehicleState();
+			vehicleStates.put(event.getDvrpVehicleId(), state);
+		} else {
+			state = vehicleStates.get(event.getDvrpVehicleId());
+		}
+
+		state.taskType = event.getTaskType();
+		state.beginTime = event.getTime();
 	}
 
 	@Override
 	public void handleEvent(TaskEndedEvent event) {
-		VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
-		if (state != null) {
-			increment(state, event.getTime());
-			state.taskType = null;
+		if (!event.getDvrpMode().equals(dvrpMode)) {
+			return;
 		}
+
+		VehicleState state = vehicleStates.get(event.getDvrpVehicleId());
+		increment(state, event.getTime());
+		state.taskType = null;
 	}
 
 	@Override
