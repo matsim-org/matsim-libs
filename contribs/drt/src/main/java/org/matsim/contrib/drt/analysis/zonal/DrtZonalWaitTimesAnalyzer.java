@@ -40,7 +40,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequestSubmittedEventHandler {
+public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequestSubmittedEventHandler {
 
 	private final DrtConfigGroup drtCfg;
 	private final DrtRequestAnalyzer requestAnalyzer;
