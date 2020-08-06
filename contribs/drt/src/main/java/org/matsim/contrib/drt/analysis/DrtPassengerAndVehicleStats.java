@@ -51,7 +51,6 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -59,8 +58,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class DrtPassengerAndVehicleStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, DrtRequestSubmittedEventHandler,
-		PassengerRequestRejectedEventHandler {
+		LinkEnterEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 
 	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
@@ -76,11 +74,9 @@ public class DrtPassengerAndVehicleStats
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
 
-	public DrtPassengerAndVehicleStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
-									   FleetSpecification fleetSpecification) {
+	public DrtPassengerAndVehicleStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
-		events.addHandler(this);
 		this.fleetSpecification = fleetSpecification;
 
 		initializeVehicles();
@@ -100,7 +96,6 @@ public class DrtPassengerAndVehicleStats
 		request2person.clear();
 		initializeVehicles();
 	}
-
 
 	private void initializeVehicles() {
 		int maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);

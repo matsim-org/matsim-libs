@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -45,24 +44,24 @@ import org.matsim.pt.PtConstants;
  *
  * @author tschlenther
  */
-public final class TimeDependentActivityBasedZonalDemandAggregator implements ZonalDemandAggregator, ActivityEndEventHandler {
+public final class TimeDependentActivityBasedZonalDemandAggregator
+		implements ZonalDemandAggregator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
-	private static final MutableInt ZERO =  new MutableInt(0);
+	private static final MutableInt ZERO = new MutableInt(0);
 
-	public TimeDependentActivityBasedZonalDemandAggregator(EventsManager eventsManager, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public TimeDependentActivityBasedZonalDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
-		//self-registration
-		eventsManager.addHandler(this);
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		Map<String, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin, Collections.emptyMap());
+		Map<String, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin,
+				Collections.emptyMap());
 		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
 	}
 
@@ -72,13 +71,13 @@ public final class TimeDependentActivityBasedZonalDemandAggregator implements Zo
 		//we need to filter activity types because we do not want to position vehicles at every arbitrary activity hotspot
 		//this filter here is now adopted to the Open Berlin Scenario
 		//TODO replace by subpopulation filter or get actTypes from somewhere else (config)?
-		if(TripStructureUtils.isStageActivityType(event.getActType()) ||
-				(event.getActType().contains("freight")) ||
-				(event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) ||
-				(event.getActType().equals(DrtActionCreator.DRT_STOP_NAME)) ||
-				(event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE)) ||
-				(event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) ||
-				(event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)))
+		if (TripStructureUtils.isStageActivityType(event.getActType())
+				|| (event.getActType().contains("freight"))
+				|| (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME))
+				|| (event.getActType().equals(DrtActionCreator.DRT_STOP_NAME))
+				|| (event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE))
+				|| (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE))
+				|| (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)))
 			return;
 
 		Double bin = getBinForTime(event.getTime());
@@ -102,7 +101,6 @@ public final class TimeDependentActivityBasedZonalDemandAggregator implements Zo
 		prepareZones();
 	}
 
-
 	private void prepareZones() {
 		for (int i = 0; i < (3600 / timeBinSize) * 36; i++) {
 			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
@@ -116,6 +114,5 @@ public final class TimeDependentActivityBasedZonalDemandAggregator implements Zo
 	private Double getBinForTime(double time) {
 		return Math.floor(time / timeBinSize);
 	}
-
 
 }

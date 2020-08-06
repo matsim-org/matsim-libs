@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -58,7 +56,6 @@ public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, Ac
 	public ZonalIdleVehicleXYVisualiser(MatsimServices services, String mode, DrtZonalSystem zonalSystem, FleetSpecification fleet) {
 		this.services = services;
 		this.mode = mode;
-		services.getEvents().addHandler(this);
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
 		initEntryMap();
