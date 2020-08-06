@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev;
+package org.matsim.core.events;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -54,6 +54,7 @@ public class MobsimScopeEventHandling implements AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		eventHandlers.forEach(eventsManager::removeHandler);
+		eventHandlers.forEach(eventHandler -> eventHandler.cleanupAfterMobsim(event.getIteration()));
 		eventHandlers.clear();
 	}
 }
