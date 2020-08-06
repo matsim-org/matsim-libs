@@ -54,7 +54,8 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 
     private static final String STUCKTIMEPARAM = "stuckTime";
-    private static final String STUCKTIMEPARAMDESC = "time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
+    private static final String STUCKTIMEPARAMDESC = "time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move."
+            + " Set to Integer.MAX_VALUE to disable this behavior";
 
     private static final String MAINMODESPARAM = "mainMode";
     private static final String MAINMODESPARAMDESC = "[comma-separated list] Modes that are handled in the mobsim along links. By default: car";

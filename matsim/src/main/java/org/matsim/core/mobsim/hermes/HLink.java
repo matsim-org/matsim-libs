@@ -180,23 +180,20 @@ public class HLink {
 	public boolean push(Agent agent, int timestep, double storageCapacityPCU) {
 		//avoid long vehicles not being able to enter a short link
     	double effectiveStorageCapacity = Math.min(storageCapacityPCU,initialCapacity);
-    	if (currentCapacity-effectiveStorageCapacity>=0) {
+    	if (currentCapacity - effectiveStorageCapacity >= 0) {
 			if (queue.push(agent)) {
 				lastPush = timestep;
 				currentCapacity = currentCapacity - effectiveStorageCapacity;
 				return true;
-			} else
-			{
+			} else {
 				throw new RuntimeException("should not happen?");
 			}
-		}
-		else if ((lastPush + stuckTimePeriod) < timestep){
+		} else if (stuckTimePeriod != Integer.MAX_VALUE && (lastPush + stuckTimePeriod) < timestep) {
 			boolean result = queue.forcePush(agent);
-			lastPush= timestep;
+			lastPush = timestep;
 			currentCapacity = currentCapacity - effectiveStorageCapacity;
 			return result;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
