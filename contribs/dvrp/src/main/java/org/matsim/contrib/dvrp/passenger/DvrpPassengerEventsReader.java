@@ -21,6 +21,7 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -42,61 +43,52 @@ public class DvrpPassengerEventsReader extends MatsimXmlParser {
     public DvrpPassengerEventsReader(EventsManager events) {
         delegate = new EventsReaderXMLv1(events);
         this.setValidating(false);
-        delegate.addCustomEventMapper(PassengerRequestRejectedEvent.EVENT_TYPE, getPassengerRequestRejectedEventMapper());
-        delegate.addCustomEventMapper(PassengerRequestScheduledEvent.EVENT_TYPE, getPassengerRequestScheduledEventMapper());
-        delegate.addCustomEventMapper(PassengerRequestSubmittedEvent.EVENT_TYPE, getPassengerRequestSubmittedEventMapper());
+        delegate.addCustomEventMapper(PassengerRequestRejectedEvent.EVENT_TYPE, this::passengerRequestRejectedEvent);
+        delegate.addCustomEventMapper(PassengerRequestScheduledEvent.EVENT_TYPE, this::passengerRequestScheduledEvent);
+        delegate.addCustomEventMapper(PassengerRequestSubmittedEvent.EVENT_TYPE, this::passengerRequestSubmittedEvent);
     }
 
     public void characters(char[] ch, int start, int length) throws SAXException {
         delegate.characters(ch, start, length);
     }
 
-    private MatsimEventsReader.CustomEventMapper<PassengerRequestRejectedEvent> getPassengerRequestRejectedEventMapper() {
-        return event -> {
+    private PassengerRequestRejectedEvent passengerRequestRejectedEvent(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
 
-            Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_TIME));
+		String mode = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_MODE);
+		Id<Request> requestId = Id.create(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_REQUEST), Request.class);
+		Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_PERSON));
+		String cause = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_CAUSE);
 
-            double time = Double.parseDouble(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_TIME));
-			String mode = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_MODE);
-			Id<Request> requestId = Id.create(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_REQUEST), Request.class);
-			Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_PERSON));
-			String cause = attributes.get(PassengerRequestRejectedEvent.ATTRIBUTE_CAUSE);
-
-            return new PassengerRequestRejectedEvent(time, mode, requestId, personId, cause);
-        };
+		return new PassengerRequestRejectedEvent(time, mode, requestId, personId, cause);
     }
 
-    private MatsimEventsReader.CustomEventMapper<PassengerRequestScheduledEvent> getPassengerRequestScheduledEventMapper() {
-        return event -> {
+    private PassengerRequestScheduledEvent passengerRequestScheduledEvent(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
 
-            Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_TIME));
+		String mode = attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_MODE);
+		Id<Request> requestId = Id.create(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_REQUEST), Request.class);
+		Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PERSON));
+		Id<DvrpVehicle> vehicleId = Id.create(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_VEHICLE), DvrpVehicle.class);
+		double pickupTime = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PICKUP_TIME));
+		double dropoffTime = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_DROPOFF_TIME));
 
-            double time = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_TIME));
-			String mode = attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_MODE);
-			Id<Request> requestId = Id.create(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_REQUEST), Request.class);
-			Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PERSON));
-			Id<DvrpVehicle> vehicleId = Id.create(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_VEHICLE), DvrpVehicle.class);
-			double pickupTime = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_PICKUP_TIME));
-            double dropoffTime = Double.parseDouble(attributes.get(PassengerRequestScheduledEvent.ATTRIBUTE_DROPOFF_TIME));
-
-            return new PassengerRequestScheduledEvent(time, mode, requestId, personId, vehicleId, pickupTime, dropoffTime);
-        };
+		return new PassengerRequestScheduledEvent(time, mode, requestId, personId, vehicleId, pickupTime, dropoffTime);
     }
 
-    private MatsimEventsReader.CustomEventMapper<PassengerRequestSubmittedEvent> getPassengerRequestSubmittedEventMapper() {
-        return event -> {
+    private PassengerRequestSubmittedEvent passengerRequestSubmittedEvent(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
 
-            Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_TIME));
+		String mode = attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_MODE);
+		Id<Request> requestId = Id.create(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_REQUEST), Request.class);
+		Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_PERSON));
+		Id<Link> fromLinkId = Id.createLinkId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_FROM_LINK));
+		Id<Link> toLinkId = Id.createLinkId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_TO_LINK));
 
-            double time = Double.parseDouble(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_TIME));
-			String mode = attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_MODE);
-			Id<Request> requestId = Id.create(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_REQUEST), Request.class);
-			Id<Person> personId = Id.createPersonId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_PERSON));
-			Id<Link> fromLinkId = Id.createLinkId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_FROM_LINK));
-			Id<Link> toLinkId = Id.createLinkId(attributes.get(PassengerRequestSubmittedEvent.ATTRIBUTE_TO_LINK));
-
-			return new PassengerRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId);
-        };
+		return new PassengerRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId);
     }
 
     @Override
