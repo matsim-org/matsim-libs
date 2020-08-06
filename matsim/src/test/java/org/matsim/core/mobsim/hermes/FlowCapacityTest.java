@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.hermes;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -31,15 +30,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.hermes.HermesTest.Fixture;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -51,10 +47,6 @@ import org.matsim.vehicles.VehicleUtils;
 public class FlowCapacityTest {
 
 	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
-
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
-
 
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
