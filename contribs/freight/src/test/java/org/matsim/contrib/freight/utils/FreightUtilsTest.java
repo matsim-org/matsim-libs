@@ -20,6 +20,8 @@ package org.matsim.contrib.freight.utils;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -449,8 +451,8 @@ public class FreightUtilsTest {
 	/**
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
-	@Test(expected = javax.management.InvalidAttributeValueException.class)
-	public void testRunJsprit_NoOfJsprtiIterationsMissing() throws InvalidAttributeValueException {
+	@Test(expected = java.util.concurrent.ExecutionException.class)
+	public void testRunJsprit_NoOfJsprtiIterationsMissing() throws ExecutionException, InterruptedException {
 		Config config = prepareConfig();
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
