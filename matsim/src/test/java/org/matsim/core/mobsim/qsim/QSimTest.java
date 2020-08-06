@@ -68,6 +68,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -632,9 +633,12 @@ public class QSimTest {
 			 */
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -642,8 +646,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
@@ -739,9 +743,12 @@ public class QSimTest {
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -749,8 +756,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
@@ -805,9 +812,12 @@ public class QSimTest {
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -815,8 +825,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
