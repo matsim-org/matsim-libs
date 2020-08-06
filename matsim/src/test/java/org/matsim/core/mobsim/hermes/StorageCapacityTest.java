@@ -162,6 +162,7 @@ public class StorageCapacityTest {
 	 * @author jfbischoff
 	 */
 	@Test
+
 	public void testStorageCapacityWithVaryingPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
@@ -171,6 +172,9 @@ public class StorageCapacityTest {
 		VehicleType tractor = VehicleUtils.createVehicleType(Id.create("tractor", VehicleType.class));
 		tractor.setPcuEquivalents(2.0);
 		scenario.getVehicles().addVehicleType(tractor);
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setPcuEquivalents(1.0);
+		scenario.getVehicles().addVehicleType(car);
 
 		for (int i = 1; i <= 500; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
@@ -187,6 +191,11 @@ public class StorageCapacityTest {
 			//every second person gets an unflowy, but speedy tractor
 			if (i % 2 == 1) {
 				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), tractor);
+				scenario.getVehicles().addVehicle(vehicle);
+				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+			}
+			if (i % 2 == 0) {
+				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
 				scenario.getVehicles().addVehicle(vehicle);
 				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
 			}
