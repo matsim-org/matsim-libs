@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -69,7 +67,7 @@ public class StorageCapacityTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		var links = generateNetwork(scenario.getNetwork());
 
-		for (int i = 1; i <= 1200; i++) {
+		for (int i = 1; i <= 600; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", links.get(0).getId());
@@ -85,8 +83,6 @@ public class StorageCapacityTest {
 
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterXML writerXML = new EventWriterXML("events.xml");
-		events.addHandler(writerXML);
 
 		VehiclesOnLinkCounter counter3 = new VehiclesOnLinkCounter(links.get(3).getId());
 		events.addHandler(counter3);
@@ -97,8 +93,7 @@ public class StorageCapacityTest {
 		/* run sim */
 		Hermes sim = HermesTest.createHermes(scenario, events);
 		sim.run();
-		writerXML.closeFile();
-		new NetworkWriter(scenario.getNetwork()).write("network.xml");
+
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
 		System.out.println(counter1.currentMax);
@@ -139,8 +134,6 @@ public class StorageCapacityTest {
 
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterXML writerXML = new EventWriterXML("events.xml");
-		events.addHandler(writerXML);
 
 		VehiclesOnLinkCounter counter3 = new VehiclesOnLinkCounter(links.get(3).getId());
 		events.addHandler(counter3);
@@ -151,8 +144,7 @@ public class StorageCapacityTest {
 		/* run sim */
 		Hermes sim = HermesTest.createHermes(scenario, events);
 		sim.run();
-		writerXML.closeFile();
-		new NetworkWriter(scenario.getNetwork()).write("network.xml");
+
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
 		System.out.println(counter1.currentMax);
@@ -177,7 +169,7 @@ public class StorageCapacityTest {
 		tractor.setPcuEquivalents(2.0);
 		scenario.getVehicles().addVehicleType(tractor);
 
-		for (int i = 1; i <= 1200; i++) {
+		for (int i = 1; i <= 500; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", links.get(0).getId());
@@ -199,8 +191,6 @@ public class StorageCapacityTest {
 
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
-		EventWriterXML writerXML = new EventWriterXML("events.xml");
-		events.addHandler(writerXML);
 
 		VehiclesOnLinkCounter counter3 = new VehiclesOnLinkCounter(links.get(3).getId());
 		events.addHandler(counter3);
@@ -209,8 +199,7 @@ public class StorageCapacityTest {
 		/* run sim */
 		Hermes sim = HermesTest.createHermes(scenario, events);
 		sim.run();
-		writerXML.closeFile();
-		new NetworkWriter(scenario.getNetwork()).write("network.xml");
+
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
 		Assert.assertEquals(9, counter3.currentMax);  // the bottleneck link can store 14 vehicles
