@@ -84,14 +84,15 @@ public class FreightUtils {
 
 		Carriers carriers = FreightUtils.getCarriers(scenario);
 
-		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
+		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
 
-		// Fill carrierServiceCounterMap
+		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			carrierServiceCounterMap.put(carrier.getId(), carrier.getServices().size());
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getShipments().size());
 		}
 
-		HashMap<Id<Carrier>, Integer> sortedMap = carrierServiceCounterMap.entrySet().stream()
+		HashMap<Id<Carrier>, Integer> sortedMap = carrierActivityCounterMap.entrySet().stream()
 				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
 
