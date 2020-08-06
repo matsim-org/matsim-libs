@@ -110,7 +110,7 @@ class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener 
 				double penalty = sign * this.observer.getPenaltyCalculator().getPenalty(walkActPair.leg.getDepartureTime(), walkActPair.act.getCoord());
 				walkActPair.leg.setTravelTime(walkActPair.leg.getTravelTime() + penalty);
 				walkActPair.leg.getRoute().setTravelTime(walkActPair.leg.getRoute().getTravelTime() + penalty);
-				walkActPair.act.setStartTime(walkActPair.act.getStartTime().seconds() + penalty);
+				walkActPair.act.setStartTime(walkActPair.act.getStartTime() + penalty);
 			}
 		}
 	}
