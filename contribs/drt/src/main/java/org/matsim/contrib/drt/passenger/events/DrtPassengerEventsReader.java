@@ -34,6 +34,8 @@ import org.xml.sax.SAXException;
 import java.util.Map;
 import java.util.Stack;
 
+import static org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.*;
+
 public final class DrtPassengerEventsReader extends MatsimXmlParser {
 
     private DvrpPassengerEventsReader delegate;
@@ -41,25 +43,25 @@ public final class DrtPassengerEventsReader extends MatsimXmlParser {
     public DrtPassengerEventsReader(EventsManager events) {
         delegate = new DvrpPassengerEventsReader(events);
         this.setValidating(false);
-        delegate.addCustomEventMapper(org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.EVENT_TYPE, getDrtRequestSubmittedEventMapper());
+        delegate.addCustomEventMapper(EVENT_TYPE, getDrtRequestSubmittedEventMapper());
     }
 
-    private MatsimEventsReader.CustomEventMapper<org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent> getDrtRequestSubmittedEventMapper() {
+    private MatsimEventsReader.CustomEventMapper<DrtRequestSubmittedEvent> getDrtRequestSubmittedEventMapper() {
         return event -> {
 
             Map<String, String> attributes = event.getAttributes();
 
-            double time = Double.parseDouble(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_TIME));
-			String mode = attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_MODE);
-			Id<Request> requestId = Id.create(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_REQUEST), Request.class);
-			Id<Person> personId = Id.createPersonId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_PERSON));
-			Id<Link> fromLinkId = Id.createLinkId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_FROM_LINK));
-			Id<Link> toLinkId = Id.createLinkId(attributes.get(DrtRequestSubmittedEvent.ATTRIBUTE_TO_LINK));
+            double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+			String mode = attributes.get(ATTRIBUTE_MODE);
+			Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
+			Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
+			Id<Link> fromLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_FROM_LINK));
+			Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
 
-			double unsharedRideTime = Double.parseDouble(attributes.get(org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.ATTRIBUTE_UNSHARED_RIDE_TIME));
-			double unsharedRideDistance = Double.parseDouble(attributes.get(org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
+			double unsharedRideTime = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_TIME));
+			double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
 
-			return new org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime, unsharedRideDistance);
+			return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime, unsharedRideDistance);
         };
     }
 
