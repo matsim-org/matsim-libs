@@ -195,7 +195,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 
 	private WarmEmissionAnalysisModule setUp() {
-		WarmEmissionAnalysisModule emissionsModule;
+
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
@@ -220,7 +220,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 			}
 		}
 		log.warn( "" );
-//		System.exit( -1);
+
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );

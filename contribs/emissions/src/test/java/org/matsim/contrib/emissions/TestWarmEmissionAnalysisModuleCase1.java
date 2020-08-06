@@ -21,7 +21,6 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -116,7 +115,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	}
 
 	private WarmEmissionAnalysisModule setUp() {
-		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 		TestWarmEmissionAnalysisModule.fillAverageTable( avgHbefaWarmTable );
@@ -321,7 +319,6 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		 */
 
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create( PASSENGER_CAR + ";"+ PETROL_TECHNOLOGY +";"+ PETROL_SIZE_CLASS +";"+ PETROL_CONCEPT, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -394,10 +391,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 
 	}
 
-	
-	//ToDo set to ignore
+
 	@Test
-	@Ignore
 	public void testCounters6(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
@@ -408,8 +403,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Id<Vehicle> inconffVehicleId = Id.create("vehicle 7", Vehicle.class);
 		double inconff = 30. * 1000;
 		double inconffavgSpeed = PETROL_SPEED_FF *2.2;
-		Id<VehicleType> inconffVehicleTypeId = Id.create(
-				PASSENGER_CAR + ";"+ PETROL_TECHNOLOGY +";"+ PETROL_SIZE_CLASS +";"+ PETROL_CONCEPT, VehicleType.class );
+		Id<VehicleType> inconffVehicleTypeId = Id.create(PASSENGER_CAR + ";"+ PETROL_TECHNOLOGY +";"+ PETROL_SIZE_CLASS +";"+ PETROL_CONCEPT, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle inconffVehicle = vehFac.createVehicle(inconffVehicleId, vehFac.createVehicleType(inconffVehicleTypeId));
 		Link inconLink = createMockLink("link incon", inconff, inconffavgSpeed / 3.6 );

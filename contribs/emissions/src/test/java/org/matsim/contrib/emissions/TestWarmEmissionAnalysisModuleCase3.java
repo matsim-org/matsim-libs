@@ -86,8 +86,6 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private boolean excep =false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
-
-	private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
 
 	// emission factors for tables - no duplicates!
@@ -193,7 +191,6 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	}
 
 	private WarmEmissionAnalysisModule setUp() {
-		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 

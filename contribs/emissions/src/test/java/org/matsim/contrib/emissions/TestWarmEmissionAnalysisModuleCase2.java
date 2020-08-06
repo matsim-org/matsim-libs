@@ -91,12 +91,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	//private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
 
-	// emission factors for tables - no duplicates!
-	private static final Double DETAILED_PETROL_FACTOR_FF = .1;
-	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
-	private static final Double DETAILED_SGFF_FACTOR_FF =   .000011;
-	private static final Double DETAILED_SGFF_FACTOR_SG = 	.0000011;
-	private static final Double AVG_PC_FACTOR_FF = 1.;
 	private static final Double AVG_PC_FACTOR_SG = 10.;
 
 	// vehicle information for regular test cases
@@ -252,7 +246,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	}
 
 	private WarmEmissionAnalysisModule setUp() {
-		WarmEmissionAnalysisModule emissionsModule;
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
