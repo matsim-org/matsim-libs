@@ -41,7 +41,6 @@ import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
@@ -77,19 +76,16 @@ public class DrtVehicleOccupancyProfileCalculator
 
 	private final String dvrpMode;
 
-	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, EventsManager events,
-			int timeInterval, QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
+	public DrtVehicleOccupancyProfileCalculator(String dvrpMode, FleetSpecification fleet, int timeInterval,
+			QSimConfigGroup qsimConfig, ImmutableSet<Task.TaskType> passengerServingTaskTypes) {
 		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
-
-		events.addHandler(this);
 
 		if (qsimConfig.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime && qsimConfig.getEndTime()
 				.isDefined()) {
 			analysisEndTime = qsimConfig.getEndTime().seconds();
 		} else {
-			analysisEndTime = fleet.getVehicleSpecifications()
-					.values()
+			analysisEndTime = fleet.getVehicleSpecifications().values()
 					.stream()
 					.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
 					.max()

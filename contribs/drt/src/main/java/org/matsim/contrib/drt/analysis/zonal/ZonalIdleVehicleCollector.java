@@ -42,8 +42,7 @@ public class ZonalIdleVehicleCollector implements ActivityStartEventHandler, Act
 	private final Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
 	private final DrtZonalSystem zonalSystem;
 
-	public ZonalIdleVehicleCollector(EventsManager events, DrtZonalSystem zonalSystem) {
-		events.addHandler(this);
+	public ZonalIdleVehicleCollector(DrtZonalSystem zonalSystem) {
 		this.zonalSystem = zonalSystem;
 		for (String z : zonalSystem.getZones().keySet()) {
 			vehiclesPerZone.put(z, new LinkedList<>());

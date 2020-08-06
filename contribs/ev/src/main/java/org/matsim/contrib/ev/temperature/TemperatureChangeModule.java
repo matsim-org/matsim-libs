@@ -27,8 +27,10 @@ import org.matsim.core.controler.AbstractModule;
 public class TemperatureChangeModule extends AbstractModule {
     @Override
     public void install() {
-        new DynQSimConfigConsistencyChecker().checkConsistency(getConfig());
-        addMobsimListenerBinding().to(TemperatureManager.class).asEagerSingleton();
-        bind(TemperatureService.class).to(TemperatureServiceImpl.class).asEagerSingleton();
-    }
+		new DynQSimConfigConsistencyChecker().checkConsistency(getConfig());
+		addMobsimListenerBinding().to(TemperatureManager.class).asEagerSingleton();
+		bind(TemperatureServiceImpl.class).asEagerSingleton();
+		bind(TemperatureService.class).to(TemperatureServiceImpl.class);
+		addEventHandlerBinding().to(TemperatureServiceImpl.class);
+	}
 }
