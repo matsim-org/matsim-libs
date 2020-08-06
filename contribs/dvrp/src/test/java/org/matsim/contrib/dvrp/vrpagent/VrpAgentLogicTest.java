@@ -54,6 +54,8 @@ public class VrpAgentLogicTest {
 		TYPE
 	}
 
+	private static final String DVRP_MODE = "dvrp_mode";
+
 	private final EventsManager eventsManager = mock(EventsManager.class);
 
 	private final VrpOptimizer optimizer = new VrpOptimizer() {
@@ -78,7 +80,7 @@ public class VrpAgentLogicTest {
 	private final DvrpVehicle vehicle = new DvrpVehicleImpl(vehicleSpecification, startLink);
 
 	private final DynAgentLogic dynAgentLogic = new VrpAgentLogic(optimizer, VrpAgentLogicTest::createAction, vehicle,
-			eventsManager);
+			DVRP_MODE, eventsManager);
 
 	@Test
 	public void testInitialActivity_unplanned() {
@@ -180,10 +182,10 @@ public class VrpAgentLogicTest {
 	}
 
 	private TaskStartedEvent taskStartedEvent(double time, Task task) {
-		return new TaskStartedEvent(time, vehicleSpecification.getId(), task.getTaskType(), task.getTaskIdx());
+		return new TaskStartedEvent(time, DVRP_MODE, vehicleSpecification.getId(), task);
 	}
 
 	private TaskEndedEvent taskEndedEvent(double time, Task task) {
-		return new TaskEndedEvent(time, vehicleSpecification.getId(), task.getTaskType(), task.getTaskIdx());
+		return new TaskEndedEvent(time, DVRP_MODE, vehicleSpecification.getId(), task);
 	}
 }

@@ -24,8 +24,6 @@
 package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -75,7 +73,7 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
 
 		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
-				getter -> new DrtVehicleOccupancyProfileCalculator(getter.getModal(FleetSpecification.class),
+				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
 						getter.get(EventsManager.class), 300, getter.get(QSimConfigGroup.class),
 						nonPassengerServingTaskTypes)));
 
