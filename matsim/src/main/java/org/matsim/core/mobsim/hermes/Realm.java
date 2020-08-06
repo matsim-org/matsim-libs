@@ -103,13 +103,15 @@ public class Realm {
     }
 
     private void advanceAgent(Agent agent) {
-        long centry = agent.currPlan();
-        if (HermesConfigGroup.DEBUG_REALMS)
+        if (HermesConfigGroup.DEBUG_REALMS) {
+            long centry = agent.currPlan();
             log(secs, String.format("agent %d finished %s (prev plan index is %d)", agent.id, Agent.toString(centry), agent.planIndex));
+        }
         agent.planIndex++;
-        long nentry = agent.currPlan();
-        if (HermesConfigGroup.DEBUG_REALMS)
+        if (HermesConfigGroup.DEBUG_REALMS) {
+            long nentry = agent.currPlan();
             log(secs, String.format("agent %d starting %s (new plan index is %d)", agent.id, Agent.toString(nentry), agent.planIndex));
+        }
     }
 
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
