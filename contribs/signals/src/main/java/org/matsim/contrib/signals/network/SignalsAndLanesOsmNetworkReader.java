@@ -53,6 +53,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -112,6 +113,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
 	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
 	private final boolean SAVE_TURN_LANES = false; // add turn info as attribute in lane file
+	private Set<Id<Link>> linksNotMatchingTagsANDnoLanes = new HashSet<>();
 
 	public enum MiddleLaneRestriction {
 		REGULATION_BASED, // all turns are allowed from middle lanes, except u-turns
@@ -162,7 +164,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_07_24";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_07_31";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -251,6 +253,43 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		NetworkSimplifier netsimplify = new NetworkSimplifier();
 		netsimplify.setNodesNotToMerge(signalizedNodes);
 		netsimplify.run(network);
+
+		Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
+
+		for (Id<Link> link : network.getLinks().keySet()){
+			if(link.toString().contains("-")){
+				LOG.info(link);
+				List<String> origLinks = Arrays.asList(link.toString().split("-"));
+				for (String origlink : origLinks){
+					mergedLinks.put(Id.createLinkId(origlink),link);
+				}
+			}
+		}
+		for (Id<Link> link : network.getLinks().keySet()) {
+			if (lanes.getLanesToLinkAssignments().get(link) != null &&
+					lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
+				for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
+					if (lane.getToLinkIds()!=null) {
+						Set<Id<Link>> links2Replace = new HashSet<>();
+						for (Id<Link> toLink : lane.getToLinkIds()) {
+							if (mergedLinks.keySet().contains(toLink)) {
+								Id<Link> merged = mergedLinks.get(toLink);
+								LOG.info("Update ToLink " + toLink.toString() + " of Lane " + lane.getId().toString() + "to merged Link " +
+										merged.toString());
+								links2Replace.add(merged);
+
+							}
+						}
+						if (!links2Replace.isEmpty()) {
+							for (Id<Link> temp : links2Replace) {
+								lane.addToLinkId(temp);
+							}
+						}
+					}
+				}
+			}
+		}
+
 
         /*
          * Clean the Network. Cleaning means removing disconnected components, so that
@@ -443,6 +482,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		//sbraun 07052020 add Network Cleaner here to create plans on the precleaned network
+		//sbraun 07052020 That causes errors
 		LOG.info("Start pre-cleaning network before Creation of the Signal plans.");
 		new NetworkCleaner().run(network);
 
@@ -1820,7 +1860,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// created - useful?************
 	// **************************************************************************************************
 	private void createLanes(final Link l, final Lanes lanes, final double nofLanes) {
-	    //if (nofLanes==0.5) LOG.warn("ACHTUNG"+ l.getId());
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(l.getAttributes().getAttribute(TYPE).toString());
 		LanesFactory factory = lanes.getFactory();
 		LanesToLinkAssignment lanesForLink = factory.createLanesToLinkAssignment(Id.create(l.getId(), Link.class));
@@ -1910,9 +1949,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = 4;
 				} else if (directionsPerLane[j].equals("reverse")) {
 					tempDir = 5;
-				} else if (directionsPerLane[j].equals("none") || //29052020 geändert zu geradeausfahren als default
-						directionsPerLane[j].equals("through") ||
-						directionsPerLane[j].equals("")) {
+				} else if (/*directionsPerLane[j].equals("none") ||*/ //29052020 geändert zu geradeausfahren als default
+						directionsPerLane[j].equals("through") /*|| //TODO sbraun07082020 Geradeausfahren als default ist nicht gut siehe Michelangelonstr,
+						directionsPerLane[j].equals("")*/) {
 					tempDir = 0;
 				} else if (directionsPerLane[j].equals("right")) {
 					tempDir = -1;
@@ -1941,6 +1980,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		Stack<Integer> tempLane = new Stack<Integer>();
 		if(turnLaneStack.size() < nofLanes) LOG.warn("Number of Lanes does not match the number of tags at link"
 				+ id.toString()+"\n Tags:"+turnLaneStack.size()+"\n Lanes: "+nofLanes);
+		this.linksNotMatchingTagsANDnoLanes.add(id);
 		while (turnLaneStack.size() < nofLanes) {
 			tempLane.push(null);
 			turnLaneStack.push(tempLane);
@@ -2265,7 +2305,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 //                    lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
 				} else if (tempLinks.size() == 2) {
-					if (tempDir == -1) { // lane direction: "right"
+					if (tempDir == -1|| tempDir == 99) { // lane direction: "right" //TODO sbraun 31072020 add right direction for 99??
 						for (LinkVector lvec : tempLinks) {
 							if (reverseLink != null && lvec.getLink().getId().equals(reverseLink.getLink().getId())){
 								continue;
@@ -2579,6 +2619,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	private void removeRestrictedLinks(Link fromLink, List<LinkVector> toLinks) {
+		//07082020 sbraun I added a return if only one Link is in the toLinks structure
+		// -> that way the network is still connected
+		if (toLinks.size()== 1){
+			LOG.warn("The Node between ToLink "+toLinks.get(0).getLink().getId().toString()+" and FromLink "+fromLink.getId().toString()+
+					"is restricted. Since there is only one ToLink this one will not be removed to ensure that the network remains connected");
+			return;
+		}
+
 		OsmNode toNode = nodes.get(Long.valueOf(fromLink.getToNode().getId().toString()));
 		for (OsmRelation restriction : osmNodeRestrictions.get(toNode.id)) {
 			if (Long.valueOf(fromLink.getAttributes().getAttribute(ORIG_ID).toString()) == restriction.fromRestricted.id) {
@@ -2902,4 +2950,5 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				return false;
 		}
 	}
+
 }
