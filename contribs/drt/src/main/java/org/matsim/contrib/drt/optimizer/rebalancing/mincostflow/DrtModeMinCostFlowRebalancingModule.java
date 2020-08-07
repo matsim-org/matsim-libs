@@ -140,8 +140,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			bindModal(ZonalIdleVehicleXYVisualiser.class).
 					toProvider(modalProvider(
 							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class),
-									getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
