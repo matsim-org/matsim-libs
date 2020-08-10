@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.hermes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,6 +39,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,6 +47,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -163,7 +166,7 @@ public class StorageCapacityTest {
 	 */
 	@Test
 
-	public void testStorageCapacityWithVaryingPCUs() {
+	public void testStorageCapacityWithDifferentPCUs() {
 		ScenarioImporter.flush();
 		Config config = ConfigUtils.createConfig();
 		config.hermes().setStuckTime(Integer.MAX_VALUE);
@@ -201,6 +204,8 @@ public class StorageCapacityTest {
 			}
 		}
 
+
+
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -214,8 +219,87 @@ public class StorageCapacityTest {
 
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
-		Assert.assertEquals(9, counter3.currentMax);  // the bottleneck link can store 14 vehicles
+		Assert.assertEquals(10, counter3.currentMax);  // the bottleneck link can store 14 vehicles
 		Assert.assertEquals(67, counter2.currentMax); //spillback 100 vehicles
+
+	}
+
+	/**
+	 * Tests that the storage capacity can be reached (but not exceeded) by agents driving over a link, changing vehicles in between. trip is: car -> walk back -> truck for all agents
+	 *
+	 * @author jfbischoff
+	 */
+	@Test
+
+	public void testStorageCapacityWithVaryingPCUs() {
+		ScenarioImporter.flush();
+		Config config = ConfigUtils.createConfig();
+		config.plansCalcRoute().setNetworkModes(Set.of(TransportMode.car, TransportMode.truck));
+		config.hermes().setStuckTime(Integer.MAX_VALUE);
+		config.hermes().setMainModes(Set.of(TransportMode.car, TransportMode.truck));
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		var links = generateNetwork(scenario.getNetwork());
+		VehicleType tractor = VehicleUtils.createVehicleType(Id.create("tractor", VehicleType.class));
+		tractor.setPcuEquivalents(2.0);
+		scenario.getVehicles().addVehicleType(tractor);
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setPcuEquivalents(1.0);
+		scenario.getVehicles().addVehicleType(car);
+
+		for (int i = 1; i <= 1; i++) {
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", links.get(0).getId());
+			a.setEndTime(7 * 3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, links.get(0).getId(), links.get(4).getId());
+			route.setLinkIds(links.get(0).getId(), List.of(links.get(1).getId(), links.get(2).getId(), links.get(3).getId()), links.get(4).getId());
+			leg.setRoute(route);
+
+			Activity b = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", links.get(4).getId());
+			b.setEndTime(15 * 3600 - 1812);
+			Leg leg2 = PopulationUtils.createAndAddLeg(plan, TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg2, TransportMode.walk);
+			Route route2 = new GenericRouteFactory().createRoute(links.get(4).getId(), links.get(0).getId());
+			route2.setTravelTime(3600);
+			route2.setDistance(1000);
+			Activity c = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", links.get(0).getId());
+			c.setEndTime(18 * 3600 - 1812);
+
+			Leg leg3 = PopulationUtils.createAndAddLeg(plan, TransportMode.truck);
+			TripStructureUtils.setRoutingMode(leg3, TransportMode.truck);
+			leg3.setRoute(route);
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", links.get(4).getId());
+
+			scenario.getPopulation().addPerson(person);
+			Vehicle tractorv = VehicleUtils.createVehicle(Id.createVehicleId("truck_" + person.getId().toString()), tractor);
+			scenario.getVehicles().addVehicle(tractorv);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.truck, tractorv.getId()));
+
+			Vehicle carv = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
+			scenario.getVehicles().addVehicle(carv);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, carv.getId()));
+
+		}
+
+
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+
+		VehiclesOnLinkCounter counter3 = new VehiclesOnLinkCounter(links.get(3).getId());
+		events.addHandler(counter3);
+		VehiclesOnLinkCounter counter2 = new VehiclesOnLinkCounter(links.get(2).getId());
+		events.addHandler(counter2);
+		/* run sim */
+		Hermes sim = HermesTest.createHermes(scenario, events, false);
+		sim.run();
+
+		System.out.println(counter3.currentMax);
+		System.out.println(counter2.currentMax);
+		//Assert.assertEquals(10, counter3.currentMax);  // the bottleneck link can store 14 vehicles
+		//Assert.assertEquals(67, counter2.currentMax); //spillback 100 vehicles
 
 	}
 

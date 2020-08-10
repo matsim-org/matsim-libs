@@ -91,7 +91,13 @@ public class HermesTest {
 	}
 
 	protected static Hermes createHermes(Scenario scenario, EventsManager events) {
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		return createHermes(scenario, events, true);
+	}
+
+	protected static Hermes createHermes(Scenario scenario, EventsManager events, boolean prepareForSim) {
+		if (prepareForSim) {
+			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		}
 		return new HermesBuilder().build(scenario, events);
 	}
 

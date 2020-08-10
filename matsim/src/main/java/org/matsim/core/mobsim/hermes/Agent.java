@@ -101,7 +101,7 @@ public class Agent {
 
     protected int eventsIndex;
 
-     // Timestamp of when the agent will be ready to exit link.
+    // Timestamp of when the agent will be ready to exit link.
     protected int linkFinishTime;
 
     // Number of passagers that this agent can take (zero for personal vehicles)
@@ -109,6 +109,9 @@ public class Agent {
 
     // Number of passegers that are currently being transported.
     private int passengersInside;
+
+    private float storageCapacityPCUE = -1;
+    private float flowCapacityPCUE = -1;
 
     // Array of passagers on this vehicle.
     private ArrayList<ArrayList<Agent>> passengersByStop;
@@ -132,14 +135,57 @@ public class Agent {
         return planEntry;
     }
 
-    public int id() { return this.id; }
-    public int linkFinishTime() { return this.linkFinishTime; }
-    public int planIndex() { return this.planIndex; }
-    public PlanArray plan() { return this.plan; }
-    public EventArray events() { return this.events; }
-    public long currPlan() { return this.plan.get(planIndex); }
-    public long prevPlan() { return this.plan.get(planIndex - 1); }
-    public boolean finished() { return planIndex >= (plan.size() - 1); }
+    public int id() {
+        return this.id;
+    }
+
+    public int linkFinishTime() {
+        return this.linkFinishTime;
+    }
+
+    public int planIndex() {
+        return this.planIndex;
+    }
+
+    public PlanArray plan() {
+        return this.plan;
+    }
+
+    public EventArray events() {
+        return this.events;
+    }
+
+    public long currPlan() {
+        return this.plan.get(planIndex);
+    }
+
+    public long prevPlan() {
+        return this.plan.get(planIndex - 1);
+    }
+
+    public long nextPlan() {
+        return this.plan.get(planIndex + 1);
+    }
+
+    public boolean finished() {
+        return planIndex >= (plan.size() - 1);
+    }
+
+    public float getFlowCapacityPCUE() {
+        return flowCapacityPCUE;
+    }
+
+    public void setFlowCapacityPCUE(float flowCapacityPCUE) {
+        this.flowCapacityPCUE = flowCapacityPCUE;
+    }
+
+    public float getStorageCapacityPCUE() {
+        return storageCapacityPCUE;
+    }
+
+    public void setStorageCapacityPCUE(float storageCapacityPCUE) {
+        this.storageCapacityPCUE = storageCapacityPCUE;
+    }
 
     public int capacity() {
         return this.capacity;

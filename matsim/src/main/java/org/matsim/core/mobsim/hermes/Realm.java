@@ -124,7 +124,7 @@ public class Realm {
         // the max(1, ...) ensures that a link hop takes at least on step.
         int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
-        float storageCapacityPCU = si.getStorageCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan()));
+        float storageCapacityPCU = agent.getStorageCapacityPCUE();
         if (next.push(agent,secs,storageCapacityPCU)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
@@ -146,8 +146,17 @@ public class Realm {
     protected boolean processAgentSleepUntil(Agent agent, long planentry) {
         int sleep = Agent.getSleepPlanEntry(planentry);
         add_delayed_agent(agent, Math.max(sleep, secs + 1));
+        updateCapacities(agent);
         advanceAgentandSetEventTime(agent);
         return true;
+    }
+
+    private void updateCapacities(Agent agent) {
+        if (Agent.getPlanHeader(agent.plan.get(agent.planIndex + 2)) == Agent.LinkType) {
+            int category = Agent.getLinkPCEEntry(agent.nextPlan());
+            agent.setStorageCapacityPCUE(si.getStorageCapacityPCE(category));
+            agent.setFlowCapacityPCUE(si.getFlowCapacityPCE(category));
+        }
     }
 
     protected boolean processAgentWait(Agent agent, long planentry) {
@@ -274,15 +283,14 @@ public class Realm {
     protected int processLinks(HLink link) {
         int routed = 0;
         Agent agent = link.queue().peek();
-        while (agent.linkFinishTime <= secs && link.flow(secs,si.getFlowCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan())))) {
+        while (agent.linkFinishTime <= secs && link.flow(secs, agent.getFlowCapacityPCUE())) {
             boolean finished = agent.finished();
             // if finished, install times on last event.
             if (finished) {
                 setEventTime(agent, agent.events().size() - 1, secs, true);
             }
             if (finished || processAgent(agent, link.id())) {
-                int linkPCEEntry1 = Agent.getLinkPCEEntry(agent.currPlan());
-                float storageCapacityPCE = si.getStorageCapacityPCE(linkPCEEntry1);
+                float storageCapacityPCE = agent.getStorageCapacityPCUE();
                 link.pop(storageCapacityPCE);
                 routed += 1;
                 if ((agent = link.queue().peek()) == null) {

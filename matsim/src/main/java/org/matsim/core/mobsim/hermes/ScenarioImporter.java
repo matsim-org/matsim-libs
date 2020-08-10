@@ -383,7 +383,8 @@ public class ScenarioImporter {
 			PlanArray flatplan,
 			EventArray events,
 			Leg leg,
-			NetworkRoute netroute) {
+			NetworkRoute netroute,
+			Agent agent) {
 		var id = person.getId();
 		Id<org.matsim.api.core.v01.network.Link> startLId = netroute.getStartLinkId();
 		Id<org.matsim.api.core.v01.network.Link> endLId = netroute.getEndLinkId();
@@ -395,6 +396,14 @@ public class ScenarioImporter {
 		int velocity = v == null ?
 				HermesConfigGroup.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
 		int egressId = endLId.index();
+
+		//initial capacity setting
+		if (agent.getFlowCapacityPCUE() == -1) {
+			agent.setFlowCapacityPCUE(getFlowCapacityPCE(pcuCategory));
+		}
+		if (agent.getStorageCapacityPCUE() == -1) {
+			agent.setStorageCapacityPCUE(getStorageCapacityPCE(pcuCategory));
+		}
 		events.add(new PersonEntersVehicleEvent(0, id, vid));
 		events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
 		if (netroute.getLinkIds().size() > 1 || !startLId.equals(endLId)) {
@@ -451,7 +460,8 @@ public class ScenarioImporter {
 			Person person,
 			PlanArray flatplan,
 			EventArray events,
-			PlanElement element) {
+			PlanElement element,
+			Agent agent) {
 		var id = person.getId();
 		if (element instanceof Leg) {
 			Leg leg = (Leg) element;
@@ -465,7 +475,7 @@ public class ScenarioImporter {
 			events.add(new PersonDepartureEvent(0, id, route.getStartLinkId(), leg.getMode()));
 			if (route instanceof NetworkRoute) {
 				if (scenario.getConfig().hermes().getMainModes().contains(leg.getMode())) {
-					processPlanNetworkRoute(person, flatplan, events, leg, (NetworkRoute) route);
+					processPlanNetworkRoute(person, flatplan, events, leg, (NetworkRoute) route, agent);
 				} else {
 					processTeleport(id, flatplan, events, (Leg) element, route, mode);
 				}
@@ -641,6 +651,9 @@ public class ScenarioImporter {
 					int hermes_id = hermes_id(v.getId().index(), true);
 					PlanArray plan = hermes_agents[hermes_id].plan();
 					EventArray events = hermes_agents[hermes_id].events();
+					int pcuCategory = deterministicPt ? 0 : vehicleTypeMapping.get(v.getType().getId());
+					hermes_agents[hermes_id].setStorageCapacityPCUE(getStorageCapacityPCE(pcuCategory));
+					hermes_agents[hermes_id].setFlowCapacityPCUE(getFlowCapacityPCE(pcuCategory));
 					generateVehicleTrip(plan, events, tl, tr, depart);
 
 				}
@@ -655,7 +668,7 @@ public class ScenarioImporter {
 			PlanArray plan = hermes_agents[hermes_id].plan();
 			EventArray events = hermes_agents[hermes_id].events();
 			for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
-				processPlanElement(person, plan, events, element);
+				processPlanElement(person, plan, events, element, hermes_agents[hermes_id]);
 			}
 		});
 	}
