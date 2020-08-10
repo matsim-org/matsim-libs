@@ -359,7 +359,7 @@ public class ScenarioImporter {
 
 		// hack to avoid a actstart as first event (hermes does not have it).
 		if (flatplan.size() != 0) {
-			events.add(new ActivityStartEvent(0, id, linkid, facid, type));
+			events.add(new ActivityStartEvent(0, id, linkid, facid, type, act.getCoord()));
 			eventid = events.size() - 1;
 		} else {
 			eventid = 0;
