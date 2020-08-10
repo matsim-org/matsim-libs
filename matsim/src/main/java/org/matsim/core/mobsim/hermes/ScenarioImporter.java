@@ -710,7 +710,7 @@ public class ScenarioImporter {
 		return flowCapacityPCEs[index];
 	}
 
-	public double getStorageCapacityPCE(int index) {
+	public float getStorageCapacityPCE(int index) {
 		return storageCapacityPCEs[index];
 	}
 }

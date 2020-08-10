@@ -22,13 +22,14 @@ import java.util.Iterator;
 
 public class HLink {
 
-	private double currentCapacity;
+	private float currentCapacity;
 	private final int initialCapacity;
 
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
 	// Java's implementation of ArrayDequeue.
 	public class AgentQueue implements Iterable<Agent> {
+
 		// the storage
 		private Agent[] array;
 		// the max capacity of the queue
@@ -166,21 +167,20 @@ public class HLink {
         this.currentCapacity = capacity;
         this.flowLeftInTimestep = flowCapacityperSecond;
 
+		// We do not preallocate using the capacity because it leads to huge memory waste.
+		//this.queue = new AgentQueue(Math.max(1, capacity));
+		this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
+	}
 
-        // We do not preallocate using the capacity because it leads to huge memory waste.
-        //this.queue = new AgentQueue(Math.max(1, capacity));
-        this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
-    }
+	public void reset() {
+		queue.clear();
+		this.nextFreeFlowSlot = 0;
+	}
 
-    public void reset() {
-    	queue.clear();
-    	this.nextFreeFlowSlot = 0;
-    }
-
-	public boolean push(Agent agent, int timestep, double storageCapacityPCU) {
+	public boolean push(Agent agent, int timestep, float storageCapacityPCU) {
 		//avoid long vehicles not being able to enter a short link
-    	double effectiveStorageCapacity = Math.min(storageCapacityPCU,initialCapacity);
-    	if (currentCapacity - effectiveStorageCapacity >= 0) {
+		float effectiveStorageCapacity = Math.min(storageCapacityPCU, initialCapacity);
+		if (currentCapacity - effectiveStorageCapacity >= 0) {
 			if (queue.push(agent)) {
 				lastPush = timestep;
 				currentCapacity = currentCapacity - effectiveStorageCapacity;
@@ -198,10 +198,10 @@ public class HLink {
 		}
 	}
 
-    public void pop(double storageCapacityPCE) {
-        queue.pop();
-        currentCapacity += storageCapacityPCE;
-    }
+	public void pop(float storageCapacityPCE) {
+		queue.pop();
+		currentCapacity += storageCapacityPCE;
+	}
 
     public int nexttime () {
         if (queue.size() == 0) {

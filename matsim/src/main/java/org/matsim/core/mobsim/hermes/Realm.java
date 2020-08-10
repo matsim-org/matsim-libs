@@ -124,7 +124,7 @@ public class Realm {
         // the max(1, ...) ensures that a link hop takes at least on step.
         int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
-        double storageCapacityPCU = si.getStorageCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan()));
+        float storageCapacityPCU = si.getStorageCapacityPCE(Agent.getLinkPCEEntry(agent.currPlan()));
         if (next.push(agent,secs,storageCapacityPCU)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
@@ -282,7 +282,7 @@ public class Realm {
             }
             if (finished || processAgent(agent, link.id())) {
                 int linkPCEEntry1 = Agent.getLinkPCEEntry(agent.currPlan());
-                double storageCapacityPCE = si.getStorageCapacityPCE(linkPCEEntry1);
+                float storageCapacityPCE = si.getStorageCapacityPCE(linkPCEEntry1);
                 link.pop(storageCapacityPCE);
                 routed += 1;
                 if ((agent = link.queue().peek()) == null) {
