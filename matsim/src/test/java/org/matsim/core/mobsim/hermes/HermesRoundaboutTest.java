@@ -45,7 +45,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
@@ -70,10 +69,9 @@ public class HermesRoundaboutTest {
 		ScenarioImporter.flush();
 		final Config config = createConfig();
 		config.controler().setMobsim("hermes");
-		//		config.controler().setMobsim("qsim");
-
 		config.parallelEventHandling().setOneThreadPerHandler(true);
-		MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+
 		buildRoundaboutNetwork(scenario);
 		buildPopulation(scenario);
 		final int[] eventsCount = new int[2];
@@ -82,7 +80,7 @@ public class HermesRoundaboutTest {
 		controler.getEvents().addHandler((LinkLeaveEventHandler) event -> eventsCount[1]++);
 		controler.run();
 		//400 agents with 3 legs each (incl. access/egress)
-		Assert.equals(1200,eventsCount[0]);
+		Assert.equals(1200, eventsCount[0]);
 		//400 agents each traveling on 7 links
 		Assert.equals(7*400,eventsCount[1]);
 	}
@@ -115,34 +113,40 @@ public class HermesRoundaboutTest {
 	}
 
 	private void buildPopulation(Scenario scenario) {
-		List<Tuple<Coord,Coord>> startEndRelations = List.of(new Tuple<>(A_START,D_START),new Tuple<>(B_START,A_START),new Tuple<>(C_START,B_START),new Tuple<>(D_START,C_START));
+		List<Tuple<Coord, Coord>> startEndRelations = List.of(new Tuple<>(A_START, D_START), new Tuple<>(B_START, A_START), new Tuple<>(C_START, B_START), new Tuple<>(D_START, C_START));
 
-		VehicleType av = VehicleUtils.createVehicleType(Id.create("av",VehicleType.class));
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
 		av.setFlowEfficiencyFactor(2.0);
 		av.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(av);
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		scenario.getVehicles().addVehicleType(car);
 
 		final PopulationFactory factory = scenario.getPopulation().getFactory();
 		int a = 0;
-		for (var startEndRelation :  startEndRelations){
-			for (int i = 0; i <100 ; i++) {
-				Person p = factory.createPerson(Id.createPersonId(a+"_"+i));
+		for (var startEndRelation : startEndRelations) {
+			for (int i = 0; i < 100; i++) {
+				Person p = factory.createPerson(Id.createPersonId(a + "_" + i));
 				scenario.getPopulation().addPerson(p);
 				Plan plan = factory.createPlan();
 				p.addPlan(plan);
-				Activity h = factory.createActivityFromCoord("home",startEndRelation.getFirst());
-				h.setEndTime(8*3600+i);
+				Activity h = factory.createActivityFromCoord("home", startEndRelation.getFirst());
+				h.setEndTime(8 * 3600 + i);
 				Leg l = factory.createLeg(TransportMode.car);
-				Activity w = factory.createActivityFromCoord("work",startEndRelation.getSecond());
+				Activity w = factory.createActivityFromCoord("work", startEndRelation.getSecond());
 				plan.addActivity(h);
 				plan.addLeg(l);
 				plan.addActivity(w);
-				if (a == 3){
+				Vehicle vehicle;
+				if (a == 3) {
 					// a single branch gets a super flowy AV
-					Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()),av);
-					scenario.getVehicles().addVehicle(vehicle);
-					VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(TransportMode.car,vehicle.getId()));
+					vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()), av);
+
+				} else {
+					vehicle = VehicleUtils.createVehicle(Id.createVehicleId(p.getId()), car);
 				}
+				scenario.getVehicles().addVehicle(vehicle);
+				VehicleUtils.insertVehicleIdsIntoAttributes(p, Map.of(TransportMode.car, vehicle.getId()));
 			}
 			a++;
 		}

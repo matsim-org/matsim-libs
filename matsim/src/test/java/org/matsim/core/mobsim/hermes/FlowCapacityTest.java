@@ -189,14 +189,18 @@ public class FlowCapacityTest {
 		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
 		av.setFlowEfficiencyFactor(2.0);
 		f.scenario.getVehicles().addVehicleType(av);
+
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setFlowEfficiencyFactor(1.0);
+		f.scenario.getVehicles().addVehicleType(car);
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 12000; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			a.setEndTime(7 * 3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -204,11 +208,10 @@ public class FlowCapacityTest {
 			f.scenario.getPopulation().addPerson(person);
 
 			//every second plan gets a super flowy AV
-			if (i%2==1){
-				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()),av);
-				f.scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car,vehicle.getId()));
-			}
+			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
+			f.scenario.getVehicles().addVehicle(vehicle);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+
 		}
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
@@ -251,15 +254,20 @@ public class FlowCapacityTest {
 		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
 		av.setFlowEfficiencyFactor(2.0);
 		f.scenario.getVehicles().addVehicleType(av);
+
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setFlowEfficiencyFactor(1.0);
+		f.scenario.getVehicles().addVehicleType(car);
+
 		f.config.hermes().setFlowCapacityFactor(0.1);
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 1200; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
-			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			a.setEndTime(7 * 3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -267,11 +275,9 @@ public class FlowCapacityTest {
 			f.scenario.getPopulation().addPerson(person);
 
 			//every second plan gets a super flowy AV
-			if (i%2==1){
-				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()),av);
-				f.scenario.getVehicles().addVehicle(vehicle);
-				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car,vehicle.getId()));
-			}
+			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
+			f.scenario.getVehicles().addVehicle(vehicle);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
 		}
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
