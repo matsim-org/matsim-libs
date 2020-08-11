@@ -22,52 +22,43 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
-import java.util.Collections;
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 /**
- * Approximates population size per zone by counting first activites per zone in the selected plans.
- * Should lead lead to rebalancing target values dependent on number of inhabitants.
+ * Calculates population size per zone by counting first activites per zone in the selected plans.
+ * Returns the share of population of the total population inside the drt service area for the given zone multiplied with the overall fleet size.
+ * Should lead lead to rebalancing target values dependent on number of inhabitants (in vehicle units).
  *
  * @author tschlenther
  */
-public final class FirstActivityCountAsZonalDemandAggregator implements ZonalDemandAggregator {
+public final class FleetSizeWeightedByPopulationShareDemandAggregator implements ZonalDemandAggregator {
 
-	private static Logger log = Logger.getLogger(FirstActivityCountAsZonalDemandAggregator.class);
+	private static Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandAggregator.class);
 
 	private final DrtZonalSystem zonalSystem;
-	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
-	private Map<String, Integer> zonalDemand = new HashMap<>();
-	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
-	private static final MutableInt ZERO =  new MutableInt(0);
+	private Map<String, Integer> activitiesPerZone = new HashMap<>();
+	private final int fleetSize;
+	private Integer totalNrActivities;
 
-	public FirstActivityCountAsZonalDemandAggregator(DrtZonalSystem zonalSystem, Population population) {
+	public FleetSizeWeightedByPopulationShareDemandAggregator(DrtZonalSystem zonalSystem, Population population, @NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
+		this.fleetSize = fleetSpecification.getVehicleSpecifications().size();
 	}
 
 	private void countFirstActsPerZone(Population population) {
 		log.info("start counting how many first activities each rebalancing zone has");
 		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons().size());
-		log.info("this might take a while...");
 
 		population.getPersons().values().stream()
 				.map(person -> person.getSelectedPlan().getPlanElements().get(0))
@@ -76,21 +67,22 @@ public final class FirstActivityCountAsZonalDemandAggregator implements ZonalDem
 					Activity activity = (Activity) element;
 					String zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
 					if (zone != null){
-						Integer oldDemandValue = this.zonalDemand.get(zone);
-						this.zonalDemand.put(zone, oldDemandValue + 1);
+						Integer oldDemandValue = this.activitiesPerZone.get(zone);
+						this.activitiesPerZone.put(zone, oldDemandValue + 1);
 					}
 				});
 
-		log.info("nr of persons that have their first activity inside the service area = " + this.zonalDemand.values().stream().collect(Collectors.summingInt(Integer::intValue)));
+		this.totalNrActivities = this.activitiesPerZone.values().stream().collect(Collectors.summingInt(Integer::intValue));
+		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
-		return zoneId -> this.zonalDemand.getOrDefault(zoneId, 0).intValue();
+		return zoneId -> ( this.activitiesPerZone.getOrDefault(zoneId, 0).intValue() / totalNrActivities ) * fleetSize;
 	}
 
 	private void prepareZones() {
 		for (String zone : zonalSystem.getZones().keySet()) {
-			zonalDemand.put(zone, 0);
+			activitiesPerZone.put(zone, 0);
 		}
 	}
 

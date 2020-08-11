@@ -42,7 +42,7 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public enum ZonalDemandAggregatorType {PreviousIteration,
 		TimeDependentActivityBased,
 		EqualVehicleDensity,
-		FirstActivityCount}
+		FleetSizeWeightedByPopulationShare}
 
 	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
 
