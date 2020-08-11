@@ -111,11 +111,10 @@ public class FlowCapacityTest {
 		System.out.println("#vehicles 7-8: " + volume[7]);
 		System.out.println("#vehicles 8-9: " + volume[8]);
 
-
-		Assert.assertEquals(0, volume[5]);    // no vehicles
-		Assert.assertEquals(3004, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(6000, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(2996, volume[8]); // all the rest
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(3004, volume[6], 1);  // we should have half of the maximum flow in this hour
+		Assert.assertEquals(6000, volume[7], 1);  // we should have maximum flow in this hour
+		Assert.assertEquals(2996, volume[8], 1);  // all the rest
 
 	}
 
@@ -161,7 +160,7 @@ public class FlowCapacityTest {
 		System.out.println("#vehicles 6-7: " + volume1[6]);
 		System.out.println("#vehicles 7-8: " + volume1[7]);
 		System.out.println("#vehicles 8-9: " + volume1[8]);
-	int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
 		System.out.println("#vehicles 3-4: " + volume[3]);
 		System.out.println("#vehicles 4-5: " + volume[4]);
 		System.out.println("#vehicles 5-6: " + volume[5]);
@@ -169,11 +168,10 @@ public class FlowCapacityTest {
 		System.out.println("#vehicles 7-8: " + volume[7]);
 		System.out.println("#vehicles 8-9: " + volume[8]);
 
-
-		Assert.assertEquals(0, volume[5]);    // no vehicles
-		Assert.assertEquals(301, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(600, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(299, volume[8]); // all the rest
+		Assert.assertEquals(0, volume[5], 1);     // no vehicles
+		Assert.assertEquals(301, volume[6], 1);  // we should have half of the maximum flow in this hour
+		Assert.assertEquals(600, volume[7], 1);  // we should have maximum flow in this hour
+		Assert.assertEquals(299, volume[8], 1);  // all the rest
 
 	}
 
@@ -294,11 +292,10 @@ public class FlowCapacityTest {
 		System.out.println("#vehicles 7-8: " + volume[7]);
 		System.out.println("#vehicles 8-9: " + volume[8]);
 
-
-		Assert.assertEquals(0, volume[5]);    // no vehicles
-		Assert.assertEquals(401, volume[6]); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
-		Assert.assertEquals(799, volume[7]); // all the rest
-		Assert.assertEquals(0, volume[8]); // nothing
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(401, volume[6], 1); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
+		Assert.assertEquals(799, volume[7], 1);  // all the rest
+		Assert.assertEquals(0, volume[8], 1);  // nothing
 	}
 
 	/**
@@ -355,12 +352,11 @@ public class FlowCapacityTest {
 		System.out.println("#vehicles 6-7: " + volume[6]);
 		System.out.println("#vehicles 7-8: " + volume[7]);
 		System.out.println("#vehicles 8-9: " + volume[8]);
-		Assert.assertEquals(0, volume[5]);    // no vehicles
-		Assert.assertEquals(201, volume[6]); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
-		Assert.assertEquals(400, volume[7]);
-		Assert.assertEquals(400, volume[8]);
-		Assert.assertEquals(199, volume[9]);
-
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(201, volume[6], 1); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
+		Assert.assertEquals(400, volume[7], 1);
+		Assert.assertEquals(400, volume[8], 1);
+		Assert.assertEquals(199, volume[9], 1);
 
 	}
 
