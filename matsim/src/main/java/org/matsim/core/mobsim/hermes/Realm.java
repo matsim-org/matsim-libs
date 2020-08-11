@@ -152,6 +152,9 @@ public class Realm {
     }
 
     private void updateCapacities(Agent agent) {
+        if (agent.plan.size < agent.planIndex + 3) {
+            return;
+        }
         if (Agent.getPlanHeader(agent.plan.get(agent.planIndex + 2)) == Agent.LinkType) {
             int category = Agent.getLinkPCEEntry(agent.nextPlan());
             agent.setStorageCapacityPCUE(si.getStorageCapacityPCE(category));
