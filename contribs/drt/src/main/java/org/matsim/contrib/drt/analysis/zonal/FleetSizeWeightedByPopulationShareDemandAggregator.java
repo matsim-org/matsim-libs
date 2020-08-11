@@ -77,7 +77,8 @@ public final class FleetSizeWeightedByPopulationShareDemandAggregator implements
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
-		return zoneId -> ( this.activitiesPerZone.getOrDefault(zoneId, 0).intValue() / totalNrActivities ) * fleetSize;
+		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
+		return zoneId ->  (int) Math.floor( ( this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities ) * fleetSize);
 	}
 
 	private void prepareZones() {
