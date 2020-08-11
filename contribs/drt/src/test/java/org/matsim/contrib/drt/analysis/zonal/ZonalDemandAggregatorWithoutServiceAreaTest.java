@@ -132,8 +132,8 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void FirstActivityCountAsZonalDemandAggregatorTest(){
-		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.FirstActivityCount, "");
+	public void FleetSizeWeightedByPopulationShareDemandAggregatorTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.FleetSizeWeightedByPopulationShare, "");
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
 		for(double ii = 0; ii < 16 * 3600; ii+=1800){

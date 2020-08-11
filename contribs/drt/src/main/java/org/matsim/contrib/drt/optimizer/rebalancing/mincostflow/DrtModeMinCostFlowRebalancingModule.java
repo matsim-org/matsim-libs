@@ -33,7 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.EqualVehicleDensityZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.FirstActivityCountAsZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.FleetSizeWeightedByPopulationShareDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.TimeDependentActivityBasedZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
@@ -121,14 +121,16 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
 				break;
 			case EqualVehicleDensity:
+				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+								getter.getModal(FleetSpecification.class))));
 				break;
-			case FirstActivityCount:
+			case FleetSizeWeightedByPopulationShare:
+				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new FirstActivityCountAsZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.get(Population.class)))).asEagerSingleton();
+						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.get(Population.class), getter.getModal(FleetSpecification.class))));
 				break;
 			default:
 				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="
