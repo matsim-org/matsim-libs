@@ -187,11 +187,14 @@ public class Agent {
         this.storageCapacityPCUE = storageCapacityPCUE;
     }
 
-    public int capacity() {
+    /*
+     *Number of passagers that this agent can take (zero for personal vehicles)
+     */
+    public int getCapacity() {
         return this.capacity;
     }
 
-    public boolean isVehicle() {
+    public boolean isTransitVehicle() {
         return this.passengersByStop == null;
     }
 

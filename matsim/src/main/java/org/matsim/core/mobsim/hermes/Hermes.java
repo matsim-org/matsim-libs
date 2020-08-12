@@ -52,8 +52,8 @@ public final class Hermes implements Mobsim {
         eventsManager.processEvents(realm.getSortedEvents());
 
 		for (Agent agent : agents) {
-			if (agent != null && !agent.finished() && !agent.isVehicle()) {
-				int matsim_id = si.matsim_id(agent.id(),  false);
+			if (agent != null && !agent.finished() && !agent.isTransitVehicle()) {
+				int matsim_id = si.matsim_id(agent.id(), false);
 				eventsManager.processEvent(
 						new PersonStuckEvent(
 								HermesConfigGroup.SIM_STEPS, Id.get(matsim_id, Person.class), Id.createLinkId("0"), "zero"));

@@ -122,28 +122,14 @@ public class ScenarioImporter {
 	}
 
 	private void generateVehicleCategories() {
-		int vehicleTypes = scenario.getVehicles().getVehicleTypes().size() + (deterministicPt ? 1 : scenario.getTransitVehicles().getVehicleTypes().size());
+		int vehicleTypes = scenario.getVehicles().getVehicleTypes().size();
 		if (vehicleTypes >= HermesConfigGroup.MAX_VEHICLE_PCETYPES) {
 			throw new RuntimeException(
-					"Too many vehicle types defined. A maximum of " + HermesConfigGroup.MAX_VEHICLE_PCETYPES + " is supported. Try using deterministic PT or reduce the number of vehicle types.");
+					"Too many vehicle types defined. A maximum of " + HermesConfigGroup.MAX_VEHICLE_PCETYPES + " is supported.");
 		}
 		flowCapacityPCEs = new float[vehicleTypes];
 		storageCapacityPCEs = new float[vehicleTypes];
 		int i = 0;
-		if (deterministicPt) {
-			flowCapacityPCEs[i] = 1;
-			storageCapacityPCEs[i] = 1;
-			i++;
-		} else {
-			for (VehicleType t : scenario.getTransitVehicles().getVehicleTypes().values()) {
-				//deliberately now scaling of capacities here, as pt frequencies are not usually reduced
-				flowCapacityPCEs[i] = (float) (t.getPcuEquivalents() * t.getFlowEfficiencyFactor());
-				storageCapacityPCEs[i] = (float) t.getPcuEquivalents();
-				vehicleTypeMapping.put(t.getId(), i);
-				i++;
-			}
-		}
-
 		for (VehicleType t : scenario.getVehicles().getVehicleTypes().values()) {
 			//downscaling of vehicles = Upscaling of PCUs
 			flowCapacityPCEs[i] = (float) (t.getPcuEquivalents() / (t.getFlowEfficiencyFactor() * scenario.getConfig().hermes().getFlowCapacityFactor()));
@@ -552,7 +538,8 @@ public class ScenarioImporter {
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
 		int endid = nr.getEndLinkId().index();
-		int pcuCategory = deterministicPt ? 0 : vehicleTypeMapping.get(v.getType().getId());
+		int pcuCategory = 0;
+		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
 		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
 		List<Double> averageSpeedbetweenStops = calculateSpeedsBetweenStops(tr);
 		int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
@@ -652,6 +639,7 @@ public class ScenarioImporter {
 					PlanArray plan = hermes_agents[hermes_id].plan();
 					EventArray events = hermes_agents[hermes_id].events();
 					int pcuCategory = deterministicPt ? 0 : vehicleTypeMapping.get(v.getType().getId());
+					//for pt vehicles, storage and flow capacities are never updated
 					hermes_agents[hermes_id].setStorageCapacityPCUE(getStorageCapacityPCE(pcuCategory));
 					hermes_agents[hermes_id].setFlowCapacityPCUE(getFlowCapacityPCE(pcuCategory));
 					generateVehicleTrip(plan, events, tl, tr, depart);
