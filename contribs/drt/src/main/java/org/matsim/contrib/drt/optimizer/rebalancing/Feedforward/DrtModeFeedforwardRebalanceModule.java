@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
@@ -45,6 +46,7 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
  * @author michalm, Chengqi Lu
  */
 public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
+	private static final Logger log = Logger.getLogger(DrtModeFeedforwardRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModeFeedforwardRebalanceModule(DrtConfigGroup drtCfg) {
@@ -54,7 +56,7 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		System.out.println("Feedforward Rebalancing Strategy is now being installed!");
+		log.info("Feedforward Rebalancing Strategy is now being installed!");
 		FeedforwardRebalancingParams params = drtCfg.getFeedforwardRebalancing().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
@@ -83,37 +85,36 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class)
-						.toProvider(modalProvider(
-								getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-										getter.getModal(Fleet.class), getter.getModal(Network.class), params)))
+				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
+						getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(Fleet.class), getter.getModal(Network.class), params,
+								getter.getModal(FeedforwardSignalHandler.class))))
 						.asEagerSingleton();
-				
-
 			}
 		});
 
-		
-		//Create PreviousIterationDepartureRecoder (this will be created only once)
-		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
-				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), params,
-						getter.get(EventsManager.class))))
+		// Create PreviousIterationDepartureRecoder (this will be created only once)
+		bindModal(FeedforwardSignalHandler.class)
+				.toProvider(modalProvider(getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class),
+						params, getter.get(EventsManager.class))))
 				.asEagerSingleton();
-		
+
 		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));
-		
+
 		{
-			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-			bindModal(ZonalIdleVehicleXYVisualiser.class).
-					toProvider(modalProvider(
-							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			// this is rather analysis - but depends on DrtZonalSystem so it can not be
+			// moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			bindModal(ZonalIdleVehicleXYVisualiser.class).toProvider(
+					modalProvider(getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+							drtCfg.getMode(), getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
-			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			bindModal(DrtZonalWaitTimesAnalyzer.class)
+					.toProvider(modalProvider(getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
+							getter.getModal(DrtRequestAnalyzer.class), getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 		}

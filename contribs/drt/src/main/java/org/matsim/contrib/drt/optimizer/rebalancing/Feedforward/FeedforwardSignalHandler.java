@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -23,10 +24,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler,
 		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
+	private static final Logger log = Logger.getLogger(FeedforwardSignalHandler.class);
 	private final DrtZonalSystem zonalSystem;
 
 	private final Map<Double, Map<String, MutableInt>> zoneNetDepartureMap = new HashMap<>();
-	private final static Map<Double, List<Triple<String, String, Integer>>> REBALANCE_PLAN_CORE = new HashMap<>();
+	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore = new HashMap<>();
 	private final Map<Id<Person>, Triple<Double, String, String>> potentialDRTTripsMap = new HashMap<>();
 	
 	private final int timeBinSize;
@@ -77,8 +79,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 
 	@Override
 	public void reset(int iteration) {
-		System.out.println("resetting: iteration number = " + Integer.toString(iteration));
-		if (iteration > 0) { // TODO if reset is not called at iteration 0, then we can remove this check
+		if (iteration > 0) { 
 			calculateRebalancePlan(true);
 		} else {
 			calculateRebalancePlan(false);
@@ -87,7 +88,6 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	}
 
 	private void prepareZoneNetDepartureMap() {
-		System.out.println("Now preparing the Departure recorder");
 		for (int i = 0; i < (3600 / timeBinSize) * simulationEndTime; i++) {
 			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
 			for (String zone : zonalSystem.getZones().keySet()) {
@@ -98,10 +98,10 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	}
 
 	private void calculateRebalancePlan(boolean calculateOrNot) {
-		REBALANCE_PLAN_CORE.clear();
+		rebalancePlanCore.clear();
 		int progressCounter = 0;
 		if (calculateOrNot) {
-			System.out.println("Start calculating rebalnace plan now");
+			log.info("Start calculating rebalnace plan now");
 			for (double timeBin : zoneNetDepartureMap.keySet()) {
 				List<Pair<String, Integer>> supply = new ArrayList<>();
 				List<Pair<String, Integer>> demand = new ArrayList<>();
@@ -115,12 +115,12 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 				}
 				List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
 						this::calcStraightLineDistance).solve(supply, demand);
-				REBALANCE_PLAN_CORE.put(timeBin, interZonalRelocations);
+				rebalancePlanCore.put(timeBin, interZonalRelocations);
 				progressCounter += 1;
-				System.out.println("Calculating: "
+				log.info("Calculating: "
 						+ Double.toString(progressCounter * timeBinSize / simulationEndTime / 36) + "% complete");
 			}
-			System.out.println("Rebalance plan calculation is now complete! ");
+			log.info("Rebalance plan calculation is now complete! ");
 		} 
 	}
 
@@ -129,8 +129,8 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 				zonalSystem.getZoneCentroid(zone2));
 	}
 
-	public static Map<Double, List<Triple<String, String, Integer>>> getRebalancePlanCore() {
-		return REBALANCE_PLAN_CORE;
+	public Map<Double, List<Triple<String, String, Integer>>> getRebalancePlanCore() {
+		return rebalancePlanCore;
 	}
 
 }

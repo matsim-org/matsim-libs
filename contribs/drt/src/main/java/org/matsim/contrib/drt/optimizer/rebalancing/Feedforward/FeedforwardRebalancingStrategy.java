@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Triple;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -27,6 +28,8 @@ import org.matsim.core.network.NetworkUtils;
  *         this strategy function properly.
  */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
+	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
+	
 	private final DrtZonalSystem zonalSystem;
 	private final FeedforwardRebalancingParams params;
 	private final Network network;
@@ -49,7 +52,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	// 3. Make the strength of feedforward signal adjustable (e.g. from 0% - 100%). 
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
-			FeedforwardRebalancingParams params) {
+			FeedforwardRebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
 		this.network = network;
 		this.zonalSystem = zonalSystem;
 		this.params = params;
@@ -59,13 +62,13 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		scale = rebalanceInterval / timeBinSize;
 
-		rebalancePlanCore = FeedforwardSignalHandler.getRebalancePlanCore();
+		rebalancePlanCore = feedforwardSignalHandler.getRebalancePlanCore();
 	}
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		// assign rebalnace vehicles based on the rebalance plan
-		System.out.println("Rebalance fleet now: Feedforward Rebalancing Strategy is used");
+		log.info("Rebalance fleet now: Feedforward Rebalancing Strategy is used");
 
 		double timeBin = Math.floor(time / timeBinSize);
 		List<Relocation> relocationList = new ArrayList<>();
