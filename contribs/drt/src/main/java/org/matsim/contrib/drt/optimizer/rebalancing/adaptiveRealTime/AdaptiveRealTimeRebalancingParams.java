@@ -59,20 +59,9 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 			"Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
 					+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)";
 
-	public static final String TARGET_ALPHA = "targetAlpha";
-	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
-
-	public static final String TARGET_BETA = "targetBeta";
-	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
-
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
 			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
-
-	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be either PreviousIterationZonalDemandAggregator, ActivityLocationBasedZonalDemandAggregator or EqualVehicleDensityZonalDemandAggregator";
 
 	public static final String REBALANCING_ZONES_GENERATION = "rebalancingZonesGeneration";
 	static final String REBALANCING_ZONES_GENERATION_EXP = "Logic for generation of zones for demand estimation while rebalancing. Value can be GridFromNetwork or ShapeFile Default is GridFromNetwork";
@@ -80,7 +69,6 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 	private static final String REBALANCING_ZONES_SHAPE_FILE = "rebalancingZonesShapeFile";
 	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
-
 
 	@Positive
 	private int interval = 1800;// [s]
@@ -91,17 +79,8 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 	@PositiveOrZero
 	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
 
-	@PositiveOrZero
-	private double targetAlpha = Double.NaN;
-
-	@PositiveOrZero
-	private double targetBeta = Double.NaN;
-
 	@Positive
 	private double cellSize = Double.NaN;// [m]
-
-	@NotNull
-	private AdaptiveRealTimeRebalancingParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIterationZonalDemandAggregator;
 
 	@NotNull
 	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;
@@ -138,10 +117,7 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 		map.put(INTERVAL, INTERVAL_EXP);
 		map.put(MIN_SERVICE_TIME, MIN_SERVICE_TIME_EXP);
 		map.put(MAX_TIME_BEFORE_IDLE, MAX_TIME_BEFORE_IDLE_EXP);
-		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
-		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(CELL_SIZE, CELL_SIZE_EXP);
-		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
 		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
 		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		return map;
@@ -196,38 +172,6 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 	}
 
 	/**
-	 * @return -- {@value #TARGET_ALPHA_EXP}
-	 */
-	@StringGetter(TARGET_ALPHA)
-	public double getTargetAlpha() {
-		return targetAlpha;
-	}
-
-	/**
-	 * @param targetAlpha -- {@value #TARGET_ALPHA_EXP}
-	 */
-	@StringSetter(TARGET_ALPHA)
-	public void setTargetAlpha(double targetAlpha) {
-		this.targetAlpha = targetAlpha;
-	}
-
-	/**
-	 * @return -- {@value #TARGET_BETA_EXP}
-	 */
-	@StringGetter(TARGET_BETA)
-	public double getTargetBeta() {
-		return targetBeta;
-	}
-
-	/**
-	 * @param targetBeta -- {@value #TARGET_BETA_EXP}
-	 */
-	@StringSetter(TARGET_BETA)
-	public void setTargetBeta(double targetBeta) {
-		this.targetBeta = targetBeta;
-	}
-
-	/**
 	 * @return -- {@value #CELL_SIZE_EXP}
 	 */
 	@StringGetter(CELL_SIZE)
@@ -242,20 +186,6 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 	public void setCellSize(double cellSize) {
 		this.cellSize = cellSize;
 	}
-
-	/**
-	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
-	 */
-	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public ZonalDemandAggregatorType getZonalDemandAggregatorType() {
-		return zonalDemandAggregatorType;
-	}
-
-	/**
-	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
-	 */
-	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public void setZonalDemandAggregatorType(ZonalDemandAggregatorType aggregatorType) { this.zonalDemandAggregatorType = aggregatorType; }
 
 	/**
 	 * @return -- {@value #REBALANCING_ZONES_GENERATION_EXP}

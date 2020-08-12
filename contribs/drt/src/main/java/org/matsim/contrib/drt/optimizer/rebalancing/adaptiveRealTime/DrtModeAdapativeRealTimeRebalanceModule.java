@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
@@ -48,8 +49,9 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
  * @author michalm, Chengqi Lu
  */
 public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeModule {
+	private static final Logger log = Logger.getLogger(DrtModeAdapativeRealTimeRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
-
+	
 	public DrtModeAdapativeRealTimeRebalanceModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
@@ -57,7 +59,7 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 
 	@Override
 	public void install() {
-		System.out.println("Adaptive Real Time Rebalancing Algorithm is now being installed!");
+		log.info("Adaptive Real Time Rebalancing Algorithm is now being installed!");
 		AdaptiveRealTimeRebalancingParams params = drtCfg.getAdaptiveRealTimeRebalancing().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
@@ -89,7 +91,7 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new AdaptiveRealTimeRebalncingStrategy(getter.getModal(DrtZonalSystem.class),
 								getter.getModal(Fleet.class), getter.getModal(MinCostRelocationCalculator.class),
-								params)))
+								params, getter.getModal(InactiveZoneIdentifier.class))))
 						.asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class)
@@ -98,6 +100,15 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 						.asEagerSingleton();
 			}
 		});
+		
+		//Create Inactive Zone remover (this will be created only once)
+		bindModal(InactiveZoneIdentifier.class).toProvider(modalProvider(
+				getter -> new InactiveZoneIdentifier(getter.getModal(DrtZonalSystem.class))))
+				.asEagerSingleton();
+		
+		// binding the event handler 
+		addEventHandlerBinding().to(modalKey(InactiveZoneIdentifier.class));
+		
 
 		{
 			// this is rather analysis - but depends on DrtZonalSystem so it can not be
