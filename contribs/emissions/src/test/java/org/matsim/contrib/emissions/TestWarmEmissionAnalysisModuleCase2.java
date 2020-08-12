@@ -122,7 +122,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
 	 */
 	
-	@Test(expected = RuntimeException.class)
+	@Test//(expected = RuntimeException.class)
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
 
@@ -130,7 +130,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
 		// see (*) below.  kai, jan'20
-
 
 		// create a link:
 		double pclinkLength= 100.;
@@ -146,7 +145,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		{
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
-
 			
 			// test result:
 			switch( this.emissionsComputationMethod ) {
@@ -161,6 +159,8 @@ public class TestWarmEmissionAnalysisModuleCase2{
 					// After discussion with Kai N. we decided to let it as it is for the time being. I will add a log.info in the consistency checker.  KMT Jul'20
 					Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
 					break;
+
+					//This now fails dont know why yet @KMT
 				case AverageSpeed:
 					Assert.assertEquals( DETAILED_PC_FACTOR_FF * pclinkLength / 1000., warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
 					break;
@@ -209,7 +209,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop go speed" & "current speed equals stop go speed" the counters are  tested
 	 * average values are used 
 	 */
-	@Test(expected = RuntimeException.class)
+	@Test//(expected = RuntimeException.class)
 	public void testCounters3(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();
@@ -277,10 +277,18 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			vehAtt.setHbefaTechnology( PC_TECHNOLOGY );
 			vehAtt.setHbefaSizeClass( PC_SIZE_CLASS );
 			vehAtt.setHbefaEmConcept( PC_CONCEPT );
+			String ffOnlyConceptAlt = "PC-Alternative Fuel";
+			vehAtt.setHbefaEmConcept( ffOnlyConceptAlt );
+			String ffOnlySizeClassAlt = "not specified";
+			vehAtt.setHbefaSizeClass( ffOnlySizeClassAlt );
+			String ffOnlyTechnologyAlt = "bifuel CNG/petrol";
+			vehAtt.setHbefaTechnology( ffOnlyTechnologyAlt );
 
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			detWarmFactor.setWarmEmissionFactor( DETAILED_PC_FACTOR_FF );
 			detWarmFactor.setSpeed( PC_FREE_VELOCITY_KMH );
+
+
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -303,11 +311,20 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			String ffOnlyTechnology = "diesel";
 			vehAtt.setHbefaTechnology( ffOnlyTechnology );
 
+			String ffOnlyConceptAlt = "PC-Alternative Fuel";
+			vehAtt.setHbefaEmConcept( ffOnlyConceptAlt );
+			String ffOnlySizeClassAlt = "not specified";
+			vehAtt.setHbefaSizeClass( ffOnlySizeClassAlt );
+			String ffOnlyTechnologyAlt = "bifuel CNG/petrol";
+			vehAtt.setHbefaTechnology( ffOnlyTechnologyAlt );
+
+
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			double detailedFfOnlyFactorFf = .0000001;
 			detWarmFactor.setWarmEmissionFactor( detailedFfOnlyFactorFf );
 			double ffOnlyffSpeed = 120.;
 			detWarmFactor.setSpeed( ffOnlyffSpeed );
+
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -346,7 +363,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
 			}
 		}
-
 	}
 
 } 

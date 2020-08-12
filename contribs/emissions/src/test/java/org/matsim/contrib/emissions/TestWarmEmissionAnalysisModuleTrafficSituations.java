@@ -54,8 +54,7 @@ import static org.matsim.contrib.emissions.Pollutant.NOx;
 @RunWith(Parameterized.class)
 public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, PM, NOx, NO2,PM, SO2));
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ) );
 	private static final String hbefaRoadCategory = "URB";
 	private final EmissionsComputationMethod emissionsComputationMethod;

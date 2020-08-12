@@ -84,7 +84,6 @@ public class TestWarmEmissionAnalysisModuleCase3{
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
-	private boolean excep =false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 	private Map<Pollutant, Double> warmEmissions;
 
