@@ -246,7 +246,7 @@ public class StorageCapacityTest {
 		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
 
-		for (int i = 1; i <= 1; i++) {
+		for (int i = 1; i <= 500; i++) {
 			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", links.get(0).getId());
@@ -292,14 +292,23 @@ public class StorageCapacityTest {
 		events.addHandler(counter3);
 		VehiclesOnLinkCounter counter2 = new VehiclesOnLinkCounter(links.get(2).getId());
 		events.addHandler(counter2);
+
+		VehiclesOnLinkCounter counter3pm = new VehiclesOnLinkCounter(links.get(3).getId(), 17 * 3600);
+		events.addHandler(counter3pm);
+		VehiclesOnLinkCounter counter2pm = new VehiclesOnLinkCounter(links.get(2).getId(), 17 * 3600);
+		events.addHandler(counter2pm);
 		/* run sim */
 		Hermes sim = HermesTest.createHermes(scenario, events, false);
 		sim.run();
 
 		System.out.println(counter3.currentMax);
 		System.out.println(counter2.currentMax);
-		//Assert.assertEquals(10, counter3.currentMax);  // the bottleneck link can store 14 vehicles
-		//Assert.assertEquals(67, counter2.currentMax); //spillback 100 vehicles
+		System.out.println(counter3pm.currentMax);
+		System.out.println(counter2pm.currentMax);
+		Assert.assertEquals(14, counter3.currentMax);  // the bottleneck link can store 14 cars
+		Assert.assertEquals(100, counter2.currentMax); //spillback 100 cars
+		Assert.assertEquals(7, counter3pm.currentMax);  // the bottleneck link can store 7 tractors
+		Assert.assertEquals(50, counter2pm.currentMax); //spillback 50 vehicles
 
 	}
 
@@ -324,16 +333,23 @@ public class StorageCapacityTest {
 	static class VehiclesOnLinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private final Id<Link> link;
+		private final double starttime;
 		int currentMax = 0;
 		int vehiclesOnLink = 0;
 
 		VehiclesOnLinkCounter(Id<Link> relevantLink) {
 			this.link = relevantLink;
+			starttime = 0;
+		}
+
+		VehiclesOnLinkCounter(Id<Link> relevantLink, double starttime) {
+			this.link = relevantLink;
+			this.starttime = starttime;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			if (event.getLinkId().equals(link)) {
+			if (event.getLinkId().equals(link) && event.getTime() > starttime) {
 				vehiclesOnLink++;
 				if (vehiclesOnLink > currentMax) {
 					currentMax = vehiclesOnLink;
@@ -343,7 +359,7 @@ public class StorageCapacityTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			if (event.getLinkId().equals(link)) {
+			if (event.getLinkId().equals(link) && event.getTime() > starttime) {
 				vehiclesOnLink--;
 			}
 		}
