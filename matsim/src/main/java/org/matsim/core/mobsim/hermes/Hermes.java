@@ -30,16 +30,16 @@ import org.matsim.core.mobsim.framework.Mobsim;
 public final class Hermes implements Mobsim {
 
 	final private static Logger log = Logger.getLogger(Hermes.class);
-    private Realm realm;
-    private Agent[] agents;
-	private ScenarioImporter si; // TODO - I don't really need this!
+	private Realm realm;
+	private Agent[] agents;
+	private ScenarioImporter si;
 	private final Scenario scenario;
-    private final ParallelEventsManager eventsManager;
+	private final ParallelEventsManager eventsManager;
 
 	public Hermes(Scenario scenario, EventsManager eventsManager) {
-        this.scenario = scenario;
-        this.eventsManager = (ParallelEventsManager) eventsManager;
-    }
+		this.scenario = scenario;
+		this.eventsManager = (ParallelEventsManager) eventsManager;
+	}
 
 	private void importScenario() throws Exception {
 		si = ScenarioImporter.instance(scenario, eventsManager);
