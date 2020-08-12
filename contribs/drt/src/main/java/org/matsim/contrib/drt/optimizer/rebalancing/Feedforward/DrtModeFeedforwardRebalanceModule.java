@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -103,19 +102,21 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		
 		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));
 		
-		// this is rather analysis - but depends on DrtZonalSystem so it can not be
-		// moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-		addControlerListenerBinding()
-				.toProvider(modalProvider(
-						getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
-								getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class))))
-				.asEagerSingleton();
+		{
+			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			bindModal(ZonalIdleVehicleXYVisualiser.class).
+					toProvider(modalProvider(
+							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
+			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
-		addControlerListenerBinding()
-				.toProvider(
-						modalProvider(getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.get(EventsManager.class),
-								getter.getModal(DrtRequestAnalyzer.class), getter.getModal(DrtZonalSystem.class))))
-				.asEagerSingleton();
+			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
+					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
+							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
+			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
+		}
 
 	}
 }

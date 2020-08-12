@@ -18,31 +18,32 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.core.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.dvrp.schedule.Tasks;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class TaskStartedEvent extends AbstractTaskEvent {
-	public static final String EVENT_TYPE = "dvrpTaskStarted";
-
-	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Task task) {
-		this(time, dvrpMode, dvrpVehicleId, task.getTaskType(), task.getTaskIdx(), Tasks.getBeginLink(task).getId());
-	}
-
-	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Task.TaskType taskType,
-			int taskIndex, Id<Link> linkId) {
-		super(time, dvrpMode, dvrpVehicleId, taskType, taskIndex, linkId);
-	}
-
+public interface MobsimScopeEventHandler extends EventHandler {
+	/**
+	 * Under normal circumstances, this method will never be called. All mobsim-scoped event handlers are removed
+	 * on AfterMobsimEvent, so before the new mobsim initialisation phase.
+	 *
+	 * @param iteration the up-coming iteration from which up-coming events will be from.
+	 */
+	@Deprecated //made deprecated to minimise chances someone overrides this method (cannot be final)
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
+	default void reset(int iteration) {
+		throw new IllegalStateException("This handler should have been unregistered on AfterMobsimEvent");
+	}
+
+	/**
+	 * Gives the event handler the possibility to clean up its internal state.
+	 * This method is called directly after the handler is removed from event handlers (on AfterMobsimEvent).
+	 *
+	 * @param iteration the iteration in which the handler was instantiated
+	 */
+	default void cleanupAfterMobsim(int iteration) {
 	}
 }

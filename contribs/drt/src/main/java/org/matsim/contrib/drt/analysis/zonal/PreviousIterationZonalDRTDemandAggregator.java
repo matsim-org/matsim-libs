@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -41,7 +40,8 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author jbischoff
  */
-public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
+public final class PreviousIterationZonalDRTDemandAggregator
+		implements ZonalDemandAggregator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
@@ -49,14 +49,13 @@ public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDem
 	private final int timeBinSize;
 	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
 	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
-	private static final MutableInt ZERO =  new MutableInt(0);
+	private static final MutableInt ZERO = new MutableInt(0);
 
-	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public PreviousIterationZonalDRTDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
 		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
-		events.addHandler(this);
 	}
 
 	@Override
@@ -101,7 +100,8 @@ public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDem
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		Map<String, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin, Collections.emptyMap());
+		Map<String, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin,
+				Collections.emptyMap());
 		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
 	}
 }

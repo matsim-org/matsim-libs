@@ -22,6 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import javax.management.InvalidAttributeValueException;
+import java.util.concurrent.ExecutionException;
 
 public class IntegrationIT {
 
@@ -29,7 +30,7 @@ public class IntegrationIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testJsprit() throws InvalidAttributeValueException {
+	public void testJsprit() throws ExecutionException, InterruptedException {
 		final String networkFilename = utils.getClassInputDirectory() + "/merged-network-simplified.xml.gz";
 		final String vehicleTypeFilename = utils.getClassInputDirectory() + "/vehicleTypes.xml";
 		final String carrierFilename = utils.getClassInputDirectory() + "/carrier.xml";
