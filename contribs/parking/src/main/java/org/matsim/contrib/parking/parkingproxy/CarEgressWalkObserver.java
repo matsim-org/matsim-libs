@@ -35,9 +35,9 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  */
 class CarEgressWalkObserver implements BeforeMobsimListener {
 	
-	private static final String INSERTIONKEY = "[INSERTIONKEY]";
-	public static final String OUTFILE_PENALTIES = "penalties_iter" + INSERTIONKEY + ".csv";
-	public static final String CARMODE = TransportMode.car;	
+//	private static final String INSERTIONKEY = "[INSERTIONKEY]";
+	public static final String OUTFILE_PENALTIES = "penalties.csv.gz";
+	public static final String CARMODE = TransportMode.car;
 	
 	private final PenaltyGenerator penaltyGenerator;
 	private final PenaltyFunction penaltyFunction;
@@ -64,8 +64,9 @@ class CarEgressWalkObserver implements BeforeMobsimListener {
 			this.penaltyCalculator.setPenaltyFunction(this.penaltyFunction);
 			this.penaltyGenerator.reset();
 		}
-		this.penaltyCalculator.dump(new File(event.getServices().getConfig().controler().getOutputDirectory(),
-				OUTFILE_PENALTIES.replace(INSERTIONKEY, Integer.toString(event.getIteration()))));
+		event.getServices().getControlerIO().createIterationDirectory(event.getIteration());
+		String file = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), OUTFILE_PENALTIES);
+		this.penaltyCalculator.dump(new File(file));
 	}
 	
 	/*package*/ PenaltyCalculator getPenaltyCalculator() {
