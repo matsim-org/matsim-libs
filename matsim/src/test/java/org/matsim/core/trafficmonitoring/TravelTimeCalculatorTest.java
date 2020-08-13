@@ -178,7 +178,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		new MatsimEventsReader(events).readFile(eventsFile);
+		events.finishProcessing();
 
 		EventsManager events2 = EventsUtils.createEventsManager();
 
@@ -187,9 +189,11 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttcalc.aggregator = aggregator ;
 		ttcalc.setTtDataFactory( ttDataFactory );
 		events2.addHandler(ttcalc);
+		events2.initProcessing();
 		for (Event e : collector.getEvents()) {
 			events2.processEvent(e);
 		}
+		events2.finishProcessing();
 
 		final int numberOfTimeSlotsToTest = 4*24;
 		
@@ -348,9 +352,10 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		TravelTimeCalculator ttCalc = new TravelTimeCalculator(network, config.travelTimeCalculator());
 		events.addHandler(ttCalc);
-				
+		events.initProcessing();
 		new MatsimEventsReader(events).readFile(eventsFilename);
-		
+		events.finishProcessing();
+
 		Link link10 = network.getLinks().get(Id.create("10", Link.class));
 
 		assertEquals("wrong link travel time at 06:00.", 110.0, ttCalc.getLinkTravelTimes().getLinkTravelTime(link10, 6.0 * 3600, null, null), EPSILON);

@@ -51,7 +51,7 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		// check for all the tags
-		Link link = network.getLinks().get(Id.createLinkId("10001f"));
+		Link link = network.getLinks().get(Id.createLinkId("10002f"));
 		assertPresentAndEqual(link, OsmTags.SURFACE, surface);
 		assertPresentAndEqual(link, OsmTags.SMOOTHNESS, smoothness);
 		assertPresentAndEqual(link, OsmTags.CYCLEWAY, cycleway);
@@ -77,7 +77,7 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		// check for all the tags
-		Link link = network.getLinks().get(Id.createLinkId("10001f"));
+		Link link = network.getLinks().get(Id.createLinkId("10002f"));
 		assertPresentAndEqual(link, OsmTags.SURFACE, "asphalt");
 	}
 
@@ -100,7 +100,7 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		// check for all the tags
-		Link link = network.getLinks().get(Id.createLinkId("10001f"));
+		Link link = network.getLinks().get(Id.createLinkId("10002f"));
 		assertFalse(link.getAllowedModes().contains(TransportMode.bike));
 		assertTrue(link.getAllowedModes().contains(TransportMode.car));
 	}
@@ -124,7 +124,7 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		// check for all the tags
-		Link link = network.getLinks().get(Id.createLinkId("10001f"));
+		Link link = network.getLinks().get(Id.createLinkId("10002f"));
 		assertTrue(link.getAllowedModes().contains(TransportMode.bike));
 		assertFalse(link.getAllowedModes().contains(TransportMode.car));
 	}
@@ -152,11 +152,11 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link forward = network.getLinks().get(Id.createLinkId("10001f"));
+		Link forward = network.getLinks().get(Id.createLinkId("10002f"));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.car));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike));
 
-		Link reverse = network.getLinks().get(Id.createLinkId("10001f_bike-reverse"));
+		Link reverse = network.getLinks().get(Id.createLinkId("10002f_bike-reverse"));
 		assertFalse(reverse.getAllowedModes().contains(TransportMode.car));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 		assertPresentAndEqual(reverse, OsmTags.SURFACE, surface);
@@ -185,11 +185,11 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link forward = network.getLinks().get(Id.createLinkId("10001f"));
+		Link forward = network.getLinks().get(Id.createLinkId("10002f"));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.car));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike));
 
-		Link reverse = network.getLinks().get(Id.createLinkId("10001f_bike-reverse"));
+		Link reverse = network.getLinks().get(Id.createLinkId("10002f_bike-reverse"));
 		assertFalse(reverse.getAllowedModes().contains(TransportMode.car));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 		assertPresentAndEqual(reverse, OsmTags.SURFACE, surface);
@@ -218,12 +218,12 @@ public class OsmBicycleReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link forward = network.getLinks().get(Id.createLinkId("10001r_bike-reverse"));
+		Link forward = network.getLinks().get(Id.createLinkId("10002r_bike-reverse"));
 		assertFalse(forward.getAllowedModes().contains(TransportMode.car));
 		assertTrue(forward.getAllowedModes().contains(TransportMode.bike));
 		assertPresentAndEqual(forward, OsmTags.SURFACE, surface);
 
-		Link reverse = network.getLinks().get(Id.createLinkId("10001r"));
+		Link reverse = network.getLinks().get(Id.createLinkId("10002r"));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.car));
 		assertTrue(reverse.getAllowedModes().contains(TransportMode.bike));
 		assertPresentAndEqual(reverse, OsmTags.SURFACE, surface);

@@ -18,6 +18,9 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +31,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -63,7 +65,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			startTask = schedule.getCurrentTask();
-			switch (((DrtTaskType)startTask.getTaskType())) {
+			switch (getBaseType(startTask)) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)startTask;
 					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
@@ -97,7 +99,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		List<? extends Task> tasks = schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
 		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getTaskType() == DrtTaskType.STOP) {
+			if (STOP.isBaseTypeOf(task)) {
 				stopTasks.add((DrtStopTask)task);
 			}
 		}

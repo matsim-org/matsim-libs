@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
@@ -31,7 +33,6 @@ import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -126,9 +127,8 @@ public class InsertionCostCalculator<D> {
 
 		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
 		Schedule schedule = vEntry.vehicle.getSchedule();
-		boolean ongoingStopTask = pickupIdx == 0
-				&& schedule.getStatus() == ScheduleStatus.STARTED
-				&& schedule.getCurrentTask().getTaskType() == DrtTaskType.STOP;
+		boolean ongoingStopTask = pickupIdx == 0 && schedule.getStatus() == ScheduleStatus.STARTED//
+				&& STOP.isBaseTypeOf(schedule.getCurrentTask());
 
 		Link pickupPreviousLink = insertion.getPickup().previousLink;
 		if ((ongoingStopTask && drtRequest.getFromLink() == pickupPreviousLink) //

@@ -69,8 +69,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
-	private boolean insertingAccessEgressWalk = false ;
-	
+	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
+
+	private static final String ACCESSEGRESSTYPE = "accessEgressType";
+	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
+	private AccessEgressType accessEgressType = AccessEgressType.none;
+
 	// ---
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
@@ -439,7 +443,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			this.setClearingDefaultModeRoutingParams( Boolean.parseBoolean( value ) );
 		} else if (RANDOMNESS.equals( key ) ) {
 			this.setRoutingRandomness( Double.parseDouble( value ) );
-		} else {
+		}
+//		else if (ISINSERTINGACCESSEGRESSWALK.equals( key ) ) {
+//			this.setInsertingAccessEgressWalk(AccessEgressType.valueOf(value));
+//		}
+//		TODO: uncomment this for release 13.0
+		else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -450,18 +459,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
 		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
-
-		//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
-
-//		for ( ModeRoutingParams param : this.getModeRoutingParams().values() ) {
-//			if ( !param.getBeelineDistanceFactor().equals( this.beelineDistanceFactor ) ) {
-//				log.error( "beeline distance factor varies by mode; this cannot be accessed by getParams()" ) ;
-//			}
-//		}
-//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString( this.beelineDistanceFactor ) ) ;
-//
-// if we uncomment the above, then this is also written into config v2 fmt, which we don't want.  kai, feb'15
-		
+//		map.put(  ISINSERTINGACCESSEGRESSWALK,getAccessEgressType().toString()) ;
+//TODO: uncomment this for release 13.0
 		return map;
 	}
 
@@ -476,6 +475,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
+		map.put(ACCESSEGRESSTYPE, ACCESSEGRESSTYPE_CMT);
 		return map;
 	}
 
@@ -559,11 +559,15 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public boolean isInsertingAccessEgressWalk() {
-		return this.insertingAccessEgressWalk ;
+
+	@StringGetter(ACCESSEGRESSTYPE)
+	public AccessEgressType getAccessEgressType() {
+		return this.accessEgressType;
 	}
-	public void setInsertingAccessEgressWalk( boolean val ) {
-		this.insertingAccessEgressWalk = val ;
+
+	@StringSetter(ACCESSEGRESSTYPE)
+	public void setAccessEgressType(AccessEgressType accessEgressType) {
+		this.accessEgressType = accessEgressType;
 	}
 
 	@StringGetter(RANDOMNESS)
@@ -577,23 +581,6 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-
-//		if ( this.insertingAccessEgressWalk ) {
-//			// we need scoring parameters for each resulting interaction activity
-//			for ( String mode : this.getNetworkModes() ) {
-//				String interactionActivityType = mode + " interaction" ;
-//				PlanCalcScoreConfigGroup.ActivityParams actParams = config.planCalcScore().getActivityParams(interactionActivityType);
-//				if ( actParams==null ) {
-//					final String msg = "You have specified to insert access and egress walk, but there are no scoring parameters to " +
-//												   "score the resulting interaction activity for mode = " + mode;
-//					throw new RuntimeException(msg) ;
-//				}
-//			}
-//		}
-		// these are now added in the config consistency checker of PlanCalcScoreConfigGroup,
-		// so there is no point in checking here since the checker here might be called
-		// earlier. kai, jan'18
-
 		Set<String> modesRoutedAsTeleportation = this.getModeRoutingParams().keySet();
 		Collection<String> modesRoutedAsNetworkModes = this.getNetworkModes();
 

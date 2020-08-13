@@ -37,6 +37,8 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -107,7 +109,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -498,7 +500,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -637,7 +639,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)

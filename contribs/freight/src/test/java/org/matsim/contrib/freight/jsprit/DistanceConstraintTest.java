@@ -21,12 +21,6 @@
 
 package org.matsim.contrib.freight.jsprit;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.management.InvalidAttributeValueException;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -49,10 +43,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  *
@@ -78,10 +76,10 @@ public class DistanceConstraintTest {
 	 * Option 1: Tour is possible with the vehicle with the small battery and the
 	 * vehicle with the small battery is cheaper
 	 *
-	 * @throws InvalidAttributeValueException
+	 * @throws ExecutionException, InterruptedException
 	 */
 	@Test
-	public final void CarrierSmallBatteryTest_Version1() throws InvalidAttributeValueException {
+	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
@@ -158,10 +156,9 @@ public class DistanceConstraintTest {
 	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
 	 * why one vehicle with a large battery is used.
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 	@Test
-	public final void CarrierLargeBatteryTest_Version2() throws InvalidAttributeValueException {
+	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -240,11 +237,10 @@ public class DistanceConstraintTest {
 	 * Option 3: costs for using one long range vehicle are higher than the costs of
 	 * using two short range truck
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void Carrier2SmallBatteryTest_Version3() throws InvalidAttributeValueException {
+	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -331,11 +327,10 @@ public class DistanceConstraintTest {
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
+	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -431,11 +426,10 @@ public class DistanceConstraintTest {
 	 *
 	 * This option (5) is designed similar to option 2
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws InvalidAttributeValueException {
+	public final void CarrierWithShipmentsMidSizeBatteryTest_Version5() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -511,11 +505,10 @@ public class DistanceConstraintTest {
 	 *
 	 * This option (6) is designed similar to option 5
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws InvalidAttributeValueException {
+	public final void CarrierWithShipmentsLargeBatteryTest_Version6() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);

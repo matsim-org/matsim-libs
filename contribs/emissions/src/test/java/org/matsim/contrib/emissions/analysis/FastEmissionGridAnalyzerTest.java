@@ -26,6 +26,7 @@ public class FastEmissionGridAnalyzerTest {
     public void rasterNetwork_singleLink() {
 
         final var cellSize = 10.;
+        final var cellArea = cellSize * cellSize;
         final var emissionPerLink = 20.;
         final var linkLength = 99;
         final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
@@ -45,13 +46,14 @@ public class FastEmissionGridAnalyzerTest {
         assertEquals(expectedCellNumber, raster.getXLength());
         assertEquals(1, raster.getYLength());
 
-        raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber, value, 0.00000001));
+        raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber / cellArea, value, 0.00000001));
     }
 
     @Test
     public void rasterNetwork_singleLinkWithBackwardsOrientation() {
 
         final var cellSize = 10.;
+        final var cellArea = cellSize * cellSize;
         final var emissionPerLink = 20.;
         final var linkLength = 99;
         final var expectedCellNumber = (int) (linkLength / cellSize) + 1;
@@ -71,13 +73,14 @@ public class FastEmissionGridAnalyzerTest {
         assertEquals(expectedCellNumber, raster.getXLength());
         assertEquals(1, raster.getYLength());
 
-        raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber, value, 0.00000001));
+        raster.forEachIndex((xi, yi, value) -> assertEquals(emissionPerLink / expectedCellNumber / cellArea, value, 0.00000001));
     }
 
     @Test
     public void rasterNetwork_twoLinks() {
 
         final var cellSize = 10.;
+        final var cellArea = cellSize * cellSize;
         final var emissionPerLink1 = 20.;
         final var emissionPerLink2 = 10.;
         final var linkLength = 99;
@@ -105,11 +108,11 @@ public class FastEmissionGridAnalyzerTest {
         raster.forEachIndex((xi, yi, value) -> {
 
             if (xi == 0 && yi == 0) {
-                assertEquals(emissionPerLink1 / expectedCellNumber + emissionPerLink2 / expectedCellNumber, value, 0.00001);
+                assertEquals((emissionPerLink1 + emissionPerLink2) / (expectedCellNumber * cellArea), value, 0.00001);
             } else if (xi == 0) {
-                assertEquals(emissionPerLink2 / expectedCellNumber, value, 0.0000001);
+                assertEquals(emissionPerLink2 / expectedCellNumber / cellArea, value, 0.0000001);
             } else if (yi == 0) {
-                assertEquals(emissionPerLink1 / expectedCellNumber, value, 0.000001);
+                assertEquals(emissionPerLink1 / expectedCellNumber / cellArea, value, 0.000001);
             } else {
                 assertEquals(0.0, value, 0.0001);
             }
@@ -169,7 +172,7 @@ public class FastEmissionGridAnalyzerTest {
         var blurredRaster = FastEmissionGridAnalyzer.processLinkEmissions(emissions, network, 10, 1);
 
         var valueAtIntersection = blurredRaster.getValueByIndex(4, 4);
-        assertEquals(1.5, valueAtIntersection, 0.00000001);
+        assertEquals(0.015, valueAtIntersection, 0.00000001);
 
         blurredRaster.forEachIndex((xi, yi, value) -> {
 
@@ -183,7 +186,7 @@ public class FastEmissionGridAnalyzerTest {
 
         final var networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "network.xml");
         final var emissionEvents = Paths.get(utils.getOutputDirectory()).resolve("emission.events.xml.gz");
-        final var biggestExpectedValue = 12.157779720279718;
+        final var biggestExpectedValue = 6.056547619047618E-6;
 
         var network = NetworkUtils.readNetwork(networkUrl.toString());
         TestUtils.writeWarmEventsToFile(emissionEvents, network, Pollutant.NOx, 10, 1, 1);

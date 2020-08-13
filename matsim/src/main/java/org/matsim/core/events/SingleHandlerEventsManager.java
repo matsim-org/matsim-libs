@@ -172,7 +172,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 2;
+			this.nextCounterMsg *= 4;
 			log.info(" event # " + this.counter);
 		}
 		computeEvent(event);
@@ -226,7 +226,10 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		try {
 			Method method = this.getHandlersForClass(event.getClass());
 			if (method != null) method.invoke(this.eventHandler, event);
-		} catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
+		} catch(InvocationTargetException e) {
+			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e.getTargetException());
+		}
+		catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
 		}
 	}
@@ -285,7 +288,12 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Event ev) {
+		boolean ret = false;
 		Class<?> klass = ev.getClass(); 
+		if (this.isBasicEventHandler) {
+			((BasicEventHandler) this.eventHandler).handleEvent(ev);
+			ret = true;
+		}
 		if (this.isLeaveLinkHandler && klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler) this.eventHandler).handleEvent((LinkLeaveEvent)ev);
 			return true;
@@ -358,10 +366,6 @@ public final class SingleHandlerEventsManager implements EventsManager {
 			((VehicleAbortsEventHandler) this.eventHandler).handleEvent((VehicleAbortsEvent) ev);
 			return true;
 		}
-		if (this.isBasicEventHandler && klass == Event.class) {
-			((BasicEventHandler) this.eventHandler).handleEvent(ev);
-			return true;
-		}
-		return false;
+		return ret;
 	}
 }

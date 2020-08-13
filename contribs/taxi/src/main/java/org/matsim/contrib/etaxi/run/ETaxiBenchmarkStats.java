@@ -33,7 +33,7 @@ public class ETaxiBenchmarkStats extends TaxiBenchmarkStats {
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		super.notifyMobsimBeforeCleanup(e);
 		ETaxiStats singleRunEStats = new ETaxiStatsCalculator(fleet.getVehicles().values()).getDailyEStats();
-		queuedTimeRatio.addValue(singleRunEStats.getFleetQueuedTimeRatio());
+		singleRunEStats.getFleetQueuedTimeRatio().ifPresent(queuedTimeRatio::addValue);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
  *
  * @author tschlenther
  */
-public class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
+public final class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
 
 	private final Map<String, MutableInt> vehiclesPerZone = new HashMap<>();
 	private static final MutableInt ZERO =  new MutableInt(0);

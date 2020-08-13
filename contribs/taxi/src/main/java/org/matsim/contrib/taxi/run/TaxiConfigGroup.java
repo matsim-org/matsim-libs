@@ -28,6 +28,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
@@ -44,6 +45,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
+	private static final Logger log = Logger.getLogger(TaxiConfigGroup.class);
+
 	public static final String GROUP_NAME = "taxi";
 
 	/**
@@ -153,7 +156,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
+		if (config.qsim().getNumberOfThreads() > 1) {
+			log.warn("EXPERIMENTAL FEATURE: Running taxi with a multi-threaded QSim");
+		}
 
 		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
 				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
