@@ -64,7 +64,7 @@ public class SwissRailRaptorCapacitiesTest {
 				raptorData,
 				new DefaultRaptorParametersForPerson(f.config),
 				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.scenario.getPopulation(), f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
+				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
 				new DefaultRaptorInVehicleCostCalculator());
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
@@ -106,7 +106,7 @@ public class SwissRailRaptorCapacitiesTest {
 				raptorData,
 				new DefaultRaptorParametersForPerson(f.config),
 				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.scenario.getPopulation(), f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
+				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
 				new DefaultRaptorInVehicleCostCalculator());
 
 		Id<Person> person1 = Id.create(1, Person.class);

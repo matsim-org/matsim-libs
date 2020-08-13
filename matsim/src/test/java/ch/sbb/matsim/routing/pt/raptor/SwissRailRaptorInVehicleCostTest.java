@@ -106,7 +106,7 @@ public class SwissRailRaptorInVehicleCostTest {
 				raptorData,
 				new DefaultRaptorParametersForPerson(f.config),
 				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.scenario.getPopulation(), f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
+				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
 				inVehCostCalcualtor);
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));

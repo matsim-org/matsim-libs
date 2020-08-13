@@ -79,7 +79,7 @@ public class SwissRailRaptorIntermodalTest {
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -151,7 +151,7 @@ public class SwissRailRaptorIntermodalTest {
         f.config.planCalcScore().addModeParams(walk);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
             new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -218,7 +218,7 @@ public class SwissRailRaptorIntermodalTest {
         f.srrConfig.addIntermodalAccessEgress(walkAccess);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
             new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -274,7 +274,7 @@ public class SwissRailRaptorIntermodalTest {
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
             new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -329,7 +329,7 @@ public class SwissRailRaptorIntermodalTest {
         // direct walk factor off
         f.config.transitRouter().setDirectWalkFactor(1.0);
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -347,7 +347,7 @@ public class SwissRailRaptorIntermodalTest {
         // direct walk factor on
         f.config.transitRouter().setDirectWalkFactor(Double.POSITIVE_INFINITY);
         data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -415,7 +415,7 @@ public class SwissRailRaptorIntermodalTest {
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -472,7 +472,7 @@ public class SwissRailRaptorIntermodalTest {
         // first check: bike should be the better option
         {
             SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -503,7 +503,7 @@ public class SwissRailRaptorIntermodalTest {
                 new TeleportationRoutingModule(TransportMode.bike, f.scenario, 1.0, 1.4));
 
             SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -577,7 +577,7 @@ public class SwissRailRaptorIntermodalTest {
 
             SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
 
-            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
+            DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
 
 
             for (int i = 0; i < 1000; i++) {
@@ -644,7 +644,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(20000, 100), Id.create("to", Link.class)); // stop D
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -700,7 +700,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(20000, 5100), Id.create("to", Link.class)); // stop F
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
             new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -736,7 +736,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(10000, 500), Id.create("to", Link.class)); // stop B or C
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
             new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -787,7 +787,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(10000, 0), Id.create("to", Link.class));
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -821,7 +821,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(0, 100), Id.create("to", Link.class)); // stop A
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
 
@@ -867,7 +867,7 @@ public class SwissRailRaptorIntermodalTest {
         });
 
         SwissRailRaptorData data2 = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
-        DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor2 = new SwissRailRaptor(data2, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
                 new LeastCostRaptorRouteSelector(), stopFinder2, new DefaultRaptorInVehicleCostCalculator());
 
