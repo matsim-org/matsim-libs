@@ -47,7 +47,7 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
+			+ " Must be positive. Default is 600 s. Expects an Integer Value";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -71,13 +71,13 @@ public final class AdaptiveRealTimeRebalancingParams extends ReflectiveConfigGro
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
 
 	@Positive
-	private int interval = 1800;// [s]
+	private int interval = 600;// [s]
 
 	@Positive
-	private double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 3600;// [s]
 
 	@PositiveOrZero
-	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 900;// [s], if 0 then soon-idle vehicle will not be considered
 
 	@Positive
 	private double cellSize = Double.NaN;// [m]

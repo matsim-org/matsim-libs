@@ -53,8 +53,6 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		log.info("Rebalance fleet now: Adaptive Real Time Rebalancing Strategy is used");
-
 		// initialization each time this function is called
 		VehicleInfoCollector vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 		supply.clear();
@@ -90,7 +88,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 				supply.add(Pair.of(z, delta));
 			}
 		}
-
+		log.info("Perform Adaptive Real Time Rebalancing now: " + Integer.toString(numAvailableVehicles) + " vehicles available");
 		// calculate using min cost flow method
 		return minCostRelocationCalculator.calcRelocations(supply, demand, rebalancableVehiclesPerZone);
 	}

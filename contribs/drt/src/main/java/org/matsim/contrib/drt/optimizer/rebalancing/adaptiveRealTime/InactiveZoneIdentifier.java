@@ -34,7 +34,9 @@ public class InactiveZoneIdentifier implements DrtRequestSubmittedEventHandler {
 	}
 
 	public Set<String> getInactiveZone() {
-		log.info("There are " + Integer.toString(activeZones.size()) + " active zones");
+		log.info("There are in totoal" + Integer.toString(zonalSystem.getZones().keySet().size()) + " zones");
+		log.info("Of which " + Integer.toString(activeZones.size()) + " are active zones");
+		log.info("Note: At iteration 0, all zone are assumed to be active");
 		return inactiveZones;
 	}
 
