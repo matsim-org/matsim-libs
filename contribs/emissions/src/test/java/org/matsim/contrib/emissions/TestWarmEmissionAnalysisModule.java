@@ -458,6 +458,7 @@ public class TestWarmEmissionAnalysisModule {
 
 			// for that road-vehicle category key, add traffic situation and speed value from current emissions factor:
 			hbefaRoadTrafficSpeeds.putIfAbsent( roadVehicleCategoryKey, new HashMap<>() );
+			//Fixme: Don't throw exception if value is not set (returning null).
 			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != emissionFactor.getSpeed()){
 				throw new RuntimeException("Try to override speeds from average table with speed from detailled table. This may lead to wrong emission calculations. KMT/GR Aug'20");
 			}
