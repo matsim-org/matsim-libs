@@ -85,7 +85,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
-	private WarmEmissionAnalysisModule emissionsModule;
+
 	private Map<Pollutant, Double> warmEmissions;
 
 	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
@@ -149,7 +149,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 
 
 	private WarmEmissionAnalysisModule setUp() {
-		WarmEmissionAnalysisModule emissionsModule;
+
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 

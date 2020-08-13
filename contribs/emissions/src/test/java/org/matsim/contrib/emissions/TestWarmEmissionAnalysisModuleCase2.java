@@ -122,7 +122,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
 	 */
 	
-	@Test//(expected = RuntimeException.class)
+	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
 
@@ -182,11 +182,8 @@ public class TestWarmEmissionAnalysisModuleCase2{
 				default:
 					throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
 			}
-
 			HandlerToTestEmissionAnalysisModules.reset();
 			warmEmissions.clear();
-
-
 		}
 
 		// sub case avg speed = stop go speed
@@ -209,7 +206,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop go speed" & "current speed equals stop go speed" the counters are  tested
 	 * average values are used 
 	 */
-	@Test//(expected = RuntimeException.class)
+	@Test
 	public void testCounters3(){
 
 		WarmEmissionAnalysisModule emissionsModule = setUp();

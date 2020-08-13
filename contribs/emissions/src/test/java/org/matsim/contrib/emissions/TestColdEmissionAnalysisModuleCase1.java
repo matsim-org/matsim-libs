@@ -163,8 +163,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		// This test seems to refer to an direct lookup in average table 
 		ecg.setDetailedVsAverageLookupBehavior(
 				EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg,
-				pollutants, emissionEventManager);
+		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
 
 	}
 

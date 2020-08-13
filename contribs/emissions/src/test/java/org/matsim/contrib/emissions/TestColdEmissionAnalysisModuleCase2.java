@@ -92,10 +92,6 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
 	
-	// fifth case: cold emission factor not set
-//	private static final String nullcase_emConcept = "nullCase";
-	// this testcase does not exist any more.  kai, jul'18
-	
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -158,9 +154,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		}
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
-		
 	}
 	
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
