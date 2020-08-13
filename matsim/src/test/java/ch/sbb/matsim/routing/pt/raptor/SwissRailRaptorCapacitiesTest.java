@@ -143,6 +143,7 @@ public class SwissRailRaptorCapacitiesTest {
 
 		// dep at 07:00: person1, person2
 		tracker.handleEvent(new TransitDriverStartsEvent(Time.parseTime("06:55:00"), driver1, vehicle1, f.fastLineId, f.fastRouteId, fastDep1));
+		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("06:55:00"), driver1, vehicle1));
 		tracker.handleEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:00:00"), vehicle1, f.stopAId, 0));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:00:10"), person1, vehicle1));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:00:20"), person2, vehicle1));
@@ -150,6 +151,7 @@ public class SwissRailRaptorCapacitiesTest {
 
 		// dep at 07:10: person3, person4, person5
 		tracker.handleEvent(new TransitDriverStartsEvent(Time.parseTime("07:05:00"), driver2, vehicle2, f.fastLineId, f.fastRouteId, fastDep2));
+		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:05:00"), driver2, vehicle2));
 		tracker.handleEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:10:00"), vehicle2, f.stopAId, 0));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:10:10"), person3, vehicle2));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:10:20"), person4, vehicle2));
@@ -158,6 +160,7 @@ public class SwissRailRaptorCapacitiesTest {
 
 		// dep at 07:20: person6, person7, person8, person9
 		tracker.handleEvent(new TransitDriverStartsEvent(Time.parseTime("07:15:00"), driver3, vehicle3, f.fastLineId, f.fastRouteId, fastDep3));
+		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:15:00"), driver3, vehicle3));
 		tracker.handleEvent(new VehicleArrivesAtFacilityEvent(Time.parseTime("07:20:00"), vehicle2, f.stopAId, 0));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:10"), person6, vehicle3));
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:20"), person7, vehicle3));

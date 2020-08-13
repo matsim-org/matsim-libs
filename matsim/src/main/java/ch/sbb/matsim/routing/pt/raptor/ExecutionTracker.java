@@ -5,6 +5,9 @@ import ch.sbb.matsim.routing.pt.raptor.ExecutionData.LineData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.RouteData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.StopData;
 import ch.sbb.matsim.routing.pt.raptor.ExecutionData.VehicleData;
+import java.util.HashSet;
+import java.util.Set;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -12,6 +15,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -33,6 +37,7 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 
 	private final ExecutionData data;
 	private final Scenario scenario;
+	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 
 	private final static VehicleData DUMMY_VEHDATA = new VehicleData(null, null, null);
 
@@ -44,6 +49,7 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
+		transitDrivers.add(event.getDriverId());
 		// store information about the current service of the transit vehicle
 		this.data.vehicleData.put(event.getVehicleId(), new VehicleData(event.getTransitLineId(), event.getTransitRouteId(), event.getDepartureId()));
 		LineData line = this.data.lineData.computeIfAbsent(event.getTransitLineId(), id -> new LineData());
@@ -82,7 +88,7 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		VehicleData vehData = this.data.vehicleData.get(event.getVehicleId());
-		if (vehData != null) {
+		if (vehData != null && !this.transitDrivers.contains(event.getPersonId())) {
 			vehData.currentPaxCount++;
 			double waitStart = this.data.waitingStarttimes.remove(event.getPersonId());
 			LineData line = this.data.lineData.get(vehData.lineId);
@@ -104,6 +110,7 @@ public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitD
 	@Override
 	public void reset(int iteration) {
 		this.data.reset();
+		this.transitDrivers.clear();
 	}
 
 }
