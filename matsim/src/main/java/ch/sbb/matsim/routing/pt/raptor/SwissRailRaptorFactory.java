@@ -4,10 +4,12 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.pt.router.TransitScheduleChangedEventHandler;
+import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -34,15 +36,15 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     private final Network network;
 
     @Inject
-    public SwissRailRaptorFactory(final TransitSchedule schedule, final Vehicles transitVehicles, final Config config, final Network network,
+    public SwissRailRaptorFactory(final Scenario scenario, final Config config,
                                   RaptorParametersForPerson raptorParametersForPerson, RaptorRouteSelector routeSelector,
                                   Provider<RaptorStopFinder> stopFinderProvider, ExecutionData executionData,
                                   RaptorInVehicleCostCalculator inVehicleCostCalculator,
                                   final EventsManager events) {
-        this.schedule = schedule;
-        this.transitVehicles = transitVehicles;
+        this.schedule = scenario.getTransitSchedule();
+        this.transitVehicles = scenario.getTransitVehicles();
         this.raptorConfig = RaptorUtils.createStaticConfig(config);
-        this.network = network;
+        this.network = scenario.getNetwork();
         this.raptorParametersForPerson = raptorParametersForPerson;
         this.routeSelector = routeSelector;
         this.stopFinderProvider = stopFinderProvider;
