@@ -155,6 +155,7 @@ public class Realm {
         if (agent.isTransitVehicle()) {
             return;
             //assures PT vehicles never update their PCUEs, as only they have a capacity > 0
+            //check is not strictly necessary in current code, adding it just in case
         }
         if (agent.plan.size < agent.planIndex + 3) {
             return;

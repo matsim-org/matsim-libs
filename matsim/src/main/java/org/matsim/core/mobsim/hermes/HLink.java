@@ -175,6 +175,11 @@ public class HLink {
 	public void reset() {
 		queue.clear();
 		this.nextFreeFlowSlot = 0;
+		this.lastPush = 0;
+		this.lastUpdate = 0;
+		this.currentCapacity = initialCapacity;
+		this.flowLeftInTimestep = flowCapacityPerS;
+
 	}
 
 	public boolean push(Agent agent, int timestep, float storageCapacityPCU) {
