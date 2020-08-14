@@ -86,6 +86,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static double SIGNAL_MERGE_DISTANCE = 30; //changed from 40m sb 25.03.2020
 	private final static double SIGNAL_LANES_CAPACITY = 2000.0;
 	private final static double THROUGHLINK_ANGLE_TOLERANCE = 0.1666667;
+	private final static double DEGREE_TOLERANCE_ROUNDABOUTS = 1.;
 	private final static int PEDESTRIAN_CROSSING_TIME = 20;
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
@@ -164,7 +165,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_07_31";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_08_13";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -450,7 +451,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
-                    if(link.getNumberOfLanes()<1.) LOG.warn(link.getNumberOfLanes());
 					fillLanesAndCheckRestrictions(link);
 				} else {
 					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
@@ -1966,7 +1966,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					LOG.warn("Lane-Tag was Null " + directionsPerLane[j] + " -> at link "+id.toString());
 				} else {
 					//Add here tempDir = 99 -> decide later what happens than with this
-//					tempDir = null;
 					tempDir = 99;
 					LOG.warn("Could not read Turnlanes: \"" + directionsPerLane[j] + "\" -> at link "+id.toString());
 				}
@@ -2057,7 +2056,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			for (int i = (int) link.getNumberOfLanes(); i > 0; i--) {
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
 						.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-				setToLinksForLaneWithTurnLanes(lane, laneStack.pop(), linkVectors, (laneStack.size() == 1));
+				setToLinksForLaneWithTurnLanes(lane, laneStack.pop(), linkVectors, (laneStack.size() == 1), link.getId());
+                if (link.getId().toString().equals("7753")){
+                    LOG.info("DEbug"+lane.getToLinkIds().get(0));
+                }
 			}
 		} else {
 			setToLinksForLanesDefault(link, linkVectors);
@@ -2086,6 +2088,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (Math.abs(toLinks.get(i).getRotation() - Math.PI) > Math
 						.abs(toLinks.get(reverseLink).getRotation() - Math.PI))
 					reverseLink = i;
+
 			}
 			if (toLinks.get(straightLink).getRotation() < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
 					|| toLinks.get(straightLink).getRotation() > (1. + THROUGHLINK_ANGLE_TOLERANCE) * Math.PI) {
@@ -2099,6 +2102,20 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 				return;
 			}
+
+			//sbraun08082020 dieser Fall oben führt zu falschen ergebnissen -> finde reverse Link mit Node-Koordinaten:
+			if (toLinks.size()==2){
+				for (int i = 1; i < toLinks.size(); i++){
+					Link tempLink = toLinks.get(i).getLink();
+					if (tempLink.getToNode().getId().equals(link.getFromNode().getId()) &&
+							tempLink.getFromNode().getId().equals(link.getToNode().getId())){
+						reverseLink = i;
+						break;
+					}
+				}
+			}
+
+
 			if (toLinks.size() == 2 && reverseLink >= 0) {
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 				return;
@@ -2214,7 +2231,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	// Fills Lanes with turn:lane informations
 	private void setToLinksForLaneWithTurnLanes(Lane lane, Stack<Integer> laneStack, List<LinkVector> toLinks,
-			boolean singleLaneOfTheLink) {
+			boolean singleLaneOfTheLink, Id<Link> linkId) {
 		//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "OSM-Information");
 		int alignmentAnte;
 		LinkVector throughLink = toLinks.get(0);
@@ -2264,9 +2281,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				//then remove dummy lane logic in laneStack
 				break;
 			}
-			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
+			if (tempDir < 0 && tempDir > -5 || tempDir == 99) { // all right directions (right,
 				// slight_right,sharp_right)
-                //sbraun this is probably a bug, templink is always empty
+                //sbraun 08082020 added tempDir == 99
 //				for (LinkVector lvec : tempLinks) {
                 for (LinkVector lvec : toLinks) {
 					if (lvec.dirTheta < (1. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI)
@@ -2503,10 +2520,35 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 																	//sbraun24072020: added 99 -> a direction which has been not understood previously
 				alignmentAnte = lane.getAlignment(); // look for the most "forward" link (closest to 180° or pi) and
 														// take it
+				//sbraun 08082020added special case rounabouts where through should actually be left //TODO Theresa fragen
 
-				lane.addToLinkId(throughLink.getLink().getId());
+				boolean unclearThrough = false;
+				if (toLinks.size()==2) {
+					if (Math.abs(toLinks.get(0).dirTheta-Math.PI) < DEGREE_TOLERANCE_ROUNDABOUTS &&
+							Math.abs(toLinks.get(1).dirTheta-Math.PI) < DEGREE_TOLERANCE_ROUNDABOUTS &&
+							!(toLinks.get(0).getLink().equals(reverseLink)||toLinks.get(1).getLink().equals(reverseLink))){
+						unclearThrough = true;
+					}
+				}
+				if (unclearThrough) {
+					LOG.warn("Detected unclear through direction at Lane " + lane.getId() +
+							" this might be a large Roundabout. Therefore add both ToLinks as 'through'.");
+				}
+				if (unclearThrough){
+					lane.addToLinkId(toLinks.get(0).getLink().getId());
+					lane.addToLinkId(toLinks.get(1).getLink().getId());
+				} else {
+					lane.addToLinkId(throughLink.getLink().getId());
+				}
+
 				if (this.SAVE_TURN_LANES) {
-					String toLinkId = throughLink.getLink().getId().toString();
+					String toLinkId;
+					if (unclearThrough) {
+						toLinkId = toLinks.get(0).getLink().getId().toString()+","+toLinks.get(1).getLink().getId().toString();
+					}else {
+						toLinkId = throughLink.getLink().getId().toString();
+					}
+
 					if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
 						lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":through");
 					} else {
@@ -2518,7 +2560,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (alignmentAnte == -2)
 					lane.setAlignment(-1);
 			}
-			if (tempDir == 5) { // lane direction: "reverse"
+			//sbraun08082020 added this to ensure that some special links are connected e.g. Baenschstr./Berlin
+			if (tempDir == 5 || network.getLinks().get(linkId).getNumberOfLanes()==1 ) { // lane direction: "reverse"
 				// look for the most "backward" link (furthest from 180° or pi)
 				// and take it
 				alignmentAnte = lane.getAlignment();
@@ -2529,18 +2572,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					alignmentAnte = -10;
 				}
 				if (reverseLink!=null) {
-					lane.addToLinkId(reverseLink.getLink().getId());
-				}
-				if (this.SAVE_TURN_LANES ==true) {
-					String toLinkId = reverseLink.getLink().getId().toString();
+                    lane.addToLinkId(reverseLink.getLink().getId());
 
-					if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-						lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":reverse");
-					} else {
-						String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-						lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|"+ toLinkId + ":reverse");
-					}
-				}
+                    if (this.SAVE_TURN_LANES == true) {
+                        String toLinkId = reverseLink.getLink().getId().toString();
+
+                        if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+                            lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":reverse");
+                        } else {
+                            String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+                            lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":reverse");
+                        }
+                    }
+                }
 				if (alignmentAnte == 0)
 					lane.setAlignment(1);
 				else
@@ -2633,13 +2677,20 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (restriction.restrictionValue == false) {
 					LinkVector lvec2remove = null;
 					for (LinkVector linkVector : toLinks) {
+						//sbraun08082020 added this to allow Uturns
+						if (linkVector.getLink().getToNode().getId().equals(fromLink.getFromNode().getId()) &&
+								linkVector.getLink().getFromNode().getId().equals(fromLink.getToNode().getId())&&
+								toLinks.size()==2){
+							LOG.warn("Don't delete reverse Link from Link "+fromLink.getId().toString()+"! Just a quick fix must be repaired");
+							continue;
+						}
 						if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
 								.toString()) == restriction.toRestricted.id) {
 							lvec2remove = linkVector;
 							break;
 						}
 					}
-					toLinks.remove(lvec2remove);
+					if (lvec2remove!=null) toLinks.remove(lvec2remove);
 				} else {
 					for (LinkVector linkVector : toLinks) {
 						if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
