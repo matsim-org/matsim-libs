@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
 import java.util.ArrayDeque;
@@ -85,13 +103,15 @@ public class Realm {
     }
 
     private void advanceAgent(Agent agent) {
-        long centry = agent.currPlan();
-        if (HermesConfigGroup.DEBUG_REALMS)
+        if (HermesConfigGroup.DEBUG_REALMS) {
+            long centry = agent.currPlan();
             log(secs, String.format("agent %d finished %s (prev plan index is %d)", agent.id, Agent.toString(centry), agent.planIndex));
+        }
         agent.planIndex++;
-        long nentry = agent.currPlan();
-        if (HermesConfigGroup.DEBUG_REALMS)
+        if (HermesConfigGroup.DEBUG_REALMS) {
+            long nentry = agent.currPlan();
             log(secs, String.format("agent %d starting %s (new plan index is %d)", agent.id, Agent.toString(nentry), agent.planIndex));
+        }
     }
 
     protected boolean processAgentLink(Agent agent, long planentry, int currLinkId) {
@@ -104,8 +124,8 @@ public class Realm {
         // the max(1, ...) ensures that a link hop takes at least on step.
         int traveltime = HermesConfigGroup.LINK_ADVANCE_DELAY + Math.max(1, next.length() / Math.min(velocity, next.velocity()));
         agent.linkFinishTime = secs + traveltime;
-
-        if (next.push(agent,secs)) {
+        float storageCapacityPCU = agent.getStorageCapacityPCUE();
+        if (next.push(agent,secs,storageCapacityPCU)) {
             advanceAgentandSetEventTime(agent);
             // If the agent we just added is the head, add to delayed links
             if (currLinkId != next.id() && next.queue().peek() == agent) {
@@ -126,8 +146,25 @@ public class Realm {
     protected boolean processAgentSleepUntil(Agent agent, long planentry) {
         int sleep = Agent.getSleepPlanEntry(planentry);
         add_delayed_agent(agent, Math.max(sleep, secs + 1));
+        updateCapacities(agent);
         advanceAgentandSetEventTime(agent);
         return true;
+    }
+
+    private void updateCapacities(Agent agent) {
+        if (agent.isTransitVehicle()) {
+            return;
+            //assures PT vehicles never update their PCUEs, as only they have a capacity > 0
+            //check is not strictly necessary in current code, adding it just in case
+        }
+        if (agent.plan.size < agent.planIndex + 3) {
+            return;
+        }
+        if (Agent.getPlanHeader(agent.plan.get(agent.planIndex + 2)) == Agent.LinkType) {
+            int category = Agent.getLinkPCEEntry(agent.nextPlan());
+            agent.setStorageCapacityPCUE(si.getStorageCapacityPCE(category));
+            agent.setFlowCapacityPCUE(si.getFlowCapacityPCE(category));
+        }
     }
 
     protected boolean processAgentWait(Agent agent, long planentry) {
@@ -254,17 +291,15 @@ public class Realm {
     protected int processLinks(HLink link) {
         int routed = 0;
         Agent agent = link.queue().peek();
-        int curr_flow = link.flow(secs);
-
-        while (agent.linkFinishTime <= secs && curr_flow > 0) {
+        while (agent.linkFinishTime <= secs && link.flow(secs, agent.getFlowCapacityPCUE())) {
             boolean finished = agent.finished();
             // if finished, install times on last event.
             if (finished) {
                 setEventTime(agent, agent.events().size() - 1, secs, true);
             }
             if (finished || processAgent(agent, link.id())) {
-                link.pop();
-                curr_flow -= 1;
+                float storageCapacityPCE = agent.getStorageCapacityPCUE();
+                link.pop(storageCapacityPCE);
                 routed += 1;
                 if ((agent = link.queue().peek()) == null) {
                     break;

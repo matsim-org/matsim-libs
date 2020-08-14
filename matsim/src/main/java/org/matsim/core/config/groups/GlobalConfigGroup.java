@@ -20,12 +20,11 @@
 
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
+import java.util.Map;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.Map;
+import org.apache.log4j.Logger;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
@@ -70,8 +69,8 @@ public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private int numberOfThreads = 2;
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String NUMBER_OF_THREADS_CMT = "\"global\" number of threads.  "
-							     + "This number is used, e.g., for replanning, but NOT in the mobsim.  "
-							     + "This can typically be set to as many cores as you have available, or possibly even slightly more.";
+			+ "This number is used, e.g., for replanning, but NOT in QSim.  "
+			+ "This can typically be set to as many cores as you have available, or possibly even slightly more.";
 
     private static final String DEFAULT_DELIMITER = "defaultDelimiter";
     private static final String DEFAULT_DELIMITER_CMT = "Default Delimiter for CSV files. May not be recognized by all writers.";

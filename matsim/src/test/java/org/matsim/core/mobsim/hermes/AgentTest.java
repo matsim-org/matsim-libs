@@ -16,43 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.mobsim.hermes;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.AllowsConfiguration;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
+import org.junit.Test;
+import org.locationtech.jts.util.Assert;
 
-public class HermesBuilder implements AllowsConfiguration {
 
-	@Override
-	public AllowsConfiguration addOverridingModule(AbstractModule abstractModule) {
-		// TODO Auto-generated method stub
-		return null;
+public class AgentTest {
+
+	@Test
+	public void prepareLinkEntry() {
+		for (int eventid = 1; eventid < HermesConfigGroup.MAX_EVENTS_AGENT; eventid *= 8) {
+			for (int lid = 1; lid < HermesConfigGroup.MAX_LINK_ID; lid *= 8) {
+				for (int j = 0; j < 255; j++) {
+					for (int i = 0; i < 15; i++) {
+						long flatplanentry = Agent.prepareLinkEntry(eventid, lid, j, i);
+						int testedEventId = Agent.getPlanEvent(flatplanentry);
+						int testedVelocity = Agent.getVelocityPlanEntry(flatplanentry);
+						int testedLinkId = Agent.getLinkPlanEntry(flatplanentry);
+						int testedPCECat = Agent.getLinkPCEEntry(flatplanentry);
+						Assert.equals(j, testedVelocity);
+						Assert.equals(eventid, testedEventId);
+						Assert.equals(lid, testedLinkId);
+						Assert.equals(i, testedPCECat);
+					}
+				}
+			}
+		}
+
 	}
-
-	@Override
-	public AllowsConfiguration addOverridingQSimModule(AbstractQSimModule qsimModule) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AllowsConfiguration addQSimModule(AbstractQSimModule qsimModule) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AllowsConfiguration configureQSimComponents(QSimComponentsConfigurator configurator) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public Hermes build(Scenario scenario, EventsManager eventsmanager) {
-		return new Hermes(scenario, eventsmanager);
-	}
-
 }

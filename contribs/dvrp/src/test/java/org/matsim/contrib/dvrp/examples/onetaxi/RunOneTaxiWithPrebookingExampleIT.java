@@ -22,13 +22,16 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup.AgentWakeupEvent;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.inject.Singleton;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.assertj.core.data.Offset;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -60,10 +63,6 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.inject.Singleton;
-
 public class RunOneTaxiWithPrebookingExampleIT {
 
 	private static final Logger log = Logger.getLogger(RunOneTaxiWithPrebookingExampleIT.class);
@@ -71,6 +70,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Ignore
 	@Test
 	public void testRun() {
 		// load config
