@@ -7,8 +7,11 @@ import org.locationtech.jts.geom.prep.PreparedGeometryFactory;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
@@ -25,23 +28,33 @@ final class ShieldingContext {
     //obstruction candidates. nkuehnel, mar '20
     private final STRtree noiseBarriers;
     private final static double GROUND_HEIGHT = 0.5;
+    private final ShieldingCorrection shieldingCorrection;
 
-    ShieldingContext(Collection<? extends NoiseBarrier> noiseBarriers) {
+    @Inject
+    ShieldingContext(Config config, ShieldingCorrection shieldingCorrection) {
+        this.shieldingCorrection = shieldingCorrection;
+        NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 
         this.noiseBarriers = new STRtree();
-        for (NoiseBarrier barrier : noiseBarriers) {
-            try {
-                this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
-            } catch (IllegalArgumentException e) {
-                logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
+        if(noiseParams.isConsiderNoiseBarriers()) {
+            final Collection<FeatureNoiseBarrierImpl> barriers
+                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(),
+                    noiseParams.getNoiseBarriersSourceCRS(), config.global().getCoordinateSystem());
+
+            for (NoiseBarrier barrier : barriers) {
+                try {
+                    this.noiseBarriers.insert(barrier.getGeometry().getEnvelopeInternal(), barrier);
+                } catch (IllegalArgumentException e) {
+                    logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
+                }
             }
         }
     }
 
     /**
-     * determines the shielding correction for a receiver point for a given link emission source
+     * determines the shielding value z for a receiver point for a given link emission source
      */
-    double determineShieldingCorrection(ReceiverPoint receiverPoint, Link link, Coord projectedCoord) {
+    double determineShieldingValue(ReceiverPoint receiverPoint, Link link, Coord projectedCoord) {
         double correctionTermShielding = 0;
         final Point rpPoint = GeometryUtils.createGeotoolsPoint(receiverPoint.getCoord());
         final Point projectedPoint = GeometryUtils.createGeotoolsPoint(projectedCoord);
@@ -118,7 +131,7 @@ final class ShieldingContext {
             double lastEdgeToSourceDistance = Math.sqrt(lastEdgeSourceXYDiff * lastEdgeSourceXYDiff
                     + lastEdgeSourceZDiff * lastEdgeSourceZDiff);
 
-            correctionTermShielding = NoiseEquations.calculateShieldingCorrection(
+            correctionTermShielding = shieldingCorrection.calculateShieldingCorrection(
                     rpPoint.distance(projectedPoint), lastEdgeToSourceDistance, receiverToFirstEdgeDistance, shieldingDepth);
         }
         return correctionTermShielding;

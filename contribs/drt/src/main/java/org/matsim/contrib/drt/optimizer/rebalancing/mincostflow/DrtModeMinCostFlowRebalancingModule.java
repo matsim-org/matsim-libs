@@ -27,8 +27,17 @@ import java.util.Map;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.analysis.zonal.*;
+import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
+import org.matsim.contrib.drt.analysis.zonal.EqualVehicleDensityZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.FleetSizeWeightedByPopulationShareDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.TimeDependentActivityBasedZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -36,7 +45,6 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
@@ -78,7 +86,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
-
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
@@ -98,36 +105,52 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		});
 
 		switch (params.getZonalDemandAggregatorType()) {
-			case PreviousIterationZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.get(EventsManager.class),
-								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+			case PreviousIteration:
+				bindModal(PreviousIterationZonalDRTDemandAggregator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								drtCfg))).asEagerSingleton();
+				bindModal(ZonalDemandAggregator.class).to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
+				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
 				break;
-			case ActivityLocationBasedZonalDemandAggregator:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new ActivityLocationBasedZonalDemandAggregator(getter.get(EventsManager.class),
+			case TimeDependentActivityBased:
+				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new TimeDependentActivityBasedZonalDemandAggregator(
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+				bindModal(ZonalDemandAggregator.class).to(
+						modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
+				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
 				break;
-			case EqualVehicleDensityZonalDemandAggregator:
+			case EqualVehicleDensity:
+				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+								getter.getModal(FleetSpecification.class))));
 				break;
+			case FleetSizeWeightedByPopulationShare:
+				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
+				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(getter.getModal(DrtZonalSystem.class),
+								getter.get(Population.class), getter.getModal(FleetSpecification.class))));
+				break;
+			default:
+				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="
+						+ params.getZonalDemandAggregatorType());
 		}
 
 		{
 			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class), drtCfg.getMode(),
-							getter.getModal(DrtZonalSystem.class),
-							getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+			bindModal(ZonalIdleVehicleXYVisualiser.class).
+					toProvider(modalProvider(
+							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
+			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
-			addControlerListenerBinding().toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
-							getter.get(EventsManager.class),
-							getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class))))
-					.asEagerSingleton();
+			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
+					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
+							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
+			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 		}
 
 	}
