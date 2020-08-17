@@ -26,8 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -56,7 +54,6 @@ public final class FleetSizeWeightedByPopulationShareDemandAggregator implements
 		prepareZones();
 		countFirstActsPerZone(population);
 		this.fleetSpecification = fleetSpecification;
-//		this.fleetSize = fleetSpecification.getVehicleSpecifications().size();
 	}
 
 	private void countFirstActsPerZone(Population population) {
