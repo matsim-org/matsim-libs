@@ -1,5 +1,24 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -17,7 +36,14 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * Tests different aspects of flow capacity in Hermes
+ *
+ */
 public class FlowCapacityTest {
 
 	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
@@ -57,6 +83,8 @@ public class FlowCapacityTest {
 			f.plans.addPerson(person);
 		}
 
+
+
 		/* build events */
 		EventsManager events = EventsUtils.createEventsManager();
 		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
@@ -67,19 +95,274 @@ public class FlowCapacityTest {
 		sim.run();
 
 		/* finish */
+		int[] volume1 = vAnalyzer.getVolumesForLink(f.link1.getId());
+		System.out.println("#vehicles 3-4: " + volume1[3]);
+		System.out.println("#vehicles 4-5: " + volume1[4]);
+		System.out.println("#vehicles 5-6: " + volume1[5]);
+		System.out.println("#vehicles 6-7: " + volume1[6]);
+		System.out.println("#vehicles 7-8: " + volume1[7]);
+		System.out.println("#vehicles 8-9: " + volume1[8]);
+		/* finish */
 		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
-		System.out.println("#vehicles 3-4: " + Integer.toString(volume[3]));
-		System.out.println("#vehicles 4-5: " + Integer.toString(volume[4]));
-		System.out.println("#vehicles 5-6: " + Integer.toString(volume[5]));
-		System.out.println("#vehicles 6-7: " + Integer.toString(volume[6]));
-		System.out.println("#vehicles 7-8: " + Integer.toString(volume[7]));
-		System.out.println("#vehicles 8-9: " + Integer.toString(volume[8]));
+		System.out.println("#vehicles 3-4: " + volume[3]);
+		System.out.println("#vehicles 4-5: " + volume[4]);
+		System.out.println("#vehicles 5-6: " + volume[5]);
+		System.out.println("#vehicles 6-7: " + volume[6]);
+		System.out.println("#vehicles 7-8: " + volume[7]);
+		System.out.println("#vehicles 8-9: " + volume[8]);
+
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(3004, volume[6], 1);  // we should have half of the maximum flow in this hour
+		Assert.assertEquals(6000, volume[7], 1);  // we should have maximum flow in this hour
+		Assert.assertEquals(2996, volume[8], 1);  // all the rest
+
+	}
+
+	/**
+	 * Tests downscaling of flow capacity works
+	 *
+	 * @author jfbischoff
+	 */
+
+	@Test
+	public void testFlowCapacityDrivingFlowCapacityFactors() {
+		Fixture f = new Fixture();
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 1200; i++) {
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+			a.setEndTime(7*3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+			leg.setRoute(route);
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+			f.plans.addPerson(person);
+		}
+		f.config.hermes().setFlowCapacityFactor(0.1);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		events.addHandler(vAnalyzer);
+
+		/* run sim */
+		Hermes sim = HermesTest.createHermes(f, events);
+		sim.run();
+
+		/* finish */
+		int[] volume1 = vAnalyzer.getVolumesForLink(f.link1.getId());
+		System.out.println("#vehicles 3-4: " + volume1[3]);
+		System.out.println("#vehicles 4-5: " + volume1[4]);
+		System.out.println("#vehicles 5-6: " + volume1[5]);
+		System.out.println("#vehicles 6-7: " + volume1[6]);
+		System.out.println("#vehicles 7-8: " + volume1[7]);
+		System.out.println("#vehicles 8-9: " + volume1[8]);
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		System.out.println("#vehicles 3-4: " + volume[3]);
+		System.out.println("#vehicles 4-5: " + volume[4]);
+		System.out.println("#vehicles 5-6: " + volume[5]);
+		System.out.println("#vehicles 6-7: " + volume[6]);
+		System.out.println("#vehicles 7-8: " + volume[7]);
+		System.out.println("#vehicles 8-9: " + volume[8]);
+
+		Assert.assertEquals(0, volume[5], 1);     // no vehicles
+		Assert.assertEquals(301, volume[6], 1);  // we should have half of the maximum flow in this hour
+		Assert.assertEquals(600, volume[7], 1);  // we should have maximum flow in this hour
+		Assert.assertEquals(299, volume[8], 1);  // all the rest
+
+	}
+
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working
+	 *
+	 * @author jfbischoff
+	 */
+
+	@Test
+	public void testFlowCapacityDrivingFlowEfficiencyFactors() {
+		Fixture f = new Fixture();
+		ScenarioImporter.flush();
+
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
+		av.setFlowEfficiencyFactor(2.0);
+		f.scenario.getVehicles().addVehicleType(av);
+
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setFlowEfficiencyFactor(1.0);
+		f.scenario.getVehicles().addVehicleType(car);
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 12000; i++) {
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+			a.setEndTime(7 * 3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+			leg.setRoute(route);
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+			f.scenario.getPopulation().addPerson(person);
+
+			//every second plan gets a super flowy AV
+			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
+			f.scenario.getVehicles().addVehicle(vehicle);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+
+		}
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		events.addHandler(vAnalyzer);
+
+		/* run sim */
+		Hermes sim = HermesTest.createHermes(f, events);
+		sim.run();
+
+
+		/* finish */
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		System.out.println("#vehicles 3-4: " + volume[3]);
+		System.out.println("#vehicles 4-5: " + volume[4]);
+		System.out.println("#vehicles 5-6: " + volume[5]);
+		System.out.println("#vehicles 6-7: " + volume[6]);
+		System.out.println("#vehicles 7-8: " + volume[7]);
+		System.out.println("#vehicles 8-9: " + volume[8]);
 
 
 		Assert.assertEquals(0, volume[5]);    // no vehicles
-		Assert.assertEquals(3602, volume[6]); // we should have half of the maximum flow in this hour
-		Assert.assertEquals(7200, volume[7]); // we should have maximum flow in this hour
-		Assert.assertEquals(1198, volume[8]); // all the rest
+		Assert.assertEquals(4005, volume[6]); // we should have half of the maximum flow in this hour * 1.5, because every second vehicle is super flowy
+		Assert.assertEquals(7995, volume[7]); // all the rest
+		Assert.assertEquals(0, volume[8]); // nothing
+
+	}
+
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working also in combination with downscaling
+	 *
+	 * @author jfbischoff
+	 */
+
+	@Test
+	public void testFlowCapacityDrivingFlowEfficiencyFactorsWithDownscaling() {
+		Fixture f = new Fixture();
+		ScenarioImporter.flush();
+
+		VehicleType av = VehicleUtils.createVehicleType(Id.create("av", VehicleType.class));
+		av.setFlowEfficiencyFactor(2.0);
+		f.scenario.getVehicles().addVehicleType(av);
+
+		VehicleType car = VehicleUtils.createVehicleType(Id.create("car", VehicleType.class));
+		car.setFlowEfficiencyFactor(1.0);
+		f.scenario.getVehicles().addVehicleType(car);
+
+		f.config.hermes().setFlowCapacityFactor(0.1);
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 1200; i++) {
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+			a.setEndTime(7 * 3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+			leg.setRoute(route);
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+			f.scenario.getPopulation().addPerson(person);
+
+			//every second plan gets a super flowy AV
+			Vehicle vehicle = i % 2 == 1 ? VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), av) : VehicleUtils.createVehicle(Id.createVehicleId(person.getId()), car);
+			f.scenario.getVehicles().addVehicle(vehicle);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car, vehicle.getId()));
+		}
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		events.addHandler(vAnalyzer);
+
+		/* run sim */
+		Hermes sim = HermesTest.createHermes(f, events);
+		sim.run();
+
+
+		/* finish */
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		System.out.println("#vehicles 3-4: " + volume[3]);
+		System.out.println("#vehicles 4-5: " + volume[4]);
+		System.out.println("#vehicles 5-6: " + volume[5]);
+		System.out.println("#vehicles 6-7: " + volume[6]);
+		System.out.println("#vehicles 7-8: " + volume[7]);
+		System.out.println("#vehicles 8-9: " + volume[8]);
+
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(401, volume[6], 1); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
+		Assert.assertEquals(799, volume[7], 1);  // all the rest
+		Assert.assertEquals(0, volume[8], 1);  // nothing
+	}
+
+	/**
+	 * Tests flow efficiency factors, e.g. for AVs, are working with downscaling and a value <1 for flow efficiency
+	 *
+	 * @author jfbischoff
+	 */
+
+	@Test
+	public void testFlowCapacityEfficiencyFactorWithLowValueAndDownscaling() {
+		Fixture f = new Fixture();
+		ScenarioImporter.flush();
+
+		VehicleType tractor = VehicleUtils.createVehicleType(Id.create("tractor", VehicleType.class));
+		tractor.setFlowEfficiencyFactor(0.5);
+		f.scenario.getVehicles().addVehicleType(tractor);
+		f.config.hermes().setFlowCapacityFactor(0.1);
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 1200; i++) {
+			Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
+			Plan plan = PersonUtils.createAndAddPlan(person, true);
+			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+			a.setEndTime(7*3600 - 1812);
+			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
+			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+			leg.setRoute(route);
+			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+			f.scenario.getPopulation().addPerson(person);
+
+			//every second person gets an unflowy, but speedy tractor
+			if (i%2==1){
+				Vehicle vehicle = VehicleUtils.createVehicle(Id.createVehicleId(person.getId()),tractor);
+				f.scenario.getVehicles().addVehicle(vehicle);
+				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(TransportMode.car,vehicle.getId()));
+			}
+		}
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 10*3600, f.network);
+		events.addHandler(vAnalyzer);
+
+		/* run sim */
+		Hermes sim = HermesTest.createHermes(f, events);
+		sim.run();
+
+
+		/* finish */
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+		System.out.println("#vehicles 3-4: " + volume[3]);
+		System.out.println("#vehicles 4-5: " + volume[4]);
+		System.out.println("#vehicles 5-6: " + volume[5]);
+		System.out.println("#vehicles 6-7: " + volume[6]);
+		System.out.println("#vehicles 7-8: " + volume[7]);
+		System.out.println("#vehicles 8-9: " + volume[8]);
+		Assert.assertEquals(0, volume[5], 1);    // no vehicles
+		Assert.assertEquals(201, volume[6], 1); // we should have half of the maximum flow in this hour * 1.3333, because every second vehicle is super flowy
+		Assert.assertEquals(400, volume[7], 1);
+		Assert.assertEquals(400, volume[8], 1);
+		Assert.assertEquals(199, volume[9], 1);
 
 	}
 
@@ -92,6 +375,7 @@ public class FlowCapacityTest {
 	@Test
 	public void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture();
+		ScenarioImporter.flush();
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30

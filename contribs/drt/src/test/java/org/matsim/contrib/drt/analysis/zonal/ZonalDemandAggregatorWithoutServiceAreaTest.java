@@ -38,6 +38,11 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
@@ -46,6 +51,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -74,6 +81,33 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 1, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 1, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 1, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+		}
+	}
+
+	@Test
+	public void EqualVehicleDensityZonalDemandAggregatorFleetModificationTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.EqualVehicleDensity, "");
+		// double number of vehicles after 0th iteration -> estimation of demand should double too
+		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(FleetModifier.class).toProvider(modalProvider(
+						getter -> new FleetModifier(getter.getModal(FleetSpecification.class),8))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(FleetModifier.class));
+			}
+		});
+		controler.run();
+		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		for(double ii = 0; ii < 16 * 3600; ii+=1800){
+			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 2, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 2, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 2, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 2, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 5", 2, demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 2, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 2, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 2, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
 		}
 	}
 
@@ -139,6 +173,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		for(double ii = 0; ii < 16 * 3600; ii+=1800){
 			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 0, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
+			// 99 activities of a 297 total at 8 vehicles: (99/297)*8 = 2.67
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 2, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 0, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 2, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
@@ -146,6 +181,34 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 0, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 0, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 2, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+		}
+	}
+
+	@Test
+	public void FleetSizeWeightedByPopulationShareDemandAggregatorFleetModificationTest(){
+		Controler controler = setupControler(MinCostFlowRebalancingParams.ZonalDemandAggregatorType.FleetSizeWeightedByPopulationShare, "");
+		// double number of vehicles after 0th iteration -> estimation of demand should double too (besides rounding issues)
+		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
+			@Override
+			public void install() {
+				bindModal(FleetModifier.class).toProvider(modalProvider(
+						getter -> new FleetModifier(getter.getModal(FleetSpecification.class),8))).asEagerSingleton();
+				addControlerListenerBinding().to(modalKey(FleetModifier.class));
+			}
+		});
+		controler.run();
+		ZonalDemandAggregator aggregator = controler.getInjector().getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		for(double ii = 0; ii < 16 * 3600; ii+=1800){
+			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 1", 0, demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
+			// 99 activities of a 297 total at 16 vehicles: (99/297)*16 = 5.33
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 2", 5, demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 3", 0, demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 4", 5, demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 5", 0, demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 6", 0, demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 7", 0, demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("wrong estimation of demand at time=" + (ii+60) + " in zone 8", 5, demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
 		}
 	}
 
@@ -262,6 +325,38 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 
 			person.addPlan(plan);
 			population.addPerson(person);
+		}
+	}
+
+	private class FleetModifier implements IterationEndsListener {
+		private FleetSpecification fleetSpecification;
+		private int numberOfVehiclesToAdd;
+
+		FleetModifier(FleetSpecification fleetSpecification, int numberOfVehiclesToAdd) {
+			this.fleetSpecification = fleetSpecification;
+			this.numberOfVehiclesToAdd = numberOfVehiclesToAdd;
+		}
+
+		@Override
+		public void notifyIterationEnds(IterationEndsEvent event) {
+			if (event.getIteration() == 0) {
+				// find any vehicle id to clone later
+				Id<DvrpVehicle> vehicleIdToBeCopied = fleetSpecification.getVehicleSpecifications().keySet().iterator().next();
+				DvrpVehicleSpecification dvrpVehicleSpecficationToBeCloned = fleetSpecification.getVehicleSpecifications().get(vehicleIdToBeCopied);
+
+				for (int vehicleCounter = 1; vehicleCounter <= numberOfVehiclesToAdd; vehicleCounter++) {
+					Id<DvrpVehicle> id = Id.create("optDrt_" + vehicleCounter + "_cloneOf_" + dvrpVehicleSpecficationToBeCloned.getId(), DvrpVehicle.class);
+					DvrpVehicleSpecification newSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
+							.id(id)
+							.serviceBeginTime(dvrpVehicleSpecficationToBeCloned.getServiceBeginTime())
+							.serviceEndTime(dvrpVehicleSpecficationToBeCloned.getServiceEndTime())
+							.startLinkId(dvrpVehicleSpecficationToBeCloned.getStartLinkId())
+							.capacity(dvrpVehicleSpecficationToBeCloned.getCapacity())
+							.build();
+
+					fleetSpecification.addVehicleSpecification(newSpecification);
+				}
+			}
 		}
 	}
 

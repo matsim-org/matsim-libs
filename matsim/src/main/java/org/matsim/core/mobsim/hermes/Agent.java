@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.core.mobsim.hermes;
 
 import java.util.ArrayList;
@@ -64,7 +83,7 @@ public class Agent {
     // Possible headers (binary format) and corresponding payload:
     // <0000> SleepForType    | 4 bits unused | 16 bit event id  | 8 bits unused   | 32 bit sleep for a number of second
     // <0001> SleepUntilType  | 4 bits unused | 16 bit event id  | 8 bits unused   | 32 bit speep until a specific time
-    // <0010> LinkType        | 4 bits unused | 16 bit event id  | 32 bit link id  | 8 bit velocity
+    // <0010> LinkType        | 4 bits PCEcategory | 16 bit event id  | 32 bit link id  | 8 bit velocity
     // <0111> WaitType        | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
     // <0011> AccessType      | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
     // <0100> EgressType      | 4 bits unused | 16 bit event id  | 8 bits unused   | 16 bit route id | 16 station id
@@ -82,7 +101,7 @@ public class Agent {
 
     protected int eventsIndex;
 
-     // Timestamp of when the agent will be ready to exit link.
+    // Timestamp of when the agent will be ready to exit link.
     protected int linkFinishTime;
 
     // Number of passagers that this agent can take (zero for personal vehicles)
@@ -90,6 +109,9 @@ public class Agent {
 
     // Number of passegers that are currently being transported.
     private int passengersInside;
+
+    private float storageCapacityPCUE = -1;
+    private float flowCapacityPCUE = -1;
 
     // Array of passagers on this vehicle.
     private ArrayList<ArrayList<Agent>> passengersByStop;
@@ -113,20 +135,66 @@ public class Agent {
         return planEntry;
     }
 
-    public int id() { return this.id; }
-    public int linkFinishTime() { return this.linkFinishTime; }
-    public int planIndex() { return this.planIndex; }
-    public PlanArray plan() { return this.plan; }
-    public EventArray events() { return this.events; }
-    public long currPlan() { return this.plan.get(planIndex); }
-    public long prevPlan() { return this.plan.get(planIndex - 1); }
-    public boolean finished() { return planIndex >= (plan.size() - 1); }
+    public int id() {
+        return this.id;
+    }
 
-    public int capacity() {
+    public int linkFinishTime() {
+        return this.linkFinishTime;
+    }
+
+    public int planIndex() {
+        return this.planIndex;
+    }
+
+    public PlanArray plan() {
+        return this.plan;
+    }
+
+    public EventArray events() {
+        return this.events;
+    }
+
+    public long currPlan() {
+        return this.plan.get(planIndex);
+    }
+
+    public long prevPlan() {
+        return this.plan.get(planIndex - 1);
+    }
+
+    public long nextPlan() {
+        return this.plan.get(planIndex + 1);
+    }
+
+    public boolean finished() {
+        return planIndex >= (plan.size() - 1);
+    }
+
+    public float getFlowCapacityPCUE() {
+        return flowCapacityPCUE;
+    }
+
+    public void setFlowCapacityPCUE(float flowCapacityPCUE) {
+        this.flowCapacityPCUE = flowCapacityPCUE;
+    }
+
+    public float getStorageCapacityPCUE() {
+        return storageCapacityPCUE;
+    }
+
+    public void setStorageCapacityPCUE(float storageCapacityPCUE) {
+        this.storageCapacityPCUE = storageCapacityPCUE;
+    }
+
+    /*
+     *Number of passagers that this agent can take (zero for personal vehicles)
+     */
+    public int getCapacity() {
         return this.capacity;
     }
 
-    public boolean isVehicle() {
+    public boolean isTransitVehicle() {
         return this.passengersByStop == null;
     }
 
@@ -154,15 +222,18 @@ public class Agent {
         return getStopPlanEntry(plan.get(planIndex + 2));
     }
 
-    public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000Fl); }
-    public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFl); }
-    public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFl); }
-    public static int getLinkPlanEntry      (long plan) { return (int)((plan >>  8) & 0x00000000FFFFFFFFl); }
-    public static int getVelocityPlanEntry  (long plan) { return (int)( plan        & 0x00000000000000FFl); }
-    public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFl); }
-    public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFl); }
-    public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFl); }
-    public static int getSleepPlanEntry     (long plan) { return (int)( plan        & 0x00000000FFFFFFFFl); }
+    public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000FL); }
+    public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFL); }
+    public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFL); }
+    public static int getLinkPlanEntry      (long plan) {return (int) ((plan >> 8) & 0x00000000FFFFFFFFL); }
+    public static int getLinkPCEEntry       (long plan) {
+        return (int) ((plan >> 56) & 0x000000000000000FL);
+    }
+    public static int getVelocityPlanEntry  (long plan) {return (int) (plan & 0x00000000000000FFL); }
+    public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFL); }
+    public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFL); }
+    public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFL); }
+    public static int getSleepPlanEntry     (long plan) { return (int)( plan        & 0x00000000FFFFFFFFL); }
 
     private static void validatePlanEntry(long planEntry) {
         int event = Agent.getPlanEvent(planEntry);
@@ -190,7 +261,7 @@ public class Agent {
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
-    private static long prepareLinkEntryElement(long linkid, long velocity) {
+    private static long prepareLinkEntryElement(long linkid, long velocity, long pcecategory) {
         if (linkid > HermesConfigGroup.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
@@ -200,8 +271,7 @@ public class Agent {
 
         // Checking for velocities that are too low.
         velocity = velocity < 0 ? HermesConfigGroup.MAX_VEHICLE_VELOCITY : velocity;
-
-        return (linkid << 8) | velocity;
+        return (pcecategory << 56) | (linkid << 8) | velocity;
     }
 
     public static long prepareStopDelay(long type, long departure, long element) {
@@ -235,8 +305,9 @@ public class Agent {
         }
     }
 
-    public static long prepareLinkEntry(int eventid, int linkid, int velocity) {
-        return preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity));
+    public static long prepareLinkEntry(int eventid, int linkid, int velocity, int pcecategory) {
+        long l = preparePlanEventEntry(LinkType, eventid, prepareLinkEntryElement(linkid, velocity, pcecategory));
+        return l;
     }
 
     public static long prepareSleepForEntry(int eventid, int element) {
