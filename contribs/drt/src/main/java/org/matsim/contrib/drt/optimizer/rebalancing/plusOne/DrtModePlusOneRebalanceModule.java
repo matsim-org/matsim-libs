@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
@@ -36,7 +37,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
@@ -44,6 +44,7 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
  * @author michalm, Chengqi Lu
  */
 public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
+	private static final Logger log = Logger.getLogger(DrtModePlusOneRebalanceModule.class);
 	private final DrtConfigGroup drtCfg;
 
 	public DrtModePlusOneRebalanceModule(DrtConfigGroup drtCfg) {
@@ -53,7 +54,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		System.out.println("Plus one Rebalancing Algorithm is now being installed!");
+		log.info("Plus one Rebalancing Algorithm is now being installed!");
 		PlusOneRebalancingParams params = drtCfg.getPlusOneRebalancing().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
@@ -83,24 +84,30 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				bindModal(RebalancingStrategy.class).toProvider(
-						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class), params,
-								getter.get(EventsManager.class))))
+						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class))))
 						.asEagerSingleton();
+				addMobsimScopeEventHandlerBinding().to(PlusOneRebalancingStrategy.class);
+//				addMobsimScopeEventHandlerBinding().to(modalKey(PlusOneRebalancingStrategy.class));
 			}
 		});
+		
+
+		
 
 		{
-			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-			bindModal(ZonalIdleVehicleXYVisualiser.class).
-					toProvider(modalProvider(
-							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			// this is rather analysis - but depends on DrtZonalSystem so it can not be
+			// moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
+			bindModal(ZonalIdleVehicleXYVisualiser.class).toProvider(
+					modalProvider(getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
+							drtCfg.getMode(), getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
 
-			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+			bindModal(DrtZonalWaitTimesAnalyzer.class)
+					.toProvider(modalProvider(getter -> new DrtZonalWaitTimesAnalyzer(drtCfg,
+							getter.getModal(DrtRequestAnalyzer.class), getter.getModal(DrtZonalSystem.class))))
+					.asEagerSingleton();
 			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 		}

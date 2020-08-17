@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -23,7 +24,9 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.MobsimScopeEventHandler;
+
+import com.google.inject.Inject;
 
 /**
  * 
@@ -33,16 +36,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
  *         during the time period
  */
 public class PlusOneRebalancingStrategy implements RebalancingStrategy, PassengerRequestScheduledEventHandler,
-		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
+		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler, MobsimScopeEventHandler {
+	private static final Logger log = Logger.getLogger(PlusOneRebalancingStrategy.class);
 	private final Network network;
 
 	private final Map<Id<Link>, Integer> targetMap = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> potentialDRTTripsMap = new HashMap<>();
-
-	public PlusOneRebalancingStrategy(Network network,
-			PlusOneRebalancingParams params, EventsManager events) {
+	
+	@Inject
+	public PlusOneRebalancingStrategy(Network network) {
 		this.network = network;
-		events.addHandler(this);
 	}
 
 	@Override
@@ -52,10 +55,10 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 
 		// calculate the matching result
 		List<Relocation> relocations = matching(rebalancableVehicleList, targetMap, network);
-		
+
 		// clear the target map for next rebalancing cycle
 		targetMap.clear();
-		
+
 		// Return relocations
 		return relocations;
 	}
@@ -65,13 +68,16 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 		List<Relocation> relocationList = new ArrayList<>();
 		Map<Id<Link>, ? extends Link> linkMap = network.getLinks();
 		for (Id<Link> destinationLinkId : targetMap.keySet()) {
-			Link destinationLink = linkMap.get(destinationLinkId);
-			DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
-			if (nearestVehicle == null) {
-				break;
+			if (!rebalancableVehicles.isEmpty()) {
+				for (int i = 0; i < targetMap.get(destinationLinkId); i++) {
+					Link destinationLink = linkMap.get(destinationLinkId);
+					DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
+					relocationList.add(new Relocation(nearestVehicle, destinationLink));
+					rebalancableVehicles.remove(nearestVehicle);
+				}
 			} else {
-				relocationList.add(new Relocation(nearestVehicle, destinationLink));
-				rebalancableVehicles.remove(nearestVehicle);
+				log.warn("There is not enough vehicle to perform rebalance at this moment!");
+				break;
 			}
 		}
 		return relocationList;
@@ -106,7 +112,7 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 			targetMap.put(departureLink, 1);
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
 		potentialDRTTripsMap.remove(event.getPersonId());
