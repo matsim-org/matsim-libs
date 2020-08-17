@@ -45,15 +45,15 @@ public final class FleetSizeWeightedByPopulationShareDemandAggregator implements
 	private static Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandAggregator.class);
 
 	private final DrtZonalSystem zonalSystem;
+	private final FleetSpecification fleetSpecification;
 	private Map<String, Integer> activitiesPerZone = new HashMap<>();
-	private final int fleetSize;
 	private Integer totalNrActivities;
 
 	public FleetSizeWeightedByPopulationShareDemandAggregator(DrtZonalSystem zonalSystem, Population population, @NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
-		this.fleetSize = fleetSpecification.getVehicleSpecifications().size();
+		this.fleetSpecification = fleetSpecification;
 	}
 
 	private void countFirstActsPerZone(Population population) {
@@ -78,6 +78,7 @@ public final class FleetSizeWeightedByPopulationShareDemandAggregator implements
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
 		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
+		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
 		return zoneId ->  (int) Math.floor( ( this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities ) * fleetSize);
 	}
 
