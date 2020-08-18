@@ -49,7 +49,6 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	// 2. Read the data from previous iteration with some lead (e.g. 10 min), in
 	// order to compensate for the average time it take vehicles to reach the
 	// rebalance destination
-	// 3. Make the strength of feedforward signal adjustable (e.g. from 0% - 100%). 
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
 			FeedforwardRebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
@@ -60,9 +59,12 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 		rebalanceInterval = params.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
-		scale = rebalanceInterval / timeBinSize;
-
+		
+		scale = params.getFeedforwardSignalStrength()*rebalanceInterval / timeBinSize;
+		log.info("The feedforward signal strength is: " + Double.toString(params.getFeedforwardSignalStrength()));
+		
 		rebalancePlanCore = feedforwardSignalHandler.getRebalancePlanCore();
+		
 	}
 
 	@Override

@@ -39,7 +39,9 @@ import com.google.common.base.Verify;
 public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "FeedforwardRebalancingStrategy";
 
-	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
+	public enum RebalancingZoneGeneration {
+		GridFromNetwork, ShapeFile
+	}
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
@@ -65,17 +67,20 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	private static final String REBALANCING_ZONES_SHAPE_FILE = "rebalancingZonesShapeFile";
 	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
 			+ "Used with rebalancingZonesGeneration=ShapeFile";
-	
+
 	public static final String TIME_BIN_SIZE = "timeBinSize";
 	static final String TIME_BIN_SIZE_EXP = "Specifies the time bin size of the feedforward signal. Within each time bin, constant DRT demand flow is assumed"
 			+ " Must be positive. Default is 900 s. Expects an Integer Value";
 
+	public static final String FEEDFORWARD_SIGNAL_STRENGTH = "feedforwardSignalStrength";
+	static final String FEEDFORWARD_SIGNAL_STRENGTH_EXP = "Specifies the strength of the feedforward signal. Expect a double value in the range of [0, 1]"
+			+ "where 0 means the feedforward signal is completely turned off and 1 means the feedforward signal is turned on at 100%. Default value is 1";
 
 	@Positive
 	private int interval = 300;// [s]
 
 	@Positive
-	private double minServiceTime = 3600 ;// [s]
+	private double minServiceTime = 3600;// [s]
 
 	@PositiveOrZero
 	private double maxTimeBeforeIdle = 900;// [s], if 0 then soon-idle vehicle will not be considered
@@ -88,10 +93,13 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 
 	@Nullable
 	private String rebalancingZonesShapeFile = null;
-	
+
 	@Positive
 	private int timeBinSize = 900; // [s]
-	
+
+	@Positive
+	private double feedforwardSignalStrength = 1;
+
 	public FeedforwardRebalancingParams() {
 		super(SET_NAME);
 	}
@@ -101,17 +109,14 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		super.checkConsistency(config);
 
 		if (getMinServiceTime() <= getMaxTimeBeforeIdle()) {
-			throw new RuntimeException(FeedforwardRebalancingParams.MIN_SERVICE_TIME
-					+ " must be greater than "
+			throw new RuntimeException(FeedforwardRebalancingParams.MIN_SERVICE_TIME + " must be greater than "
 					+ FeedforwardRebalancingParams.MAX_TIME_BEFORE_IDLE);
 		}
 
 		Verify.verify(
-				getRebalancingZonesGeneration() != RebalancingZoneGeneration.ShapeFile || getRebalancingZonesShapeFile() != null,
-				REBALANCING_ZONES_SHAPE_FILE
-						+ " must not be null when "
-						+ REBALANCING_ZONES_GENERATION
-						+ " is "
+				getRebalancingZonesGeneration() != RebalancingZoneGeneration.ShapeFile
+						|| getRebalancingZonesShapeFile() != null,
+				REBALANCING_ZONES_SHAPE_FILE + " must not be null when " + REBALANCING_ZONES_GENERATION + " is "
 						+ RebalancingZoneGeneration.ShapeFile);
 	}
 
@@ -125,6 +130,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
 		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		map.put(TIME_BIN_SIZE, TIME_BIN_SIZE_EXP);
+		map.put(FEEDFORWARD_SIGNAL_STRENGTH, FEEDFORWARD_SIGNAL_STRENGTH_EXP);
 		return map;
 	}
 
@@ -201,10 +207,13 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param rebalancingZonesGeneration -- {@value #REBALANCING_ZONES_GENERATION_EXP}
+	 * @param rebalancingZonesGeneration --
+	 *                                   {@value #REBALANCING_ZONES_GENERATION_EXP}
 	 */
 	@StringSetter(REBALANCING_ZONES_GENERATION)
-	public void setRebalancingZonesGeneration(RebalancingZoneGeneration rebalancingZonesGeneration) { this.rebalancingZonesGeneration = rebalancingZonesGeneration; }
+	public void setRebalancingZonesGeneration(RebalancingZoneGeneration rebalancingZonesGeneration) {
+		this.rebalancingZonesGeneration = rebalancingZonesGeneration;
+	}
 
 	/**
 	 * @return {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
@@ -217,7 +226,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public URL getRebalancingZonesShapeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, rebalancingZonesShapeFile);
 	}
-	
+
 	/**
 	 * @param rebalancingZonesShapeFile -- {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
 	 */
@@ -226,7 +235,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		this.rebalancingZonesShapeFile = rebalancingZonesShapeFile;
 		return this;
 	}
-	
+
 	/**
 	 * @return timeBinSize -- {@value #TIME_BIN_SIZE_EXP}
 	 */
@@ -234,13 +243,29 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public int getTimeBinSize() {
 		return timeBinSize;
 	}
-	
+
 	/**
 	 * @param timeBinSize -- {@value #TIME_BIN_SIZE_EXP}
 	 */
 	@StringSetter(TIME_BIN_SIZE)
 	public void setTimeBinSize(int timeBinSize) {
 		this.timeBinSize = timeBinSize;
+	}
+
+	/**
+	 * @return -- {@value #FEEDFORWARD_SIGNAL_STRENGTH_EXP}
+	 */
+	@StringGetter(FEEDFORWARD_SIGNAL_STRENGTH)
+	public double getFeedforwardSignalStrength() {
+		return feedforwardSignalStrength;
+	}
+
+	/**
+	 * @param interval -- {@value #FEEDFORWARD_SIGNAL_STRENGTH_EXP}
+	 */
+	@StringSetter(FEEDFORWARD_SIGNAL_STRENGTH)
+	public void setFeedforwardSignalStrength(double feedforwardSignalStrength) {
+		this.feedforwardSignalStrength = feedforwardSignalStrength;
 	}
 
 }
