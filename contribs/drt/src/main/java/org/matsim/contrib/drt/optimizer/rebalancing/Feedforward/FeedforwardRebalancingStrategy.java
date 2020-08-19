@@ -29,7 +29,7 @@ import org.matsim.core.network.NetworkUtils;
  */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
-	
+
 	private final DrtZonalSystem zonalSystem;
 	private final FeedforwardRebalancingParams params;
 	private final Network network;
@@ -39,16 +39,13 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final double rebalanceInterval;
 	private final double scale;
 	private final Random rnd = new Random(1234);
+	private final int feedforwardSignalLead;
 
 	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore;
 
 	// TODO Potential further extension
-	// 1. Add minimum number of vehicles (including soon arrival vehicles) for each
-	// zone (can be various values for different zones and/or at different time of
-	// the day)
-	// 2. Read the data from previous iteration with some lead (e.g. 10 min), in
-	// order to compensate for the average time it take vehicles to reach the
-	// rebalance destination
+	// 1. Add feedback mechanism to maintain minimum number of vehicles (including
+	// soon arrival vehicles) for each zone
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
 			FeedforwardRebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
@@ -59,12 +56,13 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 		rebalanceInterval = params.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
-		
-		scale = params.getFeedforwardSignalStrength()*rebalanceInterval / timeBinSize;
+
+		scale = params.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
 		log.info("The feedforward signal strength is: " + Double.toString(params.getFeedforwardSignalStrength()));
-		
+
 		rebalancePlanCore = feedforwardSignalHandler.getRebalancePlanCore();
-		
+		feedforwardSignalLead = params.getFeedforwardSignalLead();
+
 	}
 
 	@Override
@@ -72,7 +70,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		// assign rebalnace vehicles based on the rebalance plan
 		log.info("Rebalance fleet now: Feedforward Rebalancing Strategy is used");
 
-		double timeBin = Math.floor(time / timeBinSize);
+		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
 		List<Relocation> relocationList = new ArrayList<>();
 
 		if (rebalancePlanCore.containsKey(timeBin)) {

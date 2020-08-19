@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 import java.net.URL;
 import java.util.Map;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -76,6 +77,10 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	static final String FEEDFORWARD_SIGNAL_STRENGTH_EXP = "Specifies the strength of the feedforward signal. Expect a double value in the range of [0, 1]"
 			+ "where 0 means the feedforward signal is completely turned off and 1 means the feedforward signal is turned on at 100%. Default value is 1";
 
+	public static final String FEEDFORWARD_SIGNAL_LEAD = "feedforwardSignalLead";
+	static final String FEEDFORWARD_SIGNAL_LEAD_EXP = "Specifies the lead of the feedforward signal. The feedforward signal can lead the actual time in the simulation, so that"
+			+ "the time it takes the vehicles to travel can be compensated to some extent. Expect a non-negative integer value. Default value is 0";
+
 	@Positive
 	private int interval = 300;// [s]
 
@@ -99,6 +104,9 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 
 	@Positive
 	private double feedforwardSignalStrength = 1;
+
+	@Nonnegative
+	private int feedforwardSignalLead = 0;
 
 	public FeedforwardRebalancingParams() {
 		super(SET_NAME);
@@ -131,6 +139,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		map.put(TIME_BIN_SIZE, TIME_BIN_SIZE_EXP);
 		map.put(FEEDFORWARD_SIGNAL_STRENGTH, FEEDFORWARD_SIGNAL_STRENGTH_EXP);
+		map.put(FEEDFORWARD_SIGNAL_LEAD, FEEDFORWARD_SIGNAL_LEAD_EXP);
 		return map;
 	}
 
@@ -266,6 +275,22 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	@StringSetter(FEEDFORWARD_SIGNAL_STRENGTH)
 	public void setFeedforwardSignalStrength(double feedforwardSignalStrength) {
 		this.feedforwardSignalStrength = feedforwardSignalStrength;
+	}
+
+	/**
+	 * @return -- {@value #FEEDFORWARD_SIGNAL_LEAD_EXP}
+	 */
+	@StringGetter(FEEDFORWARD_SIGNAL_LEAD)
+	public int getFeedforwardSignalLead() {
+		return feedforwardSignalLead;
+	}
+
+	/**
+	 * @param interval -- {@value #FEEDFORWARD_SIGNAL_LEAD_EXP}
+	 */
+	@StringSetter(FEEDFORWARD_SIGNAL_LEAD)
+	public void setFeedforwardSignalLead(int feedforwardSignalLead) {
+		this.feedforwardSignalLead = feedforwardSignalLead;
 	}
 
 }
