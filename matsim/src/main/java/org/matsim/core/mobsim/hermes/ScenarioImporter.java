@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.hermes;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -112,10 +114,19 @@ public class ScenarioImporter {
 	private Map<Id<VehicleType>, Integer> vehicleTypeMapping = new HashMap<>();
 	protected final EventsManager eventsManager;
 	private final int numberOfThreads;
+	private final List<List<Event>> deterministicPtEvents;
 
 	private ScenarioImporter(Scenario scenario, EventsManager eventsManager) {
 		numberOfThreads = Math.min(scenario.getConfig().global().getNumberOfThreads(), Runtime.getRuntime().availableProcessors());
 		this.deterministicPt = scenario.getConfig().hermes().isDeterministicPt();
+		if (deterministicPt) {
+			deterministicPtEvents = new ArrayList<>(scenario.getConfig().hermes().getEndTime());
+			for (int i = 0; i < scenario.getConfig().hermes().getEndTime(); i++) {
+				deterministicPtEvents.add(new ArrayList<>(16));
+			}
+		} else {
+			deterministicPtEvents = Collections.EMPTY_LIST;
+		}
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		generateVehicleCategories();
@@ -303,7 +314,7 @@ public class ScenarioImporter {
 				case Agent.SleepForType:
 				case Agent.SleepUntilType:
 					int sleep = Agent.getSleepPlanEntry(planentry);
-					realm.delayedAgents().get(Math.min(sleep, HermesConfigGroup.SIM_STEPS + 1)).add(agent);
+					realm.delayedAgents().get(Math.min(sleep, scenario.getConfig().hermes().getEndTime() + 1)).add(agent);
 					break;
 				default:
 					Logger.getLogger(getClass()).error(String.format("ERROR -> unknow plan element type %d", type));
@@ -490,7 +501,8 @@ public class ScenarioImporter {
 	private void processTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
 		double routeTravelTime = route.getTravelTime().orElse(0.0);
 		double legTravelTime = element.getTravelTime().orElse(0.0);
-		int time = (int) Math.round(Math.max(routeTravelTime, legTravelTime));
+		int time = Math.max(0, (int) Math.round(Math.max(routeTravelTime, legTravelTime)) - 1);
+		//1 second is deducted as it is lost during interaction activities
 		flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
 		events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
 	}
@@ -528,7 +540,7 @@ public class ScenarioImporter {
 				depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
 	}
 
-	private void generateVehicleTrip(
+	private void generateDetermisticVehicleTrip(
 			PlanArray flatplan,
 			EventArray flatevents,
 			TransitLine tl,
@@ -546,6 +558,106 @@ public class ScenarioImporter {
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
 		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
 		List<Double> averageSpeedbetweenStops = calculateSpeedsBetweenStops(tr);
+
+		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
+		String legmode = null;
+
+		legmode = TransportMode.pt;
+
+		// Sleep until the time of departure
+		flatplan.add(Agent.prepareSleepUntilEntry(0, (int) Math.max(0, Math.round(depart.getDepartureTime() - 1))));
+
+		// Prepare to leave
+		flatevents.add(new TransitDriverStartsEvent(0, driverid, v.getId(), tl.getId(), tr.getId(), depart.getId()));
+		flatevents.add(new PersonDepartureEvent(0, driverid, nr.getStartLinkId(), legmode));
+		flatevents.add(new PersonEntersVehicleEvent(0, driverid, v.getId()));
+		int timerunning = (int) depart.getDepartureTime();
+		flatevents.add(new VehicleEntersTrafficEvent(timerunning, driverid, nr.getStartLinkId(), v.getId(), legmode, 1));
+		// Adding first link and possibly the first stop.
+		if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
+			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
+			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			// no event associated to stop delay
+			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
+			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
+			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			//flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
+			timerunning = (int) arrivalOffsetHelper(depart, next) + 1;
+			stopidx += 1;
+			flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
+			// We don't add a flatplan event here on purpose.
+			next = trs.get(stopidx);
+			flatplan.add(Agent.prepareSleepUntilEntry(0, (int) arrivalOffsetHelper(depart, next) - 2));
+			timerunning++;
+		}
+
+		// For each link (exclucing the first and the last)
+		for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
+
+			//flatevents.add(new LinkEnterEvent(0, v.getId(), link));
+			// flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
+			// Adding link and possibly a stop.
+			if (next.getStopFacility().getLinkId().equals(link)) {
+
+				int stopArrival = (int) arrivalOffsetHelper(depart, next);
+				flatevents.add(new LinkEnterEvent(0, v.getId(), link));
+				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), stopArrival));
+				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+				// no event associated to stop delay
+				int stopDeparture = (int) departureOffsetHelper(depart, next);
+				flatplan.add(Agent.prepareStopDelayEntry(stopDeparture, rid, stop_ids.get(stopidx), stopidx));
+				flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), stopDeparture));
+				flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+				timerunning = stopDeparture;
+				stopidx += 1;
+				next = trs.get(stopidx);
+				flatevents.add(new LinkLeaveEvent(0, v.getId(), link));
+				flatplan.add(Agent.prepareSleepUntilEntry(0, (int) (arrivalOffsetHelper(depart, next)) - 2));
+
+			} else {
+				deterministicPtEvents.get(timerunning).add(new LinkEnterEvent(timerunning, v.getId(), link));
+				double length = scenario.getNetwork().getLinks().get(link).getLength();
+				timerunning += length / averageSpeedbetweenStops.get(stopidx - 1);
+				deterministicPtEvents.get(timerunning - 2).add(new LinkLeaveEvent(timerunning - 2, v.getId(), link));
+
+			}
+			timerunning++;
+		}
+
+		// Adding last link and possibly the last stop.
+		if (next.getStopFacility().getLinkId().equals(nr.getEndLinkId())) {
+			int stopArrival = (int) arrivalOffsetHelper(depart, next);
+			flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
+			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), stopArrival));
+			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
+			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
+			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			stopidx += 1;
+			timerunning = (int) departureOffsetHelper(depart, next);
+		}
+		flatevents.add(new VehicleLeavesTrafficEvent(0, driverid, nr.getEndLinkId(), v.getId(), legmode, 1));
+		flatevents.add(new PersonLeavesVehicleEvent(0, driverid, v.getId()));
+		flatevents.add(new PersonArrivalEvent(0, driverid, nr.getEndLinkId(), legmode));
+	}
+
+	private void generateVehicleTrip(
+			PlanArray flatplan,
+			EventArray flatevents,
+			TransitLine tl,
+			TransitRoute tr,
+			Departure depart) {
+		List<TransitRouteStop> trs = tr.getStops();
+		TransitRouteStop next = trs.get(0);
+		int stopidx = 0;
+		int rid = tr.getId().index();
+		Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
+		VehicleType vt = v.getType();
+		NetworkRoute nr = tr.getRoute();
+		int endid = nr.getEndLinkId().index();
+		int pcuCategory = 0;
+		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
+		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
 		int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
@@ -582,7 +694,7 @@ public class ScenarioImporter {
 		for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
 			int linkid = link.index();
 			flatevents.add(new LinkEnterEvent(0, v.getId(), link));
-			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
+			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, velocity, pcuCategory));
 			// Adding link and possibly a stop.
 			if (next.getStopFacility().getLinkId().equals(link)) {
 				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
@@ -600,7 +712,7 @@ public class ScenarioImporter {
 
 		// Adding last link and possibly the last stop.
 		flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
-		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
+		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, velocity, pcuCategory));
 		if (next.getStopFacility().getLinkId().equals(nr.getEndLinkId())) {
 			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
 			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
@@ -626,7 +738,7 @@ public class ScenarioImporter {
 				var lastLink = lastStop.getStopFacility().getLinkId();
 				double distance = RouteUtils.calcDistance(tr.getRoute().getSubRoute(lastLink, currentLinkId), 1.0, 1.0, scenario.getNetwork());
 				double travelTime = offset - lastDepartureOffset;
-				speeds.add(distance / travelTime);
+				speeds.add(Math.min(HermesConfigGroup.MAX_VEHICLE_VELOCITY, Math.ceil(distance / travelTime)));
 			}
 			lastStop = stop;
 		}
@@ -644,12 +756,16 @@ public class ScenarioImporter {
 								int hermes_id = hermes_id(v.getId().index(), true);
 								PlanArray plan = hermes_agents[hermes_id].plan();
 								EventArray events = hermes_agents[hermes_id].events();
-								int pcuCategory = deterministicPt ? 0 : vehicleTypeMapping.get(v.getType().getId());
+								float storageCapacityPCUE = deterministicPt ? 0.1f : (float) v.getType().getPcuEquivalents();
+								float flowCapacityPCUE = deterministicPt ? 0.1f : (float) (v.getType().getPcuEquivalents() / v.getType().getFlowEfficiencyFactor());
 								//for pt vehicles, storage and flow capacities are never updated
-								hermes_agents[hermes_id].setStorageCapacityPCUE(getStorageCapacityPCE(pcuCategory));
-								hermes_agents[hermes_id].setFlowCapacityPCUE(getFlowCapacityPCE(pcuCategory));
-								generateVehicleTrip(plan, events, tl, tr, depart);
-
+								hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
+								hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
+								if (deterministicPt) {
+									generateDetermisticVehicleTrip(plan, events, tl, tr, depart);
+								} else {
+									generateVehicleTrip(plan, events, tl, tr, depart);
+								}
 							}
 						}
 					})).get();
@@ -731,5 +847,13 @@ public class ScenarioImporter {
 
 	public float getStorageCapacityPCE(int index) {
 		return storageCapacityPCEs[index];
+	}
+
+	public List<List<Event>> getDeterministicPtEvents() {
+		return deterministicPtEvents;
+	}
+
+	public boolean isDeterministicPt() {
+		return deterministicPt;
 	}
 }

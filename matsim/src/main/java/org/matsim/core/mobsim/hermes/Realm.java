@@ -220,6 +220,19 @@ public class Realm {
             setEventVehicle(out, Agent.getPlanEvent(out.currPlan()), agent.id);
         }
 
+        // True is returned as the agent is already in the delayed list.
+        return true;
+    }
+
+    protected boolean processAgentStopDepart(Agent agent, long planentry) {
+        int routeid = Agent.getRoutePlanEntry(planentry);
+        int stopid = Agent.getStopPlanEntry(planentry);
+        int stopidx = Agent.getStopIndexPlanEntry(planentry);
+        int lineid = line_of_route[routeid];
+        Map<Integer, ArrayDeque<Agent>> agents_next_stops =
+                agent_stops.get(stopid).get(lineid);
+        ArrayList<Integer> next_stops = stops_in_route.get(routeid);
+
         // take agents
         for (int idx = stopidx; idx < next_stops.size(); idx++) {
             ArrayDeque<Agent> in_agents = agents_next_stops.get(next_stops.get(idx));
@@ -241,12 +254,6 @@ public class Realm {
             }
             in_agents.removeAll(removed);
         }
-
-        // True is returned as the agent is already in the delayed list.
-        return true;
-    }
-
-    protected boolean processAgentStopDepart(Agent agent, long planentry) {
         advanceAgentandSetEventTime(agent);
         // False is returned to force this agent to be processed in the next tick.
         // This will mean that the vehicle will be processed in the next tick.
@@ -322,22 +329,34 @@ public class Realm {
         HLink link = null;
 
         while (secs != HermesConfigGroup.SIM_STEPS) {
-            if (secs % 3600 == 0){
+            if (secs % 3600 == 0) {
                 log.info("Hermes running at " + Time.writeTime(secs));
             }
             while ((agent = delayedAgentsByWakeupTime.get(secs).poll()) != null) {
-                if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing agent %d", agent.id));
+                if (HermesConfigGroup.DEBUG_REALMS) {
+                    log(secs, String.format("Processing agent %d", agent.id));
+                }
                 routed += processAgentActivities(agent);
 
             }
-            delayedAgentsByWakeupTime.set(secs,null);
+            delayedAgentsByWakeupTime.set(secs, null);
+            if (si.isDeterministicPt()) {
+                for (Event e : si.getDeterministicPtEvents().get(secs)) {
+                    sorted_events.add(e);
+                }
+                si.getDeterministicPtEvents().get(secs).clear();
+            }
 
             while ((link = delayedLinksByWakeupTime.get(secs).poll()) != null) {
-                if (HermesConfigGroup.DEBUG_REALMS) log(secs, String.format("Processing link %d", link.id()));
+                if (HermesConfigGroup.DEBUG_REALMS) {
+                    log(secs, String.format("Processing link %d", link.id()));
+                }
                 routed += processLinks(link);
             }
-            delayedLinksByWakeupTime.set(secs,null);
-            if (HermesConfigGroup.DEBUG_REALMS && routed > 0) log(secs, String.format("Processed %d agents", routed));
+            delayedLinksByWakeupTime.set(secs, null);
+            if (HermesConfigGroup.DEBUG_REALMS && routed > 0) {
+                log(secs, String.format("Processed %d agents", routed));
+            }
             if (HermesConfigGroup.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
                 eventsManager.processEvents(sorted_events);
                 sorted_events = new EventArray();
@@ -349,7 +368,6 @@ public class Realm {
     }
 
     public void setEventTime(Agent agent, int eventid, int time, boolean lastevent) {
-        // TODO - is this check necessary? -> I am trying to remove all instances where it is zero...
         if (eventid != 0) {
         	EventArray agentevents = agent.events();
             Event event = agentevents.get(eventid);
@@ -364,7 +382,7 @@ public class Realm {
             // Fix delay for PT events.
             if (event instanceof VehicleArrivesAtFacilityEvent) {
                 VehicleArrivesAtFacilityEvent vaafe = (VehicleArrivesAtFacilityEvent) event;
-                vaafe.setTime(vaafe.getDelay());
+                vaafe.setDelay(vaafe.getTime() - vaafe.getDelay());
 
             }
             else if (event instanceof VehicleDepartsAtFacilityEvent) {
