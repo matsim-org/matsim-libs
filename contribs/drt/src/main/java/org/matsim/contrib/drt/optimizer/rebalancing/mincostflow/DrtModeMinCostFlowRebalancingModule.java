@@ -121,16 +121,14 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
 				break;
 			case EqualVehicleDensity:
-				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(FleetSpecification.class))));
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 			case FleetSizeWeightedByPopulationShare:
-				// do not bind as eager singleton because fleet specification (fleet size) might change over the iterations (if using optDrt for example)
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
 						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.get(Population.class), getter.getModal(FleetSpecification.class))));
+								getter.get(Population.class), getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 			default:
 				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="

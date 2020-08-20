@@ -28,9 +28,10 @@ import java.util.function.ToIntFunction;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 /**
  * This class does not really calculate the expected demand but aims to
@@ -42,19 +43,23 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
  */
 public final class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
 
-	private final Map<String, MutableInt> vehiclesPerZone = new HashMap<>();
-	private static final MutableInt ZERO =  new MutableInt(0);
+	private final Map<String, Double> zoneAreaShares = new HashMap<>();
+	private final FleetSpecification fleetSpecification;
 
 	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem, @NotNull FleetSpecification fleetSpecification) {
-		this.compute(zonalSystem,fleetSpecification.getVehicleSpecifications().size());
+		initAreaShareMap(zonalSystem);
+		this.fleetSpecification = fleetSpecification;
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
-		return zoneId-> vehiclesPerZone.getOrDefault(zoneId,ZERO).intValue();
+		return zoneId-> {
+			double areaShare = zoneAreaShares.getOrDefault(zoneId, 0.).doubleValue();
+			return (int) Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
+		};
 	}
 
-	private void compute(@NotNull DrtZonalSystem zonalSystem, int fleetSize) {
-		vehiclesPerZone.clear();
+	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
+		zoneAreaShares.clear();
 
 		double areaSum = zonalSystem.getZones().values().stream()
 				.mapToDouble(Geometry::getArea)
@@ -63,7 +68,8 @@ public final class EqualVehicleDensityZonalDemandAggregator implements ZonalDema
 		for(String zone : zonalSystem.getZones().keySet()){
 			double areaShare = zonalSystem.getZone(zone).getArea() / areaSum;
 			if(areaShare > 1. || areaShare < 0.) throw new IllegalStateException();
-			vehiclesPerZone.put(zone,new MutableInt(Math.floor(areaShare * fleetSize)));
+			zoneAreaShares.put(zone,areaShare);
 		}
 	}
+
 }
