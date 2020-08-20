@@ -71,7 +71,6 @@ public class HermesRoundaboutTest {
 		config.controler().setMobsim("hermes");
 		config.parallelEventHandling().setOneThreadPerHandler(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
-
 		buildRoundaboutNetwork(scenario);
 		buildPopulation(scenario);
 		final int[] eventsCount = new int[2];

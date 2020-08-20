@@ -340,12 +340,12 @@ public class Realm {
 
             }
             delayedAgentsByWakeupTime.set(secs, null);
-            //            if (si.isDeterministicPt()){
-            //                for (Event e : si.getDeterministicPtEvents().get(secs)){
-            //                    sorted_events.add(e);
-            //                }
-            //                si.getDeterministicPtEvents().get(secs).clear();
-            //            }
+            if (si.isDeterministicPt()) {
+                for (Event e : si.getDeterministicPtEvents().get(secs)) {
+                    sorted_events.add(e);
+                }
+                si.getDeterministicPtEvents().get(secs).clear();
+            }
 
             while ((link = delayedLinksByWakeupTime.get(secs).poll()) != null) {
                 if (HermesConfigGroup.DEBUG_REALMS) {
