@@ -56,7 +56,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	public static final String MAX_TIME_BEFORE_IDLE = "maxTimeBeforeIdle";
 	static final String MAX_TIME_BEFORE_IDLE_EXP = //
 			"Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
-					+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)";
+					+ " Default is 600 s. In general should be lower than interval (e.g. 0.5 x interval)";
 
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
@@ -81,6 +81,14 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	static final String FEEDFORWARD_SIGNAL_LEAD_EXP = "Specifies the lead of the feedforward signal. The feedforward signal can lead the actual time in the simulation, so that"
 			+ "the time it takes the vehicles to travel can be compensated to some extent. Expect a non-negative integer value. Default value is 0";
 
+	public static final String FEEDBACK_SWITCH = "feedbackSwitch";
+	static final String FEEDBACK_SWITCH_EXP = "Turn on or off the feedback part in the strategy. Feedback part will mainain a minimum number of vehicles"
+			+ " in each zone. Default value is false";
+	
+	public static final String MIN_NUM_VEHICLES_PER_ZONE = "minNumVehiclesPerZone";
+	static final String MIN_NUM_VEHICLES_PER_ZONE_EXP = "The minimum number of vehicles a zone should keep. This value will only be used when feed back "
+			+" switch is true! Expect a non-negative value. Default value is 1";
+	
 	@Positive
 	private int interval = 300;// [s]
 
@@ -88,7 +96,7 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	private double minServiceTime = 3600;// [s]
 
 	@PositiveOrZero
-	private double maxTimeBeforeIdle = 900;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 600;// [s], if 0 then soon-idle vehicle will not be considered
 
 	@Positive
 	private double cellSize = Double.NaN;// [m]
@@ -107,7 +115,12 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 
 	@Nonnegative
 	private int feedforwardSignalLead = 0;
-
+	
+	private boolean feedbackSwitch = false; 
+	
+	@Nonnegative
+	private int minNumVehiclesPerZone = 1;
+	
 	public FeedforwardRebalancingParams() {
 		super(SET_NAME);
 	}
@@ -140,6 +153,8 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 		map.put(TIME_BIN_SIZE, TIME_BIN_SIZE_EXP);
 		map.put(FEEDFORWARD_SIGNAL_STRENGTH, FEEDFORWARD_SIGNAL_STRENGTH_EXP);
 		map.put(FEEDFORWARD_SIGNAL_LEAD, FEEDFORWARD_SIGNAL_LEAD_EXP);
+		map.put(FEEDBACK_SWITCH, FEEDBACK_SWITCH_EXP);
+		map.put(MIN_NUM_VEHICLES_PER_ZONE, MIN_NUM_VEHICLES_PER_ZONE_EXP);
 		return map;
 	}
 
@@ -286,11 +301,43 @@ public final class FeedforwardRebalancingParams extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @param interval -- {@value #FEEDFORWARD_SIGNAL_LEAD_EXP}
+	 * @param feedforwardSignalLead -- {@value #FEEDFORWARD_SIGNAL_LEAD_EXP}
 	 */
 	@StringSetter(FEEDFORWARD_SIGNAL_LEAD)
 	public void setFeedforwardSignalLead(int feedforwardSignalLead) {
 		this.feedforwardSignalLead = feedforwardSignalLead;
+	}
+	
+	/**
+	 * @return -- {@value #FEEDBACK_SWITCH_EXP}
+	 */
+	@StringGetter(FEEDBACK_SWITCH)
+	public boolean getFeedbackSwitch() {
+		return feedbackSwitch;
+	}
+
+	/**
+	 * @param feedbackSwitch -- {@value #FEEDBACK_SWITCH_EXP}
+	 */
+	@StringSetter(FEEDBACK_SWITCH)
+	public void setFeedbackSwitch(boolean feedbackSwitch) {
+		this.feedbackSwitch = feedbackSwitch;
+	}
+	
+	/**
+	 * @return -- {@value #MIN_NUM_VEHICLES_PER_ZONE_EXP}
+	 */
+	@StringGetter(MIN_NUM_VEHICLES_PER_ZONE)
+	public int getMinNumVehiclesPerZone() {
+		return minNumVehiclesPerZone;
+	}
+
+	/**
+	 * @param minNumVehiclesPerZone -- {@value #MIN_NUM_VEHICLES_PER_ZONE_EXP}
+	 */
+	@StringSetter(MIN_NUM_VEHICLES_PER_ZONE)
+	public void setMinNumVehiclesPerZone(int minNumVehiclesPerZone) {
+		this.minNumVehiclesPerZone = minNumVehiclesPerZone;
 	}
 
 }
