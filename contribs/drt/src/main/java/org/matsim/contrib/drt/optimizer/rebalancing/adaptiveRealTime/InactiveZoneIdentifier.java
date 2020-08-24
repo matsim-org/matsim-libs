@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 
-public class InactiveZoneIdentifier implements DrtRequestSubmittedEventHandler {
+public class InactiveZoneIdentifier implements PersonDepartureEventHandler {
 	private static final Logger log = Logger.getLogger(InactiveZoneIdentifier.class);
 	private final DrtZonalSystem zonalSystem;
 
@@ -17,11 +17,6 @@ public class InactiveZoneIdentifier implements DrtRequestSubmittedEventHandler {
 
 	public InactiveZoneIdentifier(DrtZonalSystem zonalSystem) {
 		this.zonalSystem = zonalSystem;
-	}
-
-	@Override
-	public void handleEvent(DrtRequestSubmittedEvent event) {
-		activeZones.add(zonalSystem.getZoneForLinkId(event.getFromLinkId()));
 	}
 
 	@Override
@@ -38,6 +33,11 @@ public class InactiveZoneIdentifier implements DrtRequestSubmittedEventHandler {
 		log.info("Of which " + Integer.toString(activeZones.size()) + " are active zones");
 		log.info("Note: At iteration 0, all zone are assumed to be active");
 		return inactiveZones;
+	}
+
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		activeZones.add(zonalSystem.getZoneForLinkId(event.getLinkId()));
 	}
 
 }
