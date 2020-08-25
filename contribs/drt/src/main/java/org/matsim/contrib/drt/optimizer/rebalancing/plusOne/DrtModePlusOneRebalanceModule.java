@@ -83,16 +83,13 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class).toProvider(
+				bindModal(PlusOneRebalancingStrategy.class).toProvider(
 						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class))))
 						.asEagerSingleton();
-				addMobsimScopeEventHandlerBinding().to(PlusOneRebalancingStrategy.class);
-//				addMobsimScopeEventHandlerBinding().to(modalKey(PlusOneRebalancingStrategy.class));
+				bindModal(RebalancingStrategy.class).to(modalKey(PlusOneRebalancingStrategy.class));
+				addMobsimScopeEventHandlerBinding().to(modalKey(PlusOneRebalancingStrategy.class));
 			}
 		});
-		
-
-		
 
 		{
 			// this is rather analysis - but depends on DrtZonalSystem so it can not be

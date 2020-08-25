@@ -26,10 +26,8 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
-import com.google.inject.Inject;
-
 /**
- * 
+ *
  * @author Chengqi Lu This strategy is based on the Plus One Rebalancing
  *         Algorithm in AMoDeus. At each rebalancing period, the algorithm will
  *         send idling vehicles to the departure places of the request departed
@@ -42,8 +40,7 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 
 	private final Map<Id<Link>, Integer> targetMap = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> potentialDRTTripsMap = new HashMap<>();
-	
-	@Inject
+
 	public PlusOneRebalancingStrategy(Network network) {
 		this.network = network;
 	}
