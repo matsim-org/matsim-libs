@@ -26,10 +26,10 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
  */
 public class LinearRebalancingTargetCalculator implements RebalancingTargetCalculator {
 	private final ZonalDemandAggregator demandAggregator;
-	private final MinCostFlowRebalancingParams params;
+	private final MinCostFlowRebalancingStrategyParams params;
 
 	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator,
-			MinCostFlowRebalancingParams params) {
+			MinCostFlowRebalancingStrategyParams params) {
 		this.demandAggregator = demandAggregator;
 		this.params = params;
 	}

@@ -38,7 +38,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
@@ -208,6 +209,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@Nullable
+	private RebalancingParams rebalancingParams;
+
 	@NotNull
 	private String drtSpeedUpMode = "";
 
@@ -248,8 +252,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				DRT_SERVICE_AREA_SHAPE_FILE
 						+ " must not be null when "
 						+ OPERATIONAL_SCHEME
-						+ " is "
-						+ OperationalScheme.serviceAreaBased);
+						+ " is " + OperationalScheme.serviceAreaBased);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
 				NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
@@ -259,7 +262,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " in order to speed up the DRT route update during the replanning phase.");
 		}
 
-		Verify.verify(getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() <= 1,
+		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
 				"More then one rebalancing parameter sets is specified");
 
 		if (useModeFilteredSubnetwork) {
@@ -640,21 +643,15 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return drtInsertionSearchParams;
 	}
 
-	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
-		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
-		if (parameterSets.size() > 1) {
-			throw new RuntimeException("More then one rebalancing parameter sets is specified");
-		}
-		return parameterSets.isEmpty() ?
-				Optional.empty() :
-				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
+	public Optional<RebalancingParams> getRebalancingParams() {
+		return Optional.ofNullable(rebalancingParams);
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		switch (type) {
-			case MinCostFlowRebalancingParams.SET_NAME:
-				return new MinCostFlowRebalancingParams();
+			case RebalancingParams.SET_NAME:
+				return new MinCostFlowRebalancingStrategyParams();
 
 			case ExtensiveInsertionSearchParams.SET_NAME:
 				return new ExtensiveInsertionSearchParams();
@@ -672,6 +669,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			Preconditions.checkState(drtInsertionSearchParams == null,
 					"Remove the existing drtRequestInsertionParams before adding a new one");
 			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
+		} else if (set instanceof RebalancingParams) {
+			Preconditions.checkState(rebalancingParams == null,
+					"Remove the existing rebalancingParams before adding a new one");
+			rebalancingParams = (RebalancingParams)set;
 		}
 
 		super.addParameterSet(set);
@@ -680,9 +681,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@Override
 	public boolean removeParameterSet(ConfigGroup set) {
 		if (set instanceof DrtInsertionSearchParams) {
-			Preconditions.checkState(drtInsertionSearchParams != null,
+			Preconditions.checkState(drtInsertionSearchParams.equals(set),
 					"The existing drtRequestInsertionParams is null. Cannot remove it.");
 			drtInsertionSearchParams = null;
+		} else if (set instanceof RebalancingParams) {
+			Preconditions.checkState(rebalancingParams.equals(set),
+					"The existing rebalancingParams is null. Cannot remove it.");
+			rebalancingParams = null;
 		}
 
 		return super.removeParameterSet(set);
