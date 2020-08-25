@@ -552,7 +552,6 @@ public class ScenarioImporter {
 		Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
-		int endid = nr.getEndLinkId().index();
 		int pcuCategory = 0;
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
 		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
@@ -580,7 +579,6 @@ public class ScenarioImporter {
 			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
 			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
 			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
-			//flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
 			timerunning = (int) arrivalOffsetHelper(depart, next) + 1;
 			stopidx += 1;
 			flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
@@ -592,9 +590,6 @@ public class ScenarioImporter {
 
 		// For each link (exclucing the first and the last)
 		for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
-
-			//flatevents.add(new LinkEnterEvent(0, v.getId(), link));
-			// flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, deterministicPt ? (int) Math.round(averageSpeedbetweenStops.get(stopidx - 1)) : velocity, pcuCategory));
 			// Adding link and possibly a stop.
 			if (next.getStopFacility().getLinkId().equals(link)) {
 
@@ -632,8 +627,6 @@ public class ScenarioImporter {
 			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
 			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
 			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
-			stopidx += 1;
-			timerunning = (int) departureOffsetHelper(depart, next);
 		}
 		flatevents.add(new VehicleLeavesTrafficEvent(0, driverid, nr.getEndLinkId(), v.getId(), legmode, 1));
 		flatevents.add(new PersonLeavesVehicleEvent(0, driverid, v.getId()));
