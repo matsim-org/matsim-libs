@@ -277,8 +277,8 @@ public class HermesTest {
 		Assert.assertEquals("wrong type of event.", ActivityStartEvent.class, allEvents.get(4).getClass());
 		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(0).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 0, allEvents.get(1).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 14, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 14, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in event.", 6.0 * 3600 + 13, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
 	}
 
 	/**
