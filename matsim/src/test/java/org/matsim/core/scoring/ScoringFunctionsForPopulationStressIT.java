@@ -107,6 +107,11 @@ public class ScoringFunctionsForPopulationStressIT {
 				}
 
 				@Override
+				public void addScore(double amount) {
+					throw new RuntimeException();
+				}
+
+				@Override
 				public void finish() {
 					throw new RuntimeException();
 				}
@@ -181,6 +186,11 @@ public class ScoringFunctionsForPopulationStressIT {
 					@Override
 					public void addMoney(double amount) {
 						delegateFunction.addMoney(amount);
+					}
+
+					@Override
+					public void addScore(double amount) {
+						delegateFunction.addScore(amount);
 					}
 
 					@Override
@@ -313,6 +323,16 @@ public class ScoringFunctionsForPopulationStressIT {
 							e.printStackTrace();
 						}
 						delegateFunction.addMoney(amount);
+					}
+
+					@Override
+					public void addScore(double amount) {
+						try {
+							Thread.sleep(MatsimRandom.getRandom().nextInt(1000));
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						delegateFunction.addScore(amount);
 					}
 
 					@Override

@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
@@ -261,13 +262,19 @@ public final class EventsReaderJson {
 					time,
 					Id.create(o.get(VehicleAbortsEvent.ATTRIBUTE_VEHICLE).asText(), Vehicle.class),
 					linkId));
-		}else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
+		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
 			this.events.processEvent(new PersonMoneyEvent(
 					time,
 					Id.create(o.get(PersonMoneyEvent.ATTRIBUTE_PERSON).asText(), Person.class),
 					o.get(PersonMoneyEvent.ATTRIBUTE_AMOUNT).asDouble(),
 					o.path(PersonMoneyEvent.ATTRIBUTE_PURPOSE).asText(null),
 					o.path(PersonMoneyEvent.ATTRIBUTE_TRANSACTION_PARTNER).asText(null)));
+		} else if (PersonScoreEvent.EVENT_TYPE.equals(eventType) || "personScore".equals(eventType)) {
+			this.events.processEvent(new PersonScoreEvent(
+					time,
+					Id.create(o.get(PersonScoreEvent.ATTRIBUTE_PERSON).asText(), Person.class),
+					o.get(PersonScoreEvent.ATTRIBUTE_AMOUNT).asDouble(),
+					o.path(PersonScoreEvent.ATTRIBUTE_KIND).asText(null)));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new PersonEntersVehicleEvent(
 					time,
