@@ -55,7 +55,7 @@ public final class PreviousIterationZonalDRTDemandAggregator
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
-		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
+		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
 	@Override

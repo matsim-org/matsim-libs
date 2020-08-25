@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -55,7 +56,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		log.info("Plus one Rebalancing Algorithm is now being installed!");
-		PlusOneRebalancingParams params = drtCfg.getPlusOneRebalancing().orElseThrow();
+		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
 			if (params.getRebalancingZonesGeneration()

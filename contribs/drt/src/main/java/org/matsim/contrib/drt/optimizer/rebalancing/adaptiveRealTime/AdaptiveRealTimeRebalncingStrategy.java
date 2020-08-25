@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostRelocationCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
@@ -32,7 +33,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
-	private final AdaptiveRealTimeRebalancingParams params;
+	private final RebalancingParams params;
 
 	private final List<Pair<String, Integer>> supply = new ArrayList<>();
 	private final List<Pair<String, Integer>> demand = new ArrayList<>();
@@ -40,7 +41,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 	private final Set<String> activeZones = new HashSet<>();
 
 	public AdaptiveRealTimeRebalncingStrategy(DrtZonalSystem zonalSystem, Fleet fleet,
-			MinCostRelocationCalculator minCostRelocationCalculator, AdaptiveRealTimeRebalancingParams params,
+			MinCostRelocationCalculator minCostRelocationCalculator, RebalancingParams params,
 			InactiveZoneIdentifier inactiveZoneIdentifier) {
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;

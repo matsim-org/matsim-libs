@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggr
 import org.matsim.contrib.drt.analysis.zonal.TimeDependentActivityBasedZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -61,13 +62,12 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 	@Override
 	public void install() {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing().orElseThrow();
+		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
-			if (params.getRebalancingZonesGeneration()
-					.equals(MinCostFlowRebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
-						.loadPreparedGeometries(params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
+			if (params.getRebalancingZonesGeneration().equals(RebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
+				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
+						params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
 				Map<String, Geometry> zones = new HashMap<>();
 				for (int i = 0; i < preparedGeometries.size(); i++) {
 					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
@@ -86,6 +86,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
+		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
+
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
@@ -97,8 +99,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
-								params)))
-						.asEagerSingleton();
+								strategyParams))).asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class)
 						.toProvider(modalProvider(getter -> new AggregatedMinCostRelocationCalculator(
@@ -107,7 +108,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		switch (params.getZonalDemandAggregatorType()) {
+		switch (strategyParams.getZonalDemandAggregatorType()) {
 			case PreviousIteration:
 				bindModal(PreviousIterationZonalDRTDemandAggregator.class).toProvider(modalProvider(
 						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.getModal(DrtZonalSystem.class),
@@ -116,8 +117,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
 				break;
 			case TimeDependentActivityBased:
-				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new TimeDependentActivityBasedZonalDemandAggregator(
+				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(
+						modalProvider(getter -> new TimeDependentActivityBasedZonalDemandAggregator(
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandAggregator.class).to(
 						modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
@@ -130,12 +131,13 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				break;
 			case FleetSizeWeightedByPopulationShare:
 				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(getter.getModal(DrtZonalSystem.class),
-								getter.get(Population.class), getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(
+								getter.getModal(DrtZonalSystem.class), getter.get(Population.class),
+								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 			default:
 				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="
-						+ params.getZonalDemandAggregatorType());
+						+ strategyParams.getZonalDemandAggregatorType());
 		}
 
 		{

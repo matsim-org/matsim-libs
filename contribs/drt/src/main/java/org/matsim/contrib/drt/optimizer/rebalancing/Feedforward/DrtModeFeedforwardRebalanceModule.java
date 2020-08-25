@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -57,7 +58,7 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		log.info("Feedforward Rebalancing Strategy is now being installed!");
-		FeedforwardRebalancingParams params = drtCfg.getFeedforwardRebalancing().orElseThrow();
+		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
 			if (params.getRebalancingZonesGeneration()

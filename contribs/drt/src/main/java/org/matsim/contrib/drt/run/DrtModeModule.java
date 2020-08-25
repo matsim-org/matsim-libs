@@ -29,11 +29,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
-import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.DrtModeAdapativeRealTimeRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -90,14 +89,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
 				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		if (drtCfg.getMinCostFlowRebalancing().isPresent()) {
-			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
-		} else if (drtCfg.getAdaptiveRealTimeRebalancing().isPresent()) {
-			install(new DrtModeAdapativeRealTimeRebalanceModule(drtCfg));
-		} else if (drtCfg.getPlusOneRebalancing().isPresent()) {
-			install(new DrtModePlusOneRebalanceModule(drtCfg));
-		} else if (drtCfg.getFeedforwardRebalancing().isPresent()) {
-			install(new DrtModeFeedforwardRebalanceModule(drtCfg));
+		if (drtCfg.getRebalancingParams().isPresent()) {
+			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
+			if (rebalancingParams.getRebalancingStrategyParams() instanceof MinCostFlowRebalancingStrategyParams) {
+				install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
+			} else {
+				throw new RuntimeException(
+						"Unsupported rebalancingStrategyParams: " + rebalancingParams.getRebalancingStrategyParams());
+			}
 		} else {
 			System.err.println("Attention: No rebalancing algorithm is used!");
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();

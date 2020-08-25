@@ -55,7 +55,7 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 
 	public TimeDependentActivityBasedZonalDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
-		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
+		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
 	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {

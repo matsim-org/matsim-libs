@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -37,7 +38,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
 
 	private final DrtZonalSystem zonalSystem;
-	private final FeedforwardRebalancingParams params;
+	private final RebalancingParams params;
 	private final Network network;
 	private final VehicleInfoCollector vehicleInfoCollector;
 
@@ -53,7 +54,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
-			FeedforwardRebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
+			RebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
 		this.network = network;
 		this.zonalSystem = zonalSystem;
 		this.params = params;

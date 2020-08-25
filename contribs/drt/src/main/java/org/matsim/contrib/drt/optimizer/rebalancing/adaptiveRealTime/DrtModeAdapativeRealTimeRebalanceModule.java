@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostRelocationCalculator;
@@ -58,7 +59,7 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 	@Override
 	public void install() {
 		log.info("Adaptive Real Time Rebalancing Algorithm is now being installed!");
-		AdaptiveRealTimeRebalancingParams params = drtCfg.getAdaptiveRealTimeRebalancing().orElseThrow();
+		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
 			if (params.getRebalancingZonesGeneration()
