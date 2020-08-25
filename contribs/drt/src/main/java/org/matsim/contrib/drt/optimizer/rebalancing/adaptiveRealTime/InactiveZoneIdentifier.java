@@ -31,7 +31,7 @@ public class InactiveZoneIdentifier implements PersonDepartureEventHandler {
 	public Set<String> getInactiveZone() {
 		log.info("There are in total " + Integer.toString(zonalSystem.getZones().keySet().size()) + " zones");
 		log.info("Of which " + Integer.toString(activeZones.size()) + " are active zones");
-		log.info("Note: At iteration 0, all zone are assumed to be active");
+		log.info("Note: At iteration 0, all zones are assumed to be active");
 		return inactiveZones;
 	}
 

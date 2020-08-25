@@ -82,7 +82,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocationList = new ArrayList<>();
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
-
+		
 		// Feedback part
 		Set<DvrpVehicle> truelyRebalancableVehicles = new HashSet<>();
 
