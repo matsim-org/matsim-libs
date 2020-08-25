@@ -16,6 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.mobsim.hermes;
 
 import java.util.ArrayDeque;
@@ -27,8 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -501,8 +500,8 @@ public class ScenarioImporter {
 	private void processTeleport(Id<Person> id, PlanArray flatplan, EventArray events, Leg element, Route route, String mode) {
 		double routeTravelTime = route.getTravelTime().orElse(0.0);
 		double legTravelTime = element.getTravelTime().orElse(0.0);
-		int time = Math.max(0, (int) Math.round(Math.max(routeTravelTime, legTravelTime)) - 1);
-		//1 second is deducted as it is lost during interaction activities
+		int time = Math.max(0, (int) Math.round(Math.max(routeTravelTime, legTravelTime)) - 2);
+		//2 second is deducted as this is the maximum possible loss during interaction activities
 		flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
 		events.add(new TeleportationArrivalEvent(0, id, route.getDistance(), mode));
 	}
@@ -747,52 +746,39 @@ public class ScenarioImporter {
 
 	private void generateTransitVehiclePlans() {
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getTransitVehicles().getVehicles();
-		try {
-			new ForkJoinPool(numberOfThreads).submit(() ->
-					scenario.getTransitSchedule().getTransitLines().values().parallelStream().forEach((tl) -> {
-						for (TransitRoute tr : tl.getRoutes().values()) {
-							for (Departure depart : tr.getDepartures().values()) {
-								Vehicle v = vehicles.get(depart.getVehicleId());
-								int hermes_id = hermes_id(v.getId().index(), true);
-								PlanArray plan = hermes_agents[hermes_id].plan();
-								EventArray events = hermes_agents[hermes_id].events();
-								float storageCapacityPCUE = deterministicPt ? 0.1f : (float) v.getType().getPcuEquivalents();
-								float flowCapacityPCUE = deterministicPt ? 0.1f : (float) (v.getType().getPcuEquivalents() / v.getType().getFlowEfficiencyFactor());
-								//for pt vehicles, storage and flow capacities are never updated
-								hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
-								hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
-								if (deterministicPt) {
-									generateDetermisticVehicleTrip(plan, events, tl, tr, depart);
-								} else {
-									generateVehicleTrip(plan, events, tl, tr, depart);
-								}
-							}
-						}
-					})).get();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
+		scenario.getTransitSchedule().getTransitLines().values().stream().forEach((tl) -> {
+			for (TransitRoute tr : tl.getRoutes().values()) {
+				for (Departure depart : tr.getDepartures().values()) {
+					Vehicle v = vehicles.get(depart.getVehicleId());
+					int hermes_id = hermes_id(v.getId().index(), true);
+					PlanArray plan = hermes_agents[hermes_id].plan();
+					EventArray events = hermes_agents[hermes_id].events();
+					float storageCapacityPCUE = deterministicPt ? 0.1f : (float) v.getType().getPcuEquivalents();
+					float flowCapacityPCUE = deterministicPt ? 0.1f : (float) (v.getType().getPcuEquivalents() / v.getType().getFlowEfficiencyFactor());
+					//for pt vehicles, storage and flow capacities are never updated
+					hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
+					hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
+					if (deterministicPt) {
+						generateDetermisticVehicleTrip(plan, events, tl, tr, depart);
+					} else {
+						generateVehicleTrip(plan, events, tl, tr, depart);
+					}
+				}
+			}
+		});
+
 	}
 
 	private void generatePersonPlans() {
 		Population population = scenario.getPopulation();
-		try {
-			new ForkJoinPool(numberOfThreads).submit(() ->
-					population.getPersons().values().parallelStream().forEach((person) -> {
-						int hermes_id = hermes_id(person.getId().index(), false);
-						PlanArray plan = hermes_agents[hermes_id].plan();
-						EventArray events = hermes_agents[hermes_id].events();
-						for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
-							processPlanElement(person, plan, events, element, hermes_agents[hermes_id]);
-						}
-					})).get();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
+		population.getPersons().values().parallelStream().forEach((person) -> {
+			int hermes_id = hermes_id(person.getId().index(), false);
+			PlanArray plan = hermes_agents[hermes_id].plan();
+			EventArray events = hermes_agents[hermes_id].events();
+			for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
+				processPlanElement(person, plan, events, element, hermes_agents[hermes_id]);
+			}
+		});
 	}
 
 	private void generateAgents() {
