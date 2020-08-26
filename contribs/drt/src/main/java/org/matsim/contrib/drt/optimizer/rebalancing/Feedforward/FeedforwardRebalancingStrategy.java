@@ -38,7 +38,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
 
 	private final DrtZonalSystem zonalSystem;
-	private final RebalancingParams params;
+	private final RebalancingParams generalParams;
 	private final Network network;
 	private final VehicleInfoCollector vehicleInfoCollector;
 
@@ -54,23 +54,25 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
-			RebalancingParams params, FeedforwardSignalHandler feedforwardSignalHandler) {
+			RebalancingParams generalParams, FeedforwardRebalancingStrategyParams strategySpecificParams,
+			FeedforwardSignalHandler feedforwardSignalHandler) {
 		this.network = network;
 		this.zonalSystem = zonalSystem;
-		this.params = params;
-		timeBinSize = params.getTimeBinSize();
+		this.generalParams = generalParams;
+		timeBinSize = strategySpecificParams.getTimeBinSize();
 
-		rebalanceInterval = params.getInterval();
+		rebalanceInterval = generalParams.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 
-		scale = params.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
-		log.info("The feedforward signal strength is: " + Double.toString(params.getFeedforwardSignalStrength()));
+		scale = strategySpecificParams.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
+		log.info("The feedforward signal strength is: "
+				+ Double.toString(strategySpecificParams.getFeedforwardSignalStrength()));
 
 		rebalancePlanCore = feedforwardSignalHandler.getRebalancePlanCore();
-		feedforwardSignalLead = params.getFeedforwardSignalLead();
+		feedforwardSignalLead = strategySpecificParams.getFeedforwardSignalLead();
 
-		feedbackSwitch = params.getFeedbackSwitch();
-		minNumVehiclesPerZone = params.getMinNumVehiclesPerZone();
+		feedbackSwitch = strategySpecificParams.getFeedbackSwitch();
+		minNumVehiclesPerZone = strategySpecificParams.getMinNumVehiclesPerZone();
 
 		log.info("Rebalance strategy constructed: Feedforward Rebalancing Strategy is used");
 		log.info("Feedback switch is set to " + Boolean.toString(feedbackSwitch));
@@ -83,16 +85,16 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocationList = new ArrayList<>();
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
-		
+
 		// Feedback part
 		Set<DvrpVehicle> truelyRebalancableVehicles = new HashSet<>();
 
 		if (feedbackSwitch) {
 			List<Link> destinationLinks = new ArrayList<>();
 			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupRebalancableVehicles(rebalancableVehicles, time, params.getMinServiceTime());
-			Map<String, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupSoonIdleVehicles(time, params.getMaxTimeBeforeIdle(), params.getMinServiceTime());
+					.groupRebalancableVehicles(rebalancableVehicles, time, generalParams.getMinServiceTime());
+			Map<String, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(
+					time, generalParams.getMaxTimeBeforeIdle(), generalParams.getMinServiceTime());
 			for (String zone : zonalSystem.getZones().keySet()) {
 				int surplus = rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
 						+ soonRebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
@@ -121,7 +123,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 							.get();
 					relocationList.add(new Relocation(nearestVehicle, link));
 					truelyRebalancableVehicles.remove(nearestVehicle);
-					if(truelyRebalancableVehicles.isEmpty()) {
+					if (truelyRebalancableVehicles.isEmpty()) {
 						break;
 					}
 				}
@@ -134,8 +136,8 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		// Feedforward part
 		// assign rebalnace vehicles based on the rebalance plan
 		if (rebalancePlanCore.containsKey(timeBin)) {
-			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupRebalancableVehicles(truelyRebalancableVehicles.stream(), time, params.getMinServiceTime());
+			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
+					truelyRebalancableVehicles.stream(), time, generalParams.getMinServiceTime());
 			// Generate relocations based on the "rebalancePlanCore"
 			for (Triple<String, String, Integer> rebalanceInfo : rebalancePlanCore.get(timeBin)) {
 				String departureZoneId = rebalanceInfo.getLeft();

@@ -37,10 +37,10 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	private final int simulationEndTime = 30; // simulation ending time in hour
 
 	/** Constructor */
-	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem, FeedforwardRebalancingParams params,
+	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem, FeedforwardRebalancingStrategyParams strategySpecificParams,
 			EventsManager events) {
 		this.zonalSystem = zonalSystem;
-		timeBinSize = params.getTimeBinSize();
+		timeBinSize = strategySpecificParams.getTimeBinSize();
 	}
 
 	@Override

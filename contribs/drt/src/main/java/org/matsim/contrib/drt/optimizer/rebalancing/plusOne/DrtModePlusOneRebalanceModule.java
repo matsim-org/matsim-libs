@@ -56,13 +56,13 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		log.info("Plus one Rebalancing Algorithm is now being installed!");
-		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
+		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
 
-			if (params.getRebalancingZonesGeneration()
-					.equals(PlusOneRebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
+			if (generalParams.getRebalancingZonesGeneration()
+					.equals(RebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
 				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
-						.loadPreparedGeometries(params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
+						.loadPreparedGeometries(generalParams.getRebalancingZonesShapeFileURL(getConfig().getContext()));
 				Map<String, Geometry> zones = new HashMap<>();
 				for (int i = 0; i < preparedGeometries.size(); i++) {
 					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
@@ -75,10 +75,10 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 						.loadPreparedGeometries(drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
 				Network modalNetwork = getter.getModal(Network.class);
 				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
-						params.getCellSize(), preparedGeometries);
+						generalParams.getCellSize(), preparedGeometries);
 				return new DrtZonalSystem(modalNetwork, zones);
 			}
-			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
+			return new DrtZonalSystem(getter.getModal(Network.class), generalParams.getCellSize());
 		})).asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {

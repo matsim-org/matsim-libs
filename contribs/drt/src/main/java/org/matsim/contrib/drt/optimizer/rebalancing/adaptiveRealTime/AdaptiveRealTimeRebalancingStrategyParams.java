@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
+package org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime;
 
 import java.util.Map;
 
@@ -25,18 +25,16 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * 
- * @author michalm
+ * @author michalm, Chengqi Lu
  */
 // TODO change this based on the algorithm!!!
-public final class PlusOneRebalancingParams extends ReflectiveConfigGroup
+public final class AdaptiveRealTimeRebalancingStrategyParams extends ReflectiveConfigGroup
 		implements RebalancingParams.RebalancingStrategyParams {
-	public static final String SET_NAME = "PlusOneRebalancingStrategy";
+	public static final String SET_NAME = "AdaptiveRealTimeRebalncingStrategy";
 
-
-	public PlusOneRebalancingParams() {
+	public AdaptiveRealTimeRebalancingStrategyParams() {
 		super(SET_NAME);
 	}
-
 
 	@Override
 	public Map<String, String> getComments() {

@@ -31,8 +31,14 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.AdaptiveRealTimeRebalancingStrategyParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.DrtModeAdapativeRealTimeRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
+import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingParams;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -93,6 +99,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
 			if (rebalancingParams.getRebalancingStrategyParams() instanceof MinCostFlowRebalancingStrategyParams) {
 				install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
+			} else if (rebalancingParams
+					.getRebalancingStrategyParams() instanceof AdaptiveRealTimeRebalancingStrategyParams) {
+				install(new DrtModeAdapativeRealTimeRebalanceModule(drtCfg));
+			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof PlusOneRebalancingParams) {
+				install(new DrtModePlusOneRebalanceModule(drtCfg));
+			} else if (rebalancingParams
+					.getRebalancingStrategyParams() instanceof FeedforwardRebalancingStrategyParams) {
+				install(new DrtModeFeedforwardRebalanceModule(drtCfg));
 			} else {
 				throw new RuntimeException(
 						"Unsupported rebalancingStrategyParams: " + rebalancingParams.getRebalancingStrategyParams());
