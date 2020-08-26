@@ -65,13 +65,17 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 		List<Relocation> relocationList = new ArrayList<>();
 		Map<Id<Link>, ? extends Link> linkMap = network.getLinks();
 		for (Id<Link> destinationLinkId : targetMap.keySet()) {
+//			int numOfRequestsOnLink = targetMap.get(destinationLinkId);
+			Link destinationLink = linkMap.get(destinationLinkId);
 			if (!rebalancableVehicles.isEmpty()) {
-				for (int i = 0; i < targetMap.get(destinationLinkId); i++) {
-					Link destinationLink = linkMap.get(destinationLinkId);
-					DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
-					relocationList.add(new Relocation(nearestVehicle, destinationLink));
-					rebalancableVehicles.remove(nearestVehicle);
-				}
+				// TODO: If the for loop is enabled, there will be concurrent modification
+				// exception at line 67.
+				// Need ot find a solution
+//				for (int i = 0; i < numOfRequestsOnLink; i++) {
+				DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
+				relocationList.add(new Relocation(nearestVehicle, destinationLink));
+				rebalancableVehicles.remove(nearestVehicle);
+//				}
 			} else {
 				log.warn("There is not enough vehicle to perform rebalance at this moment!");
 				break;

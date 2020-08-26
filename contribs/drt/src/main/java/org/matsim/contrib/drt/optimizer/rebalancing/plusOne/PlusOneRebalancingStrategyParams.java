@@ -27,13 +27,12 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * 
  * @author michalm
  */
-// TODO change this based on the algorithm!!!
-public final class PlusOneRebalancingParams extends ReflectiveConfigGroup
+public final class PlusOneRebalancingStrategyParams extends ReflectiveConfigGroup
 		implements RebalancingParams.RebalancingStrategyParams {
 	public static final String SET_NAME = "PlusOneRebalancingStrategy";
 
 
-	public PlusOneRebalancingParams() {
+	public PlusOneRebalancingStrategyParams() {
 		super(SET_NAME);
 	}
 

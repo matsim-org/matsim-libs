@@ -63,7 +63,6 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		System.err.println("Rebalance fleet now: Min Cost Flow Strategy is used"); // TODO delete this line after running properly
 		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = groupRebalancableVehicles(rebalancableVehicles,
 				time);
 		if (rebalancableVehiclesPerZone.isEmpty()) {

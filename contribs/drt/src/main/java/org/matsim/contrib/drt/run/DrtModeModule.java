@@ -38,7 +38,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime.DrtModeAdap
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.DrtModePlusOneRebalanceModule;
-import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -102,7 +102,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			} else if (rebalancingParams
 					.getRebalancingStrategyParams() instanceof AdaptiveRealTimeRebalancingStrategyParams) {
 				install(new DrtModeAdapativeRealTimeRebalanceModule(drtCfg));
-			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof PlusOneRebalancingParams) {
+			} else if (rebalancingParams.getRebalancingStrategyParams() instanceof PlusOneRebalancingStrategyParams) {
 				install(new DrtModePlusOneRebalanceModule(drtCfg));
 			} else if (rebalancingParams
 					.getRebalancingStrategyParams() instanceof FeedforwardRebalancingStrategyParams) {
