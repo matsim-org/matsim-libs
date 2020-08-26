@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,19 +15,44 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- *
+ * *********************************************************************** *
  */
+
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.function.ToIntFunction;
+import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 /**
- * @author jbischoff
+ * @author Michal Maciejewski (michalm)
  */
-public interface ZonalDemandAggregator {
+public class DrtZone {
+	private final String id;
+	private final Geometry geometry;
+	private final Coord centroid;
 
-	ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time);
+	public DrtZone(String id, Geometry geometry) {
+		this(id, geometry, MGC.point2Coord(geometry.getCentroid()));
+	}
+
+	public DrtZone(String id, Geometry geometry, Coord centroid) {
+		this.id = id;
+		this.geometry = geometry;
+		this.centroid = centroid;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public Geometry getGeometry() {
+		return geometry;
+	}
+
+	public Coord getCentroid() {
+		return centroid;
+	}
+
+	//TODO add Link closest to geometry.centroid
 }

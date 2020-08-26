@@ -47,8 +47,8 @@ public final class PreviousIterationZonalDRTDemandAggregator
 	private final String mode;
 	private final String drtSpeedUpMode;
 	private final int timeBinSize;
-	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
-	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> departures = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
 	public PreviousIterationZonalDRTDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
@@ -71,13 +71,13 @@ public final class PreviousIterationZonalDRTDemandAggregator
 		if (event.getLegMode().equals(mode) || event.getLegMode().equals(drtSpeedUpMode)) {
 			Double bin = getBinForTime(event.getTime());
 
-			String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
-			if (zoneId == null) {
+			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			if (zone == null) {
 				Logger.getLogger(getClass()).error("No zone found for linkId " + event.getLinkId().toString());
 				return;
 			}
 			if (departures.containsKey(bin)) {
-				this.departures.get(bin).get(zoneId).increment();
+				this.departures.get(bin).get(zone).increment();
 			} else
 				Logger.getLogger(getClass())
 						.error("Time " + Time.writeTime(event.getTime()) + " / bin " + bin + " is out of boundary");
@@ -86,8 +86,8 @@ public final class PreviousIterationZonalDRTDemandAggregator
 
 	private void prepareZones() {
 		for (int i = 0; i < (3600 / timeBinSize) * 36; i++) {
-			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
-			for (String zone : zonalSystem.getZones().keySet()) {
+			Map<DrtZone, MutableInt> zonesPerSlot = new HashMap<>();
+			for (DrtZone zone : zonalSystem.getZones().values()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
 			departures.put((double)i, zonesPerSlot);
@@ -98,10 +98,10 @@ public final class PreviousIterationZonalDRTDemandAggregator
 		return Math.floor(time / timeBinSize);
 	}
 
-	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		Map<String, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin,
+		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin,
 				Collections.emptyMap());
-		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
+		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
 	}
 }

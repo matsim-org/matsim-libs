@@ -25,11 +25,11 @@ import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -50,27 +50,25 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	}
 
 	@Override
-	public List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
-			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
+	public List<Relocation> calcRelocations(List<Pair<DrtZone, Integer>> supply, List<Pair<DrtZone, Integer>> demand,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations = new TransportProblem<>(
 				this::calcStraightLineDistance).solve(supply, demand);
 		return calcRelocations(rebalancableVehiclesPerZone, interZonalRelocations);
 	}
 
-	private int calcStraightLineDistance(String zone1, String zone2) {
-		return (int)DistanceUtils.calculateDistance(zonalSystem.getZoneCentroid(zone1),
-				zonalSystem.getZoneCentroid(zone2));
+	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
+		return (int)DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
 	}
 
-	private List<Relocation> calcRelocations(Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone,
-			List<Triple<String, String, Integer>> interZonalRelocations) {
+	private List<Relocation> calcRelocations(Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
+			List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations) {
 		List<Relocation> relocations = new ArrayList<>();
-		for (Triple<String, String, Integer> r : interZonalRelocations) {
+		for (Triple<DrtZone, DrtZone, Integer> r : interZonalRelocations) {
 			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
 
-			String toZone = r.getMiddle();
-			Geometry z = zonalSystem.getZone(toZone);
-			Coord zoneCentroid = MGC.point2Coord(z.getCentroid());
+			DrtZone toZone = r.getMiddle();
+			Coord zoneCentroid = MGC.point2Coord(toZone.getGeometry().getCentroid());
 			Link destinationLink = NetworkUtils.getNearestLink(network, zoneCentroid);
 
 			int flow = r.getRight();
