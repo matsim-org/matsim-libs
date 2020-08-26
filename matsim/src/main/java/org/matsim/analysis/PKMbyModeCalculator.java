@@ -95,7 +95,7 @@ public class PKMbyModeCalculator {
             for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
-                    csvPrinter.print(e.getValue().getOrDefault(mode, 0.0) / 1000.0);
+                    csvPrinter.print((int) Math.round(e.getValue().getOrDefault(mode, 0.0) / 1000.0));
                 }
                 csvPrinter.println();
             }

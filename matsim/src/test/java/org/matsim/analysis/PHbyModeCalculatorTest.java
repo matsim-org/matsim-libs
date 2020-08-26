@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -178,17 +177,17 @@ public class PHbyModeCalculatorTest {
 					Double pt_wait_value = Double.valueOf(column[pt_wait]);
 					Double stageActivity_wait_value = Double.valueOf(column[stageActivity_wait]);
 
-					Assert.assertEquals("car_travel hour does not match", (modeValues.get("car") / 3600.0),
+					Assert.assertEquals("car_travel hour does not match", Math.round(modeValues.get("car") / 3600.0),
 							car_travel_value, 0);
-					Assert.assertEquals("pt_travel hour score does not match", (modeValues.get("pt") / 3600.0),
+					Assert.assertEquals("pt_travel hour score does not match", Math.round(modeValues.get("pt") / 3600.0),
 							pt_travel_value, 0);
-					Assert.assertEquals("walk_travel hour does not match", (modeValues.get("walk") / 3600.0),
+					Assert.assertEquals("walk_travel hour does not match", Math.round(modeValues.get("walk") / 3600.0),
 							walk_travel_value, 0);
-					Assert.assertEquals("pt_wait hour does not match", (modeValues.get("pt_wait") / 3600.0),
+					Assert.assertEquals("pt_wait hour does not match", Math.round(modeValues.get("pt_wait") / 3600.0),
 							pt_wait_value, 0);
-					Assert.assertEquals("stageActivity_wait hour does not match", (modeValues.get("stageActivity_wait") / 3600.0),
+					Assert.assertEquals("stageActivity_wait hour does not match", Math.round(modeValues.get("stageActivity_wait") / 3600.0),
 							stageActivity_wait_value, 0);
-					
+
 					break;
 				}
 				iteration++;
