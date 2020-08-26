@@ -4,7 +4,7 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
@@ -714,7 +714,7 @@ public class SwissRailRaptorCore {
     }
 
     private int findNextDepartureIndexWithConstraints(RRoute route, RRouteStop routeStop, int time) {
-        return this.data.executionData.getNextAvailableDeparture(this.data, routeStop, time);
+        return this.data.occupancyData.getNextAvailableDeparture(this.data, routeStop, time);
     }
 
     private double calcTransferCost(double costBase, double costPerHour, double costMin, double costMax, double travelTime) {
@@ -1039,7 +1039,7 @@ public class SwissRailRaptorCore {
             this.currentInVehicleTime = endTime - startTime;
             this.currentTimeOfDay = startTime;
 
-            DepartureData depData = this.data.executionData.getDepartureData(nextRouteStop.line.getId(), nextRouteStop.route.getId(), depRouteStop.routeStop.getStopFacility().getId(), this.currentDepartureId);
+            DepartureData depData = this.data.occupancyData.getDepartureData(nextRouteStop.line.getId(), nextRouteStop.route.getId(), depRouteStop.routeStop.getStopFacility().getId(), this.currentDepartureId);
             this.currentPassengerCount = depData == null ? 0 : depData.paxCountAtDeparture;
         }
 

@@ -92,15 +92,15 @@ public class SwissRailRaptorInVehicleCostTest {
 	}
 
 	private void runTest(Fixture f, RaptorInVehicleCostCalculator inVehCostCalcualtor, Id<TransitLine> expectedTransitLine) {
-		ExecutionData executionData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(executionData, f.scenario);
+		OccupancyData occupancyData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario);
 		fillExecutionTracker(f, tracker);
 
 		SwissRailRaptorData raptorData = SwissRailRaptorData.create(
 				f.scenario.getTransitSchedule(), f.scenario.getTransitVehicles(),
 				RaptorUtils.createStaticConfig(f.config),
 				f.scenario.getNetwork(),
-				executionData);
+				occupancyData);
 
 		SwissRailRaptor raptor = new SwissRailRaptor(
 				raptorData,
@@ -134,7 +134,7 @@ public class SwissRailRaptorInVehicleCostTest {
 		Assert.assertEquals("walk", leg3.getMode());
 	}
 
-	private void fillExecutionTracker(Fixture f, ExecutionTracker tracker) {
+	private void fillExecutionTracker(Fixture f, OccupancyTracker tracker) {
 		Id<Person> person1 = Id.create(1, Person.class);
 		Id<Person> person2 = Id.create(2, Person.class);
 		Id<Person> person3 = Id.create(3, Person.class);

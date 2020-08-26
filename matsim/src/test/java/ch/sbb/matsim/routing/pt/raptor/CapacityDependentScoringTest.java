@@ -1,9 +1,9 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.LineData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.RouteData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.StopData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.LineData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.RouteData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.StopData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -32,7 +32,6 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -78,14 +77,14 @@ public class CapacityDependentScoringTest {
 		Network network = f.scenario.getNetwork();
 		ScoringParametersForPerson parameters = new SubpopulationScoringParameters(f.scenario);
 
-		ExecutionData execData = null;
+		OccupancyData execData = null;
 		CapacityDependentInVehicleCostCalculator inVehicleCostCalculator = null;
 		if (capacityDependent) {
-			execData = new ExecutionData();
+			execData = new OccupancyData();
 			inVehicleCostCalculator = new CapacityDependentInVehicleCostCalculator(0.7, 0.3, 1.2, 0.8);
 		}
 
-		ExecutionData finalExecData = execData;
+		OccupancyData finalExecData = execData;
 		CapacityDependentInVehicleCostCalculator finalInVehicleCostCalculator = inVehicleCostCalculator;
 
 		ScoringFunctionFactory testSFF = new ScoringFunctionFactory() {

@@ -57,13 +57,13 @@ public class SwissRailRaptorData {
     final Map<TransitStopFacility, int[]> routeStopsPerStopFacility;
     final QuadTree<TransitStopFacility> stopsQT;
     final Map<String, Map<String, QuadTree<TransitStopFacility>>> stopFilterAttribute2Value2StopsQT;
-    final ExecutionData executionData;
+    final OccupancyData occupancyData;
 
     private SwissRailRaptorData(RaptorStaticConfig config, int countStops,
                                 RRoute[] routes, int[] departures, Vehicle[] departureVehicles, Id<Departure>[] departureIds, RRouteStop[] routeStops,
                                 RTransfer[] transfers, Map<TransitStopFacility, Integer> stopFacilityIndices,
                                 Map<TransitStopFacility, int[]> routeStopsPerStopFacility, QuadTree<TransitStopFacility> stopsQT,
-                                ExecutionData executionData) {
+                                OccupancyData occupancyData) {
         this.config = config;
         this.countStops = countStops;
         this.countRouteStops = routeStops.length;
@@ -77,10 +77,10 @@ public class SwissRailRaptorData {
         this.routeStopsPerStopFacility = routeStopsPerStopFacility;
         this.stopsQT = stopsQT;
         this.stopFilterAttribute2Value2StopsQT = new HashMap<>();
-        this.executionData = executionData;
+        this.occupancyData = occupancyData;
     }
 
-    public static SwissRailRaptorData create(TransitSchedule schedule, @Nullable Vehicles transitVehicles, RaptorStaticConfig staticConfig, Network network, ExecutionData executionData) {
+    public static SwissRailRaptorData create(TransitSchedule schedule, @Nullable Vehicles transitVehicles, RaptorStaticConfig staticConfig, Network network, OccupancyData occupancyData) {
         log.info("Preparing data for SwissRailRaptor...");
         long startMillis = System.currentTimeMillis();
 
@@ -205,7 +205,7 @@ public class SwissRailRaptorData {
             }
         }
 
-        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, executionData);
+        SwissRailRaptorData data = new SwissRailRaptorData(staticConfig, countStopFacilities, routes, departures, departureVehicles, departureIds, routeStops, transfers, stopFacilityIndices, routeStopsPerStopFacility, stopsQT, occupancyData);
 
         long endMillis = System.currentTimeMillis();
         log.info("SwissRailRaptor data preparation done. Took " + (endMillis - startMillis) / 1000 + " seconds.");

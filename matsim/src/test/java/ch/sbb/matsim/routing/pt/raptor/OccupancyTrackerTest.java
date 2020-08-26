@@ -1,6 +1,6 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -29,15 +29,15 @@ import java.util.Collections;
 /**
  * @author mrieser / Simunto GmbH
  */
-public class ExecutionTrackerTest {
+public class OccupancyTrackerTest {
 
 	@Test
 	public void testGetNextDeparture() {
 		Fixture f = new Fixture();
 
 		EventsManager events = EventsUtils.createEventsManager();
-		ExecutionData execData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
+		OccupancyData execData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(execData, f.scenario);
 		events.addHandler(tracker);
 
 		events.initProcessing();
@@ -113,8 +113,8 @@ public class ExecutionTrackerTest {
 		Fixture f = new Fixture();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		ExecutionData execData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(execData, f.scenario);
+		OccupancyData execData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(execData, f.scenario);
 		events.addHandler(tracker);
 
 		events.initProcessing();

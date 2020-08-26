@@ -1,7 +1,7 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.RouteData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.RouteData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,11 +32,11 @@ public class CapacityDependentTripScoringFunction implements LegScoring {
 	private final Person person;
 	private final ScoringParameters params;
 	private final Set<String> ptModes;
-	private final ExecutionData data;
+	private final OccupancyData data;
 	private final CapacityDependentInVehicleCostCalculator inVehicleCostCalculator;
 	private double score = 0.0;
 
-	public CapacityDependentTripScoringFunction(Person person, ScoringParameters params, Set<String> ptModes, ExecutionData data, CapacityDependentInVehicleCostCalculator inVehicleCostCalculator) {
+	public CapacityDependentTripScoringFunction(Person person, ScoringParameters params, Set<String> ptModes, OccupancyData data, CapacityDependentInVehicleCostCalculator inVehicleCostCalculator) {
 		this.person = person;
 		this.params = params;
 		this.ptModes = ptModes;
@@ -100,7 +100,7 @@ public class CapacityDependentTripScoringFunction implements LegScoring {
 		final Id<TransitStopFacility> egressStopId;
 		final Vehicle ptVehicle;
 
-		public TransitRouteSegmentIterator(Person person, ExecutionData data, TransitPassengerRoute paxRoute) {
+		public TransitRouteSegmentIterator(Person person, OccupancyData data, TransitPassengerRoute paxRoute) {
 			Id<TransitLine> lineId = paxRoute.getLineId();
 			this.routeData = data.getRouteData(lineId, paxRoute.getRouteId());
 			TransitRoute ptRoute = this.routeData.route;

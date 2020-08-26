@@ -52,13 +52,13 @@ public class SwissRailRaptorCapacitiesTest {
 
 		// default case
 
-		ExecutionData executionData = new ExecutionData();
+		OccupancyData occupancyData = new OccupancyData();
 
 		SwissRailRaptorData raptorData = SwissRailRaptorData.create(
 				f.scenario.getTransitSchedule(), null,
 				RaptorUtils.createStaticConfig(f.config),
 				f.scenario.getNetwork(),
-				executionData);
+				occupancyData);
 
 		SwissRailRaptor raptor = new SwissRailRaptor(
 				raptorData,
@@ -93,14 +93,14 @@ public class SwissRailRaptorCapacitiesTest {
 
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
 		srrConfig.setUseCapacityConstraints(true);
-		executionData = new ExecutionData();
-		ExecutionTracker tracker = new ExecutionTracker(executionData, f.scenario);
+		occupancyData = new OccupancyData();
+		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario);
 
 		raptorData = SwissRailRaptorData.create(
 				f.scenario.getTransitSchedule(), null,
 				RaptorUtils.createStaticConfig(f.config),
 				f.scenario.getNetwork(),
-				executionData);
+				occupancyData);
 
 		raptor = new SwissRailRaptor(
 				raptorData,

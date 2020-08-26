@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.pt.router.TransitScheduleChangedEventHandler;
-import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -30,7 +29,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     private final RaptorParametersForPerson raptorParametersForPerson;
     private final RaptorRouteSelector routeSelector;
     private final Provider<RaptorStopFinder> stopFinderProvider;
-    private final ExecutionData executionData;
+    private final OccupancyData occupancyData;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
 
     private final Network network;
@@ -38,7 +37,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
     @Inject
     public SwissRailRaptorFactory(final Scenario scenario, final Config config,
                                   RaptorParametersForPerson raptorParametersForPerson, RaptorRouteSelector routeSelector,
-                                  Provider<RaptorStopFinder> stopFinderProvider, ExecutionData executionData,
+                                  Provider<RaptorStopFinder> stopFinderProvider, OccupancyData occupancyData,
                                   RaptorInVehicleCostCalculator inVehicleCostCalculator,
                                   final EventsManager events) {
         this.schedule = scenario.getTransitSchedule();
@@ -48,7 +47,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
         this.raptorParametersForPerson = raptorParametersForPerson;
         this.routeSelector = routeSelector;
         this.stopFinderProvider = stopFinderProvider;
-        this.executionData = executionData;
+        this.occupancyData = occupancyData;
         this.inVehicleCostCalculator = inVehicleCostCalculator;
 
         if (events != null) {
@@ -75,7 +74,7 @@ public class SwissRailRaptorFactory implements Provider<SwissRailRaptor> {
             // prevent doing the work twice.
             return this.data;
         }
-        this.data = SwissRailRaptorData.create(this.schedule, this.transitVehicles, this.raptorConfig, this.network, this.executionData);
+        this.data = SwissRailRaptorData.create(this.schedule, this.transitVehicles, this.raptorConfig, this.network, this.occupancyData);
         return this.data;
     }
 

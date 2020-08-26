@@ -14,10 +14,10 @@ import org.matsim.core.router.MainModeIdentifier;
  */
 public class SwissRailRaptorModule extends AbstractModule {
 
-    private final ExecutionData executionData = new ExecutionData();
+    private final OccupancyData occupancyData = new OccupancyData();
 
-    public ExecutionData getExecutionData() {
-        return this.executionData;
+    public OccupancyData getExecutionData() {
+        return this.occupancyData;
     }
 
     @Override
@@ -52,9 +52,9 @@ public class SwissRailRaptorModule extends AbstractModule {
             bind(RaptorStopFinder.class).to(DefaultRaptorStopFinder.class);
 
             boolean useCapacityConstraints = srrConfig.isUseCapacityConstraints();
-            bind(ExecutionData.class).toInstance(this.executionData);
+            bind(OccupancyData.class).toInstance(this.occupancyData);
             if (useCapacityConstraints) {
-                addEventHandlerBinding().to(ExecutionTracker.class);
+                addEventHandlerBinding().to(OccupancyTracker.class);
             }
             
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);

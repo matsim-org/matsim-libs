@@ -1,10 +1,10 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.DepartureData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.LineData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.RouteData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.StopData;
-import ch.sbb.matsim.routing.pt.raptor.ExecutionData.VehicleData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.LineData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.RouteData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.StopData;
+import ch.sbb.matsim.routing.pt.raptor.OccupancyData.VehicleData;
 import java.util.HashSet;
 import java.util.Set;
 import org.matsim.api.core.v01.Id;
@@ -33,16 +33,16 @@ import javax.inject.Inject;
  *
  * @author mrieser / Simunto GmbH
  */
-public class ExecutionTracker implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class OccupancyTracker implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private final ExecutionData data;
+	private final OccupancyData data;
 	private final Scenario scenario;
 	private final Set<Id<Person>> transitDrivers = new HashSet<>();
 
 	private final static VehicleData DUMMY_VEHDATA = new VehicleData(null, null, null);
 
 	@Inject
-	public ExecutionTracker(ExecutionData data, Scenario scenario) {
+	public OccupancyTracker(OccupancyData data, Scenario scenario) {
 		this.data = data;
 		this.scenario = scenario;
 	}

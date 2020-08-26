@@ -5,7 +5,6 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -23,9 +22,9 @@ import java.util.Map;
 /**
  * @author mrieser / Simunto GmbH
  */
-public class ExecutionData {
+public class OccupancyData {
 
-	private final static Logger LOG = LogManager.getLogger(ExecutionData.class);
+	private final static Logger LOG = LogManager.getLogger(OccupancyData.class);
 
 	final IdMap<TransitLine, LineData> lineData = new IdMap<>(TransitLine.class);
 	final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
