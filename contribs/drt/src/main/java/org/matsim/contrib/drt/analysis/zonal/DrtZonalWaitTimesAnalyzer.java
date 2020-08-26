@@ -119,13 +119,11 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
 		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
 			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
-			String zoneStr = zones.getZoneForLinkId(submission.getFromLinkId());
-			if (zoneStr != null) {
+			DrtZone zone = zones.getZoneForLinkId(submission.getFromLinkId());
+			final String zoneStr;
+			if (zone != null) {
 				//request submission inside drtServiceArea
-				zoneStr += delimiter + zones.getZones().get(zoneStr).getCentroid().getX() + delimiter + zones.getZones()
-						.get(zoneStr)
-						.getCentroid()
-						.getY();
+				zoneStr = zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY();
 			} else {
 				zoneStr = "outsideOfDrtZonalSystem;-;-";
 			}

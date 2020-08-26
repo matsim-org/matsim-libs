@@ -20,10 +20,11 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import static org.junit.Assert.assertEquals;
+
 import java.net.URL;
 import java.util.function.ToIntFunction;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -74,26 +75,26 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 1,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 1,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 1,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 1,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 1,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 1,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 1,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 1,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 1);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 1);
 		}
+	}
+
+	private void assertDemand(ToIntFunction<DrtZone> demandFunction, DrtZonalSystem zonalSystem, String zoneId,
+			double time, int expectedValue) {
+		DrtZone zone = zonalSystem.getZones().get(zoneId);
+		assertEquals("wrong estimation of demand at time=" + (time + 60) + " in zone " + zoneId, expectedValue,
+				demandFunction.applyAsInt(zone), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -113,25 +114,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 2,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 2,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 2,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 2,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 2,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 2,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 2,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 2,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
 		}
 	}
 
@@ -142,25 +136,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 0,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 0,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 0,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 0,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 0,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 0,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 0,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 3,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
 		}
 	}
 
@@ -171,25 +158,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 0,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 0,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 0,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 3,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 0,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 0,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 0,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 3,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
 		}
 	}
 
@@ -200,25 +180,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 0,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 3,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 0,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 3,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 0,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 0,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 0,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 3,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
 		}
 	}
 
@@ -229,26 +202,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 0,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			// 99 activities of a 297 total at 8 vehicles: (99/297)*8 = 2.67
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 2,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 0,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 2,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 0,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 0,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 0,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 2,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
 		}
 	}
 
@@ -269,26 +234,18 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		controler.run();
 		ZonalDemandAggregator aggregator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<String> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 1", 0,
-					demandFunction.applyAsInt("1"), MatsimTestUtils.EPSILON);
-			// 99 activities of a 297 total at 16 vehicles: (99/297)*16 = 5.33
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 2", 5,
-					demandFunction.applyAsInt("2"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 3", 0,
-					demandFunction.applyAsInt("3"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 4", 5,
-					demandFunction.applyAsInt("4"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 5", 0,
-					demandFunction.applyAsInt("5"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 6", 0,
-					demandFunction.applyAsInt("6"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 7", 0,
-					demandFunction.applyAsInt("7"), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("wrong estimation of demand at time=" + (ii + 60) + " in zone 8", 5,
-					demandFunction.applyAsInt("8"), MatsimTestUtils.EPSILON);
+			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 5);
+			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 5);
+			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 5);
 		}
 	}
 

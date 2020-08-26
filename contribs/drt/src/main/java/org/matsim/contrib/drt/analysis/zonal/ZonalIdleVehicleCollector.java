@@ -43,8 +43,8 @@ public class ZonalIdleVehicleCollector implements TaskStartedEventHandler, TaskE
 	private final DrtZonalSystem zonalSystem;
 	private final String dvrpMode;
 
-	private final Map<String, Set<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
-	private final Map<Id<DvrpVehicle>, String> zonePerVehicle = new HashMap<>();
+	private final Map<DrtZone, Set<Id<DvrpVehicle>>> vehiclesPerZone = new HashMap<>();
+	private final Map<Id<DvrpVehicle>, DrtZone> zonePerVehicle = new HashMap<>();
 
 	public ZonalIdleVehicleCollector(String dvrpMode, DrtZonalSystem zonalSystem) {
 		this.dvrpMode = dvrpMode;
@@ -67,16 +67,16 @@ public class ZonalIdleVehicleCollector implements TaskStartedEventHandler, TaskE
 		});
 	}
 
-	private void handleEvent(AbstractTaskEvent event, Consumer<String> handler) {
+	private void handleEvent(AbstractTaskEvent event, Consumer<DrtZone> handler) {
 		if (event.getDvrpMode().equals(dvrpMode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
-			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
 				handler.accept(zone);
 			}
 		}
 	}
 
-	public Set<Id<DvrpVehicle>> getIdleVehiclesPerZone(String zone) {
+	public Set<Id<DvrpVehicle>> getIdleVehiclesPerZone(DrtZone zone) {
 		return this.vehiclesPerZone.get(zone);
 	}
 

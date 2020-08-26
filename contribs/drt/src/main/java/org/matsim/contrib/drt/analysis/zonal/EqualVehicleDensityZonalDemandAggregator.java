@@ -28,48 +28,43 @@ import java.util.function.ToIntFunction;
 
 import javax.validation.constraints.NotNull;
 
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+
+import com.google.common.base.Preconditions;
 
 /**
  * This class does not really calculate the expected demand but aims to
  * distribute the fleet vehicles equally over all zones, weighted by zone area size.
- *
+ * <p>
  * TODO:test
  *
  * @author tschlenther
  */
 public final class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
 
-	private final Map<String, Double> zoneAreaShares = new HashMap<>();
+	private final Map<DrtZone, Double> zoneAreaShares = new HashMap<>();
 	private final FleetSpecification fleetSpecification;
 
-	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem, @NotNull FleetSpecification fleetSpecification) {
+	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem,
+			@NotNull FleetSpecification fleetSpecification) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
 	}
 
-	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
-		return zoneId-> {
-			double areaShare = zoneAreaShares.getOrDefault(zoneId, 0.).doubleValue();
-			return (int) Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
+	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+		return zone -> {
+			double areaShare = zoneAreaShares.getOrDefault(zone, 0.);
+			return (int)Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
 		};
 	}
 
 	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
-		zoneAreaShares.clear();
+		double areaSum = zonalSystem.getZones().values().stream().mapToDouble(z -> z.getGeometry().getArea()).sum();
 
-		double areaSum = zonalSystem.getZones().values().stream()
-				.mapToDouble(Geometry::getArea)
-				.sum();
-
-		for(String zone : zonalSystem.getZones().keySet()){
-			double areaShare = zonalSystem.getZone(zone).getArea() / areaSum;
-			if(areaShare > 1. || areaShare < 0.) throw new IllegalStateException();
-			zoneAreaShares.put(zone,areaShare);
+		for (DrtZone zone : zonalSystem.getZones().values()) {
+			double areaShare = zone.getGeometry().getArea() / areaSum;
+			Preconditions.checkState(areaShare >= 0. && areaShare <= 1.);
+			zoneAreaShares.put(zone, areaShare);
 		}
 	}
-
 }

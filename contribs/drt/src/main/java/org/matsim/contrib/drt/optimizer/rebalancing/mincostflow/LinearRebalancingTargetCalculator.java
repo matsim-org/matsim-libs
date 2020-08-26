@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 
@@ -36,7 +37,7 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 
 	// FIXME targets should be calculated more intelligently
 	@Override
-	public int estimate(String zone, double time) {
+	public int estimate(DrtZone zone, double time) {
 		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
 		int expectedDemand = demandAggregator.getExpectedDemandForTimeBin(time + 60).applyAsInt(zone);
 		if (expectedDemand == 0) {

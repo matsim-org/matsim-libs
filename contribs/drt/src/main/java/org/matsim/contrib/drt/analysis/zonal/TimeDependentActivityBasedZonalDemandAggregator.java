@@ -49,8 +49,8 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
-	private final Map<Double, Map<String, MutableInt>> actEnds = new HashMap<>();
-	private final Map<Double, Map<String, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> actEnds = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
 	public TimeDependentActivityBasedZonalDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
@@ -58,11 +58,11 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
-	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		Map<String, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin,
+		Map<DrtZone, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin,
 				Collections.emptyMap());
-		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
+		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
 	}
 
 	@Override
@@ -81,13 +81,13 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 			return;
 
 		Double bin = getBinForTime(event.getTime());
-		String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
-		if (zoneId == null) {
-			//zoneId can be null if the DrtZonalSystem does not cover the entire network (e.g. if OperationalScheme.serviceAreaBased is used)
+		DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+		if (zone == null) {
+			//zone can be null if the DrtZonalSystem does not cover the entire network (e.g. if OperationalScheme.serviceAreaBased is used)
 			return;
 		}
 		if (actEnds.containsKey(bin)) {
-			this.actEnds.get(bin).get(zoneId).increment();
+			this.actEnds.get(bin).get(zone).increment();
 		} else
 			Logger.getLogger(getClass())
 					.error("Time " + Time.writeTime(event.getTime()) + " / bin " + bin + " is out of boundary");
@@ -103,8 +103,8 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 
 	private void prepareZones() {
 		for (int i = 0; i < (3600 / timeBinSize) * 36; i++) {
-			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
-			for (String zone : zonalSystem.getZones().keySet()) {
+			Map<DrtZone, MutableInt> zonesPerSlot = new HashMap<>();
+			for (DrtZone zone : zonalSystem.getZones().values()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
 			actEnds.put((double)i, zonesPerSlot);

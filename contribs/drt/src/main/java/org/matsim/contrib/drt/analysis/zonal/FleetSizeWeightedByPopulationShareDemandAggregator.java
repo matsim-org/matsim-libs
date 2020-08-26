@@ -22,16 +22,16 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.ToIntFunction;
+
+import javax.validation.constraints.NotNull;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-
-import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
 
 /**
  * Calculates population size per zone by counting first activites per zone in the selected plans.
@@ -42,14 +42,15 @@ import java.util.stream.Collectors;
  */
 public final class FleetSizeWeightedByPopulationShareDemandAggregator implements ZonalDemandAggregator {
 
-	private static Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandAggregator.class);
+	private static final Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandAggregator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final FleetSpecification fleetSpecification;
-	private Map<String, Integer> activitiesPerZone = new HashMap<>();
+	private Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
 	private Integer totalNrActivities;
 
-	public FleetSizeWeightedByPopulationShareDemandAggregator(DrtZonalSystem zonalSystem, Population population, @NotNull FleetSpecification fleetSpecification) {
+	public FleetSizeWeightedByPopulationShareDemandAggregator(DrtZonalSystem zonalSystem, Population population,
+			@NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
@@ -61,31 +62,31 @@ public final class FleetSizeWeightedByPopulationShareDemandAggregator implements
 		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons().size());
 
 		population.getPersons().values().stream()
-				.map(person -> person.getSelectedPlan().getPlanElements().get(0))
-				.forEach(element -> {
-					if (! (element instanceof Activity) ) throw new RuntimeException("first plan element is not an activity");
-					Activity activity = (Activity) element;
-					String zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
-					if (zone != null){
-						Integer oldDemandValue = this.activitiesPerZone.get(zone);
-						this.activitiesPerZone.put(zone, oldDemandValue + 1);
-					}
-				});
+				.map(person -> person.getSelectedPlan().getPlanElements().get(0)).forEach(element -> {
+			if (!(element instanceof Activity))
+				throw new RuntimeException("first plan element is not an activity");
+			Activity activity = (Activity)element;
+			DrtZone zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
+			if (zone != null) {
+				Integer oldDemandValue = this.activitiesPerZone.get(zone);
+				this.activitiesPerZone.put(zone, oldDemandValue + 1);
+			}
+		});
 
-		this.totalNrActivities = this.activitiesPerZone.values().stream().collect(Collectors.summingInt(Integer::intValue));
+		this.totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
 		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
 		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
-		return zoneId ->  (int) Math.floor( ( this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities ) * fleetSize);
+		return zoneId -> (int)Math.floor(
+				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
 	}
 
 	private void prepareZones() {
-		for (String zone : zonalSystem.getZones().keySet()) {
+		for (DrtZone zone : zonalSystem.getZones().values()) {
 			activitiesPerZone.put(zone, 0);
 		}
 	}
-
 }
