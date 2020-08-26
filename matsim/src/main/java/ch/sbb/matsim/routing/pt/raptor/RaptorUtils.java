@@ -4,10 +4,10 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -23,12 +23,11 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-
 /**
  * @author mrieser / SBB
  */
 public final class RaptorUtils {
+
 
     private RaptorUtils() {
     }
@@ -44,7 +43,7 @@ public final class RaptorUtils {
         PlansCalcRouteConfigGroup.ModeRoutingParams walk = pcrConfig.getModeRoutingParams().get(TransportMode.walk);
         staticConfig.setBeelineWalkSpeed(walk.getTeleportedModeSpeed() / walk.getBeelineDistanceFactor());
         staticConfig.setBeelineWalkDistanceFactor(walk.getBeelineDistanceFactor());
-
+        staticConfig.setTransferWalkMargin(srrConfig.getTransferWalkMargin());
         staticConfig.setMinimalTransferTime(config.transitRouter().getAdditionalTransferTime());
 
         staticConfig.setUseModeMappingForPassengers(srrConfig.isUseModeMappingForPassengers());
@@ -93,9 +92,11 @@ public final class RaptorUtils {
         return raptorParams;
     }
 
-    public static List<Leg> convertRouteToLegs(RaptorRoute route) {
+    public static List<Leg> convertRouteToLegs(RaptorRoute route, double transferWalkMargin) {
         List<Leg> legs = new ArrayList<>(route.parts.size());
         double lastArrivalTime = Double.NaN;
+        boolean firstPtLegProcessed = false;
+        Leg previousTransferWalkleg = null;
         for (RaptorRoute.RoutePart part : route.parts) {
             if (part.planElements != null) {
                 for (PlanElement pe : part.planElements) {
@@ -105,7 +106,7 @@ public final class RaptorUtils {
                         if (leg.getDepartureTime().isUndefined()) {
                             leg.setDepartureTime(lastArrivalTime);
                         }
-						lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
+                        lastArrivalTime = leg.getDepartureTime().seconds() + leg.getTravelTime().seconds();
                     }
                 }
             } else if (part.line != null) {
@@ -120,19 +121,31 @@ public final class RaptorUtils {
                 ptLeg.setRoute(ptRoute);
                 legs.add(ptLeg);
                 lastArrivalTime = part.arrivalTime;
+                firstPtLegProcessed = true;
+                if (previousTransferWalkleg != null) {
+                    //adds the margin only to legs in between pt legs
+                    double traveltime = Math.max(0, previousTransferWalkleg.getTravelTime().seconds() - transferWalkMargin);
+                    previousTransferWalkleg.setTravelTime(traveltime);
+                    previousTransferWalkleg.getRoute().setTravelTime(traveltime);
+
+                }
             } else {
                 // a non-pt leg
                 Leg walkLeg = PopulationUtils.createLeg(part.mode);
                 walkLeg.setDepartureTime(part.depTime);
-                walkLeg.setTravelTime(part.arrivalTime - part.depTime);
+                double travelTime = part.arrivalTime - part.depTime;
+                walkLeg.setTravelTime(travelTime);
                 Id<Link> startLinkId = part.fromStop == null ? (route.fromFacility == null ? null : route.fromFacility.getLinkId()) : part.fromStop.getLinkId();
-                Id<Link> endLinkId =  part.toStop == null ? (route.toFacility == null ? null : route.toFacility.getLinkId()) : part.toStop.getLinkId();
+                Id<Link> endLinkId = part.toStop == null ? (route.toFacility == null ? null : route.toFacility.getLinkId()) : part.toStop.getLinkId();
                 Route walkRoute = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
-                walkRoute.setTravelTime(part.arrivalTime - part.depTime);
+                walkRoute.setTravelTime(travelTime);
                 walkRoute.setDistance(part.distance);
                 walkLeg.setRoute(walkRoute);
                 legs.add(walkLeg);
                 lastArrivalTime = part.arrivalTime;
+                if (firstPtLegProcessed) {
+                    previousTransferWalkleg = walkLeg;
+                }
             }
         }
 

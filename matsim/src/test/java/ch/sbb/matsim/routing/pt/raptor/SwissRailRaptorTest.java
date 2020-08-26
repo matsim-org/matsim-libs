@@ -7,10 +7,10 @@ package ch.sbb.matsim.routing.pt.raptor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -50,8 +50,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
@@ -270,6 +268,7 @@ public class SwissRailRaptorTest {
     public void testLineChange() {
         Fixture f = new Fixture();
         f.init();
+        ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class).setTransferWalkMargin(0);
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(16100, 10050);
@@ -294,7 +293,8 @@ public class SwissRailRaptorTest {
         assertEquals(Id.create("green clockwise", TransitRoute.class), ptRoute.getRouteId());
         double actualTravelTime = 0.0;
         for (Leg leg : legs) {
-			actualTravelTime += leg.getTravelTime().seconds();
+            actualTravelTime += leg.getTravelTime().seconds();
+            System.out.println(leg.getTravelTime().seconds());
         }
         double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
                 CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / raptorParams.getBeelineWalkSpeed();
@@ -496,15 +496,16 @@ public class SwissRailRaptorTest {
             TransitRouter router = createTransitRouter(f.schedule, f.config, f.scenario.getNetwork());
             Coord fromCoord = f.fromFacility.getCoord();
             Coord toCoord = f.toFacility.getCoord();
-            List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
+            List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0 * 3600 + 50 * 60, null);
             double legDuration = calcTripDuration(new ArrayList<>(legs));
             Assert.assertEquals(5, legs.size());
-			Assert.assertEquals(100, legs.get(0).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-			Assert.assertEquals(800, legs.get(1).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-			Assert.assertEquals(300, legs.get(2).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-			Assert.assertEquals(600, legs.get(3).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-			Assert.assertEquals(100, legs.get(4).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
-            Assert.assertEquals(1900.0, legDuration, 0.0);
+            Assert.assertEquals(100, legs.get(0).getTravelTime().seconds(), 0.0);    // 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+            Assert.assertEquals(800, legs.get(1).getTravelTime().seconds(), 0.0);    // 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+            Assert.assertEquals(295, legs.get(2).getTravelTime().seconds(),
+                    0.0);    // 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s -5 seconds margin; arrival at 08:10:00
+            Assert.assertEquals(600, legs.get(3).getTravelTime().seconds(), 0.0);    // 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+            Assert.assertEquals(100, legs.get(4).getTravelTime().seconds(), 0.0);    // 0.1km with 1m/s walk speed -> 100s
+            Assert.assertEquals(1895.0, legDuration, 0.0);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
                     f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
@@ -515,20 +516,22 @@ public class SwissRailRaptorTest {
                     f.scenario.getNetwork(), // use a walk router in case no PT path is found
                     walkRoutingModule);
 
-            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
+            List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0 * 3600 + 50 * 60, null);
             double tripDuration = calcTripDuration(planElements);
             Assert.assertEquals(9, planElements.size());
-			Assert.assertEquals(100, ((Leg)planElements.get(0)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
-			Assert.assertEquals(800, ((Leg)planElements.get(2)).getTravelTime().seconds(), 0.0);	// 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
-			Assert.assertEquals(300, ((Leg)planElements.get(4)).getTravelTime().seconds(), 0.0);	// 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
-			Assert.assertEquals(600, ((Leg)planElements.get(6)).getTravelTime().seconds(), 0.0);	// 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
-			Assert.assertEquals(100, ((Leg)planElements.get(8)).getTravelTime().seconds(), 0.0);	// 0.1km with 1m/s walk speed -> 100s
-            Assert.assertEquals(1900.0, tripDuration, 0.0);
+            Assert.assertEquals(100, ((Leg) planElements.get(0)).getTravelTime().seconds(), 0.0);    // 0.1km with 1m/s walk speed -> 100s; arrival at 07:51:40
+            Assert.assertEquals(800, ((Leg) planElements.get(2)).getTravelTime().seconds(), 0.0);    // 8m 20s waiting for pt departure and 5m pt travel time -> 500s + 300s = 800s; arrival at 08:05:00
+            Assert.assertEquals(295, ((Leg) planElements.get(4)).getTravelTime().seconds(),
+                    0.0);    // 0.004km with 1m/s walk speed, but minimal waiting time -> max(4s, 300s) = 300s; arrival at 08:10:00
+            Assert.assertEquals(600, ((Leg) planElements.get(6)).getTravelTime().seconds(), 0.0);    // 5m 00s waiting for pt departure and 5m pt travel time -> 300s + 300s = 600s; arrival at 08:15:00
+            Assert.assertEquals(100, ((Leg) planElements.get(8)).getTravelTime().seconds(), 0.0);    // 0.1km with 1m/s walk speed -> 100s
+            Assert.assertEquals(1895.0, tripDuration, 0.0);
         }
 
         // 65 minutes additional transfer time - miss one departure
         {
             TransferFixture f = new TransferFixture(65 * 60.0);
+            ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class).setTransferWalkMargin(0);
             TransitRouter router = createTransitRouter(f.schedule, f.config, f.scenario.getNetwork());
             Coord fromCoord = f.fromFacility.getCoord();
             Coord toCoord = f.toFacility.getCoord();
@@ -1033,18 +1036,18 @@ public class SwissRailRaptorTest {
             this.staticConfig.setBeelineWalkSpeed(10.0); // so the agents can walk the distance in 10 seconds
 
             double x = 0;
-            this.coord1 = new Coord(x, (double) 0);
+            this.coord1 = new Coord(x, 0);
             x += 1000;
-            this.coord2 = new Coord(x, (double) 0);
+            this.coord2 = new Coord(x, 0);
             x += (this.staticConfig.getBeelineWalkConnectionDistance() * 0.75);
             double y = -1000;
             this.coord3 = new Coord(x, y);
-            this.coord4 = new Coord(x, (double) 0);
-            this.coord5 = new Coord(x, (double) 1000);
+            this.coord4 = new Coord(x, 0);
+            this.coord5 = new Coord(x, 1000);
             x += (this.staticConfig.getBeelineWalkConnectionDistance() * 0.75);
-            this.coord6 = new Coord(x, (double) 0);
+            this.coord6 = new Coord(x, 0);
             x += 1000;
-            this.coord7 = new Coord(x, (double) 0);
+            this.coord7 = new Coord(x, 0);
 
             // network
             Network network = this.scenario.getNetwork();
