@@ -133,10 +133,10 @@ public class PHbyModeCalculator {
             for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
-                	TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0));
-                    csvPrinter.print(travelTimeAndWaitTime.travelTime / 3600.0);
-                    csvPrinter.print(travelTimeAndWaitTime.waitTime / 3600.0);
-                }
+					TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode, new TravelTimeAndWaitTime(0.0, 0.0));
+					csvPrinter.print((int) Math.round(travelTimeAndWaitTime.travelTime / 3600.0));
+					csvPrinter.print((int) Math.round(travelTimeAndWaitTime.waitTime / 3600.0));
+				}
                 csvPrinter.println();
             }
 
