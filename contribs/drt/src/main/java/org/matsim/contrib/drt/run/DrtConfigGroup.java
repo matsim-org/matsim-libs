@@ -252,7 +252,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				DRT_SERVICE_AREA_SHAPE_FILE
 						+ " must not be null when "
 						+ OPERATIONAL_SCHEME
-						+ " is " + OperationalScheme.serviceAreaBased);
+						+ " is "
+						+ OperationalScheme.serviceAreaBased);
 
 		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
 				NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
@@ -651,7 +652,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public ConfigGroup createParameterSet(String type) {
 		switch (type) {
 			case RebalancingParams.SET_NAME:
-				return new MinCostFlowRebalancingStrategyParams();
+				return new RebalancingParams();
 
 			case ExtensiveInsertionSearchParams.SET_NAME:
 				return new ExtensiveInsertionSearchParams();
