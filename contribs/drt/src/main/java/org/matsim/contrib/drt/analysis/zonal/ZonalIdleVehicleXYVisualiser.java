@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.locationtech.jts.geom.Point;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.vrpagent.AbstractTaskEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
@@ -49,7 +49,7 @@ public class ZonalIdleVehicleXYVisualiser
 	private final DrtZonalSystem zonalSystem;
 	private final MatsimServices services;
 
-	private final Map<String, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
+	private final Map<DrtZone, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
 
 	public ZonalIdleVehicleXYVisualiser(MatsimServices services, String mode, DrtZonalSystem zonalSystem) {
 		this.services = services;
@@ -59,7 +59,7 @@ public class ZonalIdleVehicleXYVisualiser
 	}
 
 	private void initEntryMap() {
-		for (String z : zonalSystem.getZones().keySet()) {
+		for (DrtZone z : zonalSystem.getZones().values()) {
 			LinkedList<Tuple<Double, Integer>> list = new LinkedList<>();
 			list.add(new Tuple<>(0d, 0));
 			zoneEntries.put(z, list);
@@ -84,9 +84,9 @@ public class ZonalIdleVehicleXYVisualiser
 		});
 	}
 
-	private void handleEvent(AbstractTaskEvent event, Consumer<String> handler) {
+	private void handleEvent(AbstractTaskEvent event, Consumer<DrtZone> handler) {
 		if (event.getDvrpMode().equals(mode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
-			String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone != null) {
 				handler.accept(zone);
 			}
@@ -102,11 +102,10 @@ public class ZonalIdleVehicleXYVisualiser
 			CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");
 			writer.writeNext(new String[] { "zone", "X", "Y", "time", "idleDRTVehicles" }, false);
 			this.zoneEntries.forEach((zone, entriesList) -> {
-				Point p = zonalSystem.getZone(zone).getCentroid();
-				double x = p.getX();
-				double y = p.getY();
+				Coord c = zone.getCentroid();
 				entriesList.forEach(entry -> writer.writeNext(
-						new String[] { zone, "" + x, "" + y, "" + entry.getFirst(), "" + entry.getSecond() }, false));
+						new String[] { zone.getId(), "" + c.getX(), "" + c.getY(), "" + entry.getFirst(),
+								"" + entry.getSecond() }, false));
 			});
 
 			writer.close();
