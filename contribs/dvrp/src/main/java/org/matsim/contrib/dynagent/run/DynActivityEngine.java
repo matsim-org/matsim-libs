@@ -34,6 +34,8 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
+import com.google.common.base.Preconditions;
+
 /**
  * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
@@ -57,23 +59,21 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
 		while (dynAgentIter.hasNext()) {
 			DynAgent agent = dynAgentIter.next();
-			if (agent.getState() == State.ACTIVITY) {
-				agent.doSimStep(time);
-				// ask agents about the current activity end time;
-				double currentEndTime = agent.getActivityEndTime();
+			Preconditions.checkState(agent.getState() == State.ACTIVITY);
+			agent.doSimStep(time);
+			// ask agents about the current activity end time;
+			double currentEndTime = agent.getActivityEndTime();
 
-				if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
-					unregisterAgentAtActivityLocation(agent);
-					internalInterface.getMobsim().getAgentCounter().decLiving();
-					dynAgentIter.remove();
-				} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
-					unregisterAgentAtActivityLocation(agent);
-					agent.endActivityAndComputeNextState(time);
-					internalInterface.arrangeNextAgentState(agent);
-					dynAgentIter.remove();
-				}
+			if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
+				unregisterAgentAtActivityLocation(agent);
+				internalInterface.getMobsim().getAgentCounter().decLiving();
+				dynAgentIter.remove();
+			} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
+				unregisterAgentAtActivityLocation(agent);
+				agent.endActivityAndComputeNextState(time);
+				internalInterface.arrangeNextAgentState(agent);
+				dynAgentIter.remove();
 			}
-			// TODO what if not activity?
 		}
 	}
 
