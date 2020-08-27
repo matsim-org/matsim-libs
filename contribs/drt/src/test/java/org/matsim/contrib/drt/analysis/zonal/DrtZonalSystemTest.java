@@ -21,8 +21,8 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwork;
+import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem.createFromGeometries;
 
 import java.util.Map;
 
@@ -36,15 +36,15 @@ public class DrtZonalSystemTest {
 
 	@Test
 	public void test_cellSize100() {
-		DrtZonalSystem drtZonalSystem = new DrtZonalSystem(createNetwork(),
-				createGridFromNetwork(createNetwork(), 100));
+		DrtZonalSystem drtZonalSystem = createFromGeometries(createNetwork(),
+				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
 		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("5");
 	}
 
 	@Test
 	public void test_cellSize700() {
-		DrtZonalSystem drtZonalSystem = new DrtZonalSystem(createNetwork(),
-				createGridFromNetwork(createNetwork(), 700));
+		DrtZonalSystem drtZonalSystem = createFromGeometries(createNetwork(),
+				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
 		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("1");
 	}
 

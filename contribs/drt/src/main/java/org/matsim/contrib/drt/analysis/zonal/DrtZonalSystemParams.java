@@ -126,7 +126,7 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 		return zonesShapeFile;
 	}
 
-	public URL getRebalancingZonesShapeFileURL(URL context) {
+	public URL getZonesShapeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, zonesShapeFile);
 	}
 

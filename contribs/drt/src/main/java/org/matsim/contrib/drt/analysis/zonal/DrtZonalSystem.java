@@ -27,6 +27,7 @@ import java.util.Map.Entry;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,17 +38,28 @@ import org.matsim.core.utils.geometry.geotools.MGC;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtZonalSystem {
-	private static final DrtZone NO_ZONE = new DrtZone(null, null, null);
+	public static DrtZonalSystem createFromPreparedGeometries(Network network,
+			Map<String, PreparedGeometry> geometries) {
+		return new DrtZonalSystem(network, geometries.entrySet()
+				.stream()
+				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
+	}
+
+	public static DrtZonalSystem createFromGeometries(Network network, Map<String, Geometry> geometries) {
+		return new DrtZonalSystem(network, geometries.entrySet()
+				.stream()
+				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
+	}
+
+	private static final DrtZone NO_ZONE = new DrtZone(null, null, null, null);
 
 	private final Map<Id<Link>, DrtZone> link2zone = new HashMap<>();
 	private final Network network;
 	private final Map<String, DrtZone> zones;
 
-	public DrtZonalSystem(Network network, Map<String, Geometry> geometries) {
+	public DrtZonalSystem(Network network, Map<String, DrtZone> zones) {
 		this.network = network;
-		this.zones = geometries.entrySet()
-				.stream()
-				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue())));
+		this.zones = zones;
 	}
 
 	public DrtZone getZoneForLinkId(Id<Link> linkId) {
@@ -58,7 +70,7 @@ public class DrtZonalSystem {
 
 		Point linkCoord = MGC.coord2Point(network.getLinks().get(linkId).getCoord());
 		for (DrtZone z : zones.values()) {
-			if (z.getGeometry().intersects(linkCoord)) {
+			if (intersects(z, linkCoord)) {
 				//if a link Coord borders two or more cells, the allocation to a cell is random.
 				// Seems hard to overcome, but most likely better than returning no zone at
 				// all and mostly not too relevant in non-grid networks.
@@ -70,6 +82,11 @@ public class DrtZonalSystem {
 
 		link2zone.put(linkId, NO_ZONE);
 		return null;
+	}
+
+	private boolean intersects(DrtZone zone, Point point) {
+		PreparedGeometry preparedGeometry = zone.getPreparedGeometry();
+		return preparedGeometry != null ? preparedGeometry.intersects(point) : zone.getGeometry().intersects(point);
 	}
 
 	/**
