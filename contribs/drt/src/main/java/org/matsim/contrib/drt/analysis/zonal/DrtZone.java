@@ -21,6 +21,7 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -30,15 +31,22 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 public class DrtZone {
 	private final String id;
 	private final Geometry geometry;
+	private final PreparedGeometry preparedGeometry;
 	private final Coord centroid;
 
-	public DrtZone(String id, Geometry geometry) {
-		this(id, geometry, MGC.point2Coord(geometry.getCentroid()));
+	public DrtZone(String id, PreparedGeometry preparedGeometry) {
+		this(id, preparedGeometry.getGeometry(), preparedGeometry,
+				MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()));
 	}
 
-	public DrtZone(String id, Geometry geometry, Coord centroid) {
+	public DrtZone(String id, Geometry geometry) {
+		this(id, geometry, null, MGC.point2Coord(geometry.getCentroid()));
+	}
+
+	DrtZone(String id, Geometry geometry, PreparedGeometry preparedGeometry, Coord centroid) {
 		this.id = id;
 		this.geometry = geometry;
+		this.preparedGeometry = preparedGeometry;
 		this.centroid = centroid;
 	}
 
@@ -54,5 +62,7 @@ public class DrtZone {
 		return centroid;
 	}
 
-	//TODO add Link closest to geometry.centroid
+	public PreparedGeometry getPreparedGeometry() {
+		return preparedGeometry;
+	}
 }

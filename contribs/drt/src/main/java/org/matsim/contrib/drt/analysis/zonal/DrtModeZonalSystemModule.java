@@ -22,20 +22,19 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
 import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetworkWithinServiceArea;
-import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams.ZoneGeneration;
+import static org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
+import static org.matsim.utils.gis.shp2matsim.ShpGeometryUtils.loadPreparedGeometries;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
+
+import one.util.streamex.EntryStream;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -54,24 +53,24 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 		DrtZonalSystemParams params = drtCfg.getZonalSystemParams().orElseThrow();
 
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
-			if (params.getZonesGeneration().equals(ZoneGeneration.ShapeFile)) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
-				Map<String, Geometry> zones = new HashMap<>();
-				for (int i = 0; i < preparedGeometries.size(); i++) {
-					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
-				}
-				return new DrtZonalSystem(getter.getModal(Network.class), zones);
-			} else if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
-				Network modalNetwork = getter.getModal(Network.class);
-				Map<String, Geometry> zones = createGridFromNetworkWithinServiceArea(modalNetwork, params.getCellSize(),
-						preparedGeometries);
-				return new DrtZonalSystem(modalNetwork, zones);
-			} else {
-				return new DrtZonalSystem(getter.getModal(Network.class),
-						createGridFromNetwork(getter.getModal(Network.class), params.getCellSize()));
+			Network network = getter.getModal(Network.class);
+			switch (params.getZonesGeneration()) {
+				case ShapeFile:
+					final List<PreparedGeometry> preparedGeometries = loadPreparedGeometries(
+							params.getZonesShapeFileURL(getConfig().getContext()));
+					return DrtZonalSystem.createFromPreparedGeometries(network,
+							EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
+
+				case GridFromNetwork:
+					var gridZones = drtCfg.getOperationalScheme() == OperationalScheme.serviceAreaBased ?
+							createGridFromNetworkWithinServiceArea(network, params.getCellSize(),
+									loadPreparedGeometries(
+											drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()))) :
+							createGridFromNetwork(network, params.getCellSize());
+					return DrtZonalSystem.createFromGeometries(network, gridZones);
+
+				default:
+					throw new RuntimeException("Unsupported zone generation");
 			}
 		})).asEagerSingleton();
 
