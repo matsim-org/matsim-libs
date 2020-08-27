@@ -11,8 +11,8 @@ environment:
 image: Visual Studio 2019
 
 install:
-  - cmd: SET MAVEN_OPTS=-Xmx2g
-  - cmd: SET JAVA_OPTS=-Xmx2g
+  - cmd: SET MAVEN_OPTS=-Xmx4g
+  - cmd: SET JAVA_OPTS=-Xmx4g
   - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
   - cmd: mvn --version
   - cmd: java -version
