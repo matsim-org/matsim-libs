@@ -265,9 +265,13 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		rebalancingStrategyParams.setZonalDemandAggregatorType(aggregatorType);
 
 		RebalancingParams rebalancingParams = new RebalancingParams();
-		rebalancingParams.setCellSize(500);
 		rebalancingParams.addParameterSet(rebalancingStrategyParams);
 		drtCfg.addParameterSet(rebalancingParams);
+
+		DrtZonalSystemParams zonalSystemParams = new DrtZonalSystemParams();
+		zonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
+		zonalSystemParams.setCellSize(500.);
+		drtCfg.addParameterSet(zonalSystemParams);
 
 		drtCfg.setChangeStartLinkToLastLinkInSchedule(false); //do not take result from last iteration...
 

@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams.ZoneGeneration;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +30,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.MatsimServices;
@@ -48,10 +49,10 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
+		DrtZonalSystemParams params = drtCfg.getZonalSystemParams().orElseThrow();
 
 		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
-			if (params.getRebalancingZonesGeneration().equals(RebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
+			if (params.getZonesGeneration().equals(ZoneGeneration.ShapeFile)) {
 				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
 						params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
 				Map<String, Geometry> zones = new HashMap<>();
@@ -59,17 +60,16 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
 				}
 				return new DrtZonalSystem(getter.getModal(Network.class), zones);
-			}
-
-			if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+			} else if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
 				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
 						drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
 				Network modalNetwork = getter.getModal(Network.class);
 				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
 						params.getCellSize(), preparedGeometries);
 				return new DrtZonalSystem(modalNetwork, zones);
+			} else {
+				return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 			}
-			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
 		})).asEagerSingleton();
 
 		//zonal analysis

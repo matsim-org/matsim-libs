@@ -35,6 +35,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
@@ -208,6 +209,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
+
+	@Nullable
+	private DrtZonalSystemParams zonalSystemParams;
 
 	@Nullable
 	private RebalancingParams rebalancingParams;
@@ -644,6 +648,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return drtInsertionSearchParams;
 	}
 
+	public Optional<DrtZonalSystemParams> getZonalSystemParams() {
+		return Optional.ofNullable(zonalSystemParams);
+	}
+
 	public Optional<RebalancingParams> getRebalancingParams() {
 		return Optional.ofNullable(rebalancingParams);
 	}
@@ -653,6 +661,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		switch (type) {
 			case RebalancingParams.SET_NAME:
 				return new RebalancingParams();
+
+			case DrtZonalSystemParams.SET_NAME:
+				return new DrtZonalSystemParams();
 
 			case ExtensiveInsertionSearchParams.SET_NAME:
 				return new ExtensiveInsertionSearchParams();
@@ -674,6 +685,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			Preconditions.checkState(rebalancingParams == null,
 					"Remove the existing rebalancingParams before adding a new one");
 			rebalancingParams = (RebalancingParams)set;
+		} else if (set instanceof DrtZonalSystemParams) {
+			Preconditions.checkState(zonalSystemParams == null,
+					"Remove the existing zonalSystemParams before adding a new one");
+			zonalSystemParams = (DrtZonalSystemParams)set;
 		}
 
 		super.addParameterSet(set);
@@ -689,6 +704,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			Preconditions.checkState(rebalancingParams.equals(set),
 					"The existing rebalancingParams is null. Cannot remove it.");
 			rebalancingParams = null;
+		} else if (set instanceof DrtZonalSystemParams) {
+			Preconditions.checkState(zonalSystemParams.equals(set),
+					"The existing zonalSystemParams is null. Cannot remove it.");
+			zonalSystemParams = null;
 		}
 
 		return super.removeParameterSet(set);
