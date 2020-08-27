@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetwork;
+import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtils.createGridFromNetworkWithinServiceArea;
 import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams.ZoneGeneration;
 
 import java.util.HashMap;
@@ -64,11 +66,12 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
 						drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
 				Network modalNetwork = getter.getModal(Network.class);
-				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
-						params.getCellSize(), preparedGeometries);
+				Map<String, Geometry> zones = createGridFromNetworkWithinServiceArea(modalNetwork, params.getCellSize(),
+						preparedGeometries);
 				return new DrtZonalSystem(modalNetwork, zones);
 			} else {
-				return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
+				return new DrtZonalSystem(getter.getModal(Network.class),
+						createGridFromNetwork(getter.getModal(Network.class), params.getCellSize()));
 			}
 		})).asEagerSingleton();
 

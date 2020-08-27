@@ -43,10 +43,6 @@ public class DrtZonalSystem {
 	private final Network network;
 	private final Map<String, DrtZone> zones;
 
-	public DrtZonalSystem(Network network, double cellSize) {
-		this(network, DrtGridUtils.createGridFromNetwork(network, cellSize));
-	}
-
 	public DrtZonalSystem(Network network, Map<String, Geometry> geometries) {
 		this.network = network;
 		this.zones = geometries.entrySet()
