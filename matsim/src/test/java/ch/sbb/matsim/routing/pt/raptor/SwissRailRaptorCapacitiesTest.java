@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -19,10 +20,12 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
@@ -94,7 +97,7 @@ public class SwissRailRaptorCapacitiesTest {
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(f.config, SwissRailRaptorConfigGroup.class);
 		srrConfig.setUseCapacityConstraints(true);
 		occupancyData = new OccupancyData();
-		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario);
+		OccupancyTracker tracker = new OccupancyTracker(occupancyData, f.scenario, new DefaultRaptorInVehicleCostCalculator(), EventsUtils.createEventsManager(), new SubpopulationScoringParameters(f.scenario));
 
 		raptorData = SwissRailRaptorData.create(
 				f.scenario.getTransitSchedule(), null,
@@ -119,14 +122,24 @@ public class SwissRailRaptorCapacitiesTest {
 		Id<Person> person8 = Id.create(8, Person.class);
 		Id<Person> person9 = Id.create(9, Person.class);
 
+		Id<Link> linkId = Id.create(1, Link.class);
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:51:00"), person1, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:51:00"), person1, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:52:00"), person2, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:52:00"), person2, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:53:00"), person3, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:53:00"), person3, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:54:00"), person4, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:54:00"), person4, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:55:00"), person5, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:55:00"), person5, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:56:00"), person6, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:56:00"), person6, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:57:00"), person7, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:57:00"), person7, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:58:00"), person8, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:58:00"), person8, f.stopAId, f.stopDId));
+		tracker.handleEvent(new PersonDepartureEvent(Time.parseTime("06:59:00"), person9, linkId, "pt"));
 		tracker.handleEvent(new AgentWaitingForPtEvent(Time.parseTime("06:59:00"), person9, f.stopAId, f.stopDId));
 
 		Id<Person> driver1 = Id.create(1001, Person.class);

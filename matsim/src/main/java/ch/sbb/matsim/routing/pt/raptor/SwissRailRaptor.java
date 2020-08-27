@@ -39,7 +39,6 @@ public class SwissRailRaptor implements TransitRouter {
     private final RaptorParametersForPerson parametersForPerson;
     private final RaptorRouteSelector defaultRouteSelector;
     private final RaptorStopFinder stopFinder;
-    private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
 
     private boolean treeWarningShown = false;
 
@@ -53,7 +52,6 @@ public class SwissRailRaptor implements TransitRouter {
         this.parametersForPerson = parametersForPerson;
         this.defaultRouteSelector = routeSelector;
         this.stopFinder = stopFinder;
-        this.inVehicleCostCalculator = inVehicleCostCalculator;
     }
 
     @Override

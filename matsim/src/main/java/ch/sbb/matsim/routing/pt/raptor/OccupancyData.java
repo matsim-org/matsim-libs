@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -28,16 +30,14 @@ public class OccupancyData {
 
 	final IdMap<TransitLine, LineData> lineData = new IdMap<>(TransitLine.class);
 	final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
-	final Map<Id<Person>, Double> waitingStarttimes = new HashMap<>();
-	final Map<Id<Person>, Id<Departure>> lastUsedDeparturePerPerson = new HashMap<>();
+	final Map<Id<Person>, PassengerData> paxData = new HashMap<>();
 	private CacheData cache = null;
 
 	public void reset() {
 		LOG.info("[SwissRailRaptor] Resetting ExecutionData");
-		this.vehicleData.clear();
-		this.waitingStarttimes.clear();
 		this.lineData.clear();
-		this.lastUsedDeparturePerPerson.clear();
+		this.vehicleData.clear();
+		this.paxData.clear();
 		this.cache = null;
 	}
 
@@ -96,17 +96,17 @@ public class OccupancyData {
 		return line.routeData.get(transitRoute);
 	}
 
-	public Vehicle getVehicle(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<Departure> departure) {
-		LineData line = this.lineData.get(transitLine);
-		if (line == null) {
-			return null;
-		}
-		RouteData route = line.routeData.get(transitRoute);
-		if (route == null) {
-			return null;
-		}
-		return route.vehicles.get(departure);
-	}
+//	public Vehicle getVehicle(Id<TransitLine> transitLine, Id<TransitRoute> transitRoute, Id<Departure> departure) {
+//		LineData line = this.lineData.get(transitLine);
+//		if (line == null) {
+//			return null;
+//		}
+//		RouteData route = line.routeData.get(transitRoute);
+//		if (route == null) {
+//			return null;
+//		}
+//		return route.vehicles.get(departure);
+//	}
 
 	public int getNextAvailableDeparture(SwissRailRaptorData data, SwissRailRaptorData.RRouteStop routeStop, double time) {
 		CacheData cache = getCache(data);
@@ -128,10 +128,6 @@ public class OccupancyData {
 			return -1;
 		}
 		return offset + pos;
-	}
-
-	public Id<Departure> getLastUsedDeparture(Id<Person> personId) {
-		return this.lastUsedDeparturePerPerson.get(personId);
 	}
 
 	private CacheData getCache(SwissRailRaptorData data) {
@@ -200,7 +196,6 @@ public class OccupancyData {
 
 	static class RouteData {
 		Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<>();
-		Map<Id<Departure>, Vehicle> vehicles = new HashMap<>();
 		final TransitRoute route;
 
 		public RouteData(TransitRoute route) {
@@ -280,16 +275,33 @@ public class OccupancyData {
 	}
 
 	static class VehicleData {
+		final Vehicle vehicle;
 		final Id<TransitLine> lineId;
 		final Id<TransitRoute> routeId;
 		final Id<Departure> departureId;
 		Id<TransitStopFacility> stopFacilityId = null;
 		int currentPaxCount = 0;
 
-		public VehicleData(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<Departure> departureId) {
+		public VehicleData(Vehicle vehicle, Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<Departure> departureId) {
+			this.vehicle = vehicle;
 			this.lineId = lineId;
 			this.routeId = routeId;
 			this.departureId = departureId;
+		}
+	}
+
+	static class PassengerData {
+		final Person person;
+		final Map<String, ModeUtilityParameters> modeParams;
+		String mode;
+		double waitingStartTime;
+		double vehBoardingTime;
+		Id<TransitStopFacility> boardingStopId;
+		Id<Departure> departureId;
+
+		public PassengerData(Person person, Map<String, ModeUtilityParameters> modeParams) {
+			this.person = person;
+			this.modeParams = modeParams;
 		}
 	}
 

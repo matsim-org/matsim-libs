@@ -1,39 +1,47 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.LineData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.RouteData;
-import ch.sbb.matsim.routing.pt.raptor.OccupancyData.StopData;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.ScoreEventScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
-import org.matsim.pt.routes.DefaultTransitPassengerRoute;
-import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -57,10 +65,8 @@ public class CapacityDependentScoringTest {
 
 	@Test
 	public void testScoring() {
-		Fixture f = new Fixture();
-
-		double normalScore = calcScore(f, false);
-		double capDepScore = calcScore(f, true);
+		double normalScore = calcScore(new Fixture(), false);
+		double capDepScore = calcScore(new Fixture(), true);
 
 		System.out.println("normal score: " + normalScore);
 		System.out.println("capacity dependent score: " + capDepScore);
@@ -77,15 +83,10 @@ public class CapacityDependentScoringTest {
 		Network network = f.scenario.getNetwork();
 		ScoringParametersForPerson parameters = new SubpopulationScoringParameters(f.scenario);
 
-		OccupancyData execData = null;
-		CapacityDependentInVehicleCostCalculator inVehicleCostCalculator = null;
-		if (capacityDependent) {
-			execData = new OccupancyData();
-			inVehicleCostCalculator = new CapacityDependentInVehicleCostCalculator(0.7, 0.3, 1.2, 0.8);
-		}
-
-		OccupancyData finalExecData = execData;
-		CapacityDependentInVehicleCostCalculator finalInVehicleCostCalculator = inVehicleCostCalculator;
+		EventsManager events = EventsUtils.createEventsManager();
+		RaptorInVehicleCostCalculator inVehicleCostCalculator = capacityDependent ? (new CapacityDependentInVehicleCostCalculator(0.7, 0.3, 1.2, 0.8)) : (new DefaultRaptorInVehicleCostCalculator());
+		OccupancyData occData = new OccupancyData();
+		OccupancyTracker occTracker = new OccupancyTracker(occData, f.scenario, inVehicleCostCalculator, events, parameters);
 
 		ScoringFunctionFactory testSFF = new ScoringFunctionFactory() {
 			@Override
@@ -94,11 +95,7 @@ public class CapacityDependentScoringTest {
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, network, config.transit().getTransitModes()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				if (capacityDependent) {
-					scoringFunctionAccumulator.addScoringFunction(new CapacityDependentTripScoringFunction(person, params, config.transit().getTransitModes(), finalExecData, finalInVehicleCostCalculator));
-				}
+				scoringFunctionAccumulator.addScoringFunction(new ScoreEventScoring());
 
 				return scoringFunctionAccumulator;
 			}
@@ -107,51 +104,55 @@ public class CapacityDependentScoringTest {
 		Population population = f.scenario.getPopulation();
 		PopulationFactory pf = population.getFactory();
 		Person person = pf.createPerson(Id.create("1", Person.class));
+		population.addPerson(person);
 
-		if (capacityDependent) {
-			Vehicles transitVehicles = f.scenario.getTransitVehicles();
-			VehicleType vehType = VehicleUtils.createVehicleType(Id.create("bus", VehicleType.class));
-			vehType.getCapacity().setSeats(5);
-			Vehicle veh = VehicleUtils.createVehicle(Id.create("v1", Vehicle.class), vehType);
-			Id<Departure> departureId = Id.create(1, Departure.class);
-			LineData lineData = new LineData();
-			execData.lineData.put(f.fastLineId, lineData);
+		EventsToScore events2Score = EventsToScore.createWithoutScoreUpdating(f.scenario, testSFF, events);
+		events2Score.beginIteration(0);
+		events.addHandler(occTracker);
 
-			RouteData routeData = new RouteData(f.scenario.getTransitSchedule().getTransitLines().get(f.fastLineId).getRoutes().get(f.fastRouteId));
-			lineData.routeData.put(f.fastRouteId, routeData);
-			routeData.vehicles.put(departureId, veh);
+		events.addHandler((BasicEventHandler) event -> {
+			if (event instanceof PersonScoreEvent) {
+				System.out.println(event);
+			}
+		});
 
-			StopData stopDataA = new StopData();
-			DepartureData depDataA1 = stopDataA.getOrCreate(departureId);
-			depDataA1.vehDepTime = 7*3600;
-			routeData.stopData.put(f.stopAId, stopDataA);
-			StopData stopDataB = new StopData();
-			DepartureData depDataB1 = stopDataB.getOrCreate(departureId);
-			depDataB1.vehDepTime = 7*3600 + 5*60;
-			routeData.stopData.put(f.stopBId, stopDataB);
-			StopData stopDataC = new StopData();
-			DepartureData depDataC1 = stopDataC.getOrCreate(departureId);
-			depDataC1.vehDepTime = 7*3600 + 10*60;
-			routeData.stopData.put(f.stopCId, stopDataC);
-			StopData stopDataD = new StopData();
-			DepartureData depDataD1 = stopDataD.getOrCreate(departureId);
-			depDataD1.vehDepTime = 7*3600 + 15*60;
-			routeData.stopData.put(f.stopDId, stopDataD);
+		events.initProcessing();
 
-			execData.lastUsedDeparturePerPerson.put(person.getId(), departureId);
-		}
+		Vehicles transitVehicles = f.scenario.getTransitVehicles();
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("bus", VehicleType.class));
+		vehType.getCapacity().setSeats(5);
+		Vehicle veh = VehicleUtils.createVehicle(Id.create("v1", Vehicle.class), vehType);
+		transitVehicles.addVehicleType(vehType);
+		transitVehicles.addVehicle(veh);
 
-		ScoringFunction sf = testSFF.createNewScoringFunction(person);
+		Id<Person> driver1 = Id.create("d1", Person.class);
+		events.processEvent(new TransitDriverStartsEvent(7*3600 - 100, driver1, veh.getId(), f.fastLineId, f.fastRouteId, Id.create("f1", Departure.class)));
+		events.processEvent(new PersonDepartureEvent(7*3600 - 100, driver1, Id.create(1, Link.class), "car"));
+		events.processEvent(new PersonEntersVehicleEvent(7*3600 - 100, driver1, veh.getId()));
 
-		TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(Id.create("aa", Link.class), Id.create("dd", Link.class), f.stopAId, f.stopDId, f.fastLineId, f.fastRouteId);
-		Leg leg = pf.createLeg("pt");
-		leg.setRoute(ptRoute);
-		leg.setDepartureTime(7*3600);
-		leg.setTravelTime(15*60);
+		events.processEvent(new ActivityEndEvent(7*3600, person.getId(), Id.create(1, Link.class), null, "home"));
+		events.processEvent(new PersonDepartureEvent(7*3600, person.getId(), Id.create(1, Link.class), "pt"));
+		events.processEvent(new AgentWaitingForPtEvent(7*3600, person.getId(), f.stopAId, f.stopDId));
 
-		sf.handleLeg(leg);
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600-10, veh.getId(), f.stopAId, 0));
+		events.processEvent(new PersonEntersVehicleEvent(7*3600-5, person.getId(), veh.getId()));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600, veh.getId(), f.stopAId, 0));
 
-		return sf.getScore();
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 5*60, veh.getId(), f.stopBId, 0));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 5*60, veh.getId(), f.stopBId, 0));
+
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 10*60, veh.getId(), f.stopCId, 0));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 10*60, veh.getId(), f.stopCId, 0));
+
+		events.processEvent(new VehicleArrivesAtFacilityEvent(7*3600 + 15*60 - 10, veh.getId(), f.stopDId, 0));
+		events.processEvent(new PersonLeavesVehicleEvent(7*3600 + 15*60, person.getId(), veh.getId()));
+		events.processEvent(new PersonArrivalEvent(7*3600 + 15*60, person.getId(), Id.create(4, Link.class), "pt"));
+		events.processEvent(new VehicleDepartsAtFacilityEvent(7*3600 + 16*60, veh.getId(), f.stopDId, 0));
+
+		events.finishProcessing();
+		events2Score.finish();
+		Double score = events2Score.getAgentScore(person.getId());
+		return score;
 	}
 
 	private static class Fixture {
@@ -226,6 +227,7 @@ public class CapacityDependentScoringTest {
 
 			// transit schedule
 
+			this.config.transit().setUseTransit(true);
 			TransitSchedule schedule = this.scenario.getTransitSchedule();
 			TransitScheduleFactory sf = schedule.getFactory();
 
