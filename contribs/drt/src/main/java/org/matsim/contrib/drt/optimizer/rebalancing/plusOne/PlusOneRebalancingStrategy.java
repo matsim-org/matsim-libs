@@ -3,8 +3,10 @@ package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,18 +66,17 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 			Map<Id<Link>, Integer> targetMap, Network network) {
 		List<Relocation> relocationList = new ArrayList<>();
 		Map<Id<Link>, ? extends Link> linkMap = network.getLinks();
-		for (Id<Link> destinationLinkId : targetMap.keySet()) {
-//			int numOfRequestsOnLink = targetMap.get(destinationLinkId);
+		Set<Id<Link>> destinationLinkIds = new HashSet<>();
+		destinationLinkIds.addAll(targetMap.keySet());
+		for (Id<Link> destinationLinkId : destinationLinkIds) {
+			int numOfRequestsOnLink = targetMap.get(destinationLinkId);
 			Link destinationLink = linkMap.get(destinationLinkId);
 			if (!rebalancableVehicles.isEmpty()) {
-				// TODO: If the for loop is enabled, there will be concurrent modification
-				// exception at line 67.
-				// Need ot find a solution
-//				for (int i = 0; i < numOfRequestsOnLink; i++) {
-				DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
-				relocationList.add(new Relocation(nearestVehicle, destinationLink));
-				rebalancableVehicles.remove(nearestVehicle);
-//				}
+				for (int i = 0; i < numOfRequestsOnLink; i++) {
+					DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
+					relocationList.add(new Relocation(nearestVehicle, destinationLink));
+					rebalancableVehicles.remove(nearestVehicle);
+				}
 			} else {
 				log.warn("There is not enough vehicle to perform rebalance at this moment!");
 				break;
