@@ -1,9 +1,10 @@
 package org.matsim.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.testcases.utils.LogCounter;
 
@@ -47,11 +48,18 @@ public class MemoryObserverTest {
 		// there should be 3 log messages, than none, than 3 again, than none.
 		// but due to it being threads and influences of the OS scheduler, the numbers might be off by 1 or so, let's consider this in the tests.
 
-		LOG.info("received the following numbers of log statements: " + activeLogs1 + ", " + inactiveLogs2 + ", " + activeLogs3 + ", " + inactiveLogs4);
-		Assert.assertTrue("There should be between 2 and 4 log messages", activeLogs1 >= 2 && activeLogs1 <= 4);
-		Assert.assertTrue("There should be at most 1 log message when being stopped", inactiveLogs2 <= 1);
-		Assert.assertTrue("There should be between 2 and 4 log messages", activeLogs3 >= 2 && activeLogs3 <= 4);
-		Assert.assertTrue("There should be at most 1 log message when being stopped", inactiveLogs4 <= 1);
+		LOG.info("received the following numbers of log statements: "
+				+ activeLogs1
+				+ ", "
+				+ inactiveLogs2
+				+ ", "
+				+ activeLogs3
+				+ ", "
+				+ inactiveLogs4);
+		assertThat(activeLogs1).as("Number of log messages").isBetween(2, 4);
+		assertThat(inactiveLogs2).as("Number of log messages when being stopped").isLessThanOrEqualTo(1);
+		assertThat(activeLogs3).as("Number of log messages").isBetween(2, 4);
+		assertThat(inactiveLogs4).as("Number of log messages when being stopped").isLessThanOrEqualTo(1);
 	}
 
 	@Test
@@ -83,11 +91,14 @@ public class MemoryObserverTest {
 		// there should be 3 log messages, again 3, than none.
 		// but due to it being threads and influences of the OS scheduler, the numbers might be off by 1 or so, let's consider this in the tests.
 
-		LOG.info("received the following numbers of log statements: " + activeLogs1 + ", " + activeLogs2 + ", " + inactiveLogs3);
-		Assert.assertTrue("There should be between 2 and 4 log messages", activeLogs1 >= 2 && activeLogs1 <= 4);
-		Assert.assertTrue("There should be between 2 and 4 log messages", activeLogs2 >= 2 && activeLogs2 <= 4);
-		Assert.assertTrue("There should be at most 1 log message when being stopped", inactiveLogs3 <= 1);
-
+		LOG.info("received the following numbers of log statements: "
+				+ activeLogs1
+				+ ", "
+				+ activeLogs2
+				+ ", "
+				+ inactiveLogs3);
+		assertThat(activeLogs1).as("Number of log messages").isBetween(2, 4);
+		assertThat(activeLogs2).as("Number of log messages").isBetween(2, 4);
+		assertThat(inactiveLogs3).as("Number of log messages when being stopped").isLessThanOrEqualTo(1);
 	}
-
 }
