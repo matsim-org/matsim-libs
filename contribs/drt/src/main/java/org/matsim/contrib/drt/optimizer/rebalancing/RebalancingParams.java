@@ -18,10 +18,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import java.net.URL;
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -42,8 +40,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String SET_NAME = "rebalancing";
 
-	public enum RebalancingZoneGeneration {GridFromNetwork, ShapeFile}
-
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
 			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
@@ -58,17 +54,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 			"Maximum remaining time before busy vehicle becomes idle to be considered as soon-idle vehicle."
 					+ " Default is 900 s. In general should be lower than interval (e.g. 0.5 x interval)";
 
-	public static final String CELL_SIZE = "cellSize";
-	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
-			+ " Depends on demand, supply and network. Often used with values in the range of 500 - 2000 m";
-
-	public static final String REBALANCING_ZONES_GENERATION = "rebalancingZonesGeneration";
-	static final String REBALANCING_ZONES_GENERATION_EXP = "Logic for generation of zones for demand estimation while rebalancing. Value can be GridFromNetwork or ShapeFile Default is GridFromNetwork";
-
-	public static final String REBALANCING_ZONES_SHAPE_FILE = "rebalancingZonesShapeFile";
-	private static final String REBALANCING_ZONES_SHAPE_FILE_EXP = "allows to configure rebalancing zones."
-			+ "Used with rebalancingZonesGeneration=ShapeFile";
-
 	@Positive
 	private int interval = 1800;// [s]
 
@@ -77,15 +62,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 
 	@PositiveOrZero
 	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
-
-	@Positive
-	private double cellSize = Double.NaN;// [m]
-
-	@NotNull
-	private RebalancingZoneGeneration rebalancingZonesGeneration = RebalancingZoneGeneration.GridFromNetwork;
-
-	@Nullable
-	private String rebalancingZonesShapeFile = null;
 
 	@NotNull
 	private RebalancingStrategyParams rebalancingStrategyParams;
@@ -104,13 +80,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 
 		Preconditions.checkArgument(getMinServiceTime() > getMaxTimeBeforeIdle(),
 				RebalancingParams.MIN_SERVICE_TIME + "must be greater than" + RebalancingParams.MAX_TIME_BEFORE_IDLE);
-
-		Preconditions.checkArgument(getRebalancingZonesGeneration() != RebalancingZoneGeneration.ShapeFile
-				|| getRebalancingZonesShapeFile() != null, REBALANCING_ZONES_SHAPE_FILE
-				+ " must not be null when "
-				+ REBALANCING_ZONES_GENERATION
-				+ " is "
-				+ RebalancingZoneGeneration.ShapeFile);
 	}
 
 	@Override
@@ -119,9 +88,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 		map.put(INTERVAL, INTERVAL_EXP);
 		map.put(MIN_SERVICE_TIME, MIN_SERVICE_TIME_EXP);
 		map.put(MAX_TIME_BEFORE_IDLE, MAX_TIME_BEFORE_IDLE_EXP);
-		map.put(CELL_SIZE, CELL_SIZE_EXP);
-		map.put(REBALANCING_ZONES_GENERATION, REBALANCING_ZONES_GENERATION_EXP);
-		map.put(REBALANCING_ZONES_SHAPE_FILE, REBALANCING_ZONES_SHAPE_FILE_EXP);
 		return map;
 	}
 
@@ -171,58 +137,6 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 	@StringSetter(MAX_TIME_BEFORE_IDLE)
 	public void setMaxTimeBeforeIdle(double maxTimeBeforeIdle) {
 		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
-	}
-
-	/**
-	 * @return -- {@value #CELL_SIZE_EXP}
-	 */
-	@StringGetter(CELL_SIZE)
-	public double getCellSize() {
-		return cellSize;
-	}
-
-	/**
-	 * @param cellSize -- {@value #CELL_SIZE_EXP}
-	 */
-	@StringSetter(CELL_SIZE)
-	public void setCellSize(double cellSize) {
-		this.cellSize = cellSize;
-	}
-
-	/**
-	 * @return -- {@value #REBALANCING_ZONES_GENERATION_EXP}
-	 */
-	@StringGetter(REBALANCING_ZONES_GENERATION)
-	public RebalancingZoneGeneration getRebalancingZonesGeneration() {
-		return rebalancingZonesGeneration;
-	}
-
-	/**
-	 * @param rebalancingZonesGeneration -- {@value #REBALANCING_ZONES_GENERATION_EXP}
-	 */
-	@StringSetter(REBALANCING_ZONES_GENERATION)
-	public void setRebalancingZonesGeneration(RebalancingZoneGeneration rebalancingZonesGeneration) {
-		this.rebalancingZonesGeneration = rebalancingZonesGeneration;
-	}
-
-	/**
-	 * @return {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
-	 */
-	@StringGetter(REBALANCING_ZONES_SHAPE_FILE)
-	public String getRebalancingZonesShapeFile() {
-		return rebalancingZonesShapeFile;
-	}
-
-	public URL getRebalancingZonesShapeFileURL(URL context) {
-		return ConfigGroup.getInputFileURL(context, rebalancingZonesShapeFile);
-	}
-
-	/**
-	 * @param rebalancingZonesShapeFile -- {@link #REBALANCING_ZONES_SHAPE_FILE_EXP}
-	 */
-	@StringSetter(REBALANCING_ZONES_SHAPE_FILE)
-	public void setRebalancingZonesShapeFile(String rebalancingZonesShapeFile) {
-		this.rebalancingZonesShapeFile = rebalancingZonesShapeFile;
 	}
 
 	@Override

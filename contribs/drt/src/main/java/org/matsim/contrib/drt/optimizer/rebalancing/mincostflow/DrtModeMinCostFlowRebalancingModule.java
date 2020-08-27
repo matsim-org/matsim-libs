@@ -20,24 +20,14 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.EqualVehicleDensityZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.FleetSizeWeightedByPopulationShareDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.PreviousIterationZonalDRTDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.TimeDependentActivityBasedZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
@@ -46,8 +36,6 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.controler.MatsimServices;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 /**
  * @author michalm
@@ -63,29 +51,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 	@Override
 	public void install() {
 		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
-		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
-
-			if (params.getRebalancingZonesGeneration().equals(RebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						params.getRebalancingZonesShapeFileURL(getConfig().getContext()));
-				Map<String, Geometry> zones = new HashMap<>();
-				for (int i = 0; i < preparedGeometries.size(); i++) {
-					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
-				}
-				return new DrtZonalSystem(getter.getModal(Network.class), zones);
-			}
-
-			if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
-				Network modalNetwork = getter.getModal(Network.class);
-				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
-						params.getCellSize(), preparedGeometries);
-				return new DrtZonalSystem(modalNetwork, zones);
-			}
-			return new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize());
-		})).asEagerSingleton();
-
 		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
@@ -115,8 +80,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
 				break;
 			case TimeDependentActivityBased:
-				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(
-						modalProvider(getter -> new TimeDependentActivityBasedZonalDemandAggregator(
+				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(modalProvider(
+						getter -> new TimeDependentActivityBasedZonalDemandAggregator(
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandAggregator.class).to(
 						modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
@@ -137,22 +102,5 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="
 						+ strategyParams.getZonalDemandAggregatorType());
 		}
-
-		{
-			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-			bindModal(ZonalIdleVehicleXYVisualiser.class).
-					toProvider(modalProvider(
-							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
-			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
-
-			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
-			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
-		}
-
 	}
 }

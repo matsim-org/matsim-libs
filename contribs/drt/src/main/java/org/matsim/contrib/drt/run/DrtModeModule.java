@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
@@ -91,6 +92,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		if (drtCfg.getRebalancingParams().isPresent()) {
 			RebalancingParams rebalancingParams = drtCfg.getRebalancingParams().get();
+			install(new DrtModeZonalSystemModule(drtCfg));
+
 			if (rebalancingParams.getRebalancingStrategyParams() instanceof MinCostFlowRebalancingStrategyParams) {
 				install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
 			} else {
