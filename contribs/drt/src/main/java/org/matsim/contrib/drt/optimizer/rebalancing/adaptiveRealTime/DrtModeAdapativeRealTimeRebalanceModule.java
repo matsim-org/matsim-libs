@@ -22,10 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.adaptiveRealTime;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
-import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator;
@@ -34,7 +31,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.controler.MatsimServices;
 
 /**
  * @author michalm, Chengqi Lu
@@ -76,23 +72,6 @@ public class DrtModeAdapativeRealTimeRebalanceModule extends AbstractDvrpModeMod
 		
 		// binding the event handler 
 		addEventHandlerBinding().to(modalKey(InactiveZoneIdentifier.class));
-		
-
-		{
-			//this is rather analysis - but depends on DrtZonalSystem so it can not be moved into DrtModeAnalysisModule until DrtZonalSystem at the moment...
-			bindModal(ZonalIdleVehicleXYVisualiser.class).
-					toProvider(modalProvider(
-							getter -> new ZonalIdleVehicleXYVisualiser(getter.get(MatsimServices.class),
-									drtCfg.getMode(), getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
-			addEventHandlerBinding().to(modalKey(ZonalIdleVehicleXYVisualiser.class));
-
-			bindModal(DrtZonalWaitTimesAnalyzer.class).toProvider(modalProvider(
-					getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
-							getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
-			addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
-			addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
-		}
 
 	}
 }
