@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
@@ -21,15 +22,16 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler,
 		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
 	private static final Logger log = Logger.getLogger(FeedforwardSignalHandler.class);
 	private final DrtZonalSystem zonalSystem;
 
-	private final Map<Double, Map<String, MutableInt>> zoneNetDepartureMap = new HashMap<>();
-	private final Map<Double, List<Triple<String, String, Integer>>> rebalancePlanCore = new HashMap<>();
-	private final Map<Id<Person>, Triple<Double, String, String>> potentialDRTTripsMap = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> zoneNetDepartureMap = new HashMap<>();
+	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> rebalancePlanCore = new HashMap<>();
+	private final Map<Id<Person>, Triple<Double, DrtZone, DrtZone>> potentialDRTTripsMap = new HashMap<>();
 	
 	private final int timeBinSize;
 	
@@ -58,11 +60,11 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		// Then remove the travel information from the potential trips Map
 		Id<Person> personId = event.getPersonId();
 		double timeBin = potentialDRTTripsMap.get(personId).getLeft();
-		String departureZoneId = potentialDRTTripsMap.get(personId).getMiddle();
-		String arrivalZoneId = potentialDRTTripsMap.get(personId).getRight();
+		DrtZone departureZone = potentialDRTTripsMap.get(personId).getMiddle();
+		DrtZone arrivalZone = potentialDRTTripsMap.get(personId).getRight();
 
-		zoneNetDepartureMap.get(timeBin).get(departureZoneId).increment();
-		zoneNetDepartureMap.get(timeBin).get(arrivalZoneId).decrement();
+		zoneNetDepartureMap.get(timeBin).get(departureZone).increment();
+		zoneNetDepartureMap.get(timeBin).get(arrivalZone).decrement();
 		potentialDRTTripsMap.remove(personId);
 	}
 
@@ -72,8 +74,8 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		// temporary data base (Potential DRT Trips Map)
 		Id<Person> personId = event.getPersonId();
 		double timeBin = Math.floor(event.getTime() / timeBinSize);
-		String departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
-		String arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
+		DrtZone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
+		DrtZone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
 		potentialDRTTripsMap.put(personId, Triple.of(timeBin, departureZoneId, arrivalZoneId));
 	}
 
@@ -89,8 +91,8 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 
 	private void prepareZoneNetDepartureMap() {
 		for (int i = 0; i < (3600 / timeBinSize) * simulationEndTime; i++) {
-			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
-			for (String zone : zonalSystem.getZones().keySet()) {
+			Map<DrtZone, MutableInt> zonesPerSlot = new HashMap<>();
+			for (DrtZone zone : zonalSystem.getZones().values()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
 			zoneNetDepartureMap.put((double) i, zonesPerSlot);
@@ -103,9 +105,9 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		if (calculateOrNot) {
 			log.info("Start calculating rebalnace plan now");
 			for (double timeBin : zoneNetDepartureMap.keySet()) {
-				List<Pair<String, Integer>> supply = new ArrayList<>();
-				List<Pair<String, Integer>> demand = new ArrayList<>();
-				for (String zone : zoneNetDepartureMap.get(timeBin).keySet()) {
+				List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
+				List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
+				for (DrtZone zone : zoneNetDepartureMap.get(timeBin).keySet()) {
 					int netDeparture = zoneNetDepartureMap.get(timeBin).get(zone).intValue();
 					if (netDeparture > 0) {
 						demand.add(Pair.of(zone, netDeparture));
@@ -113,7 +115,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 						supply.add(Pair.of(zone, -netDeparture));
 					}
 				}
-				List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
+				List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations = new TransportProblem<>(
 						this::calcStraightLineDistance).solve(supply, demand);
 				rebalancePlanCore.put(timeBin, interZonalRelocations);
 				progressCounter += 1;
@@ -124,12 +126,12 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		} 
 	}
 
-	private int calcStraightLineDistance(String zone1, String zone2) {
-		return (int) DistanceUtils.calculateDistance(zonalSystem.getZoneCentroid(zone1),
-				zonalSystem.getZoneCentroid(zone2));
+	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
+		return (int) DistanceUtils.calculateDistance(MGC.point2Coord(zone1.getGeometry().getCentroid()),
+				MGC.point2Coord(zone2.getGeometry().getCentroid()));
 	}
 
-	public Map<Double, List<Triple<String, String, Integer>>> getRebalancePlanCore() {
+	public Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> getRebalancePlanCore() {
 		return rebalancePlanCore;
 	}
 

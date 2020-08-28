@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -26,15 +27,15 @@ public class VehicleInfoCollector {
 	}
 
 	// also include vehicles being right now relocated or recharged
-	public Map<String, List<DvrpVehicle>> groupSoonIdleVehicles(double time, double maxTimeBeforeIdle,
+	public Map<DrtZone, List<DvrpVehicle>> groupSoonIdleVehicles(double time, double maxTimeBeforeIdle,
 			double minServiceTime) {
-		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = new HashMap<>();
+		Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone = new HashMap<>();
 		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			Schedule s = v.getSchedule();
 			StayTask stayTask = (StayTask) Schedules.getLastTask(s);
 			if (stayTask.getStatus() == TaskStatus.PLANNED && stayTask.getBeginTime() < time + maxTimeBeforeIdle
 					&& v.getServiceEndTime() > time + minServiceTime) {
-				String zone = zonalSystem.getZoneForLinkId(stayTask.getLink().getId());
+				DrtZone zone = zonalSystem.getZoneForLinkId(stayTask.getLink().getId());
 				if (zone != null) {
 					soonIdleVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);
 				}
@@ -43,12 +44,12 @@ public class VehicleInfoCollector {
 		return soonIdleVehiclesPerZone;
 	}
 
-	public Map<String, List<DvrpVehicle>> groupRebalancableVehicles(Stream<? extends DvrpVehicle> rebalancableVehicles,
+	public Map<DrtZone, List<DvrpVehicle>> groupRebalancableVehicles(Stream<? extends DvrpVehicle> rebalancableVehicles,
 			double time, double minServiceTime) {
-		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = new HashMap<>();
+		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = new HashMap<>();
 		rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + minServiceTime).forEach(v -> {
 			Link link = ((StayTask) v.getSchedule().getCurrentTask()).getLink();
-			String zone = zonalSystem.getZoneForLinkId(link.getId());
+			DrtZone zone = zonalSystem.getZoneForLinkId(link.getId());
 			if (zone != null) {
 				// zonePerVehicle.put(v.getId(), zone);
 				rebalancableVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);

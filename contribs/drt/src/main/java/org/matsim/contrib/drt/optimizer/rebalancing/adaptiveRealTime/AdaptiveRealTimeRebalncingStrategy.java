@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostRelocationCalculator;
@@ -35,10 +36,10 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 	private final MinCostRelocationCalculator minCostRelocationCalculator;
 	private final RebalancingParams params;
 
-	private final List<Pair<String, Integer>> supply = new ArrayList<>();
-	private final List<Pair<String, Integer>> demand = new ArrayList<>();
-	private final Map<String, Integer> targetMap = new HashMap<>();
-	private final Set<String> activeZones = new HashSet<>();
+	private final List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
+	private final List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
+	private final Map<DrtZone, Integer> targetMap = new HashMap<>();
+	private final Set<DrtZone> activeZones = new HashSet<>();
 
 	public AdaptiveRealTimeRebalncingStrategy(DrtZonalSystem zonalSystem, Fleet fleet,
 			MinCostRelocationCalculator minCostRelocationCalculator, RebalancingParams params,
@@ -48,7 +49,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		this.minCostRelocationCalculator = minCostRelocationCalculator;
 		this.params = params;
 
-		activeZones.addAll(zonalSystem.getZones().keySet());
+		activeZones.addAll(zonalSystem.getZones().values());
 		activeZones.removeAll(inactiveZoneIdentifier.getInactiveZone());
 	}
 
@@ -63,7 +64,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		int numAvailableVehicles = rebalancableVehiclesList.size();
 
 		// Get idling vehicles in each zone
-		Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
+		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
 				.groupRebalancableVehicles(rebalancableVehiclesList.stream(), time, params.getMinServiceTime());
 		if (rebalancableVehiclesPerZone.isEmpty()) {
 			log.info("There is no rebalancable Vehicle at this moment!");
@@ -71,14 +72,14 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		}
 
 		// Get soon idle vehicle for each zone
-		Map<String, List<DvrpVehicle>> soonIdleVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(time,
+		Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(time,
 				params.getMaxTimeBeforeIdle(), params.getMinServiceTime());
 
 		// calculate real time target of each zone
 		calculateRealTimeRebalanceTarget(targetMap, fleet, activeZones, numAvailableVehicles);
 
 		// calculate supply and demand for each zone
-		for (String z : zonalSystem.getZones().keySet()) {
+		for (DrtZone z : zonalSystem.getZones().values()) {
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, Collections.emptyList()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, Collections.emptyList()).size();
 			int target = targetMap.getOrDefault(z, 0);
@@ -94,8 +95,8 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		return minCostRelocationCalculator.calcRelocations(supply, demand, rebalancableVehiclesPerZone);
 	}
 
-	private void calculateRealTimeRebalanceTarget(Map<String, Integer> targetMap, Fleet fleet,
-			Set<String> activeZones, int numAvailableVehicles) {
+	private void calculateRealTimeRebalanceTarget(Map<DrtZone, Integer> targetMap, Fleet fleet,
+			Set<DrtZone> activeZones, int numAvailableVehicles) {
 		// TODO enable different methods for real time target generation by adding
 		// switch and corresponding parameter entry in the parameter file
 
@@ -104,7 +105,7 @@ public class AdaptiveRealTimeRebalncingStrategy implements RebalancingStrategy {
 		int targetValue = (int) Math.floor(numAvailableVehicles / activeZones.size());
 		if (targetValue < 1)
 			log.warn("There is too few idling vehicles to perform rebalance! No vehicles will be assigned to rebalance task at this period");
-		for (String z : activeZones) {
+		for (DrtZone z : activeZones) {
 			targetMap.put(z, targetValue);
 		}
 	}
