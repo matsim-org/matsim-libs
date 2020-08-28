@@ -69,7 +69,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		});
 
 		switch (strategyParams.getZonalDemandEstimatorType()) {
-			case PreviousIteration:
+			case PreviousIterationDemand:
 				bindModal(PreviousIterationDRTDemandEstimator.class).toProvider(modalProvider(
 						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class),
 								drtCfg))).asEagerSingleton();

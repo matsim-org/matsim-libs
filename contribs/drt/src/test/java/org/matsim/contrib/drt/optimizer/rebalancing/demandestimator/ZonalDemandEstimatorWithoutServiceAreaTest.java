@@ -135,7 +135,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void PreviousIterationZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIteration, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "");
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -157,7 +157,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void PreviousIterationZonalDemandEstimatorWithSpeedUpModeTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIteration, "drt_teleportation");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "drt_teleportation");
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
