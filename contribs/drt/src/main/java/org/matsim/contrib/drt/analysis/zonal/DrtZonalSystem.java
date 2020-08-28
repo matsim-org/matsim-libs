@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import javax.annotation.Nullable;
+
 /**
  * @author jbischoff
  * @author Michal Maciejewski (michalm)
@@ -62,6 +64,14 @@ public class DrtZonalSystem {
 		this.zones = zones;
 	}
 
+	/**
+	 *
+	 * @param linkId
+	 * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
+	 * Result may be null in case the given link is outside of the service area.
+	 *
+	 */
+	@Nullable
 	public DrtZone getZoneForLinkId(Id<Link> linkId) {
 		DrtZone zone = link2zone.get(linkId);
 		if (zone != null) {
