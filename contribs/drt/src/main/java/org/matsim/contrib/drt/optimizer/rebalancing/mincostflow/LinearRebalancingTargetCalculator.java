@@ -19,7 +19,7 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandAggregator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 
 /**

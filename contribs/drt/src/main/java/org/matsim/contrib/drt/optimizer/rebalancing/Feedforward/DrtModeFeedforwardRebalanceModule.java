@@ -20,16 +20,9 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleXYVisualiser;
@@ -41,7 +34,6 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 /**
  * @author michalm, Chengqi Lu
@@ -61,29 +53,6 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
 		FeedforwardRebalancingStrategyParams strategySpecificParams = (FeedforwardRebalancingStrategyParams) generalParams
 				.getRebalancingStrategyParams();
-
-		bindModal(DrtZonalSystem.class).toProvider(modalProvider(getter -> {
-			if (generalParams.getRebalancingZonesGeneration()
-					.equals(RebalancingParams.RebalancingZoneGeneration.ShapeFile)) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-						generalParams.getRebalancingZonesShapeFileURL(getConfig().getContext()));
-				Map<String, Geometry> zones = new HashMap<>();
-				for (int i = 0; i < preparedGeometries.size(); i++) {
-					zones.put("" + (i + 1), preparedGeometries.get(i).getGeometry());
-				}
-				return new DrtZonalSystem(getter.getModal(Network.class), zones);
-			}
-
-			if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-				final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
-						.loadPreparedGeometries(drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()));
-				Network modalNetwork = getter.getModal(Network.class);
-				Map<String, Geometry> zones = DrtGridUtils.createGridFromNetworkWithinServiceArea(modalNetwork,
-						generalParams.getCellSize(), preparedGeometries);
-				return new DrtZonalSystem(modalNetwork, zones);
-			}
-			return new DrtZonalSystem(getter.getModal(Network.class), generalParams.getCellSize());
-		})).asEagerSingleton();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override

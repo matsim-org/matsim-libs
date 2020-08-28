@@ -1,10 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- * Controler.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,6 +35,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -265,9 +268,13 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		rebalancingStrategyParams.setZonalDemandAggregatorType(aggregatorType);
 
 		RebalancingParams rebalancingParams = new RebalancingParams();
-		rebalancingParams.setCellSize(500);
 		rebalancingParams.addParameterSet(rebalancingStrategyParams);
 		drtCfg.addParameterSet(rebalancingParams);
+
+		DrtZonalSystemParams zonalSystemParams = new DrtZonalSystemParams();
+		zonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
+		zonalSystemParams.setCellSize(500.);
+		drtCfg.addParameterSet(zonalSystemParams);
 
 		drtCfg.setChangeStartLinkToLastLinkInSchedule(false); //do not take result from last iteration...
 
