@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author jbischoff
  */
-public final class PreviousIterationZonalDRTDemandEstimator
+public final class PreviousIterationDRTDemandEstimator
 		implements ZonalDemandEstimator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
@@ -54,7 +54,7 @@ public final class PreviousIterationZonalDRTDemandEstimator
 	private final Map<Double, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
-	public PreviousIterationZonalDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public PreviousIterationDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();

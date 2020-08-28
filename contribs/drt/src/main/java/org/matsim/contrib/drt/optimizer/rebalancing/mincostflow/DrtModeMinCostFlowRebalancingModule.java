@@ -70,11 +70,11 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 		switch (strategyParams.getZonalDemandEstimatorType()) {
 			case PreviousIteration:
-				bindModal(PreviousIterationZonalDRTDemandEstimator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationZonalDRTDemandEstimator(getter.getModal(DrtZonalSystem.class),
+				bindModal(PreviousIterationDRTDemandEstimator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class),
 								drtCfg))).asEagerSingleton();
-				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
-				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
+				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				break;
 			case FleetSizeWeightedByActivityEnds:
 				bindModal(FleetSizeWeightedByActivityEndsDemandEstimator.class).toProvider(modalProvider(
