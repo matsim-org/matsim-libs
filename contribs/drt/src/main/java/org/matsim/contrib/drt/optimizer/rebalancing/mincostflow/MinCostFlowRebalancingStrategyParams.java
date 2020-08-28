@@ -35,7 +35,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
 	public enum ZonalDemandEstimatorType {
-		PreviousIteration, TimeDependentActivityBased, EqualVehicleDensity, FirstActivityCount,
+		PreviousIteration, FleetSizeWeightedByActivityEnds, EqualVehicleDensity, FirstActivityCount,
 		FleetSizeWeightedByPopulationShare
 	}
 

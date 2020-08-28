@@ -177,9 +177,9 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void ActivityLocationBasedZonalDemandEstimatorTest() {
+	public void FleetSizeWeightedByActivityEndsDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.TimeDependentActivityBased, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "");
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -188,13 +188,13 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "2", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
 			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "4", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
 			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
+			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
 		}
 	}
 
@@ -314,7 +314,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	 * 1	3	5	7
 	 * <p>
 	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
-	 * That should lead to half of the drt vehicles rebalanced to the left column when using TimeDependentActivityBasedZonalDemandEstimator.
+	 * That should lead to half of the drt vehicles rebalanced to the left column when using FleetSizeWeightedByActivityEndsDemandEstimator.
 	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
 	 * That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDRTDemandEstimator.
 	 * 3) in the center, there is nothing happening.

@@ -76,13 +76,15 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
 				break;
-			case TimeDependentActivityBased:
-				bindModal(TimeDependentActivityBasedZonalDemandEstimator.class).toProvider(modalProvider(
-						getter -> new TimeDependentActivityBasedZonalDemandEstimator(
-								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
+			case FleetSizeWeightedByActivityEnds:
+				bindModal(FleetSizeWeightedByActivityEndsDemandEstimator.class).toProvider(modalProvider(
+						getter -> new FleetSizeWeightedByActivityEndsDemandEstimator(
+								getter.getModal(DrtZonalSystem.class),
+								getter.getModal(FleetSpecification.class),
+								drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(
-						modalKey(TimeDependentActivityBasedZonalDemandEstimator.class));
-				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandEstimator.class));
+						modalKey(FleetSizeWeightedByActivityEndsDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(FleetSizeWeightedByActivityEndsDemandEstimator.class));
 				break;
 			case EqualVehicleDensity:
 				bindModal(ZonalDemandEstimator.class).toProvider(modalProvider(

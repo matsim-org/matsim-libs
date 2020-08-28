@@ -36,36 +36,45 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 /**
- * Aggregates all activity ends per zone and time bin in every iteration and returns the numbers from the previous iteration
- * as expected demand for the current iteration. This will lead to rebalancing target locations related to activity volume per zone.
+ * <p>
+ * Estimates the demand of zones time-dependent in vehicle units.
+ * For each time bin, the share of activity ends (in the previous iteration) in the given zone is multiplied with the fleet size.
+ * This means in rush hours, the amount of vehicles assigned to a zone per activity end is less than in non-rush hours.
+ * </p>
+ *
  *
  * @author tschlenther
  */
-public final class TimeDependentActivityBasedZonalDemandEstimator
+public final class FleetSizeWeightedByActivityEndsDemandEstimator
 		implements ZonalDemandEstimator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
+	private final FleetSpecification fleetSpecification;
 	private final int timeBinSize;
 	private final Map<Double, Map<DrtZone, MutableInt>> actEnds = new HashMap<>();
 	private final Map<Double, Map<DrtZone, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
-	public TimeDependentActivityBasedZonalDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public FleetSizeWeightedByActivityEndsDemandEstimator(DrtZonalSystem zonalSystem, FleetSpecification fleetSpecification, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
+		this.fleetSpecification = fleetSpecification;
 		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
 	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
+		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
 		Map<DrtZone, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin,
 				Collections.emptyMap());
-		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
+		int totalNrActivityEnds = expectedDemandForTimeBin.values().stream().mapToInt(MutableInt::intValue).sum();
+		return zone -> (int) Math.floor(fleetSize * (expectedDemandForTimeBin.getOrDefault(zone, ZERO).doubleValue() / totalNrActivityEnds)) ;
 	}
 
 	@Override
