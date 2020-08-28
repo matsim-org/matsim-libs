@@ -25,11 +25,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.EqualVehicleDensityZonalDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByPopulationShareDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationZonalDRTDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.TimeDependentActivityBasedZonalDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandAggregator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.*;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -62,7 +59,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
-						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
+						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandEstimator.class),
 								strategyParams))).asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
@@ -71,36 +68,36 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			}
 		});
 
-		switch (strategyParams.getZonalDemandAggregatorType()) {
+		switch (strategyParams.getZonalDemandEstimatorType()) {
 			case PreviousIteration:
-				bindModal(PreviousIterationZonalDRTDemandAggregator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationZonalDRTDemandAggregator(getter.getModal(DrtZonalSystem.class),
+				bindModal(PreviousIterationZonalDRTDemandEstimator.class).toProvider(modalProvider(
+						getter -> new PreviousIterationZonalDRTDemandEstimator(getter.getModal(DrtZonalSystem.class),
 								drtCfg))).asEagerSingleton();
-				bindModal(ZonalDemandAggregator.class).to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
-				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandAggregator.class));
+				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(PreviousIterationZonalDRTDemandEstimator.class));
 				break;
 			case TimeDependentActivityBased:
-				bindModal(TimeDependentActivityBasedZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new TimeDependentActivityBasedZonalDemandAggregator(
+				bindModal(TimeDependentActivityBasedZonalDemandEstimator.class).toProvider(modalProvider(
+						getter -> new TimeDependentActivityBasedZonalDemandEstimator(
 								getter.getModal(DrtZonalSystem.class), drtCfg))).asEagerSingleton();
-				bindModal(ZonalDemandAggregator.class).to(
-						modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
-				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandAggregator.class));
+				bindModal(ZonalDemandEstimator.class).to(
+						modalKey(TimeDependentActivityBasedZonalDemandEstimator.class));
+				addEventHandlerBinding().to(modalKey(TimeDependentActivityBasedZonalDemandEstimator.class));
 				break;
 			case EqualVehicleDensity:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new EqualVehicleDensityZonalDemandAggregator(getter.getModal(DrtZonalSystem.class),
+				bindModal(ZonalDemandEstimator.class).toProvider(modalProvider(
+						getter -> new EqualVehicleDensityZonalDemandEstimator(getter.getModal(DrtZonalSystem.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 			case FleetSizeWeightedByPopulationShare:
-				bindModal(ZonalDemandAggregator.class).toProvider(modalProvider(
-						getter -> new FleetSizeWeightedByPopulationShareDemandAggregator(
+				bindModal(ZonalDemandEstimator.class).toProvider(modalProvider(
+						getter -> new FleetSizeWeightedByPopulationShareDemandEstimator(
 								getter.getModal(DrtZonalSystem.class), getter.get(Population.class),
 								getter.getModal(FleetSpecification.class)))).asEagerSingleton();
 				break;
 			default:
-				throw new IllegalArgumentException("do not know what to do with ZonalDemandAggregatorType="
-						+ strategyParams.getZonalDemandAggregatorType());
+				throw new IllegalArgumentException("do not know what to do with ZonalDemandEstimatorType="
+						+ strategyParams.getZonalDemandEstimatorType());
 		}
 	}
 }

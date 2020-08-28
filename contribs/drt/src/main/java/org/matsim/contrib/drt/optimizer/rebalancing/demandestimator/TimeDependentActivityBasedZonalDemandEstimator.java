@@ -47,8 +47,8 @@ import org.matsim.pt.PtConstants;
  *
  * @author tschlenther
  */
-public final class TimeDependentActivityBasedZonalDemandAggregator
-		implements ZonalDemandAggregator, ActivityEndEventHandler {
+public final class TimeDependentActivityBasedZonalDemandEstimator
+		implements ZonalDemandEstimator, ActivityEndEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final int timeBinSize;
@@ -56,7 +56,7 @@ public final class TimeDependentActivityBasedZonalDemandAggregator
 	private final Map<Double, Map<DrtZone, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
-	public TimeDependentActivityBasedZonalDemandAggregator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public TimeDependentActivityBasedZonalDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}

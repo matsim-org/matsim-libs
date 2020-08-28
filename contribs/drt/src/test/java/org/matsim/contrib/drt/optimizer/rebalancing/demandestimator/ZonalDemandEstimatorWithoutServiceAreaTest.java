@@ -63,7 +63,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class ZonalDemandAggregatorWithoutServiceAreaTest {
+public class ZonalDemandEstimatorWithoutServiceAreaTest {
 
 	//TODO write test with service area !!
 	// (with an service are, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
@@ -72,15 +72,15 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void EqualVehicleDensityZonalDemandAggregatorTest() {
+	public void EqualVehicleDensityZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.EqualVehicleDensity, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "");
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 1);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 1);
@@ -101,9 +101,9 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void EqualVehicleDensityZonalDemandAggregatorFleetModificationTest() {
+	public void EqualVehicleDensityZonalDemandEstimatorFleetModificationTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.EqualVehicleDensity, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "");
 		// double number of vehicles after 0th iteration -> estimation of demand should double too
 		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
@@ -115,11 +115,11 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 			}
 		});
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 2);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
@@ -133,15 +133,15 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void PreviousIterationZonalDemandAggregatorTest() {
+	public void PreviousIterationZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.PreviousIteration, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIteration, "");
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
@@ -155,15 +155,15 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void PreviousIterationZonalDemandAggregatorWithSpeedUpModeTest() {
+	public void PreviousIterationZonalDemandEstimatorWithSpeedUpModeTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.PreviousIteration, "drt_teleportation");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIteration, "drt_teleportation");
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
@@ -177,15 +177,15 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void ActivityLocationBasedZonalDemandAggregatorTest() {
+	public void ActivityLocationBasedZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.TimeDependentActivityBased, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.TimeDependentActivityBased, "");
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 3);
@@ -199,15 +199,15 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void FleetSizeWeightedByPopulationShareDemandAggregatorTest() {
+	public void FleetSizeWeightedByPopulationShareDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.FleetSizeWeightedByPopulationShare, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "");
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
@@ -221,9 +221,9 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void FleetSizeWeightedByPopulationShareDemandAggregatorFleetModificationTest() {
+	public void FleetSizeWeightedByPopulationShareDemandEstimatorFleetModificationTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType.FleetSizeWeightedByPopulationShare, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "");
 		// double number of vehicles after 0th iteration -> estimation of demand should double too (besides rounding issues)
 		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
@@ -235,11 +235,11 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 			}
 		});
 		controler.run();
-		ZonalDemandAggregator aggregator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandAggregator.class, "drt"));
+		ZonalDemandEstimator estimator = controler.getInjector()
+				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = aggregator.getExpectedDemandForTimeBin(
+			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 5);
@@ -252,7 +252,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		}
 	}
 
-	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType aggregatorType,
+	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType estimatorType,
 			String drtSpeedUpModeForRebalancingConfiguration) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");
@@ -265,7 +265,7 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 		MinCostFlowRebalancingStrategyParams rebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
 		rebalancingStrategyParams.setTargetAlpha(1);
 		rebalancingStrategyParams.setTargetBeta(0);
-		rebalancingStrategyParams.setZonalDemandAggregatorType(aggregatorType);
+		rebalancingStrategyParams.setZonalDemandEstimatorType(estimatorType);
 
 		RebalancingParams rebalancingParams = new RebalancingParams();
 		rebalancingParams.addParameterSet(rebalancingStrategyParams);
@@ -314,11 +314,11 @@ public class ZonalDemandAggregatorWithoutServiceAreaTest {
 	 * 1	3	5	7
 	 * <p>
 	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
-	 * That should lead to half of the drt vehicles rebalanced to the left column when using TimeDependentActivityBasedZonalDemandAggregator.
+	 * That should lead to half of the drt vehicles rebalanced to the left column when using TimeDependentActivityBasedZonalDemandEstimator.
 	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
-	 * That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDRTDemandAggregator.
+	 * That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationZonalDRTDemandEstimator.
 	 * 3) in the center, there is nothing happening.
-	 * But, when using EqualVehicleDensityZonalDemandAggregator, one vehicle should get sent to every zone..
+	 * But, when using EqualVehicleDensityZonalDemandEstimator, one vehicle should get sent to every zone..
 	 */
 	private void setupPopulation(Population population) {
 		//delete what's there

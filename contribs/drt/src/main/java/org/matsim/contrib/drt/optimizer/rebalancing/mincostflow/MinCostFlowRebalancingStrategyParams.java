@@ -34,7 +34,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 		implements RebalancingParams.RebalancingStrategyParams {
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
-	public enum ZonalDemandAggregatorType {
+	public enum ZonalDemandEstimatorType {
 		PreviousIteration, TimeDependentActivityBased, EqualVehicleDensity, FirstActivityCount,
 		FleetSizeWeightedByPopulationShare
 	}
@@ -47,8 +47,8 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
 			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
-	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandAggregatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be one of either [PreviousIteration, TimeDependentActivityBased, EqualVehicleDensity, FirstActivityCount] Current default is PreviousIteration";
+	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandEstimatorType";
+	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be one of [PreviousIteration, TimeDependentActivityBased, EqualVehicleDensity, FirstActivityCount] Current default is PreviousIteration";
 
 	@PositiveOrZero
 	private double targetAlpha = Double.NaN;
@@ -57,7 +57,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	private double targetBeta = Double.NaN;
 
 	@NotNull
-	private MinCostFlowRebalancingStrategyParams.ZonalDemandAggregatorType zonalDemandAggregatorType = ZonalDemandAggregatorType.PreviousIteration;
+	private MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIteration;
 
 	public MinCostFlowRebalancingStrategyParams() {
 		super(SET_NAME);
@@ -113,15 +113,15 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
 	 */
 	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public ZonalDemandAggregatorType getZonalDemandAggregatorType() {
-		return zonalDemandAggregatorType;
+	public ZonalDemandEstimatorType getZonalDemandEstimatorType() {
+		return zonalDemandEstimatorType;
 	}
 
 	/**
 	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
 	 */
 	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public void setZonalDemandAggregatorType(ZonalDemandAggregatorType aggregatorType) {
-		this.zonalDemandAggregatorType = aggregatorType;
+	public void setZonalDemandEstimatorType(ZonalDemandEstimatorType aggregatorType) {
+		this.zonalDemandEstimatorType = aggregatorType;
 	}
 }
