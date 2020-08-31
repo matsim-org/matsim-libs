@@ -102,7 +102,7 @@ public class NoiseIT {
 		} );;
 
 //		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseContext noiseContext = injector.getInstance( NoiseContextImpl.class ) ;
+		NoiseContext noiseContext = injector.getInstance( NoiseContext.class ) ;
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);

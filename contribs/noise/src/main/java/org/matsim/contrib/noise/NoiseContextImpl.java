@@ -32,9 +32,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -98,6 +105,60 @@ final class NoiseContextImpl implements NoiseContext {
 		checkConsistency();
 		setLinksMinMax();
 		setLinksToZones();
+		checkTunnels();
+	}
+
+	private void checkTunnels() {
+		final URL tunnelUrl = this.noiseParams.getTunnelLinkIDsFileURL(this.scenario.getConfig().getContext());
+		try {
+			if(Files.exists(Paths.get(tunnelUrl.toURI()))) {
+
+				if (this.noiseParams.getTunnelLinkIDsSet().size() > 0) {
+					log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
+					this.noiseParams.getTunnelLinkIDsSet().clear();
+				}
+
+				// loading tunnel link IDs from file
+				BufferedReader br = IOUtils.getBufferedReader(tunnelUrl.getFile());
+
+				String line = null;
+				try {
+					line = br.readLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} // headers
+
+				log.info("Reading tunnel link Id file...");
+				try {
+					int countWarning = 0;
+					while ((line = br.readLine()) != null) {
+
+						String[] columns = line.split(";");
+						Id<Link> linkId = null;
+						for (int column = 0; column < columns.length; column++) {
+							if (column == 0) {
+								linkId = Id.createLinkId(columns[column]);
+							} else {
+								if (countWarning < 1) {
+									log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
+								} else if (countWarning == 1) {
+									log.warn("This message is only given once.");
+								}
+								countWarning++;
+							}
+						}
+						log.info("Adding tunnel link ID " + linkId);
+						this.noiseParams.getTunnelLinkIDsSet().add(linkId);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				log.info("Reading tunnel link Id file... Done.");
+			}
+		} catch (URISyntaxException e) {
+			log.warn("Could not read tunnels.");
+		}
 	}
 
 	// for routing purposes

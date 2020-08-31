@@ -294,53 +294,6 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 		
-		if  (this.tunnelLinkIdFile != null && !"".equals(this.tunnelLinkIdFile)) {
-			
-			if (this.tunnelLinkIDs.size() > 0) {
-				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
-				this.tunnelLinkIDs.clear();
-			}
-			
-			// loading tunnel link IDs from file
-			URL url = this.getTunnelLinkIDsFileURL(config.getContext());
-			BufferedReader br = IOUtils.getBufferedReader(url.getFile());
-			
-			String line = null;
-			try {
-				line = br.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} // headers
-
-			log.info("Reading tunnel link Id file...");
-			try {
-				int countWarning = 0;
-				while ((line = br.readLine()) != null) {
-					
-					String[] columns = line.split(";");
-					Id<Link> linkId = null;
-					for (int column = 0; column < columns.length; column++) {
-						if (column == 0) {
-							linkId = Id.createLinkId(columns[column]);
-						} else {
-							if (countWarning < 1) {
-								log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
-							} else if (countWarning == 1) {
-								log.warn("This message is only given once.");
-							}
-							countWarning++;
-						}						
-					}
-					log.info("Adding tunnel link ID " + linkId);
-					this.tunnelLinkIDs.add(linkId);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			log.info("Reading tunnel link Id file... Done.");
-		}
-		
 		if (this.useActualSpeedLevel && this.allowForSpeedsOutsideTheValidRange) {
 			log.warn("Using the actual vehicle speeds for the noise computation may result in very low speed levels due to congestion."
 					+ " The RLS computation approach defines a range of valid speed levels: for cars: 30-130 km/h; for HGV: 30-80 km/h."
