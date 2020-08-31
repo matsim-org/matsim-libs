@@ -26,18 +26,15 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.function.Consumer;
 
-import org.locationtech.jts.geom.Point;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.vrpagent.*;
+import org.matsim.contrib.dvrp.vrpagent.AbstractTaskEvent;
+import org.matsim.contrib.dvrp.vrpagent.TaskEndedEvent;
+import org.matsim.contrib.dvrp.vrpagent.TaskEndedEventHandler;
+import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
+import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -45,73 +42,70 @@ import org.matsim.core.utils.collections.Tuple;
 
 import com.opencsv.CSVWriter;
 
-public class ZonalIdleVehicleXYVisualiser implements ActivityEndEventHandler, ActivityStartEventHandler, IterationEndsListener {
+public class ZonalIdleVehicleXYVisualiser
+		implements TaskStartedEventHandler, TaskEndedEventHandler, IterationEndsListener {
 
 	private final String mode;
 	private final DrtZonalSystem zonalSystem;
 	private final MatsimServices services;
-	private final FleetSpecification fleet;
 
-	private final Map<String, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
+	private final Map<DrtZone, LinkedList<Tuple<Double, Integer>>> zoneEntries = new HashMap<>();
 
-
-	public ZonalIdleVehicleXYVisualiser(MatsimServices services, String mode, DrtZonalSystem zonalSystem, FleetSpecification fleet) {
+	public ZonalIdleVehicleXYVisualiser(MatsimServices services, String mode, DrtZonalSystem zonalSystem) {
 		this.services = services;
 		this.mode = mode;
-		services.getEvents().addHandler(this);
 		this.zonalSystem = zonalSystem;
-		this.fleet = fleet;
 		initEntryMap();
 	}
 
 	private void initEntryMap() {
-		for (String z : zonalSystem.getZones().keySet()) {
-			LinkedList<Tuple<Double,Integer>> list = new LinkedList<>();
+		for (DrtZone z : zonalSystem.getZones().values()) {
+			LinkedList<Tuple<Double, Integer>> list = new LinkedList<>();
 			list.add(new Tuple<>(0d, 0));
 			zoneEntries.put(z, list);
 		}
 	}
 
 	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
-			if(this.fleet.getVehicleSpecifications().containsKey(Id.create(event.getPersonId().toString(), DvrpVehicle.class))){
-				String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-				if (zone != null) {
-					LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
-					Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
-					zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
-				}
-			}
-		}
+	public void handleEvent(TaskStartedEvent event) {
+		handleEvent(event, zone -> {
+			LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
+			Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
+			zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh + 1));
+		});
 	}
 
 	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().equals(DrtActionCreator.DRT_STAY_NAME)) {
-			if(this.fleet.getVehicleSpecifications().containsKey(Id.create(event.getPersonId().toString(), DvrpVehicle.class))){
-				String zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-				if (zone != null) {
-					LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
-					Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
-					zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
-				}
+	public void handleEvent(TaskEndedEvent event) {
+		handleEvent(event, zone -> {
+			LinkedList<Tuple<Double, Integer>> zoneTuples = zoneEntries.get(zone);
+			Integer oldNrOfVeh = zoneTuples.getLast().getSecond();
+			zoneTuples.add(new Tuple<>(event.getTime(), oldNrOfVeh - 1));
+		});
+	}
+
+	private void handleEvent(AbstractTaskEvent event, Consumer<DrtZone> handler) {
+		if (event.getDvrpMode().equals(mode) && event.getTaskType().equals(DrtStayTask.TYPE)) {
+			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			if (zone != null) {
+				handler.accept(zone);
 			}
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String filename = services.getControlerIO().getIterationFilename(services.getIterationNumber(), mode + "_idleVehiclesPerZoneXY.csv");
+		String filename = services.getControlerIO()
+				.getIterationFilename(services.getIterationNumber(), mode + "_idleVehiclesPerZoneXY.csv");
 
 		try {
 			CSVWriter writer = new CSVWriter(Files.newBufferedWriter(Paths.get(filename)), ';', '"', '"', "\n");
-			writer.writeNext(new String[]{"zone", "X", "Y", "time", "idleDRTVehicles"}, false);
-			this.zoneEntries.forEach( (zone, entriesList) -> {
-				Point p = zonalSystem.getZone(zone).getCentroid();
-				double x = p.getX();
-				double y = p.getY();
-				entriesList.forEach(entry -> writer.writeNext(new String[]{zone, "" + x, "" + y, "" + entry.getFirst(), "" + entry.getSecond()}, false));
+			writer.writeNext(new String[] { "zone", "X", "Y", "time", "idleDRTVehicles" }, false);
+			this.zoneEntries.forEach((zone, entriesList) -> {
+				Coord c = zone.getCentroid();
+				entriesList.forEach(entry -> writer.writeNext(
+						new String[] { zone.getId(), "" + c.getX(), "" + c.getY(), "" + entry.getFirst(),
+								"" + entry.getSecond() }, false));
 			});
 
 			writer.close();

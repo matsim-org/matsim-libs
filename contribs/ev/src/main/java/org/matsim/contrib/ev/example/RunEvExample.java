@@ -79,6 +79,7 @@ public class RunEvExample {
 					@Override
 					protected void configureQSim() {
 						bind(VehicleChargingHandler.class).asEagerSingleton();
+						addMobsimScopeEventHandlerBinding().to(VehicleChargingHandler.class);
 					}
 				});
 			}

@@ -49,7 +49,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -66,8 +65,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	private final Network network;
 	private final DrtConfigGroup drtCfg;
 
-	public DrtRequestAnalyzer(EventsManager events, Network network, DrtConfigGroup drtCfg) {
-		events.addHandler(this);
+	public DrtRequestAnalyzer(Network network, DrtConfigGroup drtCfg) {
 		this.network = network;
 		this.drtCfg = drtCfg;
 	}

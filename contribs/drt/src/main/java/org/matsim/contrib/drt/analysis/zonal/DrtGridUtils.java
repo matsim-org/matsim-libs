@@ -23,10 +23,8 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -37,6 +35,8 @@ import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import one.util.streamex.EntryStream;
 
 /**
  * @author jbischoff
@@ -74,10 +74,9 @@ public class DrtGridUtils {
 	}
 
 	/**
-	 *
 	 * First creates a grid based on the network bounding box. Then removes all zones that do not intersect the service area.
 	 * Result may contain zones that are barely included in the service area. But as passengers may walk into the service area,
-	 * it seems appropiate that the DrtZonalSystem, which is used for demand estimation, is larger than the service area.
+	 * it seems appropriate that the DrtZonalSystem, which is used for demand estimation, is larger than the service area.
 	 * The {@code cellsize} indirectly determines, how much larger the DrtZonalSystem may get.
 	 *
 	 * @param network
@@ -88,23 +87,16 @@ public class DrtGridUtils {
 	public static Map<String, Geometry> createGridFromNetworkWithinServiceArea(Network network, double cellsize,
 			List<PreparedGeometry> serviceAreaGeoms) {
 		Map<String, Geometry> grid = createGridFromNetwork(network, cellsize);
-		Set<String> zonesToRemove = new HashSet<>();
+		log.info("total number of created grid zones = " + grid.size());
 
-		log.info("checking zones for intersection with drt service area...");
-		log.info("total number of created zones = " + grid.size());
+		log.info("searching for grid zones within the drt service area...");
 		Counter counter = new Counter("dealt with zone ");
-		grid.forEach((key, value) -> {
-			counter.incCounter();
-			for (PreparedGeometry serviceAreaGeom : serviceAreaGeoms) {
-				if (serviceAreaGeom.intersects(value)) {
-					return;
-				}
-			}
-			zonesToRemove.add(key);
-		});
-		zonesToRemove.forEach(grid::remove);
+		Map<String, Geometry> zonesWithinServiceArea = EntryStream.of(grid)
+				.peekKeys(id -> counter.incCounter())
+				.filterValues(cell -> serviceAreaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(cell)))
+				.toMap();
 
-		log.info("number of remaining zones = " + grid.size());
+		log.info("number of remaining grid zones = " + zonesWithinServiceArea.size());
 		return grid;
 	}
 }

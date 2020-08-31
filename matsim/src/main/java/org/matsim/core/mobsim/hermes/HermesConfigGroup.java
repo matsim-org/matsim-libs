@@ -1,3 +1,21 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
 import java.util.Map;
@@ -21,6 +39,8 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final int MAX_STOP_ROUTE_ID = 65536;
     // Maximum vehicle velocity (limited to 8 bits in the plan)
     public static final int MAX_VEHICLE_VELOCITY = 255;
+    // Maximum vehicle PCE types (limited to 4 bits)
+    public static final int MAX_VEHICLE_PCETYPES = 15;
     // Maximum number of events per agent (limited to 16 bits in the plan)
     public static final int MAX_EVENTS_AGENT = 65536;
 
@@ -34,13 +54,14 @@ public class HermesConfigGroup extends ReflectiveConfigGroup {
     private static final String STORAGE_CAPACITY_FACTOR = "storageCapacityFactor";
 
     private static final String STUCKTIMEPARAM = "stuckTime";
-    private static final String STUCKTIMEPARAMDESC = "time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
+    private static final String STUCKTIMEPARAMDESC = "time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move."
+            + " Set to Integer.MAX_VALUE to disable this behavior";
 
     private static final String MAINMODESPARAM = "mainMode";
     private static final String MAINMODESPARAMDESC = "[comma-separated list] Modes that are handled in the mobsim along links. By default: car";
     private Set<String> mainModes = Set.of(TransportMode.car);
 
-    private static final String DETPTDESC = "treats PT as deterministic. Everything will run on time.";
+    private static final String DETPTDESC = "treats PT as deterministic. PT vehicles will run with a steady speed. Should be used with separate network layers for PT and other network modes.";
     private boolean deterministicPt = false;
     public static final boolean DEBUG_REALMS = false;
     public static final boolean DEBUG_EVENTS = false;

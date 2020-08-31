@@ -18,27 +18,28 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 
 /**
  * @author michalm
  */
 public class LinearRebalancingTargetCalculator implements RebalancingTargetCalculator {
-	private final ZonalDemandAggregator demandAggregator;
-	private final MinCostFlowRebalancingParams params;
+	private final ZonalDemandEstimator demandEstimator;
+	private final MinCostFlowRebalancingStrategyParams params;
 
-	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator,
-			MinCostFlowRebalancingParams params) {
-		this.demandAggregator = demandAggregator;
+	public LinearRebalancingTargetCalculator(ZonalDemandEstimator demandEstimator,
+											 MinCostFlowRebalancingStrategyParams params) {
+		this.demandEstimator = demandEstimator;
 		this.params = params;
 	}
 
 	// FIXME targets should be calculated more intelligently
 	@Override
-	public int estimate(String zone, double time) {
+	public int estimate(DrtZone zone, double time) {
 		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		int expectedDemand = demandAggregator.getExpectedDemandForTimeBin(time + 60).applyAsInt(zone);
+		int expectedDemand = demandEstimator.getExpectedDemandForTimeBin(time + 60).applyAsInt(zone);
 		if (expectedDemand == 0) {
 			return 0;// for larger zones we may assume that target is at least 1 (or in some cases) ??????
 		}
