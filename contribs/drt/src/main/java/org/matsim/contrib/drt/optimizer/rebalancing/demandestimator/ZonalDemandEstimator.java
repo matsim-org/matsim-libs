@@ -30,7 +30,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 /**
  * @author jbischoff
  */
-public interface ZonalDemandAggregator {
+public interface ZonalDemandEstimator {
 
 	ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time);
 }

@@ -43,17 +43,17 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
  *
  * @author tschlenther
  */
-public final class FleetSizeWeightedByPopulationShareDemandAggregator implements ZonalDemandAggregator {
+public final class FleetSizeWeightedByPopulationShareDemandEstimator implements ZonalDemandEstimator {
 
-	private static final Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandAggregator.class);
+	private static final Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandEstimator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final FleetSpecification fleetSpecification;
 	private Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
 	private Integer totalNrActivities;
 
-	public FleetSizeWeightedByPopulationShareDemandAggregator(DrtZonalSystem zonalSystem, Population population,
-			@NotNull FleetSpecification fleetSpecification) {
+	public FleetSizeWeightedByPopulationShareDemandEstimator(DrtZonalSystem zonalSystem, Population population,
+															 @NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);

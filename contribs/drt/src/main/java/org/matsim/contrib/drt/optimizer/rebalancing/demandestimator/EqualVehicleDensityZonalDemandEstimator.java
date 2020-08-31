@@ -43,13 +43,13 @@ import com.google.common.base.Preconditions;
  *
  * @author tschlenther
  */
-public final class EqualVehicleDensityZonalDemandAggregator implements ZonalDemandAggregator {
+public final class EqualVehicleDensityZonalDemandEstimator implements ZonalDemandEstimator {
 
 	private final Map<DrtZone, Double> zoneAreaShares = new HashMap<>();
 	private final FleetSpecification fleetSpecification;
 
-	public EqualVehicleDensityZonalDemandAggregator(@NotNull DrtZonalSystem zonalSystem,
-			@NotNull FleetSpecification fleetSpecification) {
+	public EqualVehicleDensityZonalDemandEstimator(@NotNull DrtZonalSystem zonalSystem,
+												   @NotNull FleetSpecification fleetSpecification) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
 	}
