@@ -50,7 +50,6 @@ import java.util.HashSet;
  *
  */
 public class NoiseRLS19IT {
-	private static final Logger log = Logger.getLogger( NoiseRLS19IT.class );
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -157,35 +156,41 @@ public class NoiseRLS19IT {
         Network network = scenario.getNetwork();
         Node from = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(6, 7));
         Node to = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(7, 6));
+
         final Link link = NetworkUtils.createAndAddLink(network, Id.createLinkId("link"), from, to, 10, 40 / 3.6, 0, 0);
+        final Link link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("link2"), from, to, 10, 40 / 3.6, 0, 0);
 
         final NoiseLink noiseLink = new NoiseLink(link.getId());
+        final NoiseLink noiseLink2 = new NoiseLink(link2.getId());
+
         noiseContext.getNoiseLinks().put(link.getId(), noiseLink);
+        noiseContext.getNoiseLinks().put(link2.getId(), noiseLink2);
 
         RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario);
         for (int i = 0; i < 1800; i++) {
             noiseLink.addEnteringAgent(RLS19VehicleType.pkw);
+            noiseLink2.addEnteringAgent(RLS19VehicleType.pkw);
         }
 
         emission.calculateEmission(noiseLink);
+        emission.calculateEmission(noiseLink2);
         Assert.assertEquals("Wrong final noise link emission!", 84.23546653306667, noiseLink.getEmission(), MatsimTestUtils.EPSILON);
 
         NoiseReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
 
-        double projectedDistance = CoordUtils.distancePointLinesegment(link.getFromNode().getCoord(), link.getToNode().getCoord(), rp.getCoord());
 
         RLS19NoiseImmission immission = new RLS19NoiseImmission(noiseContext, shieldingContext);
-        final double correction = immission.calculateCorrection(projectedDistance, rp, link);
 
-        Assert.assertEquals("Wrong correction!", 58.081507648764386,
-                correction, MatsimTestUtils.EPSILON);
+        noiseLink.setEmission(65);
+        noiseLink2.setEmission(55);
 
-        rp.setLinkId2Correction(link.getId(), correction);
+        rp.setLinkId2Correction(link.getId(), 6.6622);
+        rp.setLinkId2Correction(link2.getId(), 8.794733);
 
         immission.calculateImmission(rp, 8*3600);
         final double currentImmission = rp.getCurrentImmission();
 
-        Assert.assertEquals("Wrong immission!", 36.153958884302284,
+        Assert.assertEquals("Wrong immission!", 73.77467715144601,
                 currentImmission, MatsimTestUtils.EPSILON);
     }
 }

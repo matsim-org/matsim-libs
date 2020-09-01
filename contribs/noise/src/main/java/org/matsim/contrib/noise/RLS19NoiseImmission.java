@@ -52,14 +52,15 @@ public class RLS19NoiseImmission implements NoiseImmission {
                 } else {
                     NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
                     if (noiseLink != null) {
-                        noiseImmission = calculateIsolatedLinkImmission(rp, noiseLink);
-                        linkId2IsolatedImmission.put(linkId, noiseImmission);
+                        noiseImmission = calculateLinkImmission(rp, noiseLink);
+                        double isolatedLinkImmission = 10 * Math.log10(noiseImmission);
+                        linkId2IsolatedImmission.put(linkId, isolatedLinkImmission);
                         for (RLS19VehicleType vehicleType : RLS19VehicleType.values()) {
                             double immissionPlusOne = calculateIsolatedLinkImmissionPlusOneVehicle(rp, noiseLink, vehicleType);
                             if (immissionPlusOne < 0.) {
                                 immissionPlusOne = 0.;
                             }
-                            if (immissionPlusOne < noiseImmission) {
+                            if (immissionPlusOne < isolatedLinkImmission) {
                                 throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one "
                                         + vehicleType.getId() + immissionPlusOne + ". This should not happen. Aborting...");
                             }
@@ -68,7 +69,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
                     }
                 }
                 if (noiseImmission > 0.) {
-                    sumTmp += (Math.pow(10, (0.1 * noiseImmission)));
+                    sumTmp += noiseImmission;
                 }
             }
             if (sumTmp > 0) {
@@ -83,8 +84,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
     @Override
     //TODO: add height of immission point (z-coordinate for shielding and ground dampening)
     public double calculateCorrection(double projectedDistance, NoiseReceiverPoint nrp, Link candidateLink) {
-        final double correction = getSectionsCorrection(nrp, candidateLink);
-        return 10* Math.log10(correction);
+        return getSectionsCorrection(nrp, candidateLink);
     }
 
     private double getSectionsCorrection(NoiseReceiverPoint nrp, Link link) {
@@ -154,9 +154,9 @@ public class RLS19NoiseImmission implements NoiseImmission {
     }
 
 
-    private double calculateIsolatedLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
+    private double calculateLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
         if (!(noiseLink.getEmission() == 0.)) {
-            double noiseImmission = noiseLink.getEmission() + rp.getLinkCorrection(noiseLink.getId());
+            double noiseImmission = Math.pow(10, 0.1 * noiseLink.getEmission()) * rp.getLinkCorrection(noiseLink.getId());
             if (noiseImmission < 0.) {
                 noiseImmission = 0.;
             }
@@ -168,7 +168,8 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
     private double calculateIsolatedLinkImmissionPlusOneVehicle(NoiseReceiverPoint rp, NoiseLink noiseLink, NoiseVehicleType type) {
         if (!(noiseLink.getEmission() == 0.)) {
-            double noiseImmission = noiseLink.getEmissionPlusOneVehicle(type) + rp.getLinkCorrection(noiseLink.getId());
+            double noiseImmission = 10 * Math.log10(Math.pow(10, 0.1 * noiseLink.getEmissionPlusOneVehicle(type)) * rp.getLinkCorrection(noiseLink.getId()));
+
             if (noiseImmission < 0.) {
                 noiseImmission = 0.;
             }

@@ -546,7 +546,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter(TUNNEL_LINK_ID_FILE)
-	private String getTunnelLinkIdFile() {
+	public String getTunnelLinkIdFile() {
 		return tunnelLinkIdFile;
 	}
 

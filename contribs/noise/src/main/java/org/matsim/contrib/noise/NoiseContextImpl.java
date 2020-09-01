@@ -109,55 +109,57 @@ final class NoiseContextImpl implements NoiseContext {
 	}
 
 	private void checkTunnels() {
-		final URL tunnelUrl = this.noiseParams.getTunnelLinkIDsFileURL(this.scenario.getConfig().getContext());
-		try {
-			if(Files.exists(Paths.get(tunnelUrl.toURI()))) {
+		if(noiseParams.getTunnelLinkIdFile() != null) {
+			final URL tunnelUrl = this.noiseParams.getTunnelLinkIDsFileURL(this.scenario.getConfig().getContext());
+			try {
+				if (Files.exists(Paths.get(tunnelUrl.toURI()))) {
 
-				if (this.noiseParams.getTunnelLinkIDsSet().size() > 0) {
-					log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
-					this.noiseParams.getTunnelLinkIDsSet().clear();
-				}
-
-				// loading tunnel link IDs from file
-				BufferedReader br = IOUtils.getBufferedReader(tunnelUrl.getFile());
-
-				String line = null;
-				try {
-					line = br.readLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} // headers
-
-				log.info("Reading tunnel link Id file...");
-				try {
-					int countWarning = 0;
-					while ((line = br.readLine()) != null) {
-
-						String[] columns = line.split(";");
-						Id<Link> linkId = null;
-						for (int column = 0; column < columns.length; column++) {
-							if (column == 0) {
-								linkId = Id.createLinkId(columns[column]);
-							} else {
-								if (countWarning < 1) {
-									log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
-								} else if (countWarning == 1) {
-									log.warn("This message is only given once.");
-								}
-								countWarning++;
-							}
-						}
-						log.info("Adding tunnel link ID " + linkId);
-						this.noiseParams.getTunnelLinkIDsSet().add(linkId);
+					if (this.noiseParams.getTunnelLinkIDsSet().size() > 0) {
+						log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
+						this.noiseParams.getTunnelLinkIDsSet().clear();
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
 
-				log.info("Reading tunnel link Id file... Done.");
+					// loading tunnel link IDs from file
+					BufferedReader br = IOUtils.getBufferedReader(tunnelUrl.getFile());
+
+					String line = null;
+					try {
+						line = br.readLine();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} // headers
+
+					log.info("Reading tunnel link Id file...");
+					try {
+						int countWarning = 0;
+						while ((line = br.readLine()) != null) {
+
+							String[] columns = line.split(";");
+							Id<Link> linkId = null;
+							for (int column = 0; column < columns.length; column++) {
+								if (column == 0) {
+									linkId = Id.createLinkId(columns[column]);
+								} else {
+									if (countWarning < 1) {
+										log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
+									} else if (countWarning == 1) {
+										log.warn("This message is only given once.");
+									}
+									countWarning++;
+								}
+							}
+							log.info("Adding tunnel link ID " + linkId);
+							this.noiseParams.getTunnelLinkIDsSet().add(linkId);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
+					log.info("Reading tunnel link Id file... Done.");
+				}
+			} catch (URISyntaxException e) {
+				log.warn("Could not read tunnels.");
 			}
-		} catch (URISyntaxException e) {
-			log.warn("Could not read tunnels.");
 		}
 	}
 
