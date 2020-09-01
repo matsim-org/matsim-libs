@@ -103,6 +103,9 @@ public final class NoiseOfflineCalculation{
 //			events.addHandler(linkSpeedCalculator);
 //		}
 
+		final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
+		noiseParams.checkConsistency(noiseContext.getScenario().getConfig());
+
 		EventWriterXML eventWriter = null;
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 			String eventsFile;

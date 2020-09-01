@@ -4,10 +4,10 @@ import com.google.inject.Inject;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineSegment;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.EnumMap;
@@ -25,14 +25,12 @@ public class RLS19NoiseImmission implements NoiseImmission {
     private final NoiseConfigGroup noiseParams;
     private final NoiseContext noiseContext;
 
-    private final Network network;
     private final ShieldingContext shielding;
 
     @Inject
     RLS19NoiseImmission(NoiseContext noiseContext, ShieldingContext shielding) {
         this.noiseParams = noiseContext.getNoiseParams();
         this.noiseContext = noiseContext;
-        this.network = noiseContext.getScenario().getNetwork();
         this.shielding = shielding;
     }
 
@@ -54,14 +52,15 @@ public class RLS19NoiseImmission implements NoiseImmission {
                 } else {
                     NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
                     if (noiseLink != null) {
-                        noiseImmission = calculateIsolatedLinkImmission(rp, noiseLink);
-                        linkId2IsolatedImmission.put(linkId, noiseImmission);
-                        for (RLS19VehicleType vehicleType: RLS19VehicleType.values()) {
+                        noiseImmission = calculateLinkImmission(rp, noiseLink);
+                        double isolatedLinkImmission = 10 * Math.log10(noiseImmission);
+                        linkId2IsolatedImmission.put(linkId, isolatedLinkImmission);
+                        for (RLS19VehicleType vehicleType : RLS19VehicleType.values()) {
                             double immissionPlusOne = calculateIsolatedLinkImmissionPlusOneVehicle(rp, noiseLink, vehicleType);
                             if (immissionPlusOne < 0.) {
                                 immissionPlusOne = 0.;
                             }
-                            if (immissionPlusOne < noiseImmission) {
+                            if (immissionPlusOne < isolatedLinkImmission) {
                                 throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one "
                                         + vehicleType.getId() + immissionPlusOne + ". This should not happen. Aborting...");
                             }
@@ -70,7 +69,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
                     }
                 }
                 if (noiseImmission > 0.) {
-                    sumTmp += (Math.pow(10, (0.1 * noiseImmission)));
+                    sumTmp += noiseImmission;
                 }
             }
             if (sumTmp > 0) {
@@ -85,60 +84,98 @@ public class RLS19NoiseImmission implements NoiseImmission {
     @Override
     //TODO: add height of immission point (z-coordinate for shielding and ground dampening)
     public double calculateCorrection(double projectedDistance, NoiseReceiverPoint nrp, Link candidateLink) {
-
-        if (projectedDistance < MINIMUM_DISTANCE) {
-            projectedDistance = MINIMUM_DISTANCE;
-            log.debug("Distance between " + candidateLink.getId() + " and " + nrp.getId() + " is too small. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + MINIMUM_DISTANCE + ".");
-        }
-
-        double geometricDivergence = 20 * Math.log10(projectedDistance) + 10 * Math.log10(2 * Math.PI);
-        double airDampeningFactor =  projectedDistance / 200.;
-        double groundDampening = Math.max(4.8 - (AVERAGE_GROUND_HEIGHT / projectedDistance) * (34 + 600 / projectedDistance), 0);
-
-        double shielding = 0.;
-        if (noiseParams.isConsiderNoiseBarriers()) {
-            Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
-                    candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-            shielding = this.shielding.determineShieldingValue(nrp, candidateLink, projectedSourceCoord);
-        }
-
-        double dampeningCorrection = geometricDivergence + airDampeningFactor + groundDampening + shielding;
-
-        //TODO: implement reflection - if someone is looking for a (bachelor) thesis...
-        double firstReflectionCorrection = 0;
-        double secondReflectionCorrection = 0;
-
-        return dampeningCorrection + firstReflectionCorrection + secondReflectionCorrection;
+        return getSectionsCorrection(nrp, candidateLink);
     }
 
-    private double calculateIsolatedLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
+    private double getSectionsCorrection(NoiseReceiverPoint nrp, Link link) {
 
-        double noiseImmission = 0.;
+        Coordinate nrpCoordinate = CoordUtils.createGeotoolsCoordinate(nrp.getCoord());
+        LineSegment linkSegment = new LineSegment(CoordUtils.createGeotoolsCoordinate(link.getFromNode().getCoord()),
+                CoordUtils.createGeotoolsCoordinate(link.getToNode().getCoord()));
+
+        return getSubSectionsCorrection(nrpCoordinate, linkSegment);
+    }
+
+    private double getSubSectionsCorrection(Coordinate nrpCoordinate, LineSegment segment) {
+
+        double correctionTemp = 0;
+        final double length = segment.getLength();
+
+        // "Als Faustregel sollte bei freier Schallausbreitung ueber ebenem
+        // Boden die Länge l_i eines Fahrstreifenteilstücks
+        // maximal die Hälfte der Weglänge si von der Mitte
+        // des Teilstücks zum Immissionsort betragen (li ≤ si / 2)"
+        double maxL = segment.midPoint().distance(nrpCoordinate) / 2;
+        if (length <= maxL) {
+            final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment);
+            correctionTemp += Math.pow(10, 0.1*sectionCorrection);
+        } else {
+            double lMid = length / 2;
+
+            double leftLength = lMid - maxL / 2;
+            Coordinate leftCoord = segment.pointAlong(leftLength / length);
+            LineSegment leftRemaining = new LineSegment(segment.p0, leftCoord);
+
+            double rightLength = lMid + maxL / 2;
+            Coordinate rightCoord = segment.pointAlong(rightLength / length);
+            LineSegment rightRemaining = new LineSegment(rightCoord, segment.p1);
+
+            LineSegment central = new LineSegment(leftCoord, rightCoord);
+
+            final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, central);
+            correctionTemp += Math.pow(10, 0.1*sectionCorrection);
+            correctionTemp += getSubSectionsCorrection(nrpCoordinate, leftRemaining);
+            correctionTemp += getSubSectionsCorrection(nrpCoordinate, rightRemaining);
+        }
+        return correctionTemp;
+    }
+
+    private double calculateCorrection(Coordinate nrp, LineSegment segment) {
+
+        double distance = segment.midPoint().distance(nrp);
+        if (distance < MINIMUM_DISTANCE) {
+            distance = MINIMUM_DISTANCE;
+        }
+
+        double geometricDivergence = 20 * Math.log10(distance) + 10 * Math.log10(2 * Math.PI);
+        double airDampeningFactor = distance / 200.;
+        double groundDampening = Math.max(4.8 - (AVERAGE_GROUND_HEIGHT / distance) * (34 + 600 / distance), 0);
+
+        if (noiseParams.isConsiderNoiseBarriers()) {
+            return geometricDivergence + airDampeningFactor + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
+        } else {
+            return geometricDivergence + airDampeningFactor ;
+        }
+
+        //TODO: implement reflection - if someone is looking for a (bachelor) thesis...
+//        double firstReflectionCorrection = 0;
+//        double secondReflectionCorrection = 0;
+//        return dampeningCorrection + firstReflectionCorrection + secondReflectionCorrection;
+    }
+
+
+    private double calculateLinkImmission(NoiseReceiverPoint rp, NoiseLink noiseLink) {
         if (!(noiseLink.getEmission() == 0.)) {
-            double correction = rp.getLinkCorrection(noiseLink.getId());
-            Link link = network.getLinks().get(noiseLink.getId());
-            //this is actually different from RLS 90 and accounts for length of the link
-            noiseImmission = noiseLink.getEmission() + 10 * Math.log10(link.getLength()) - correction;
+            double noiseImmission = Math.pow(10, 0.1 * noiseLink.getEmission()) * rp.getLinkCorrection(noiseLink.getId());
             if (noiseImmission < 0.) {
                 noiseImmission = 0.;
             }
+            return noiseImmission;
+        } else {
+            return 0;
         }
-        return noiseImmission;
     }
 
     private double calculateIsolatedLinkImmissionPlusOneVehicle(NoiseReceiverPoint rp, NoiseLink noiseLink, NoiseVehicleType type) {
-        double plusOne = 0;
-        if (!(noiseLink.getEmissionPlusOneVehicle(type) == 0.)) {
-            double correction = rp.getLinkCorrection(noiseLink.getId());
-            Link link = network.getLinks().get(noiseLink.getId());
-            //this is actually different from RLS 90 and accounts for length of the link
-            plusOne = noiseLink.getEmissionPlusOneVehicle(type) + 10 * Math.log10(link.getLength()) - correction;
-            if (plusOne < 0.) {
-                plusOne = 0.;
+        if (!(noiseLink.getEmission() == 0.)) {
+            double noiseImmission = 10 * Math.log10(Math.pow(10, 0.1 * noiseLink.getEmissionPlusOneVehicle(type)) * rp.getLinkCorrection(noiseLink.getId()));
+
+            if (noiseImmission < 0.) {
+                noiseImmission = 0.;
             }
+            return noiseImmission;
+        } else {
+            return 0;
         }
-        return plusOne;
     }
-
-
 }

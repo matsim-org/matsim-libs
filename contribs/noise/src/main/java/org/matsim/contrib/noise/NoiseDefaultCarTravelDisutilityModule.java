@@ -32,6 +32,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 
 import java.util.Map;
 
+import static org.matsim.core.config.ConfigUtils.addOrGetModule;
+
 /**
 * @author ikaddoura
 */
@@ -41,7 +43,7 @@ public final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule 
 	@Override
 	public void install() {
 		
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
+		NoiseConfigGroup noiseParameters = addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 				
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			
