@@ -106,6 +106,9 @@ public class RLS19NoiseImmission implements NoiseImmission {
         // maximal die Hälfte der Weglänge si von der Mitte
         // des Teilstücks zum Immissionsort betragen (li ≤ si / 2)"
         double maxL = segment.midPoint().distance(nrpCoordinate) / 2;
+        if(maxL == 0) {
+            return 0;
+        }
         if (length <= maxL) {
             final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment);
             correctionTemp += Math.pow(10, 0.1*sectionCorrection);
