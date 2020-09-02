@@ -1,6 +1,6 @@
 package org.matsim.contrib.noise;
 
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Id;
  */
 interface NoiseBarrier {
 
-    Geometry getGeometry();
+    PreparedGeometry getGeometry();
 
     double getHeight();
 

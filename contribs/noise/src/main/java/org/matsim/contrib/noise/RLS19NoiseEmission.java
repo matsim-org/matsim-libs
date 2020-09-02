@@ -94,7 +94,7 @@ class RLS19NoiseEmission implements NoiseEmission {
 
     }
 
-    private double calculateEmission(NoiseLink noiseLink,
+    double calculateEmission(NoiseLink noiseLink,
                                      double vPkw, double vLkw1, double vLkw2,
                                      int nPkw, int nLkw1, int nLkw2) {
 
@@ -126,7 +126,7 @@ class RLS19NoiseEmission implements NoiseEmission {
         return 10 * Math.log10(m) + 10 * Math.log10(partPkw + partLkw1 + partLkw2) - 30;
     }
 
-    private double calculateVehicleTypeNoise(double p, double v, double singleVehicleEmission) {
+    double calculateVehicleTypeNoise(double p, double v, double singleVehicleEmission) {
         return p * (Math.pow(10, 0.1 * singleVehicleEmission) / v);
     }
 
@@ -137,7 +137,7 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    private double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g,
+    double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g,
                                                   RLS19IntersectionType intersectionType, double intersectionDistance) {
         double baseValue = calculateBaseVehicleTypeEmission(vehicleType, v);
         double surfaceCorrection = calculateSurfaceCorrection();
@@ -158,7 +158,7 @@ class RLS19NoiseEmission implements NoiseEmission {
      * according to the type of junction {@link RLS19IntersectionType} and the distance to the point of
      * intersection of intersecting or converging source lines (=nodes)
      */
-    private double calculateIntersectionCorrection(RLS19IntersectionType intersectionType, double distance) {
+    double calculateIntersectionCorrection(RLS19IntersectionType intersectionType, double distance) {
         double correction = intersectionType.correction * Math.max(1 - (distance / 120.), 0);
         return correction;
     }
@@ -170,7 +170,7 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return gradient correction in dB(A)
      */
-    private double calculateGradientCorrection(double g, double v, RLS19VehicleType vehicleType) {
+    double calculateGradientCorrection(double g, double v, RLS19VehicleType vehicleType) {
         double correction = 0;
         switch (vehicleType) {
             case pkw:
@@ -210,7 +210,7 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    private double calculateBaseVehicleTypeEmission(RLS19VehicleType vehicleType, double v) {
+    double calculateBaseVehicleTypeEmission(RLS19VehicleType vehicleType, double v) {
         double emission = vehicleType.getEmissionParameterA()
                 + 10 * Math.log10(1 + Math.pow(v / vehicleType.getEmissionParameterB(), vehicleType.getEmissionParameterC()));
         return emission;
@@ -226,7 +226,7 @@ class RLS19NoiseEmission implements NoiseEmission {
         return 0;
     }
 
-    private double getV(NoiseLink noiseLink, RLS19VehicleType type) {
+    double getV(NoiseLink noiseLink, RLS19VehicleType type) {
         Link link = network.getLinks().get(noiseLink.getId());
 
         double v = (link.getFreespeed()) * 3.6;
