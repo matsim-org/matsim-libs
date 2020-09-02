@@ -41,7 +41,7 @@ public final class NoiseComputationModule extends AbstractModule {
 
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
-		this.bind(NoiseContext.class).in( Singleton.class );
+		this.bind(NoiseContext.class).to(NoiseContextImpl.class).in( Singleton.class );
 		this.bind(ShieldingContext.class).in(Singleton.class);
 
 		switch (noiseParameters.getNoiseComputationMethod()) {

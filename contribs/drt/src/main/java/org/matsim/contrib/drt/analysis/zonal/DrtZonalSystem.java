@@ -19,80 +19,90 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.LinkedHashMap;
+import static java.util.stream.Collectors.toMap;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
-import org.matsim.api.core.v01.Coord;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
+import javax.annotation.Nullable;
+
 /**
  * @author jbischoff
+ * @author Michal Maciejewski (michalm)
  */
 public class DrtZonalSystem {
-
-	private final Map<Id<Link>, String> link2zone = new LinkedHashMap<>();
-	private final Network network;
-	private final Map<String, Geometry> zones;
-
-	public DrtZonalSystem(Network network, double cellSize) {
-		this.network = network;
-		zones = DrtGridUtils.createGridFromNetwork(network, cellSize);
-
+	public static DrtZonalSystem createFromPreparedGeometries(Network network,
+			Map<String, PreparedGeometry> geometries) {
+		return new DrtZonalSystem(network, geometries.entrySet()
+				.stream()
+				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
 	}
 
-	public DrtZonalSystem(Network network, Map<String, Geometry> zones) {
+	public static DrtZonalSystem createFromGeometries(Network network, Map<String, Geometry> geometries) {
+		return new DrtZonalSystem(network, geometries.entrySet()
+				.stream()
+				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
+	}
+
+	private static final DrtZone NO_ZONE = new DrtZone(null, null, null, null);
+
+	private final Map<Id<Link>, DrtZone> link2zone = new HashMap<>();
+	private final Network network;
+	private final Map<String, DrtZone> zones;
+
+	public DrtZonalSystem(Network network, Map<String, DrtZone> zones) {
 		this.network = network;
 		this.zones = zones;
-
 	}
 
-	public Geometry getZone(String zone) {
-		return zones.get(zone);
-	}
-
-	public String getZoneForLinkId(Id<Link> linkId) {
-		if (this.link2zone.containsKey(linkId)) {
-			return link2zone.get(linkId);
+	/**
+	 *
+	 * @param linkId
+	 * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
+	 * Result may be null in case the given link is outside of the service area.
+	 *
+	 */
+	@Nullable
+	public DrtZone getZoneForLinkId(Id<Link> linkId) {
+		DrtZone zone = link2zone.get(linkId);
+		if (zone != null) {
+			return zone == NO_ZONE ? null : zone;
 		}
 
 		Point linkCoord = MGC.coord2Point(network.getLinks().get(linkId).getCoord());
-
-		for (Entry<String, Geometry> e : zones.entrySet()) {
-			if (e.getValue().intersects(linkCoord)) {
+		for (DrtZone z : zones.values()) {
+			if (intersects(z, linkCoord)) {
 				//if a link Coord borders two or more cells, the allocation to a cell is random.
 				// Seems hard to overcome, but most likely better than returning no zone at
 				// all and mostly not too relevant in non-grid networks.
 				// jb, june 2019
-				link2zone.put(linkId, e.getKey());
-				return e.getKey();
+				link2zone.put(linkId, z);
+				return z;
 			}
 		}
-		link2zone.put(linkId, null);
-		return null;
 
+		link2zone.put(linkId, NO_ZONE);
+		return null;
+	}
+
+	private boolean intersects(DrtZone zone, Point point) {
+		PreparedGeometry preparedGeometry = zone.getPreparedGeometry();
+		return preparedGeometry != null ? preparedGeometry.intersects(point) : zone.getGeometry().intersects(point);
 	}
 
 	/**
 	 * @return the zones
 	 */
-	public Map<String, Geometry> getZones() {
+	public Map<String, DrtZone> getZones() {
 		return zones;
-	}
-
-	public Coord getZoneCentroid(String zoneId) {
-
-		Geometry zone = zones.get(zoneId);
-		if (zone == null) {
-			Logger.getLogger(getClass()).error("Zone " + zoneId + " not found.");
-			return null;
-		}
-		return MGC.point2Coord(zone.getCentroid());
 	}
 }

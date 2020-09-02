@@ -20,18 +20,6 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -40,15 +28,26 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequestSubmittedEventHandler {
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.io.IOUtils;
+
+public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequestSubmittedEventHandler {
 
 	private final DrtConfigGroup drtCfg;
 	private final DrtRequestAnalyzer requestAnalyzer;
 	private final DrtZonalSystem zones;
 	private Map<Id<Request>, DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
 
-	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, EventsManager eventsManager, DrtRequestAnalyzer requestAnalyzer, DrtZonalSystem zones){
-		eventsManager.addHandler(this);
+	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtRequestAnalyzer requestAnalyzer,
+			DrtZonalSystem zones) {
 		this.drtCfg = configGroup;
 		this.requestAnalyzer = requestAnalyzer;
 		this.zones = zones;
@@ -67,10 +66,10 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 		this.submittedRequests.put(event.getRequestId(), event);
 	}
 
-
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		String fileName = event.getServices().getControlerIO()
+		String fileName = event.getServices()
+				.getControlerIO()
 				.getIterationFilename(event.getIteration(), "waitStats" + "_" + drtCfg.getMode() + "_zonal.csv");
 		write(fileName);
 	}
@@ -89,26 +88,25 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 			for (Map.Entry<String, DescriptiveStatistics> zoneStatsEntry : zoneStats.entrySet()) {
 				DescriptiveStatistics stats = zoneStatsEntry.getValue();
 				bw.newLine();
-				bw.append(zoneStatsEntry.getKey() +
-						delimiter +
-						format.format(stats.getN()) +
-						delimiter +
-						format.format(stats.getSum()) +
-						delimiter +
-						stats.getMean() +
-						delimiter +
-						stats.getMin() +
-						delimiter +
-						stats.getMax() +
-						delimiter +
-						stats.getPercentile(95) +
-						delimiter +
-						stats.getPercentile(90) +
-						delimiter +
-						stats.getPercentile(80) +
-						delimiter +
-						stats.getPercentile(75)
-						);
+				bw.append(zoneStatsEntry.getKey()
+						+ delimiter
+						+ format.format(stats.getN())
+						+ delimiter
+						+ format.format(stats.getSum())
+						+ delimiter
+						+ stats.getMean()
+						+ delimiter
+						+ stats.getMin()
+						+ delimiter
+						+ stats.getMax()
+						+ delimiter
+						+ stats.getPercentile(95)
+						+ delimiter
+						+ stats.getPercentile(90)
+						+ delimiter
+						+ stats.getPercentile(80)
+						+ delimiter
+						+ stats.getPercentile(75));
 			}
 			bw.flush();
 			bw.close();
@@ -121,16 +119,16 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
 		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
 			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
-			String zoneStr = zones.getZoneForLinkId(submission.getFromLinkId());
-			if(zoneStr != null){
+			DrtZone zone = zones.getZoneForLinkId(submission.getFromLinkId());
+			final String zoneStr;
+			if (zone != null) {
 				//request submission inside drtServiceArea
-				zoneStr += delimiter + zones.getZones().get(zoneStr).getCentroid().getX() +
-						delimiter + zones.getZones().get(zoneStr).getCentroid().getY();
+				zoneStr = zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY();
 			} else {
-				zoneStr= "outsideOfDrtZonalSystem;-;-";
+				zoneStr = "outsideOfDrtZonalSystem;-;-";
 			}
 			DescriptiveStatistics waitingTimeStats = zoneStats.get(zoneStr);
-			if(waitingTimeStats == null){
+			if (waitingTimeStats == null) {
 				waitingTimeStats = new DescriptiveStatistics();
 			}
 			waitingTimeStats.addValue(requestAnalyzer.getWaitTimeCompare().get(requestId).getFirst());
@@ -138,6 +136,4 @@ public class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequ
 		}
 		return zoneStats;
 	}
-
-
 }

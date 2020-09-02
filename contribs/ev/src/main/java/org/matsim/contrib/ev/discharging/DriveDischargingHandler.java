@@ -32,10 +32,9 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.MobsimScopeEventHandler;
-import org.matsim.contrib.ev.MobsimScopeEventHandling;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.core.events.MobsimScopeEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -70,12 +69,10 @@ public class DriveDischargingHandler
 	private final Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg,
-			MobsimScopeEventHandling events) {
+	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
 		evDrives = new HashMap<>(eVehicles.size() / 10);
-		events.addMobsimScopeHandler(this);
 	}
 
 	@Override

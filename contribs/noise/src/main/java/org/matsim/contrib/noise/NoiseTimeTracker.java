@@ -70,6 +70,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private final NoiseDamageCalculation damageCalculation;
     private final NoiseVehicleIdentifier vehicleIdentifier;
 	private final Set<NoiseVehicleType> vehicleTypes;
+	private String networkModesToIgnore;
 
 	@Inject
 	NoiseTimeTracker(NoiseContext context, NoiseEmission emission, NoiseImmission immissionModule,
@@ -81,6 +82,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		this.damageCalculation = damageCalculation;
         this.vehicleIdentifier = vehicleIdentifier;
 		this.vehicleTypes = vehicleTypes;
+		networkModesToIgnore = this.noiseContext.getNoiseParams().getNetworkModesToIgnore();
 		setRelevantLinkInfo();
 	}
 
@@ -265,8 +267,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		this.noiseContext.getNoiseParams().getNetworkModesToIgnore();
-		if (this.noiseContext.getNoiseParams().getNetworkModesToIgnore().contains(event.getNetworkMode())) {
+		if (networkModesToIgnore.contains(event.getNetworkMode())) {
 			this.noiseContext.getIgnoredNetworkModeVehicleIDs().add(event.getVehicleId());
 		}
 	}

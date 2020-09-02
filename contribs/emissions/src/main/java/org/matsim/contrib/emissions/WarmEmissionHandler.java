@@ -183,6 +183,13 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				double arrivalTime = this.vehicleLeavesTraffic.get(vehicleId).getSecond();
 				double departureTime = this.vehicleEntersTraffic.get(vehicleId).getSecond();
 				travelTime = leaveTime - enterTime - departureTime + arrivalTime;
+
+				// now that we subtracted the time spent on the link outside of the vehicle
+				// we delete these events (so that when the link gets crossed once more
+				// the departure/arrival time are not wrongly taken into account)
+				// Thanks @markusstraub for providing this
+				this.vehicleLeavesTraffic.remove(vehicleId);
+				this.vehicleEntersTraffic.remove(vehicleId);
 			}
 
 			Vehicle vehicle = VehicleUtils.findVehicle( vehicleId, scenario );

@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,12 +15,13 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
  *
  */
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,8 +32,9 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -41,22 +43,22 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author jbischoff
  */
-public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDemandAggregator, PersonDepartureEventHandler {
+public final class PreviousIterationDRTDemandEstimator
+		implements ZonalDemandEstimator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
 	private final String drtSpeedUpMode;
 	private final int timeBinSize;
-	private final Map<Double, Map<String, MutableInt>> departures = new HashMap<>();
-	private final Map<Double, Map<String, MutableInt>> previousIterationDepartures = new HashMap<>();
-	private static final MutableInt ZERO =  new MutableInt(0);
+	private final Map<Double, Map<DrtZone, MutableInt>> departures = new HashMap<>();
+	private final Map<Double, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
+	private static final MutableInt ZERO = new MutableInt(0);
 
-	public PreviousIterationZonalDRTDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public PreviousIterationDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
-		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
-		events.addHandler(this);
+		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
 	@Override
@@ -72,13 +74,13 @@ public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDem
 		if (event.getLegMode().equals(mode) || event.getLegMode().equals(drtSpeedUpMode)) {
 			Double bin = getBinForTime(event.getTime());
 
-			String zoneId = zonalSystem.getZoneForLinkId(event.getLinkId());
-			if (zoneId == null) {
+			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
+			if (zone == null) {
 				Logger.getLogger(getClass()).error("No zone found for linkId " + event.getLinkId().toString());
 				return;
 			}
 			if (departures.containsKey(bin)) {
-				this.departures.get(bin).get(zoneId).increment();
+				this.departures.get(bin).get(zone).increment();
 			} else
 				Logger.getLogger(getClass())
 						.error("Time " + Time.writeTime(event.getTime()) + " / bin " + bin + " is out of boundary");
@@ -87,8 +89,8 @@ public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDem
 
 	private void prepareZones() {
 		for (int i = 0; i < (3600 / timeBinSize) * 36; i++) {
-			Map<String, MutableInt> zonesPerSlot = new HashMap<>();
-			for (String zone : zonalSystem.getZones().keySet()) {
+			Map<DrtZone, MutableInt> zonesPerSlot = new HashMap<>();
+			for (DrtZone zone : zonalSystem.getZones().values()) {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
 			departures.put((double)i, zonesPerSlot);
@@ -99,9 +101,10 @@ public final class PreviousIterationZonalDRTDemandAggregator implements ZonalDem
 		return Math.floor(time / timeBinSize);
 	}
 
-	public ToIntFunction<String> getExpectedDemandForTimeBin(double time) {
+	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
-		Map<String, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin, Collections.emptyMap());
-		return zoneId -> expectedDemandForTimeBin.getOrDefault(zoneId, ZERO).intValue();
+		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin,
+				Collections.emptyMap());
+		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
 	}
 }
