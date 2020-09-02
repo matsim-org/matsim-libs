@@ -25,9 +25,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.*;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.EqualVehicleDensityZonalDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByActivityEndsDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByPopulationShareDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.LinearRebalancingTargetCalculator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -79,8 +83,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 			case FleetSizeWeightedByActivityEnds:
 				bindModal(FleetSizeWeightedByActivityEndsDemandEstimator.class).toProvider(modalProvider(
 						getter -> new FleetSizeWeightedByActivityEndsDemandEstimator(
-								getter.getModal(DrtZonalSystem.class),
-								getter.getModal(FleetSpecification.class),
+								getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class),
 								drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(
 						modalKey(FleetSizeWeightedByActivityEndsDemandEstimator.class));
