@@ -20,49 +20,46 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.locationtech.jts.geom.Geometry;
+import java.util.Map;
+
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DrtZone {
 	private final String id;
-	private final Geometry geometry;
 	private final PreparedGeometry preparedGeometry;
-	private final Coord centroid;
+	private final Link targetLink;
+	private final Map<Id<Link>, Link> links;
 
-	public DrtZone(String id, PreparedGeometry preparedGeometry) {
-		this(id, preparedGeometry.getGeometry(), preparedGeometry,
-				MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()));
-	}
-
-	public DrtZone(String id, Geometry geometry) {
-		this(id, geometry, null, MGC.point2Coord(geometry.getCentroid()));
-	}
-
-	DrtZone(String id, Geometry geometry, PreparedGeometry preparedGeometry, Coord centroid) {
+	public DrtZone(String id, PreparedGeometry preparedGeometry, Link targetLink, Map<Id<Link>, Link> links) {
 		this.id = id;
-		this.geometry = geometry;
 		this.preparedGeometry = preparedGeometry;
-		this.centroid = centroid;
+		this.targetLink = targetLink;
+		this.links = links;
 	}
 
 	public String getId() {
 		return id;
 	}
 
-	public Geometry getGeometry() {
-		return geometry;
+	public PreparedGeometry getPreparedGeometry() {
+		return preparedGeometry;
+	}
+
+	public Link getTargetLink() {
+		return targetLink;
 	}
 
 	public Coord getCentroid() {
-		return centroid;
+		return targetLink.getCoord();
 	}
 
-	public PreparedGeometry getPreparedGeometry() {
-		return preparedGeometry;
+	public Map<Id<Link>, Link> getLinks() {
+		return links;
 	}
 }

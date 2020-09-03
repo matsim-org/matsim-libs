@@ -35,7 +35,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 /**
  * @author michalm
@@ -68,7 +67,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
 
 			DrtZone toZone = r.getMiddle();
-			Coord zoneCentroid = MGC.point2Coord(toZone.getGeometry().getCentroid());
+			Coord zoneCentroid = toZone.getCentroid();
 			Link destinationLink = NetworkUtils.getNearestLink(network, zoneCentroid);
 
 			int flow = r.getRight();
