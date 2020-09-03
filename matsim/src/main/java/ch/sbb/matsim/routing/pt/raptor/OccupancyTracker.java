@@ -12,8 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
-import org.locationtech.jts.awt.PointShapeFactory;
-import org.locationtech.jts.awt.PointShapeFactory.X;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -33,10 +32,9 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -52,6 +50,8 @@ import javax.inject.Inject;
  * @author mrieser / Simunto GmbH
  */
 public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+
+	private final static Logger LOG = Logger.getLogger(OccupancyTracker.class);
 
 	private final OccupancyData data;
 	private final Scenario scenario;
@@ -172,7 +172,11 @@ public class OccupancyTracker implements PersonDepartureEventHandler, AgentWaiti
 		double capacityScore = -this.inVehCostCalculator.getInVehicleCost(travelTime, margUtil_s, person, vehData.vehicle, null, iter);
 
 		double scoreDiff = capacityScore - defaultScore;
-		this.events.processEvent(new PersonScoreEvent(time, person.getId(), scoreDiff, "pt-occupancy"));
+		if (Double.isNaN(scoreDiff)) {
+			LOG.warn("Getting NaN as score: " + passengerData.person.getId() + " " + vehData.lineId + " " + vehData.routeId + " " + Time.writeTime(time) + " " + depTime + " " + travelTime + " " + defaultScore + " " + capacityScore);
+		} else {
+			this.events.processEvent(new PersonScoreEvent(time, person.getId(), scoreDiff, "pt-occupancy"));
+		}
 	}
 
 	public static class EffectiveRouteSegmentIterator implements RouteSegmentIterator {

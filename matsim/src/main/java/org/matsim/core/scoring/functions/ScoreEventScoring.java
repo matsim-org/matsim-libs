@@ -25,7 +25,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  */
 public final class ScoreEventScoring implements SumScoringFunction.ScoreScoring {
 
-	private double score;
+	private double score = 0.0;
 
 	@Override
 	public void addScore(final double amount) {
