@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWei
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByPopulationShareDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualRebalancableVehicleDistributionTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.LinearRebalancingTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -69,6 +70,14 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 										getter.getModal(ZonalDemandEstimator.class), strategyParams)))
 								.asEagerSingleton();
 						break;
+
+					case EqualRebalancableVehicleDistribution:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
+								getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
+										getter.getModal(ZonalDemandEstimator.class),
+										getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+						break;
+
 					default:
 						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
 								+ strategyParams.getZonalDemandEstimatorType());
