@@ -19,11 +19,12 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
 
@@ -48,9 +49,9 @@ public class DrtZonalSystem {
 	public static DrtZonalSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries) {
 
 		//geometries without links are skipped
-		Map<String, Map<Id<Link>, Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
+		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
 				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
-				.grouping(toMap(Link::getId, l -> l));
+				.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
 		Map<String, DrtZone> zones = EntryStream.of(linksByGeometryId).mapKeyValue((id, links) -> {
@@ -85,7 +86,7 @@ public class DrtZonalSystem {
 		this.zones = zones;
 		this.link2zone = zones.values()
 				.stream()
-				.flatMap(zone -> zone.getLinks().values().stream().map(link -> Pair.of(link.getId(), zone)))
+				.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
 				.collect(toMap(Pair::getKey, Pair::getValue));
 	}
 

@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocati
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.network.NetworkUtils;
 
 /**
  * @author michalm
@@ -70,7 +69,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
 
 			DrtZone toZone = r.getMiddle();
-			Link targetLink = targetLinkSelector.selectTargetLinkFor(toZone);
+			Link targetLink = targetLinkSelector.selectTargetLink(toZone);
 
 			int flow = r.getRight();
 			for (int f = 0; f < flow; f++) {

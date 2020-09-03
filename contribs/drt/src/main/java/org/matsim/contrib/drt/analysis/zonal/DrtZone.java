@@ -20,11 +20,10 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.Map;
+import java.util.List;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
@@ -34,9 +33,9 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 public class DrtZone {
 	private final String id;
 	private final PreparedGeometry preparedGeometry;
-	private final Map<Id<Link>, Link> links;
+	private final List<Link> links;
 
-	public DrtZone(String id, PreparedGeometry preparedGeometry, Map<Id<Link>, Link> links) {
+	public DrtZone(String id, PreparedGeometry preparedGeometry, List<Link> links) {
 		this.id = id;
 		this.preparedGeometry = preparedGeometry;
 		this.links = links;
@@ -50,11 +49,7 @@ public class DrtZone {
 		return preparedGeometry;
 	}
 
-	public Coord getCentroid() {
-		return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());
-	}
+	public Coord getCentroid() { return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());	}
 
-	public Map<Id<Link>, Link> getLinks() {
-		return links;
-	}
+	public List<Link> getLinks() { return links; }
 }

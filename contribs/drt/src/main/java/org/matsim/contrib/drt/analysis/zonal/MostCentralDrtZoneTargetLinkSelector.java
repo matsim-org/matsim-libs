@@ -20,32 +20,36 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author tschlenther
+ */
 public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
 
-	Map<DrtZone,Link> targetLinks = new HashMap<>();
+	private final Map<DrtZone,Link> targetLinks = new HashMap<>();
 
-	@Override
-	public Link selectTargetLinkFor(DrtZone zone) {
-		if(this.targetLinks.containsKey(zone)) return this.targetLinks.get(zone);
-
-		Double minDistance = Double.MAX_VALUE;
-		Link closestLink = null;
-		for(Link link : zone.getLinks().values()){
-			// vehicle will be standing at the toNode, this is why we use toNode rather than getCoord
-			double dist = NetworkUtils.getEuclideanDistance(zone.getCentroid(), link.getToNode().getCoord());
-			if(dist < minDistance){
-				minDistance = dist;
-				closestLink = link;
+	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem){
+		drtZonalSystem.getZones().values().stream().forEach(zone -> {
+			Double minDistance = Double.MAX_VALUE;
+			Link closestLink = null;
+			for(Link link : zone.getLinks()){
+				// vehicle will be standing at the toNode, this is why we use toNode rather than getCoord
+				double dist = NetworkUtils.getEuclideanDistance(zone.getCentroid(), link.getToNode().getCoord());
+				if(dist < minDistance){
+					minDistance = dist;
+					closestLink = link;
+				}
 			}
-		}
-		if(closestLink == null) throw new RuntimeException("could not determin most central link for zone " + zone);
-		this.targetLinks.put(zone, closestLink);
-		return closestLink;
+			Preconditions.checkNotNull(closestLink, "could not determine most central link for zone %s ", zone);
+			this.targetLinks.put(zone, closestLink);
+		});
 	}
+
+	@Override public Link selectTargetLink(DrtZone zone) { return this.targetLinks.get(zone); }
 }
