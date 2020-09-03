@@ -140,8 +140,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		//allow fallback to average table
 		weam.getEcg().setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-
-		// should be ok
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
 		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
@@ -152,6 +150,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	}
 
+	//using the different computation methods, the NOx warm Emissions are calculated for the diffrent trafic Situations (FF;HEAVY;SAT;SG)
 	@Test
 	public void testTrafficSituations() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
@@ -164,9 +163,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
 
-		// yy in the following, the stop-and-go-fraction tests are purely regression tests; I never checked if they are correct in the first place.
-		// kai, jan'20
-
 		double actualSpeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
@@ -178,7 +174,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals( 1360.1219512195123, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy this is not even close to the "averageSpeed" value, which is 200. kai, jan'20
 				break;
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[HEAVY_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
@@ -193,7 +188,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals( 3431.219512195123, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy the "averageSpeed" value is 2000.  kai, jan'20
 				break;
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
@@ -213,8 +207,9 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals(11715.609756097561, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy the "averageSpeed" value is 2000.  kai, jan'20
 				break;
+
+			//@KMT Why here the SAT Index has it something to do with the +5 addition to the actualSpeed variable?? If so it is a bit confusing
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 				break;
@@ -227,6 +222,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
 		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
+		//@KMT isn´t something missing here?
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				break;
