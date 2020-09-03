@@ -12,18 +12,11 @@ public class StringCollectionConverterTest {
 	@Test
 	public void test() {
 
-//		var expectedString = "{\"a\",\"value-a\",\"b\",\"value-b\"},";
-
-//		var expectedString = "{\"a\",\"a\"}";
-		var expectedString = "{\"a\"},{\"b\"}";
-
-
+		var expectedString = "[\"a\",\"b\"]";
 		var converter = new StringCollectionConverter();
-
 		Collection<String> convert = converter.convert(expectedString);
-
 		var serializedString = converter.convertToString(convert);
-
 		assertEquals(expectedString, serializedString);
+
 	}
 }
