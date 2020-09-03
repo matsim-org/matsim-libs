@@ -105,10 +105,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
         // Boden die Länge l_i eines Fahrstreifenteilstücks
         // maximal die Hälfte der Weglänge si von der Mitte
         // des Teilstücks zum Immissionsort betragen (li ≤ si / 2)"
-        double maxL = segment.midPoint().distance(nrpCoordinate) / 2;
-        if(maxL == 0) {
-            return 0;
-        }
+        double maxL = Math.max(1, segment.midPoint().distance(nrpCoordinate) / 2);
         if (length <= maxL) {
             final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment);
             correctionTemp += Math.pow(10, 0.1*sectionCorrection);
@@ -125,8 +122,8 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
             LineSegment central = new LineSegment(leftCoord, rightCoord);
 
-            final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, central);
-            correctionTemp += Math.pow(10, 0.1*sectionCorrection);
+            final double sectionCorrection = 10 * Math.log10(central.getLength()) - calculateCorrection(nrpCoordinate, central);
+            correctionTemp += Math.pow(10, 0.1 * sectionCorrection);
             correctionTemp += getSubSectionsCorrection(nrpCoordinate, leftRemaining);
             correctionTemp += getSubSectionsCorrection(nrpCoordinate, rightRemaining);
         }
@@ -135,10 +132,8 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
     private double calculateCorrection(Coordinate nrp, LineSegment segment) {
 
-        double distance = segment.midPoint().distance(nrp);
-        if (distance < MINIMUM_DISTANCE) {
-            distance = MINIMUM_DISTANCE;
-        }
+        double distance = Math.max(1, segment.midPoint().distance(nrp));
+
 
         double geometricDivergence = 20 * Math.log10(distance) + 10 * Math.log10(2 * Math.PI);
         double airDampeningFactor = distance / 200.;
