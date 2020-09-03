@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -34,6 +35,10 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 		implements RebalancingParams.RebalancingStrategyParams {
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
+	public enum RebalancingTargetCalculatorType {
+		LinearRebalancingTarget
+	}
+
 	public enum ZonalDemandEstimatorType {
 		PreviousIterationDemand, FleetSizeWeightedByActivityEnds, EqualVehicleDensity,
 		FleetSizeWeightedByPopulationShare
@@ -47,18 +52,29 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
 			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
+	public static final String REBALANCING_TARGET_CALCULATOR_TYPE = "rebalancingTargetCalculatorType";
+	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =
+			"Defines the calculator used for computing rebalancing targets per each zone"
+					+ " (i.e. number of the desired vehicles). Current default is LinearRebalancingTarget";
+
 	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandEstimatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation. Can be one of [PreviousIterationDemand, FleetSizeWeightedByActivityEnds, EqualVehicleDensity," +
-			" FleetSizeWeightedByPopulationShare] Current default is PreviousIterationDemand";
-
-	@PositiveOrZero
-	private double targetAlpha = Double.NaN;
-
-	@PositiveOrZero
-	private double targetBeta = Double.NaN;
+	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation."
+			+ " Can be one of [PreviousIterationDemand, FleetSizeWeightedByActivityEnds, EqualVehicleDensity,"
+			+ " FleetSizeWeightedByPopulationShare] Current default is PreviousIterationDemand";
 
 	@NotNull
-	private MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
+	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.LinearRebalancingTarget;
+
+	@Nullable
+	@PositiveOrZero
+	private Double targetAlpha = null;
+
+	@Nullable
+	@PositiveOrZero
+	private Double targetBeta = null;
+
+	@NotNull
+	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
 	public MinCostFlowRebalancingStrategyParams() {
 		super(SET_NAME);
@@ -82,7 +98,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_ALPHA_EXP}
 	 */
 	@StringGetter(TARGET_ALPHA)
-	public double getTargetAlpha() {
+	public Double getTargetAlpha() {
 		return targetAlpha;
 	}
 
@@ -98,7 +114,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_BETA_EXP}
 	 */
 	@StringGetter(TARGET_BETA)
-	public double getTargetBeta() {
+	public Double getTargetBeta() {
 		return targetBeta;
 	}
 
@@ -111,6 +127,22 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	/**
+	 * @return -- {@value #REBALANCING_TARGET_CALCULATOR_TYPE_EXP}
+	 */
+	@StringGetter(REBALANCING_TARGET_CALCULATOR_TYPE)
+	public RebalancingTargetCalculatorType getRebalancingTargetCalculatorType() {
+		return rebalancingTargetCalculatorType;
+	}
+
+	/**
+	 * @param calculatorType -- {@value #REBALANCING_TARGET_CALCULATOR_TYPE_EXP}
+	 */
+	@StringSetter(REBALANCING_TARGET_CALCULATOR_TYPE)
+	public void setRebalancingTargetCalculatorType(RebalancingTargetCalculatorType calculatorType) {
+		this.rebalancingTargetCalculatorType = calculatorType;
+	}
+
+	/**
 	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
 	 */
 	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
@@ -119,10 +151,10 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	/**
-	 * @param aggregatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 * @param estimatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
 	 */
 	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
-	public void setZonalDemandEstimatorType(ZonalDemandEstimatorType aggregatorType) {
-		this.zonalDemandEstimatorType = aggregatorType;
+	public void setZonalDemandEstimatorType(ZonalDemandEstimatorType estimatorType) {
+		this.zonalDemandEstimatorType = estimatorType;
 	}
 }

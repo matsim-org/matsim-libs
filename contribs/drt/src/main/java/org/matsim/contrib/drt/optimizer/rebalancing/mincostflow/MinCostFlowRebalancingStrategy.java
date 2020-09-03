@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,6 +32,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -42,9 +44,6 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
  * @author michalm
  */
 public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
-	public interface RebalancingTargetCalculator {
-		int estimate(DrtZone zone, double time);
-	}
 
 	private final RebalancingTargetCalculator rebalancingTargetCalculator;
 	private final DrtZonalSystem zonalSystem;
@@ -111,12 +110,13 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 		List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
 		List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
 
+		ToIntFunction<DrtZone> targetFunction = rebalancingTargetCalculator.calculate(time,
+				rebalancableVehiclesPerZone);
 		for (DrtZone z : zonalSystem.getZones().values()) {
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, Collections.emptyList()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, Collections.emptyList()).size();
-			int target = rebalancingTargetCalculator.estimate(z, time);
 
-			int delta = Math.min(rebalancable + soonIdle - target, rebalancable);
+			int delta = Math.min(rebalancable + soonIdle - targetFunction.applyAsInt(z), rebalancable);
 			if (delta < 0) {
 				demand.add(Pair.of(z, -delta));
 			} else if (delta > 0) {
