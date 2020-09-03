@@ -24,22 +24,27 @@ import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler,
-		DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
+public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
+		PassengerRequestRejectedEventHandler {
 	private static final Logger log = Logger.getLogger(FeedforwardSignalHandler.class);
 	private final DrtZonalSystem zonalSystem;
 
+	//1. TODO make int ZonalDemandEstimator (String mode)
 	private final Map<Double, Map<DrtZone, MutableInt>> zoneNetDepartureMap = new HashMap<>();
-	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> rebalancePlanCore = new HashMap<>();
 	private final Map<Id<Person>, Triple<Double, DrtZone, DrtZone>> potentialDRTTripsMap = new HashMap<>();
-	
+
+	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> rebalancePlanCore = new HashMap<>();
+
 	private final int timeBinSize;
-	
+
 	// temporary parameter (to be gotten from the parameter file) //TODO
 	private final int simulationEndTime = 30; // simulation ending time in hour
 
-	/** Constructor */
-	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem, FeedforwardRebalancingStrategyParams strategySpecificParams,
+	/**
+	 * Constructor
+	 */
+	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem,
+			FeedforwardRebalancingStrategyParams strategySpecificParams,
 			EventsManager events) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = strategySpecificParams.getTimeBinSize();
@@ -81,7 +86,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 
 	@Override
 	public void reset(int iteration) {
-		if (iteration > 0) { 
+		if (iteration > 0) {
 			calculateRebalancePlan(true);
 		} else {
 			calculateRebalancePlan(false);
@@ -120,10 +125,11 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 				rebalancePlanCore.put(timeBin, interZonalRelocations);
 				progressCounter += 1;
 				log.info("Calculating: "
-						+ Double.toString(progressCounter * timeBinSize / simulationEndTime / 36) + "% complete");
+						+ Double.toString(progressCounter * timeBinSize / simulationEndTime / 36)
+						+ "% complete");
 			}
 			log.info("Rebalance plan calculation is now complete! ");
-		} 
+		}
 	}
 
 	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {

@@ -92,9 +92,11 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		Set<DvrpVehicle> truelyRebalancableVehicles = new HashSet<>();
 
 		if (feedbackSwitch) {
+			//(comment) Feedback part is MinCostFlowRebalancingStrategy
+
 			List<Link> destinationLinks = new ArrayList<>();
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupRebalancableVehicles(rebalancableVehicles, time, generalParams.getMinServiceTime());
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
+					rebalancableVehicles, time, generalParams.getMinServiceTime());
 			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(
 					time, generalParams.getMaxTimeBeforeIdle(), generalParams.getMinServiceTime());
 			for (DrtZone zone : zonalSystem.getZones().values()) {
@@ -111,17 +113,19 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				} else if (surplus < 0) {
 					int deficit = -1 * surplus;
 					for (int i = 0; i < deficit; i++) {
-						Link destinationLink = NetworkUtils.getNearestLink(network, MGC.point2Coord(zone.getGeometry().getCentroid()));
+						Link destinationLink = NetworkUtils.getNearestLink(network,
+								MGC.point2Coord(zone.getGeometry().getCentroid()));
 						destinationLinks.add(destinationLink);
 					}
 				}
 			}
 
+			//2. TODO implement as MinCostRelocationCalculator
 			if (!truelyRebalancableVehicles.isEmpty()) {
 				for (Link link : destinationLinks) {
-					DvrpVehicle nearestVehicle = truelyRebalancableVehicles.stream().min(Comparator.comparing(
-							v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(),
-									link.getCoord())))
+					DvrpVehicle nearestVehicle = truelyRebalancableVehicles.stream()
+							.min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(
+									Schedules.getLastLinkInSchedule(v).getCoord(), link.getCoord())))
 							.get();
 					relocationList.add(new Relocation(nearestVehicle, link));
 					truelyRebalancableVehicles.remove(nearestVehicle);
