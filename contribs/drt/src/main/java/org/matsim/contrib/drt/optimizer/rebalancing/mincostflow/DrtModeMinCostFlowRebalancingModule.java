@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWei
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByPopulationShareDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.EqualRebalancableVehicleDistributionTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.LinearRebalancingTargetCalculator;
 import org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -52,7 +53,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 	@Override
 	public void install() {
 		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
-		
+
 		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
@@ -61,8 +62,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), params)))
-						.asEagerSingleton();
+								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
 
 				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case LinearRebalancingTarget:
@@ -71,15 +71,22 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 										getter.getModal(ZonalDemandEstimator.class), strategyParams)))
 								.asEagerSingleton();
 						break;
+
+					case EqualRebalancableVehicleDistribution:
+						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
+								getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
+										getter.getModal(ZonalDemandEstimator.class),
+										getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+						break;
+
 					default:
 						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
 								+ strategyParams.getZonalDemandEstimatorType());
 				}
 
-				bindModal(MinCostRelocationCalculator.class)
-						.toProvider(modalProvider(getter -> new AggregatedMinCostRelocationCalculator(
-								getter.getModal(DrtZonalSystem.class), getter.getModal(Network.class))))
-						.asEagerSingleton();
+				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
+						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(Network.class)))).asEagerSingleton();
 			}
 		});
 
