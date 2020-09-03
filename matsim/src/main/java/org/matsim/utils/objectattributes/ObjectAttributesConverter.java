@@ -26,10 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.utils.objectattributes.attributeconverters.*;
 import org.matsim.api.core.v01.Coord;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Object that converts arbitrary objects to and from strings based on the logic defined by {@AttributeConverter}s
@@ -57,6 +54,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(Long.class.getName(), new LongConverter());
 		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
 		this.converters.put(Map.class.getName(), new StringStringMapConverter());
+		this.converters.put(Collection.class.getName(), new StringCollectionConverter());
 		this.converters.put(Coord.class.getName(), new CoordConverter());
 		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 	}
