@@ -74,6 +74,8 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			}
 		})).asEagerSingleton();
 
+		bindModal(DrtZoneTargetLinkSelector.class).to(MostCentralDrtZoneTargetLinkSelector.class).asEagerSingleton();
+
 		//zonal analysis
 		bindModal(ZonalIdleVehicleXYVisualiser.class).
 				toProvider(modalProvider(

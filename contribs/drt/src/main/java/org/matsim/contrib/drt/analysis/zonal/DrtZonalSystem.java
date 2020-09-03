@@ -41,17 +41,11 @@ import one.util.streamex.StreamEx;
 /**
  * @author jbischoff
  * @author Michal Maciejewski (michalm)
+ * @author Tilmann Schlenther (tschlenther)
  */
 public class DrtZonalSystem {
 
-	public static DrtZonalSystem createFromPreparedGeometries(Network network,
-			Map<String, PreparedGeometry> geometries) {
-		//FIXME implement a search of the link closest to the centroid
-		return createFromPreparedGeometries(network, geometries, (geometry, links) -> links.values().iterator().next());
-	}
-
-	public static DrtZonalSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries,
-			BiFunction<PreparedGeometry, Map<Id<Link>, Link>, Link> targetLinkSelector) {
+	public static DrtZonalSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries) {
 
 		//geometries without links are skipped
 		Map<String, Map<Id<Link>, Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
@@ -61,7 +55,7 @@ public class DrtZonalSystem {
 		//the zonal system contains only zones that have at least one link
 		Map<String, DrtZone> zones = EntryStream.of(linksByGeometryId).mapKeyValue((id, links) -> {
 			PreparedGeometry geometry = geometries.get(id);
-			return new DrtZone(id, geometry, targetLinkSelector.apply(geometry, links), links);
+			return new DrtZone(id, geometry, links);
 		}).collect(toMap(DrtZone::getId, z -> z));
 
 		return new DrtZonalSystem(zones);

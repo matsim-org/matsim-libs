@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -42,10 +43,12 @@ import org.matsim.core.network.NetworkUtils;
 public class AggregatedMinCostRelocationCalculator implements MinCostRelocationCalculator {
 	private final DrtZonalSystem zonalSystem;
 	private final Network network;
+	private final DrtZoneTargetLinkSelector targetLinkSelector;
 
-	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem, Network network) {
+	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem, Network network, DrtZoneTargetLinkSelector targetLinkSelector) {
 		this.zonalSystem = zonalSystem;
 		this.network = network;
+		this.targetLinkSelector = targetLinkSelector;
 	}
 
 	@Override
@@ -67,14 +70,13 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
 
 			DrtZone toZone = r.getMiddle();
-			Coord zoneCentroid = toZone.getCentroid();
-			Link destinationLink = NetworkUtils.getNearestLink(network, zoneCentroid);
+			Link targetLink = targetLinkSelector.selectTargetLinkFor(toZone);
 
 			int flow = r.getRight();
 			for (int f = 0; f < flow; f++) {
 				// TODO use BestDispatchFinder (needs to be moved from taxi to dvrp) instead
-				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, destinationLink);
-				relocations.add(new Relocation(nearestVehicle, destinationLink));
+				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, targetLink);
+				relocations.add(new Relocation(nearestVehicle, targetLink));
 				rebalancableVehicles.remove(nearestVehicle);// TODO use map to have O(1) removal
 			}
 		}

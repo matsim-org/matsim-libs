@@ -1,9 +1,10 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,46 +16,23 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.Map;
-
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.gbl.MatsimRandom;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
-public class DrtZone {
-	private final String id;
-	private final PreparedGeometry preparedGeometry;
-	private final Map<Id<Link>, Link> links;
+import java.util.ArrayList;
+import java.util.Random;
 
-	public DrtZone(String id, PreparedGeometry preparedGeometry, Map<Id<Link>, Link> links) {
-		this.id = id;
-		this.preparedGeometry = preparedGeometry;
-		this.links = links;
+public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
+
+	private final Random random = MatsimRandom.getLocalInstance();
+
+	@Override
+	public Link selectTargetLinkFor(DrtZone zone) {
+		return new ArrayList<>(zone.getLinks().values()).get(random.nextInt(zone.getLinks().size()));
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public PreparedGeometry getPreparedGeometry() {
-		return preparedGeometry;
-	}
-
-	public Coord getCentroid() {
-		return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());
-	}
-
-	public Map<Id<Link>, Link> getLinks() {
-		return links;
-	}
 }
