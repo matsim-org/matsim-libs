@@ -20,36 +20,32 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import com.google.common.base.Preconditions;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.NetworkUtils;
+import static java.util.stream.Collectors.toMap;
+import static org.matsim.contrib.util.distance.DistanceUtils.calculateSquaredDistance;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.network.Link;
+
+import one.util.streamex.StreamEx;
 
 /**
  * @author tschlenther
  */
-public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
+public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
+	private final Map<DrtZone, Link> targetLinks;
 
-	private final Map<DrtZone,Link> targetLinks = new HashMap<>();
-
-	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem){
-		drtZonalSystem.getZones().values().stream().forEach(zone -> {
-			Double minDistance = Double.MAX_VALUE;
-			Link closestLink = null;
-			for(Link link : zone.getLinks()){
-				// vehicle will be standing at the toNode, this is why we use toNode rather than getCoord
-				double dist = NetworkUtils.getEuclideanDistance(zone.getCentroid(), link.getToNode().getCoord());
-				if(dist < minDistance){
-					minDistance = dist;
-					closestLink = link;
-				}
-			}
-			Preconditions.checkNotNull(closestLink, "could not determine most central link for zone %s ", zone);
-			this.targetLinks.put(zone, closestLink);
-		});
+	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem) {
+		targetLinks = drtZonalSystem.getZones()
+				.values()
+				.stream()
+				.collect(toMap(zone -> zone, zone -> StreamEx.of(zone.getLinks())
+						.minByDouble(link -> calculateSquaredDistance(zone.getCentroid(), link.getToNode().getCoord()))
+						.orElseThrow()));
 	}
 
-	@Override public Link selectTargetLink(DrtZone zone) { return this.targetLinks.get(zone); }
+	@Override
+	public Link selectTargetLink(DrtZone zone) {
+		return this.targetLinks.get(zone);
+	}
 }
