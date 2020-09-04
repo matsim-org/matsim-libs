@@ -178,21 +178,10 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			}
 		}
 		
-		
 		CarrierVehicle getVehicle() {
 			return scheduledTour.getVehicle();
 		}
 
-//		TourElement getPlannedTourElement(int elementIndex){
-//			int index = elementIndex-1;
-//			int elementsSize = scheduledTour.getTour().getTourElements().size();
-//			if(index < 0) return scheduledTour.getTour().getStart();
-//			else if(index == elementsSize) return scheduledTour.getTour().getEnd();
-//			else if(index < elementsSize){
-//				return scheduledTour.getTour().getTourElements().get(index);
-//			}
-//			else throw new IllegalStateException("index out of bounds");
-//		}
 	}
 
 	private final Id<Carrier> id;
@@ -206,8 +195,6 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 	private int nextId = 0;
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
-
-//	private final Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 
@@ -235,7 +222,6 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 		System.out.flush();
 		System.err.flush() ;
 		List<Plan> routes = new ArrayList<>();
-		//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
 		}
@@ -272,14 +258,9 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-//			MobSimVehicleRoute mobsimRoute;
-//			MobSimVehicleRoute abc = new MobSimVehicleRoute();
-//			abc.plan = plan;
 			FreightControlerUtils.putVehicle( plan, vehicle );
 			routes.add(plan);
-			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
-//			driverTourMap.put(driverId, scheduledTour);
 		}
 		return routes;
 	}
@@ -290,7 +271,6 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 
 	private void clear() {
 		carrierDriverAgents.clear();
-//		driverTourMap.clear();
 		driverIds.clear();
 		nextId = 0;
 	}

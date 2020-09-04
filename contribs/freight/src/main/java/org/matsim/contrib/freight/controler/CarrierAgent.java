@@ -197,8 +197,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-//	private final Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
-
 	private final ScoringFunction scoringFunction;
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
@@ -229,7 +227,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		System.out.flush();
 		System.err.flush() ;
 		List<Plan> routes = new ArrayList<>();
-		//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
 			return routes;
 		}
@@ -267,14 +264,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-//			MobSimVehicleRoute mobsimRoute;
-//			MobSimVehicleRoute abc = new MobSimVehicleRoute();
-//			abc.plan = plan;
 			FreightControlerUtils.putVehicle( plan, vehicle );
 			routes.add(plan);
-			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
-//			driverTourMap.put(driverId, scheduledTour);
 		}
 		return routes;
 	}
@@ -287,7 +279,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private void clear() {
 		carrierDriverAgents.clear();
-//		driverTourMap.clear();
 		driverIds.clear();
 		nextId = 0;
 	}
