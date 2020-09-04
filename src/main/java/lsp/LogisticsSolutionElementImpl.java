@@ -71,7 +71,7 @@ import lsp.controler.LSPSimulationTracker;
 
 	@Override
 	public void schedulingOfResourceCompleted() {
-		for(ShipmentTuple tuple : outgoingShipments.getSortedShipments()){
+		for( ShipmentWithTime tuple : outgoingShipments.getSortedShipments()){
 			nextElement.getIncomingShipments().addShipment(tuple.getTime(), tuple.getShipment());
 		}
 	}

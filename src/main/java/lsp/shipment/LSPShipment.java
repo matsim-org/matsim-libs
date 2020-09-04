@@ -29,18 +29,18 @@ public interface LSPShipment {
 	
 	public int getCapacityDemand();
 	
-	public double getServiceTime();
+	public double getServiceDuration();
 	
 	public Collection<EventHandler> getEventHandlers();
 	
 	public Collection<Requirement> getRequirements();
 	
-	public Collection<UtilityFunction> getUtilityFunctions();
+//	public Collection<UtilityFunction> getUtilityFunctions();
 	
 	public Collection<LSPInfo> getInfos();
 	
 	public Id<LogisticsSolution> getSolutionId();
 	
-	public void setSolutionId(Id<LogisticsSolution> Id);
+//	public void setSolutionId(Id<LogisticsSolution> Id);
 	
 }

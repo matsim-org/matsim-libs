@@ -14,19 +14,19 @@ import lsp.functions.LSPInfo;
 
 /* package-private */ class LSPShipmentImpl implements LSPShipment {
 
-	private Id<LSPShipment> id;
-	private Id<Link> fromLinkId;
-	private Id<Link> toLinkId;
-	private TimeWindow startTimeWindow;
-	private TimeWindow endTimeWindow;
-	private int capacityDemand;
-	private double serviceTime;
-	private ShipmentPlan schedule;
-	private ShipmentPlan log;
-	private ArrayList<EventHandler> eventHandlers;
-	private ArrayList<Requirement> requirements;
-	private ArrayList<UtilityFunction> utilityFunctions;
-	private ArrayList<LSPInfo> infos;
+	private final Id<LSPShipment> id;
+	private final Id<Link> fromLinkId;
+	private final Id<Link> toLinkId;
+	private final TimeWindow startTimeWindow;
+	private final TimeWindow endTimeWindow;
+	private final int capacityDemand;
+	private final double serviceTime;
+	private final ShipmentPlan schedule;
+	private final ShipmentPlan log;
+	private final ArrayList<EventHandler> eventHandlers;
+	private final ArrayList<Requirement> requirements;
+//	private final ArrayList<UtilityFunction> utilityFunctions;
+	private final ArrayList<LSPInfo> infos;
 	private Id<LogisticsSolution> solutionId;
 
 	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
@@ -41,17 +41,13 @@ import lsp.functions.LSPInfo;
 		this.log = new Log(this);
 		this.eventHandlers = new ArrayList<>();
 		this.requirements = new ArrayList<>();
-		for(Requirement requirement : builder.getRequirements()) {
-			this.requirements.add(requirement);
-		}
-		this.utilityFunctions = new ArrayList<>();
-		for(UtilityFunction utilityFunction : builder.getUtilityFunctions()) {
-			this.utilityFunctions.add(utilityFunction);
-		}
+		this.requirements.addAll( builder.getRequirements() );
+//		this.utilityFunctions = new ArrayList<>();
+//		for(UtilityFunction utilityFunction : builder.getUtilityFunctions()) {
+//			this.utilityFunctions.add(utilityFunction);
+//		}
 		this.infos = new ArrayList<>();
-		for(LSPInfo info : builder.getInfos()) {
-			this.infos.add(info);
-		}
+		this.infos.addAll( builder.getInfos() );
 	}
 	
 	
@@ -96,7 +92,7 @@ import lsp.functions.LSPInfo;
 	}
 
 	@Override
-	public double getServiceTime() {
+	public double getServiceDuration() {
 		return serviceTime;
 	}
 
@@ -112,10 +108,10 @@ import lsp.functions.LSPInfo;
 	}
 
 
-	@Override
-	public Collection<UtilityFunction> getUtilityFunctions() {
-		return utilityFunctions;
-	}
+//	@Override
+//	public Collection<UtilityFunction> getUtilityFunctions() {
+//		return utilityFunctions;
+//	}
 
 
 	@Override
@@ -124,14 +120,14 @@ import lsp.functions.LSPInfo;
 	}
 
 
-	public Id<LogisticsSolution> getSolutionId() {
+	@Override public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
 	}
 
 
-	public void setSolutionId(Id<LogisticsSolution> solutionId) {
-		this.solutionId = solutionId;
-	}
+//	@Override public void setSolutionId( Id<LogisticsSolution> solutionId ) {
+//		this.solutionId = solutionId;
+//	}
 
 	
 	

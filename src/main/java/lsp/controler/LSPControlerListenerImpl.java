@@ -40,7 +40,7 @@ import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
 
 
-public class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
 ReplanningListener, IterationEndsListener, IterationStartsListener{
 
 	

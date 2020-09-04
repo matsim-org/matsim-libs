@@ -12,6 +12,5 @@ public interface LSPSimulationTracker extends AfterMobsimListener {
 
 	public Collection<EventHandler> getEventHandlers();
 	public Collection<LSPInfo> getInfos();
-	public void notifyAfterMobsim(AfterMobsimEvent event);
 	public void reset();
 }

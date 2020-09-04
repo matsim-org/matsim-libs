@@ -374,7 +374,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			LogisticsSolutionElement element = entry.getValue().element;
 			assertTrue(service.getLocationLinkId() == shipment.getFromLinkId());
 			assertTrue(service.getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(service.getServiceDuration() == shipment.getServiceTime());
+			assertTrue(service.getServiceDuration() == shipment.getServiceDuration() );
 			boolean handledByReloadingPoint = false;
 			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
 				if(clientElement == element) {
@@ -400,7 +400,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			LogisticsSolutionElement element = entry.getValue().element;
 			assertTrue(service.getLocationLinkId() == toLinkId);
 			assertTrue(service.getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(service.getServiceDuration() == shipment.getServiceTime());
+			assertTrue(service.getServiceDuration() == shipment.getServiceDuration() );
 			boolean handledByReloadingPoint = false;
 			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
 				if(clientElement == element) {
@@ -425,7 +425,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			CollectionTourEndEventHandler collectionEndHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
 			assertTrue(collectionEndHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
 			assertTrue(collectionEndHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(collectionEndHandler.getCarrierService().getServiceDuration() == shipment.getServiceTime());
+			assertTrue(collectionEndHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
 			assertTrue(collectionEndHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
 			assertTrue(collectionEndHandler.getElement() == planElements.get(0).getSolutionElement());
 			assertTrue(collectionEndHandler.getElement() == planElements.get(1).getSolutionElement());
@@ -441,7 +441,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			CollectionServiceEndEventHandler collectionServiceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
 			assertTrue(collectionServiceHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
 			assertTrue(collectionServiceHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(collectionServiceHandler.getCarrierService().getServiceDuration() == shipment.getServiceTime());
+			assertTrue(collectionServiceHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
 			assertTrue(collectionServiceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
 			assertTrue(collectionServiceHandler.getElement() == planElements.get(0).getSolutionElement());
 			assertTrue(collectionServiceHandler.getElement() == planElements.get(1).getSolutionElement());
@@ -456,7 +456,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(eventHandlers.get(2) instanceof MainRunTourStartEventHandler);
 			MainRunTourStartEventHandler mainRunStartHandler = (MainRunTourStartEventHandler) eventHandlers.get(2);
 			assertTrue(mainRunStartHandler.getCarrierService().getLocationLinkId() == toLinkId);
-			assertTrue(mainRunStartHandler.getCarrierService().getServiceDuration() == shipment.getServiceTime());
+			assertTrue(mainRunStartHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
 			assertTrue(mainRunStartHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
 			assertTrue(mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
 			assertTrue(mainRunStartHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);
@@ -473,7 +473,7 @@ public class MultipleShipmentsSecondReloadLSPSchedulingTest {
 			assertTrue(eventHandlers.get(3) instanceof MainRunTourEndEventHandler);
 			MainRunTourEndEventHandler mainRunEndHandler = (MainRunTourEndEventHandler) eventHandlers.get(3);
 			assertTrue(mainRunEndHandler.getCarrierService().getLocationLinkId() == toLinkId);
-			assertTrue(mainRunEndHandler.getCarrierService().getServiceDuration() == shipment.getServiceTime());
+			assertTrue(mainRunEndHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
 			assertTrue(mainRunEndHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
 			assertTrue(mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getStart() == 0);
 			assertTrue(mainRunEndHandler.getCarrierService().getServiceStartTimeWindow().getEnd() == Integer.MAX_VALUE);

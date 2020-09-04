@@ -1,6 +1,7 @@
 package lsp.controler;
 
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import lsp.LSPs;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import lsp.replanning.LSPReplanningModule;
@@ -15,12 +16,12 @@ import java.util.Collection;
 public class LSPModule extends AbstractModule {
 
 	
-	private LSPs lsps;
-	private LSPReplanningModule replanningModule;
-	private LSPScoringModule scoringModule;
-	private Collection<LSPEventCreator> creators;
+	private final LSPs lsps;
+	private final LSPReplanningModule replanningModule;
+	private final LSPScoringModule scoringModule;
+	private final Collection<LSPEventCreator> creators;
 	
-	private FreightConfigGroup carrierConfig = new FreightConfigGroup();
+	private final FreightConfigGroup carrierConfig = new FreightConfigGroup();
 	
 	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators) {
 	   this.lsps = lsps;
@@ -41,7 +42,7 @@ public class LSPModule extends AbstractModule {
 			 bind(LSPScoringModule.class).toInstance(scoringModule);
 		}
 		
-		bind( LSPControlerListenerImpl.class ).asEagerSingleton();
+		bind( LSPControlerListenerImpl.class ).in( Singleton.class );
 		addControlerListenerBinding().to( LSPControlerListenerImpl.class );
 		bindMobsim().toProvider( LSPQSimFactory.class );
 	}

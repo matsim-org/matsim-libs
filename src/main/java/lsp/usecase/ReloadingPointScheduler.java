@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import lsp.LogisticsSolutionElement;
-import lsp.ShipmentTuple;
+import lsp.ShipmentWithTime;
 import lsp.resources.LSPResource;
 import lsp.resources.LSPResourceScheduler;
 import lsp.shipment.ShipmentPlanElement;
@@ -22,37 +22,37 @@ import lsp.shipment.ShipmentPlanElement;
 	private ReloadingPointTourEndEventHandler eventHandler;
 
 	ReloadingPointScheduler(UsecaseUtils.ReloadingPointSchedulerBuilder builder){
-		this.shipments = new ArrayList<ShipmentTuple>();
+		this.shipments = new ArrayList<ShipmentWithTime>();
 		this.capacityNeedLinear = builder.getCapacityNeedLinear();
 		this.capacityNeedFixed = builder.getCapacityNeedFixed();
 
 	}
 	
-	protected void initializeValues(LSPResource resource) {
+	@Override protected void initializeValues( LSPResource resource ) {
 		if(resource.getClass() == ReloadingPoint.class){
 			this.reloadingPoint = (ReloadingPoint) resource;
 		}
 	}
 	
-	protected void scheduleResource() {
-		for(ShipmentTuple tupleToBeAssigned: shipments){
+	@Override protected void scheduleResource() {
+		for( ShipmentWithTime tupleToBeAssigned: shipments){
 			handleWaitingShipment(tupleToBeAssigned);
 		}
 	}
 
-	@Deprecated //TODO Method has no content, KMT Jul'20
+	@Override @Deprecated //TODO Method has no content, KMT Jul'20
 	protected void updateShipments() {
 		log.error("This method is not implemented. Nothing will happen here. ");
 	}
 	
 	
 	
-	private void handleWaitingShipment(ShipmentTuple tupleToBeAssigned){
+	private void handleWaitingShipment( ShipmentWithTime tupleToBeAssigned ){
 		updateSchedule(tupleToBeAssigned);
 		addShipmentToEventHandler(tupleToBeAssigned);
 	}
 	
-	private void updateSchedule(ShipmentTuple tuple){
+	private void updateSchedule( ShipmentWithTime tuple ){
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
 		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getCapacityDemand());
@@ -69,7 +69,7 @@ import lsp.shipment.ShipmentPlanElement;
 		tuple.getShipment().getSchedule().addPlanElement(id, handle);
 	}
 	
-	private void addShipmentToEventHandler(ShipmentTuple tuple){
+	private void addShipmentToEventHandler( ShipmentWithTime tuple ){
 		for(LogisticsSolutionElement element : reloadingPoint.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				eventHandler.addShipment(tuple.getShipment(), element);

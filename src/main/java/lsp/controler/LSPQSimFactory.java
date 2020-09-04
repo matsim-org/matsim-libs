@@ -45,8 +45,8 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import javax.inject.Inject;
 import java.util.Collection;
 
-@Deprecated public // replace by something that just adds the necessary elements to the default mobsim, rather than replacing the mobsim.  kai/kai, jun'20
-class LSPQSimFactory implements Provider<Mobsim> {
+@Deprecated // replace by something that just adds the necessary elements to the default mobsim, rather than replacing the mobsim.  kai/kai, jun'20
+public class LSPQSimFactory implements Provider<Mobsim> {
 	private static final Logger log = Logger.getLogger( LSPQSimFactory.class ) ;
 
 	private final Scenario scenario;
