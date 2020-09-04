@@ -66,7 +66,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class ZonalDemandEstimatorWithoutServiceAreaTest {
 
 	//TODO write test with service area !!
-	// (with an service are, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
+	// (with an service area, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -74,12 +74,12 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void EqualVehicleDensityZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
+		for (double ii = 0; ii < 16 * 3600; ii += 1800) { //1800 is the rebalancing interval width
 			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 1);
@@ -103,7 +103,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void EqualVehicleDensityZonalDemandEstimatorFleetModificationTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "", false);
 		// double number of vehicles after 0th iteration -> estimation of demand should double too
 		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
@@ -135,7 +135,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void PreviousIterationZonalDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -157,7 +157,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void PreviousIterationZonalDemandEstimatorWithSpeedUpModeTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "drt_teleportation");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "drt_teleportation", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -179,7 +179,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByActivityEndsDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -201,7 +201,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByPopulationShareDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
@@ -223,7 +223,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByPopulationShareDemandEstimatorFleetModificationTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "");
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "", false);
 		// double number of vehicles after 0th iteration -> estimation of demand should double too (besides rounding issues)
 		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
@@ -253,7 +253,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	}
 
 	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType estimatorType,
-			String drtSpeedUpModeForRebalancingConfiguration) {
+									 String drtSpeedUpModeForRebalancingConfiguration, boolean useServiceArea) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -261,6 +261,12 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		drtCfg.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfiguration);
+
+		if(useServiceArea){
+			throw new IllegalArgumentException("about to get implemented...");
+//			drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+//			drtCfg.setDrtServiceAreaShapeFile("");
+		}
 
 		MinCostFlowRebalancingStrategyParams rebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
 		rebalancingStrategyParams.setTargetAlpha(1);

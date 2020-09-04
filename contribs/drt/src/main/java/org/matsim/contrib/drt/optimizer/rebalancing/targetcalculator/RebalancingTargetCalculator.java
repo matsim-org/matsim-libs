@@ -18,38 +18,18 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.ToIntFunction;
 
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DrtZone {
-	private final String id;
-	private final PreparedGeometry preparedGeometry;
-	private final List<Link> links;
-
-	public DrtZone(String id, PreparedGeometry preparedGeometry, List<Link> links) {
-		this.id = id;
-		this.preparedGeometry = preparedGeometry;
-		this.links = links;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public PreparedGeometry getPreparedGeometry() {
-		return preparedGeometry;
-	}
-
-	public Coord getCentroid() { return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());	}
-
-	public List<Link> getLinks() { return links; }
+public interface RebalancingTargetCalculator {
+	ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }
