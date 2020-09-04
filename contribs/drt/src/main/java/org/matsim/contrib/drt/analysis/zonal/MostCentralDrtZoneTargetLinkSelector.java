@@ -1,9 +1,10 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,41 +16,36 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.List;
+import static java.util.stream.Collectors.toMap;
+import static org.matsim.contrib.util.distance.DistanceUtils.calculateSquaredDistance;
 
-import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.matsim.api.core.v01.Coord;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.geotools.MGC;
+
+import one.util.streamex.StreamEx;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author tschlenther
  */
-public class DrtZone {
-	private final String id;
-	private final PreparedGeometry preparedGeometry;
-	private final List<Link> links;
+public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
+	private final Map<DrtZone, Link> targetLinks;
 
-	public DrtZone(String id, PreparedGeometry preparedGeometry, List<Link> links) {
-		this.id = id;
-		this.preparedGeometry = preparedGeometry;
-		this.links = links;
+	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem) {
+		targetLinks = drtZonalSystem.getZones()
+				.values()
+				.stream()
+				.collect(toMap(zone -> zone, zone -> StreamEx.of(zone.getLinks())
+						.minByDouble(link -> calculateSquaredDistance(zone.getCentroid(), link.getToNode().getCoord()))
+						.orElseThrow()));
 	}
 
-	public String getId() {
-		return id;
+	@Override
+	public Link selectTargetLink(DrtZone zone) {
+		return this.targetLinks.get(zone);
 	}
-
-	public PreparedGeometry getPreparedGeometry() {
-		return preparedGeometry;
-	}
-
-	public Coord getCentroid() { return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());	}
-
-	public List<Link> getLinks() { return links; }
 }

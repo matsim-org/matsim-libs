@@ -49,7 +49,7 @@ public final class EqualVehicleDensityZonalDemandEstimator implements ZonalDeman
 	private final FleetSpecification fleetSpecification;
 
 	public EqualVehicleDensityZonalDemandEstimator(@NotNull DrtZonalSystem zonalSystem,
-												   @NotNull FleetSpecification fleetSpecification) {
+			@NotNull FleetSpecification fleetSpecification) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
 	}
@@ -62,10 +62,14 @@ public final class EqualVehicleDensityZonalDemandEstimator implements ZonalDeman
 	}
 
 	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
-		double areaSum = zonalSystem.getZones().values().stream().mapToDouble(z -> z.getGeometry().getArea()).sum();
+		double areaSum = zonalSystem.getZones()
+				.values()
+				.stream()
+				.mapToDouble(z -> z.getPreparedGeometry().getGeometry().getArea())
+				.sum();
 
 		for (DrtZone zone : zonalSystem.getZones().values()) {
-			double areaShare = zone.getGeometry().getArea() / areaSum;
+			double areaShare = zone.getPreparedGeometry().getGeometry().getArea() / areaSum;
 			Preconditions.checkState(areaShare >= 0. && areaShare <= 1.);
 			zoneAreaShares.put(zone, areaShare);
 		}
