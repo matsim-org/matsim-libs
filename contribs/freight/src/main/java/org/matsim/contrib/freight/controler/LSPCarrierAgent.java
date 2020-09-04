@@ -85,7 +85,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			if (currentRoute.size() > 1) {
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
 				networkRoute.setTravelTime(travelTime);
-				networkRoute.setVehicleId(getVehicle().getVehicleId());
+				networkRoute.setVehicleId(getVehicle().getId() );
 				currentLeg.setRoute(networkRoute);
 				currentRoute = null;
 			} else {
@@ -187,16 +187,16 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			return scheduledTour.getVehicle();
 		}
 
-		TourElement getPlannedTourElement(int elementIndex){
-			int index = elementIndex-1;
-			int elementsSize = scheduledTour.getTour().getTourElements().size();
-			if(index < 0) return scheduledTour.getTour().getStart();
-			else if(index == elementsSize) return scheduledTour.getTour().getEnd();
-			else if(index < elementsSize){
-				return scheduledTour.getTour().getTourElements().get(index);
-			}
-			else throw new IllegalStateException("index out of bounds");
-		}
+//		TourElement getPlannedTourElement(int elementIndex){
+//			int index = elementIndex-1;
+//			int elementsSize = scheduledTour.getTour().getTourElements().size();
+//			if(index < 0) return scheduledTour.getTour().getStart();
+//			else if(index == elementsSize) return scheduledTour.getTour().getEnd();
+//			else if(index < elementsSize){
+//				return scheduledTour.getTour().getTourElements().get(index);
+//			}
+//			else throw new IllegalStateException("index out of bounds");
+//		}
 	}
 
 	private final Id<Carrier> id;
@@ -315,7 +315,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 		return id;
 	}
 
-	public void notifyEventHappened(Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter) {
+	private void notifyEventHappened(Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter) {
 		tracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);
 	}
 	 
