@@ -50,10 +50,23 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * This keeps track of the carrier during simulation.
+ *
+ * @author mzilske, sschroeder
+ *
+ */
 class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, LinkLeaveEventHandler,
 							VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, VehicleEntersTrafficEventHandler, PersonLeavesVehicleEventHandler {
 
-	
+	/**
+	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
+	 *
+	 * <p>In addition, the driver knows which planElement is associated to a shipment and service, respectively.
+	 *
+	 * @author mzilske, sschroeder
+	 *
+	 */
 	class CarrierDriverAgent {
 
 		private Leg currentLeg;
@@ -79,7 +92,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			double travelTime = currentLeg.getDepartureTime().seconds() + currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
-				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
+				NetworkRoute networkRoute = RouteUtils.createNetworkRoute( currentRoute );
 				networkRoute.setTravelTime(travelTime);
 				networkRoute.setVehicleId(getVehicle().getId() );
 				currentLeg.setRoute(networkRoute);
@@ -141,8 +154,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			else{
 				TourActivity tourActivity = getTourActivity();
 				assert activity.getLinkId().toString().equals(tourActivity.getLocation().toString()) : "linkId of activity is not equal to linkId of tourActivity. This must not be.";
-				FreightActivity freightActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
-				currentActivity = freightActivity;
+				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
 				activityStarted(event);
 			}
 		}
@@ -280,8 +292,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		Person person = PopulationUtils.getFactory().createPerson(driverId);
-		return person;
+		return PopulationUtils.getFactory().createPerson(driverId );
 	}
 
 	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {

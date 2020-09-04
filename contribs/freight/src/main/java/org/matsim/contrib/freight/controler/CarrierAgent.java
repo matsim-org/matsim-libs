@@ -72,7 +72,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private final ScheduledTour scheduledTour;
 
-		private int activityCounter = 1;
+		private int activityCounter = 0;
 
 		private CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
 			this.driverId = driverId;
@@ -86,7 +86,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					+ currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
 			if (currentRoute.size() > 1) {
-				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
+				NetworkRoute networkRoute = RouteUtils.createNetworkRoute( currentRoute );
 				networkRoute.setTravelTime(travelTime);
 				networkRoute.setVehicleId(getVehicle().getId() );
 				currentLeg.setRoute(networkRoute);
@@ -110,7 +110,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Leg leg = PopulationUtils.createLeg(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
-			currentRoute = new ArrayList<Id<Link>>();
+			currentRoute = new ArrayList<>();
 		}
 
 		private void handleEvent( LinkEnterEvent event ) {
@@ -145,13 +145,16 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				TourActivity tourActivity = getTourActivity();
 				if (!activity.getLinkId().toString().equals(tourActivity.getLocation().toString()))
 					throw new AssertionError("linkId of activity is not equal to linkId of tourActivity. This must not be.");
-				FreightActivity freightActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
-				currentActivity = freightActivity; 
+				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow()); 
 			}
 		}
 
 		private void activityFinished(String activityType, double time) {
-			if(FreightConstants.START.equals(activityType) || FreightConstants.END.equals(activityType)) return;
+			if(FreightConstants.START.equals(activityType) ) {
+				activityCounter += 1;
+				return;
+			}
+			if( FreightConstants.END.equals(activityType)) return;
 			Tour tour = this.scheduledTour.getTour();
 			if (FreightConstants.PICKUP.equals(activityType)) {
 				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
@@ -288,9 +291,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Person createDriverPerson(Id<Person> driverId) {
-		final Id<Person> id = driverId;
-		Person person = PopulationUtils.getFactory().createPerson(id);
-		return person;
+		return PopulationUtils.getFactory().createPerson( driverId );
 	}
 
 	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {
