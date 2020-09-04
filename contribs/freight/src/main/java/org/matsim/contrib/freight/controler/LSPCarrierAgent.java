@@ -68,17 +68,13 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 
 		private int activityCounter = 0;
 
-		CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
+		private CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
 			this.driverId = driverId;
 			this.scheduledTour = tour;
 			new HashMap<Integer, CarrierShipment>();
 		}
 
-		/**
-		 * 
-		 * @param event
-		 */
-		public void handleEvent(PersonArrivalEvent event) {
+		private void handleEvent( PersonArrivalEvent event ) {
 			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds() );
 			double travelTime = currentLeg.getDepartureTime().seconds() + currentLeg.getTravelTime().seconds() - currentLeg.getDepartureTime().seconds();
 			currentLeg.setTravelTime(travelTime);
@@ -103,7 +99,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(PersonDepartureEvent event) {
+		private void handleEvent( PersonDepartureEvent event ) {
 			Leg leg = PopulationUtils.createLeg(event.getLegMode());
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
@@ -111,16 +107,16 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(LinkEnterEvent event) {
-            currentRoute.add(event.getLinkId());
-            notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		private void handleEvent( LinkEnterEvent event ) {
+			currentRoute.add(event.getLinkId());
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		public void handleEvent(LinkLeaveEvent event) {
+		private void handleEvent( LinkLeaveEvent event ) {
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 		
-		public void handleEvent(ActivityEndEvent event) {
+		private void handleEvent( ActivityEndEvent event ) {
 			if (currentActivity == null) {
 				Activity  firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
 				firstActivity.setFacilityId(event.getFacilityId());
@@ -134,7 +130,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
 		}
 
-		public void handleEvent(ActivityStartEvent event) {
+		private void handleEvent( ActivityStartEvent event ) {
 			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
 			activity.setStartTime(event.getTime());
@@ -151,19 +147,19 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			}
 		}
 
-		public void handleEvent(VehicleLeavesTrafficEvent event) {
+		private void handleEvent( VehicleLeavesTrafficEvent event ) {
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 		
-		public void handleEvent(PersonEntersVehicleEvent event) {
+		private void handleEvent( PersonEntersVehicleEvent event ) {
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 		
-		public void handleEvent(VehicleEntersTrafficEvent event) {
+		private void handleEvent( VehicleEntersTrafficEvent event ) {
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 		
-		public void handleEvent(PersonLeavesVehicleEvent event) {
+		private void handleEvent( PersonLeavesVehicleEvent event ) {
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 		
@@ -205,13 +201,13 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 
 	private final LSPCarrierTracker tracker;
 
-	private Collection<Id<Person>> driverIds = new ArrayList<>();
+	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
 	private int nextId = 0;
 
-	private Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
+	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
+//	private final Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 
@@ -283,7 +279,7 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 			routes.add(plan);
 			//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
-			driverTourMap.put(driverId, scheduledTour);
+//			driverTourMap.put(driverId, scheduledTour);
 		}
 		return routes;
 	}
@@ -294,12 +290,12 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 
 	private void clear() {
 		carrierDriverAgents.clear();
-		driverTourMap.clear();
+//		driverTourMap.clear();
 		driverIds.clear();
 		nextId = 0;
 	}
 
-	public Collection<Id<Person>> getDriverIds() {
+	Collection<Id<Person>> getDriverIds() {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
@@ -319,39 +315,27 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 		tracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);
 	}
 	 
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
+	@Override public void handleEvent(PersonArrivalEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	@Override
-	public void reset(int iteration) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	@Override public void handleEvent(LinkEnterEvent event) {
 		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+	@Override public void handleEvent(LinkLeaveEvent event) {
 		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
+	@Override public void handleEvent(PersonDepartureEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
+	@Override public void handleEvent(ActivityEndEvent event) {
 			getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
+	@Override public void handleEvent(ActivityStartEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
@@ -359,23 +343,19 @@ class LSPCarrierAgent implements ActivityStartEventHandler, ActivityEndEventHand
 		return carrierDriverAgents.get(driverId);
 	}
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
+	@Override public void handleEvent(VehicleLeavesTrafficEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);	
 	}
 
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
+	@Override public void handleEvent(PersonEntersVehicleEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
+	@Override public void handleEvent(VehicleEntersTrafficEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);		
 	}
 
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
+	@Override public void handleEvent(PersonLeavesVehicleEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);	
 	}
 
