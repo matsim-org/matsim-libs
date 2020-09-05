@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
@@ -85,8 +84,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				}
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
-						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Network.class),
+						getter -> new AggregatedMinCostRelocationCalculator(
 								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
 			}
 		});

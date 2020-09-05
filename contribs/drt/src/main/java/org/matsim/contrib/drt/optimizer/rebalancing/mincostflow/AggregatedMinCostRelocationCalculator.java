@@ -27,8 +27,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
@@ -37,16 +35,14 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
+ * Computes inter-zonal flows at the zonal (aggregated) level (i.e. without looking into individual vehicles)
+ *
  * @author michalm
  */
 public class AggregatedMinCostRelocationCalculator implements MinCostRelocationCalculator {
-	private final DrtZonalSystem zonalSystem;
-	private final Network network;
 	private final DrtZoneTargetLinkSelector targetLinkSelector;
 
-	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem, Network network, DrtZoneTargetLinkSelector targetLinkSelector) {
-		this.zonalSystem = zonalSystem;
-		this.network = network;
+	public AggregatedMinCostRelocationCalculator(DrtZoneTargetLinkSelector targetLinkSelector) {
 		this.targetLinkSelector = targetLinkSelector;
 	}
 
