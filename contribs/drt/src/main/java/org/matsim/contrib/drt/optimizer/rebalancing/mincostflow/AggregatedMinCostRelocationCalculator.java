@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
@@ -49,9 +48,8 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	@Override
 	public List<Relocation> calcRelocations(List<Pair<DrtZone, Integer>> supply, List<Pair<DrtZone, Integer>> demand,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations = new TransportProblem<>(
-				this::calcStraightLineDistance).solve(supply, demand);
-		return calcRelocations(rebalancableVehiclesPerZone, interZonalRelocations);
+		return calcRelocations(rebalancableVehiclesPerZone,
+				new TransportProblem<>(this::calcStraightLineDistance).solve(supply, demand));
 	}
 
 	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
@@ -59,16 +57,14 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	}
 
 	private List<Relocation> calcRelocations(Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
-			List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations) {
+			List<TransportProblem.Flow<DrtZone, DrtZone>> flows) {
 		List<Relocation> relocations = new ArrayList<>();
-		for (Triple<DrtZone, DrtZone, Integer> r : interZonalRelocations) {
-			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(r.getLeft());
+		for (TransportProblem.Flow<DrtZone, DrtZone> flow : flows) {
+			List<DvrpVehicle> rebalancableVehicles = rebalancableVehiclesPerZone.get(flow.origin);
 
-			DrtZone toZone = r.getMiddle();
-			Link targetLink = targetLinkSelector.selectTargetLink(toZone);
+			Link targetLink = targetLinkSelector.selectTargetLink(flow.destination);
 
-			int flow = r.getRight();
-			for (int f = 0; f < flow; f++) {
+			for (int f = 0; f < flow.amount; f++) {
 				// TODO use BestDispatchFinder (needs to be moved from taxi to dvrp) instead
 				DvrpVehicle nearestVehicle = findNearestVehicle(rebalancableVehicles, targetLink);
 				relocations.add(new Relocation(nearestVehicle, targetLink));
