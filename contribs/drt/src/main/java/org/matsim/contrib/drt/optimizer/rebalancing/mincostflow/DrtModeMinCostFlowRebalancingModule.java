@@ -61,7 +61,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
+								getter.getModal(RelocationCalculator.class), params))).asEagerSingleton();
 
 				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case LinearRebalancingTarget:
@@ -83,7 +83,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								+ strategyParams.getZonalDemandEstimatorType());
 				}
 
-				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
+				bindModal(RelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(
 								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
 			}

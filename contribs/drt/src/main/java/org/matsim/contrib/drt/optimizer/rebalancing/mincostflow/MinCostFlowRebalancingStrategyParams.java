@@ -46,11 +46,13 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
+			+ " Used only for LinearRebalancingTarget";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
+			+ " Used only for LinearRebalancingTarget";
 
 	public static final String REBALANCING_TARGET_CALCULATOR_TYPE = "rebalancingTargetCalculatorType";
 	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =

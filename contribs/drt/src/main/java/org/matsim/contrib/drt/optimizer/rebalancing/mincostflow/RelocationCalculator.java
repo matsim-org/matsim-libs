@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 /**
  * @author michalm
  */
-public interface MinCostRelocationCalculator {
+public interface RelocationCalculator {
 	/**
 	 * @param vehicleSurplus              could be negative (supply - demand), typically contains only non-zero values (zones with zero surplus are skipped)
 	 * @param rebalancableVehiclesPerZone list of rebalancable vehicles per each zone (zones without rebalancable vehicles are usually skipped)
