@@ -39,6 +39,16 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  * @author michalm
  */
 public class AggregatedMinCostRelocationCalculator implements MinCostRelocationCalculator {
+	public static class DrtZoneVehicleSurplus {
+		public final DrtZone zone;
+		public final int surplus;
+
+		public DrtZoneVehicleSurplus(DrtZone zone, int surplus) {
+			this.zone = zone;
+			this.surplus = surplus;
+		}
+	}
+
 	private final DrtZoneTargetLinkSelector targetLinkSelector;
 
 	public AggregatedMinCostRelocationCalculator(DrtZoneTargetLinkSelector targetLinkSelector) {
@@ -46,8 +56,18 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	}
 
 	@Override
-	public List<Relocation> calcRelocations(List<Pair<DrtZone, Integer>> supply, List<Pair<DrtZone, Integer>> demand,
+	public List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
+		List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
+		for (DrtZoneVehicleSurplus s : vehicleSurplus) {
+			if (s.surplus > 0) {
+				supply.add(Pair.of(s.zone, s.surplus));
+			} else if (s.surplus < 0) {
+				demand.add(Pair.of(s.zone, -s.surplus));
+			}
+		}
+
 		return calcRelocations(rebalancableVehiclesPerZone,
 				new TransportProblem<>(this::calcStraightLineDistance).solve(supply, demand));
 	}
