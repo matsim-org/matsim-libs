@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -27,13 +26,8 @@ import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
-import org.matsim.contrib.freight.events.ShipmentPickedUpEvent;
 import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 
@@ -48,21 +42,16 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 
 	private final Carriers carriers;
 
-	private final EventsManager eventsManager;
-	
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
 	
-	private Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<Id<Person>, CarrierAgent>();
+	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<Id<Person>, CarrierAgent>();
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
-
-		eventsManager = EventsUtils.createEventsManager();
-		// yyyy this is not using the central events manager; I have no idea why this might work.  kai, oct'19
 	}
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
@@ -72,13 +61,9 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
 			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
 			log.warn( "" );
-			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunction, delegate);
+			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction, delegate);
 			carrierAgents.add(carrierAgent);
 		}
-	}
-
-	public EventsManager getEventsManager() {
-		return eventsManager;
 	}
 
 	/**
@@ -101,7 +86,6 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 	 * 
 	 */
 	public void scoreSelectedPlans() {
-//		log.warn("calling scoreSelectedPlans") ;
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
 			agent.scoreSelectedPlan();
@@ -120,30 +104,6 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 			}
 		}
 		return null;
-	}
-
-	private void processEvent(Event event) {
-		eventsManager.processEvent(event);
-	}
-
-	/**
-	 * Informs the world that a shipment has been picked up.
-	 * 
-	 * <p>Is called by carrierAgent in charge of picking up shipments. It throws an ShipmentPickedupEvent which can be listened to
-	 * with an ShipmentPickedUpListener.
-	 * 
-	 * @param carrierId
-	 * @param driverId
-	 * @param shipment
-	 * @param time
-	 * @see ShipmentPickedUpEvent, ShipmentPickedUpEventHandler
-	 */
-	public void notifyPickedUp(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
-		processEvent(new ShipmentPickedUpEvent(carrierId, driverId, shipment, time));
-	}
-
-	public void notifyDelivered(Id<Carrier> carrierId, Id<Person> driverId, CarrierShipment shipment, double time) {
-		processEvent(new ShipmentDeliveredEvent(carrierId, driverId, shipment,time));
 	}
 
 	@Override

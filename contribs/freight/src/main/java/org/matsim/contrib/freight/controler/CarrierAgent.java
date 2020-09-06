@@ -170,26 +170,18 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private void activityFinished( ActivityEndEvent event ) {
 			String activityType = event.getActType();
-			double time = event.getTime();
 			notifyEventHappened(event, currentActivity, scheduledTour, driverId, activityCounter);
 			if(FreightConstants.START.equals(activityType) ) {
 				activityCounter += 1;
 				return;
 			}
 			if( FreightConstants.END.equals(activityType)) return;
-			Tour tour = this.scheduledTour.getTour();
 			if (FreightConstants.PICKUP.equals(activityType)) {
-				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
-				notifyPickup(driverId, tourElement.getShipment(),time);
-				//				logger.info("pickup occured");
 				activityCounter += 2;
 			} else if (FreightConstants.DELIVERY.equals(activityType)) {
-				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
-				notifyDelivery(driverId,tourElement.getShipment(), time);
 				activityCounter += 2;
 			}
 			else{
-				//notify activity ends ??
 				activityCounter += 2;
 			}
 		}
@@ -215,8 +207,6 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	private LSPCarrierTracker lspTracker;
 	private final Carrier carrier;
 
-	private CarrierAgentTracker tracker;
-
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
 	private int nextId = 0;
@@ -227,8 +217,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 
-	CarrierAgent( CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
-		this.tracker = carrierAgentTracker;
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		Gbl.assertNotNull(carrierScoringFunction); // scoringFunctionFactory is null. this must not be.
@@ -337,16 +326,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}
 	}
 
-	private void notifyPickup( Id<Person> driverId, CarrierShipment shipment, double time ) {
-		tracker.notifyPickedUp(carrier.getId(), driverId, shipment, time);
-	}
-
-	private void notifyDelivery( Id<Person> driverId, CarrierShipment shipment, double time ) {
-		tracker.notifyDelivered(carrier.getId(), driverId, shipment, time);
-	}
-
 	void scoreSelectedPlan() {
-//		Logger.getLogger(this.getClass()).warn("calling scoreSelectedPlan" ) ;
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
