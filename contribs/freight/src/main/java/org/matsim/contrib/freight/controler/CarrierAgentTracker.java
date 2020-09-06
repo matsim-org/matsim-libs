@@ -38,7 +38,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private final Carriers carriers;
 
-	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler = new Vehicle2DriverEventHandler();
 
 	private final Collection<CarrierAgent> carrierAgents = new ArrayList<>();
 	
@@ -48,7 +48,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private LSPFreightControlerListener listener;
 
-	public CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory ) {
+	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory ) {
 		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
@@ -70,13 +70,13 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
 			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
 			log.warn( "" );
-			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction, delegate);
+			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction, vehicle2DriverEventHandler );
 			carrierAgents.add(carrierAgent);
 		}
 	}
 	private void createCarrierAgents() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( this, carrier, delegate) );
+			carrierAgents.add( new CarrierAgent( this, carrier, vehicle2DriverEventHandler ) );
 		}
 	}
 
@@ -108,7 +108,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void reset(int iteration) {
-		delegate.reset(iteration);
+		vehicle2DriverEventHandler.reset(iteration );
 	}
 
 	private CarrierAgent findCarrierAgent(Id<Carrier> id) {
@@ -124,7 +124,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		listener.processEvent(event);
 	}
 
-	public void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
+	void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
 		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator LSPEventCreator : lspEventCreators ) {
 			Event customEvent = LSPEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
 			if(customEvent != null) {
@@ -141,7 +141,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(delegate.getDriverOfVehicle(event.getVehicleId()));
+		CarrierAgent carrierAgent = getCarrierAgent( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId() ) );
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);
 	}
@@ -189,7 +189,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
+		vehicle2DriverEventHandler.handleEvent(event );
 		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);
@@ -197,7 +197,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
+		vehicle2DriverEventHandler.handleEvent(event );
 		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);
@@ -205,7 +205,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(delegate.getDriverOfVehicle(event.getVehicleId() ) );
+		CarrierAgent carrierAgent = getCarrierAgent( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId() ) );
 		if(carrierAgent == null) return;
 		carrierAgent.handleEvent(event);	
 	}
