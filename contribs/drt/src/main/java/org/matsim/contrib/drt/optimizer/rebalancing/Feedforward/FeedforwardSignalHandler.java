@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem.Flow;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
@@ -21,7 +22,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
 		PassengerRequestRejectedEventHandler {
@@ -32,7 +32,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	private final Map<Double, Map<DrtZone, MutableInt>> zoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Person>, Triple<Double, DrtZone, DrtZone>> potentialDRTTripsMap = new HashMap<>();
 
-	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> feedforwardSignal = new HashMap<>();
+	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal = new HashMap<>();
 
 	private final int timeBinSize;
 
@@ -118,7 +118,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 						supply.add(Pair.of(zone, -netDeparture));
 					}
 				}
-				List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations = new TransportProblem<>(
+				List<Flow<DrtZone, DrtZone>> interZonalRelocations = new TransportProblem<>(
 						this::calcStraightLineDistance).solve(supply, demand);
 				feedforwardSignal.put(timeBin, interZonalRelocations);
 				progressCounter += 1;
@@ -130,11 +130,11 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	}
 
 	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
-		return (int) DistanceUtils.calculateDistance(MGC.point2Coord(zone1.getGeometry().getCentroid()),
-				MGC.point2Coord(zone2.getGeometry().getCentroid()));
+		return (int) DistanceUtils.calculateDistance(zone1.getCentroid(),
+				zone2.getCentroid());
 	}
 
-	public Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> getFeedforwardSignal() {
+	public Map<Double, List<Flow<DrtZone, DrtZone>>> getFeedforwardSignal() {
 		return feedforwardSignal;
 	}
 

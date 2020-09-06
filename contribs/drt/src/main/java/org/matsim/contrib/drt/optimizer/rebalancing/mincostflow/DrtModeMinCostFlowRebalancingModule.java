@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.EqualVehicleDensityZonalDemandEstimator;
@@ -62,7 +62,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
+								getter.getModal(RelocationCalculator.class), params))).asEagerSingleton();
 
 				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case LinearRebalancingTarget:
@@ -84,9 +84,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								+ strategyParams.getZonalDemandEstimatorType());
 				}
 
-				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
-						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getModal(Network.class)))).asEagerSingleton();
+				bindModal(RelocationCalculator.class).toProvider(modalProvider(
+						getter -> new AggregatedMinCostRelocationCalculator(
+								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
 			}
 		});
 

@@ -275,26 +275,22 @@ public final class VehicleUtils {
 	}
 	//******** CostInformation attributes ************
 
-	@Deprecated
-	/*package*/ static double getCostsPerSecondWaiting(CostInformation costInformation) {
-		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
+	public static Double getCostsPerSecondWaiting(CostInformation costInformation) {
+		return (Double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
 	}
 
 
-	@Deprecated
-	/*package*/ static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
+	public static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_WAITING, costsPerSecond);
 	}
 
 
-	@Deprecated
-	/*package*/ static double getCostsPerSecondInService(CostInformation costInformation) {
-		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
+	public static Double getCostsPerSecondInService(CostInformation costInformation) {
+		return (Double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
 	}
 
 
-	@Deprecated
-	/*package*/ static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
+	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 

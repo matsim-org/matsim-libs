@@ -67,12 +67,15 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 									loadPreparedGeometries(
 											drtCfg.getDrtServiceAreaShapeFileURL(getConfig().getContext()))) :
 							createGridFromNetwork(network, params.getCellSize());
-					return DrtZonalSystem.createFromGeometries(network, gridZones);
+					return DrtZonalSystem.createFromPreparedGeometries(network, gridZones);
 
 				default:
 					throw new RuntimeException("Unsupported zone generation");
 			}
 		})).asEagerSingleton();
+
+		bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter ->
+				new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 
 		//zonal analysis
 		bindModal(ZonalIdleVehicleXYVisualiser.class).

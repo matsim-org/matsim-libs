@@ -285,21 +285,22 @@ public class MatsimJspritFactory {
 	 *
 	 * <p>
 	 * No description and engineInformation can be set here. Do it by calling
-	 * setEngineInforation(engineInfo) from the returned object.
+	 * setEngineInformation(engineInfo) from the returned object.
 	 *
-	 * @param type to be transformed
+	 * @param jspritVehType to be transformed
 	 * @return CarrierVehicleType
 	 */
-	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType type) {
-		VehicleType typeBuilder = VehicleUtils.getFactory()
-				.createVehicleType(Id.create(type.getTypeId(), VehicleType.class));
-		typeBuilder.getCapacity().setWeightInTons(type.getCapacityDimensions().get(0));
-		typeBuilder.getCostInformation().setCostsPerMeter(type.getVehicleCostParams().perDistanceUnit);
-		typeBuilder.getCostInformation().setCostsPerSecond(type.getVehicleCostParams().perTransportTimeUnit);
-		VehicleType vehicleType = typeBuilder;
-		vehicleType.getCostInformation().setFixedCost(type.getVehicleCostParams().fix);
-		typeBuilder.setMaximumVelocity(type.getMaxVelocity());
-		return typeBuilder;
+	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritVehType) {
+		VehicleType vehicleType = VehicleUtils.getFactory()
+				.createVehicleType(Id.create(jspritVehType.getTypeId(), VehicleType.class));
+		vehicleType.getCapacity().setWeightInTons(jspritVehType.getCapacityDimensions().get(0));
+		vehicleType.getCostInformation().setCostsPerMeter(jspritVehType.getVehicleCostParams().perDistanceUnit);
+		vehicleType.getCostInformation().setCostsPerSecond(jspritVehType.getVehicleCostParams().perTransportTimeUnit);
+		vehicleType.getCostInformation().setFixedCost(jspritVehType.getVehicleCostParams().fix);
+		VehicleUtils.setCostsPerSecondInService(vehicleType.getCostInformation(), jspritVehType.getVehicleCostParams().perServiceTimeUnit);
+		VehicleUtils.setCostsPerSecondWaiting(vehicleType.getCostInformation(), jspritVehType.getVehicleCostParams().perWaitingTimeUnit);
+		vehicleType.setMaximumVelocity(jspritVehType.getMaxVelocity());
+		return vehicleType;
 	}
 
 	/**
@@ -330,7 +331,20 @@ public class MatsimJspritFactory {
 		}
 		typeBuilder.addCapacityDimension(0, vehicleCapacityInt);
 		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter());
+
 		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		if (VehicleUtils.getCostsPerSecondInService(carrierVehicleType.getCostInformation()) != null) {
+			typeBuilder.setCostPerServiceTime(VehicleUtils.getCostsPerSecondInService(carrierVehicleType.getCostInformation()));
+		} else {
+			log.info("Costs per service time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + carrierVehicleType.getId());
+			typeBuilder.setCostPerServiceTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		}
+		if (VehicleUtils.getCostsPerSecondWaiting(carrierVehicleType.getCostInformation()) != null) {
+			typeBuilder.setCostPerWaitingTime(VehicleUtils.getCostsPerSecondWaiting(carrierVehicleType.getCostInformation()));
+		} else {
+			log.info("Costs per waiting time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + carrierVehicleType.getId());
+			typeBuilder.setCostPerWaitingTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		}
 		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();

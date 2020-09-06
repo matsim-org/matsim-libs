@@ -43,8 +43,7 @@ import org.matsim.core.utils.misc.Time;
  *
  * @author jbischoff
  */
-public final class PreviousIterationDRTDemandEstimator
-		implements ZonalDemandEstimator, PersonDepartureEventHandler {
+public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEstimator, PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;

@@ -21,8 +21,8 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -52,19 +52,18 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(RebalancingStrategy.class)
-						.toProvider(modalProvider(
-								getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
-										getter.getModal(Fleet.class), getter.getModal(Network.class), generalParams,
-										strategySpecificParams, getter.getModal(FeedforwardSignalHandler.class))))
+				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
+						getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
+								getter.getModal(Fleet.class), generalParams, strategySpecificParams,
+								getter.getModal(FeedforwardSignalHandler.class),
+								getter.getModal(DrtZoneTargetLinkSelector.class))))
 						.asEagerSingleton();
 			}
 		});
 
 		// Create PreviousIterationDepartureRecoder (this will be created only once)
-		bindModal(FeedforwardSignalHandler.class)
-				.toProvider(modalProvider(getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class),
-						strategySpecificParams)))
+		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
+				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), strategySpecificParams)))
 				.asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));

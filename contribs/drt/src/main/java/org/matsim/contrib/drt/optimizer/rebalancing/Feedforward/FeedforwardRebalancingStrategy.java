@@ -10,21 +10,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem.Flow;
 import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 
 /**
  * @author Chengqi Lu This strategy is created based on the Feedforward Fluidic
@@ -41,7 +39,6 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 	private final DrtZonalSystem zonalSystem;
 	private final RebalancingParams generalParams;
-	private final Network network;
 	private final VehicleInfoCollector vehicleInfoCollector;
 
 	private final int timeBinSize;
@@ -53,14 +50,16 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final boolean feedbackSwitch;
 	private final int minNumVehiclesPerZone;
 
-	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> feedforwardSignal;
+	private final DrtZoneTargetLinkSelector drtZoneTargetLinkSelector;
 
-	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
-			RebalancingParams generalParams, FeedforwardRebalancingStrategyParams strategySpecificParams,
-			FeedforwardSignalHandler feedforwardSignalHandler) {
-		this.network = network;
+	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal;
+
+	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, RebalancingParams generalParams,
+			FeedforwardRebalancingStrategyParams strategySpecificParams,
+			FeedforwardSignalHandler feedforwardSignalHandler, DrtZoneTargetLinkSelector drtZoneTargetLinkSelector) {
 		this.zonalSystem = zonalSystem;
 		this.generalParams = generalParams;
+		this.drtZoneTargetLinkSelector = drtZoneTargetLinkSelector;
 		timeBinSize = strategySpecificParams.getTimeBinSize();
 
 		rebalanceInterval = generalParams.getInterval();
@@ -92,13 +91,14 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		Set<DvrpVehicle> truelyRebalancableVehicles = new HashSet<>();
 
 		if (feedbackSwitch) {
-			//(comment) Feedback part is MinCostFlowRebalancingStrategy
+			// (comment) Feedback part is MinCostFlowRebalancingStrategy
 
 			List<Link> destinationLinks = new ArrayList<>();
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
-					rebalancableVehicles, time, generalParams.getMinServiceTime());
-			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(
-					time, generalParams.getMaxTimeBeforeIdle(), generalParams.getMinServiceTime());
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
+					.groupRebalancableVehicles(rebalancableVehicles, time, generalParams.getMinServiceTime());
+			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector
+					.groupSoonIdleVehicles(time, generalParams.getMaxTimeBeforeIdle(),
+							generalParams.getMinServiceTime());
 			for (DrtZone zone : zonalSystem.getZones().values()) {
 				int surplus = rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
 						+ soonRebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
@@ -113,19 +113,18 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				} else if (surplus < 0) {
 					int deficit = -1 * surplus;
 					for (int i = 0; i < deficit; i++) {
-						Link destinationLink = NetworkUtils.getNearestLink(network,
-								MGC.point2Coord(zone.getGeometry().getCentroid()));
+						Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(zone);
 						destinationLinks.add(destinationLink);
 					}
 				}
 			}
 
-			//2. TODO implement as MinCostRelocationCalculator
+			// 2. TODO implement as MinCostRelocationCalculator
 			if (!truelyRebalancableVehicles.isEmpty()) {
 				for (Link link : destinationLinks) {
-					DvrpVehicle nearestVehicle = truelyRebalancableVehicles.stream()
-							.min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(
-									Schedules.getLastLinkInSchedule(v).getCoord(), link.getCoord())))
+					DvrpVehicle nearestVehicle = truelyRebalancableVehicles.stream().min(Comparator.comparing(
+							v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(),
+									link.getCoord())))
 							.get();
 					relocationList.add(new Relocation(nearestVehicle, link));
 					truelyRebalancableVehicles.remove(nearestVehicle);
@@ -142,13 +141,14 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		// Feedforward part
 		// assign rebalnace vehicles based on the rebalance plan
 		if (feedforwardSignal.containsKey(timeBin)) {
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
-					truelyRebalancableVehicles.stream(), time, generalParams.getMinServiceTime());
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
+					.groupRebalancableVehicles(truelyRebalancableVehicles.stream(), time,
+							generalParams.getMinServiceTime());
 			// Generate relocations based on the "rebalancePlanCore"
-			for (Triple<DrtZone, DrtZone, Integer> rebalanceInfo : feedforwardSignal.get(timeBin)) {
-				DrtZone departureZone = rebalanceInfo.getLeft();
-				DrtZone arrivalZone = rebalanceInfo.getMiddle();
-				int vehicleToSend = (int) Math.floor(scale * rebalanceInfo.getRight() + rnd.nextDouble());
+			for (Flow<DrtZone, DrtZone> rebalanceInfo : feedforwardSignal.get(timeBin)) {
+				DrtZone departureZone = rebalanceInfo.origin;
+				DrtZone arrivalZone = rebalanceInfo.destination;
+				int vehicleToSend = (int) Math.floor(scale * rebalanceInfo.amount + rnd.nextDouble());
 				// Note: we use probability to solve the problem of non-integer value of
 				// vehileToSend after scaling.
 				int numVehiclesInZone = 0;
@@ -163,10 +163,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				if (vehicleToSend > 0) {
 					for (int i = 0; i < vehicleToSend; i++) {
 						// TODO change to "send to random link in a node"
-						Link destinationLink = NetworkUtils.getNearestLink(network,
-								MGC.point2Coord(arrivalZone.getGeometry().getCentroid()));
-						relocationList.add(new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0),
-								destinationLink));
+						Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
+						relocationList.add(
+								new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0), destinationLink));
 						rebalancableVehiclesPerZone.get(departureZone).remove(0);
 					}
 				}
