@@ -53,7 +53,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final boolean feedbackSwitch;
 	private final int minNumVehiclesPerZone;
 
-	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> rebalancePlanCore;
+	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> feedforwardSignal;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, Network network,
 			RebalancingParams generalParams, FeedforwardRebalancingStrategyParams strategySpecificParams,
@@ -70,7 +70,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		log.info("The feedforward signal strength is: "
 				+ Double.toString(strategySpecificParams.getFeedforwardSignalStrength()));
 
-		rebalancePlanCore = feedforwardSignalHandler.getRebalancePlanCore();
+		feedforwardSignal = feedforwardSignalHandler.getFeedforwardSignal();
 		feedforwardSignalLead = strategySpecificParams.getFeedforwardSignalLead();
 
 		feedbackSwitch = strategySpecificParams.getFeedbackSwitch();
@@ -141,11 +141,11 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 		// Feedforward part
 		// assign rebalnace vehicles based on the rebalance plan
-		if (rebalancePlanCore.containsKey(timeBin)) {
+		if (feedforwardSignal.containsKey(timeBin)) {
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
 					truelyRebalancableVehicles.stream(), time, generalParams.getMinServiceTime());
 			// Generate relocations based on the "rebalancePlanCore"
-			for (Triple<DrtZone, DrtZone, Integer> rebalanceInfo : rebalancePlanCore.get(timeBin)) {
+			for (Triple<DrtZone, DrtZone, Integer> rebalanceInfo : feedforwardSignal.get(timeBin)) {
 				DrtZone departureZone = rebalanceInfo.getLeft();
 				DrtZone arrivalZone = rebalanceInfo.getMiddle();
 				int vehicleToSend = (int) Math.floor(scale * rebalanceInfo.getRight() + rnd.nextDouble());

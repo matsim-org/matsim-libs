@@ -21,7 +21,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 public class FeedforwardSignalHandler implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
@@ -29,11 +28,11 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	private static final Logger log = Logger.getLogger(FeedforwardSignalHandler.class);
 	private final DrtZonalSystem zonalSystem;
 
-	//1. TODO make int ZonalDemandEstimator (String mode)
+	// 1. TODO make int ZonalDemandEstimator (String mode) 
 	private final Map<Double, Map<DrtZone, MutableInt>> zoneNetDepartureMap = new HashMap<>();
 	private final Map<Id<Person>, Triple<Double, DrtZone, DrtZone>> potentialDRTTripsMap = new HashMap<>();
 
-	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> rebalancePlanCore = new HashMap<>();
+	private final Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> feedforwardSignal = new HashMap<>();
 
 	private final int timeBinSize;
 
@@ -44,8 +43,7 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	 * Constructor
 	 */
 	public FeedforwardSignalHandler(DrtZonalSystem zonalSystem,
-			FeedforwardRebalancingStrategyParams strategySpecificParams,
-			EventsManager events) {
+			FeedforwardRebalancingStrategyParams strategySpecificParams) {
 		this.zonalSystem = zonalSystem;
 		timeBinSize = strategySpecificParams.getTimeBinSize();
 	}
@@ -87,9 +85,9 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 	@Override
 	public void reset(int iteration) {
 		if (iteration > 0) {
-			calculateRebalancePlan(true);
+			calculateFeedforwardSignal(true);
 		} else {
-			calculateRebalancePlan(false);
+			calculateFeedforwardSignal(false);
 		}
 		prepareZoneNetDepartureMap();
 	}
@@ -104,8 +102,8 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 		}
 	}
 
-	private void calculateRebalancePlan(boolean calculateOrNot) {
-		rebalancePlanCore.clear();
+	private void calculateFeedforwardSignal(boolean calculateOrNot) {
+		feedforwardSignal.clear();
 		int progressCounter = 0;
 		if (calculateOrNot) {
 			log.info("Start calculating rebalnace plan now");
@@ -122,10 +120,9 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 				}
 				List<Triple<DrtZone, DrtZone, Integer>> interZonalRelocations = new TransportProblem<>(
 						this::calcStraightLineDistance).solve(supply, demand);
-				rebalancePlanCore.put(timeBin, interZonalRelocations);
+				feedforwardSignal.put(timeBin, interZonalRelocations);
 				progressCounter += 1;
-				log.info("Calculating: "
-						+ Double.toString(progressCounter * timeBinSize / simulationEndTime / 36)
+				log.info("Calculating: " + Double.toString(progressCounter * timeBinSize / simulationEndTime / 36)
 						+ "% complete");
 			}
 			log.info("Rebalance plan calculation is now complete! ");
@@ -137,8 +134,8 @@ public class FeedforwardSignalHandler implements PassengerRequestScheduledEventH
 				MGC.point2Coord(zone2.getGeometry().getCentroid()));
 	}
 
-	public Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> getRebalancePlanCore() {
-		return rebalancePlanCore;
+	public Map<Double, List<Triple<DrtZone, DrtZone, Integer>>> getFeedforwardSignal() {
+		return feedforwardSignal;
 	}
 
 }

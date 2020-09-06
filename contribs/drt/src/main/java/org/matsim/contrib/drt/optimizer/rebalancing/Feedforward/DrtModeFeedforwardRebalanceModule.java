@@ -29,7 +29,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
  * @author michalm, Chengqi Lu
@@ -65,7 +64,7 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		// Create PreviousIterationDepartureRecoder (this will be created only once)
 		bindModal(FeedforwardSignalHandler.class)
 				.toProvider(modalProvider(getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class),
-						strategySpecificParams, getter.get(EventsManager.class))))
+						strategySpecificParams)))
 				.asEagerSingleton();
 
 		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));
