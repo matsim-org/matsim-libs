@@ -9,16 +9,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -50,7 +42,10 @@ import org.matsim.vehicles.VehicleUtils;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler {
+class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+					      LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
+					      PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler
+{
 
 	/**
 	 * This keeps track of a scheduledTour during simulation and can thus be seen as the driver of the vehicle that runs the tour.
@@ -104,6 +99,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				currentLeg.setRoute(genericRoute);
 			}
 			scoringFunction.handleLeg(currentLeg);
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
 		private void handleEvent( PersonDepartureEvent event ) {
@@ -111,11 +107,17 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			leg.setDepartureTime(event.getTime());
 			currentLeg = leg;
 			currentRoute = new ArrayList<>();
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
 		private void handleEvent( LinkEnterEvent event ) {
 			scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getId(),event.getLinkId()) );
 			currentRoute.add(event.getLinkId());
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		}
+
+		private void handleEvent( LinkLeaveEvent event ) {
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
 		private void handleEvent( ActivityEndEvent event ) {
@@ -126,7 +128,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			}
 			currentActivity.setEndTime(event.getTime());
 			scoringFunction.handleActivity(currentActivity);
-			activityFinished(event.getActType(), event.getTime()); 
+			activityFinished(event);
 		}
 
 		private TourActivity getTourActivity() {
@@ -145,11 +147,31 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				TourActivity tourActivity = getTourActivity();
 				if (!activity.getLinkId().toString().equals(tourActivity.getLocation().toString()))
 					throw new AssertionError("linkId of activity is not equal to linkId of tourActivity. This must not be.");
-				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow()); 
+				currentActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
+				notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
 			}
 		}
 
-		private void activityFinished(String activityType, double time) {
+		private void handleEvent( VehicleLeavesTrafficEvent event ) {
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		}
+
+		private void handleEvent( PersonEntersVehicleEvent event ) {
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		}
+
+		private void handleEvent( VehicleEntersTrafficEvent event ) {
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		}
+
+		private void handleEvent( PersonLeavesVehicleEvent event ) {
+			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		}
+
+		private void activityFinished( ActivityEndEvent event ) {
+			String activityType = event.getActType();
+			double time = event.getTime();
+			notifyEventHappened(event, currentActivity, scheduledTour, driverId, activityCounter);
 			if(FreightConstants.START.equals(activityType) ) {
 				activityCounter += 1;
 				return;
@@ -190,9 +212,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final Id<Carrier> id;
 
+	private LSPCarrierTracker lspTracker;
 	private final Carrier carrier;
 
-	private final CarrierAgentTracker tracker;
+	private CarrierAgentTracker tracker;
 
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
@@ -200,11 +223,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private final ScoringFunction scoringFunction;
+	private ScoringFunction scoringFunction;
 
 	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
 
-	CarrierAgent(CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler) {
+	CarrierAgent( CarrierAgentTracker carrierAgentTracker, Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
 		this.tracker = carrierAgentTracker;
 		this.carrier = carrier;
 		this.id = carrier.getId();
@@ -212,6 +235,14 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		this.scoringFunction = carrierScoringFunction;
 		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 	}
+
+	public CarrierAgent( LSPCarrierTracker lspCarrierTracker, Carrier carrier, Vehicle2DriverEventHandler vehicle2DriverEventHandler ){
+		lspTracker = lspCarrierTracker;
+		this.carrier = carrier;
+		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
+		this.id = carrier.getId();
+	}
+
 
 	public Id<Carrier> getId() {
 		return id;
@@ -301,6 +332,11 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		return id;
 	}
 
+	private void notifyEventHappened( Event event, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
+		if ( scoringFunction==null ) {
+			lspTracker.notifyEventHappened(event, carrier, activity, scheduledTour, driverId, activityCounter);}
+	}
+
 	private void notifyPickup( Id<Person> driverId, CarrierShipment shipment, double time ) {
 		tracker.notifyPickedUp(carrier.getId(), driverId, shipment, time);
 	}
@@ -317,29 +353,37 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		scoringFunction.finish();
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
-
 	@Override public void handleEvent(PersonArrivalEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
-
 	@Override public void handleEvent(LinkEnterEvent event) {
 		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
 	}
-
+	@Override public void handleEvent(LinkLeaveEvent event) {
+		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
+	}
 	@Override public void handleEvent(PersonDepartureEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
-
 	@Override public void handleEvent(ActivityEndEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
-
 	@Override public void handleEvent(ActivityStartEvent event) {
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
-
+	@Override public void handleEvent(VehicleLeavesTrafficEvent event) {
+		getDriver(event.getPersonId()).handleEvent(event);
+	}
+	@Override public void handleEvent(PersonEntersVehicleEvent event) {
+		getDriver(event.getPersonId()).handleEvent(event);
+	}
+	@Override public void handleEvent(VehicleEntersTrafficEvent event) {
+		getDriver(event.getPersonId()).handleEvent(event);
+	}
+	@Override public void handleEvent(PersonLeavesVehicleEvent event) {
+		getDriver(event.getPersonId()).handleEvent(event);
+	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
 	}
-
 }
