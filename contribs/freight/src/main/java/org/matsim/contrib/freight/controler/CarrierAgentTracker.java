@@ -134,40 +134,86 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	}
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
 		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
+		carrierAgent.handleEvent(event, driverId );
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId() ) );
+		final Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle( event.getVehicleId() );
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
 		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
+		carrierAgent.handleEvent(event, driverId );
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
 		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
+		carrierAgent.handleEvent(event, driverId );
 	}
 
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
 		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
+		carrierAgent.handleEvent(event, driverId );
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
 		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
+		carrierAgent.handleEvent(event, driverId );
 	}
 
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		vehicle2DriverEventHandler.handleEvent(event );
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event, driverId );
+	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		vehicle2DriverEventHandler.handleEvent(event );
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event, driverId );
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		final Id<Person> driverId = vehicle2DriverEventHandler.getDriverOfVehicle( event.getVehicleId() );
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event, driverId );
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event, driverId );
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		final Id<Person> driverId = event.getPersonId();
+		CarrierAgent carrierAgent = getCarrierAgent( driverId );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event, driverId );
+	}
 	private CarrierAgent getCarrierAgent(Id<Person> driverId) {
 		if(driverAgentMap.containsKey(driverId)){
 			return driverAgentMap.get(driverId);
@@ -178,49 +224,13 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 				return ca;
 			}
 		}
-		return null;	
+		return null;
 	}
-	
+
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		CarrierAgent carrierAgent = getCarrierAgent(driverId);
 		if(carrierAgent == null) throw new IllegalStateException("missing carrier agent. cannot find carrierAgent to driver " + driverId);
 		return carrierAgent.getDriver(driverId);
 	}
 
-	@Override
-	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		vehicle2DriverEventHandler.handleEvent(event );
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		vehicle2DriverEventHandler.handleEvent(event );
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent( vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId() ) );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);	
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);
-	}
-
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
-		if(carrierAgent == null) return;
-		carrierAgent.handleEvent(event);	
-	}
 }

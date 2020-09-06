@@ -73,6 +73,22 @@ class CarrierAgent
 			this.scheduledTour = tour;
 		}
 
+		private void handleTheEvent( Event event ) {
+			if ( event instanceof PersonArrivalEvent ) {
+				handleEvent( (PersonArrivalEvent) event );
+			} else if ( event instanceof PersonDepartureEvent ){
+				handleEvent( (PersonDepartureEvent) event );
+			} else if ( event instanceof LinkEnterEvent ){
+				handleEvent( (LinkEnterEvent) event );
+			} else if ( event instanceof ActivityEndEvent ) {
+				handleEvent( (ActivityEndEvent) event );
+			} else if ( event instanceof ActivityStartEvent ) {
+				handleEvent( (ActivityStartEvent) event );
+			} else {
+				notifyEventHappened( event, null, scheduledTour, driverId, activityCounter );
+			}
+		}
+
 		private void handleEvent( PersonArrivalEvent event ) {
 			currentLeg.setTravelTime( event.getTime() - currentLeg.getDepartureTime().seconds());
 			double travelTime = currentLeg.getDepartureTime().seconds()
@@ -118,10 +134,6 @@ class CarrierAgent
 			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
 		}
 
-		private void handleEvent( LinkLeaveEvent event ) {
-			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
-		}
-
 		private void handleEvent( ActivityEndEvent event ) {
 			if (currentActivity == null) {
 				Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
@@ -151,10 +163,6 @@ class CarrierAgent
 			}
 		}
 
-		private TourActivity getTourActivity() {
-			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
-		}
-
 		private void handleEvent( ActivityStartEvent event ) {
 			Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId()); 
 			activity.setFacilityId(event.getFacilityId());
@@ -174,20 +182,8 @@ class CarrierAgent
 			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
 		}
 
-		private void handleEvent( VehicleLeavesTrafficEvent event ) {
-			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
-		}
-
-		private void handleEvent( PersonEntersVehicleEvent event ) {
-			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
-		}
-
-		private void handleEvent( VehicleEntersTrafficEvent event ) {
-			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
-		}
-
-		private void handleEvent( PersonLeavesVehicleEvent event ) {
-			notifyEventHappened(event, null, scheduledTour, driverId, activityCounter);
+		private TourActivity getTourActivity() {
+			return (TourActivity) this.scheduledTour.getTour().getTourElements().get(activityCounter);
 		}
 
 		CarrierVehicle getVehicle() {
@@ -341,45 +337,8 @@ class CarrierAgent
 		scoringFunction.finish();
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
-//	@Override public
-	void handleEvent(PersonArrivalEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(LinkEnterEvent event) {
-		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(LinkLeaveEvent event) {
-		getDriver(vehicle2DriverEventHandler.getDriverOfVehicle(event.getVehicleId())).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(PersonDepartureEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(ActivityEndEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(ActivityStartEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(VehicleLeavesTrafficEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(PersonEntersVehicleEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(VehicleEntersTrafficEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
-	}
-//	@Override public
-	void handleEvent(PersonLeavesVehicleEvent event) {
-		getDriver(event.getPersonId()).handleEvent(event);
+	void handleEvent( Event event, Id<Person> driverId ) {
+		getDriver( driverId ).handleTheEvent( event );
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
