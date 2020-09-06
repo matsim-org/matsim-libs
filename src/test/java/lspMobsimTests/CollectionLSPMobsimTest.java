@@ -9,9 +9,8 @@ import java.util.Random;
 
 import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
-import lsp.scoring.LSPScoringModulsUtils;
+import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.*;
-import lsp.usecase.*;
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,9 +24,7 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -175,7 +172,7 @@ public class CollectionLSPMobsimTest {
 		} );
 
 		controler.addOverridingModule( new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps ),
-				LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventCreatorUtils.getStandardEventCreators()) );
+				LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators()) );
 
 		controler.run();
 	}

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 
 public class LSPs {
 	
-	private Map<Id<LSP>, LSP> lsps = new HashMap<>();
+	private final Map<Id<LSP>, LSP> lsps = new HashMap<>();
 
 	public LSPs(Collection<LSP> lsps) {
 		makeMap(lsps);
@@ -20,17 +20,12 @@ public class LSPs {
 		}
 	}
 
-	public LSPs() {
-
-	}
+//	public LSPs() {
+//
+//	}
 
 	public Map<Id<LSP>, LSP> getLSPs() {
 		return lsps;
 	}
 
-	public void addLSP(LSP lsp) {
-		if(!lsps.containsKey(lsp.getId())){
-			lsps.put(lsp.getId(), lsp);
-		}
-	}
 }

@@ -8,7 +8,7 @@ import java.util.Random;
 import lsp.*;
 import lsp.replanning.LSPReplanner;
 import lsp.replanning.LSPReplanningUtils;
-import lsp.scoring.LSPScoringModulsUtils;
+import lsp.scoring.LSPScoringUtils;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.*;
 import org.matsim.api.core.v01.Id;
@@ -177,7 +177,7 @@ import lsp.shipment.LSPShipment;
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringModulsUtils.createDefaultLSPScoringModule(lsps), LSPEventCreatorUtils.getStandardEventCreators());
+		LSPModule module = new LSPModule(lsps, LSPReplanningUtils.createDefaultLSPReplanningModule(lsps), LSPScoringUtils.createDefaultLSPScoringModule(lsps ), LSPEventCreatorUtils.getStandardEventCreators());
 
 	  //Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);
