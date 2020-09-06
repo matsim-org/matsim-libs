@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 
 import org.apache.log4j.Logger;
@@ -54,11 +55,11 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
 
-		ToIntFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemandForTimeBin(time);
+		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemandForTimeBin(time);
 		Set<DrtZone> activeZones = zonalSystem.getZones()
 				.values()
 				.stream()
-				.filter(zone -> currentDemandEstimator.applyAsInt(zone) > 0)
+				.filter(zone -> currentDemandEstimator.applyAsDouble(zone) > 0)
 				.collect(toSet());
 
 		// TODO enable different methods for real time target generation by adding

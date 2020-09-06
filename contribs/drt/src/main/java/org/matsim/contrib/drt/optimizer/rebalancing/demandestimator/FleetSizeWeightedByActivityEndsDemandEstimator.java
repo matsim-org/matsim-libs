@@ -26,7 +26,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
@@ -62,19 +62,21 @@ public final class FleetSizeWeightedByActivityEndsDemandEstimator
 	private final Map<Double, Map<DrtZone, MutableInt>> activityEndsPerTimeBinAndZone = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 
-	public FleetSizeWeightedByActivityEndsDemandEstimator(DrtZonalSystem zonalSystem, FleetSpecification fleetSpecification, DrtConfigGroup drtCfg) {
+	public FleetSizeWeightedByActivityEndsDemandEstimator(DrtZonalSystem zonalSystem,
+			FleetSpecification fleetSpecification, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		this.fleetSpecification = fleetSpecification;
 		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
-	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
 		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
 		Map<DrtZone, MutableInt> expectedDemandForTimeBin = activityEndsPerTimeBinAndZone.getOrDefault(bin,
 				Collections.emptyMap());
 		int totalNrActivityEnds = expectedDemandForTimeBin.values().stream().mapToInt(MutableInt::intValue).sum();
-		return zone -> (int) Math.floor(fleetSize * (expectedDemandForTimeBin.getOrDefault(zone, ZERO).doubleValue() / totalNrActivityEnds)) ;
+		return zone -> Math.floor(
+				fleetSize * (expectedDemandForTimeBin.getOrDefault(zone, ZERO).doubleValue() / totalNrActivityEnds));
 	}
 
 	@Override

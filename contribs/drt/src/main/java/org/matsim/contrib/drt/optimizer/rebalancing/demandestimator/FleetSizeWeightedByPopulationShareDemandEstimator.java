@@ -25,7 +25,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import javax.validation.constraints.NotNull;
 
@@ -49,11 +49,11 @@ public final class FleetSizeWeightedByPopulationShareDemandEstimator implements 
 
 	private final DrtZonalSystem zonalSystem;
 	private final FleetSpecification fleetSpecification;
-	private Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
+	private final Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
 	private Integer totalNrActivities;
 
 	public FleetSizeWeightedByPopulationShareDemandEstimator(DrtZonalSystem zonalSystem, Population population,
-															 @NotNull FleetSpecification fleetSpecification) {
+			@NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
@@ -62,28 +62,32 @@ public final class FleetSizeWeightedByPopulationShareDemandEstimator implements 
 
 	private void countFirstActsPerZone(Population population) {
 		log.info("start counting how many first activities each rebalancing zone has");
-		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons().size());
+		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
+				.size());
 
-		population.getPersons().values().stream()
-				.map(person -> person.getSelectedPlan().getPlanElements().get(0)).forEach(element -> {
-			if (!(element instanceof Activity))
-				throw new RuntimeException("first plan element is not an activity");
-			Activity activity = (Activity)element;
-			DrtZone zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
-			if (zone != null) {
-				Integer oldDemandValue = this.activitiesPerZone.get(zone);
-				this.activitiesPerZone.put(zone, oldDemandValue + 1);
-			}
-		});
+		population.getPersons()
+				.values()
+				.stream()
+				.map(person -> person.getSelectedPlan().getPlanElements().get(0))
+				.forEach(element -> {
+					if (!(element instanceof Activity))
+						throw new RuntimeException("first plan element is not an activity");
+					Activity activity = (Activity)element;
+					DrtZone zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
+					if (zone != null) {
+						Integer oldDemandValue = this.activitiesPerZone.get(zone);
+						this.activitiesPerZone.put(zone, oldDemandValue + 1);
+					}
+				});
 
 		this.totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
 		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
 		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
-		return zoneId -> (int)Math.floor(
+		return zoneId -> Math.floor(
 				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
 	}
 

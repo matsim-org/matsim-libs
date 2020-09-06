@@ -23,7 +23,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 import static org.junit.Assert.assertEquals;
 
 import java.net.URL;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,7 +80,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) { //1800 is the rebalancing interval width
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 1);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 1);
@@ -93,11 +93,11 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 		}
 	}
 
-	private void assertDemand(ToIntFunction<DrtZone> demandFunction, DrtZonalSystem zonalSystem, String zoneId,
+	private void assertDemand(ToDoubleFunction<DrtZone> demandFunction, DrtZonalSystem zonalSystem, String zoneId,
 			double time, int expectedValue) {
 		DrtZone zone = zonalSystem.getZones().get(zoneId);
 		assertEquals("wrong estimation of demand at time=" + (time + 60) + " in zone " + zoneId, expectedValue,
-				demandFunction.applyAsInt(zone), MatsimTestUtils.EPSILON);
+				demandFunction.applyAsDouble(zone), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 2);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
@@ -141,7 +141,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
@@ -157,13 +157,14 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void PreviousIterationZonalDemandEstimatorWithSpeedUpModeTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "drt_teleportation", false);
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand,
+				"drt_teleportation", false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
@@ -179,13 +180,14 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByActivityEndsDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "", false);
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "",
+				false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
@@ -201,13 +203,14 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByPopulationShareDemandEstimatorTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "", false);
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "",
+				false);
 		controler.run();
 		ZonalDemandEstimator estimator = controler.getInjector()
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
@@ -223,7 +226,8 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	@Test
 	public void FleetSizeWeightedByPopulationShareDemandEstimatorFleetModificationTest() {
 		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "", false);
+				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "",
+				false);
 		// double number of vehicles after 0th iteration -> estimation of demand should double too (besides rounding issues)
 		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
 			@Override
@@ -239,7 +243,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
 		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
 		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-			ToIntFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
+			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
 					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
 			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
 			assertDemand(demandFunction, zonalSystem, "2", ii, 5);
@@ -253,7 +257,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	}
 
 	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType estimatorType,
-									 String drtSpeedUpModeForRebalancingConfiguration, boolean useServiceArea) {
+			String drtSpeedUpModeForRebalancingConfiguration, boolean useServiceArea) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"eight_shared_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -262,10 +266,10 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		drtCfg.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfiguration);
 
-		if(useServiceArea){
+		if (useServiceArea) {
 			throw new IllegalArgumentException("about to get implemented...");
-//			drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
-//			drtCfg.setDrtServiceAreaShapeFile("");
+			//			drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
+			//			drtCfg.setDrtServiceAreaShapeFile("");
 		}
 
 		MinCostFlowRebalancingStrategyParams rebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
