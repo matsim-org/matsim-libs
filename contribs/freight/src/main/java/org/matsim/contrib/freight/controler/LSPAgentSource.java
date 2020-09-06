@@ -34,6 +34,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -50,28 +51,28 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class LSPAgentSource implements AgentSource {
 
-	private static Logger log = Logger.getLogger( LSPAgentSource.class );
+	private static final Logger log = Logger.getLogger( LSPAgentSource.class );
 	
-	private Collection<Plan> vehicleRoutes;
+	private final Collection<Plan> vehicleRoutes;
 	
-	private Collection<MobsimAgent> mobSimAgents;
+	private final AgentFactory agentFactory;
 
-	private AgentFactory agentFactory;
-
-	private QSim qsim;
+	private final QSim qsim;
 
 	public LSPAgentSource( Collection<Plan> vehicleRoutes, AgentFactory agentFactory, QSim qsim ) {
 		this.vehicleRoutes = vehicleRoutes;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
-		mobSimAgents = new ArrayList<>();
 	}
 
 	@Override
 	public void insertAgentsIntoMobsim() {
 		for ( Plan vRoute : vehicleRoutes) {
+
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPerson());
-			Vehicle vehicle = null;
+			Gbl.assertNotNull( agent );
+
+			Vehicle vehicle;
 			if( FreightControlerUtils.getVehicle( vRoute ) == null){
 				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 				log.warn("vehicle for agent "+vRoute.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
@@ -81,18 +82,15 @@ public class LSPAgentSource implements AgentSource {
 				log.warn("vehicleType for agent "+vRoute.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
 			}
 			else vehicle = FreightControlerUtils.getVehicle( vRoute );
-//			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
+			Gbl.assertNotNull(vehicle);
+
 			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
+			Gbl.assertNotNull( qVeh );
+
 			qsim.addParkedVehicle( qVeh, agent.getCurrentLinkId() );
 			qsim.insertAgentIntoMobsim(agent);
-			mobSimAgents.add(agent);
+			log.warn( "just added vehicle with id=" + qVeh.getId() + " and agent with id=" + agent.getId() );
 		}
 	}
-
-	public Collection<MobsimAgent> getMobSimAgents() {
-		return mobSimAgents;
-	}
-	
-	
 
 }

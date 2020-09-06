@@ -8,27 +8,18 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
 
 /**
@@ -37,21 +28,39 @@ import org.matsim.core.scoring.ScoringFunction;
  * @author mzilske, sschroeder
  *
  */
-class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
+						     LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
+						     PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler 
+{
+	// yyyy not sure if this _has_ to be public, but current LSP design makes this necessary.  kai, sep'20
+
 	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
 
 	private final Carriers carriers;
 
 	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private final Collection<CarrierAgent> carrierAgents = new ArrayList<CarrierAgent>();
+	private final Collection<CarrierAgent> carrierAgents = new ArrayList<>();
 	
-	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<Id<Person>, CarrierAgent>();
+	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<>();
 
-	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
+	private Collection<LSPEventCreator> lspEventCreators;
+
+	private LSPFreightControlerListener listener;
+
+	public CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory ) {
 		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
+	}
+	public CarrierAgentTracker( Carriers carriers, LSPFreightControlerListener listener, Collection<LSPEventCreator> creators ) {
+		this.carriers = carriers;
+		this.lspEventCreators = creators;
+		createCarrierAgents();
+		this.listener = listener;
+
+		Gbl.assertNotNull( this.listener);
+		Gbl.assertNotNull( this.lspEventCreators );
 	}
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
@@ -65,6 +74,11 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 			carrierAgents.add(carrierAgent);
 		}
 	}
+	private void createCarrierAgents() {
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			carrierAgents.add( new CarrierAgent( this, carrier, delegate) );
+		}
+	}
 
 	/**
 	 * Returns the entire set of selected carrier plans.
@@ -72,7 +86,7 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 	 * @return collection of plans
 	 * @see Plan, CarrierPlan
 	 */
-	Collection<Plan> createPlans() {
+	public Collection<Plan> createPlans() {
 		List<Plan> vehicleRoutes = new ArrayList<>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
 			List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
@@ -106,6 +120,18 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 		return null;
 	}
 
+	private void processEvent(Event event) {
+		listener.processEvent(event);
+	}
+
+	public void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
+		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator LSPEventCreator : lspEventCreators ) {
+			Event customEvent = LSPEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
+			if(customEvent != null) {
+				processEvent(customEvent);
+			}
+		}
+	}
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId());
@@ -164,10 +190,37 @@ class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEvent
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
 		delegate.handleEvent(event);
+		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		delegate.handleEvent(event);
+		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		CarrierAgent carrierAgent = getCarrierAgent(delegate.getDriverOfVehicle(event.getVehicleId() ) );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event);	
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event);
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		CarrierAgent carrierAgent = getCarrierAgent(event.getPersonId() );
+		if(carrierAgent == null) return;
+		carrierAgent.handleEvent(event);	
 	}
 }
