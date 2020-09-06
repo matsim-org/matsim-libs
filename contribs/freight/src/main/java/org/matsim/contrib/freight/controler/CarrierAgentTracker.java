@@ -54,6 +54,8 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		createCarrierAgents(carrierScoringFunctionFactory);
 	}
 	public CarrierAgentTracker( Carriers carriers, LSPFreightControlerListener listener, Collection<LSPEventCreator> creators ) {
+		// yyyy needs to be public with current setup. kai, sep'20
+
 		this.carriers = carriers;
 		this.lspEventCreators = creators;
 		createCarrierAgents();
@@ -70,13 +72,13 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
 			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
 			log.warn( "" );
-			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction, vehicle2DriverEventHandler );
+			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction );
 			carrierAgents.add(carrierAgent);
 		}
 	}
 	private void createCarrierAgents() {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			carrierAgents.add( new CarrierAgent( this, carrier, vehicle2DriverEventHandler ) );
+			carrierAgents.add( new CarrierAgent( this, carrier ) );
 		}
 	}
 

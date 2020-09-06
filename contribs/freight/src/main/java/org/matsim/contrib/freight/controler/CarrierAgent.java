@@ -216,21 +216,17 @@ class CarrierAgent
 
 	private ScoringFunction scoringFunction;
 
-	private final Vehicle2DriverEventHandler vehicle2DriverEventHandler;
-
-	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction, Vehicle2DriverEventHandler vehicle2DriverEventHandler ) {
+	CarrierAgent( Carrier carrier, ScoringFunction carrierScoringFunction ) {
 		this.carrier = carrier;
 		this.id = carrier.getId();
 		this.scoringFunction = carrierScoringFunction;
-		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 
 		Gbl.assertNotNull(carrierScoringFunction);
 	}
 
-	public CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier, Vehicle2DriverEventHandler vehicle2DriverEventHandler ){
+	public CarrierAgent( CarrierAgentTracker lspCarrierTracker, Carrier carrier ){
 		lspTracker = lspCarrierTracker;
 		this.carrier = carrier;
-		this.vehicle2DriverEventHandler = vehicle2DriverEventHandler;
 		this.id = carrier.getId();
 
 		Gbl.assertNotNull( lspTracker );
