@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToDoubleFunction;
 import java.util.function.ToIntFunction;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
@@ -47,7 +48,7 @@ public class LinearRebalancingTargetCalculator implements RebalancingTargetCalcu
 	@Override
 	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		ToIntFunction<DrtZone> expectedDemandFunction = demandEstimator.getExpectedDemandForTimeBin(time + 60);
-		return zone -> (int)Math.round(alpha * expectedDemandFunction.applyAsInt(zone) + beta);
+		ToDoubleFunction<DrtZone> expectedDemandFunction = demandEstimator.getExpectedDemandForTimeBin(time + 60);
+		return zone -> (int)Math.round(alpha * expectedDemandFunction.applyAsDouble(zone) + beta);
 	}
 }
