@@ -6,13 +6,7 @@ import java.util.ListIterator;
 
 import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
@@ -254,7 +248,7 @@ import org.matsim.vehicles.VehicleType;
 	
 	
 	private Carrier createAuxiliaryCarrier( ArrayList<ShipmentWithTime> shipmentsInCurrentTour, double startTime ){
-		Carrier auxiliaryCarrier = CarrierImpl.newInstance(carrier.getId());
+		Carrier auxiliaryCarrier = CarrierUtils.createCarrier( carrier.getId() );
 		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getId(), carrierVehicle.getLocation());
 	    vBuilder.setEarliestStart(startTime);

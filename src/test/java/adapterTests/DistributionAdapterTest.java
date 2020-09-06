@@ -12,11 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -63,14 +59,14 @@ public class DistributionAdapterTest {
 			distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 			Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 			distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-			distributionCarrierVehicle.setVehicleType(distributionType);
-			
+			distributionCarrierVehicle.setType( distributionType );
+
 			CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 			capabilitiesBuilder.addType(distributionType);
 			capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 			capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 			capabilities = capabilitiesBuilder.build();
-			distributionCarrier = CarrierImpl.newInstance(carrierId);
+			distributionCarrier = CarrierUtils.createCarrier( carrierId );
 			distributionCarrier.setCarrierCapabilities(capabilities);
 			
 			

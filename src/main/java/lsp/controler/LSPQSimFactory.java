@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup.TimeWindowHandling;
+import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.controler.LSPAgentSource;
-import org.matsim.contrib.freight.controler.LSPCarrierTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -51,10 +51,10 @@ public class LSPQSimFactory implements Provider<Mobsim> {
 
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
-	private final LSPCarrierTracker carrierResourceTracker;
+	private final CarrierAgentTracker carrierResourceTracker;
 	private final FreightConfigGroup carrierConfig;
 
-	@Inject LSPQSimFactory( Scenario scenario, EventsManager eventsManager, LSPCarrierTracker carrierResourceTracker, FreightConfigGroup carrierConfig ) {
+	@Inject LSPQSimFactory( Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierResourceTracker, FreightConfigGroup carrierConfig ) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.carrierResourceTracker = carrierResourceTracker;

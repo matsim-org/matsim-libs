@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.LSPCarrierTracker;
+import org.matsim.contrib.freight.controler.CarrierAgentTracker;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
 import org.matsim.contrib.freight.controler.LSPFreightControlerListener;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,20 +44,17 @@ class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMob
 ReplanningListener, IterationEndsListener, IterationStartsListener{
 
 	
-	private LSPCarrierTracker carrierResourceTracker;
-	private Carriers carriers;    
-	private LSPs lsps;
-	private LSPReplanningModule replanningModule;
-	private LSPScoringModule scoringModule;
-	private Collection<LSPEventCreator> creators;
+	private CarrierAgentTracker carrierResourceTracker;
+	private final Carriers carriers;
+	private final LSPs lsps;
+	private final LSPReplanningModule replanningModule;
+	private final LSPScoringModule scoringModule;
+	private final Collection<LSPEventCreator> creators;
 	
 	private ArrayList <EventHandler> registeredHandlers;
-	
-	
-	@Inject EventsManager eventsManager;
-	@Inject Network network;
 
-	
+	@Inject EventsManager eventsManager;
+
 	@Inject LSPControlerListenerImpl( LSPs lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<LSPEventCreator> creators ) {
 	        this.lsps = lsps;
 	        this.replanningModule = replanningModule;
@@ -72,9 +69,9 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 		LSPRescheduler rescheduler = new LSPRescheduler(lsps);
 		rescheduler.notifyBeforeMobsim(event);
 		
-		carrierResourceTracker = new LSPCarrierTracker(carriers, network, this, creators);
+		carrierResourceTracker = new CarrierAgentTracker(carriers, this, creators);
 		eventsManager.addHandler(carrierResourceTracker);
-		registeredHandlers = new ArrayList<EventHandler>();
+		registeredHandlers = new ArrayList<>();
 		
 		for(LSP lsp : lsps.getLSPs().values()) {
 			for(LSPShipment shipment : lsp.getShipments()) {
@@ -175,7 +172,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 		return carriers;
 	}
 
-	public void processEvent(Event event){
+	@Override public void processEvent( Event event ){
 		   eventsManager.processEvent(event);
 	}
 
@@ -185,7 +182,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 		
 	}
 
-	public LSPCarrierTracker getCarrierResourceTracker() {
+	public CarrierAgentTracker getCarrierResourceTracker() {
 		return carrierResourceTracker;
 	}
 

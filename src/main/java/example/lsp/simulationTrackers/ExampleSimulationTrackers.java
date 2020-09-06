@@ -14,12 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -54,7 +49,7 @@ import lsp.shipment.LSPShipment;
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setVehicleType(collectionType);
+		carrierVehicle.setType( collectionType );
 
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
@@ -62,7 +57,7 @@ import lsp.shipment.LSPShipment;
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
 
-		Carrier carrier = CarrierImpl.newInstance(carrierId);
+		Carrier carrier = CarrierUtils.createCarrier( carrierId );
 		carrier.setCarrierCapabilities(capabilities);
 
 		//The Adapter i.e. the Resource is created

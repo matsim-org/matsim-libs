@@ -56,14 +56,14 @@ public class AssignerRequirementsTest {
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId);
-		redVehicle.setVehicleType(collectionType);
-		
+		redVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder redCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		redCapabilitiesBuilder.addType(collectionType);
 		redCapabilitiesBuilder.addVehicle(redVehicle);
 		redCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities redCapabilities = redCapabilitiesBuilder.build();
-		Carrier redCarrier = CarrierImpl.newInstance(redCarrierId);
+		Carrier redCarrier = CarrierUtils.createCarrier( redCarrierId );
 		redCarrier.setCarrierCapabilities(redCapabilities);
 				
 		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
@@ -92,14 +92,14 @@ public class AssignerRequirementsTest {
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId);
-		blueVehicle.setVehicleType(collectionType);
-		
+		blueVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder blueCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		blueCapabilitiesBuilder.addType(collectionType);
 		blueCapabilitiesBuilder.addVehicle(blueVehicle);
 		blueCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities blueCapabilities = blueCapabilitiesBuilder.build();
-		Carrier blueCarrier = CarrierImpl.newInstance(blueCarrierId);
+		Carrier blueCarrier = CarrierUtils.createCarrier( blueCarrierId );
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 				
 		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);

@@ -15,12 +15,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -63,14 +58,14 @@ public class CompleteLSPShipmentAssignerTest {
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle collectionCarrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setVehicleType(collectionType);
-		
+		collectionCarrierVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder collectionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		collectionCapabilitiesBuilder.addType(collectionType);
 		collectionCapabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		collectionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities collectionCapabilities = collectionCapabilitiesBuilder.build();
-		Carrier collectionCarrier = CarrierImpl.newInstance(collectionCarrierId);
+		Carrier collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
 		collectionCarrier.setCarrierCapabilities(collectionCapabilities);
 		
 		
@@ -117,15 +112,15 @@ public class CompleteLSPShipmentAssignerTest {
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
 		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
-		mainRunCarrierVehicle.setVehicleType(mainRunType);
-				
-		
+		mainRunCarrierVehicle.setType( mainRunType );
+
+
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = collectionCapabilitiesBuilder.build();
-		Carrier mainRunCarrier = CarrierImpl.newInstance(collectionCarrierId);
+		Carrier mainRunCarrier = CarrierUtils.createCarrier( collectionCarrierId );
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
 
 
@@ -172,14 +167,14 @@ public class CompleteLSPShipmentAssignerTest {
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		distributionCarrierVehicle.setVehicleType(distributionType);
-		
+		distributionCarrierVehicle.setType( distributionType );
+
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(distributionType);
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierImpl.newInstance(distributionCarrierId);
+		Carrier carrier = CarrierUtils.createCarrier( distributionCarrierId );
 		carrier.setCarrierCapabilities(distributionCapabilities);
 		
 		

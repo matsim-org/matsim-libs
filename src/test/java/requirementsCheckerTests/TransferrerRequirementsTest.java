@@ -14,11 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -64,14 +60,14 @@ public class TransferrerRequirementsTest {
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> redVehicleId = Id.createVehicleId("RedVehicle");
 		CarrierVehicle redVehicle = CarrierVehicle.newInstance(redVehicleId, collectionLinkId);
-		redVehicle.setVehicleType(collectionType);
-		
+		redVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder redCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		redCapabilitiesBuilder.addType(collectionType);
 		redCapabilitiesBuilder.addVehicle(redVehicle);
 		redCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities redCapabilities = redCapabilitiesBuilder.build();
-		Carrier redCarrier = CarrierImpl.newInstance(redCarrierId);
+		Carrier redCarrier = CarrierUtils.createCarrier( redCarrierId );
 		redCarrier.setCarrierCapabilities(redCapabilities);
 				
 		Id<LSPResource> redAdapterId = Id.create("RedCarrierAdapter", LSPResource.class);
@@ -101,14 +97,14 @@ public class TransferrerRequirementsTest {
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
 		CarrierVehicle blueVehicle = CarrierVehicle.newInstance(blueVehicleId, collectionLinkId);
-		blueVehicle.setVehicleType(collectionType);
-		
+		blueVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder blueCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		blueCapabilitiesBuilder.addType(collectionType);
 		blueCapabilitiesBuilder.addVehicle(blueVehicle);
 		blueCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities blueCapabilities = blueCapabilitiesBuilder.build();
-		Carrier blueCarrier = CarrierImpl.newInstance(blueCarrierId);
+		Carrier blueCarrier = CarrierUtils.createCarrier( blueCarrierId );
 		blueCarrier.setCarrierCapabilities(blueCapabilities);
 				
 		Id<LSPResource> blueAdapterId = Id.create("BlueCarrierAdapter", LSPResource.class);
