@@ -1,47 +1,28 @@
 package lsp.controler;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.inject.Inject;
-
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierAgentTracker;
-import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
-import org.matsim.contrib.freight.controler.LSPFreightControlerListener;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.ScoringListener;
-import org.matsim.core.events.handler.EventHandler;
-
+import lsp.*;
 import lsp.functions.LSPInfo;
-import lsp.LSP;
-import lsp.LSPPlan;
-import lsp.LSPs;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
 import lsp.replanning.LSPReplanningModule;
 import lsp.resources.LSPCarrierResource;
 import lsp.scoring.LSPScoringModule;
 import lsp.shipment.LSPShipment;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.controler.CarrierAgentTracker;
+import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
+import org.matsim.core.events.handler.EventHandler;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.Collection;
 
 
-class LSPControlerListenerImpl implements LSPFreightControlerListener, BeforeMobsimListener, AfterMobsimListener, ScoringListener,
-ReplanningListener, IterationEndsListener, IterationStartsListener{
+class LSPControlerListenerImpl implements BeforeMobsimListener, AfterMobsimListener, ScoringListener,
+ReplanningListener, IterationStartsListener{
 
 	
 	private CarrierAgentTracker carrierResourceTracker;
@@ -69,7 +50,7 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 		LSPRescheduler rescheduler = new LSPRescheduler(lsps);
 		rescheduler.notifyBeforeMobsim(event);
 		
-		carrierResourceTracker = new CarrierAgentTracker(carriers, this, creators);
+		carrierResourceTracker = new CarrierAgentTracker(carriers, creators, eventsManager );
 		eventsManager.addHandler(carrierResourceTracker);
 		registeredHandlers = new ArrayList<>();
 		
@@ -170,16 +151,6 @@ ReplanningListener, IterationEndsListener, IterationStartsListener{
 			}
 		}
 		return carriers;
-	}
-
-	@Override public void processEvent( Event event ){
-		   eventsManager.processEvent(event);
-	}
-
-	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		
-		
 	}
 
 	public CarrierAgentTracker getCarrierResourceTracker() {
