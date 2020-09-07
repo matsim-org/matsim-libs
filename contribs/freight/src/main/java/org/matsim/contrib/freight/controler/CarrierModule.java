@@ -91,10 +91,10 @@ public class CarrierModule extends AbstractModule {
 			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 		}
 
-		// First, we need a ControlerListener.
-		bind(CarrierControlerListener.class).asEagerSingleton();
+		bind(CarrierControlerListener.class).in( Singleton.class );
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
+		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
 		List<String> abc = qsimComponents.getActiveComponents();
 		abc.add( FreightAgentSource.COMPONENT_NAME ) ;
@@ -109,6 +109,7 @@ public class CarrierModule extends AbstractModule {
 		}
 		qsimComponents.setActiveComponents( abc );
 
+		// this installs qsim components, which are switched on (or not) via the above syntax:
 		this.installQSimModule( new AbstractQSimModule(){
 			@Override protected void configureQSim(){
 				this.bind( FreightAgentSource.class ).in( Singleton.class );

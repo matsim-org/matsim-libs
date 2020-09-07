@@ -29,9 +29,7 @@
 package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -47,7 +45,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 import javax.inject.Inject;
-import java.util.Map;
+
 /**
  * Controls the workflow of the simulation.
  * <p></p>
@@ -81,7 +79,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 	}
 
 	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory);
+		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
 		eventsManager.addHandler(carrierAgentTracker);
 		// (add and remove per mobsim run)
 	}

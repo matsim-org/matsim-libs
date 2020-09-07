@@ -18,6 +18,7 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
 import org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -44,24 +45,24 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	
 	private final Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<>();
 
+	private final EventsManager events;
+
 	private Collection<LSPEventCreator> lspEventCreators;
 
-	private LSPFreightControlerListener listener;
-
-	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory ) {
+	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
+		this.events = events;
 		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
 	}
-	public CarrierAgentTracker( Carriers carriers, LSPFreightControlerListener listener, Collection<LSPEventCreator> creators ) {
+	public CarrierAgentTracker( Carriers carriers, Collection<LSPEventCreator> creators, EventsManager events ) {
 		// yyyy needs to be public with current setup. kai, sep'20
 
 		this.carriers = carriers;
 		this.lspEventCreators = creators;
+		this.events = events;
 		createCarrierAgents();
-		this.listener = listener;
 
-		Gbl.assertNotNull( this.listener);
 		Gbl.assertNotNull( this.lspEventCreators );
 	}
 
@@ -122,15 +123,11 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		return null;
 	}
 
-	private void processEvent(Event event) {
-		listener.processEvent(event);
-	}
-
 	void notifyEventHappened( Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId, int activityCounter ) {
 		for( org.matsim.contrib.freight.events.eventsCreator.LSPEventCreator LSPEventCreator : lspEventCreators ) {
 			Event customEvent = LSPEventCreator.createEvent(event, carrier, activity, scheduledTour, driverId, activityCounter);
 			if(customEvent != null) {
-				processEvent(customEvent);
+				events.processEvent(customEvent);
 			}
 		}
 	}
