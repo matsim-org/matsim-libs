@@ -23,7 +23,6 @@ import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -73,7 +72,7 @@ class CarrierAgent
 			this.scheduledTour = tour;
 		}
 
-		private void handleTheEvent( Event event ) {
+		private void handleAnEvent( Event event ) {
 			if ( event instanceof PersonArrivalEvent ) {
 				handleEvent( (PersonArrivalEvent) event );
 			} else if ( event instanceof PersonDepartureEvent ){
@@ -334,7 +333,7 @@ class CarrierAgent
 		carrier.getSelectedPlan().setScore(scoringFunction.getScore());
 	}
 	void handleEvent( Event event, Id<Person> driverId ) {
-		getDriver( driverId ).handleTheEvent( event );
+		getDriver( driverId ).handleAnEvent( event );
 	}
 	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
