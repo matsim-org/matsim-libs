@@ -43,10 +43,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebal
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.core.config.Config;
@@ -55,42 +51,18 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class ZonalDemandEstimatorWithoutServiceAreaTest {
+public class PreviousIterationDRTDemandEstimatorTest {
 
 	//TODO write test with service area !!
 	// (with an service area, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
-
-	//	@Test
-	//	public void EqualVehicleDensityZonalDemandEstimatorTest() {
-	//		Controler controler = setupControler(
-	//				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "", false);
-	//		controler.run();
-	//		ZonalDemandEstimator estimator = controler.getInjector()
-	//				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-	//		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-	//		for (double ii = 0; ii < 16 * 3600; ii += 1800) { //1800 is the rebalancing interval width
-	//			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-	//					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-	//			assertDemand(demandFunction, zonalSystem, "1", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "2", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "3", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "4", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "5", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "6", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "7", ii, 1);
-	//			assertDemand(demandFunction, zonalSystem, "8", ii, 1);
-	//		}
-	//	}
 
 	private void assertDemand(ToDoubleFunction<DrtZone> demandFunction, DrtZonalSystem zonalSystem, String zoneId,
 			double time, int expectedValue) {
@@ -99,40 +71,8 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 				demandFunction.applyAsDouble(zone), MatsimTestUtils.EPSILON);
 	}
 
-	//	@Test
-	//	public void EqualVehicleDensityZonalDemandEstimatorFleetModificationTest() {
-	//		Controler controler = setupControler(
-	//				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.EqualVehicleDensity, "", false);
-	//		// double number of vehicles after 0th iteration -> estimation of demand should double too
-	//		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
-	//			@Override
-	//			public void install() {
-	//				bindModal(FleetModifier.class).toProvider(
-	//						modalProvider(getter -> new FleetModifier(getter.getModal(FleetSpecification.class), 8)))
-	//						.asEagerSingleton();
-	//				addControlerListenerBinding().to(modalKey(FleetModifier.class));
-	//			}
-	//		});
-	//		controler.run();
-	//		ZonalDemandEstimator estimator = controler.getInjector()
-	//				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-	//		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-	//		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-	//			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-	//					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-	//			assertDemand(demandFunction, zonalSystem, "1", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "3", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "5", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "6", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "7", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
-	//		}
-	//	}
-
 	@Test
-	public void PreviousIterationZonalDemandEstimatorTest() {
+	public void estimateDemand_standardSetup() {
 		Controler controler = setupControler(
 				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "", false);
 		controler.run();
@@ -154,7 +94,7 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void PreviousIterationZonalDemandEstimatorWithSpeedUpModeTest() {
+	public void estimateDemand_withSpeedUpMode() {
 		Controler controler = setupControler(
 				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand,
 				"drt_teleportation", false);
@@ -175,62 +115,6 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
 		}
 	}
-
-	//	@Test
-	//	public void FleetSizeWeightedByPopulationShareDemandEstimatorTest() {
-	//		Controler controler = setupControler(
-	//				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "",
-	//				false);
-	//		controler.run();
-	//		ZonalDemandEstimator estimator = controler.getInjector()
-	//				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-	//		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-	//		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-	//			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-	//					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-	//			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
-	//			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
-	//		}
-	//	}
-	//
-	//	@Test
-	//	public void FleetSizeWeightedByPopulationShareDemandEstimatorFleetModificationTest() {
-	//		Controler controler = setupControler(
-	//				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "",
-	//				false);
-	//		// double number of vehicles after 0th iteration -> estimation of demand should double too (besides rounding issues)
-	//		controler.addOverridingModule(new AbstractDvrpModeModule("drt") {
-	//			@Override
-	//			public void install() {
-	//				bindModal(FleetModifier.class).toProvider(
-	//						modalProvider(getter -> new FleetModifier(getter.getModal(FleetSpecification.class), 8)))
-	//						.asEagerSingleton();
-	//				addControlerListenerBinding().to(modalKey(FleetModifier.class));
-	//			}
-	//		});
-	//		controler.run();
-	//		ZonalDemandEstimator estimator = controler.getInjector()
-	//				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-	//		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-	//		for (double ii = 0; ii < 16 * 3600; ii += 1800) {
-	//			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-	//					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-	//			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "2", ii, 5);
-	//			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "4", ii, 5);
-	//			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-	//			assertDemand(demandFunction, zonalSystem, "8", ii, 5);
-	//		}
-	//	}
 
 	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType estimatorType,
 			String drtSpeedUpModeForRebalancingConfiguration, boolean useServiceArea) {
@@ -366,43 +250,4 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 			population.addPerson(person);
 		}
 	}
-
-	private class FleetModifier implements IterationEndsListener {
-		private FleetSpecification fleetSpecification;
-		private int numberOfVehiclesToAdd;
-
-		FleetModifier(FleetSpecification fleetSpecification, int numberOfVehiclesToAdd) {
-			this.fleetSpecification = fleetSpecification;
-			this.numberOfVehiclesToAdd = numberOfVehiclesToAdd;
-		}
-
-		@Override
-		public void notifyIterationEnds(IterationEndsEvent event) {
-			if (event.getIteration() == 0) {
-				// find any vehicle id to clone later
-				Id<DvrpVehicle> vehicleIdToBeCopied = fleetSpecification.getVehicleSpecifications()
-						.keySet()
-						.iterator()
-						.next();
-				DvrpVehicleSpecification dvrpVehicleSpecficationToBeCloned = fleetSpecification.getVehicleSpecifications()
-						.get(vehicleIdToBeCopied);
-
-				for (int vehicleCounter = 1; vehicleCounter <= numberOfVehiclesToAdd; vehicleCounter++) {
-					Id<DvrpVehicle> id = Id.create(
-							"optDrt_" + vehicleCounter + "_cloneOf_" + dvrpVehicleSpecficationToBeCloned.getId(),
-							DvrpVehicle.class);
-					DvrpVehicleSpecification newSpecification = ImmutableDvrpVehicleSpecification.newBuilder()
-							.id(id)
-							.serviceBeginTime(dvrpVehicleSpecficationToBeCloned.getServiceBeginTime())
-							.serviceEndTime(dvrpVehicleSpecficationToBeCloned.getServiceEndTime())
-							.startLinkId(dvrpVehicleSpecficationToBeCloned.getStartLinkId())
-							.capacity(dvrpVehicleSpecficationToBeCloned.getCapacity())
-							.build();
-
-					fleetSpecification.addVehicleSpecification(newSpecification);
-				}
-			}
-		}
-	}
-
 }
