@@ -36,11 +36,12 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
 	public enum RebalancingTargetCalculatorType {
-		LinearRebalancingTarget, EqualRebalancableVehicleDistribution
+		LinearRebalancingTarget, EqualRebalancableVehicleDistribution, EqualVehicleDensity,
+		EqualVehiclesToPopulationRatio
 	}
 
 	public enum ZonalDemandEstimatorType {
-		PreviousIterationDemand, EqualVehicleDensity, FleetSizeWeightedByPopulationShare
+		PreviousIterationDemand
 	}
 
 	public static final String TARGET_ALPHA = "targetAlpha";
@@ -56,12 +57,14 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	public static final String REBALANCING_TARGET_CALCULATOR_TYPE = "rebalancingTargetCalculatorType";
 	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =
 			"Defines the calculator used for computing rebalancing targets per each zone"
-					+ " (i.e. number of the desired vehicles). Current default is LinearRebalancingTarget";
+					+ " (i.e. number of the desired vehicles)."
+					+ " Can be one of [LinearRebalancingTarget, EqualRebalancableVehicleDistribution,"
+					+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
+					+ " Current default is LinearRebalancingTarget";
 
 	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandEstimatorType";
 	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand, EqualVehicleDensity,"
-			+ " FleetSizeWeightedByPopulationShare] Current default is PreviousIterationDemand";
+			+ " Can be one of [PreviousIterationDemand]. Current default is PreviousIterationDemand";
 
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.LinearRebalancingTarget;
