@@ -36,8 +36,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	public static final String SET_NAME = "minCostFlowRebalancingStrategy";
 
 	public enum RebalancingTargetCalculatorType {
-		LinearRebalancingTarget, EqualRebalancableVehicleDistribution, EqualVehicleDensity,
-		EqualVehiclesToPopulationRatio
+		EstimatedDemand, EqualRebalancableVehicleDistribution, EqualVehicleDensity, EqualVehiclesToPopulationRatio
 	}
 
 	public enum ZonalDemandEstimatorType {
@@ -67,7 +66,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 			+ " Can be one of [PreviousIterationDemand]. Current default is PreviousIterationDemand";
 
 	@NotNull
-	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.LinearRebalancingTarget;
+	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
 	@Nullable
 	@PositiveOrZero
