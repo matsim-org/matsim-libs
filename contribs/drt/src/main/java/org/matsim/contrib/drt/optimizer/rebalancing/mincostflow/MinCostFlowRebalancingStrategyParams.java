@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -76,7 +78,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@PositiveOrZero
 	private Double targetBeta = null;
 
-	@NotNull
+	@Nullable //required only if rebalancingTargetCalculatorType == EstimatedDemand
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
 	public MinCostFlowRebalancingStrategyParams() {
@@ -86,6 +88,16 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
+
+		if (rebalancingTargetCalculatorType == RebalancingTargetCalculatorType.EstimatedDemand) {
+			checkState(zonalDemandEstimatorType != null,
+					"zonalDemandEstimatorType is required if EstimatedDemand is used as rebalancing target");
+			checkState(targetAlpha != null, "targetAlpha is required if EstimatedDemand is used as rebalancing target");
+			checkState(targetBeta != null, "targetBeta is required if EstimatedDemand is used as rebalancing target");
+		} else {
+			checkState(zonalDemandEstimatorType == null,
+					"zonalDemandEstimatorType should be null if the rebalancing target is not set to EstimatedDemand");
+		}
 	}
 
 	@Override
