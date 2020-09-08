@@ -20,234 +20,160 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URL;
-import java.util.function.ToDoubleFunction;
+import java.util.List;
+import java.util.Map;
 
-import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
-import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.testcases.fakes.FakeLink;
 
+/**
+ * @author michalm (Michal Maciejewski)
+ */
 public class PreviousIterationDRTDemandEstimatorTest {
 
-	//TODO write test with service area !!
-	// (with an service area, demand estimation zones are not spread over the entire network but restricted to the service are (plus a little surrounding))
+	private static final String DRT_SPEEDUP = "drt_speedup";
 
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	private final Link link1 = new FakeLink(Id.createLinkId("link_1"));
+	private final Link link2 = new FakeLink(Id.createLinkId("link_2"));
 
-	private void assertDemand(ToDoubleFunction<DrtZone> demandFunction, DrtZonalSystem zonalSystem, String zoneId,
-			double time, int expectedValue) {
-		DrtZone zone = zonalSystem.getZones().get(zoneId);
-		assertEquals("wrong estimation of demand at time=" + (time + 60) + " in zone " + zoneId, expectedValue,
-				demandFunction.applyAsDouble(zone), MatsimTestUtils.EPSILON);
+	private final DrtZone zone1 = DrtZone.createDummyZone("zone_1", List.of(link1), new Coord());
+	private final DrtZone zone2 = DrtZone.createDummyZone("zone_2", List.of(link2), new Coord());
+	private final DrtZonalSystem zonalSystem = new DrtZonalSystem(Map.of(zone1.getId(), zone1, zone2.getId(), zone2));
+
+	@Test
+	public void noDepartures() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
+
+		//no events in previous iterations
+		estimator.reset(1);
+
+		assertDemand(estimator, 0, zone1, 0);
+		assertDemand(estimator, 2000, zone1, 0);
+		assertDemand(estimator, 4000, zone1, 0);
+		assertDemand(estimator, 0, zone2, 0);
+		assertDemand(estimator, 2000, zone2, 0);
+		assertDemand(estimator, 4000, zone2, 0);
 	}
 
 	@Test
-	public void estimateDemand_standardSetup() {
-		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand, "", false);
-		controler.run();
-		ZonalDemandEstimator estimator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "4", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
-		}
+	public void drtDepartures() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
+
+		//time bin 0-1800
+		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
+		estimator.handleEvent(departureEvent(200, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(500, link2, TransportMode.drt));
+		estimator.handleEvent(departureEvent(1500, link1, TransportMode.drt));
+		//time bin 1800-3600
+		estimator.handleEvent(departureEvent(2500, link1, DRT_SPEEDUP));
+		//time bin 3600-5400
+		estimator.handleEvent(departureEvent(4000, link2, TransportMode.drt));
+		//time bin 5400-7200
+		estimator.handleEvent(departureEvent(7000, link1, TransportMode.drt));
+		estimator.handleEvent(departureEvent(7100, link2, DRT_SPEEDUP));
+		estimator.reset(1);
+
+		//time bin 0-1800
+		assertDemand(estimator, 0, zone1, 3);
+		assertDemand(estimator, 0, zone2, 1);
+		//time bin 1800-3600
+		assertDemand(estimator, 1800, zone1, 1);
+		assertDemand(estimator, 1800, zone2, 0);
+		//time bin 3600-5400
+		assertDemand(estimator, 3600, zone1, 0);
+		assertDemand(estimator, 3600, zone2, 1);
+		//time bin 5400-7200
+		assertDemand(estimator, 5400, zone1, 1);
+		assertDemand(estimator, 5400, zone2, 1);
+		//time bin 7200-9000
+		assertDemand(estimator, 7200, zone1, 0);
+		assertDemand(estimator, 7200, zone2, 0);
 	}
 
 	@Test
-	public void estimateDemand_withSpeedUpMode() {
-		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.PreviousIterationDemand,
-				"drt_teleportation", false);
-		controler.run();
-		ZonalDemandEstimator estimator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "2", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "4", ii, 3);
-			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "8", ii, 3);
-		}
+	public void nonDrtDepartures() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
+
+		estimator.handleEvent(departureEvent(100, link1, "mode X"));
+		estimator.handleEvent(departureEvent(200, link2, TransportMode.car));
+		estimator.reset(1);
+
+		assertDemand(estimator, 0, zone1, 0);
+		assertDemand(estimator, 0, zone2, 0);
 	}
 
-	private Controler setupControler(MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType estimatorType,
-			String drtSpeedUpModeForRebalancingConfiguration, boolean useServiceArea) {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
-				"eight_shared_taxi_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
+	@Test
+	public void currentCountsAreCopiedToPreviousAfterReset() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
 
-		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
-		drtCfg.setDrtSpeedUpMode(drtSpeedUpModeForRebalancingConfiguration);
+		estimator.handleEvent(departureEvent(100, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(200, link2, TransportMode.drt));
 
-		if (useServiceArea) {
-			throw new IllegalArgumentException("about to get implemented...");
-			//			drtCfg.setOperationalScheme(DrtConfigGroup.OperationalScheme.serviceAreaBased);
-			//			drtCfg.setDrtServiceAreaShapeFile("");
-		}
+		assertDemand(estimator, 0, zone1, 0);
+		assertDemand(estimator, 0, zone2, 0);
 
-		MinCostFlowRebalancingStrategyParams rebalancingStrategyParams = new MinCostFlowRebalancingStrategyParams();
-		rebalancingStrategyParams.setTargetAlpha(1);
-		rebalancingStrategyParams.setTargetBeta(0);
-		rebalancingStrategyParams.setZonalDemandEstimatorType(estimatorType);
+		estimator.reset(1);
 
+		assertDemand(estimator, 0, zone1, 1);
+		assertDemand(estimator, 0, zone2, 1);
+	}
+
+	@Test
+	public void timeBinsAreRespected() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
+
+		estimator.handleEvent(departureEvent(100, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(2200, link2, TransportMode.drt));
+		estimator.reset(1);
+
+		assertDemand(estimator, 0, zone1, 1);
+		assertDemand(estimator, 1799, zone1, 1);
+		assertDemand(estimator, 1800, zone1, 0);
+
+		assertDemand(estimator, 1799, zone2, 0);
+		assertDemand(estimator, 1800, zone2, 1);
+		assertDemand(estimator, 3599, zone2, 1);
+		assertDemand(estimator, 3600, zone2, 0);
+	}
+
+	@Test
+	public void noTimeLimitIsImposed() {
+		PreviousIterationDRTDemandEstimator estimator = createEstimator(1800);
+
+		estimator.handleEvent(departureEvent(10000000, link1, DRT_SPEEDUP));
+		estimator.reset(1);
+
+		assertDemand(estimator, 10000000, zone1, 1);
+	}
+
+	private PreviousIterationDRTDemandEstimator createEstimator(int timeBinSize) {
 		RebalancingParams rebalancingParams = new RebalancingParams();
-		rebalancingParams.addParameterSet(rebalancingStrategyParams);
-		drtCfg.addParameterSet(rebalancingParams);
+		rebalancingParams.setInterval(timeBinSize);
 
-		DrtZonalSystemParams zonalSystemParams = new DrtZonalSystemParams();
-		zonalSystemParams.setZonesGeneration(DrtZonalSystemParams.ZoneGeneration.GridFromNetwork);
-		zonalSystemParams.setCellSize(500.);
-		drtCfg.addParameterSet(zonalSystemParams);
+		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
+		drtConfigGroup.setDrtSpeedUpMode(DRT_SPEEDUP);
+		drtConfigGroup.addParameterSet(rebalancingParams);
 
-		drtCfg.setChangeStartLinkToLastLinkInSchedule(false); //do not take result from last iteration...
-
-		config.controler().setLastIteration(1);
-		config.qsim().setStartTime(0.);
-		config.controler()
-				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-		PlansCalcRouteConfigGroup.ModeRoutingParams pseudoDrtSpeedUpModeRoutingParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(
-				"drt_teleportation");
-		pseudoDrtSpeedUpModeRoutingParams.setBeelineDistanceFactor(1.3);
-		pseudoDrtSpeedUpModeRoutingParams.setTeleportedModeSpeed(8.0);
-		config.plansCalcRoute().addModeRoutingParams(pseudoDrtSpeedUpModeRoutingParams);
-
-		// if adding a new mode (drtSpeedUpMode), some default modes are deleted, so re-insert them...
-		PlansCalcRouteConfigGroup.ModeRoutingParams walkRoutingParams = new PlansCalcRouteConfigGroup.ModeRoutingParams(
-				TransportMode.walk);
-		walkRoutingParams.setBeelineDistanceFactor(1.3);
-		walkRoutingParams.setTeleportedModeSpeed(3.0 / 3.6);
-		config.plansCalcRoute().addModeRoutingParams(walkRoutingParams);
-
-		PlanCalcScoreConfigGroup.ModeParams pseudoDrtSpeedUpModeScoreParams = new PlanCalcScoreConfigGroup.ModeParams(
-				"drt_teleportation");
-		config.planCalcScore().addModeParams(pseudoDrtSpeedUpModeScoreParams);
-
-		//this is the wrong way around (create controler before manipulating scenario...
-		Controler controler = DrtControlerCreator.createControler(config, false);
-		setupPopulation(controler.getScenario().getPopulation());
-		return controler;
+		return new PreviousIterationDRTDemandEstimator(zonalSystem, drtConfigGroup);
 	}
 
-	/**
-	 * we have eight zones, 2 rows 4 columns.
-	 * order of zones:
-	 * 2	4	6	8
-	 * 1	3	5	7
-	 * <p>
-	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
-	 * That should lead to half of the drt vehicles rebalanced to the left column when using FleetSizeWeightedByActivityEndsDemandEstimator.
-	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
-	 * That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationDRTDemandEstimator.
-	 * 3) in the center, there is nothing happening.
-	 * But, when using EqualVehicleDensityZonalDemandEstimator, one vehicle should get sent to every zone..
-	 */
-	private void setupPopulation(Population population) {
-		//delete what's there
-		population.getPersons().clear();
+	private PersonDepartureEvent departureEvent(double time, Link link, String mode) {
+		return new PersonDepartureEvent(time, null, link.getId(), mode);
+	}
 
-		PopulationFactory factory = population.getFactory();
-
-		Id<Link> left1 = Id.createLinkId(344);
-		Id<Link> left2 = Id.createLinkId(112);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("leftColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", left1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg(TransportMode.car));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", left2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-
-		Id<Link> right1 = Id.createLinkId(151);
-		Id<Link> right2 = Id.createLinkId(319);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("rightColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", right1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg(TransportMode.drt));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", right2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-
-		Id<Link> center1 = Id.createLinkId(147);
-		Id<Link> center2 = Id.createLinkId(315);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("centerColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", center1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg("drt_teleportation"));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", center2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
+	private void assertDemand(PreviousIterationDRTDemandEstimator estimator, double time, DrtZone zone,
+			double expectedDemand) {
+		assertThat(estimator.getExpectedDemandForTimeBin(time).applyAsDouble(zone)).isEqualTo(expectedDemand);
 	}
 }
