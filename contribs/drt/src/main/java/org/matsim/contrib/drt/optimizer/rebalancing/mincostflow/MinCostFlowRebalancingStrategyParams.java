@@ -40,8 +40,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	public enum ZonalDemandEstimatorType {
-		PreviousIterationDemand, FleetSizeWeightedByActivityEnds, EqualVehicleDensity,
-		FleetSizeWeightedByPopulationShare
+		PreviousIterationDemand, EqualVehicleDensity, FleetSizeWeightedByPopulationShare
 	}
 
 	public static final String TARGET_ALPHA = "targetAlpha";
@@ -61,7 +60,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandEstimatorType";
 	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand, FleetSizeWeightedByActivityEnds, EqualVehicleDensity,"
+			+ " Can be one of [PreviousIterationDemand, EqualVehicleDensity,"
 			+ " FleetSizeWeightedByPopulationShare] Current default is PreviousIterationDemand";
 
 	@NotNull

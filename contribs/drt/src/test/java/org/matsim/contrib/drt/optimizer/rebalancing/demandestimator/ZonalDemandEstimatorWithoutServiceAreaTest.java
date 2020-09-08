@@ -178,29 +178,6 @@ public class ZonalDemandEstimatorWithoutServiceAreaTest {
 	}
 
 	@Test
-	public void FleetSizeWeightedByActivityEndsDemandEstimatorTest() {
-		Controler controler = setupControler(
-				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByActivityEnds, "",
-				false);
-		controler.run();
-		ZonalDemandEstimator estimator = controler.getInjector()
-				.getInstance(DvrpModes.key(ZonalDemandEstimator.class, "drt"));
-		DrtZonalSystem zonalSystem = controler.getInjector().getInstance(DvrpModes.key(DrtZonalSystem.class, "drt"));
-		for (double ii = 1800; ii < 16 * 3600; ii += 1800) {
-			ToDoubleFunction<DrtZone> demandFunction = estimator.getExpectedDemandForTimeBin(
-					ii + 60); //inside DRT, the demand is actually estimated for rebalancing time + 60 seconds..
-			assertDemand(demandFunction, zonalSystem, "1", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "2", ii, 2);
-			assertDemand(demandFunction, zonalSystem, "3", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "4", ii, 2);
-			assertDemand(demandFunction, zonalSystem, "5", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "6", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "7", ii, 0);
-			assertDemand(demandFunction, zonalSystem, "8", ii, 2);
-		}
-	}
-
-	@Test
 	public void FleetSizeWeightedByPopulationShareDemandEstimatorTest() {
 		Controler controler = setupControler(
 				MinCostFlowRebalancingStrategyParams.ZonalDemandEstimatorType.FleetSizeWeightedByPopulationShare, "",

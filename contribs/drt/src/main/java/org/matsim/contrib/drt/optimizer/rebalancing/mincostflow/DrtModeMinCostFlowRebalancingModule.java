@@ -26,7 +26,6 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.EqualVehicleDensityZonalDemandEstimator;
-import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByActivityEndsDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.FleetSizeWeightedByPopulationShareDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.PreviousIterationDRTDemandEstimator;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
@@ -96,15 +95,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
-				break;
-			case FleetSizeWeightedByActivityEnds:
-				bindModal(FleetSizeWeightedByActivityEndsDemandEstimator.class).toProvider(modalProvider(
-						getter -> new FleetSizeWeightedByActivityEndsDemandEstimator(
-								getter.getModal(DrtZonalSystem.class), getter.getModal(FleetSpecification.class),
-								drtCfg))).asEagerSingleton();
-				bindModal(ZonalDemandEstimator.class).to(
-						modalKey(FleetSizeWeightedByActivityEndsDemandEstimator.class));
-				addEventHandlerBinding().to(modalKey(FleetSizeWeightedByActivityEndsDemandEstimator.class));
 				break;
 			case EqualVehicleDensity:
 				bindModal(ZonalDemandEstimator.class).toProvider(modalProvider(
