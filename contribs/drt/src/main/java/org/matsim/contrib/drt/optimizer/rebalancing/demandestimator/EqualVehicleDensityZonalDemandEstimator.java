@@ -25,7 +25,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import javax.validation.constraints.NotNull;
 
@@ -54,17 +54,15 @@ public final class EqualVehicleDensityZonalDemandEstimator implements ZonalDeman
 		this.fleetSpecification = fleetSpecification;
 	}
 
-	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		return zone -> {
 			double areaShare = zoneAreaShares.getOrDefault(zone, 0.);
-			return (int)Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
+			return Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
 		};
 	}
 
 	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
-		double areaSum = zonalSystem.getZones()
-				.values()
-				.stream()
+		double areaSum = zonalSystem.getZones().values().stream()
 				.mapToDouble(z -> z.getPreparedGeometry().getGeometry().getArea())
 				.sum();
 

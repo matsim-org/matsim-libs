@@ -22,6 +22,8 @@ package org.matsim.contrib.drt.analysis.zonal;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -31,25 +33,45 @@ import org.matsim.core.utils.geometry.geotools.MGC;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtZone {
+	public static DrtZone createDummyZone(String id, List<Link> links, Coord centroid) {
+		return new DrtZone(id, null, links, centroid);
+	}
+
 	private final String id;
-	private final PreparedGeometry preparedGeometry;
+	@Nullable
+	private final PreparedGeometry preparedGeometry; //null for virtual/dummy zones
 	private final List<Link> links;
+	private final Coord centroid;
 
 	public DrtZone(String id, PreparedGeometry preparedGeometry, List<Link> links) {
+		this(id, preparedGeometry, links, MGC.point2Coord(preparedGeometry.getGeometry().getCentroid()));
+	}
+
+	private DrtZone(String id, @Nullable PreparedGeometry preparedGeometry, List<Link> links, Coord centroid) {
 		this.id = id;
 		this.preparedGeometry = preparedGeometry;
 		this.links = links;
+		this.centroid = centroid;
 	}
 
 	public String getId() {
 		return id;
 	}
 
+	@Nullable
 	public PreparedGeometry getPreparedGeometry() {
 		return preparedGeometry;
 	}
 
-	public Coord getCentroid() { return MGC.point2Coord(preparedGeometry.getGeometry().getCentroid());	}
+	public Coord getCentroid() {
+		return centroid;
+	}
 
-	public List<Link> getLinks() { return links; }
+	public List<Link> getLinks() {
+		return links;
+	}
+
+	boolean isDummy() {
+		return preparedGeometry == null;
+	}
 }

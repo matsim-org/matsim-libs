@@ -26,7 +26,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
@@ -100,7 +100,7 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 		return Math.floor(time / timeBinSize);
 	}
 
-	public ToIntFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		Double bin = getBinForTime(time);
 		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin,
 				Collections.emptyMap());
