@@ -66,7 +66,6 @@ public class ObjectAttributesConverter {
 
 	private AttributeConverter getConverter(String className) {
 		if (converters.containsKey(className)) return converters.get(className);
-
 		try {
 			Class<?> clazz = Class.forName(className);
 
@@ -75,10 +74,10 @@ public class ObjectAttributesConverter {
 				converters.put(className, converter);
 				return converter;
 			}
-			for (Class<?> anInterface : clazz.getInterfaces()) {
-				if(anInterface.equals(Map.class)) return this.converters.get(Map.class.getName());
-				if(anInterface.equals(Collection.class)) return this.converters.get(Collection.class.getName());
-			}
+
+			if(Map.class.isAssignableFrom(clazz)) return this.converters.get(Map.class.getName());
+			if(Collection.class.isAssignableFrom(clazz)) return this.converters.get(Collection.class.getName());
+
 			if (missingConverters.add(className)) {
 				log.warn("No AttributeConverter found for class " + className + ". Not all attribute values can be converted.");
 			}
