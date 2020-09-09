@@ -69,10 +69,15 @@ public class ObjectAttributesConverter {
 
 		try {
 			Class<?> clazz = Class.forName(className);
+
 			if (clazz.isEnum()) {
 				AttributeConverter converter = new EnumConverter(clazz);
 				converters.put(className, converter);
 				return converter;
+			}
+			for (Class<?> anInterface : clazz.getInterfaces()) {
+				if(anInterface.equals(Map.class)) return this.converters.get(Map.class.getName());
+				if(anInterface.equals(Collection.class)) return this.converters.get(Collection.class.getName());
 			}
 			if (missingConverters.add(className)) {
 				log.warn("No AttributeConverter found for class " + className + ". Not all attribute values can be converted.");
