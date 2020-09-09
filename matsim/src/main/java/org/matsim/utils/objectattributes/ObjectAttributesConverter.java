@@ -59,6 +59,7 @@ public class ObjectAttributesConverter {
 		this.converters.put(Coord[].class.getName(), new CoordArrayConverter());
 	}
 
+	//this is for reading
 	public Object convert(String className, String value) {
 		AttributeConverter converter = getConverter(className);
 		return converter == null ? null : converter.convert(value);
@@ -93,9 +94,20 @@ public class ObjectAttributesConverter {
 
 	public String convertToString(Object o) {
 
-		// obviously this will not work this way if we have more generic conversion, but good for now, janek (Mar, 2020)
-		var className = isStringStringMap(o) ? Map.class.getName() : (isStringCollection(o) ? Collection.class.getName() : o.getClass().getName());
-		AttributeConverter converter = getConverter(className);
+		AttributeConverter converter = getConverter(o.getClass().getName());
+
+		//handle map and collection converter - check for string elements
+		//we pass in a lot of maps here that we can and (maybe) do not want to write
+		{
+			if(converter instanceof StringStringMapConverter){
+				Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
+				if(! (firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String) ) return null;
+			}
+			if(converter instanceof StringCollectionConverter){
+				if(! ( ((Collection) o).iterator().next() instanceof String) ) return null;
+			}
+		}
+
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
@@ -127,21 +139,4 @@ public class ObjectAttributesConverter {
 		return this.converters.remove(clazz.getName());
 	}
 
-	private boolean isStringStringMap(Object o) {
-
-		// very ugly test for maps
-		if (o instanceof Map && ((Map) o).size() > 0) {
-			Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
-			return firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String;
-		}
-		return false;
-	}
-
-	private boolean isStringCollection(Object o) {
-		//ugly test for collections
-		if(o instanceof Collection && !((Collection) o).isEmpty()){
-			return ((Collection) o).iterator().next() instanceof String;
-		}
-		return false;
-	}
 }
