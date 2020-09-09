@@ -90,13 +90,13 @@ public class ObjectAttributesConverter {
 	public String convertToString(Object o) {
 
 		// obviously this will not work this way if we have more generic conversion, but good for now, janek (Mar, 2020)
-		var className = isStringStringMap(o) ? Map.class.getName() : o.getClass().getName();
+		var className = isStringStringMap(o) ? Map.class.getName() : (isStringCollection(o) ? Collection.class.getName() : o.getClass().getName());
 		AttributeConverter converter = getConverter(className);
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
 
-    /**
+	/**
 	 * Sets the converter for reading attributes of the specified class.
 	 *
 	 * @param clazz
@@ -129,6 +129,14 @@ public class ObjectAttributesConverter {
 		if (o instanceof Map && ((Map) o).size() > 0) {
 			Map.Entry firstEntry = ((Map<Object, Object>) o).entrySet().iterator().next();
 			return firstEntry.getKey() instanceof String && firstEntry.getValue() instanceof String;
+		}
+		return false;
+	}
+
+	private boolean isStringCollection(Object o) {
+		//ugly test for collections
+		if(o instanceof Collection && !((Collection) o).isEmpty()){
+			return ((Collection) o).iterator().next() instanceof String;
 		}
 		return false;
 	}
