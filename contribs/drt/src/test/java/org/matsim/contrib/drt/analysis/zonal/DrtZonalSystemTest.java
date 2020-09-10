@@ -25,7 +25,10 @@ import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwo
 import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem.createFromPreparedGeometries;
 
 import org.junit.Test;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
+
+import java.util.List;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -45,4 +48,30 @@ public class DrtZonalSystemTest {
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
 		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("1");
 	}
+
+	@Test
+	public void test_gridWithinServiceArea(){
+		// abgucken von createGridFromNetwork
+		List<PreparedGeometry> serviceArea = createServiceArea();
+
+		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
+				DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea));
+
+
+
+		//teste anzahl zonen
+
+		//gib mir zone für einen link außerhalb und prüfe ob null
+		assertThat(zonalSystem.getZoneForLinkId(linkAUßerhalbServiceArea).isEqualTo(null);
+	}
+
+	@Test
+	public void test_noZonesWithoutLinks(){
+		//baue eine serviceArea, die ganz woanders als das Netzwerk liegt
+
+		//teste, dass drtZonalSystem keine Zone hat
+	}
+
+
+
 }
