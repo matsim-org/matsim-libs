@@ -1,7 +1,6 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +16,11 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem.Flow;
 import org.matsim.contrib.drt.optimizer.rebalancing.toolbox.VehicleInfoCollector;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
  * @author Chengqi Lu This strategy is created based on the Feedforward Fluidic
@@ -51,15 +49,18 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final int minNumVehiclesPerZone;
 
 	private final DrtZoneTargetLinkSelector drtZoneTargetLinkSelector;
+	private final FastHeuristicRelocationCalculator fastHeuristicRelocationCalculator;
 
 	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, RebalancingParams generalParams,
 			FeedforwardRebalancingStrategyParams strategySpecificParams,
-			FeedforwardSignalHandler feedforwardSignalHandler, DrtZoneTargetLinkSelector drtZoneTargetLinkSelector) {
+			FeedforwardSignalHandler feedforwardSignalHandler, DrtZoneTargetLinkSelector drtZoneTargetLinkSelector,
+			FastHeuristicRelocationCalculator fastHeuristicRelocationCalculator) {
 		this.zonalSystem = zonalSystem;
 		this.generalParams = generalParams;
 		this.drtZoneTargetLinkSelector = drtZoneTargetLinkSelector;
+		this.fastHeuristicRelocationCalculator = fastHeuristicRelocationCalculator;
 		timeBinSize = strategySpecificParams.getTimeBinSize();
 
 		rebalanceInterval = generalParams.getInterval();
@@ -88,54 +89,29 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
 
 		// Feedback part
-		Set<DvrpVehicle> truelyRebalancableVehicles = new HashSet<>();
+		List<DvrpVehicle> truelyRebalancableVehicles = new ArrayList<>();
 
 		if (feedbackSwitch) {
-			// (comment) Feedback part is MinCostFlowRebalancingStrategy
-
-			List<Link> destinationLinks = new ArrayList<>();
+			List<DrtZoneVehicleSurplus> vehicleSurplusList = new ArrayList<>();
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
 					.groupRebalancableVehicles(rebalancableVehicles, time, generalParams.getMinServiceTime());
 			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector
 					.groupSoonIdleVehicles(time, generalParams.getMaxTimeBeforeIdle(),
 							generalParams.getMinServiceTime());
+
 			for (DrtZone zone : zonalSystem.getZones().values()) {
 				int surplus = rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
 						+ soonRebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
 						- minNumVehiclesPerZone;
-				if (surplus > 0) {
-					int numToAdd = Math.min(surplus,
-							rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size());
-					for (int i = 0; i < numToAdd; i++) {
-						truelyRebalancableVehicles
-								.add(rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).get(i));
-					}
-				} else if (surplus < 0) {
-					int deficit = -1 * surplus;
-					for (int i = 0; i < deficit; i++) {
-						Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(zone);
-						destinationLinks.add(destinationLink);
-					}
-				}
+				vehicleSurplusList.add(new DrtZoneVehicleSurplus(zone, surplus));
 			}
+			
+			relocationList.addAll(
+					fastHeuristicRelocationCalculator.calcRelocations(vehicleSurplusList, rebalancableVehiclesPerZone));
+			truelyRebalancableVehicles.addAll(fastHeuristicRelocationCalculator.getTruelyRebalancableVehicles());
 
-			// 2. TODO implement as MinCostRelocationCalculator
-			if (!truelyRebalancableVehicles.isEmpty()) {
-				for (Link link : destinationLinks) {
-					DvrpVehicle nearestVehicle = truelyRebalancableVehicles.stream().min(Comparator.comparing(
-							v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(),
-									link.getCoord())))
-							.get();
-					relocationList.add(new Relocation(nearestVehicle, link));
-					truelyRebalancableVehicles.remove(nearestVehicle);
-					if (truelyRebalancableVehicles.isEmpty()) {
-						break;
-					}
-				}
-			}
 		} else {
 			truelyRebalancableVehicles.addAll(rebalancableVehicles.collect(Collectors.toList()));
-			// This line is needed when feedback part is not enabled
 		}
 
 		// Feedforward part

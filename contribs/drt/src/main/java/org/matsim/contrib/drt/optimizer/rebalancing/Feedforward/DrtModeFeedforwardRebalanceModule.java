@@ -57,7 +57,8 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 						getter -> new FeedforwardRebalancingStrategy(getter.getModal(DrtZonalSystem.class),
 								getter.getModal(Fleet.class), generalParams, strategySpecificParams,
 								getter.getModal(FeedforwardSignalHandler.class),
-								getter.getModal(DrtZoneTargetLinkSelector.class))))
+								getter.getModal(DrtZoneTargetLinkSelector.class),
+								getter.getModal(FastHeuristicRelocationCalculator.class))))
 						.asEagerSingleton();
 			}
 		});
@@ -72,6 +73,9 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 				modalProvider(getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class),
 						drtCfg, strategySpecificParams)))
 				.asEagerSingleton();
+
+		bindModal(FastHeuristicRelocationCalculator.class).toProvider(modalProvider(
+				getter -> new FastHeuristicRelocationCalculator(getter.getModal(DrtZoneTargetLinkSelector.class))));
 
 		addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
 		addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
