@@ -162,7 +162,6 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 				if (vehicleToSend > 0) {
 					for (int i = 0; i < vehicleToSend; i++) {
-						// TODO change to "send to random link in a node"
 						Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
 						relocationList.add(
 								new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0), destinationLink));

@@ -25,6 +25,7 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZoneTargetLinkSelector;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.NetDepartureReplenishDemandEstimator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -62,11 +63,18 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 		});
 
 		// Create PreviousIterationDepartureRecoder (this will be created only once)
-		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
-				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), strategySpecificParams)))
+		bindModal(FeedforwardSignalHandler.class)
+				.toProvider(modalProvider(getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class),
+						strategySpecificParams, getter.getModal(NetDepartureReplenishDemandEstimator.class))))
 				.asEagerSingleton();
 
-		addEventHandlerBinding().to(modalKey(FeedforwardSignalHandler.class));
+		bindModal(NetDepartureReplenishDemandEstimator.class).toProvider(
+				modalProvider(getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class),
+						drtCfg, strategySpecificParams)))
+				.asEagerSingleton();
+
+		addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
+		addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
 
 	}
 }
