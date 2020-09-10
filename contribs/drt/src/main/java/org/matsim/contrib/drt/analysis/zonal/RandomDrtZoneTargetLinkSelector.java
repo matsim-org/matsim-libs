@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +18,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.function.ToIntFunction;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
+
+import java.util.Random;
 
 /**
- * @author jbischoff
+ * @author tschlenther
  */
-public interface ZonalDemandAggregator {
+public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
 
-	ToIntFunction<String> getExpectedDemandForTimeBin(double time);
+	private final Random random = MatsimRandom.getLocalInstance();
+
+	@Override
+	public Link selectTargetLink(DrtZone zone) {
+		return zone.getLinks().get(random.nextInt(zone.getLinks().size()));
+	}
+
 }

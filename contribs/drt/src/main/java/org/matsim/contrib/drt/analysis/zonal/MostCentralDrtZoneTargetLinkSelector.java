@@ -1,8 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,19 +18,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
+package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.List;
+import static java.util.stream.Collectors.toMap;
+import static org.matsim.contrib.util.distance.DistanceUtils.calculateSquaredDistance;
+
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.api.core.v01.network.Link;
+
+import one.util.streamex.StreamEx;
 
 /**
- * @author michalm
+ * @author tschlenther
  */
-public interface MinCostRelocationCalculator {
-	List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
-			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone);
+public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
+	private final Map<DrtZone, Link> targetLinks;
+
+	public MostCentralDrtZoneTargetLinkSelector(DrtZonalSystem drtZonalSystem) {
+		targetLinks = drtZonalSystem.getZones()
+				.values()
+				.stream()
+				.collect(toMap(zone -> zone, zone -> StreamEx.of(zone.getLinks())
+						.minByDouble(link -> calculateSquaredDistance(zone.getCentroid(), link.getToNode().getCoord()))
+						.orElseThrow()));
+	}
+
+	@Override
+	public Link selectTargetLink(DrtZone zone) {
+		return this.targetLinks.get(zone);
+	}
 }

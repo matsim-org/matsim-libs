@@ -8,10 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Assert;
@@ -47,8 +43,10 @@ public class IterationTravelStatsControlerListenerTest {
 	Config config = ConfigUtils.createConfig();
 	
 	private static int person;
+	private static int executed_score;
 	private static int first_act_x;
 	private static int first_act_y;
+	private static int first_act_type;
 	
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -116,26 +114,14 @@ public class IterationTravelStatsControlerListenerTest {
 		});
 		IterationTravelStatsControlerListener ltcl = injector.getInstance(IterationTravelStatsControlerListener.class);
 		ltcl.notifyShutdown(shutdownEvent);
-		Map<Id<Person>, List<String>> firstActivity = identifyFirstActivityLocation(scenario);
-		readAndValidateValues(firstActivity);
+		readAndValidateValues(scenario);
 	}
 	
-	private Map<Id<Person>, List<String>> identifyFirstActivityLocation(Scenario scenario) {
-		Map<Id<Person>, List<String>> firstActivity = new HashMap<Id<Person>, List<String>>();
-		 for (Person p : scenario.getPopulation().getPersons().values()) {
-			Id<Person> id = p.getId();
-			List<String> coordinates = new ArrayList<>();
-			 Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
-			 String x = Double.toString(firstAct.getCoord().getX());
-			 String y = Double.toString(firstAct.getCoord().getY());
-			 coordinates.add(x);
-			 coordinates.add(y);
-			 firstActivity.put(id, coordinates);
-		 }
-		 return firstActivity;
+	private Activity identifyFirstActivity(Person person) {
+		return (Activity) person.getSelectedPlan().getPlanElements().get(0);
 	}
 	
-	private void readAndValidateValues(Map<Id<Person>, List<String>> firstActivity) {
+	private void readAndValidateValues(Scenario scenario) {
 
 		String file = utils.getOutputDirectory() + "/output_persons.csv.gz";
 		BufferedReader br;
@@ -155,10 +141,15 @@ public class IterationTravelStatsControlerListenerTest {
 					Double y = (first_act_y > 0) ? Double.valueOf(column[first_act_y]) : 0;
 					Id<Person> personId = Id.create(column[person], Person.class);
 
-					Assert.assertEquals("x coordinate does not match", Double.valueOf(firstActivity.get(personId).get(0)), x,
-							0);
-					Assert.assertEquals("y coordinate does not match", Double.valueOf(firstActivity.get(personId).get(1)), y,
-							0);
+					Person personInScenario = scenario.getPopulation().getPersons().get(personId);
+					Activity firstActivity = identifyFirstActivity(personInScenario);
+
+					Assert.assertEquals("wrong score", personInScenario.getSelectedPlan().getScore(), Double.valueOf(column[executed_score]), MatsimTestUtils.EPSILON);
+					Assert.assertEquals("x coordinate does not match", firstActivity.getCoord().getX(), x,
+							MatsimTestUtils.EPSILON);
+					Assert.assertEquals("y coordinate does not match", firstActivity.getCoord().getY(), y,
+							MatsimTestUtils.EPSILON);
+					Assert.assertEquals("type of first activity does not match", firstActivity.getType(), column[first_act_type]);
 
 					break;
 			}
@@ -181,12 +172,20 @@ public class IterationTravelStatsControlerListenerTest {
 				person = i;
 				break;
 
+			case "executed_score":
+				executed_score = i;
+				break;
+
 			case "first_act_x":
 				first_act_x = i;
 				break;
 				
 			case "first_act_y":
 				first_act_y = i;
+				break;
+
+			case "first_act_type":
+				first_act_type = i;
 				break;
 
 			}

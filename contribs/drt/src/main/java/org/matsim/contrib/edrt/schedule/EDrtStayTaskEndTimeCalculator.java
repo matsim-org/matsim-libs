@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +16,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.noise;
+package org.matsim.contrib.edrt.schedule;
 
-/**
- * @author ikaddoura
- *
- */
-public enum NoiseAllocationApproach {
-        AverageCost, MarginalCost
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+
+public class EDrtStayTaskEndTimeCalculator extends DrtStayTaskEndTimeCalculator {
+	public EDrtStayTaskEndTimeCalculator(DrtConfigGroup drtConfigGroup) {
+		super(drtConfigGroup);
+	}
+
+	@Override
+	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
+		if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
+			// FIXME underestimated due to the ongoing AUX/drive consumption
+			double duration = task.getEndTime() - task.getBeginTime();
+			return newBeginTime + duration;
+		} else {
+			return super.calcNewEndTime(vehicle, task, newBeginTime);
+		}
+	}
 }

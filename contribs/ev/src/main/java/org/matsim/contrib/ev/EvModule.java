@@ -31,9 +31,6 @@ public class EvModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(MobsimScopeEventHandling.class).asEagerSingleton();
-		addControlerListenerBinding().to(MobsimScopeEventHandling.class);
-
 		install(new ElectricFleetModule());
 		install(new ChargingInfrastructureModule());
 		install(new ChargingModule());

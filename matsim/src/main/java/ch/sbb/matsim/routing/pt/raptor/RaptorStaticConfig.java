@@ -38,6 +38,7 @@ public class RaptorStaticConfig {
     private double beelineWalkDistanceFactor = 1.0;
 
     private double minimalTransferTime = 60;
+    private double transferWalkMargin = 5;
 
     private boolean useModeMappingForPassengers = false;
     private final Map<String, String> passengerModeMappings = new HashMap<>();
@@ -66,6 +67,14 @@ public class RaptorStaticConfig {
 
     public void setBeelineWalkDistanceFactor(double beelineWalkDistanceFactor) {
         this.beelineWalkDistanceFactor = beelineWalkDistanceFactor;
+    }
+
+    public double getTransferWalkMargin() {
+        return transferWalkMargin;
+    }
+
+    public void setTransferWalkMargin(double transferWalkMargin) {
+        this.transferWalkMargin = transferWalkMargin;
     }
 
     public double getMinimalTransferTime() {

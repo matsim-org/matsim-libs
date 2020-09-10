@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +18,18 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import org.matsim.core.events.handler.EventHandler;
+import java.util.List;
+import java.util.Map;
+import java.util.function.ToIntFunction;
+
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface MobsimScopeEventHandler extends EventHandler {
-	@Override
-	default void reset(int iteration) {
-		throw new IllegalStateException("This handler should have been unregistered on AfterMobsimEvent");
-	}
+public interface RebalancingTargetCalculator {
+	ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

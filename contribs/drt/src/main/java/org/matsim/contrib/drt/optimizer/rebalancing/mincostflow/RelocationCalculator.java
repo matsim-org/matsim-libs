@@ -18,30 +18,23 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import java.util.List;
+import java.util.Map;
+
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
  * @author michalm
  */
-public class LinearRebalancingTargetCalculator implements RebalancingTargetCalculator {
-	private final ZonalDemandAggregator demandAggregator;
-	private final MinCostFlowRebalancingParams params;
-
-	public LinearRebalancingTargetCalculator(ZonalDemandAggregator demandAggregator,
-			MinCostFlowRebalancingParams params) {
-		this.demandAggregator = demandAggregator;
-		this.params = params;
-	}
-
-	// FIXME targets should be calculated more intelligently
-	@Override
-	public int estimate(String zone, double time) {
-		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		int expectedDemand = demandAggregator.getExpectedDemandForTimeBin(time + 60).applyAsInt(zone);
-		if (expectedDemand == 0) {
-			return 0;// for larger zones we may assume that target is at least 1 (or in some cases) ??????
-		}
-		return (int)Math.round(params.getTargetAlpha() * expectedDemand + params.getTargetBeta());
-	}
+public interface RelocationCalculator {
+	/**
+	 * @param vehicleSurplus              could be negative (supply - demand), typically contains only non-zero values (zones with zero surplus are skipped)
+	 * @param rebalancableVehiclesPerZone list of rebalancable vehicles per each zone (zones without rebalancable vehicles are usually skipped)
+	 * @return vehicle relocations
+	 */
+	List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

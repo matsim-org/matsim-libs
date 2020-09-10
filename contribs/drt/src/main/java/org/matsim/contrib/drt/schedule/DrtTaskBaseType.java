@@ -35,6 +35,10 @@ public enum DrtTaskBaseType {
 	}
 
 	public boolean isBaseTypeOf(Task task) {
-		return ((DrtTaskType)task.getTaskType()).getBaseType().orElse(null) == this;
+		return isBaseTypeOf(task.getTaskType());
+	}
+
+	public boolean isBaseTypeOf(Task.TaskType taskType) {
+		return ((DrtTaskType)taskType).getBaseType().orElse(null) == this;
 	}
 }
