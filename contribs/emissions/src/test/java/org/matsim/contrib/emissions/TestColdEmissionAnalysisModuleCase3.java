@@ -92,10 +92,6 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
 	
-	// fifth case: cold emission factor not set
-//	private static final String nullcase_emConcept = "nullCase";
-	// this testcase does not exist any more.  kai, jul'18
-	
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -109,8 +105,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 
-		setUp();
-		
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		List<ArrayList> testCases = new ArrayList<>();
 
 		ArrayList<Object> testCase3 = new ArrayList<>();
@@ -143,7 +138,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	
 
 	
-	private void setUp() {
+	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		
@@ -162,7 +157,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 //		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
+		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 		
 	}
 	
@@ -232,8 +227,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );

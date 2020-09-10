@@ -113,11 +113,10 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		 * six test cases with complete input data
 		 * or input that should be assigned to average/default cases
 		 */
-		
-		setUp();
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
+
 		
 		List<ArrayList> testCases = new ArrayList<>();
-
 		ArrayList<Object> testCase4 = new ArrayList<>();
 
 		
@@ -159,7 +158,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		
 	}
 	
-	private void setUp() {
+	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		
@@ -177,9 +176,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		}
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
-		
+		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 	}
 	
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
