@@ -21,11 +21,12 @@
 /**
  *
  */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 
 import javax.validation.constraints.NotNull;
 
@@ -34,6 +35,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 /**
@@ -43,16 +45,16 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
  *
  * @author tschlenther
  */
-public final class FleetSizeWeightedByPopulationShareDemandEstimator implements ZonalDemandEstimator {
+public final class EqualVehiclesToPopulationRatioTargetCalculator implements RebalancingTargetCalculator {
 
-	private static final Logger log = Logger.getLogger(FleetSizeWeightedByPopulationShareDemandEstimator.class);
+	private static final Logger log = Logger.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
 	private final DrtZonalSystem zonalSystem;
 	private final FleetSpecification fleetSpecification;
 	private final Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
 	private Integer totalNrActivities;
 
-	public FleetSizeWeightedByPopulationShareDemandEstimator(DrtZonalSystem zonalSystem, Population population,
+	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
 			@NotNull FleetSpecification fleetSpecification) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
@@ -84,10 +86,11 @@ public final class FleetSizeWeightedByPopulationShareDemandEstimator implements 
 		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	@Override
+	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
 		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
-		return zoneId -> Math.floor(
+		return zoneId -> (int)Math.floor(
 				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
 	}
 

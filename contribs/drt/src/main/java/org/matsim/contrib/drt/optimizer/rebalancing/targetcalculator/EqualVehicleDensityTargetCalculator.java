@@ -21,16 +21,18 @@
 /**
  *
  */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
 
 import javax.validation.constraints.NotNull;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
 import com.google.common.base.Preconditions;
@@ -43,26 +45,29 @@ import com.google.common.base.Preconditions;
  *
  * @author tschlenther
  */
-public final class EqualVehicleDensityZonalDemandEstimator implements ZonalDemandEstimator {
+public final class EqualVehicleDensityTargetCalculator implements RebalancingTargetCalculator {
 
 	private final Map<DrtZone, Double> zoneAreaShares = new HashMap<>();
 	private final FleetSpecification fleetSpecification;
 
-	public EqualVehicleDensityZonalDemandEstimator(@NotNull DrtZonalSystem zonalSystem,
+	public EqualVehicleDensityTargetCalculator(@NotNull DrtZonalSystem zonalSystem,
 			@NotNull FleetSpecification fleetSpecification) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
 	}
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
+	@Override
+	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		return zone -> {
 			double areaShare = zoneAreaShares.getOrDefault(zone, 0.);
-			return Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
+			return (int)Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
 		};
 	}
 
 	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
-		double areaSum = zonalSystem.getZones().values().stream()
+		double areaSum = zonalSystem.getZones()
+				.values()
+				.stream()
 				.mapToDouble(z -> z.getPreparedGeometry().getGeometry().getArea())
 				.sum();
 

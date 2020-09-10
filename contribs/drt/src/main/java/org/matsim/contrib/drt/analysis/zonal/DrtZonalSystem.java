@@ -82,7 +82,7 @@ public class DrtZonalSystem {
 	private final Map<String, DrtZone> zones;
 	private final Map<Id<Link>, DrtZone> link2zone;
 
-	private DrtZonalSystem(Map<String, DrtZone> zones) {
+	public DrtZonalSystem(Map<String, DrtZone> zones) {
 		this.zones = zones;
 		this.link2zone = zones.values()
 				.stream()
