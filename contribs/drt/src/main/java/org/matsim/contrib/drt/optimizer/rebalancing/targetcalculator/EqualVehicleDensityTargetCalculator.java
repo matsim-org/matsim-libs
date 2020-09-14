@@ -41,7 +41,6 @@ import com.google.common.base.Preconditions;
  * This class does not really calculate the expected demand but aims to
  * distribute the fleet vehicles equally over all zones, weighted by zone area size.
  * <p>
- * TODO:test
  *
  * @author tschlenther
  */
