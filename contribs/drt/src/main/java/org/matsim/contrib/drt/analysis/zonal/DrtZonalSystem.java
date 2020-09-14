@@ -51,6 +51,7 @@ public class DrtZonalSystem {
 		//geometries without links are skipped
 		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
 				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+				.filterKeys(key -> key != null)
 				.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
@@ -70,6 +71,7 @@ public class DrtZonalSystem {
 	 */
 	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
 		//TODO use endNode.getCoord() ?
+		//TODO use fake zone (with no geometry) instead of null?
 		Point linkCoord = MGC.coord2Point(link.getCoord());
 		return geometries.entrySet()
 				.stream()
