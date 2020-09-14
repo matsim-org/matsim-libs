@@ -94,10 +94,12 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 					"zonalDemandEstimatorType is required if EstimatedDemand is used as rebalancing target");
 			checkState(targetAlpha != null, "targetAlpha is required if EstimatedDemand is used as rebalancing target");
 			checkState(targetBeta != null, "targetBeta is required if EstimatedDemand is used as rebalancing target");
-		} else {
-			checkState(zonalDemandEstimatorType == null,
-					"zonalDemandEstimatorType should be null if the rebalancing target is not set to EstimatedDemand");
 		}
+//		not possible to set zonalDemandEstimatorType because the the switch in DrtModeMinCostFlowRebalancingModule will lead to a NullPointer
+//		else {
+//			checkState(zonalDemandEstimatorType == null,
+//					"zonalDemandEstimatorType should be null if the rebalancing target is not set to EstimatedDemand");
+//		}
 	}
 
 	@Override
