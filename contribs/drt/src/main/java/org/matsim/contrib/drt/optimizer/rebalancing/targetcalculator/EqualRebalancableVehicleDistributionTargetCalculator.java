@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
@@ -52,7 +51,8 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 	}
 
 	@Override
-	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+	public ToDoubleFunction<DrtZone> calculate(double time,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
 
 		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemandForTimeBin(time);
@@ -75,13 +75,7 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 			return zone -> 0;
 		}
 
-		int targetValue = numAvailableVehicles / activeZones.size();
-		if (targetValue < 1) {
-			log.debug(
-					"There is too few idling vehicles to perform rebalance! No vehicles will be assigned to rebalance task at this period");
-			return zone -> 0;
-		} else {
-			return zone -> activeZones.contains(zone) ? targetValue : 0;
-		}
+		double targetValue = (double)numAvailableVehicles / activeZones.size();
+		return zone -> activeZones.contains(zone) ? targetValue : 0;
 	}
 }

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
@@ -109,13 +109,17 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private List<Relocation> calculateMinCostRelocations(double time,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,
 			Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone) {
-		ToIntFunction<DrtZone> targetFunction = rebalancingTargetCalculator.calculate(time,
+		ToDoubleFunction<DrtZone> targetFunction = rebalancingTargetCalculator.calculate(time,
 				rebalancableVehiclesPerZone);
+		var minCostFlowRebalancingStrategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
+		double alpha = minCostFlowRebalancingStrategyParams.getTargetAlpha();
+		double beta = minCostFlowRebalancingStrategyParams.getTargetBeta();
 
 		List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones().values().stream().map(z -> {
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, List.of()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, List.of()).size();
-			int surplus = Math.min(rebalancable + soonIdle - targetFunction.applyAsInt(z), rebalancable);
+			int target = (int)Math.floor(alpha * targetFunction.applyAsDouble(z) + beta);
+			int surplus = Math.min(rebalancable + soonIdle - target, rebalancable);
 			return new DrtZoneVehicleSurplus(z, surplus);
 		}).collect(toList());
 

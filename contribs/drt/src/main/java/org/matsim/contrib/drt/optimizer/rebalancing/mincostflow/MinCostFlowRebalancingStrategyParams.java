@@ -70,13 +70,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
-	@Nullable
 	@PositiveOrZero
-	private Double targetAlpha = null;
+	private double targetAlpha = Double.NaN;
 
-	@Nullable
 	@PositiveOrZero
-	private Double targetBeta = null;
+	private double targetBeta = Double.NaN;
 
 	@Nullable //required only if rebalancingTargetCalculatorType == EstimatedDemand
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
@@ -92,8 +90,6 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 		if (rebalancingTargetCalculatorType == RebalancingTargetCalculatorType.EstimatedDemand) {
 			checkState(zonalDemandEstimatorType != null,
 					"zonalDemandEstimatorType is required if EstimatedDemand is used as rebalancing target");
-			checkState(targetAlpha != null, "targetAlpha is required if EstimatedDemand is used as rebalancing target");
-			checkState(targetBeta != null, "targetBeta is required if EstimatedDemand is used as rebalancing target");
 		}
 //		not possible to set zonalDemandEstimatorType because the the switch in DrtModeMinCostFlowRebalancingModule will lead to a NullPointer
 //		else {
@@ -115,7 +111,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_ALPHA_EXP}
 	 */
 	@StringGetter(TARGET_ALPHA)
-	public Double getTargetAlpha() {
+	public double getTargetAlpha() {
 		return targetAlpha;
 	}
 
@@ -131,7 +127,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_BETA_EXP}
 	 */
 	@StringGetter(TARGET_BETA)
-	public Double getTargetBeta() {
+	public double getTargetBeta() {
 		return targetBeta;
 	}
 
