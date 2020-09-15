@@ -18,16 +18,12 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -42,7 +38,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	public enum ZonalDemandEstimatorType {
-		PreviousIterationDemand
+		PreviousIterationDemand, None
 	}
 
 	public static final String TARGET_ALPHA = "targetAlpha";
@@ -65,7 +61,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public static final String ZONAL_DEMAND_ESTIMATOR_TYPE = "zonalDemandEstimatorType";
 	static final String ZONAL_DEMAND_ESTIMATOR_TYPE_EXP = "Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand]. Current default is PreviousIterationDemand";
+			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand";
 
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
@@ -76,26 +72,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@PositiveOrZero
 	private double targetBeta = Double.NaN;
 
-	@Nullable //required only if rebalancingTargetCalculatorType == EstimatedDemand
+	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
 	public MinCostFlowRebalancingStrategyParams() {
 		super(SET_NAME);
-	}
-
-	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
-
-		if (rebalancingTargetCalculatorType == RebalancingTargetCalculatorType.EstimatedDemand) {
-			checkState(zonalDemandEstimatorType != null,
-					"zonalDemandEstimatorType is required if EstimatedDemand is used as rebalancing target");
-		}
-//		not possible to set zonalDemandEstimatorType because the the switch in DrtModeMinCostFlowRebalancingModule will lead to a NullPointer
-//		else {
-//			checkState(zonalDemandEstimatorType == null,
-//					"zonalDemandEstimatorType should be null if the rebalancing target is not set to EstimatedDemand");
-//		}
 	}
 
 	@Override

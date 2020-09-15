@@ -109,6 +109,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				break;
 
+			case None:
+				break;
+
 			default:
 				throw new IllegalArgumentException(
 						"Unsupported zonalDemandEstimatorType=" + strategyParams.getZonalDemandEstimatorType());
