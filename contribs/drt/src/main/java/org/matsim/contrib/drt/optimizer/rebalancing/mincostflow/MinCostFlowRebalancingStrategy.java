@@ -20,7 +20,6 @@ package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
@@ -62,7 +61,7 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = RebalancingUtils.groupRebalancableVehicles(
 				zonalSystem, params, rebalancableVehicles, time);
 		if (rebalancableVehiclesPerZone.isEmpty()) {
-			return Collections.emptyList();
+			return List.of();
 		}
 		Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone = RebalancingUtils.groupSoonIdleVehicles(zonalSystem,
 				params, fleet, time);
