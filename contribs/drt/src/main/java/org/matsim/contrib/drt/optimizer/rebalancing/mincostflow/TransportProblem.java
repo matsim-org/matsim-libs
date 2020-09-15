@@ -25,6 +25,8 @@ import java.util.function.ToIntBiFunction;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 import graphs.flows.MinCostFlow;
 import graphs.flows.MinCostFlow.Edge;
@@ -33,6 +35,24 @@ import graphs.flows.MinCostFlow.Edge;
  * @author michalm
  */
 public class TransportProblem<P, C> {
+	public static List<Flow<DrtZone, DrtZone>> solveForVehicleSurplus(
+			List<AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus> vehicleSurplus) {
+		List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
+		List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
+		for (AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus s : vehicleSurplus) {
+			if (s.surplus > 0) {
+				supply.add(Pair.of(s.zone, s.surplus));
+			} else if (s.surplus < 0) {
+				demand.add(Pair.of(s.zone, -s.surplus));
+			}
+		}
+		return new TransportProblem<DrtZone, DrtZone>(TransportProblem::calcStraightLineDistance).solve(supply, demand);
+	}
+
+	private static int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
+		return (int)DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
+	}
+
 	public static class Flow<P, C> {
 		public final P origin;
 		public final C destination;
