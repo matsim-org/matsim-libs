@@ -25,12 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -64,9 +63,12 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	private final DrtZonalSystem zonalSystem = DrtZonalSystem.createFromPreparedGeometries(network,
 			DrtGridUtils.createGridFromNetwork(network, 500.));
 
+	private final Population population = PopulationUtils.createPopulation(config);
+	private final PopulationFactory factory = population.getFactory();
+
 	@Test
 	public void testCalculate_oneVehiclePerZone() {
-		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, createPopulation(),
+		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(8)).calculate(0, Map.of());
 
 		assertTarget(targetFunction, zonalSystem, "1", 0);
@@ -81,7 +83,7 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 
 	@Test
 	public void testCalculate_twoVehiclesPerZone() {
-		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, createPopulation(),
+		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, population,
 				createFleetSpecification(16)).calculate(0, Map.of());
 
 		assertTarget(targetFunction, zonalSystem, "1", 0);
@@ -113,75 +115,20 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	 * order of zones:
 	 * 2	4	6	8
 	 * 1	3	5	7
-	 * <p>
-	 * 1) in the left column, there are half of the people, performing dummy - > car -> dummy
-	 * That should lead to half of the drt vehicles rebalanced to the left column when using FleetSizeWeightedByActivityEndsDemandEstimator.
-	 * 2) in the right column, the other half of the people perform dummy -> drt -> dummy from top row to bottom row.
-	 * That should lead to all drt vehicles rebalanced to the right column when using PreviousIterationDRTDemandEstimator.
-	 * 3) in the center, there is nothing happening.
-	 * But, when using EqualVehicleDensityZonalDemandEstimator, one vehicle should get sent to every zone..
 	 */
-	private Population createPopulation() {
-		Population population = PopulationUtils.createPopulation(config);
-		//delete what's there
-		population.getPersons().clear();
+	@Before
+	public void initPopulation() {
+		createAndAddPerson("leftColumn", Id.createLinkId(344));
+		createAndAddPerson("rightColumn", Id.createLinkId(151));
+		createAndAddPerson("centerColumn", Id.createLinkId(147));
+	}
 
-		PopulationFactory factory = population.getFactory();
-
-		Id<Link> left1 = Id.createLinkId(344);
-		Id<Link> left2 = Id.createLinkId(112);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("leftColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", left1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg(TransportMode.car));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", left2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-
-		Id<Link> right1 = Id.createLinkId(151);
-		Id<Link> right2 = Id.createLinkId(319);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("rightColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", right1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg(TransportMode.drt));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", right2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-
-		Id<Link> center1 = Id.createLinkId(147);
-		Id<Link> center2 = Id.createLinkId(315);
-
-		for (int i = 1; i < 100; i++) {
-			Person person = factory.createPerson(Id.createPersonId("centerColumn_" + i));
-
-			Plan plan = factory.createPlan();
-			Activity dummy1 = factory.createActivityFromLinkId("dummy", center1);
-			dummy1.setEndTime(i * 10 * 60);
-			plan.addActivity(dummy1);
-
-			plan.addLeg(factory.createLeg("drt_teleportation"));
-			plan.addActivity(factory.createActivityFromLinkId("dummy", center2));
-
-			person.addPlan(plan);
-			population.addPerson(person);
-		}
-		return population;
+	private void createAndAddPerson(String id, Id<Link> linkId) {
+		Person person = factory.createPerson(Id.createPersonId(id));
+		Plan plan = factory.createPlan();
+		plan.addActivity(factory.createActivityFromLinkId("dummy", linkId));
+		person.addPlan(plan);
+		population.addPerson(person);
 	}
 
 	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
