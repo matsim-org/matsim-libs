@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.counting;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
@@ -53,25 +53,21 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 
 	private static final Logger log = Logger.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
-	private final DrtZonalSystem zonalSystem;
-	private final FleetSpecification fleetSpecification;
+	private final int fleetSize;
 	private final Map<DrtZone, Integer> activitiesPerZone;
 	private final int totalNrActivities;
 
 	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
 			@NotNull FleetSpecification fleetSpecification) {
-		this.zonalSystem = zonalSystem;
-		this.fleetSpecification = fleetSpecification;
-
-		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
+		log.debug("nr of zones: " + zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
 				.size());
-		activitiesPerZone = countFirstActsPerZone(population);
-
+		fleetSize = fleetSpecification.getVehicleSpecifications().size();
+		activitiesPerZone = countFirstActsPerZone(zonalSystem, population);
 		totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
-		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
+		log.debug("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	private Map<DrtZone, Integer> countFirstActsPerZone(Population population) {
+	private Map<DrtZone, Integer> countFirstActsPerZone(DrtZonalSystem zonalSystem, Population population) {
 		return population.getPersons()
 				.values()
 				.stream()
@@ -82,10 +78,9 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 	}
 
 	@Override
-	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
-		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
-		return zoneId -> (int)Math.floor(
-				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
+	public ToDoubleFunction<DrtZone> calculate(double time,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		double factor = (double)fleetSize / totalNrActivities;
+		return zoneId -> this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() * factor;
 	}
 }

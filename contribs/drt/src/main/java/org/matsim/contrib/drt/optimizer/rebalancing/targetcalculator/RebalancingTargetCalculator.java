@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -31,5 +31,5 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author Michal Maciejewski (michalm)
  */
 public interface RebalancingTargetCalculator {
-	ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
+	ToDoubleFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

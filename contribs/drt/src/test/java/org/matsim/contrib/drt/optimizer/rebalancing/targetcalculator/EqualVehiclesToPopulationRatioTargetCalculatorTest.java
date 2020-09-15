@@ -23,7 +23,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -66,32 +66,32 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 
 	@Test
 	public void testCalculate_oneVehiclePerZone() {
-		ToIntFunction<DrtZone> demandFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem,
-				createPopulation(), createFleetSpecification(8)).calculate(0, Map.of());
+		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, createPopulation(),
+				createFleetSpecification(8)).calculate(0, Map.of());
 
-		assertTarget(demandFunction, zonalSystem, "1", 0);
-		assertTarget(demandFunction, zonalSystem, "2", 2);
-		assertTarget(demandFunction, zonalSystem, "3", 0);
-		assertTarget(demandFunction, zonalSystem, "4", 2);
-		assertTarget(demandFunction, zonalSystem, "5", 0);
-		assertTarget(demandFunction, zonalSystem, "6", 0);
-		assertTarget(demandFunction, zonalSystem, "7", 0);
-		assertTarget(demandFunction, zonalSystem, "8", 2);
+		assertTarget(targetFunction, zonalSystem, "1", 0);
+		assertTarget(targetFunction, zonalSystem, "2", 8. / 3);
+		assertTarget(targetFunction, zonalSystem, "3", 0);
+		assertTarget(targetFunction, zonalSystem, "4", 8. / 3);
+		assertTarget(targetFunction, zonalSystem, "5", 0);
+		assertTarget(targetFunction, zonalSystem, "6", 0);
+		assertTarget(targetFunction, zonalSystem, "7", 0);
+		assertTarget(targetFunction, zonalSystem, "8", 8. / 3);
 	}
 
 	@Test
 	public void testCalculate_twoVehiclesPerZone() {
-		ToIntFunction<DrtZone> demandFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem,
-				createPopulation(), createFleetSpecification(16)).calculate(0, Map.of());
+		var targetFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem, createPopulation(),
+				createFleetSpecification(16)).calculate(0, Map.of());
 
-		assertTarget(demandFunction, zonalSystem, "1", 0);
-		assertTarget(demandFunction, zonalSystem, "2", 5);
-		assertTarget(demandFunction, zonalSystem, "3", 0);
-		assertTarget(demandFunction, zonalSystem, "4", 5);
-		assertTarget(demandFunction, zonalSystem, "5", 0);
-		assertTarget(demandFunction, zonalSystem, "6", 0);
-		assertTarget(demandFunction, zonalSystem, "7", 0);
-		assertTarget(demandFunction, zonalSystem, "8", 5);
+		assertTarget(targetFunction, zonalSystem, "1", 0);
+		assertTarget(targetFunction, zonalSystem, "2", 16. / 3);
+		assertTarget(targetFunction, zonalSystem, "3", 0);
+		assertTarget(targetFunction, zonalSystem, "4", 16. / 3);
+		assertTarget(targetFunction, zonalSystem, "5", 0);
+		assertTarget(targetFunction, zonalSystem, "6", 0);
+		assertTarget(targetFunction, zonalSystem, "7", 0);
+		assertTarget(targetFunction, zonalSystem, "8", 16. / 3);
 	}
 
 	private FleetSpecification createFleetSpecification(int count) {
@@ -184,8 +184,8 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 		return population;
 	}
 
-	private void assertTarget(ToIntFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
-			int expectedValue) {
-		assertThat(targetFunction.applyAsInt(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
+	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
+			double expectedValue) {
+		assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
 	}
 }
