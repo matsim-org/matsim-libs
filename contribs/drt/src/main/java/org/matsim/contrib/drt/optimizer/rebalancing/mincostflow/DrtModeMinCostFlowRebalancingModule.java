@@ -87,7 +87,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new EqualVehiclesToPopulationRatioTargetCalculator(
 										getter.getModal(DrtZonalSystem.class), getter.get(Population.class),
-										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+										getter.getModal(FleetSpecification.class), strategyParams))).asEagerSingleton();
 						break;
 
 					default:

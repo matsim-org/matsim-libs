@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -65,9 +66,11 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 			DrtGridUtils.createGridFromNetwork(network, 500.));
 
 	@Test
-	public void testCalculate_oneVehiclePerZone() {
+	public void testCalculate_oneVehiclePerInhabitant() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(1);
 		ToIntFunction<DrtZone> demandFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem,
-				createPopulation(), createFleetSpecification(8)).calculate(0, Map.of());
+				createPopulation(), createFleetSpecification(8), params).calculate(0, Map.of());
 
 		assertTarget(demandFunction, zonalSystem, "1", 0);
 		assertTarget(demandFunction, zonalSystem, "2", 2);
@@ -80,9 +83,28 @@ public class EqualVehiclesToPopulationRatioTargetCalculatorTest {
 	}
 
 	@Test
-	public void testCalculate_twoVehiclesPerZone() {
+	public void testCalculate_halfAVehiclePerInhabitant() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(0.5);
 		ToIntFunction<DrtZone> demandFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem,
-				createPopulation(), createFleetSpecification(16)).calculate(0, Map.of());
+				createPopulation(), createFleetSpecification(8), params).calculate(0, Map.of());
+
+		assertTarget(demandFunction, zonalSystem, "1", 0);
+		assertTarget(demandFunction, zonalSystem, "2", 1);
+		assertTarget(demandFunction, zonalSystem, "3", 0);
+		assertTarget(demandFunction, zonalSystem, "4", 1);
+		assertTarget(demandFunction, zonalSystem, "5", 0);
+		assertTarget(demandFunction, zonalSystem, "6", 0);
+		assertTarget(demandFunction, zonalSystem, "7", 0);
+		assertTarget(demandFunction, zonalSystem, "8", 1);
+	}
+
+	@Test
+	public void testCalculate_twoVehiclesPerInhabitant() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(1);
+		ToIntFunction<DrtZone> demandFunction = new EqualVehiclesToPopulationRatioTargetCalculator(zonalSystem,
+				createPopulation(), createFleetSpecification(16), params).calculate(0, Map.of());
 
 		assertTarget(demandFunction, zonalSystem, "1", 0);
 		assertTarget(demandFunction, zonalSystem, "2", 5);

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
@@ -52,14 +53,16 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 	private final DrtZonalSystem zonalSystem;
 	private final FleetSpecification fleetSpecification;
 	private final Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
+	private final Double alpha;
 	private Integer totalNrActivities;
 
 	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
-			@NotNull FleetSpecification fleetSpecification) {
+														  @NotNull FleetSpecification fleetSpecification, MinCostFlowRebalancingStrategyParams params) {
 		this.zonalSystem = zonalSystem;
 		prepareZones();
 		countFirstActsPerZone(population);
 		this.fleetSpecification = fleetSpecification;
+		this.alpha = params.getTargetAlpha();
 	}
 
 	private void countFirstActsPerZone(Population population) {
@@ -91,7 +94,7 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
 		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
 		return zoneId -> (int)Math.floor(
-				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
+				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize * alpha);
 	}
 
 	private void prepareZones() {
