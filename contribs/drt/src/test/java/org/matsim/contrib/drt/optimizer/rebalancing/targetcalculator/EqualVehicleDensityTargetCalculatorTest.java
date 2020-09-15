@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
@@ -58,22 +59,37 @@ public class EqualVehicleDensityTargetCalculatorTest {
 
 	@Test
 	public void calculate_oneVehiclePerZone() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(1);
 		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(8)).calculate(0, Map.of());
+				createFleetSpecification(8),params).calculate(0, Map.of());
+		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 1));
+	}
+
+	@Test
+	public void calculate_oneVehiclePerZoneEqualsHalfTheFleet() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(0.5);
+		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
+				createFleetSpecification(16),params).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 1));
 	}
 
 	@Test
 	public void calculate_lessVehiclesThanZones() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(1);
 		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(7)).calculate(0, Map.of());
+				createFleetSpecification(7), params).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 0));
 	}
 
 	@Test
 	public void calculate_moreVehiclesThanZones() {
+		MinCostFlowRebalancingStrategyParams params = new MinCostFlowRebalancingStrategyParams();
+		params.setTargetAlpha(1);
 		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
-				createFleetSpecification(9)).calculate(0, Map.of());
+				createFleetSpecification(9), params).calculate(0, Map.of());
 		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 1));
 	}
 

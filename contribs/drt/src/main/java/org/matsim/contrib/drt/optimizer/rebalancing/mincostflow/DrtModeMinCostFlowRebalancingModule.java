@@ -80,7 +80,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 					case EqualVehicleDensity:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new EqualVehicleDensityTargetCalculator(getter.getModal(DrtZonalSystem.class),
-										getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+										getter.getModal(FleetSpecification.class), strategyParams))).asEagerSingleton();
 						break;
 
 					case EqualVehiclesToPopulationRatio:

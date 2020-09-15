@@ -32,6 +32,7 @@ import javax.validation.constraints.NotNull;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 
@@ -48,18 +49,20 @@ public final class EqualVehicleDensityTargetCalculator implements RebalancingTar
 
 	private final Map<DrtZone, Double> zoneAreaShares = new HashMap<>();
 	private final FleetSpecification fleetSpecification;
+	private final double alpha;
 
 	public EqualVehicleDensityTargetCalculator(@NotNull DrtZonalSystem zonalSystem,
-			@NotNull FleetSpecification fleetSpecification) {
+			@NotNull FleetSpecification fleetSpecification, MinCostFlowRebalancingStrategyParams params) {
 		initAreaShareMap(zonalSystem);
 		this.fleetSpecification = fleetSpecification;
+		this.alpha = params.getTargetAlpha();
 	}
 
 	@Override
 	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		return zone -> {
 			double areaShare = zoneAreaShares.getOrDefault(zone, 0.);
-			return (int)Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
+			return (int)Math.floor(alpha * areaShare * this.fleetSpecification.getVehicleSpecifications().size());
 		};
 	}
 
