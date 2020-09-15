@@ -80,6 +80,10 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 	@Override
 	public ToDoubleFunction<DrtZone> calculate(double time,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		if (totalNrActivities == 0) {
+			return zoneId -> 0;
+		}
+
 		double factor = (double)fleetSize / totalNrActivities;
 		return zoneId -> this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() * factor;
 	}
