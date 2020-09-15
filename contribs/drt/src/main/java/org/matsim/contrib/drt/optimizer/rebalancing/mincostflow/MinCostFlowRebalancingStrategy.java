@@ -111,12 +111,15 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 			Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone) {
 		ToDoubleFunction<DrtZone> targetFunction = rebalancingTargetCalculator.calculate(time,
 				rebalancableVehiclesPerZone);
+		var minCostFlowRebalancingStrategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
+		double alpha = minCostFlowRebalancingStrategyParams.getTargetAlpha();
+		double beta = minCostFlowRebalancingStrategyParams.getTargetBeta();
 
 		List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones().values().stream().map(z -> {
 			int rebalancable = rebalancableVehiclesPerZone.getOrDefault(z, List.of()).size();
 			int soonIdle = soonIdleVehiclesPerZone.getOrDefault(z, List.of()).size();
-			int surplus = Math.min(rebalancable + soonIdle - (int)Math.floor(targetFunction.applyAsDouble(z)),
-					rebalancable);
+			int target = (int)Math.floor(alpha * targetFunction.applyAsDouble(z) + beta);
+			int surplus = Math.min(rebalancable + soonIdle - target, rebalancable);
 			return new DrtZoneVehicleSurplus(z, surplus);
 		}).collect(toList());
 

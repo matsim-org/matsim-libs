@@ -66,8 +66,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 					case EstimatedDemand:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new DemandEstimatorAsTargetCalculator(
-										getter.getModal(ZonalDemandEstimator.class), strategyParams)))
-								.asEagerSingleton();
+										getter.getModal(ZonalDemandEstimator.class)))).asEagerSingleton();
 						break;
 
 					case EqualRebalancableVehicleDistribution:

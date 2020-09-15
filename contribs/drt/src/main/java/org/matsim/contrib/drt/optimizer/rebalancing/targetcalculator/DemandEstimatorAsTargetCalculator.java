@@ -26,7 +26,6 @@ import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
@@ -34,14 +33,9 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  */
 public class DemandEstimatorAsTargetCalculator implements RebalancingTargetCalculator {
 	private final ZonalDemandEstimator demandEstimator;
-	private final double alpha;
-	private final double beta;
 
-	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator,
-			MinCostFlowRebalancingStrategyParams params) {
+	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator) {
 		this.demandEstimator = demandEstimator;
-		alpha = params.getTargetAlpha();
-		beta = params.getTargetBeta();
 	}
 
 	@Override
@@ -49,7 +43,6 @@ public class DemandEstimatorAsTargetCalculator implements RebalancingTargetCalcu
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		// TODO remove this hidden "+60"
 		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		ToDoubleFunction<DrtZone> expectedDemandFunction = demandEstimator.getExpectedDemandForTimeBin(time + 60);
-		return zone -> alpha * expectedDemandFunction.applyAsDouble(zone) + beta;
+		return demandEstimator.getExpectedDemandForTimeBin(time + 60);
 	}
 }
