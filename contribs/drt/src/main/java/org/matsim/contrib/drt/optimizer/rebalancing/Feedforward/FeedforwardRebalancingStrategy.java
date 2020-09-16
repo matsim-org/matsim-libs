@@ -1,10 +1,12 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -22,13 +24,13 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 
 /**
  * @author Chengqi Lu This strategy is created based on the Feedforward Fluidic
- *         rebalancing algorithm in AMoDeus. The algorithm send rebalancing
- *         vehicles based on the DRT demand flow of previous iteration. This
- *         strategy is comparable to the MinCostFlowRebalancing Strategy with
- *         Previous Iteration Zonal DRT Demand Aggregator. But, instead of
- *         setting a rebalance target for each zone, the concept of flow is
- *         used. Important: At least 2 iterations are needed in order to make
- *         this strategy function properly.
+ * rebalancing algorithm in AMoDeus. The algorithm send rebalancing
+ * vehicles based on the DRT demand flow of previous iteration. This
+ * strategy is comparable to the MinCostFlowRebalancing Strategy with
+ * Previous Iteration Zonal DRT Demand Aggregator. But, instead of
+ * setting a rebalance target for each zone, the concept of flow is
+ * used. Important: At least 2 iterations are needed in order to make
+ * this strategy function properly.
  */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);
@@ -39,7 +41,7 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 	private final int timeBinSize;
 	private final double rebalanceInterval;
-	private final double scale;
+	private final double scaling;
 	private final Random rnd = new Random(1234);
 	private final int feedforwardSignalLead;
 
@@ -47,14 +49,14 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private final int minNumVehiclesPerZone;
 
 	private final DrtZoneTargetLinkSelector drtZoneTargetLinkSelector;
-	private final FastHeuristicRelocationCalculator fastHeuristicRelocationCalculator;
+	private final FastHeuristicZonalRelocationCalculator fastHeuristicRelocationCalculator;
 
 	private final Map<Double, List<Flow<DrtZone, DrtZone>>> feedforwardSignal;
 
 	public FeedforwardRebalancingStrategy(DrtZonalSystem zonalSystem, Fleet fleet, RebalancingParams generalParams,
 			FeedforwardRebalancingStrategyParams strategySpecificParams,
 			FeedforwardSignalHandler feedforwardSignalHandler, DrtZoneTargetLinkSelector drtZoneTargetLinkSelector,
-			FastHeuristicRelocationCalculator fastHeuristicRelocationCalculator) {
+			FastHeuristicZonalRelocationCalculator fastHeuristicRelocationCalculator) {
 		this.zonalSystem = zonalSystem;
 		this.generalParams = generalParams;
 		this.drtZoneTargetLinkSelector = drtZoneTargetLinkSelector;
@@ -64,9 +66,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		rebalanceInterval = generalParams.getInterval();
 		vehicleInfoCollector = new VehicleInfoCollector(fleet, zonalSystem);
 
-		scale = strategySpecificParams.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
-		log.info("The feedforward signal strength is: "
-				+ Double.toString(strategySpecificParams.getFeedforwardSignalStrength()));
+		scaling = strategySpecificParams.getFeedforwardSignalStrength() * rebalanceInterval / timeBinSize;
+		log.info("The feedforward signal strength is: " + Double.toString(
+				strategySpecificParams.getFeedforwardSignalStrength()));
 
 		feedforwardSignal = feedforwardSignalHandler.getFeedforwardSignal();
 		feedforwardSignalLead = strategySpecificParams.getFeedforwardSignalLead();
@@ -86,65 +88,60 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 		List<Relocation> relocationList = new ArrayList<>();
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
 
-		// Feedback part
-		List<DvrpVehicle> truelyRebalancableVehicles = new ArrayList<>();
+		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector.groupRebalancableVehicles(
+				rebalancableVehicles, time, generalParams.getMinServiceTime());
 
+		// Feedback part
 		if (feedbackSwitch) {
 			List<DrtZoneVehicleSurplus> vehicleSurplusList = new ArrayList<>();
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupRebalancableVehicles(rebalancableVehicles, time, generalParams.getMinServiceTime());
-			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupSoonIdleVehicles(time, generalParams.getMaxTimeBeforeIdle(),
-							generalParams.getMinServiceTime());
+			Map<DrtZone, List<DvrpVehicle>> soonRebalancableVehiclesPerZone = vehicleInfoCollector.groupSoonIdleVehicles(
+					time, generalParams.getMaxTimeBeforeIdle(), generalParams.getMinServiceTime());
 
 			for (DrtZone zone : zonalSystem.getZones().values()) {
-				int surplus = rebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
-						+ soonRebalancableVehiclesPerZone.getOrDefault(zone, new ArrayList<>()).size()
-						- minNumVehiclesPerZone;
-				vehicleSurplusList.add(new DrtZoneVehicleSurplus(zone, surplus));
+				int rebalancable = rebalancableVehiclesPerZone.getOrDefault(zone, List.of()).size();
+				int soonIdle = soonRebalancableVehiclesPerZone.getOrDefault(zone, List.of()).size();
+
+				int surplus = rebalancable + soonIdle - minNumVehiclesPerZone;
+				vehicleSurplusList.add(new DrtZoneVehicleSurplus(zone, Math.min(surplus, rebalancable)));
 			}
-			
+
 			relocationList.addAll(
 					fastHeuristicRelocationCalculator.calcRelocations(vehicleSurplusList, rebalancableVehiclesPerZone));
-			truelyRebalancableVehicles.addAll(fastHeuristicRelocationCalculator.getTruelyRebalancableVehicles());
-
-		} else {
-			truelyRebalancableVehicles.addAll(rebalancableVehicles.collect(Collectors.toList()));
 		}
+		Set<DvrpVehicle> relocatedVehicles = relocationList.stream()
+				.map(relocation -> relocation.vehicle)
+				.collect(toSet());
 
 		// Feedforward part
-		// assign rebalnace vehicles based on the rebalance plan
+		// assign rebalance vehicles based on the rebalance plan
 		if (feedforwardSignal.containsKey(timeBin)) {
-			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = vehicleInfoCollector
-					.groupRebalancableVehicles(truelyRebalancableVehicles.stream(), time,
-							generalParams.getMinServiceTime());
 			// Generate relocations based on the "rebalancePlanCore"
 			for (Flow<DrtZone, DrtZone> rebalanceInfo : feedforwardSignal.get(timeBin)) {
 				DrtZone departureZone = rebalanceInfo.origin;
 				DrtZone arrivalZone = rebalanceInfo.destination;
-				int vehicleToSend = (int) Math.floor(scale * rebalanceInfo.amount + rnd.nextDouble());
+				int vehicleToSend = (int)Math.floor(scaling * rebalanceInfo.amount + rnd.nextDouble());
 				// Note: we use probability to solve the problem of non-integer value of
 				// vehileToSend after scaling.
-				int numVehiclesInZone = 0;
+				int numAvailableVehiclesInZone = 0;
 				if (rebalancableVehiclesPerZone.get(departureZone) != null) {
-					numVehiclesInZone = rebalancableVehiclesPerZone.get(departureZone).size();
+					numAvailableVehiclesInZone = (int)rebalancableVehiclesPerZone.get(departureZone)
+							.stream()
+							.filter(v -> !relocatedVehicles.contains(v))
+							.count();
 				}
 
-				if (vehicleToSend > numVehiclesInZone) {
-					vehicleToSend = numVehiclesInZone;
+				if (vehicleToSend > numAvailableVehiclesInZone) {
+					vehicleToSend = numAvailableVehiclesInZone;
 				}
 
-				if (vehicleToSend > 0) {
-					for (int i = 0; i < vehicleToSend; i++) {
-						Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
-						relocationList.add(
-								new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0), destinationLink));
-						rebalancableVehiclesPerZone.get(departureZone).remove(0);
-					}
+				for (int i = 0; i < vehicleToSend; i++) {
+					Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
+					relocationList.add(
+							new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0), destinationLink));
+					rebalancableVehiclesPerZone.get(departureZone).remove(0);
 				}
 			}
 		}
 		return relocationList;
 	}
-
 }

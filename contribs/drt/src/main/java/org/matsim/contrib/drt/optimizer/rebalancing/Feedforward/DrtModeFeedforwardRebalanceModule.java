@@ -58,27 +58,25 @@ public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 								getter.getModal(Fleet.class), generalParams, strategySpecificParams,
 								getter.getModal(FeedforwardSignalHandler.class),
 								getter.getModal(DrtZoneTargetLinkSelector.class),
-								getter.getModal(FastHeuristicRelocationCalculator.class))))
+								getter.getModal(FastHeuristicZonalRelocationCalculator.class))))
 						.asEagerSingleton();
 			}
 		});
 
 		// Create PreviousIterationDepartureRecoder (this will be created only once)
-		bindModal(FeedforwardSignalHandler.class)
-				.toProvider(modalProvider(getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class),
-						strategySpecificParams, getter.getModal(NetDepartureReplenishDemandEstimator.class))))
-				.asEagerSingleton();
+		bindModal(FeedforwardSignalHandler.class).toProvider(modalProvider(
+				getter -> new FeedforwardSignalHandler(getter.getModal(DrtZonalSystem.class), strategySpecificParams,
+						getter.getModal(NetDepartureReplenishDemandEstimator.class)))).asEagerSingleton();
 
-		bindModal(NetDepartureReplenishDemandEstimator.class).toProvider(
-				modalProvider(getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class),
-						drtCfg, strategySpecificParams)))
-				.asEagerSingleton();
+		bindModal(NetDepartureReplenishDemandEstimator.class).toProvider(modalProvider(
+				getter -> new NetDepartureReplenishDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
+						strategySpecificParams))).asEagerSingleton();
 
-		bindModal(FastHeuristicRelocationCalculator.class).toProvider(modalProvider(
-				getter -> new FastHeuristicRelocationCalculator(getter.getModal(DrtZoneTargetLinkSelector.class))));
+		bindModal(FastHeuristicZonalRelocationCalculator.class).toProvider(modalProvider(
+				getter -> new FastHeuristicZonalRelocationCalculator(
+						getter.getModal(DrtZoneTargetLinkSelector.class))));
 
 		addEventHandlerBinding().to(modalKey(NetDepartureReplenishDemandEstimator.class));
 		addControlerListenerBinding().to(modalKey(FeedforwardSignalHandler.class));
-
 	}
 }

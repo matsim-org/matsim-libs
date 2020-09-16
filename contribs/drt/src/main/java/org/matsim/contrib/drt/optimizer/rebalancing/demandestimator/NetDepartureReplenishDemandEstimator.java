@@ -15,23 +15,25 @@ import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebal
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 
-public class NetDepartureReplenishDemandEstimator implements ZonalDemandEstimator,
-		PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
+public class NetDepartureReplenishDemandEstimator
+		implements PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,
+		PassengerRequestRejectedEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
 	private final int timeBinSize;
 	private final Map<Double, Map<DrtZone, MutableInt>> currentZoneNetDepartureMap = new HashMap<>();
 	private final Map<Double, Map<DrtZone, MutableInt>> previousZoneNetDepartureMap = new HashMap<>();
-	private final Map<Id<Person>, Triple<Double, DrtZone, DrtZone>> potentialDRTTripsMap = new HashMap<>();
+	private final Map<Id<Request>, Triple<Double, DrtZone, DrtZone>> potentialDrtTripsMap = new HashMap<>();
 	private static final MutableInt ZERO = new MutableInt(0);
 	private final int simulationEndTime = 36; // simulation ending time in hour (greater than or equal to actual end
-												// time)
+	// time)
 
 	public NetDepartureReplenishDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
 			FeedforwardRebalancingStrategyParams strategySpecificParams) {
@@ -46,7 +48,7 @@ public class NetDepartureReplenishDemandEstimator implements ZonalDemandEstimato
 		// If a request is rejected, remove the request info from the temporary storage
 		// place
 		Id<Person> personId = event.getPersonId();
-		potentialDRTTripsMap.remove(personId);
+		potentialDrtTripsMap.remove(personId);
 	}
 
 	@Override
@@ -54,11 +56,10 @@ public class NetDepartureReplenishDemandEstimator implements ZonalDemandEstimato
 		// Here, we get a potential DRT trip. We will first note it down in the
 		// temporary data base (Potential DRT Trips Map)
 		if (event.getMode().equals(mode)) {
-			Id<Person> personId = event.getPersonId();
 			double timeBin = Math.floor(event.getTime() / timeBinSize);
 			DrtZone departureZoneId = zonalSystem.getZoneForLinkId(event.getFromLinkId());
 			DrtZone arrivalZoneId = zonalSystem.getZoneForLinkId(event.getToLinkId());
-			potentialDRTTripsMap.put(personId, Triple.of(timeBin, departureZoneId, arrivalZoneId));
+			potentialDrtTripsMap.put(event.getRequestId(), Triple.of(timeBin, departureZoneId, arrivalZoneId));
 		}
 	}
 
@@ -68,14 +69,14 @@ public class NetDepartureReplenishDemandEstimator implements ZonalDemandEstimato
 		// the database;
 		// Then remove the travel information from the potential trips Map
 		if (event.getMode().equals(mode)) {
-			Id<Person> personId = event.getPersonId();
-			double timeBin = potentialDRTTripsMap.get(personId).getLeft();
-			DrtZone departureZone = potentialDRTTripsMap.get(personId).getMiddle();
-			DrtZone arrivalZone = potentialDRTTripsMap.get(personId).getRight();
+			Triple<Double, DrtZone, DrtZone> triple = potentialDrtTripsMap.remove(event.getRequestId());
+			double timeBin = triple.getLeft();
+			DrtZone departureZone = triple.getMiddle();
+			DrtZone arrivalZone = triple.getRight();
 
-			currentZoneNetDepartureMap.get(timeBin).get(departureZone).increment();
-			currentZoneNetDepartureMap.get(timeBin).get(arrivalZone).decrement();
-			potentialDRTTripsMap.remove(personId);
+			var zoneNetDepartureMapSlice = currentZoneNetDepartureMap.computeIfAbsent(timeBin, t -> new HashMap<>());
+			zoneNetDepartureMapSlice.computeIfAbsent(departureZone, z -> new MutableInt()).increment();
+			zoneNetDepartureMapSlice.computeIfAbsent(arrivalZone, z -> new MutableInt()).decrement();
 		}
 	}
 
@@ -83,25 +84,12 @@ public class NetDepartureReplenishDemandEstimator implements ZonalDemandEstimato
 	public void reset(int iteration) {
 		previousZoneNetDepartureMap.clear();
 		previousZoneNetDepartureMap.putAll(currentZoneNetDepartureMap);
-		prepareZoneNetDepartureMap();
 	}
 
-	@Override
 	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
 		double timeBin = Math.floor(time / timeBinSize);
 		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousZoneNetDepartureMap.getOrDefault(timeBin,
 				Collections.emptyMap());
 		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
 	}
-
-	private void prepareZoneNetDepartureMap() {
-		for (int i = 0; i < (3600 / timeBinSize) * simulationEndTime; i++) {
-			Map<DrtZone, MutableInt> zonesPerSlot = new HashMap<>();
-			for (DrtZone zone : zonalSystem.getZones().values()) {
-				zonesPerSlot.put(zone, new MutableInt());
-			}
-			currentZoneNetDepartureMap.put((double) i, zonesPerSlot);
-		}
-	}
-
 }

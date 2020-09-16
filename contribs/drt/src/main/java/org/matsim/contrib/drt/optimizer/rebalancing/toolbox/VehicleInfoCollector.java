@@ -16,6 +16,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 
+//TODO remove this class
 public class VehicleInfoCollector {
 
 	private Fleet fleet;
@@ -27,14 +28,12 @@ public class VehicleInfoCollector {
 	}
 
 	// also include vehicles being right now relocated or recharged
-	public Map<DrtZone, List<DvrpVehicle>> groupSoonIdleVehicles(double time, double maxTimeBeforeIdle,
-			double minServiceTime) {
+	public Map<DrtZone, List<DvrpVehicle>> groupSoonIdleVehicles(double time, double maxTimeBeforeIdle, double minServiceTime) {
 		Map<DrtZone, List<DvrpVehicle>> soonIdleVehiclesPerZone = new HashMap<>();
 		for (DvrpVehicle v : fleet.getVehicles().values()) {
 			Schedule s = v.getSchedule();
 			StayTask stayTask = (StayTask) Schedules.getLastTask(s);
-			if (stayTask.getStatus() == TaskStatus.PLANNED && stayTask.getBeginTime() < time + maxTimeBeforeIdle
-					&& v.getServiceEndTime() > time + minServiceTime) {
+			if (stayTask.getStatus() == TaskStatus.PLANNED && stayTask.getBeginTime() < time + maxTimeBeforeIdle && v.getServiceEndTime() > time + minServiceTime) {
 				DrtZone zone = zonalSystem.getZoneForLinkId(stayTask.getLink().getId());
 				if (zone != null) {
 					soonIdleVehiclesPerZone.computeIfAbsent(zone, z -> new ArrayList<>()).add(v);

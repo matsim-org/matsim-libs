@@ -1,19 +1,19 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.NetDepartureReplenishDemandEstimator;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.AggregatedMinCostRelocationCalculator.DrtZoneVehicleSurplus;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.TransportProblem.Flow;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
@@ -43,31 +43,22 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 		int numOfTimeBin = simulationEndTime * 3600 / timeBinSize;
 		log.info("Start calculating rebalnace plan now");
 		for (int i = 0; i < numOfTimeBin; i++) {
-			double timeBin = (double) i;
-			List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
-			List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
-			for (DrtZone zone : zonalSystem.getZones().values()) {
-				ToDoubleFunction<DrtZone> netDepartureInputFunction = netDepartureReplenishDemandEstimator
-						.getExpectedDemandForTimeBin(timeBin);
-				double netDeparture = netDepartureInputFunction.applyAsDouble(zone);
-				if (netDeparture > 0) {
-					demand.add(Pair.of(zone, (int) netDeparture));
-				} else if (netDeparture < 0) {
-					supply.add(Pair.of(zone, (int) (-1 * netDeparture)));
-				}
-			}
-			List<Flow<DrtZone, DrtZone>> interZonalRelocations = new TransportProblem<>(this::calcStraightLineDistance)
-					.solve(supply, demand);
-			feedforwardSignal.put(timeBin, interZonalRelocations);
-			progressCounter += 1;
-			log.info("Calculating: " + Double.toString(progressCounter * timeBinSize / simulationEndTime / 36)
-					+ "% complete");
+			double timeBin = i;
+
+			ToDoubleFunction<DrtZone> netDepartureInputFunction = netDepartureReplenishDemandEstimator.getExpectedDemandForTimeBin(
+					timeBin);
+
+			List<DrtZoneVehicleSurplus> vehicleSurpluses = zonalSystem.getZones()
+					.values()
+					.stream()
+					.map(z -> new DrtZoneVehicleSurplus(z, (int)netDepartureInputFunction.applyAsDouble(z)))
+					.collect(toList());
+
+			feedforwardSignal.put(timeBin, TransportProblem.solveForVehicleSurplus(vehicleSurpluses));
+			progressCounter++;
+			log.debug("Calculating: " + (double)progressCounter * timeBinSize / simulationEndTime / 36 + "% complete");
 		}
 		log.info("Rebalance plan calculation is now complete! ");
-	}
-
-	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
-		return (int) DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
 	}
 
 	public Map<Double, List<Flow<DrtZone, DrtZone>>> getFeedforwardSignal() {
@@ -81,5 +72,4 @@ public class FeedforwardSignalHandler implements IterationStartsListener {
 			calculateFeedforwardSignal();
 		}
 	}
-
 }
