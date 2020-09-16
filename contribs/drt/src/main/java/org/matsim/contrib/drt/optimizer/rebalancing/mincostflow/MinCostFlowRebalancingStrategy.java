@@ -43,16 +43,16 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private final RebalancingTargetCalculator rebalancingTargetCalculator;
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
-	private final RelocationCalculator relocationCalculator;
+	private final ZonalRelocationCalculator zonalRelocationCalculator;
 	private final RebalancingParams params;
 
 	public MinCostFlowRebalancingStrategy(RebalancingTargetCalculator rebalancingTargetCalculator,
-			DrtZonalSystem zonalSystem, Fleet fleet, RelocationCalculator relocationCalculator,
+			DrtZonalSystem zonalSystem, Fleet fleet, ZonalRelocationCalculator zonalRelocationCalculator,
 			RebalancingParams params) {
 		this.rebalancingTargetCalculator = rebalancingTargetCalculator;
 		this.zonalSystem = zonalSystem;
 		this.fleet = fleet;
-		this.relocationCalculator = relocationCalculator;
+		this.zonalRelocationCalculator = zonalRelocationCalculator;
 		this.params = params;
 	}
 
@@ -85,6 +85,6 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 			return new DrtZoneVehicleSurplus(z, surplus);
 		}).collect(toList());
 
-		return relocationCalculator.calcRelocations(vehicleSurpluses, rebalancableVehiclesPerZone);
+		return zonalRelocationCalculator.calcRelocations(vehicleSurpluses, rebalancableVehiclesPerZone);
 	}
 }
