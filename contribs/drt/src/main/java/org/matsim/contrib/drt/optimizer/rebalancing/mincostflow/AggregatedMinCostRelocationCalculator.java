@@ -37,7 +37,7 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  *
  * @author michalm
  */
-public class AggregatedMinCostRelocationCalculator implements RelocationCalculator {
+public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCalculator {
 	public static class DrtZoneVehicleSurplus {
 		public final DrtZone zone;
 		public final int surplus;

@@ -80,10 +80,6 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		passengerHandler.setInternalInterface(internalInterface);
 	}
 
-	public String getMode() {
-		return mode;
-	}
-
 	@Override
 	public void onPrepareSim() {
 	}
