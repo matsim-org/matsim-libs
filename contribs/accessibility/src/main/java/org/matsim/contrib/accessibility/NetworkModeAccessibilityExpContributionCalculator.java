@@ -113,23 +113,27 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
 		double expSum = 0.;
 
-		for (final AggregationObject destination : aggregatedOpportunities.values()) {
-			Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
-
-			// Orthogonal walk to nearest link
-			Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-			double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
-			double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
-
-			// NEW AV MODE
-			//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
-			//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-			//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-			// END NEW AV MODE
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
+		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+		double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+		// Orthogonal walk to nearest link
+		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
+		// NEW AV MODE
+		//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
+		//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+		//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+		// END NEW AV MODE
 
 			// Travel on section of first link to first node
 			double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
 			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
+
+		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
+		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
+
+		for (final AggregationObject destination : aggregatedOpportunities.values()) {
+
+
 
 			// Remaining travel on network
 			double congestedCarUtility = -lcpt.getTree().get(((Node) destination.getNearestBasicLocation()).getId()).getCost();
@@ -139,9 +143,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 			// Pre-computed effect of all opportunities reachable from destination network node
 			double sumExpVjkWalk = destination.getSum();
 
-			// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
-			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-			expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
+				expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
 					+ congestedCarUtilityRoad2Node + congestedCarUtility)) * sumExpVjkWalk;
 		}
 		return expSum;
