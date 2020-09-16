@@ -74,14 +74,21 @@ public class DrtZonalSystemTest {
 		
 		//gib mir zone für einen link außerhalb und prüfe ob null
 		Id<Link> id = Id.createLinkId("da");
-		assertThat(zonalSystem.getZoneForLinkId(id).equals(null));
+		assertThat(zonalSystem.getZoneForLinkId(id) == null);
 	}
 
 	@Test
 	public void test_noZonesWithoutLinks(){
 		//baue eine serviceArea, die ganz woanders als das Netzwerk liegt
+		Coordinate min = new Coordinate(1500, 1500);
+		Coordinate max = new Coordinate(2500, 2500);
+		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea);
+		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(), 
+				grid);
 
 		//teste, dass drtZonalSystem keine Zone hat
+		assertEquals(0, zonalSystem.getZones().size());
 	}
 	
 	public List<PreparedGeometry> createServiceArea(Coordinate min, Coordinate max){
