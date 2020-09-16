@@ -19,6 +19,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 	private double walkSpeed_m_s;
 
 	private Node fromNode = null;
-	private LeastCostPathTreeExtended lcpt;
+	private LeastCostPathTree lcpt;
 	//private final DijkstraTree dijkstraTree;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
@@ -67,7 +68,8 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 
 		RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, scheme);
+//		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, scheme);
+		this.lcpt = new LeastCostPathTree(travelTime, travelDisutility);
 		//this.dijkstraTree = new DijkstraTree(network, travelDisutility, travelTime);
 		//FastMultiNodeDijkstraFactory fastMultiNodeDijkstraFactory = new FastMultiNodeDijkstraFactory(true);
 		//this.multiNodePathCalculator = (MultiNodePathCalculator) fastMultiNodeDijkstraFactory.createPathCalculator(network, travelDisutility, travelTime);
@@ -102,7 +104,7 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 	@Override
 	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = subNetwork.getNodes().get(fromNodeId);
-		this.lcpt.calculateExtended(subNetwork, fromNode, departureTime);
+		this.lcpt.calculate(subNetwork, fromNode, departureTime);
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
 		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
 	}
@@ -124,9 +126,9 @@ final class NetworkModeAccessibilityExpContributionCalculator implements Accessi
 		//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
 		// END NEW AV MODE
 
-			// Travel on section of first link to first node
-			double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
-			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
+		// Travel on section of first link to first node
+		double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
+		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
 		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
 		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
