@@ -18,16 +18,12 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -42,7 +38,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	public enum ZonalDemandEstimatorType {
-		PreviousIterationDemand
+		PreviousIterationDemand, None
 	}
 
 	public static final String TARGET_ALPHA = "targetAlpha";
@@ -59,26 +55,24 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =
 			"Defines the calculator used for computing rebalancing targets per each zone"
 					+ " (i.e. number of the desired vehicles)."
-					+ " Can be one of [LinearRebalancingTarget, EqualRebalancableVehicleDistribution,"
+					+ " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
 					+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
 					+ " Current default is LinearRebalancingTarget";
 
-	public static final String ZONAL_DEMAND_AGGREGATOR_TYPE = "zonalDemandEstimatorType";
-	static final String ZONAL_DEMAND_AGGREGATOR_TYPE_EXP = "Defines the methodology for demand estimation."
-			+ " Can be one of [PreviousIterationDemand]. Current default is PreviousIterationDemand";
+	public static final String ZONAL_DEMAND_ESTIMATOR_TYPE = "zonalDemandEstimatorType";
+	static final String ZONAL_DEMAND_ESTIMATOR_TYPE_EXP = "Defines the methodology for demand estimation."
+			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand";
 
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
-	@Nullable
 	@PositiveOrZero
-	private Double targetAlpha = null;
+	private double targetAlpha = Double.NaN;
 
-	@Nullable
 	@PositiveOrZero
-	private Double targetBeta = null;
+	private double targetBeta = Double.NaN;
 
-	@Nullable //required only if rebalancingTargetCalculatorType == EstimatedDemand
+	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
 
 	public MinCostFlowRebalancingStrategyParams() {
@@ -86,26 +80,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
-
-		if (rebalancingTargetCalculatorType == RebalancingTargetCalculatorType.EstimatedDemand) {
-			checkState(zonalDemandEstimatorType != null,
-					"zonalDemandEstimatorType is required if EstimatedDemand is used as rebalancing target");
-			checkState(targetAlpha != null, "targetAlpha is required if EstimatedDemand is used as rebalancing target");
-			checkState(targetBeta != null, "targetBeta is required if EstimatedDemand is used as rebalancing target");
-		} else {
-			checkState(zonalDemandEstimatorType == null,
-					"zonalDemandEstimatorType should be null if the rebalancing target is not set to EstimatedDemand");
-		}
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
-		map.put(ZONAL_DEMAND_AGGREGATOR_TYPE, ZONAL_DEMAND_AGGREGATOR_TYPE_EXP);
+		map.put(ZONAL_DEMAND_ESTIMATOR_TYPE, ZONAL_DEMAND_ESTIMATOR_TYPE_EXP);
 		return map;
 	}
 
@@ -113,7 +92,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_ALPHA_EXP}
 	 */
 	@StringGetter(TARGET_ALPHA)
-	public Double getTargetAlpha() {
+	public double getTargetAlpha() {
 		return targetAlpha;
 	}
 
@@ -129,7 +108,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	 * @return -- {@value #TARGET_BETA_EXP}
 	 */
 	@StringGetter(TARGET_BETA)
-	public Double getTargetBeta() {
+	public double getTargetBeta() {
 		return targetBeta;
 	}
 
@@ -158,17 +137,17 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	/**
-	 * @return -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 * @return -- {@value #ZONAL_DEMAND_ESTIMATOR_TYPE_EXP}
 	 */
-	@StringGetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	@StringGetter(ZONAL_DEMAND_ESTIMATOR_TYPE)
 	public ZonalDemandEstimatorType getZonalDemandEstimatorType() {
 		return zonalDemandEstimatorType;
 	}
 
 	/**
-	 * @param estimatorType -- {@value #ZONAL_DEMAND_AGGREGATOR_TYPE_EXP}
+	 * @param estimatorType -- {@value #ZONAL_DEMAND_ESTIMATOR_TYPE_EXP}
 	 */
-	@StringSetter(ZONAL_DEMAND_AGGREGATOR_TYPE)
+	@StringSetter(ZONAL_DEMAND_ESTIMATOR_TYPE)
 	public void setZonalDemandEstimatorType(ZonalDemandEstimatorType estimatorType) {
 		this.zonalDemandEstimatorType = estimatorType;
 	}

@@ -25,6 +25,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -46,11 +47,13 @@ import one.util.streamex.StreamEx;
  */
 public class DrtZonalSystem {
 
-	public static DrtZonalSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries) {
+	public static DrtZonalSystem createFromPreparedGeometries(Network network,
+			Map<String, PreparedGeometry> geometries) {
 
 		//geometries without links are skipped
 		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
 				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+				.filterKeys(Objects::nonNull)
 				.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
@@ -68,6 +71,7 @@ public class DrtZonalSystem {
 	 * If a given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
 	 * Result may be null in case the given link is outside of the service area.
 	 */
+	@Nullable
 	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
 		//TODO use endNode.getCoord() ?
 		Point linkCoord = MGC.coord2Point(link.getCoord());

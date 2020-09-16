@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -58,37 +59,41 @@ public class DrtZonalSystemTest {
 
 	@Test
 	public void test_gridWithinServiceArea(){
-		// abgucken von createGridFromNetwork
 		Coordinate min = new Coordinate(-500, 500);
 		Coordinate max = new Coordinate(1500, 1500);
 		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea);
 		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
-				DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea));
-		
-		//teste anzahl zonen
-		assertEquals(4, zonalSystem.getZones().size());
-		
-		
-		//gib mir zone für einen link außerhalb und prüfe ob null
+				grid);
+
+		assertEquals(3, zonalSystem.getZones().size());
+
+		//link 'da' is outside of the service area
 		Id<Link> id = Id.createLinkId("da");
-		assertThat(zonalSystem.getZoneForLinkId(id).equals(null));
+		assertThat(zonalSystem.getZoneForLinkId(id) == null);
 	}
 
 	@Test
 	public void test_noZonesWithoutLinks(){
-		//baue eine serviceArea, die ganz woanders als das Netzwerk liegt
+		Coordinate min = new Coordinate(1500, 1500);
+		Coordinate max = new Coordinate(2500, 2500);
+		List<PreparedGeometry> serviceArea = createServiceArea(min,max);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetworkWithinServiceArea(createNetwork(), 100, serviceArea);
+		DrtZonalSystem zonalSystem = createFromPreparedGeometries(createNetwork(),
+				grid);
 
-		//teste, dass drtZonalSystem keine Zone hat
+		//service area is off the network - so we should have 0 zones..
+		assertEquals(0, zonalSystem.getZones().size());
 	}
-	
+
 	public List<PreparedGeometry> createServiceArea(Coordinate min, Coordinate max){
 		GeometryFactory gf = new GeometryFactory();
 		PreparedGeometryFactory preparedGeometryFactory = new PreparedGeometryFactory();
 		List<PreparedGeometry> ServiceArea =  new ArrayList<>();
 		Coordinate p1 = new Coordinate(min.x, min.y);
-		Coordinate p2 = new Coordinate(min.x, max.y);
+		Coordinate p2 = new Coordinate(max.x, min.y);
 		Coordinate p3 = new Coordinate(max.x, max.y);
-		Coordinate p4 = new Coordinate(max.x, min.y);
+		Coordinate p4 = new Coordinate(min.x, max.y);
 		Coordinate[] ca = { p1, p2, p3, p4, p1 };
 		Polygon polygon = new Polygon(gf.createLinearRing(ca), null, gf);
 		ServiceArea.add(preparedGeometryFactory.create(polygon));

@@ -74,8 +74,16 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 			}
 		})).asEagerSingleton();
 
-		bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter ->
-				new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+		bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter -> {
+				switch (params.getTargetLinkSelection()) {
+					case mostCentral:
+						return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class));
+					case random:
+						return new RandomDrtZoneTargetLinkSelector();
+					default:
+						throw new RuntimeException("Unsupported target link selection = " + params.getTargetLinkSelection());
+				}
+		})).asEagerSingleton();
 
 		//zonal analysis
 		bindModal(ZonalIdleVehicleXYVisualiser.class).

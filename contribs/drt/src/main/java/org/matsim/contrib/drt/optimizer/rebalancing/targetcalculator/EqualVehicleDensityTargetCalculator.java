@@ -26,7 +26,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import javax.validation.constraints.NotNull;
 
@@ -41,7 +41,6 @@ import com.google.common.base.Preconditions;
  * This class does not really calculate the expected demand but aims to
  * distribute the fleet vehicles equally over all zones, weighted by zone area size.
  * <p>
- * TODO:test
  *
  * @author tschlenther
  */
@@ -57,11 +56,9 @@ public final class EqualVehicleDensityTargetCalculator implements RebalancingTar
 	}
 
 	@Override
-	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		return zone -> {
-			double areaShare = zoneAreaShares.getOrDefault(zone, 0.);
-			return (int)Math.floor(areaShare * this.fleetSpecification.getVehicleSpecifications().size());
-		};
+	public ToDoubleFunction<DrtZone> calculate(double time,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		return zone -> zoneAreaShares.getOrDefault(zone, 0.) * fleetSpecification.getVehicleSpecifications().size();
 	}
 
 	private void initAreaShareMap(DrtZonalSystem zonalSystem) {
