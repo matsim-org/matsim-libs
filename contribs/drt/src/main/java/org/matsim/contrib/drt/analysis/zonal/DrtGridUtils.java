@@ -97,6 +97,6 @@ public class DrtGridUtils {
 				.toMap();
 
 		log.info("number of remaining grid zones = " + zonesWithinServiceArea.size());
-		return grid;
+		return zonesWithinServiceArea;
 	}
 }
