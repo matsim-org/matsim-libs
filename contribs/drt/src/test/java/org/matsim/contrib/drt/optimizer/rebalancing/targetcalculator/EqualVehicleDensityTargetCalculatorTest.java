@@ -23,7 +23,7 @@ package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.function.ToDoubleFunction;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -58,23 +58,23 @@ public class EqualVehicleDensityTargetCalculatorTest {
 
 	@Test
 	public void calculate_oneVehiclePerZone() {
-		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
+		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(8)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 1));
+		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 1));
 	}
 
 	@Test
 	public void calculate_lessVehiclesThanZones() {
-		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
+		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(7)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 0));
+		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 7. / 8));
 	}
 
 	@Test
 	public void calculate_moreVehiclesThanZones() {
-		ToIntFunction<DrtZone> demandFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
+		var targetFunction = new EqualVehicleDensityTargetCalculator(zonalSystem,
 				createFleetSpecification(9)).calculate(0, Map.of());
-		zonalSystem.getZones().keySet().forEach(id -> assertTarget(demandFunction, zonalSystem, id, 1));
+		zonalSystem.getZones().keySet().forEach(id -> assertTarget(targetFunction, zonalSystem, id, 9. / 8));
 	}
 
 	private FleetSpecification createFleetSpecification(int count) {
@@ -91,8 +91,8 @@ public class EqualVehicleDensityTargetCalculatorTest {
 		return fleetSpecification;
 	}
 
-	private void assertTarget(ToIntFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
-			int expectedValue) {
-		assertThat(targetFunction.applyAsInt(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
+	private void assertTarget(ToDoubleFunction<DrtZone> targetFunction, DrtZonalSystem zonalSystem, String zoneId,
+			double expectedValue) {
+		assertThat(targetFunction.applyAsDouble(zonalSystem.getZones().get(zoneId))).isEqualTo(expectedValue);
 	}
 }
