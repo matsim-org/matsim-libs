@@ -43,6 +43,8 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 		super(SET_NAME);
 	}
 
+	public enum TargetLinkSelection {random, mostCentral}
+
 	public enum ZoneGeneration {GridFromNetwork, ShapeFile}
 
 	public static final String ZONES_GENERATION = "zonesGeneration";
@@ -57,6 +59,10 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 	private static final String ZONES_SHAPE_FILE_EXP = "allows to configure zones."
 			+ " Used with zonesGeneration=ShapeFile";
 
+	public static final String ZONE_TARGET_LINK_SELECTION = "zoneTargetLinkSelection";
+	static final String ZONE_TARGET_LINK_SELECTION_EXP = "Defines how the target link of a zone is determined (e.g. for rebalancing)."
+			+ " Possible values are [random,mostCentral]. Default behavior is mostCentral, where all vehicles are sent to the same link.";
+
 	@NotNull
 	private ZoneGeneration zonesGeneration = null;
 
@@ -66,6 +72,9 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 
 	@Nullable
 	private String zonesShapeFile = null;
+
+	@NotNull
+	private TargetLinkSelection targetLinkSelection = TargetLinkSelection.mostCentral;
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -137,4 +146,16 @@ public class DrtZonalSystemParams extends ReflectiveConfigGroup {
 	public void setZonesShapeFile(String zonesShapeFile) {
 		this.zonesShapeFile = zonesShapeFile;
 	}
+
+	/**
+	 * @return -- {@value #ZONE_TARGET_LINK_SELECTION_EXP}
+	 */
+	@StringGetter(ZONE_TARGET_LINK_SELECTION)
+	public TargetLinkSelection getTargetLinkSelection() { return targetLinkSelection; }
+
+	/**
+	 * @param targetLinkSelection -- {@value #ZONE_TARGET_LINK_SELECTION_EXP}
+	 */
+	@StringSetter(ZONE_TARGET_LINK_SELECTION)
+	public void setTargetLinkSelection(TargetLinkSelection targetLinkSelection) { this.targetLinkSelection = targetLinkSelection; }
 }

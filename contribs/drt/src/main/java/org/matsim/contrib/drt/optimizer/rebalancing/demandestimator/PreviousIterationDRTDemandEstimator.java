@@ -73,7 +73,11 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 			Double bin = getBinForTime(event.getTime());
 
 			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
-			Preconditions.checkNotNull(zone, "No zone found for linkId %s", event.getLinkId().toString());
+			if (zone == null) {
+				//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
+				logger.warn("No zone found for linkId " + event.getLinkId().toString());
+				return;
+			}
 
 			currentIterationDepartures.computeIfAbsent(bin, v -> new HashMap<>())
 					.computeIfAbsent(zone, z -> new MutableInt())
