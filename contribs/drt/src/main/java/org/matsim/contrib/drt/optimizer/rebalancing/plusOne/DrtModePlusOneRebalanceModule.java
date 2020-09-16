@@ -42,7 +42,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		log.info("Plus one Rebalancing Algorithm is now being installed!");
+		log.info("Plus one rebalancing strategy is now being installed!");
 		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
 		PlusOneRebalancingStrategyParams specificParams = (PlusOneRebalancingStrategyParams) generalParams
 				.getRebalancingStrategyParams();
