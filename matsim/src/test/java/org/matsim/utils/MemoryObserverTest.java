@@ -98,7 +98,8 @@ public class MemoryObserverTest {
 				+ ", "
 				+ inactiveLogs3);
 		assertThat(activeLogs1).as("Number of log messages").isBetween(2, 4);
-		assertThat(activeLogs2).as("Number of log messages").isBetween(2, 4);
+		//if count2 is low then activeLogs2 may be even 5 (count sequence: 0, 2, 7, 7) -- happens on appveyor
+		assertThat(activeLogs2).as("Number of log messages").isBetween(2, 5);
 		assertThat(inactiveLogs3).as("Number of log messages when being stopped").isLessThanOrEqualTo(1);
 	}
 }

@@ -83,8 +83,8 @@ final class InitialCarrierPlanCreator {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
-                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit*waiting + service;
+                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
+                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
                 //						//				return penalty4missedTws*tooLate;
                 //						return 0.0;
             }

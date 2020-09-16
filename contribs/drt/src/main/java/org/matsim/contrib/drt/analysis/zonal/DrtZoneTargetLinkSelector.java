@@ -1,9 +1,9 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +15,14 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-/**
- *
- */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.function.ToDoubleFunction;
+import org.matsim.api.core.v01.network.Link;
 
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+public interface DrtZoneTargetLinkSelector {
 
-/**
- * @author jbischoff
- */
-public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time);
+	Link selectTargetLink(DrtZone zone);
+
 }

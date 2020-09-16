@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 public class JointDemandUtils {
 
+    //TODO use StringCollection object attribute type instead of custom convention (using semicolon)
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     public static final String CARRIER_MARKET_ATTRIBUTE_NAME = "market";
     static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";

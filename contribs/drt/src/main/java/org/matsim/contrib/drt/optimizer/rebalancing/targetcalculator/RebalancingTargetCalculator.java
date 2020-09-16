@@ -18,18 +18,18 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
- * @author jbischoff
+ * @author Michal Maciejewski (michalm)
  */
-public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time);
+public interface RebalancingTargetCalculator {
+	ToDoubleFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }
