@@ -1,17 +1,13 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -24,8 +20,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
 /**
@@ -40,11 +34,14 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 	private static final Logger log = Logger.getLogger(PlusOneRebalancingStrategy.class);
 	private final Network network;
 
-	private final Map<Id<Link>, Integer> targetMap = new HashMap<>();
+	private final ZoneFreeRelocationCalculator zoneFreeRelocationCalculator;
+
+	private final List<Id<Link>> targetLinkIDList = new ArrayList<>();
 	private final Map<Id<Person>, Id<Link>> potentialDRTTripsMap = new HashMap<>();
 
-	public PlusOneRebalancingStrategy(Network network) {
+	public PlusOneRebalancingStrategy(Network network, ZoneFreeRelocationCalculator zoneFreeRelocationCalculator) {
 		this.network = network;
+		this.zoneFreeRelocationCalculator = zoneFreeRelocationCalculator;
 	}
 
 	@Override
@@ -53,49 +50,26 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 		List<? extends DvrpVehicle> rebalancableVehicleList = rebalancableVehicles.collect(Collectors.toList());
 
 		// calculate the matching result
-		List<Relocation> relocations = matching(rebalancableVehicleList, targetMap, network);
+		List<Link> targetLinkList = linkIDsToLinks(targetLinkIDList);
+		log.debug("There are in total " + targetLinkList.size() + " rebalance targets at this time period");
+		log.debug("There are " + rebalancableVehicleList.size() + " vehicles that can be rebalanced");
+		List<Relocation> relocations = zoneFreeRelocationCalculator.calcRelocations(targetLinkList,
+				rebalancableVehicleList);
 
 		// clear the target map for next rebalancing cycle
-		targetMap.clear();
+		targetLinkIDList.clear();
 
 		// Return relocations
 		return relocations;
 	}
 
-	private List<Relocation> matching(List<? extends DvrpVehicle> rebalancableVehicles,
-			Map<Id<Link>, Integer> targetMap, Network network) {
-		List<Relocation> relocationList = new ArrayList<>();
+	private List<Link> linkIDsToLinks(List<Id<Link>> targetLinkIDList) {
+		List<Link> targetLinkList = new ArrayList<>();
 		Map<Id<Link>, ? extends Link> linkMap = network.getLinks();
-		Set<Id<Link>> destinationLinkIds = new HashSet<>();
-		destinationLinkIds.addAll(targetMap.keySet());
-		for (Id<Link> destinationLinkId : destinationLinkIds) {
-			int numOfRequestsOnLink = targetMap.get(destinationLinkId);
-			Link destinationLink = linkMap.get(destinationLinkId);
-			if (!rebalancableVehicles.isEmpty()) {
-				for (int i = 0; i < numOfRequestsOnLink; i++) {
-					DvrpVehicle nearestVehicle = findNearestVehicle(destinationLink, rebalancableVehicles);
-					relocationList.add(new Relocation(nearestVehicle, destinationLink));
-					rebalancableVehicles.remove(nearestVehicle);
-				}
-			} else {
-				log.warn("There is not enough vehicle to perform rebalance at this moment!");
-				break;
-			}
+		for (Id<Link> linkId : targetLinkIDList) {
+			targetLinkList.add(linkMap.get(linkId));
 		}
-		return relocationList;
-	}
-
-	private DvrpVehicle findNearestVehicle(Link destinationLink, List<? extends DvrpVehicle> rebalancableVehicles) {
-		// First implementation: find the closest vehicles for each link.
-		// TODO upgrade the matching with more advanced matching algorithm (e.g.
-		// bipartite matching)
-		if (rebalancableVehicles.isEmpty()) {
-			return null;
-		}
-		Coord toCoord = destinationLink.getCoord();
-		return rebalancableVehicles.stream().min(Comparator.comparing(
-				v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(), toCoord)))
-				.get();
+		return targetLinkList;
 	}
 
 	@Override
@@ -107,12 +81,7 @@ public class PlusOneRebalancingStrategy implements RebalancingStrategy, Passenge
 	public void handleEvent(PassengerRequestScheduledEvent event) {
 		Id<Person> personId = event.getPersonId();
 		Id<Link> departureLink = potentialDRTTripsMap.get(personId);
-		if (targetMap.containsKey(departureLink)) {
-			int newValue = targetMap.get(departureLink) + 1;
-			targetMap.put(departureLink, newValue);
-		} else {
-			targetMap.put(departureLink, 1);
-		}
+		targetLinkIDList.add(departureLink);
 	}
 
 	@Override

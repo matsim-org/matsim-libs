@@ -35,6 +35,8 @@ public interface RelocationCalculator {
 	 * @param rebalancableVehiclesPerZone list of rebalancable vehicles per each zone (zones without rebalancable vehicles are usually skipped)
 	 * @return vehicle relocations
 	 */
+	// TODO perhaps change the name of the interface to AggregatedRelocationCalculator?
+
 	List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone);
 }

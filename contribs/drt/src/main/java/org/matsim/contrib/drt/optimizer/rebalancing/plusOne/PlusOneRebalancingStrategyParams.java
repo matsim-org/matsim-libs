@@ -20,6 +20,8 @@ package org.matsim.contrib.drt.optimizer.rebalancing.plusOne;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -31,16 +33,42 @@ public final class PlusOneRebalancingStrategyParams extends ReflectiveConfigGrou
 		implements RebalancingParams.RebalancingStrategyParams {
 	public static final String SET_NAME = "PlusOneRebalancingStrategy";
 
+	public static final String RELOCATION_CALCULATOR_TYPE = "relocationCalculatorType";
+	static final String RELOCATION_CALCULATOR_TYPE_EXP = "specific the zone free relocation calculator. Default is fast heuristic zone free relocation calculator";
+
+	// add entry here when additional calculator is implemented
+	public enum ZoneFreeRelocationCalculatorType {
+		FastHeuristic
+	}
+
+	@NotNull
+	private ZoneFreeRelocationCalculatorType zoneFreeRelocationCalculatorType = ZoneFreeRelocationCalculatorType.FastHeuristic;
 
 	public PlusOneRebalancingStrategyParams() {
 		super(SET_NAME);
 	}
 
-
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
+		map.put(RELOCATION_CALCULATOR_TYPE, RELOCATION_CALCULATOR_TYPE_EXP);
 		return map;
+	}
+
+	/**
+	 * @return -- {@value #RELOCATION_CALCULATOR_TYPE_EXP}
+	 */
+	@StringGetter(RELOCATION_CALCULATOR_TYPE)
+	public ZoneFreeRelocationCalculatorType getZoneFreeRelocationCalculatorType() {
+		return zoneFreeRelocationCalculatorType;
+	}
+
+	/**
+	 * @param estimatorType -- {@value #RELOCATION_CALCULATOR_TYPE_EXP}
+	 */
+	@StringSetter(RELOCATION_CALCULATOR_TYPE)
+	public void setRelocationCalculatorType(ZoneFreeRelocationCalculatorType zoneFreeRelocationCalculatorType) {
+		this.zoneFreeRelocationCalculatorType = zoneFreeRelocationCalculatorType;
 	}
 
 }
