@@ -1,9 +1,10 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +16,25 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
+
+package org.matsim.contrib.drt.analysis.zonal;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
+
+import java.util.Random;
 
 /**
- *
+ * @author tschlenther
  */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
 
-import java.util.function.ToDoubleFunction;
+	private final Random random = MatsimRandom.getLocalInstance();
 
-import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+	@Override
+	public Link selectTargetLink(DrtZone zone) {
+		return zone.getLinks().get(random.nextInt(zone.getLinks().size()));
+	}
 
-/**
- * @author jbischoff
- */
-public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time);
 }

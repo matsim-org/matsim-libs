@@ -33,6 +33,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -192,7 +193,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-270.4, carrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-270.462, carrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWServices.getSelectedPlan().getScheduledTours()){
 //			tourDurationSum += scheduledTour.getTour().getEnd().getExpectedArrival() - scheduledTour.getDeparture();
@@ -214,7 +215,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursInitialCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipments.getSelectedPlan().getScore(), 0.1);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-136.87, carrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);			//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -238,7 +239,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWServicesIsCorrect() {
-		Assert.assertEquals(-140.4, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
+		Assert.assertEquals(-140.462, carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWServices.getSelectedPlan().getScheduledTours()){
@@ -264,7 +265,7 @@ public class FreightUtilsIT {
 	 */
 	@Test
 	public void toursCarrierWShipmentsOnlyFromCarrierWShipmentsIsCorrect() {
-		Assert.assertEquals(-136.8, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), 0.1);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18		
+		Assert.assertEquals(-136.87, carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON);	//Note: In score waiting and serviceDurationTime are not includes by now -> May fail, when fixed. KMT Okt/18
 		
 //		double tourDurationSum = 0;
 //		for (ScheduledTour scheduledTour: carrierWShipmentsOnlyFromCarrierWShipments.getSelectedPlan().getScheduledTours()){
@@ -297,7 +298,7 @@ public class FreightUtilsIT {
 
 		return CarrierShipment.Builder.newInstance(shipmentId, fromLinkId, toLinkId, size)
 				.setDeliveryServiceTime(30.0)
-				.setDeliveryTimeWindow(TimeWindow.newInstance(3600.0, 36000.0))
+				.setDeliveryTimeWindow(TimeWindow.newInstance(0.0, 36000.0))
 				.setPickupServiceTime(5.0)
 				.setPickupTimeWindow(TimeWindow.newInstance(0.0, 7200.0))
 				.build();
@@ -307,7 +308,7 @@ public class FreightUtilsIT {
 		return CarrierService.Builder.newInstance(Id.create(id, CarrierService.class), Id.create(to, Link.class))
 				.setCapacityDemand(size)
 				.setServiceDuration(31.0)
-				.setServiceStartTimeWindow(TimeWindow.newInstance(3601.0, 36001.0))
+				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();
 	}
 	

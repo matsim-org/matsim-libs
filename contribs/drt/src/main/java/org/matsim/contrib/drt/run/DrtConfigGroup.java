@@ -268,7 +268,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		}
 
 		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
-				"More then one rebalancing parameter sets is specified");
+				"More than one rebalancing parameter sets is specified");
 
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);

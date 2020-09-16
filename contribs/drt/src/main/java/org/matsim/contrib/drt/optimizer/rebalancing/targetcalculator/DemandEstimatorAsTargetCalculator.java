@@ -18,18 +18,31 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
-package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
+package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
+import java.util.List;
+import java.util.Map;
 import java.util.function.ToDoubleFunction;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
+import org.matsim.contrib.drt.optimizer.rebalancing.demandestimator.ZonalDemandEstimator;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 /**
- * @author jbischoff
+ * @author michalm
  */
-public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time);
+public class DemandEstimatorAsTargetCalculator implements RebalancingTargetCalculator {
+	private final ZonalDemandEstimator demandEstimator;
+
+	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator) {
+		this.demandEstimator = demandEstimator;
+	}
+
+	@Override
+	public ToDoubleFunction<DrtZone> calculate(double time,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		// TODO remove this hidden "+60"
+		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
+		return demandEstimator.getExpectedDemandForTimeBin(time + 60);
+	}
 }

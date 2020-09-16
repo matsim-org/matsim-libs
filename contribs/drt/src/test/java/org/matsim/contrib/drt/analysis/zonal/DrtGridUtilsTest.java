@@ -7,6 +7,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -19,14 +20,14 @@ public class DrtGridUtilsTest {
 	@Test
 	public void test() {
 		Network network = createNetwork();
-		Map<String, Geometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
 
 		assertThat(grid).hasSize(100);
 
 		int cell = 1;
 		for (int col = 0; col < 10; col++) {
 			for (int row = 0; row < 10; row++) {
-				Geometry geometry = grid.get(cell + "");
+				Geometry geometry = grid.get(cell + "").getGeometry();
 
 				assertThat(geometry.getCoordinates()).containsExactly(//
 						new Coordinate(col * 100, row * 100),//
