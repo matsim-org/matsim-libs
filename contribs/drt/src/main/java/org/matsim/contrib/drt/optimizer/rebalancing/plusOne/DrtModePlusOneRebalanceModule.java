@@ -50,21 +50,21 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(PlusOneRebalancingStrategy.class).toProvider(
-						modalProvider(getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class),
-								getter.getModal(ZoneFreeRelocationCalculator.class))))
+				bindModal(PlusOneRebalancingStrategy.class).toProvider(modalProvider(
+						getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class),
+								getter.getModal(LinkBasedRelocationCalculator.class))))
 						.asEagerSingleton();
 
 				// binding zone free relocation calculator
 				switch (specificParams.getZoneFreeRelocationCalculatorType()) {
-				case FastHeuristic:
-					bindModal(ZoneFreeRelocationCalculator.class)
-							.toProvider(modalProvider(getter -> new FastHeuristicZoneFreeRelocationCalculator()));
-					break;
+					case FastHeuristic:
+						bindModal(LinkBasedRelocationCalculator.class).toProvider(
+								modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()));
+						break;
 
-				default:
-					throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
-							+ specificParams.getZoneFreeRelocationCalculatorType());
+					default:
+						throw new IllegalArgumentException("Unsupported rebalancingTargetCalculatorType="
+								+ specificParams.getZoneFreeRelocationCalculatorType());
 				}
 
 				// binding event handler

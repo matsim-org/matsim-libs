@@ -11,7 +11,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
-public class FastHeuristicZoneFreeRelocationCalculator implements ZoneFreeRelocationCalculator {
+public class FastHeuristicLinkBasedRelocationCalculator implements LinkBasedRelocationCalculator {
 
 	@Override
 	public List<Relocation> calcRelocations(List<Link> targetLinks, List<? extends DvrpVehicle> rebalancableVehicles) {
@@ -25,15 +25,13 @@ public class FastHeuristicZoneFreeRelocationCalculator implements ZoneFreeReloca
 		}
 		return relocations;
 	}
-	
-	private DvrpVehicle findNearestVehicle(Link destinationLink, List<? extends DvrpVehicle> rebalancableVehicles) {
-		if (rebalancableVehicles.isEmpty()) {
-			return null;
-		}
-		Coord toCoord = destinationLink.getCoord();
-		return rebalancableVehicles.stream().min(Comparator.comparing(
-				v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(), toCoord)))
+
+	private DvrpVehicle findNearestVehicle(Link targetLink, List<? extends DvrpVehicle> rebalancableVehicles) {
+		Coord toCoord = targetLink.getCoord();
+		return rebalancableVehicles.stream()
+				.min(Comparator.comparing(
+						v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(),
+								toCoord)))
 				.get();
 	}
-
 }
