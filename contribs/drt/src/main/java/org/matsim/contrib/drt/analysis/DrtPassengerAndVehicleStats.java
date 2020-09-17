@@ -24,11 +24,8 @@ package org.matsim.contrib.drt.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
@@ -48,28 +45,50 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author jbischoff
+ * @author Michal Maciejewski
  */
 public class DrtPassengerAndVehicleStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, DrtRequestSubmittedEventHandler, PassengerRequestRejectedEventHandler {
+		LinkEnterEventHandler, DrtRequestSubmittedEventHandler {
 
-	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
-	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
+	static class VehicleState {
+		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
+		double totalDistance = 0;
+		double totalOccupiedDistance = 0;
+		double totalRevenueDistance = 0; //in (passenger x meters)
+		final double[] totalDistanceByOccupancy;
+
+		private VehicleState(int maxCapacity) {
+			totalDistanceByOccupancy = new double[maxCapacity + 1];
+		}
+
+		private void linkEntered(Link link) {
+			double linkLength = link.getLength();
+			distanceByPersonId.values().forEach(distance -> distance.add(linkLength));
+			totalDistance += linkLength;
+			int occupancy = distanceByPersonId.size();
+			if (occupancy > 0) {
+				totalOccupiedDistance += linkLength;
+				totalRevenueDistance += linkLength * occupancy;
+			}
+			totalDistanceByOccupancy[occupancy] += linkLength;
+		}
+	}
+
+	private final Map<Id<Person>, PersonDepartureEvent> departureEvents = new HashMap<>();
+	private final Map<Id<Person>, DrtRequestSubmittedEvent> requestSubmittedEvents = new HashMap<>();
+
 	private final List<DrtTrip> drtTrips = new ArrayList<>();
-	private final Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
-	private final Map<Id<Vehicle>, double[]> vehicleDistances = new HashMap<>();
 	private final Map<Id<Person>, DrtTrip> currentTrips = new HashMap<>();
-	private final Map<Id<Person>, Double> unsharedDistances = new HashMap<>();
-	private final Map<Id<Person>, Double> unsharedTimes = new HashMap<>();
-	private final Set<Id<Person>> rejectedPersons = new HashSet<>();
-	private final Map<Id<Request>, Id<Person>> request2person = new HashMap<>();
+
+	private final Map<Id<Vehicle>, VehicleState> vehicleStates = new HashMap<>();
+
 	private final String mode;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
@@ -84,51 +103,70 @@ public class DrtPassengerAndVehicleStats
 
 	@Override
 	public void reset(int iteration) {
+		departureEvents.clear();
+		requestSubmittedEvents.clear();
 		drtTrips.clear();
-		departureTimes.clear();
-		departureLinks.clear();
-		inVehicleDistance.clear();
 		currentTrips.clear();
-		vehicleDistances.clear();
-		unsharedDistances.clear();
-		unsharedTimes.clear();
-		rejectedPersons.clear();
-		request2person.clear();
+		vehicleStates.clear();
+
 		initializeVehicles();
 	}
 
 	private void initializeVehicles() {
-		int maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
-		Set<Id<Vehicle>> monitoredVehicles = fleetSpecification.getVehicleSpecifications()
+		int maxCapacity = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
+		fleetSpecification.getVehicleSpecifications()
 				.keySet()
 				.stream()
 				.map(Id::createVehicleId)
-				.collect(Collectors.toSet());
+				.forEach(id -> vehicleStates.put(id, new VehicleState(maxCapacity)));
+	}
 
-		for (Id<Vehicle> vid : monitoredVehicles) {
-			this.inVehicleDistance.put(vid, new HashMap<>());
-			this.vehicleDistances.put(vid, new double[3 + maxcap]);
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		if (event.getLegMode().equals(mode)) {
+			Preconditions.checkState(departureEvents.put(event.getPersonId(), event) == null,
+					"There is already a departure event associated with this person");
+		}
+	}
+
+	@Override
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (event.getMode().equals(mode)) {
+			Preconditions.checkState(requestSubmittedEvents.put(event.getPersonId(), event) == null,
+					"There is already a request associated with this person");
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
+		if (departureEvent != null) {
+			double departureTime = departureEvent.getTime();
+			double waitTime = event.getTime() - departureTime;
+			Id<Link> departureLink = departureEvent.getLinkId();
+
+			DrtRequestSubmittedEvent requestSubmittedEvent = requestSubmittedEvents.remove(event.getPersonId());
+			double unsharedDistance = requestSubmittedEvent.getUnsharedRideDistance();
+			double unsharedTime = requestSubmittedEvent.getUnsharedRideTime();
+
+			Coord departureCoord = network.getLinks().get(departureLink).getCoord();
+			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
+					departureCoord, waitTime, unsharedDistance, unsharedTime);
+			drtTrips.add(trip);
+
+			Preconditions.checkState(currentTrips.put(event.getPersonId(), trip) == null,
+					"There is already an ongoing trip associated with this person");
+
+			vehicleStates.get(event.getVehicleId()).distanceByPersonId.put(event.getPersonId(), new MutableDouble());
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (inVehicleDistance.containsKey(event.getVehicleId())) {
-			double distance = network.getLinks().get(event.getLinkId()).getLength();
-			for (MutableDouble d : inVehicleDistance.get(event.getVehicleId()).values()) {
-				d.add(distance);
-			}
-			this.vehicleDistances.get(event.getVehicleId())[0] += distance; // overall distance drive
-			int occupancy = inVehicleDistance.get(event.getVehicleId()).size();
-			this.vehicleDistances.get(event.getVehicleId())[1] += distance * occupancy; // overall revenue distance
-			if (occupancy > 0) {
-				this.vehicleDistances.get(event.getVehicleId())[2] += distance; // overall occupied distance
-				this.vehicleDistances.get(event.getVehicleId())[2
-						+ occupancy] += distance; // overall occupied distance with n passengers
-
-			}
+		VehicleState vehicleState = vehicleStates.get(event.getVehicleId());
+		if (vehicleState != null) {
+			vehicleState.linkEntered(network.getLinks().get(event.getLinkId()));
 		}
-
 	}
 
 	@Override
@@ -136,84 +174,29 @@ public class DrtPassengerAndVehicleStats
 		if (event.getLegMode().equals(mode)) {
 			DrtTrip trip = currentTrips.remove(event.getPersonId());
 			if (trip != null) {
-				double distance = inVehicleDistance.get(trip.getVehicle()).remove(event.getPersonId()).doubleValue();
+				double distance = vehicleStates.get(trip.getVehicle()).distanceByPersonId.remove(event.getPersonId())
+						.doubleValue();
 				trip.setTravelDistance(distance);
 				trip.setArrivalTime(event.getTime());
 				trip.setToLink(event.getLinkId());
-				Coord toCoord = this.network.getLinks().get(event.getLinkId()).getCoord();
-				trip.setToCoord(toCoord);
-				trip.setInVehicleTravelTime(event.getTime() - trip.getDepartureTime() - trip.getWaitTime());
+				trip.setToCoord(network.getLinks().get(event.getLinkId()).getCoord());
 			} else {
-				if (this.rejectedPersons.contains(event.getPersonId())) {
-					// XXX might happen only if we teleported rejected passengers
-				} else {
-					throw new NullPointerException("Arrival without departure?");
-				}
+				throw new IllegalStateException("Arrival without departure?");
 			}
-
-			// remove person in case the person has trips with dvrp and non-dvrp modes
-			this.departureTimes.remove(event.getPersonId());
-		}
-
-	}
-
-	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(mode)) {
-			this.departureTimes.put(event.getPersonId(), event.getTime());
-			this.departureLinks.put(event.getPersonId(), event.getLinkId());
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.departureTimes.containsKey(event.getPersonId())) {
-			double departureTime = this.departureTimes.remove(event.getPersonId());
-			double waitTime = event.getTime() - departureTime;
-			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
-			double unsharedDistance = this.unsharedDistances.remove(event.getPersonId());
-			double unsharedTime = this.unsharedTimes.remove(event.getPersonId());
-			Coord departureCoord = this.network.getLinks().get(departureLink).getCoord();
-			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
-					departureCoord, waitTime);
-			trip.setUnsharedDistanceEstimate_m(unsharedDistance);
-			trip.setUnsharedTimeEstimate_m(unsharedTime);
-			this.drtTrips.add(trip);
-			this.currentTrips.put(event.getPersonId(), trip);
-			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());
 		}
 	}
 
 	/**
 	 * @return the drtTrips
 	 */
-	public List<DrtTrip> getDrtTrips() {
+	List<DrtTrip> getDrtTrips() {
 		return drtTrips;
 	}
 
 	/**
 	 * @return the vehicleDistances
 	 */
-	public Map<Id<Vehicle>, double[]> getVehicleDistances() {
-		return vehicleDistances;
-	}
-
-	@Override
-	public void handleEvent(DrtRequestSubmittedEvent event) {
-		if (!event.getMode().equals(mode)) {
-			return;
-		}
-		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
-		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
-		this.request2person.put(event.getRequestId(), event.getPersonId());
-		this.rejectedPersons.remove(event.getPersonId());// XXX needed only if we teleported rejected passengers
-	}
-
-	@Override
-	public void handleEvent(PassengerRequestRejectedEvent event) {
-		if (!event.getMode().equals(mode)) {
-			return;
-		}
-		rejectedPersons.add(request2person.get(event.getRequestId()));
+	Map<Id<Vehicle>, VehicleState> getVehicleStates() {
+		return vehicleStates;
 	}
 }
