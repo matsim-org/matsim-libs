@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -31,19 +32,34 @@ import static org.matsim.contrib.drt.analysis.zonal.DrtGridUtilsTest.createNetwo
 import static org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem.createFromPreparedGeometries;
 
 public class DrtZoneTargetLinkSelectorTest {
-
-	void RamdomDrtZoneTargetLinkSelectorTest(){
+	
+	
+	@Test
+	public void RamdomDrtZoneTargetLinkSelectorTest(){
 		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
 
-		RandomDrtZoneTargetLinkSelector selector = new RandomDrtZoneTargetLinkSelector(drtZonalSystem);
+		RandomDrtZoneTargetLinkSelector selector = new RandomDrtZoneTargetLinkSelector();
 
 		Set<Id<Link>> links = new HashSet<>();
 		for(int i = 0; i < 1000; i ++){
-			links.add(selector.selectTargetLink(zone1).getId());
+			links.add(selector.selectTargetLink(drtZonalSystem.getZones().get("1")).getId());
 		}
 		//zone has 4 links, we query RandomDrtZoneTargetLinkSelector a lot of times, so every link of zone should be returned at least once...
-		assertThat(links.size() == zone1.getLinks.size());
+		assertThat(links.size() == drtZonalSystem.getZones().get("1").getLinks().size());
+	}
+	
+	@Test
+	public void MostCentralDrtZoneTargetLinkSelectorTest(){
+		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
+				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
+
+		MostCentralDrtZoneTargetLinkSelector selector = new MostCentralDrtZoneTargetLinkSelector(drtZonalSystem);
+		
+		Link link = selector.selectTargetLink(drtZonalSystem.getZones().get("3"));
+
+
+		assertThat(link.getId().toString() ==  "cd");
 	}
 
 
