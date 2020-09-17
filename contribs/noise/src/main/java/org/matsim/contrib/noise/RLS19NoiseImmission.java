@@ -142,7 +142,7 @@ public class RLS19NoiseImmission implements NoiseImmission {
         if (noiseParams.isConsiderNoiseBarriers()) {
             return geometricDivergence + airDampeningFactor + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
         } else {
-            return geometricDivergence + airDampeningFactor ;
+            return geometricDivergence + airDampeningFactor + groundDampening ;
         }
 
         //TODO: implement reflection - if someone is looking for a (bachelor) thesis...
