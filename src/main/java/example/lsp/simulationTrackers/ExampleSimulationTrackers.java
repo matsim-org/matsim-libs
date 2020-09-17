@@ -1,9 +1,6 @@
 package example.lsp.simulationTrackers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import lsp.*;
 import lsp.replanning.LSPReplanningUtils;
@@ -188,7 +185,7 @@ import lsp.shipment.LSPShipment;
 		//Retrieve cost info from lsp
 		LSPInfo costInfo;
 		for(LSPInfo info : lsp.getSelectedPlan().getSolutions().iterator().next().getInfos()) {
-			if(info.getName() == "cost_function") {
+			if( Objects.equals( info.getName(), "cost_function" ) ) {
 				costInfo = info;
 				for(LSPInfoFunctionValue value : costInfo.getFunction().getValues()){
 					System.out.println(value.getName() + " " + value.getValue());
