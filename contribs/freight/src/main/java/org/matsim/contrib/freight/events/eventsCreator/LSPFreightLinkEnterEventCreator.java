@@ -16,7 +16,7 @@ import org.matsim.contrib.freight.events.LSPFreightLinkEnterEvent;
 			Id<Person> driverId, int activityCounter) {
 		if(event instanceof LinkEnterEvent) {
 			LinkEnterEvent enterEvent = (LinkEnterEvent) event;
-			return new LSPFreightLinkEnterEvent(carrier.getId(), scheduledTour.getVehicle().getVehicleId(), driverId, enterEvent.getLinkId(), enterEvent.getTime(), scheduledTour.getVehicle());
+			return new LSPFreightLinkEnterEvent(carrier.getId(), scheduledTour.getVehicle().getId(), driverId, enterEvent.getLinkId(), enterEvent.getTime(), scheduledTour.getVehicle());
 		}
 		return null;
 	}	

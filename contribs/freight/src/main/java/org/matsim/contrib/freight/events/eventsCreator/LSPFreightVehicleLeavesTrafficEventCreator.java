@@ -16,7 +16,7 @@ import org.matsim.contrib.freight.events.LSPFreightVehicleLeavesTrafficEvent;
 			Id<Person> driverId, int activityCounter) {
 		if(event instanceof VehicleLeavesTrafficEvent) {
 			VehicleLeavesTrafficEvent leavesEvent = (VehicleLeavesTrafficEvent) event;
-			return new LSPFreightVehicleLeavesTrafficEvent(leavesEvent, carrier.getId(), leavesEvent.getTime(), driverId, leavesEvent.getLinkId(), scheduledTour.getVehicle().getVehicleId(), scheduledTour.getVehicle());
+			return new LSPFreightVehicleLeavesTrafficEvent(leavesEvent, carrier.getId(), leavesEvent.getTime(), driverId, leavesEvent.getLinkId(), scheduledTour.getVehicle().getId(), scheduledTour.getVehicle());
 		}
 		return null;
 	}

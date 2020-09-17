@@ -12,11 +12,10 @@ import org.matsim.contrib.freight.events.LSPFreightLinkLeaveEvent;
 /*package-private*/  final class LSPFreightLinkLeaveEventCreator implements LSPEventCreator {
 
 	@Override
-	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour,
-			Id<Person> driverId,int activityCounter) {
+	public Event createEvent(Event event, Carrier carrier, Activity activity, ScheduledTour scheduledTour, Id<Person> driverId,int activityCounter) {
 		if((event instanceof LinkLeaveEvent)) {
 			LinkLeaveEvent  leaveEvent = (LinkLeaveEvent) event;
-			return new LSPFreightLinkLeaveEvent(carrier.getId(), scheduledTour.getVehicle().getVehicleId(), driverId, leaveEvent.getLinkId(), leaveEvent.getTime(), scheduledTour.getVehicle());
+			return new LSPFreightLinkLeaveEvent(carrier.getId(), scheduledTour.getVehicle().getId(), driverId, leaveEvent.getLinkId(), leaveEvent.getTime(), scheduledTour.getVehicle());
 		}	
 		return null;
 	}

@@ -65,7 +65,7 @@ public final class LSPServiceEndEvent extends Event {
 		}
 		attr.put(ATTRIBUTE_ACTTYPE, event.getActType());
 		attr.put(ATTRIBUTE_SERVICE, service.getId().toString());
-		attr.put(ATTRIBUTE_VEHICLE, vehicle.getVehicleId().toString());
+		attr.put(ATTRIBUTE_VEHICLE, vehicle.getId().toString() );
 		attr.put(ATTRIBUTE_CARRIER, carrierId.toString());
 		return attr;
 	}

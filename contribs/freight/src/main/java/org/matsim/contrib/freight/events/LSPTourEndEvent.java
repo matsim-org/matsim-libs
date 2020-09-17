@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.Tour.End;
 
 public final class LSPTourEndEvent extends Event{
 
@@ -57,7 +56,7 @@ public final class LSPTourEndEvent extends Event{
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getVehicleId().toString());
+		attr.put(ATTRIBUTE_VEHICLE, this.vehicle.getId().toString() );
 		attr.put(ATTRIBUTE_LINK, this.tour.getStartLinkId().toString());
 		attr.put(ATTRIBUTE_CARRIER, this.carrierId.toString());
 		attr.put(ATTRIBUTE_DRIVER, this.driverId.toString());

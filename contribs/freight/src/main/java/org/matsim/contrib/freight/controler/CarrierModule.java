@@ -91,7 +91,8 @@ public class CarrierModule extends AbstractModule {
 			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 		}
 
-		bind(CarrierControlerListener.class).in( Singleton.class );
+//		bind(CarrierControlerListener.class).in( Singleton.class );
+		bind(CarrierControlerListener.class).asEagerSingleton();
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
 		// this switches on certain qsim components:

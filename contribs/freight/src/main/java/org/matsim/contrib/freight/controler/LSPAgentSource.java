@@ -28,9 +28,7 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,6 +41,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.Collection;
+
 
 /**
  * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
@@ -51,6 +51,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public class LSPAgentSource implements AgentSource {
 
+	public static final String COMPONENT_NAME = LSPAgentSource.class.getSimpleName();
 	private static final Logger log = Logger.getLogger( LSPAgentSource.class );
 	
 	private final Collection<Plan> vehicleRoutes;
@@ -59,8 +60,8 @@ public class LSPAgentSource implements AgentSource {
 
 	private final QSim qsim;
 
-	public LSPAgentSource( Collection<Plan> vehicleRoutes, AgentFactory agentFactory, QSim qsim ) {
-		this.vehicleRoutes = vehicleRoutes;
+	@Inject LSPAgentSource( CarrierAgentTracker carrierAgentTracker, AgentFactory agentFactory, QSim qsim ) {
+		this.vehicleRoutes = carrierAgentTracker.createPlans();
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
 	}
