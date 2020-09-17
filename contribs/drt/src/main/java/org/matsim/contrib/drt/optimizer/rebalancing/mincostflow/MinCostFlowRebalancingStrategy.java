@@ -43,6 +43,7 @@ public class MinCostFlowRebalancingStrategy implements RebalancingStrategy {
 	private final RebalancingTargetCalculator rebalancingTargetCalculator;
 	private final DrtZonalSystem zonalSystem;
 	private final Fleet fleet;
+
 	private final ZonalRelocationCalculator zonalRelocationCalculator;
 	private final RebalancingParams params;
 
