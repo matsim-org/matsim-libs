@@ -54,8 +54,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final int maxcap;
 
 	public DrtAnalysisControlerListener(Config config, DrtConfigGroup drtCfg, FleetSpecification fleet,
-										DrtPassengerAndVehicleStats drtPassengerStats, MatsimServices matsimServices, Network network,
-										DrtRequestAnalyzer drtRequestAnalyzer) {
+			DrtPassengerAndVehicleStats drtPassengerStats, MatsimServices matsimServices, Network network,
+			DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.drtPassengerStats = drtPassengerStats;
 		this.matsimServices = matsimServices;
 		this.network = network;
@@ -79,8 +79,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				filename(event, "waitTimeComparison", ".csv"), createGraphs);
 		List<DrtTrip> trips = drtPassengerStats.getDrtTrips();
 
-		DrtTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(),
-				filename(event, "drt_rejections", ".csv"), "time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY");
+		DrtTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(), filename(event, "drt_rejections", ".csv"),
+				"time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY");
 
 		double rejectionRate = (double)drtRequestAnalyzer.getRejections().size()
 				/ (double)(drtRequestAnalyzer.getRejections().size() + trips.size());
@@ -89,24 +89,26 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		writeIterationPassengerStats(
 				tripsSummarize + ";" + drtRequestAnalyzer.getRejections().size() + ";" + format.format(rejectionRate),
 				event.getIteration());
-		double l_d = DrtTripsAnalyser.getTotalDistance(drtPassengerStats.getVehicleDistances()) / (trips.size()
+		double l_d = DrtTripsAnalyser.getTotalDistance(drtPassengerStats.getVehicleStates()) / (trips.size()
 				* directDistanceMean);
-		String vehStats = DrtTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";")
+		String vehStats = DrtTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleStates(), ";")
 				+ ";"
 				+ format.format(l_d);
-		String occStats = DrtTripsAnalyser.summarizeDetailedOccupancyStats(drtPassengerStats.getVehicleDistances(),
-				";", maxcap);
+		String occStats = DrtTripsAnalyser.summarizeDetailedOccupancyStats(drtPassengerStats.getVehicleStates(), ";",
+				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
 		if (drtCfg.isPlotDetailedCustomerStats()) {
 			DrtTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), DrtTrip.HEADER);
 		}
-		DrtTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
+		DrtTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleStates(),
 				filename(event, "vehicleDistanceStats", ".csv"));
 		DrtTripsAnalyser.analyseDetours(network, trips, drtCfg, filename(event, "drt_detours"), createGraphs);
 		DrtTripsAnalyser.analyseWaitTimes(filename(event, "waitStats"), trips, 1800, createGraphs);
 
-		double endTime = qSimCfg.getEndTime().orElseGet(()->
-			 trips.isEmpty() ? qSimCfg.getStartTime().seconds() : trips.get(trips.size() - 1).getDepartureTime());
+		double endTime = qSimCfg.getEndTime()
+				.orElseGet(() -> trips.isEmpty() ?
+						qSimCfg.getStartTime().orElse(0) :
+						trips.get(trips.size() - 1).getDepartureTime());
 
 		DrtTripsAnalyser.analyzeBoardingsAndDeboardings(trips, ";", qSimCfg.getStartTime().orElse(0), endTime, 3600,
 				filename(event, "drt_boardings", ".csv"), filename(event, "drt_alightments", ".csv"), network);

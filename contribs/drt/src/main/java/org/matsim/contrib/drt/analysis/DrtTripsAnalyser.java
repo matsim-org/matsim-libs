@@ -65,10 +65,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-/**
- * @author jbischoff
- */
-
 public class DrtTripsAnalyser {
 
 	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
@@ -412,7 +408,8 @@ public class DrtTripsAnalyser {
 	 * @param vehicleDistances
 	 * @param iterationFilename
 	 */
-	public static void writeVehicleDistances(Map<Id<Vehicle>, double[]> vehicleDistances, String iterationFilename) {
+	public static void writeVehicleDistances(
+			Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances, String iterationFilename) {
 		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;revenueDistance_pm";
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
@@ -422,21 +419,16 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 		try {
 			bw.write(header);
-			for (Entry<Id<Vehicle>, double[]> e : vehicleDistances.entrySet()) {
-				double drivenDistance = e.getValue()[0];
-				double revenueDistance = e.getValue()[1];
-				double occDistance = e.getValue()[2];
-				double emptyDistance = drivenDistance - occDistance;
+			bw.newLine();
+			for (Entry<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> e : vehicleDistances.entrySet()) {
+				var vehicleId = e.getKey();
+				var vehicleState = e.getValue();
+				bw.write(vehicleId + ";"//
+						+ format.format(vehicleState.totalDistance) + ";"//
+						+ format.format(vehicleState.totalOccupiedDistance) + ";"//
+						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + ";"//
+						+ format.format(vehicleState.totalRevenueDistance));
 				bw.newLine();
-				bw.write(e.getKey().toString()
-						+ ";"
-						+ format.format(drivenDistance)
-						+ ";"
-						+ format.format(occDistance)
-						+ ";"
-						+ format.format(emptyDistance)
-						+ ";"
-						+ format.format(revenueDistance));
 			}
 			bw.flush();
 			bw.close();
@@ -451,7 +443,8 @@ public class DrtTripsAnalyser {
 	 * @param del              Delimiter tag
 	 * @return
 	 */
-	public static String summarizeVehicles(Map<Id<Vehicle>, double[]> vehicleDistances, String del) {
+	public static String summarizeVehicles(Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances,
+			String del) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -463,12 +456,11 @@ public class DrtTripsAnalyser {
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
-		for (double[] dist : vehicleDistances.values()) {
-			driven.addValue(dist[0]);
-			revenue.addValue(dist[1]);
-			occupied.addValue(dist[2]);
-			double emptyD = dist[0] - dist[2];
-			empty.addValue(emptyD);
+		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+			driven.addValue(state.totalDistance);
+			revenue.addValue(state.totalRevenueDistance);
+			occupied.addValue(state.totalOccupiedDistance);
+			empty.addValue(state.totalDistanceByOccupancy[0]);
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
@@ -491,10 +483,10 @@ public class DrtTripsAnalyser {
 				+ format.format(d_r_d_t);
 	}
 
-	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {
+	public static double getTotalDistance(Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances) {
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		for (double[] dist : vehicleDistances.values()) {
-			driven.addValue(dist[0]);
+		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+			driven.addValue(state.totalDistance);
 		}
 		return driven.getSum();
 	}
@@ -512,8 +504,8 @@ public class DrtTripsAnalyser {
 				.getAsInt();
 	}
 
-	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del,
-			int maxcap) {
+	public static String summarizeDetailedOccupancyStats(
+			Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances, String del, int maxcap) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -522,11 +514,9 @@ public class DrtTripsAnalyser {
 
 		double[] sum = new double[maxcap + 1];
 
-		for (double[] dist : vehicleDistances.values()) {
-			double emptyD = dist[0] - dist[2];
-			sum[0] += emptyD;
-			for (int i = 3; i < maxcap + 3; i++) {
-				sum[i - 2] += dist[i];
+		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+			for (int i = 0; i < maxcap + 1; i++) {
+				sum[i] += state.totalDistanceByOccupancy[i];
 			}
 		}
 		StringBuilder result = new StringBuilder();
