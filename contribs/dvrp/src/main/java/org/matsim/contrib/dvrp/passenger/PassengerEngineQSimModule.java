@@ -30,7 +30,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 				addModalComponent(PassengerEngine.class, PassengerEngineWithPrebooking.createProvider(getMode()));
 				return;
 			case TELEPORTING:
-				addModalComponent(PassengerEngine.class, TeleportingPassengerEngine.class);
+				addModalComponent(PassengerEngine.class, TeleportingPassengerEngine.createProvider(getMode()));
 				return;
 			default:
 				throw new IllegalStateException("Type: " + type + " is not supported");

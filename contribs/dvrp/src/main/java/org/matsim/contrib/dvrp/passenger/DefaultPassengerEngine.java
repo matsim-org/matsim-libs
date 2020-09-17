@@ -44,6 +44,9 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
+/**
+ * @author Michal Maciejewski (michalm)
+ */
 public final class DefaultPassengerEngine implements PassengerEngine {
 
 	private final String mode;
@@ -60,8 +63,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
 
-	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
-			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
+	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
 			PassengerRequestValidator requestValidator, PassengerRequestEventForwarder passengerRequestEventForwarder) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
@@ -128,8 +130,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now) {
+	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, PassengerRequest request, double now) {
 		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()), now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
@@ -167,8 +168,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 			@Override
 			public DefaultPassengerEngine get() {
-				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer,
-						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
+				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
 						passengerRequestEventForwarder);
 			}
