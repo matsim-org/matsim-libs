@@ -23,7 +23,7 @@
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 import org.matsim.core.config.Config;
 
@@ -32,28 +32,46 @@ import com.google.inject.Module;
 import com.google.inject.util.Modules;
 
 public abstract class AbstractMobsimModule extends AbstractModule {
-	private Optional<Config> config = Optional.empty();
-	private Optional<AbstractMobsimModule> parent = Optional.empty();
+	private Config config = null;
+	private Integer iterationNumber = null;
+	private AbstractMobsimModule parent = null;
 
 	public final void setConfig(Config config) {
-		this.config = Optional.of(config);
+		this.config = Objects.requireNonNull(config);
+	}
+
+	public final void setIterationNumber(int iterationNumber) {
+		this.iterationNumber = iterationNumber;
 	}
 
 	public final void setParent(AbstractMobsimModule parent) {
-		this.parent = Optional.of(parent);
+		this.parent = Objects.requireNonNull(parent);
 	}
 
 	protected final Config getConfig() {
-		if (config.isPresent()) {
-			return config.get();
+		if (config != null) {
+			return config;
 		}
 
-		if (parent.isPresent()) {
-			return parent.get().getConfig();
+		if (parent != null) {
+			return parent.getConfig();
 		}
 
 		throw new IllegalStateException(
 				"No config set. Did you try to use the module outside of the QSim initialization process?");
+	}
+
+	protected final int getIterationNumber() {
+		if (iterationNumber != null) {
+			return iterationNumber;
+		}
+
+		if (parent != null) {
+			return parent.getIterationNumber();
+		}
+
+		throw new IllegalStateException(
+				"No iteration number set. Did you try to use the module outside of the QSim initialization process?");
 	}
 
 	protected final void configure() {
