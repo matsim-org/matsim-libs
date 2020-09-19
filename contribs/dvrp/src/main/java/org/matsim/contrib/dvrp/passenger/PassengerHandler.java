@@ -73,7 +73,8 @@ class PassengerHandler {
 		return violations.isEmpty();
 	}
 
-	boolean tryPickUpPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, double now) {
+	boolean tryPickUpPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId,
+			double now) {
 		if (internalInterface.unregisterAdditionalAgentOnLink(passenger.getId(), driver.getCurrentLinkId()) == null) {
 			//only possible with prebooking
 			return false;
@@ -84,14 +85,16 @@ class PassengerHandler {
 		passenger.setVehicle(mobVehicle);
 
 		eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+		eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, requestId, passenger.getId()));
 		return true;
 	}
 
-	void dropOffPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, double now) {
+	void dropOffPassenger(MobsimDriverAgent driver, MobsimPassengerAgent passenger, Id<Request> requestId, double now) {
 		MobsimVehicle mobVehicle = driver.getVehicle();
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);
 
+		eventsManager.processEvent(new PassengerDroppedOffEvent(now, mode, requestId, passenger.getId()));
 		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
 		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());

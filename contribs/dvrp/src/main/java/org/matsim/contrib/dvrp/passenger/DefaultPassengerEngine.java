@@ -132,14 +132,15 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
-		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()), now);
+		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
+				request.getId(), now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
 
 	@Override
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activePassengers.remove(request.getId()), now);
+		passengerHandler.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(), now);
 	}
 
 	@Override

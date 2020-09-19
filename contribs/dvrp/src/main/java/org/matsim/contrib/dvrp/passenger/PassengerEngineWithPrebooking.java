@@ -213,7 +213,7 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 			return false;// wait for the passenger
 		}
 
-		if (!passengerHandler.tryPickUpPassenger(driver, passenger, now)) {
+		if (!passengerHandler.tryPickUpPassenger(driver, passenger, request.getId(), now)) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
 			awaitingPickups.put(request.getId(), pickupActivity);
@@ -224,7 +224,8 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 	}
 
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activeRequests.remove(request.getId()).passenger, now);
+		passengerHandler.dropOffPassenger(driver, activeRequests.remove(request.getId()).passenger, request.getId(),
+				now);
 	}
 
 	// ================ REJECTED/SCHEDULED EVENTS
