@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,13 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-public interface PassengerEngine extends MobsimEngine, DepartureHandler, PassengerHandler,
-		PassengerRequestEventForwarder.PassengerRequestEventListener {
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface PassengerHandler {
+	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+			PassengerRequest request, double now);
+
+	void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now);
 }

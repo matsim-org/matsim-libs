@@ -21,7 +21,7 @@ package org.matsim.contrib.edrt;
 
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -48,9 +48,9 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final DrtActionCreator drtActionCreator;
 	private final MobsimTimer timer;
 
-	public EDrtActionCreator(PassengerEngine passengerEngine, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+	public EDrtActionCreator(PassengerHandler passengerHandler, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
-		drtActionCreator = new DrtActionCreator(passengerEngine, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
+		drtActionCreator = new DrtActionCreator(passengerHandler, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
 	}
 
 	@Override
