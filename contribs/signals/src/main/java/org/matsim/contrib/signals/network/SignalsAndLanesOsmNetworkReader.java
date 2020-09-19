@@ -258,8 +258,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		netsimplify.setNodesNotToMerge(signalizedNodes);
 		netsimplify.run(network);
 
-		Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
 
+		/*
+		If Links are merged, the new name has to be added to lane file and signal file
+		 */
+		Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
 		for (Id<Link> link : network.getLinks().keySet()){
 			if(link.toString().contains("-")){
 				List<String> origLinks = Arrays.asList(link.toString().split("-"));
@@ -268,6 +271,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				}
 			}
 		}
+        // Update Lanefile
 		for (Id<Link> link : network.getLinks().keySet()) {
 			if (lanes.getLanesToLinkAssignments().get(link) != null &&
 					lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
@@ -292,6 +296,69 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				}
 			}
 		}
+		// Update Signalfile
+        for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()) {
+            for (SignalData signaldata : signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()) {
+                Id<Link> signalLink = signaldata.getLinkId();
+                if (mergedLinks.containsKey(signalLink)){
+                    Id<Link> merged = mergedLinks.get(signalLink);
+                    signaldata.setLinkId(merged);
+                    LOG.info("Update Link " + signalLink.toString() + " of SignalSystem " + idsystems.toString()+ "to merged Link " +
+                            merged.toString());
+                }
+            }
+        }
+
+
+
+        //sbraun 19092020 add cleaning logic TODO maybe for LaneConsitencyChecker?
+        LOG.info("Check if all OutLinks of junction with lanes are connected to the network");
+        Map<Id<Node>,Set<Id<Link>>> junctionNodes = new HashMap<>();
+        //Fill Map with junction nodes and all ToLinks from Lanes
+        for (Id<Link> link : network.getLinks().keySet()) {
+            if (lanes.getLanesToLinkAssignments().get(link) != null &&
+                    lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
+                for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
+                    if (lane.getToLinkIds() != null) {
+                        Id<Node> jn = network.getLinks().get(link).getToNode().getId();
+                        if (!junctionNodes.containsKey(jn)){
+                            junctionNodes.put(jn,new HashSet<Id<Link>>());
+                        }
+                        for (Id<Link> toLink :lane.getToLinkIds()){
+                            if (!junctionNodes.get(jn).contains(toLink)) junctionNodes.get(jn).add(toLink);
+                        }
+                    }
+                }
+            }
+        }
+        Set<Id<Node>> checkedJn = new HashSet<Id<Node>>();
+        for (Id<Node> jn : junctionNodes.keySet()){
+            //At a junction if the size of the set filled above equals the number of outLinks everything is fine
+            if (network.getNodes().get(jn).getOutLinks().keySet().size()== junctionNodes.get(jn).size()){
+                checkedJn.add(jn);
+                continue;
+            }
+            //If there is one inLink of that junction which has no Lanes (i.e connects every Outlink) - the junction is fine
+            for (Id<Link>inLink :network.getNodes().get(jn).getInLinks().keySet()){
+                if (!lanes.getLanesToLinkAssignments().containsKey(inLink)){
+                    checkedJn.add(jn);
+                    break;
+                }
+            }
+            // Identify the not connected OutLink
+            for (Id<Link>outLink :network.getNodes().get(jn).getOutLinks().keySet()){
+                if (!junctionNodes.get(jn).contains(outLink) && !checkedJn.contains(jn)){
+                    LOG.warn("Link "+outLink.toString()+" is not connected to the network - remove lanes from all inLinks of the corresponding junction:");
+                    checkedJn.add(jn);
+                    for (Id<Link> inLink: network.getNodes().get(jn).getInLinks().keySet()){
+                        LOG.warn("\t\tRemove Lanes on Link "+inLink.toString());
+                        lanes.getLanesToLinkAssignments().remove(inLink);
+                    }
+                }
+            }
+        }
+
+
 
 
         /*
