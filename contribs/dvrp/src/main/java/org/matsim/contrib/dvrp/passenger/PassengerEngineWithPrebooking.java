@@ -200,7 +200,7 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 
 	// ================ PICKUP / DROPOFF
 
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
 		RequestEntry requestEntry = activeRequests.get(request.getId());

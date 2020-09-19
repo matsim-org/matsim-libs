@@ -25,8 +25,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 public interface PassengerEngine
 		extends MobsimEngine, DepartureHandler, PassengerRequestEventForwarder.PassengerRequestEventListener {
-	boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver, PassengerRequest request,
-			double now);
+	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+			PassengerRequest request, double now);
 
 	void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now);
 }

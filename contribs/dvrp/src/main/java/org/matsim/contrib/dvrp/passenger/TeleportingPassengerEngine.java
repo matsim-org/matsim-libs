@@ -144,7 +144,7 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");
 	}

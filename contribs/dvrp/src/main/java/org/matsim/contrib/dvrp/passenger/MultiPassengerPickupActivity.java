@@ -55,7 +55,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	protected void beforeFirstStep(double now) {
 		for (PassengerRequest request : requests.values()) {
-			if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+			if (passengerEngine.tryPickUpPassenger(this, driver, request, now)) {
 				passengersPickedUp++;
 			}
 		}
@@ -64,7 +64,7 @@ public class MultiPassengerPickupActivity extends FirstLastSimStepDynActivity im
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
 		PassengerRequest request = getRequestForPassenger(passenger.getId());
-		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
+		if (passengerEngine.tryPickUpPassenger(this, driver, request, now)) {
 			passengersPickedUp++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
