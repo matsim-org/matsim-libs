@@ -260,7 +260,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		/*
-		If Links are merged, the new name has to be added to lane file and signal file
+		If Links are merged, the new name has to be added to lane file (signal nodes are excluded from merging therefore the signal file is already fine)
 		 */
 		Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
 		for (Id<Link> link : network.getLinks().keySet()){
@@ -296,19 +296,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				}
 			}
 		}
-		// Update Signalfile
-        for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()) {
-            for (SignalData signaldata : signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()) {
-                Id<Link> signalLink = signaldata.getLinkId();
-                if (mergedLinks.containsKey(signalLink)){
-                    Id<Link> merged = mergedLinks.get(signalLink);
-                    signaldata.setLinkId(merged);
-                    LOG.info("Update Link " + signalLink.toString() + " of SignalSystem " + idsystems.toString()+ "to merged Link " +
-                            merged.toString());
-                }
-            }
-        }
-
 
 
         //sbraun 19092020 add cleaning logic TODO maybe for LaneConsitencyChecker?
