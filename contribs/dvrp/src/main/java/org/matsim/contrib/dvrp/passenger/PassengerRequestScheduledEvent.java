@@ -31,7 +31,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author michalm
  */
 public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "PassengersRequest scheduled";
+	public static final String EVENT_TYPE = "PassengerRequest scheduled";
 
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";

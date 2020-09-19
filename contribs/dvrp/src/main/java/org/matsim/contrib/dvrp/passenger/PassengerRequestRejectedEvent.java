@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author michalm
  */
 public class PassengerRequestRejectedEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "PassengersRequest rejected";
+	public static final String EVENT_TYPE = "PassengerRequest rejected";
 
 	public static final String ATTRIBUTE_CAUSE = "cause";
 
