@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -84,8 +85,9 @@ class InternalPassengerHandling {
 		mobVehicle.addPassenger(passenger);
 		passenger.setVehicle(mobVehicle);
 
+		Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
 		eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
-		eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, requestId, passenger.getId()));
+		eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, requestId, passenger.getId(), vehicleId));
 		return true;
 	}
 
@@ -94,7 +96,8 @@ class InternalPassengerHandling {
 		mobVehicle.removePassenger(passenger);
 		passenger.setVehicle(null);
 
-		eventsManager.processEvent(new PassengerDroppedOffEvent(now, mode, requestId, passenger.getId()));
+		Id<DvrpVehicle> vehicleId = Id.create(mobVehicle.getId(), DvrpVehicle.class);
+		eventsManager.processEvent(new PassengerDroppedOffEvent(now, mode, requestId, passenger.getId(), vehicleId));
 		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
 		passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());

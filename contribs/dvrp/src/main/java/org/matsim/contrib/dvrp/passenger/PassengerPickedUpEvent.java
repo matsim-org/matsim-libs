@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 /**
@@ -30,8 +31,9 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 public class PassengerPickedUpEvent extends AbstractPassengerEvent {
 	public static final String EVENT_TYPE = "passenger picked up";
 
-	public PassengerPickedUpEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
-		super(time, mode, requestId, personId);
+	public PassengerPickedUpEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<DvrpVehicle> vehicleId) {
+		super(time, mode, requestId, personId, vehicleId);
 	}
 
 	@Override

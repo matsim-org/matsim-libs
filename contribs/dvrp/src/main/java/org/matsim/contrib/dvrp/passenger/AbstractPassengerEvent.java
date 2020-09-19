@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.internal.HasPersonId;
 
@@ -34,16 +35,20 @@ import org.matsim.core.api.internal.HasPersonId;
 public abstract class AbstractPassengerEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_MODE = "mode";
 	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final String mode;
 	private final Id<Request> requestId;
 	private final Id<Person> personId;
+	private final Id<DvrpVehicle> vehicleId;
 
-	public AbstractPassengerEvent(double time, String mode, Id<Request> requestId, Id<Person> personId) {
+	public AbstractPassengerEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<DvrpVehicle> vehicleId) {
 		super(time);
 		this.mode = mode;
 		this.requestId = requestId;
 		this.personId = personId;
+		this.vehicleId = vehicleId;
 	}
 
 	public final String getMode() {
@@ -65,11 +70,16 @@ public abstract class AbstractPassengerEvent extends Event implements HasPersonI
 		return personId;
 	}
 
+	public Id<DvrpVehicle> getVehicleId() {
+		return vehicleId;
+	}
+
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_MODE, mode);
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
 		return attr;
 	}
 }
