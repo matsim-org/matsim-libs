@@ -39,8 +39,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class PassengerHandler {
-	private static final Logger LOGGER = Logger.getLogger(PassengerHandler.class);
+class InternalPassengerHandling {
+	private static final Logger LOGGER = Logger.getLogger(InternalPassengerHandling.class);
 
 	private final String mode;
 	private final EventsManager eventsManager;
@@ -48,7 +48,7 @@ class PassengerHandler {
 
 	private InternalInterface internalInterface;
 
-	PassengerHandler(String mode, EventsManager eventsManager) {
+	InternalPassengerHandling(String mode, EventsManager eventsManager) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 	}

@@ -57,13 +57,14 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	private final Network network;
 	private final PassengerRequestValidator requestValidator;
 
-	private final PassengerHandler passengerHandler;
+	private final InternalPassengerHandling internalPassengerHandling;
 
 	private InternalInterface internalInterface;
 
 	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
 
-	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer, PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
+	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
 			PassengerRequestValidator requestValidator, PassengerRequestEventForwarder passengerRequestEventForwarder) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
@@ -72,14 +73,14 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		this.network = network;
 		this.requestValidator = requestValidator;
 
-		passengerHandler = new PassengerHandler(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		passengerHandler.setInternalInterface(internalInterface);
+		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
 
 	@Override
@@ -106,15 +107,15 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
-		PassengerRequest request = requestCreator.createRequest(passengerHandler.createRequestId(), passenger.getId(),
-				route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 		validateAndSubmitRequest(passenger, request, now);
 		return true;
 	}
 
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
-		if (passengerHandler.validateRequest(request, requestValidator, now)) {
+		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			synchronized (optimizer) {
 				//optimizer can also reject request if cannot handle it
 				// (async operation, notification comes via the events channel)
@@ -132,7 +133,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	@Override
 	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
-		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
 				request.getId(), now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
@@ -140,7 +141,8 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 	@Override
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(), now);
+		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(),
+				now);
 	}
 
 	@Override
