@@ -113,7 +113,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// specify turn restrictions of lanes without turn:lanes information on OSM
 	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
 	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
-	private final boolean SAVE_TURN_LANES = true; // add turn info as attribute in lane file
+	private final boolean SAVE_TURN_LANES = false; // add turn info as attribute in lane file
 	private Set<Id<Link>> linksNotMatchingTagsANDnoLanes = new HashSet<>();
 
 	public enum MiddleLaneRestriction {
@@ -160,12 +160,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	public static void main(String[] args) {
 //		String inputOSM = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/osm/brandenburg.osm";
 //		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
-		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
+
+ 		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_09_04";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_09_19";
+// 		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/cottbus2020_09_18";
+
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -193,8 +196,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		reader.setMakePedestrianSignals(false);         //TODO check was passiert
 
 
-//		//fuer Cottbus
-//		//spree neisse
+		//fuer Cottbus
+		//spree neisse
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 1);
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 2);
 //		reader.setHierarchyLayer( 52.045199,14.115944, 51.551772,14.817009, 3);
@@ -207,9 +210,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //
 //      //BoundingBox Cottbus
 //		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
-//																	// (south,west,north,east)
+																	// (south,west,north,east)
 
-		 //fuer Berlin
+//		 //fuer Berlin
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 1);
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 2);
 		reader.setHierarchyLayer( 52.57667+1, 13.25544-1, 52.44844-1, 13.52695+1, 3);
@@ -259,7 +262,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		for (Id<Link> link : network.getLinks().keySet()){
 			if(link.toString().contains("-")){
-				LOG.info(link);
 				List<String> origLinks = Arrays.asList(link.toString().split("-"));
 				for (String origlink : origLinks){
 					mergedLinks.put(Id.createLinkId(origlink),link);
@@ -1573,7 +1575,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		if (inLinksAngle > (3. / 4. * Math.PI) && inLinksAngle < (5. / 4. * Math.PI)) {
 			if (!this.makePedestrianSignals) {
 				this.systems.getSignalSystemData().remove(signalSystem.getId());
-				LOG.warn(signalSystem.getId().toString());
+				LOG.info("Remove Signal-"+signalSystem.getId().toString()+" as the InLinks angle indicates that this is is Pedestrian Crossing.");
 				return;
 			} else {
 				SignalGroupData group = this.groups.getFactory().createSignalGroupData(signalSystem.getId(),
@@ -2270,15 +2272,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					lane.addToLinkId(throughLink.getLink().getId());
 					writeOutLinkInfo(lane, throughLink.getLink().getId(), "through");
 
-					if (this.SAVE_TURN_LANES) {
-						String toLinkId = throughLink.getLink().getId().toString();
-						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-							lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":through");
-						} else {
-							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":through");
-						}
-					}
+//					if (this.SAVE_TURN_LANES) {
+//						String toLinkId = throughLink.getLink().getId().toString();
+//						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+//							lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":through");
+//						} else {
+//							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+//							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":through");
+//						}
+//					}
 				}else {
 					for (LinkVector lvec : toLinks) {
 						// add all to-links except u-turn
@@ -2286,15 +2288,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							lane.addToLinkId(lvec.getLink().getId());
 							writeOutLinkInfo(lane, lvec.getLink().getId(), "unclear");
 
-							if (this.SAVE_TURN_LANES) {
-								String toLinkId = lvec.getLink().getId().toString();
-								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":unclear");
-								} else {
-									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":unclear");
-								}
-							}
+//							if (this.SAVE_TURN_LANES) {
+//								String toLinkId = lvec.getLink().getId().toString();
+//								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
+//									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":unclear");
+//								} else {
+//									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
+//									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":unclear");
+//								}
+//							}
 						}
 					}
 				}
@@ -2318,7 +2320,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					if (tempLinks.get(0).getLink().getId().equals(reverseLink.getLink().getId())) {
 						if (!this.allowUTurnAtLeftLaneOnly && insertedUTurnOnLeftLane) {
 							lane.addToLinkId(tempLinks.get(0).getLink().getId());
-							writeOutLinkInfo(lane, tempLinks.get(0).getLink().getId(), "right");
+							writeOutLinkInfo(lane, tempLinks.get(0).getLink().getId(), "reverse");
 
 							if (this.SAVE_TURN_LANES == true) {
 								String toLinkId = tempLinks.get(0).getLink().getId().toString();
@@ -2796,7 +2798,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		public void endTag(final String name, final String content, final Stack<String> context) {
 			super.endTag(name, content, context);
 			
-			// TODO check this!
 			if ("relation".equals(name)) {
 				if (this.currentRelation.fromRestricted != null) {
 					if (this.currentRelation.resNode != null && this.currentRelation.toRestricted != null) {
