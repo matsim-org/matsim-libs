@@ -22,6 +22,7 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
+		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
 		switch (type) {
 			case DEFAULT:
 				addModalComponent(PassengerEngine.class, DefaultPassengerEngine.createProvider(getMode()));
