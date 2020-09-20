@@ -20,8 +20,14 @@
 
 package org.matsim.contrib.dvrp.vrpagent;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Tasks;
@@ -32,13 +38,15 @@ import org.matsim.contrib.dvrp.schedule.Tasks;
 public class TaskStartedEvent extends AbstractTaskEvent {
 	public static final String EVENT_TYPE = "dvrpTaskStarted";
 
-	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Task task) {
-		this(time, dvrpMode, dvrpVehicleId, task.getTaskType(), task.getTaskIdx(), Tasks.getBeginLink(task).getId());
+	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
+			Task task) {
+		this(time, dvrpMode, dvrpVehicleId, driverId, task.getTaskType(), task.getTaskIdx(),
+				Tasks.getBeginLink(task).getId());
 	}
 
-	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Task.TaskType taskType,
-			int taskIndex, Id<Link> linkId) {
-		super(time, dvrpMode, dvrpVehicleId, taskType, taskIndex, linkId);
+	public TaskStartedEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
+			Task.TaskType taskType, int taskIndex, Id<Link> linkId) {
+		super(time, dvrpMode, dvrpVehicleId, driverId, taskType, taskIndex, linkId);
 	}
 
 	@Override
