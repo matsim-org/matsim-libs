@@ -159,17 +159,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * @param it             iteration
 	 */
 	private void writeIterationPassengerStats(String summarizeTrips, int it) {
-		BufferedWriter bw = getAppendingBufferedWriter("drt_customer_stats", ".csv");
-		try {
+		try (var bw = getAppendingBufferedWriter("drt_customer_stats", ".csv")) {
 			if (!headerWritten) {
 				headerWritten = true;
 				bw.write(
 						"runId;iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean;rejections;rejectionRate");
+				bw.newLine();
 			}
-			bw.newLine();
 			bw.write(runId + ";" + it + ";" + summarizeTrips);
-			bw.flush();
-			bw.close();
+			bw.newLine();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -180,37 +178,29 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	 * @param it                iteration
 	 */
 	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
-		BufferedWriter bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv");
-		try {
+		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
 				bw.write(
-						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t");
-
-				bw.write(";l_det");
-
+						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det");
+				bw.newLine();
 			}
-			bw.newLine();
 			bw.write(runId + ";" + it + ";" + summarizeVehicles);
-			bw.flush();
-			bw.close();
+			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		BufferedWriter bw2 = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv");
-		try {
+		try (var bw = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv")) {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
-				bw2.write("runId;iteration");
+				bw.write("runId;iteration");
 				for (int i = 0; i <= maxcap; i++) {
-					bw2.write(";" + i + " pax distance_m");
+					bw.write(";" + i + " pax distance_m");
 				}
-
+				bw.newLine();
 			}
-			bw2.newLine();
-			bw2.write(runId + ";" + it + vehOcc);
-			bw2.flush();
-			bw2.close();
+			bw.write(runId + ";" + it + vehOcc);
+			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -219,28 +209,22 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	public void writeAndPlotWaitTimeEstimateComparison(
 			Collection<PerformedRequestEventSequence> performedRequestEventSequences, String plotFileName,
 			String textFileName, boolean createChart) {
-		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
+		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
+			XYSeries times = new XYSeries("waittimes", true, true);
 
-		XYSeries times = new XYSeries("waittimes", true, true);
-
-		try {
 			bw.append("RequestId;actualWaitTime;estimatedWaitTime;deviate");
 			for (PerformedRequestEventSequence seq : performedRequestEventSequences) {
 				bw.newLine();
 				double actualWaitTime = seq.getPickedUp().getTime() - seq.getSubmitted().getTime();
 				double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
 
-				bw.append(seq.getSubmitted().getRequestId() + "")
-						.append(";")
-						.append(actualWaitTime + "")
+				bw.append(seq.getSubmitted().getRequestId() + "").append(";").append(actualWaitTime + "")
 						.append(";")
 						.append(estimatedWaitTime + "")
 						.append(";")
 						.append((actualWaitTime - estimatedWaitTime) + "");
 				times.add(actualWaitTime, estimatedWaitTime);
 			}
-			bw.flush();
-			bw.close();
 
 			if (createChart) {
 				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
