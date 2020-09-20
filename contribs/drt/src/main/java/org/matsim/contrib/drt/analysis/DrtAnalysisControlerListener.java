@@ -20,13 +20,22 @@
 package org.matsim.contrib.drt.analysis;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.xy.XYSeries;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.core.config.Config;
@@ -75,20 +84,41 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		boolean createGraphs = event.getServices().getConfig().controler().isCreateGraphs();
 
-		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(filename(event, "waitTimeComparison", ".png"),
-				filename(event, "waitTimeComparison", ".csv"), createGraphs);
+		writeAndPlotWaitTimeEstimateComparison(drtRequestAnalyzer.getPerformedRequestSequences().values(),
+				filename(event, "waitTimeComparison", ".png"), filename(event, "waitTimeComparison", ".csv"),
+				createGraphs);
 		List<DrtTrip> trips = drtPassengerStats.getDrtTrips();
 
-		DrtTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(), filename(event, "drt_rejections", ".csv"),
-				"time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY");
+		DrtTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejectedRequestSequences().values(),
+				filename(event, "drt_rejections", ".csv"), "time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY",
+				seq -> {
+					DrtRequestSubmittedEvent submission = seq.getSubmitted();
+					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
+					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();
+					return submission.getTime()
+							+ ";"
+							+ submission.getPersonId()
+							+ ";"
+							+ submission.getFromLinkId()
+							+ ";"
+							+ submission.getToLinkId()
+							+ ";"
+							+ fromCoord.getX()
+							+ ";"
+							+ fromCoord.getY()
+							+ ";"
+							+ toCoord.getX()
+							+ ";"
+							+ toCoord.getY();
+				});
 
-		double rejectionRate = (double)drtRequestAnalyzer.getRejections().size()
-				/ (double)(drtRequestAnalyzer.getRejections().size() + trips.size());
+		double rejectionRate = (double)drtRequestAnalyzer.getRejectedRequestSequences().size()
+				/ drtRequestAnalyzer.getRequestSubmissions().size();
 		String tripsSummarize = DrtTripsAnalyser.summarizeTrips(trips, ";");
 		double directDistanceMean = DrtTripsAnalyser.getDirectDistanceMean(trips);
 		writeIterationPassengerStats(
-				tripsSummarize + ";" + drtRequestAnalyzer.getRejections().size() + ";" + format.format(rejectionRate),
-				event.getIteration());
+				tripsSummarize + ";" + drtRequestAnalyzer.getRejectedRequestSequences().size() + ";" + format.format(
+						rejectionRate), event.getIteration());
 		double l_d = DrtTripsAnalyser.getTotalDistance(drtPassengerStats.getVehicleStates()) / (trips.size()
 				* directDistanceMean);
 		String vehStats = DrtTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleStates(), ";")
@@ -98,7 +128,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				maxcap);
 		writeIterationVehicleStats(vehStats, occStats, event.getIteration());
 		if (drtCfg.isPlotDetailedCustomerStats()) {
-			DrtTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), DrtTrip.HEADER);
+			DrtTripsAnalyser.collection2Text(trips, filename(event, "drt_trips", ".csv"), DrtTrip.HEADER,
+					DrtTrip::toString);
 		}
 		DrtTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleStates(),
 				filename(event, "vehicleDistanceStats", ".csv"));
@@ -182,6 +213,44 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			bw2.close();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	public void writeAndPlotWaitTimeEstimateComparison(
+			Collection<PerformedRequestEventSequence> performedRequestEventSequences, String plotFileName,
+			String textFileName, boolean createChart) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
+
+		XYSeries times = new XYSeries("waittimes", true, true);
+
+		try {
+			bw.append("RequestId;actualWaitTime;estimatedWaitTime;deviate");
+			for (PerformedRequestEventSequence seq : performedRequestEventSequences) {
+				bw.newLine();
+				double actualWaitTime = seq.getPickedUp().getTime() - seq.getSubmitted().getTime();
+				double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
+
+				bw.append(seq.getSubmitted().getRequestId() + "")
+						.append(";")
+						.append(actualWaitTime + "")
+						.append(";")
+						.append(estimatedWaitTime + "")
+						.append(";")
+						.append((actualWaitTime - estimatedWaitTime) + "");
+				times.add(actualWaitTime, estimatedWaitTime);
+			}
+			bw.flush();
+			bw.close();
+
+			if (createChart) {
+				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
+						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+				//			xAxis.setLowerBound(0);
+				//			yAxis.setLowerBound(0);
+				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -117,9 +118,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 
 	private Map<String, DescriptiveStatistics> createZonalStats(String delimiter) {
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
-		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
-			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
-			DrtZone zone = zones.getZoneForLinkId(submission.getFromLinkId());
+		for (PerformedRequestEventSequence data : requestAnalyzer.getPerformedRequestSequences().values()) {
+			DrtZone zone = zones.getZoneForLinkId(data.getSubmitted().getFromLinkId());
 			final String zoneStr;
 			if (zone != null) {
 				//request submission inside drtServiceArea
@@ -131,7 +131,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 			if (waitingTimeStats == null) {
 				waitingTimeStats = new DescriptiveStatistics();
 			}
-			waitingTimeStats.addValue(requestAnalyzer.getWaitTimeCompare().get(requestId).getFirst());
+			double waitTime = data.getPickedUp().getTime() - data.getSubmitted().getTime();
+			waitingTimeStats.addValue(waitTime);
 			zoneStats.put(zoneStr, waitingTimeStats);
 		}
 		return zoneStats;
