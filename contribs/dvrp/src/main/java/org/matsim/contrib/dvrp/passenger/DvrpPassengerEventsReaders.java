@@ -18,18 +18,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.passenger.events;
+package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Map;
-
-import org.matsim.contrib.dvrp.passenger.DvrpPassengerEventsReaders;
-import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.MatsimEventsReader;
 
 import com.google.common.collect.ImmutableMap;
 
-public final class DrtPassengerEventsReader {
-	public static final Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS = ImmutableMap.<String, CustomEventMapper>builder()
-			.putAll(DvrpPassengerEventsReaders.CUSTOM_EVENT_MAPPERS)
-			.put(DrtRequestSubmittedEvent.EVENT_TYPE, DrtRequestSubmittedEvent::convert)
-			.build();
+public class DvrpPassengerEventsReaders {
+	public static final ImmutableMap<String, MatsimEventsReader.CustomEventMapper> CUSTOM_EVENT_MAPPERS = ImmutableMap.of(
+			PassengerRequestSubmittedEvent.EVENT_TYPE, PassengerRequestSubmittedEvent::convert,//
+			PassengerRequestScheduledEvent.EVENT_TYPE, PassengerRequestScheduledEvent::convert,//
+			PassengerRequestRejectedEvent.EVENT_TYPE, PassengerRequestRejectedEvent::convert,//
+			PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
+			PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert);
+
+	public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
+		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+		CUSTOM_EVENT_MAPPERS.forEach(reader::addCustomEventMapper);
+		return reader;
+	}
 }
