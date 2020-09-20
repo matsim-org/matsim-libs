@@ -52,4 +52,16 @@ public class TaskEndedEvent extends AbstractTaskEvent {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
+
+	public static TaskEndedEvent convert(GenericEvent event, Function<String, Task.TaskType> taskTypeFunction) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_DVRP_MODE));
+		Id<DvrpVehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_DVRP_VEHICLE), DvrpVehicle.class);
+		Id<Person> driverId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
+		Task.TaskType taskType = Objects.requireNonNull(taskTypeFunction.apply(attributes.get(ATTRIBUTE_TASK_TYPE)));
+		int taskIndex = Integer.parseInt(attributes.get(ATTRIBUTE_TASK_INDEX));
+		Id<Link> linkId = Id.createLinkId(attributes.get(ATTRIBUTE_LINK));
+		return new TaskEndedEvent(time, mode, vehicleId, driverId, taskType, taskIndex, linkId);
+	}
 }
