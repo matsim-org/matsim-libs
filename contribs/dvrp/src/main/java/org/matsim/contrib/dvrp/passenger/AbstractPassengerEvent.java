@@ -18,79 +18,68 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.HasLinkId;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.api.internal.HasPersonId;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public abstract class AbstractTaskEvent extends Event implements HasPersonId, HasLinkId {
-	public static final String ATTRIBUTE_DVRP_VEHICLE = "dvrpVehicle";
-	public static final String ATTRIBUTE_TASK_TYPE = "taskType";
-	public static final String ATTRIBUTE_TASK_INDEX = "taskIndex";
-	public static final String ATTRIBUTE_DVRP_MODE = "dvrpMode";
+public abstract class AbstractPassengerEvent extends Event implements HasPersonId {
+	public static final String ATTRIBUTE_MODE = "mode";
+	public static final String ATTRIBUTE_REQUEST = "request";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
-	private final String dvrpMode;
-	private final Id<DvrpVehicle> dvrpVehicleId;
-	private final Id<Person> driverId;
-	private final TaskType taskType;
-	private final int taskIndex;
-	private final Id<Link> linkId;
+	private final String mode;
+	private final Id<Request> requestId;
+	private final Id<Person> personId;
+	private final Id<DvrpVehicle> vehicleId;
 
-	protected AbstractTaskEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
-			TaskType taskType, int taskIndex, Id<Link> linkId) {
+	public AbstractPassengerEvent(double time, String mode, Id<Request> requestId, Id<Person> personId,
+			Id<DvrpVehicle> vehicleId) {
 		super(time);
-		this.dvrpMode = dvrpMode;
-		this.dvrpVehicleId = dvrpVehicleId;
-		this.driverId = driverId;
-		this.taskType = taskType;
-		this.taskIndex = taskIndex;
-		this.linkId = linkId;
+		this.mode = mode;
+		this.requestId = requestId;
+		this.personId = personId;
+		this.vehicleId = vehicleId;
 	}
 
-	public final Id<DvrpVehicle> getDvrpVehicleId() {
-		return dvrpVehicleId;
+	public final String getMode() {
+		return mode;
 	}
 
+	/**
+	 * @return id of the request
+	 */
+	public final Id<Request> getRequestId() {
+		return requestId;
+	}
+
+	/**
+	 * @return id of the passenger (person)
+	 */
 	@Override
-	public Id<Person> getPersonId() {
-		return driverId;
+	public final Id<Person> getPersonId() {
+		return personId;
 	}
 
-	public final TaskType getTaskType() {
-		return taskType;
-	}
-
-	public final int getTaskIndex() {
-		return taskIndex;
-	}
-
-	public String getDvrpMode() {
-		return dvrpMode;
-	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return linkId;
+	public Id<DvrpVehicle> getVehicleId() {
+		return vehicleId;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_DVRP_VEHICLE, dvrpVehicleId + "");
-		attr.put(ATTRIBUTE_TASK_TYPE, taskType.name());
-		attr.put(ATTRIBUTE_TASK_INDEX, taskIndex + "");
-		attr.put(ATTRIBUTE_DVRP_MODE, dvrpMode + "");
+		attr.put(ATTRIBUTE_MODE, mode);
+		attr.put(ATTRIBUTE_REQUEST, requestId + "");
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
 		return attr;
 	}
 }

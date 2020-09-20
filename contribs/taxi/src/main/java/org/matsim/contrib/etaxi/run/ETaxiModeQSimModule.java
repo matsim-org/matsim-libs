@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
@@ -135,8 +135,9 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public ETaxiActionCreator get() {
-						PassengerEngine passengerEngine = getModalInstance(PassengerEngine.class);
-						return new ETaxiActionCreator(new TaxiActionCreator(passengerEngine, taxiCfg, timer, dvrpCfg));
+						return new ETaxiActionCreator(
+								new TaxiActionCreator(getModalInstance(PassengerHandler.class), taxiCfg, timer,
+										dvrpCfg));
 					}
 				}).asEagerSingleton();
 

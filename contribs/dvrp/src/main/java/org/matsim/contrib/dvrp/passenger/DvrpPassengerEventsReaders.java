@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,35 +20,22 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.MatsimEventsReader;
 
-public class SinglePassengerDropoffActivity extends FirstLastSimStepDynActivity {
-	private final PassengerHandler passengerHandler;
-	private final DynAgent driver;
-	private final PassengerRequest request;
+import com.google.common.collect.ImmutableMap;
 
-	private final double departureTime;
+public class DvrpPassengerEventsReaders {
+	public static final ImmutableMap<String, MatsimEventsReader.CustomEventMapper> CUSTOM_EVENT_MAPPERS = ImmutableMap.of(
+			PassengerRequestSubmittedEvent.EVENT_TYPE, PassengerRequestSubmittedEvent::convert,//
+			PassengerRequestScheduledEvent.EVENT_TYPE, PassengerRequestScheduledEvent::convert,//
+			PassengerRequestRejectedEvent.EVENT_TYPE, PassengerRequestRejectedEvent::convert,//
+			PassengerPickedUpEvent.EVENT_TYPE, PassengerPickedUpEvent::convert, //
+			PassengerDroppedOffEvent.EVENT_TYPE, PassengerDroppedOffEvent::convert);
 
-	public SinglePassengerDropoffActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask dropoffTask,
-			PassengerRequest request, String activityType) {
-		super(activityType);
-
-		this.passengerHandler = passengerHandler;
-		this.driver = driver;
-		this.request = request;
-
-		departureTime = dropoffTask.getEndTime();
-	}
-
-	@Override
-	protected boolean isLastStep(double now) {
-		return now >= departureTime;
-	}
-
-	@Override
-	protected void afterLastStep(double now) {
-		passengerHandler.dropOffPassenger(driver, request, now);
+	public static MatsimEventsReader createEventsReader(EventsManager eventsManager) {
+		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+		CUSTOM_EVENT_MAPPERS.forEach(reader::addCustomEventMapper);
+		return reader;
 	}
 }

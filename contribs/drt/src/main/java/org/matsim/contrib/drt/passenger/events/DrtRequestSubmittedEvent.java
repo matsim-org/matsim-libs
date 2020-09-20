@@ -20,8 +20,10 @@
 package org.matsim.contrib.drt.passenger.events;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -71,5 +73,19 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_TIME, unsharedRideTime + "");
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance + "");
 		return attr;
+	}
+
+	public static DrtRequestSubmittedEvent convert(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
+		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
+		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
+		Id<Link> fromLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_FROM_LINK));
+		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
+		double unsharedRideTime = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_TIME));
+		double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
+		return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime,
+				unsharedRideDistance);
 	}
 }

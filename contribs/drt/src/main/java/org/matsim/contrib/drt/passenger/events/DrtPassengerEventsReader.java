@@ -20,60 +20,16 @@
 
 package org.matsim.contrib.drt.passenger.events;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.GenericEvent;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.DvrpPassengerEventsReader;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import java.util.Map;
-import java.util.Stack;
 
-import static org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent.*;
+import org.matsim.contrib.dvrp.passenger.DvrpPassengerEventsReaders;
+import org.matsim.core.events.MatsimEventsReader.CustomEventMapper;
 
-public final class DrtPassengerEventsReader extends MatsimXmlParser {
+import com.google.common.collect.ImmutableMap;
 
-    private DvrpPassengerEventsReader delegate;
-
-    public DrtPassengerEventsReader(EventsManager events) {
-        delegate = new DvrpPassengerEventsReader(events);
-        this.setValidating(false);
-        delegate.addCustomEventMapper(EVENT_TYPE, this::drtRequestSubmittedEvent);
-    }
-
-    private DrtRequestSubmittedEvent drtRequestSubmittedEvent(GenericEvent event) {
-		Map<String, String> attributes = event.getAttributes();
-
-		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
-		String mode = attributes.get(ATTRIBUTE_MODE);
-		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
-		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
-		Id<Link> fromLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_FROM_LINK));
-		Id<Link> toLinkId = Id.createLinkId(attributes.get(ATTRIBUTE_TO_LINK));
-
-		double unsharedRideTime = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_TIME));
-		double unsharedRideDistance = Double.parseDouble(attributes.get(ATTRIBUTE_UNSHARED_RIDE_DISTANCE));
-
-		return new DrtRequestSubmittedEvent(time, mode, requestId, personId, fromLinkId, toLinkId, unsharedRideTime, unsharedRideDistance);
-    }
-
-	public void characters(char[] ch, int start, int length) throws SAXException {
-		delegate.characters(ch, start, length);
-	}
-
-    @Override
-    public void startTag(String name, Attributes atts, Stack<String> context) {
-        delegate.startTag(name, atts, context);
-    }
-
-    @Override
-    public void endTag(String name, String content, Stack<String> context) {
-        delegate.endTag(name, content, context);
-    }
+public final class DrtPassengerEventsReader {
+	public static final Map<String, CustomEventMapper> CUSTOM_EVENT_MAPPERS = ImmutableMap.<String, CustomEventMapper>builder()
+			.putAll(DvrpPassengerEventsReaders.CUSTOM_EVENT_MAPPERS)
+			.put(DrtRequestSubmittedEvent.EVENT_TYPE, DrtRequestSubmittedEvent::convert)
+			.build();
 }

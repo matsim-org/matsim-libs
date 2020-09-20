@@ -59,7 +59,7 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 	private final Network network;
 	private final PassengerRequestValidator requestValidator;
 
-	private final PassengerHandler passengerHandler;
+	private final InternalPassengerHandling internalPassengerHandling;
 
 	private InternalInterface internalInterface;
 
@@ -75,14 +75,14 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 		this.network = network;
 		this.requestValidator = requestValidator;
 
-		passengerHandler = new PassengerHandler(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		passengerHandler.setInternalInterface(internalInterface);
+		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
 
 	@Override
@@ -107,9 +107,9 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
 
-		PassengerRequest request = requestCreator.createRequest(passengerHandler.createRequestId(), passenger.getId(),
-				route, getLink(fromLinkId), getLink(toLinkId), now, now);
-		if (passengerHandler.validateRequest(request, requestValidator, now)) {
+		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			adaptRouteForTeleportation(passenger, request, now);
 			return false;//teleport the passenger (will be handled by the teleportation engine)
 		} else {
@@ -144,7 +144,7 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
 		throw new UnsupportedOperationException("No picking-up when teleporting");
 	}

@@ -3,7 +3,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2020 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,16 +18,16 @@
  * *********************************************************************** *
  */
 
+/**
+ *
+ */
 package org.matsim.contrib.dvrp.passenger;
 
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author Michal Maciejewski (michalm)
+ * @author michalm (Michal Maciejewski)
  */
-public interface PassengerHandler {
-	boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
-			PassengerRequest request, double now);
-
-	void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now);
+public interface PassengerDroppedOffEventHandler extends EventHandler {
+	void handleEvent(PassengerDroppedOffEvent event);
 }
