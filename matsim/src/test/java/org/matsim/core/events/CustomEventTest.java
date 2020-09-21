@@ -22,23 +22,22 @@
 
 package org.matsim.core.events;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.events.algorithms.EventWriterJson;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Map;
 
 public class CustomEventTest {
 
@@ -97,18 +96,14 @@ public class CustomEventTest {
 		});
 		eventsManager2.initProcessing();
 		EventsReaderXMLv1 eventsReaderXMLv1 = new EventsReaderXMLv1(eventsManager2);
-		eventsReaderXMLv1.addCustomEventMapper("rain", new MatsimEventsReader.CustomEventMapper() {
-			@Override
-			public Event apply(GenericEvent event) {
-				return new RainOnPersonEvent(event.getTime(), Id.createPersonId(event.getAttributes().get("person")));
-			}
-		});
+		eventsReaderXMLv1.addCustomEventMapper("rain", event -> new RainOnPersonEvent(event.getTime(),
+				Id.createPersonId(event.getAttributes().get("person"))));
 		eventsReaderXMLv1.parse(new ByteArrayInputStream(buf));
 		eventsManager2.finishProcessing();
 		Assert.assertEquals(1, oneEvent.size());
 		Event event = oneEvent.get(0);
 		Assert.assertTrue(event instanceof RainOnPersonEvent);
-		RainOnPersonEvent ropEvent = ((RainOnPersonEvent) event);
+		RainOnPersonEvent ropEvent = ((RainOnPersonEvent)event);
 		Assert.assertEquals(0.0, ropEvent.getTime(), 1e-7);
 		Assert.assertEquals(Id.createPersonId("wurst"), ropEvent.getPersonId());
 	}
@@ -140,18 +135,14 @@ public class CustomEventTest {
 		});
 		eventsManager2.initProcessing();
 		EventsReaderJson eventsReader = new EventsReaderJson(eventsManager2);
-		eventsReader.addCustomEventMapper("rain", new MatsimEventsReader.CustomEventMapper() {
-			@Override
-			public Event apply(GenericEvent event) {
-				return new RainOnPersonEvent(event.getTime(), Id.createPersonId(event.getAttributes().get("person")));
-			}
-		});
+		eventsReader.addCustomEventMapper("rain", event -> new RainOnPersonEvent(event.getTime(),
+				Id.createPersonId(event.getAttributes().get("person"))));
 		eventsReader.parse(new ByteArrayInputStream(buf));
 		eventsManager2.finishProcessing();
 		Assert.assertEquals(1, oneEvent.size());
 		Event event = oneEvent.get(0);
 		Assert.assertTrue(event instanceof RainOnPersonEvent);
-		RainOnPersonEvent ropEvent = ((RainOnPersonEvent) event);
+		RainOnPersonEvent ropEvent = ((RainOnPersonEvent)event);
 		Assert.assertEquals(0.0, ropEvent.getTime(), 1e-7);
 		Assert.assertEquals(Id.createPersonId("wurst"), ropEvent.getPersonId());
 	}
