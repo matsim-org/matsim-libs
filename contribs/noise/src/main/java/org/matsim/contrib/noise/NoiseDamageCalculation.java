@@ -196,41 +196,19 @@ public class NoiseDamageCalculation {
      * Noise allocation approach: AverageCost
      */
     private void calculateCostSharesPerLinkPerTimeInterval(NoiseReceiverPoint rp) {
-
-        Map<Id<Link>, Double> linkId2costShare = new HashMap<>();
-
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
-
         if (rp.getDamageCosts() != 0.) {
             for (Id<Link> linkId : rp.getLinkId2IsolatedImmission().keySet()) {
-
                 double linkImmission = rp.getLinkId2IsolatedImmission().get(linkId);
-                double costs = 0.;
-
                 if (!(linkImmission == 0.)) {
                     double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(linkImmission, rp.getCurrentImmission());
-                    costs = costShare * rp.getDamageCosts();
-                }
-                linkId2costShare.put(linkId, costs);
-            }
-        }
-
-//		}
-
-        // summing up the link-based costs
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
-        if (rp.getDamageCosts() != 0.) {
-
-            for (Id<Link> linkId : rp.getRelevantLinks()) {
-                NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
-                if ( noiseLink != null) {
-                    noiseLink.addDamageCost(linkId2costShare.get(linkId));
+                    double costs = costShare * rp.getDamageCosts();
+                    NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
+                    if ( noiseLink != null) {
+                        noiseLink.addDamageCost(costs);
+                    }
                 }
             }
         }
-//		}
     }
 
     /*
