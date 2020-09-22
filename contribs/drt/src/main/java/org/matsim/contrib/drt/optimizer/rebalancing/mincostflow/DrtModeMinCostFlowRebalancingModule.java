@@ -52,7 +52,6 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 	@Override
 	public void install() {
 		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
-
 		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {

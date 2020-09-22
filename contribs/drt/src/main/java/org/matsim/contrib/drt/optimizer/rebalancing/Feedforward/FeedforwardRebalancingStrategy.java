@@ -23,14 +23,15 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 
 /**
- * @author Chengqi Lu This strategy is created based on the Feedforward Fluidic
- *         rebalancing algorithm in AMoDeus. The algorithm send rebalancing
- *         vehicles based on the DRT demand flow of previous iteration. This
- *         strategy is comparable to the MinCostFlowRebalancing Strategy with
- *         Previous Iteration Zonal DRT Demand Aggregator. But, instead of
- *         setting a rebalance target for each zone, the concept of flow is
- *         used. Important: At least 2 iterations are needed in order to make
- *         this strategy function properly.
+ * This strategy is created based on the Feedforward Fluidic rebalancing algorithm in AMoDeus.
+ * The algorithm send rebalancing vehicles based on the DRT demand flow of previous iteration.
+ * This strategy is comparable to the MinCostFlowRebalancing Strategy with Previous Iteration Zonal DRT Demand
+ * Aggregator. But, instead of setting a rebalance target for each zone, the concept of flow is
+ * used.
+ * <p>
+ * Important: At least 2 iterations are needed in order to make this strategy function properly.
+ *
+ * @author Chengqi Lu
  */
 public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	private static final Logger log = Logger.getLogger(FeedforwardRebalancingStrategy.class);

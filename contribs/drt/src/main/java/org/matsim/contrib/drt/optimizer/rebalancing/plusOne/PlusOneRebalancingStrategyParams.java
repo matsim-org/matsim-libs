@@ -26,7 +26,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * 
+ *
  * @author michalm
  */
 public final class PlusOneRebalancingStrategyParams extends ReflectiveConfigGroup
@@ -64,7 +64,7 @@ public final class PlusOneRebalancingStrategyParams extends ReflectiveConfigGrou
 	}
 
 	/**
-	 * @param estimatorType -- {@value #RELOCATION_CALCULATOR_TYPE_EXP}
+	 * @param zoneFreeRelocationCalculatorType -- {@value #RELOCATION_CALCULATOR_TYPE_EXP}
 	 */
 	@StringSetter(RELOCATION_CALCULATOR_TYPE)
 	public void setRelocationCalculatorType(ZoneFreeRelocationCalculatorType zoneFreeRelocationCalculatorType) {

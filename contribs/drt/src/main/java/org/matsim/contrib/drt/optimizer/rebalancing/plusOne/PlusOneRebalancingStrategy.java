@@ -24,10 +24,11 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.core.events.MobsimScopeEventHandler;
 
 /**
- * @author Chengqi Lu This strategy is based on the Plus One Rebalancing
- * Algorithm in AMoDeus. At each rebalancing period, the algorithm will
- * send idling vehicles to the departure places of the request departed
+ * This strategy is based on the Plus One Rebalancing Algorithm in AMoDeus.
+ * At each rebalancing period, the algorithm will send idling vehicles to the departure places of the request departed
  * during the time period
+ *
+ * @author Chengqi Lu
  */
 public class PlusOneRebalancingStrategy
 		implements RebalancingStrategy, PassengerRequestScheduledEventHandler, DrtRequestSubmittedEventHandler,

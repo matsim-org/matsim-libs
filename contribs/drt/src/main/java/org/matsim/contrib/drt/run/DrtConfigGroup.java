@@ -67,11 +67,12 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			+ "(passengers'/customers' perspective)";
 
 	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
-	static final String USE_MODE_FILTERED_SUBNETWORK_EXP = "Limit the operation of vehicles to links (of the 'dvrp_routing'"
-			+ " network) with 'allowedModes' containing this 'mode'."
-			+ " For backward compatibility, the value is set to false by default"
-			+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
-			+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String STOP_DURATION = "stopDuration";
 	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
@@ -80,26 +81,30 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String MAX_WAIT_TIME_EXP = "Max wait time for the bus to come (optimisation constraint).";
 
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
-	static final String MAX_TRAVEL_TIME_ALPHA_EXP = "Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-			+ "Alpha should not be smaller than 1.";
+	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
+			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
+					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
-	static final String MAX_TRAVEL_TIME_BETA_EXP = "Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-			+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
-			+ "Beta should not be smaller than 0.";
+	static final String MAX_TRAVEL_TIME_BETA_EXP =
+			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
+					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "Beta should not be smaller than 0.";
 
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
-	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP = "If true, the max travel and wait times of a submitted request"
-			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-			+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-			+ " InsertionCostCalculator.PenaltyCalculator";
+	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
+			"If true, the max travel and wait times of a submitted request"
+					+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
+					+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
+					+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
+					+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
+					+ " InsertionCostCalculator.PenaltyCalculator";
 
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
-	static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP = "If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
-			+ "day at the link where it stopped operating the day before. False by default.";
+	static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP =
+			"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
+					+ "day at the link where it stopped operating the day before. False by default.";
 
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
@@ -107,14 +112,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 	static final String OPERATIONAL_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
-	// TODO consider renaming maxWalkDistance to max access/egress distance (or even
-	// have 2 separate params)
+	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	static final String ESTIMATED_DRT_SPEED_EXP = "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
-			+ "and in plans file, [m/s]. The default value is 25 km/h";
+	static final String ESTIMATED_DRT_SPEED_EXP =
+			"Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
+					+ "and in plans file, [m/s]. The default value is 25 km/h";
 
 	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
 	static final String ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP = "Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.";
@@ -123,8 +128,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
 
 	public static final String TRANSIT_STOP_FILE = "transitStopFile";
-	static final String TRANSIT_STOP_FILE_EXP = "Stop locations file (transit schedule format, but without lines) for DRT stops. "
-			+ "Used only for the stopbased mode";
+	static final String TRANSIT_STOP_FILE_EXP =
+			"Stop locations file (transit schedule format, but without lines) for DRT stops. "
+					+ "Used only for the stopbased mode";
 
 	private static final String DRT_SERVICE_AREA_SHAPE_FILE = "drtServiceAreaShapeFile";
 	private static final String DRT_SERVICE_AREA_SHAPE_FILE_EXP = "allows to configure a service area per drt mode."
@@ -134,9 +140,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String WRITE_DETAILED_CUSTOMER_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
-	static final String NUMBER_OF_THREADS_EXP = "Number of threads used for parallel evaluation of request insertion into existing schedules."
-			+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
-			+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+	static final String NUMBER_OF_THREADS_EXP =
+			"Number of threads used for parallel evaluation of request insertion into existing schedules."
+					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
+					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
 	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
 	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
@@ -153,10 +160,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private double maxWaitTime = Double.NaN;// seconds
 
 	// max arrival time defined as:
-	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) +
-	// maxTravelTimeBeta,
-	// where unshared_ride_travel_time(fromLink, toLink) is calculated during
-	// replanning (see: DrtRouteCreator)
+	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
+	// where unshared_ride_travel_time(fromLink, toLink) is calculated during replanning (see: DrtRouteCreator)
 	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
@@ -181,8 +186,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
-	@Nullable // it is possible to generate a FleetSpecification (instead of reading it from a
-				// file)
+	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
 
 	@Nullable
@@ -225,8 +229,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 		if (config.qsim().getEndTime().isUndefined()
 				|| config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
-			// Not an issue if all request rejections are immediate (i.e. happen during
-			// request submission)
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
 			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
 					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
@@ -242,7 +245,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				MAX_WAIT_TIME + " must not be smaller than " + STOP_DURATION);
 
 		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
-				TRANSIT_STOP_FILE + " must not be null when " + OPERATIONAL_SCHEME + " is "
+				TRANSIT_STOP_FILE
+						+ " must not be null when "
+						+ OPERATIONAL_SCHEME
+						+ " is "
 						+ OperationalScheme.stopbased);
 
 		Verify.verify(
@@ -428,8 +434,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	}
 
 	/**
-	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated --
-	 *                                                   {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
+	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
 	@StringSetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
 	public DrtConfigGroup setRejectRequestIfMaxWaitOrTravelTimeViolated(
@@ -447,8 +452,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	}
 
 	/**
-	 * @param changeStartLinkToLastLinkInSchedule --
-	 *                                            {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
+	 * @param changeStartLinkToLastLinkInSchedule -- {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
 	 */
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public DrtConfigGroup setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
@@ -489,8 +493,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	}
 
 	/**
-	 * @param idleVehiclesReturnToDepots --
-	 *                                   {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
+	 * @param idleVehiclesReturnToDepots -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
 	 */
 	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
 	public DrtConfigGroup setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {

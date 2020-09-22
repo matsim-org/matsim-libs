@@ -31,7 +31,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 public class NoRebalancingStrategy implements RebalancingStrategy {
 	@Override
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
-		System.err.println("No rebalance strategy is used!!!");
 		return Collections.emptyList();
 	}
 }

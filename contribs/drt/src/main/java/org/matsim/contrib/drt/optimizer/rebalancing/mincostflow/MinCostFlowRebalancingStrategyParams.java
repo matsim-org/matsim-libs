@@ -40,8 +40,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	public enum ZonalDemandEstimatorType {
 		PreviousIterationDemand, None
 	}
-	
-	//TODO move this to the params for the target calculator
+
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
 			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."

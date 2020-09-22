@@ -27,8 +27,8 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * 
- * @author michalm, Chengqi Lu
+ * @author Chengqi Lu
+ * @author michalm (Michal Maciejewski)
  */
 public final class FeedforwardRebalancingStrategyParams extends ReflectiveConfigGroup
 		implements RebalancingParams.RebalancingStrategyParams {
@@ -108,7 +108,7 @@ public final class FeedforwardRebalancingStrategyParams extends ReflectiveConfig
 	}
 
 	/**
-	 * @param interval -- {@value #FEEDFORWARD_SIGNAL_STRENGTH_EXP}
+	 * @param feedforwardSignalStrength -- {@value #FEEDFORWARD_SIGNAL_STRENGTH_EXP}
 	 */
 	@StringSetter(FEEDFORWARD_SIGNAL_STRENGTH)
 	public void setFeedforwardSignalStrength(double feedforwardSignalStrength) {

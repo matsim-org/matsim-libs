@@ -69,7 +69,6 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 
 		// First implementation: Simply evenly distribute the rebalancable (i.e. idling
 		// and have enough service time) across the network
-
 		if (activeZones.isEmpty()) {
 			log.debug(
 					"There is no active zones at this time period. No vehicles will be assigned to rebalance task at this period");

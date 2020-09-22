@@ -32,7 +32,8 @@ import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
 /**
- * @author michalm, Chengqi Lu
+ * @author Chengqi Lu
+ * @author michalm (Michal Maciejewski)
  */
 public class DrtModeFeedforwardRebalanceModule extends AbstractDvrpModeModule {
 	private static final Logger log = Logger.getLogger(DrtModeFeedforwardRebalanceModule.class);

@@ -75,9 +75,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
-
 		rebalancingInterval = drtCfg.getRebalancingParams().map(RebalancingParams::getInterval).orElse(null);
-
 		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
 				drtCfg.getAdvanceRequestPlanningHorizon());
 	}
