@@ -220,31 +220,33 @@ public class NoiseDamageCalculation {
             NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
             if (noiseLink != null) {
                 double damageCostSum = noiseLink.getDamageCost();
+                if(damageCostSum > 0) {
 
-                int[] counts = new int[vehicleTypes.size()];
-                double[] levels = new double[vehicleTypes.size()];
+                    int[] counts = new int[vehicleTypes.size()];
+                    double[] levels = new double[vehicleTypes.size()];
 
-                int i = 0;
-                for(NoiseVehicleType type: vehicleTypes) {
-                    counts[i] = noiseLink.getAgentsEntering(type);
-                    levels[i] = emission.calculateSingleVehicleLevel(type, noiseLink);
-                    i++;
-                }
-
-                double[] shares = NoiseEquations.calculateShare(counts, levels);
-
-                NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
-
-                int j = 0;
-                for(NoiseVehicleType type: vehicleTypes) {
-                    double damageCostSumVehicle = shares[j] * damageCostSum;
-                    if (!(counts[j] == 0)) {
-                        double damageCostPerVehicle = damageCostSumVehicle / (counts[j] * noiseParams.getScaleFactor());
-                        if (damageCostPerVehicle > 0.) {
-                            noiseLink.setAverageDamageCostPerVehicle(type, damageCostPerVehicle);
-                        }
+                    int i = 0;
+                    for (NoiseVehicleType type : vehicleTypes) {
+                        counts[i] = noiseLink.getAgentsEntering(type);
+                        levels[i] = emission.calculateSingleVehicleLevel(type, noiseLink);
+                        i++;
                     }
-                    j++;
+
+                    double[] shares = NoiseEquations.calculateShare(counts, levels);
+
+                    NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
+
+                    int j = 0;
+                    for (NoiseVehicleType type : vehicleTypes) {
+                        double damageCostSumVehicle = shares[j] * damageCostSum;
+                        if (counts[j] > 0) {
+                            double damageCostPerVehicle = damageCostSumVehicle / (counts[j] * noiseParams.getScaleFactor());
+                            if (damageCostPerVehicle > 0.) {
+                                noiseLink.setAverageDamageCostPerVehicle(type, damageCostPerVehicle);
+                            }
+                        }
+                        j++;
+                    }
                 }
             }
         }
