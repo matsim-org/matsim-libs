@@ -87,19 +87,13 @@ class RLS19NoiseEmission implements NoiseEmission {
 
         switch ((RLS19VehicleType) type) {
             case pkw:
-                nPkw = (int) ((noiseLink.getAgentsEntering(type)
-                        * (noiseParams.getScaleFactor()))
-                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                nPkw =1;
                 break;
             case lkw1:
-                nLkw1 = (int) ((noiseLink.getAgentsEntering(type)
-                        * (noiseParams.getScaleFactor()))
-                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                nLkw1 = 1;
                 break;
             case lkw2:
-                nLkw2 = (int) ((noiseLink.getAgentsEntering(type)
-                        * (noiseParams.getScaleFactor()))
-                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                nLkw2 = 1;
                 break;
         }
 
@@ -112,6 +106,9 @@ class RLS19NoiseEmission implements NoiseEmission {
                                      int nPkw, int nLkw1, int nLkw2) {
 
         int m = nPkw + nLkw1 + nLkw2;
+        if(m == 0) {
+            return 0;
+        }
 
         double pLkw1 = ((double) nLkw1) / m;
         double pLkw2 = ((double) nLkw2) / m;
