@@ -24,7 +24,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -144,6 +146,10 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 		switch (type) {
 			case MinCostFlowRebalancingStrategyParams.SET_NAME:
 				return new MinCostFlowRebalancingStrategyParams();
+			case FeedforwardRebalancingStrategyParams.SET_NAME:
+				return new FeedforwardRebalancingStrategyParams();
+			case PlusOneRebalancingStrategyParams.SET_NAME:
+				return new PlusOneRebalancingStrategyParams();
 		}
 
 		return super.createParameterSet(type);
