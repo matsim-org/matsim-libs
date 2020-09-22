@@ -85,7 +85,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 				case STARTED:
 					Task task = schedule.getCurrentTask();
-					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), task));
+					eventsManager.processEvent(new TaskEndedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					break;
 
 				case PLANNED:
@@ -100,7 +100,8 @@ public final class VrpAgentLogic implements DynAgentLogic {
 			switch (schedule.getStatus()) {
 				case STARTED:
 					Task task = schedule.getCurrentTask();
-					eventsManager.processEvent(new TaskStartedEvent(now, dvrpMode, vehicle.getId(), task));
+					eventsManager.processEvent(
+							new TaskStartedEvent(now, dvrpMode, vehicle.getId(), agent.getId(), task));
 					return dynActionCreator.createAction(agent, vehicle, now);
 
 				case COMPLETED:

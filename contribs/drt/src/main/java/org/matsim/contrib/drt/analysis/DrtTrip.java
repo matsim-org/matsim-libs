@@ -19,49 +19,72 @@
 
 package org.matsim.contrib.drt.analysis;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 public class DrtTrip implements Comparable<DrtTrip> {
 	private final double departureTime;
 	private final Id<Person> person;
 	private final Id<Vehicle> vehicle;
 	private final Id<Link> fromLinkId;
-	private final double waitTime;
-	private double travelTime = Double.NaN;
-	private double travelDistance_m = Double.NaN;
-	private double unsharedDistanceEstimate_m = Double.NaN;
-	private double unsharedTimeEstimate_m = Double.NaN;
-	private Id<Link> toLink = null;
-	private double arrivalTime = Double.NaN;
 	private final Coord fromCoord;
+	private final double waitTime;
+	private final double unsharedDistanceEstimate_m;
+	private final double unsharedTimeEstimate_m;
+
+	private double travelDistance_m = Double.NaN;
+	private double arrivalTime = Double.NaN;
+	private Id<Link> toLink = null;
 	private Coord toCoord = null;
-	private final	DecimalFormat format;
 
-
-	static final String demitter = ";";
-	public static final String HEADER = "departureTime" + demitter + "personId" + demitter + "vehicleId" + demitter
-			+ "fromLinkId" + demitter + "fromX" + demitter + "fromY" + demitter + "toLinkId" + demitter + "toX"
-			+ demitter + "toY" + demitter + "waitTime" + demitter + "arrivalTime" + demitter + "travelTime" + demitter
-			+ "travelDistance_m"+demitter+"direcTravelDistance_m";
+	private final DecimalFormat format = new DecimalFormat();
+	static final String delimitter = ";";
+	public static final String HEADER = "departureTime"
+			+ delimitter
+			+ "personId"
+			+ delimitter
+			+ "vehicleId"
+			+ delimitter
+			+ "fromLinkId"
+			+ delimitter
+			+ "fromX"
+			+ delimitter
+			+ "fromY"
+			+ delimitter
+			+ "toLinkId"
+			+ delimitter
+			+ "toX"
+			+ delimitter
+			+ "toY"
+			+ delimitter
+			+ "waitTime"
+			+ delimitter
+			+ "arrivalTime"
+			+ delimitter
+			+ "travelTime"
+			+ delimitter
+			+ "travelDistance_m"
+			+ delimitter
+			+ "direcTravelDistance_m";
 
 	DrtTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
-			double waitTime) {
+			double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m) {
 		this.departureTime = departureTime;
 		this.person = person;
 		this.vehicle = vehicle;
 		this.fromLinkId = fromLinkId;
 		this.fromCoord = fromCoord;
 		this.waitTime = waitTime;
-		
-		this.format = new DecimalFormat();
+		this.unsharedDistanceEstimate_m = unsharedDistanceEstimate_m;
+		this.unsharedTimeEstimate_m = unsharedTimeEstimate_m;
+
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
 		format.setMaximumFractionDigits(2);
@@ -74,15 +97,6 @@ public class DrtTrip implements Comparable<DrtTrip> {
 
 	public Id<Person> getPerson() {
 		return person;
-	}
-	
-
-	public void setUnsharedDistanceEstimate_m(double unsharedDistanceEstimate_m) {
-		this.unsharedDistanceEstimate_m = unsharedDistanceEstimate_m;
-	}
-
-	public void setUnsharedTimeEstimate_m(double unsharedTimeEstimate_m) {
-		this.unsharedTimeEstimate_m = unsharedTimeEstimate_m;
 	}
 
 	public Id<Vehicle> getVehicle() {
@@ -98,27 +112,22 @@ public class DrtTrip implements Comparable<DrtTrip> {
 	}
 
 	public double getInVehicleTravelTime() {
-		return travelTime;
-	}
-
-	public void setInVehicleTravelTime(double travelTime) {
-		this.travelTime = travelTime;
+		return arrivalTime - departureTime - waitTime;
 	}
 
 	public double getTravelDistance() {
 		return travelDistance_m;
 	}
-	
 
 	public double getUnsharedDistanceEstimate_m() {
 		return unsharedDistanceEstimate_m;
 	}
-	
+
 	public double getUnsharedTimeEstimate_m() {
 		return unsharedTimeEstimate_m;
 	}
 
-	public void setTravelDistance(double travelDistance_m) {
+	void setTravelDistance(double travelDistance_m) {
 		this.travelDistance_m = travelDistance_m;
 	}
 
@@ -126,7 +135,7 @@ public class DrtTrip implements Comparable<DrtTrip> {
 		return toLink;
 	}
 
-	public void setToLink(Id<Link> toLink) {
+	void setToLink(Id<Link> toLink) {
 		this.toLink = toLink;
 	}
 
@@ -134,7 +143,7 @@ public class DrtTrip implements Comparable<DrtTrip> {
 		return arrivalTime;
 	}
 
-	public void setArrivalTime(double arrivalTime) {
+	void setArrivalTime(double arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
 
@@ -142,7 +151,7 @@ public class DrtTrip implements Comparable<DrtTrip> {
 		return toCoord;
 	}
 
-	public void setToCoord(Coord toCoord) {
+	void setToCoord(Coord toCoord) {
 		this.toCoord = toCoord;
 	}
 
@@ -170,10 +179,32 @@ public class DrtTrip implements Comparable<DrtTrip> {
 			fromCoordX = fromCoord.getX();
 			fromCoordY = fromCoord.getY();
 		}
-		return getDepartureTime() + demitter + getPerson() + demitter + getVehicle() + demitter + getFromLinkId()
-				+ demitter + format.format(fromCoordX) + demitter + format.format(fromCoordY) + demitter + getToLinkId() + demitter + format.format(toCoordX)
-				+ demitter + format.format(toCoordY) + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
-				+ getInVehicleTravelTime() + demitter + format.format(getTravelDistance())+ demitter+ format.format(unsharedDistanceEstimate_m);
+		return getDepartureTime()
+				+ delimitter
+				+ getPerson()
+				+ delimitter
+				+ getVehicle()
+				+ delimitter
+				+ getFromLinkId()
+				+ delimitter
+				+ format.format(fromCoordX)
+				+ delimitter
+				+ format.format(fromCoordY)
+				+ delimitter
+				+ getToLinkId()
+				+ delimitter
+				+ format.format(toCoordX)
+				+ delimitter
+				+ format.format(toCoordY)
+				+ delimitter
+				+ getWaitTime()
+				+ delimitter
+				+ getArrivalTime()
+				+ delimitter
+				+ getInVehicleTravelTime()
+				+ delimitter
+				+ format.format(getTravelDistance())
+				+ delimitter
+				+ format.format(unsharedDistanceEstimate_m);
 	}
-
 }
