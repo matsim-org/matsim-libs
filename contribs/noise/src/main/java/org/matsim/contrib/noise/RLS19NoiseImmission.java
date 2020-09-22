@@ -53,7 +53,12 @@ public class RLS19NoiseImmission implements NoiseImmission {
                     NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
                     if (noiseLink != null) {
                         noiseImmission = calculateLinkImmission(rp, noiseLink);
-                        double isolatedLinkImmission = 10 * Math.log10(noiseImmission);
+                        double isolatedLinkImmission;
+                        if(noiseImmission > 0) {
+                            isolatedLinkImmission = 10 * Math.log10(noiseImmission);
+                        } else {
+                            isolatedLinkImmission = 0;
+                        }
                         linkId2IsolatedImmission.put(linkId, isolatedLinkImmission);
                         for (RLS19VehicleType vehicleType : RLS19VehicleType.values()) {
                             double immissionPlusOne = calculateIsolatedLinkImmissionPlusOneVehicle(rp, noiseLink, vehicleType);
