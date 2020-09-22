@@ -81,17 +81,30 @@ class RLS19NoiseEmission implements NoiseEmission {
 
     @Override
     public double calculateSingleVehicleLevel(NoiseVehicleType type, NoiseLink noiseLink) {
-        double g = 0;
-        final Object gradient = network.getLinks().get(noiseLink.getId()).getAttributes().getAttribute("GRADIENT");
-        if(gradient != null) {
-            g = (Double) gradient;
+        int nPkw = 0;
+        int nLkw1 = 0;
+        int nLkw2 = 0;
+
+        switch ((RLS19VehicleType) type) {
+            case pkw:
+                nPkw = (int) ((noiseLink.getAgentsEntering(type)
+                        * (noiseParams.getScaleFactor()))
+                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                break;
+            case lkw1:
+                nLkw1 = (int) ((noiseLink.getAgentsEntering(type)
+                        * (noiseParams.getScaleFactor()))
+                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                break;
+            case lkw2:
+                nLkw2 = (int) ((noiseLink.getAgentsEntering(type)
+                        * (noiseParams.getScaleFactor()))
+                        * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
+                break;
         }
 
-        RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
-        double intersectionDistance = 0;
-        double vehicleVelocity = getV(noiseLink, (RLS19VehicleType) type);
-        return calculateSingleVehicleEmission((RLS19VehicleType) type, vehicleVelocity, g, intersectionType, intersectionDistance);
-
+        return calculateEmission(noiseLink, getV(noiseLink, pkw),getV(noiseLink, lkw1), getV(noiseLink, lkw2),
+                nPkw, nLkw1, nLkw2);
     }
 
     double calculateEmission(NoiseLink noiseLink,
