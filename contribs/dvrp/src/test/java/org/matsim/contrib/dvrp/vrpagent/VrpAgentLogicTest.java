@@ -81,10 +81,12 @@ public class VrpAgentLogicTest {
 
 	private final DynAgentLogic dynAgentLogic = new VrpAgentLogic(optimizer, VrpAgentLogicTest::createAction, vehicle,
 			DVRP_MODE, eventsManager);
+	private final DynAgent dynAgent = new DynAgent(Id.createPersonId(vehicleSpecification.getId()), startLink.getId(),
+			null, dynAgentLogic);
 
 	@Test
 	public void testInitialActivity_unplanned() {
-		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(null);
+		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		assertThat(initialActivity.getActivityType()).isEqualTo(BEFORE_SCHEDULE_ACTIVITY_TYPE);
 		assertThat(initialActivity.getEndTime()).isEqualTo(vehicleSpecification.getServiceEndTime());
@@ -93,7 +95,7 @@ public class VrpAgentLogicTest {
 
 	@Test
 	public void testInitialActivity_planned() {
-		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(null);
+		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -105,7 +107,7 @@ public class VrpAgentLogicTest {
 
 	@Test
 	public void testInitialActivity_started_failure() {
-		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(null);
+		DynActivity initialActivity = dynAgentLogic.computeInitialActivity(dynAgent);
 
 		StayTask task0 = new StayTask(TestTaskType.TYPE, 10, 90, startLink);
 		vehicle.getSchedule().addTask(task0);
@@ -182,10 +184,10 @@ public class VrpAgentLogicTest {
 	}
 
 	private TaskStartedEvent taskStartedEvent(double time, Task task) {
-		return new TaskStartedEvent(time, DVRP_MODE, vehicleSpecification.getId(), task);
+		return new TaskStartedEvent(time, DVRP_MODE, vehicleSpecification.getId(), dynAgent.getId(), task);
 	}
 
 	private TaskEndedEvent taskEndedEvent(double time, Task task) {
-		return new TaskEndedEvent(time, DVRP_MODE, vehicleSpecification.getId(), task);
+		return new TaskEndedEvent(time, DVRP_MODE, vehicleSpecification.getId(), dynAgent.getId(), task);
 	}
 }

@@ -40,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -240,7 +241,7 @@ public class DrtTripsAnalyser {
 		}
 
 		collection2Text(detours, fileName + ".csv",
-				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
+				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour", String::toString);
 
 		if (createGraphs) {
 			final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
@@ -386,7 +387,8 @@ public class DrtTripsAnalyser {
 		return chart;
 	}
 
-	public static <T> void collection2Text(Collection<T> c, String filename, String header) {
+	public static <T> void collection2Text(Collection<T> c, String filename, String header,
+			Function<T, String> toStringFunction) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			if (header != null) {
@@ -394,7 +396,7 @@ public class DrtTripsAnalyser {
 				bw.newLine();
 			}
 			for (T t : c) {
-				bw.write(t.toString());
+				bw.write(toStringFunction.apply(t));
 				bw.newLine();
 			}
 			bw.flush();
@@ -515,7 +517,7 @@ public class DrtTripsAnalyser {
 		double[] sum = new double[maxcap + 1];
 
 		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
-			for (int i = 0; i < maxcap + 1; i++) {
+			for (int i = 0; i <= maxcap; i++) {
 				sum[i] += state.totalDistanceByOccupancy[i];
 			}
 		}

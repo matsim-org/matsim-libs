@@ -58,7 +58,7 @@ public class CarrierModule extends AbstractModule {
 	}
 
 	/**
-	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
+	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must be bound separately
 	 * when this constructor is used.
 	 *
 	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
@@ -78,8 +78,7 @@ public class CarrierModule extends AbstractModule {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
-	@Override
-	public void install() {
+	@Override public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
 		bind(Carriers.class).toProvider(new CarrierProvider()).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
@@ -92,12 +91,13 @@ public class CarrierModule extends AbstractModule {
 			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 		}
 
-		// First, we need a ControlerListener.
+//		bind(CarrierControlerListener.class).in( Singleton.class );
 		bind(CarrierControlerListener.class).asEagerSingleton();
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
-	    QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
-	    List<String> abc = qsimComponents.getActiveComponents();
+		// this switches on certain qsim components:
+		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+		List<String> abc = qsimComponents.getActiveComponents();
 		abc.add( FreightAgentSource.COMPONENT_NAME ) ;
 		switch ( freightConfig.getTimeWindowHandling() ) {
 			case ignore:
@@ -110,11 +110,12 @@ public class CarrierModule extends AbstractModule {
 		}
 		qsimComponents.setActiveComponents( abc );
 
-	    this.installQSimModule( new AbstractQSimModule(){
-		    @Override protected void configureQSim(){
-		    	this.bind( FreightAgentSource.class ).in( Singleton.class );
-			    this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
-			    switch( freightConfig.getTimeWindowHandling() ) {
+		// this installs qsim components, which are switched on (or not) via the above syntax:
+		this.installQSimModule( new AbstractQSimModule(){
+			@Override protected void configureQSim(){
+				this.bind( FreightAgentSource.class ).in( Singleton.class );
+				this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
+				switch( freightConfig.getTimeWindowHandling() ) {
 					case ignore:
 						break;
 					case enforceBeginnings:
@@ -124,7 +125,7 @@ public class CarrierModule extends AbstractModule {
 						throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
 				}
 			}
-	    } );
+		} );
 
 
 		this.addControlerListenerBinding().toInstance( new ShutdownListener(){
@@ -140,6 +141,7 @@ public class CarrierModule extends AbstractModule {
 	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
 	// The freight QSim needs it (see below [[where?]]).
 	// yyyy this feels rather scary.  kai, oct'19
+	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
 	@Provides
 	CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
 		return carrierControlerListener.getCarrierAgentTracker();

@@ -45,6 +45,8 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Preconditions;
@@ -54,8 +56,8 @@ import com.google.common.base.Preconditions;
  * @author Michal Maciejewski
  */
 public class DrtPassengerAndVehicleStats
-		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, DrtRequestSubmittedEventHandler {
+		implements PersonDepartureEventHandler, DrtRequestSubmittedEventHandler, PersonEntersVehicleEventHandler,
+		LinkEnterEventHandler, TeleportationArrivalEventHandler, PersonArrivalEventHandler {
 
 	static class VehicleState {
 		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
@@ -141,21 +143,8 @@ public class DrtPassengerAndVehicleStats
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
 		if (departureEvent != null) {
-			double departureTime = departureEvent.getTime();
-			double waitTime = event.getTime() - departureTime;
-			Id<Link> departureLink = departureEvent.getLinkId();
-
-			DrtRequestSubmittedEvent requestSubmittedEvent = requestSubmittedEvents.remove(event.getPersonId());
-			double unsharedDistance = requestSubmittedEvent.getUnsharedRideDistance();
-			double unsharedTime = requestSubmittedEvent.getUnsharedRideTime();
-
-			Coord departureCoord = network.getLinks().get(departureLink).getCoord();
-			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
-					departureCoord, waitTime, unsharedDistance, unsharedTime);
-			drtTrips.add(trip);
-
-			Preconditions.checkState(currentTrips.put(event.getPersonId(), trip) == null,
-					"There is already an ongoing trip associated with this person");
+			double waitTime = event.getTime() - departureEvent.getTime();
+			createAndStoreTrip(departureEvent, event.getVehicleId(), waitTime);
 
 			vehicleStates.get(event.getVehicleId()).distanceByPersonId.put(event.getPersonId(), new MutableDouble());
 		}
@@ -170,19 +159,40 @@ public class DrtPassengerAndVehicleStats
 	}
 
 	@Override
+	public void handleEvent(TeleportationArrivalEvent event) {
+		PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
+		if (departureEvent != null) {
+			double waitTime = 0;
+			DrtTrip trip = createAndStoreTrip(departureEvent, null, waitTime);
+
+			trip.setTravelDistance(event.getDistance());
+		}
+	}
+
+	private DrtTrip createAndStoreTrip(PersonDepartureEvent event, Id<Vehicle> vehicleId, double waitTime) {
+		Coord departureCoord = network.getLinks().get(event.getLinkId()).getCoord();
+		DrtRequestSubmittedEvent requestSubmittedEvent = requestSubmittedEvents.remove(event.getPersonId());
+		DrtTrip trip = new DrtTrip(event.getTime(), event.getPersonId(), vehicleId, event.getLinkId(), departureCoord,
+				waitTime, requestSubmittedEvent.getUnsharedRideDistance(), requestSubmittedEvent.getUnsharedRideTime());
+
+		drtTrips.add(trip);
+		Preconditions.checkState(currentTrips.put(event.getPersonId(), trip) == null,
+				"There is already an ongoing trip associated with this person");
+		return trip;
+	}
+
+	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(mode)) {
 			DrtTrip trip = currentTrips.remove(event.getPersonId());
-			if (trip != null) {
+			if (trip.getVehicle() != null) {// not teleported
 				double distance = vehicleStates.get(trip.getVehicle()).distanceByPersonId.remove(event.getPersonId())
 						.doubleValue();
 				trip.setTravelDistance(distance);
-				trip.setArrivalTime(event.getTime());
-				trip.setToLink(event.getLinkId());
-				trip.setToCoord(network.getLinks().get(event.getLinkId()).getCoord());
-			} else {
-				throw new IllegalStateException("Arrival without departure?");
 			}
+			trip.setArrivalTime(event.getTime());
+			trip.setToLink(event.getLinkId());
+			trip.setToCoord(network.getLinks().get(event.getLinkId()).getCoord());
 		}
 	}
 

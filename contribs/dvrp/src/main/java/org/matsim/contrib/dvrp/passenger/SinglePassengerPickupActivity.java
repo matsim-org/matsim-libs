@@ -25,18 +25,18 @@ import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
-	private final PassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final DynAgent driver;
 	private final PassengerRequest request;
 	private final double expectedEndTime;
 
 	private boolean passengerAboard = false;
 
-	public SinglePassengerPickupActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask pickupTask,
+	public SinglePassengerPickupActivity(PassengerHandler passengerHandler, DynAgent driver, StayTask pickupTask,
 			PassengerRequest request, String activityType) {
 		super(activityType);
 
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.driver = driver;
 		this.request = request;
 		this.expectedEndTime = pickupTask.getEndTime();
@@ -49,7 +49,7 @@ public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity i
 
 	@Override
 	protected void beforeFirstStep(double now) {
-		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class SinglePassengerPickupActivity extends FirstLastSimStepDynActivity i
 			throw new IllegalArgumentException("I am waiting for a different passenger!");
 		}
 
-		passengerAboard = passengerEngine.pickUpPassenger(this, driver, request, now);
+		passengerAboard = passengerHandler.tryPickUpPassenger(this, driver, request, now);
 		if (!passengerAboard) {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
 		}

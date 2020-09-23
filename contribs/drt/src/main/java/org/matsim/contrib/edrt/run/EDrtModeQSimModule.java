@@ -42,8 +42,8 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -176,7 +176,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						new EDrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
-				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerEngine.class),
+				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class),
 						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
 
