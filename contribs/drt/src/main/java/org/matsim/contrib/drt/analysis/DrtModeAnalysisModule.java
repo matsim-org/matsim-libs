@@ -24,8 +24,6 @@
 package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalWaitTimesAnalyzer;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -34,7 +32,6 @@ import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
@@ -61,12 +58,13 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		bindModal(DrtPassengerAndVehicleStats.class).toProvider(modalProvider(
-				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), getter.get(EventsManager.class),
-						drtCfg, getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), drtCfg,
+						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtPassengerAndVehicleStats.class));
 
-		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(
-				getter -> new DrtRequestAnalyzer(getter.get(EventsManager.class), getter.get(Network.class), drtCfg)))
+		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(getter -> new DrtRequestAnalyzer(drtCfg)))
 				.asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtRequestAnalyzer.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
@@ -75,9 +73,9 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
 
 		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
-				getter -> new DrtVehicleOccupancyProfileCalculator(getter.getModal(FleetSpecification.class),
-						getter.get(EventsManager.class), 300, getter.get(QSimConfigGroup.class),
-						nonPassengerServingTaskTypes)));
+				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
+						300, getter.get(QSimConfigGroup.class), nonPassengerServingTaskTypes))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,

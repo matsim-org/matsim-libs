@@ -429,6 +429,12 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.10.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>3.3.3</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<properties>

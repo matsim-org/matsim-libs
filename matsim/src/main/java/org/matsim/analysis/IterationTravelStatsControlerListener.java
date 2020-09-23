@@ -21,7 +21,11 @@
 
  package org.matsim.analysis;
 
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.log4j.Logger;
@@ -35,14 +39,9 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.io.IOUtils;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 class IterationTravelStatsControlerListener implements IterationEndsListener, ShutdownListener {
 
@@ -70,15 +69,22 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     @Inject
     TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
 
+    @Inject
+    AnalysisMainModeIdentifier mainModeIdentifier;
+
+    Logger log = Logger.getLogger(IterationTravelStatsControlerListener.class);
+
 	@Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
+        pHbyModeCalculator.writeOutput();
+        pkMbyModeCalculator.writeOutput();
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
         final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
-            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension).write(experiencedPlansService.getExperiencedPlans()
+            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.legscsv));
         }
@@ -88,9 +94,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		travelDistanceStats.close();
-		// TODO: this way the statistics are written only at the end. Better after each iteration?
-        pHbyModeCalculator.writeOutput();
-        pkMbyModeCalculator.writeOutput();
+
         if (config.controler().getWriteTripsInterval() > 0) {
             writePersonsCSV();
         }
@@ -102,25 +106,35 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         attributes.remove("vehicles");
         List<String> header = new ArrayList<>();
         header.add("person");
+        header.add("executed_score");
         header.add("first_act_x");
         header.add("first_act_y");
+        header.add("first_act_type");
         header.addAll(attributes);
         try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputDirectoryHierarchy.getOutputFilename(Controler.DefaultFiles.personscsv)),
                 CSVFormat.DEFAULT.withDelimiter(config.global().getDefaultDelimiter().charAt(0)).withHeader(header.stream().toArray(String[]::new)))) {
             for (Person p : scenario.getPopulation().getPersons().values()) {
+                if (p.getSelectedPlan() == null) {
+                    log.error("Found person without a selected plan: " + p.getId().toString() + " will not be added to output_persons.csv");
+                    continue;
+                }
                 List<String> line = new ArrayList<>();
                 line.add(p.getId().toString());
+                line.add(p.getSelectedPlan().getScore() == null ? "null" : p.getSelectedPlan().getScore().toString());
                 String x = "";
                 String y = "";
+                String actType = "";
                 if (p.getSelectedPlan().getPlanElements().size() > 0) {
                     Activity firstAct = (Activity) p.getSelectedPlan().getPlanElements().get(0);
                     if (firstAct.getCoord() != null) {
                         x = Double.toString(firstAct.getCoord().getX());
                         y = Double.toString(firstAct.getCoord().getY());
                     }
+                    actType = firstAct.getType();
                 }
                 line.add(x);
                 line.add(y);
+                line.add(actType);
                 for (String attribute : attributes) {
                     Object value = p.getAttributes().getAttribute(attribute);
                     String result = value != null ? String.valueOf(value) : "";

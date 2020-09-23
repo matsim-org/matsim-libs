@@ -57,7 +57,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(1, parser.getWays().size());
-		assertEquals(3, parser.getNodes().size());
+		assertEquals(4, parser.getNodes().size());
 		assertEquals(1, parser.getSignalizedNodes().size());
 		assertEquals(0, parser.getNodeRestrictions().size());
 
@@ -91,7 +91,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(1, parser.getWays().size());
-		assertEquals(3, parser.getNodes().size());
+		assertEquals(4, parser.getNodes().size());
 		assertEquals(1, parser.getSignalizedNodes().size());
 		assertEquals(0, parser.getNodeRestrictions().size());
 
@@ -125,7 +125,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(1, parser.getWays().size());
-		assertEquals(3, parser.getNodes().size());
+		assertEquals(4, parser.getNodes().size());
 		assertEquals(0, parser.getSignalizedNodes().size());
 		assertEquals(0, parser.getNodeRestrictions().size());
 	}
@@ -145,7 +145,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(1, parser.getWays().size());
-		assertEquals(3, parser.getNodes().size());
+		assertEquals(4, parser.getNodes().size());
 		assertEquals(0, parser.getSignalizedNodes().size());
 		assertEquals(0, parser.getNodeRestrictions().size());
 	}
@@ -166,7 +166,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(2, parser.getWays().size());
-		assertEquals(5, parser.getNodes().size());
+		assertEquals(17, parser.getNodes().size());
 		assertEquals(0, parser.getSignalizedNodes().size());
 		assertEquals(1, parser.getNodeRestrictions().size());
 
@@ -193,7 +193,7 @@ public class OsmSignalsParserTest {
 		parser.parse(file);
 
 		assertEquals(2, parser.getWays().size());
-		assertEquals(5, parser.getNodes().size());
+		assertEquals(17, parser.getNodes().size());
 		assertEquals(0, parser.getSignalizedNodes().size());
 		assertEquals(1, parser.getNodeRestrictions().size());
 

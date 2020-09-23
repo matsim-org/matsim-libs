@@ -1,18 +1,39 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
 import java.util.Iterator;
 
 public class HLink {
 
+	private float currentCapacity;
+	private final int initialCapacity;
+
 	// The whole purpose of this implementation is to have a dynamically sized queue that never goes over the capacity
 	// restriction. This becomes a big memory waste when large scenarios are used. This implementation is inspired in
 	// Java's implementation of ArrayDequeue.
 	public class AgentQueue implements Iterable<Agent> {
+
 		// the storage
 		private Agent[] array;
 		// the max capacity of the queue
 		private int maxcapacity;
-		private final int maxPhysicalCapacity;
 
 		// Pop/peak from head
 		private int head;
@@ -23,7 +44,6 @@ public class HLink {
 
 		public AgentQueue(int maxcapacity, int initialcapacity) {
 			this.maxcapacity = maxcapacity;
-			this.maxPhysicalCapacity = maxcapacity;
 			this.array = new Agent[initialcapacity];
 		}
 
@@ -45,23 +65,14 @@ public class HLink {
 			if (size == 0) {
 				array[tail] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			} else if (array.length > size) {
 				array[tail = inc(tail)] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			} else {
-				if (array.length >= maxcapacity) {
-					return false;
-				}
 				// expand array
-				Agent[] narray = new Agent[Math.min(maxcapacity, array.length * 2)];
+				Agent[] narray = new Agent[array.length * 2];
 				for (int i = head, left = size, dst = 0; left > 0; i = inc(i), left--, dst++) {
 					narray[dst] = array[i];
 				}
@@ -71,9 +82,6 @@ public class HLink {
 				// push
 				array[tail = inc(tail)] = agent;
 				size += 1;
-				if (size<=maxPhysicalCapacity){
-					maxcapacity = maxPhysicalCapacity;
-				}
 				return true;
 			}
 		}
@@ -137,52 +145,68 @@ public class HLink {
     private final int velocity;
     // Queues of agents on this link. Boundary links use both queues.
     private final AgentQueue queue;
-    // Number of time steps necessary to reset the flow.
-    private final int flowPeriod;
-    // Number of vehicles that can leave the link per time period.
-    private final int flowCapacity;
+    // Number of vehicles that can leave the link per time second.
+    private final float flowCapacityPerS;
+    private float flowLeftInTimestep;
+    private int lastUpdate;
     // When (which timestep) flow was updated the last time.
-    private int lastFlowUpdate;
+    private int nextFreeFlowSlot;
 	private int lastPush;
 	private final int stuckTimePeriod;
 
-    public HLink(int id, int capacity, int length, int velocity, int flowPeriod, int flowCapacity, int stuckTimePeriod) {
+    public HLink(int id, int capacity, int length, int velocity,  float flowCapacityperSecond, int stuckTimePeriod) {
         this.id = id;
         this.length = length;
         this.velocity = velocity;
-        this.flowPeriod = flowPeriod;
-        this.flowCapacity = flowCapacity;
-        this.lastFlowUpdate = 0;
+        this.flowCapacityPerS = flowCapacityperSecond;
         this.stuckTimePeriod = stuckTimePeriod;
         this.lastPush = 0;
-        // We do not preallocate using the capacity because it leads to huge memory waste.
-        //this.queue = new AgentQueue(Math.max(1, capacity));
-        this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
-    }
+        this.lastUpdate = 0;
+        this.nextFreeFlowSlot = 0;
+        this.initialCapacity = capacity;
+        this.currentCapacity = capacity;
+        this.flowLeftInTimestep = flowCapacityperSecond;
 
-    public void reset() {
-    	queue.clear();
-    	this.lastFlowUpdate = 0;
-    }
+		// We do not preallocate using the capacity because it leads to huge memory waste.
+		//this.queue = new AgentQueue(Math.max(1, capacity));
+		this.queue = new AgentQueue(Math.max(1, capacity), Math.min(capacity, 16));
+	}
 
-	public boolean push(Agent agent, int timestep) {
-		if( queue.push(agent)){
-			lastPush = timestep;
-			return true;
-		}
-		else if ((lastPush + stuckTimePeriod) < timestep){
+	public void reset() {
+		queue.clear();
+		this.nextFreeFlowSlot = 0;
+		this.lastPush = 0;
+		this.lastUpdate = 0;
+		this.currentCapacity = initialCapacity;
+		this.flowLeftInTimestep = flowCapacityPerS;
+
+	}
+
+	public boolean push(Agent agent, int timestep, float storageCapacityPCU) {
+		//avoid long vehicles not being able to enter a short link
+		float effectiveStorageCapacity = Math.min(storageCapacityPCU, initialCapacity);
+		if (currentCapacity - effectiveStorageCapacity >= 0) {
+			if (queue.push(agent)) {
+				lastPush = timestep;
+				currentCapacity = currentCapacity - effectiveStorageCapacity;
+				return true;
+			} else {
+				throw new RuntimeException("should not happen?");
+			}
+		} else if (stuckTimePeriod != Integer.MAX_VALUE && (lastPush + stuckTimePeriod) < timestep) {
 			boolean result = queue.forcePush(agent);
-			lastPush= timestep;
+			lastPush = timestep;
+			currentCapacity = currentCapacity - effectiveStorageCapacity;
 			return result;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
 
-    public void pop() {
-        queue.pop();
-    }
+	public void pop(float storageCapacityPCE) {
+		queue.pop();
+		currentCapacity += storageCapacityPCE;
+	}
 
     public int nexttime () {
         if (queue.size() == 0) {
@@ -196,12 +220,24 @@ public class HLink {
         return this.length;
     }
 
-    public int flow(int timestep) {
-    	if (timestep - lastFlowUpdate >= flowPeriod) {
-    		lastFlowUpdate = timestep;
-    		return flowCapacity;
+    public boolean flow(int timestep, float requestedFlow) {
+    	if (timestep  >= nextFreeFlowSlot) {
+			// if requestedFlow<flowCapacityPerS, more than one vehicle can pass per timestep
+			if (lastUpdate == timestep){
+				if (flowLeftInTimestep >= 0) {
+					flowLeftInTimestep-=requestedFlow;
+					nextFreeFlowSlot = timestep + (int) Math.floor( requestedFlow / flowCapacityPerS);
+					return true;
+				} else return false;
+			} else {
+				flowLeftInTimestep=flowLeftInTimestep+flowCapacityPerS-requestedFlow;
+				lastUpdate = timestep;
+				nextFreeFlowSlot = timestep + (int) Math.floor( requestedFlow / flowCapacityPerS);
+				return true;
+			}
+
     	} else {
-    		return 0;
+    		return false;
     	}
     }
 

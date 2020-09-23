@@ -23,7 +23,7 @@ import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiT
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -42,14 +42,14 @@ import com.google.inject.Inject;
  * @author michalm
  */
 final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
-	private final PassengerEngine passengerEngine;
+	private final PassengerHandler passengerHandler;
 	private final MobsimTimer timer;
 	private final String mobsimMode;
 
 	@Inject
-	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerEngine passengerEngine, MobsimTimer timer,
+	public OneTaxiActionCreator(@DvrpMode(TransportMode.taxi) PassengerHandler passengerHandler, MobsimTimer timer,
 			DvrpConfigGroup dvrpCfg) {
-		this.passengerEngine = passengerEngine;
+		this.passengerHandler = passengerHandler;
 		this.timer = timer;
 		this.mobsimMode = dvrpCfg.getMobsimMode();
 	}
@@ -64,12 +64,12 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 			case PICKUP:
 				OneTaxiServeTask pickupTask = (OneTaxiServeTask)task;
-				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pickupTask, pickupTask.getRequest(),
-						"OneTaxiPickup");
+				return new SinglePassengerPickupActivity(passengerHandler, dynAgent, pickupTask,
+						pickupTask.getRequest(), "OneTaxiPickup");
 
 			case DROPOFF:
 				OneTaxiServeTask dropoffTask = (OneTaxiServeTask)task;
-				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dropoffTask,
+				return new SinglePassengerDropoffActivity(passengerHandler, dynAgent, dropoffTask,
 						dropoffTask.getRequest(), "OneTaxiDropoff");
 
 			case WAIT:

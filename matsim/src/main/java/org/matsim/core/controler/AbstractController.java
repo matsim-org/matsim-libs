@@ -24,6 +24,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.MemoryObserver;
 
 /*package*/ abstract class AbstractController {
@@ -161,7 +162,11 @@ import org.matsim.utils.MemoryObserver;
         });
 
         this.getStopwatch().endIteration();
-        this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        try {
+            this.getStopwatch().writeTextFile(this.getControlerIO().getOutputFilename("stopwatch"));
+        } catch (UncheckedIOException e) {
+            log.error("Could not write stopwatch file.", e);
+        }
         if (config.controler().isCreateGraphs()) {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }

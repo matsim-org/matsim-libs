@@ -22,167 +22,143 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.jfree.chart.ChartUtils;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.xy.XYSeries;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
 
 /**
+ * Creates PerformedRequestEventSequence (for scheduled requests) and RejectedRequestEventSequence (for rejected requests).
+ * Almost all data for request/trip analysis is there (except info on actual paths), so should be quite reusable.
+ *
  * @author jbischoff
+ * @author Michal Maciejewski
  */
 public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler, PassengerRequestScheduledEventHandler,
-		DrtRequestSubmittedEventHandler, PersonEntersVehicleEventHandler {
+		DrtRequestSubmittedEventHandler, PassengerPickedUpEventHandler, PassengerDroppedOffEventHandler {
 
-	private final Map<Id<Request>, DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
-	private final Map<Id<Request>, Tuple<Double, Double>> waitTimeCompare = new HashMap<>();
-	private final Map<Id<Person>, PassengerRequestScheduledEvent> scheduledRequests = new HashMap<>();
-	private final List<String> rejections = new ArrayList<>();
-	private final Network network;
+	public static class PerformedRequestEventSequence {
+		private final DrtRequestSubmittedEvent submitted;
+		private final PassengerRequestScheduledEvent scheduled;
+		private PassengerPickedUpEvent pickedUp;
+		private PassengerDroppedOffEvent droppedOff;
+
+		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
+				PassengerRequestScheduledEvent scheduled) {
+			this.submitted = submitted;
+			this.scheduled = scheduled;
+		}
+
+		public DrtRequestSubmittedEvent getSubmitted() {
+			return submitted;
+		}
+
+		public PassengerRequestScheduledEvent getScheduled() {
+			return scheduled;
+		}
+
+		public PassengerPickedUpEvent getPickedUp() {
+			return pickedUp;
+		}
+
+		public PassengerDroppedOffEvent getDroppedOff() {
+			return droppedOff;
+		}
+	}
+
+	public static class RejectedRequestEventSequence {
+		private final DrtRequestSubmittedEvent submitted;
+		private final PassengerRequestRejectedEvent rejected;
+
+		public RejectedRequestEventSequence(DrtRequestSubmittedEvent submitted,
+				PassengerRequestRejectedEvent rejected) {
+			this.submitted = submitted;
+			this.rejected = rejected;
+		}
+
+		public DrtRequestSubmittedEvent getSubmitted() {
+			return submitted;
+		}
+
+		public PassengerRequestRejectedEvent getRejected() {
+			return rejected;
+		}
+	}
+
 	private final DrtConfigGroup drtCfg;
+	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
+	private final Map<Id<Request>, RejectedRequestEventSequence> rejectedRequestSequences = new HashMap<>();
+	private final Map<Id<Request>, PerformedRequestEventSequence> performedRequestSequences = new HashMap<>();
 
-	public DrtRequestAnalyzer(EventsManager events, Network network, DrtConfigGroup drtCfg) {
-		events.addHandler(this);
-		this.network = network;
+	public DrtRequestAnalyzer(DrtConfigGroup drtCfg) {
 		this.drtCfg = drtCfg;
+	}
+
+	public Map<Id<Request>, DrtRequestSubmittedEvent> getRequestSubmissions() {
+		return requestSubmissions;
+	}
+
+	public Map<Id<Request>, RejectedRequestEventSequence> getRejectedRequestSequences() {
+		return rejectedRequestSequences;
+	}
+
+	public Map<Id<Request>, PerformedRequestEventSequence> getPerformedRequestSequences() {
+		return performedRequestSequences;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		submittedRequests.clear();
-		scheduledRequests.clear();
-		waitTimeCompare.clear();
-		rejections.clear();
+		requestSubmissions.clear();
+		rejectedRequestSequences.clear();
+		performedRequestSequences.clear();
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (this.scheduledRequests.containsKey(event.getPersonId())) {
-			PassengerRequestScheduledEvent scheduled = scheduledRequests.remove(event.getPersonId());
-			DrtRequestSubmittedEvent submission = this.submittedRequests.remove(scheduled.getRequestId());
-			double actualWaitTime = event.getTime() - submission.getTime();
-			double estimatedWaitTime = scheduled.getPickupTime() - submission.getTime();
-			waitTimeCompare.put(submission.getRequestId(), Tuple.of(actualWaitTime, estimatedWaitTime));
-
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (event.getMode().equals(drtCfg.getMode())) {
+			requestSubmissions.put(event.getRequestId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		if (!event.getMode().equals(drtCfg.getMode())) {
-			return;
+		if (event.getMode().equals(drtCfg.getMode())) {
+			performedRequestSequences.put(event.getRequestId(),
+					new PerformedRequestEventSequence(requestSubmissions.get(event.getRequestId()), event));
 		}
-		DrtRequestSubmittedEvent submission = this.submittedRequests.get(event.getRequestId());
-		if (submission != null) {
-			this.scheduledRequests.put(submission.getPersonId(), event);
-		} else
-			throw new RuntimeException("Vehicle allocation without submission?");
-	}
-
-	@Override
-	public void handleEvent(DrtRequestSubmittedEvent event) {
-		if (!event.getMode().equals(drtCfg.getMode())) {
-			return;
-		}
-		this.submittedRequests.put(event.getRequestId(), event);
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		if (!event.getMode().equals(drtCfg.getMode())) {
-			return;
+		if (event.getMode().equals(drtCfg.getMode())) {
+			rejectedRequestSequences.put(event.getRequestId(),
+					new RejectedRequestEventSequence(requestSubmissions.get(event.getRequestId()), event));
 		}
-		DrtRequestSubmittedEvent submission = this.submittedRequests.remove(event.getRequestId());
-		Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
-		Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();
-		this.rejections.add(submission.getTime()
-				+ ";"
-				+ submission.getPersonId()
-				+ ";"
-				+ submission.getFromLinkId()
-				+ ";"
-				+ submission.getToLinkId()
-				+ ";"
-				+ fromCoord.getX()
-				+ ";"
-				+ fromCoord.getY()
-				+ ";"
-				+ toCoord.getX()
-				+ ";"
-				+ toCoord.getY());
 	}
 
-	/**
-	 * @return the waitTimeCompare
-	 */
-	public Map<Id<Request>, Tuple<Double, Double>> getWaitTimeCompare() {
-		return waitTimeCompare;
+	@Override
+	public void handleEvent(PassengerPickedUpEvent event) {
+		if (event.getMode().equals(drtCfg.getMode())) {
+			performedRequestSequences.get(event.getRequestId()).pickedUp = event;
+		}
 	}
 
-	/**
-	 * @return the rejections
-	 */
-	public List<String> getRejections() {
-		return rejections;
-	}
-
-	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName, boolean createChart) {
-		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
-
-		XYSeries times = new XYSeries("waittimes", true, true);
-
-		try {
-			bw.append("RequestId;actualWaitTime;estimatedWaitTime;deviate");
-			for (Entry<Id<Request>, Tuple<Double, Double>> e : this.waitTimeCompare.entrySet()) {
-				bw.newLine();
-				double first = e.getValue().getFirst();
-				double second = e.getValue().getSecond();
-				bw.append(e.getKey().toString())
-						.append(";")
-						.append(String.valueOf(first))
-						.append(";")
-						.append(String.valueOf(second))
-						.append(";")
-						.append(String.valueOf(first - second));
-				times.add(first, second);
-			}
-			bw.flush();
-			bw.close();
-
-			if (createChart) {
-				final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
-						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
-				//			xAxis.setLowerBound(0);
-				//			yAxis.setLowerBound(0);
-				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
-			}
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+	@Override
+	public void handleEvent(PassengerDroppedOffEvent event) {
+		if (event.getMode().equals(drtCfg.getMode())) {
+			performedRequestSequences.get(event.getRequestId()).droppedOff = event;
 		}
 	}
 }
