@@ -28,51 +28,52 @@
 
 package org.matsim.contrib.freight.controler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.Collection;
+
+
 /**
  * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
  * this template use File | Settings | File Templates.
  * 
  */
- class FreightAgentSource implements AgentSource {
-	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
+public class LSPAgentSource implements AgentSource {
 
-	private static Logger log = Logger.getLogger(FreightAgentSource.class);
-	private final CarrierAgentTracker tracker;
+	public static final String COMPONENT_NAME = LSPAgentSource.class.getSimpleName();
+	private static final Logger log = Logger.getLogger( LSPAgentSource.class );
+	
+	private final Collection<Plan> vehicleRoutes;
+	
+	private final AgentFactory agentFactory;
 
-	private Collection<MobsimAgent> mobSimAgents;
+	private final QSim qsim;
 
-	private AgentFactory agentFactory;
-
-	private QSim qsim;
-
-	@Inject
-	FreightAgentSource(CarrierAgentTracker tracker, AgentFactory agentFactory, QSim qsim) {
-		this.tracker = tracker;
+	@Inject LSPAgentSource( CarrierAgentTracker carrierAgentTracker, AgentFactory agentFactory, QSim qsim ) {
+		this.vehicleRoutes = carrierAgentTracker.createPlans();
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
-		mobSimAgents = new ArrayList<MobsimAgent>();
 	}
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for ( Plan vRoute : tracker.createPlans()) {
+		for ( Plan vRoute : vehicleRoutes) {
+
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPerson());
-			Vehicle vehicle = null;
+			Gbl.assertNotNull( agent );
+
+			Vehicle vehicle;
 			if( FreightControlerUtils.getVehicle( vRoute ) == null){
 				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 				log.warn("vehicle for agent "+vRoute.getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
@@ -82,21 +83,15 @@ import org.matsim.vehicles.VehicleUtils;
 				log.warn("vehicleType for agent "+vRoute.getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
 			}
 			else vehicle = FreightControlerUtils.getVehicle( vRoute );
-//			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
-			
-			QVehicle qVehicle = new QVehicleImpl( vehicle ) ;
-			qsim.addParkedVehicle( qVehicle, agent.getCurrentLinkId() );
-			// yyyyyy should rather use QVehicleFactory.  kai, nov'18
-			
+			Gbl.assertNotNull(vehicle);
+
+			QVehicleImpl qVeh = new QVehicleImpl( vehicle );
+			Gbl.assertNotNull( qVeh );
+
+			qsim.addParkedVehicle( qVeh, agent.getCurrentLinkId() );
 			qsim.insertAgentIntoMobsim(agent);
-			mobSimAgents.add(agent);
+			log.warn( "just added vehicle with id=" + qVeh.getId() + " and agent with id=" + agent.getId() );
 		}
 	}
-
-	public Collection<MobsimAgent> getMobSimAgents() {
-		return mobSimAgents;
-	}
-	
-	
 
 }

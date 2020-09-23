@@ -651,8 +651,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	@Inject
-	void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+	@Inject void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+		// I think that "injecting a method" means that the method is called at some point, pulling the method arguments out of injection.  In
+		// consequence, it is assumed that a "Set<MobsimListener>" was bound before, and is used here.  I think that the results of
+		// multibinding will be provided in several ways, one of them as this kind of set.  Thus, the working assumption is that the
+		// <MobsimListener> multibinder that is constructed in AbstractModule is retrieved here.  kai, sep'20
+		
 		for (MobsimListener listener : listeners) {
 			this.listenerManager.addQueueSimulationListener(listener);
 		}

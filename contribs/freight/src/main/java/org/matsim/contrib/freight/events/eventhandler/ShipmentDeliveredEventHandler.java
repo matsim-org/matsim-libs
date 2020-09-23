@@ -1,5 +1,6 @@
-package org.matsim.contrib.freight.events;
+package org.matsim.contrib.freight.events.eventhandler;
 
+import org.matsim.contrib.freight.events.ShipmentDeliveredEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
