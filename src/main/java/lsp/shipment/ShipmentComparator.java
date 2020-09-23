@@ -2,12 +2,12 @@ package lsp.shipment;
 
 import java.util.Comparator;
 
-import lsp.ShipmentTuple;
+import lsp.ShipmentWithTime;
 
-public final class ShipmentComparator implements Comparator<ShipmentTuple>{
+public final class ShipmentComparator implements Comparator<ShipmentWithTime>{
 
 	@Override
-	public int compare(ShipmentTuple o1, ShipmentTuple o2) {
+	public int compare( ShipmentWithTime o1, ShipmentWithTime o2 ) {
 		return Double.compare(o1.getTime(), o2.getTime());
 	}
 }

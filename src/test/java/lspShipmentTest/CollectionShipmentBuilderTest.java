@@ -76,7 +76,7 @@ public class CollectionShipmentBuilderTest {
 			assertNotNull(shipment.getCapacityDemand());
 			assertNotNull(shipment.getEndTimeWindow());
 			assertNotNull(shipment.getFromLinkId());
-			assertNotNull(shipment.getServiceTime());
+			assertNotNull(shipment.getServiceDuration() );
 			assertNotNull(shipment.getToLinkId());
 			assertNotNull(shipment.getStartTimeWindow());
 			assertNotNull(shipment.getSchedule());

@@ -3,20 +3,20 @@ package example.lsp.lspScoring;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import lsp.functions.InfoFunctionUtils;
+import lsp.functions.LSPInfoFunctionUtils;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
-import lsp.functions.InfoFunctionValue;
-import lsp.controler.SimulationTracker;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunctionValue;
+import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class TipSimulationTracker implements SimulationTracker {
+/*package-private*/ class TipSimulationTracker implements LSPSimulationTracker{
 
 	private TipEventHandler handler;
-	private Info info;
+	private LSPInfo info;
 
-	/*package-private*/ TipSimulationTracker(TipEventHandler handler, Info info) {
+	/*package-private*/ TipSimulationTracker(TipEventHandler handler, LSPInfo info) {
 		this.info = info;
 		this.handler = handler;
 	}
@@ -29,8 +29,8 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
-		ArrayList<Info> infos = new ArrayList<Info>();
+	public Collection<LSPInfo> getInfos() {
+		ArrayList<LSPInfo> infos = new ArrayList<LSPInfo>();
 		infos.add(info);
 		return infos;
 	}
@@ -38,7 +38,7 @@ import lsp.controler.SimulationTracker;
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		double tip = handler.getTip();
-		InfoFunctionValue<Double>  value = InfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
+		LSPInfoFunctionValue<Double> value = LSPInfoFunctionUtils.createInfoFunctionValue("TIP IN EUR" );
 		value.setValue(tip);
 		info.getFunction().getValues().add(value);
 	}

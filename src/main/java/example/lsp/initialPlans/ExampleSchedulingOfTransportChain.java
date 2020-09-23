@@ -12,12 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -25,7 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 /*A transport chain with five elements (collection-> reloading -> main run -> reloading -> delivery) is created and scheduled
  * 
@@ -49,26 +44,26 @@ import lsp.resources.Resource;
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setVehicleType(collectionType);
-		
+		carrierVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-		
-		Carrier collectionCarrier = CarrierImpl.newInstance(collectionCarrierId);
+
+		Carrier collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
 		collectionCarrier.setCarrierCapabilities(capabilities);
 		
 		//The collection adapter i.e. the Resource is created
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		adapterBuilder.setCarrier(collectionCarrier);
 		adapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource collectionAdapter = adapterBuilder.build();
+		LSPResource collectionAdapter = adapterBuilder.build();
 		
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
@@ -78,7 +73,7 @@ import lsp.resources.Resource;
 
 		
 		//The first reloading adapter i.e. the Resource is created
-        Id<Resource> firstReloadingId = Id.create("ReloadingPoint1", Resource.class);
+        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
         Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
         
@@ -89,7 +84,7 @@ import lsp.resources.Resource;
         
         //The scheduler is added to the Resource and the Resource is created
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
         //The SolutionElement for the first reloading point is created
         Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
@@ -113,18 +108,18 @@ import lsp.resources.Resource;
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> mainRunVehicleId = Id.createVehicleId("MainRunVehicle");
 		CarrierVehicle mainRunCarrierVehicle = CarrierVehicle.newInstance(mainRunVehicleId, fromLinkId);
-		mainRunCarrierVehicle.setVehicleType(mainRunType);
-					
+		mainRunCarrierVehicle.setType( mainRunType );
+
 		CarrierCapabilities.Builder mainRunCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		mainRunCapabilitiesBuilder.addType(mainRunType);
 		mainRunCapabilitiesBuilder.addVehicle(mainRunCarrierVehicle);
 		mainRunCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities mainRunCapabilities = mainRunCapabilitiesBuilder.build();
-		Carrier mainRunCarrier = CarrierImpl.newInstance(mainRunCarrierId);
+		Carrier mainRunCarrier = CarrierUtils.createCarrier( mainRunCarrierId );
 		mainRunCarrier.setCarrierCapabilities(mainRunCapabilities);
         
 		//The adapter i.e. the main run resource is created
-		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
         UsecaseUtils.MainRunCarrierAdapterBuilder mainRunAdapterBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunAdapterBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
@@ -132,7 +127,7 @@ import lsp.resources.Resource;
         
         //The scheduler for the main run Rescource is created and added to the Resource
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
-        Resource mainRunAdapter = mainRunAdapterBuilder.build();
+        LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
 
         //The LogisticsSolutionElement for the main run Resource is created
         Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
@@ -142,7 +137,7 @@ import lsp.resources.Resource;
 		
 		
 		//The second reloading adapter i.e. the Resource is created       
-        Id<Resource> secondReloadingId = Id.create("ReloadingPoint2", Resource.class);
+        Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
         UsecaseUtils.ReloadingPointBuilder secondReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(secondReloadingId, secondReloadingLinkId);
         
@@ -153,7 +148,7 @@ import lsp.resources.Resource;
        
         //The scheduler is added to the Resource and the Resource is created
         secondReloadingPointBuilder.setReloadingScheduler(secondSchedulerBuilder.build());
-        Resource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
+        LSPResource secondReloadingPointAdapter = secondReloadingPointBuilder.build();
         
         //The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
         Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement", LogisticsSolutionElement.class);
@@ -176,25 +171,25 @@ import lsp.resources.Resource;
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		distributionCarrierVehicle.setVehicleType(distributionType);
-			
+		distributionCarrierVehicle.setType( distributionType );
+
 		CarrierCapabilities.Builder distributionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		distributionCapabilitiesBuilder.addType(distributionType);
 		distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
-		Carrier distributionCarrier = CarrierImpl.newInstance(distributionCarrierId);
+		Carrier distributionCarrier = CarrierUtils.createCarrier( distributionCarrierId );
 		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 		
 		//The distribution adapter i.e. the Resource is created
-		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setCarrier(distributionCarrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
-		Resource distributionAdapter = distributionAdapterBuilder.build();
+		LSPResource distributionAdapter = distributionAdapterBuilder.build();
 		
 		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
@@ -236,7 +231,7 @@ import lsp.resources.Resource;
 		completeLSPBuilder.setId(completeLSPId);
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);

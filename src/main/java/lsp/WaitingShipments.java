@@ -8,9 +8,9 @@ public interface WaitingShipments {
 
 	public void addShipment(double time ,LSPShipment shipment);
 	
-	public Collection<ShipmentTuple> getSortedShipments();
+	public Collection<ShipmentWithTime> getSortedShipments();
 	
-	public Collection<ShipmentTuple> getShipments();
+	public Collection<ShipmentWithTime> getShipments();
 	
 	public void clear();
 	

@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 class ScheduledShipmentHandle implements ShipmentPlanElement {
 
@@ -12,7 +12,7 @@ class ScheduledShipmentHandle implements ShipmentPlanElement {
 	private double startTime;
 	private double endTime;
 	private LogisticsSolutionElement element;
-	private Id<Resource> resourceId;
+	private Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 
 	ScheduledShipmentHandle( ShipmentUtils.ScheduledShipmentHandleBuilder builder ){
@@ -43,7 +43,7 @@ class ScheduledShipmentHandle implements ShipmentPlanElement {
 	}
 
 	@Override
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

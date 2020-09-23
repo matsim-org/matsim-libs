@@ -11,20 +11,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 
 
@@ -37,7 +33,7 @@ public class CollectionAdapterTest {
 	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
-	private CarrierResource carrierResource;
+	private LSPCarrierResource carrierResource;
 	private Id<Link> collectionLinkId;
 	private CarrierCapabilities capabilities;
 	
@@ -62,18 +58,18 @@ public class CollectionAdapterTest {
 		collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
 		collectionCarrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		collectionCarrierVehicle.setVehicleType(collectionType);
-		
+		collectionCarrierVehicle.setType( collectionType );
+
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(collectionType);
 		capabilitiesBuilder.addVehicle(collectionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
-		collectionCarrier = CarrierImpl.newInstance(carrierId);
+		collectionCarrier = CarrierUtils.createCarrier( carrierId );
 		collectionCarrier.setCarrierCapabilities(capabilities);
 		
 		
-		Id<Resource> adapterId = Id.create("CollectionCarrierAdapter", Resource.class);
+		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.CollectionCarrierAdapterBuilder builder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
 		builder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
 		builder.setCarrier(collectionCarrier);
@@ -86,8 +82,8 @@ public class CollectionAdapterTest {
 	public void testCollectionAdapter() {
 		assertTrue(carrierResource.getClientElements() != null);
 		assertTrue(carrierResource.getClientElements().isEmpty());
-		assertTrue(CarrierResource.class.isAssignableFrom(carrierResource.getClass()));
-		if(CarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass()));
+		if(LSPCarrierResource.class.isAssignableFrom(carrierResource.getClass())) {
 			assertTrue(Carrier.class.isAssignableFrom(carrierResource.getClassOfResource()));
 			assertTrue(carrierResource.getCarrier() == collectionCarrier);
 		}
@@ -121,7 +117,7 @@ public class CollectionAdapterTest {
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertTrue(vehicles.get(0) == collectionCarrierVehicle);
-					assertTrue(collectionCarrierVehicle.getVehicleType() == collectionType);
+					assertTrue(collectionCarrierVehicle.getType() == collectionType);
 					assertTrue(collectionCarrierVehicle.getLocation() == collectionLinkId);
 				}
 			}

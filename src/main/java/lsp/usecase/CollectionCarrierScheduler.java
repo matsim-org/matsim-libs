@@ -23,19 +23,19 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import lsp.LogisticsSolutionElement;
-import lsp.ShipmentTuple;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
-import lsp.resources.ResourceScheduler;
+import lsp.ShipmentWithTime;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
+import lsp.resources.LSPResourceScheduler;
 
 
-/*package-private*/  class CollectionCarrierScheduler extends ResourceScheduler {
+/*package-private*/  class CollectionCarrierScheduler extends LSPResourceScheduler {
 	
 	static class LSPCarrierPair{
-		private ShipmentTuple tuple;
+		private ShipmentWithTime tuple;
 		private CarrierService service;
 		
-		public LSPCarrierPair(ShipmentTuple tuple, CarrierService service){
+		public LSPCarrierPair( ShipmentWithTime tuple, CarrierService service ){
 			this.tuple = tuple;
 			this.service = service;
 		}
@@ -77,7 +77,7 @@ import lsp.resources.ResourceScheduler;
 	}*/
 	
 	
-	public void initializeValues(Resource resource){
+	@Override public void initializeValues( LSPResource resource ){
 		this.pairs = new ArrayList<LSPCarrierPair>();
 		if(resource.getClass() == CollectionCarrierAdapter.class){
 			this.adapter = (CollectionCarrierAdapter) resource;
@@ -90,8 +90,8 @@ import lsp.resources.ResourceScheduler;
 	}
 	
 	
-	public void scheduleResource() {
-		for(ShipmentTuple tupleToBeAssigned: shipments){
+	@Override public void scheduleResource() {
+		for( ShipmentWithTime tupleToBeAssigned: shipments){
 			CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
 			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
@@ -99,12 +99,12 @@ import lsp.resources.ResourceScheduler;
 		routeCarrier();	
 	}
 			
-	private CarrierService convertToCarrierService(ShipmentTuple tuple){
+	private CarrierService convertToCarrierService( ShipmentWithTime tuple ){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getFromLinkId());
 		builder.setServiceStartTimeWindow(tuple.getShipment().getStartTimeWindow());
 		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
-		builder.setServiceDuration(tuple.getShipment().getServiceTime());
+		builder.setServiceDuration(tuple.getShipment().getServiceDuration() );
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
@@ -129,14 +129,14 @@ import lsp.resources.ResourceScheduler;
 	}
 	
 	
-	protected void updateShipments() {
-		for(ShipmentTuple tuple : shipments) {
+	@Override protected void updateShipments() {
+		for( ShipmentWithTime tuple : shipments) {
 			updateShipment(tuple);
 		}
 	}
 	
 	
-	private void updateShipment(ShipmentTuple tuple){
+	private void updateShipment( ShipmentWithTime tuple ){
 			
 		//outerLoop:
 		for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()){
@@ -160,7 +160,7 @@ import lsp.resources.ResourceScheduler;
 		}		
 	}
 	
-	private void addShipmentLoadElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){
+	private void addShipmentLoadElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
 		ShipmentUtils.ScheduledShipmentLoadBuilder builder = ShipmentUtils.ScheduledShipmentLoadBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
@@ -172,7 +172,7 @@ import lsp.resources.ResourceScheduler;
 		Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex-1);
 		double startTimeOfLoading = legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
 		builder.setStartTime(startTimeOfLoading);
-		builder.setEndTime(startTimeOfLoading + tuple.getShipment().getServiceTime());
+		builder.setEndTime(startTimeOfLoading + tuple.getShipment().getServiceDuration() );
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());
@@ -182,7 +182,7 @@ import lsp.resources.ResourceScheduler;
 		tuple.getShipment().getSchedule().addPlanElement(id, load);
 	}
 	
-	private void addCollectionServiceEventHandler(CarrierService carrierService, ShipmentTuple tuple,  CarrierResource resource){	
+	private void addCollectionServiceEventHandler( CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource ){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionServiceEndEventHandler endHandler = new CollectionServiceEndEventHandler(carrierService, tuple.getShipment(), element, resource);
@@ -193,7 +193,7 @@ import lsp.resources.ResourceScheduler;
 		
 	}
 	
-	private void addCollectionTourEndEventHandler(CarrierService carrierService, ShipmentTuple tuple, CarrierResource resource){
+	private void addCollectionTourEndEventHandler( CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource ){
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){
 				CollectionTourEndEventHandler handler = new CollectionTourEndEventHandler(carrierService, tuple.getShipment(), element, resource);
@@ -204,7 +204,7 @@ import lsp.resources.ResourceScheduler;
 		
 	}
 	
-	private void addShipmentTransportElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){
+	private void addShipmentTransportElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
 		ShipmentUtils.ScheduledShipmentTransportBuilder builder = ShipmentUtils.ScheduledShipmentTransportBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){
@@ -229,7 +229,7 @@ import lsp.resources.ResourceScheduler;
 		tuple.getShipment().getSchedule().addPlanElement(id, transport);
 	}
 	
-	private void addShipmentUnloadElement(ShipmentTuple tuple, Tour tour, Tour.ServiceActivity serviceActivity){
+	private void addShipmentUnloadElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
 		ShipmentUtils.ScheduledShipmentUnloadBuilder builder = ShipmentUtils.ScheduledShipmentUnloadBuilder.newInstance();
 		builder.setResourceId(adapter.getId());
 		for(LogisticsSolutionElement element : adapter.getClientElements()){

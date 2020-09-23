@@ -11,11 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -23,8 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 
 
@@ -39,7 +35,7 @@ public class MainRunAdapterTest {
 	private CarrierVehicle carrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;
-	private CarrierResource mainRunAdapter;
+	private LSPCarrierResource mainRunAdapter;
 	
 	@Before
 	public void initialize() {
@@ -64,19 +60,19 @@ public class MainRunAdapterTest {
 		fromLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("MainRunVehicle");
 		carrierVehicle = CarrierVehicle.newInstance(collectionVehicleId, fromLinkId);
-		carrierVehicle.setVehicleType(mainRunType);
-				
-		
+		carrierVehicle.setType( mainRunType );
+
+
 		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 		capabilitiesBuilder.addType(mainRunType);
 		capabilitiesBuilder.addVehicle(carrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		capabilities = capabilitiesBuilder.build();
-		carrier = CarrierImpl.newInstance(carrierId);
+		carrier = CarrierUtils.createCarrier( carrierId );
 		carrier.setCarrierCapabilities(capabilities);
 
 
-		Id<Resource> mainRunId = Id.create("MainRunAdapter", Resource.class);
+		Id<LSPResource> mainRunId = Id.create("MainRunAdapter", LSPResource.class);
         UsecaseUtils.MainRunCarrierAdapterBuilder mainRunBuilder = UsecaseUtils.MainRunCarrierAdapterBuilder.newInstance(mainRunId, network);
         mainRunBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
         mainRunBuilder.setFromLinkId(Id.createLinkId("(4 2) (4 3)"));
@@ -90,8 +86,8 @@ public class MainRunAdapterTest {
 	public void testMainRunAdapter() {
 		assertTrue(mainRunAdapter.getClientElements() != null);
 		assertTrue(mainRunAdapter.getClientElements().isEmpty());
-		assertTrue(CarrierResource.class.isAssignableFrom(mainRunAdapter.getClass()));
-		if(CarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
+		assertTrue(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass()));
+		if(LSPCarrierResource.class.isAssignableFrom(mainRunAdapter.getClass())) {
 			assertTrue(Carrier.class.isAssignableFrom(mainRunAdapter.getClassOfResource()));
 			assertTrue(mainRunAdapter.getCarrier() == carrier);
 		}
@@ -123,7 +119,7 @@ public class MainRunAdapterTest {
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 				if(vehicles.size() == 1) {
 					assertTrue(vehicles.get(0) == carrierVehicle);
-					assertTrue(carrierVehicle.getVehicleType() == mainRunType);
+					assertTrue(carrierVehicle.getType() == mainRunType);
 					assertTrue(carrierVehicle.getLocation() == fromLinkId);
 				}
 			}

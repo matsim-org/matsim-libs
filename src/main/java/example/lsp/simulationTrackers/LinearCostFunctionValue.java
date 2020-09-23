@@ -1,8 +1,8 @@
 package example.lsp.simulationTrackers;
 
-import lsp.functions.InfoFunctionValue;
+import lsp.functions.LSPInfoFunctionValue;
 
-/*package-private*/ class LinearCostFunctionValue implements InfoFunctionValue<Double> {
+/*package-private*/ class LinearCostFunctionValue implements LSPInfoFunctionValue<Double> {
 
 	private Double value;
 

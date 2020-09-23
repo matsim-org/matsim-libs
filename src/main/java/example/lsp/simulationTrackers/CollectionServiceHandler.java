@@ -3,15 +3,16 @@ package example.lsp.simulationTrackers;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceEndEventHandler;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import lsp.events.ServiceStartEvent;
-import lsp.eventhandlers.ServiceStartEventHandler;
-import lsp.events.ServiceEndEvent;
-import lsp.eventhandlers.ServiceEndEventHandler;
+import org.matsim.contrib.freight.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
+import org.matsim.contrib.freight.events.LSPServiceEndEvent;
+import org.matsim.vehicles.Vehicle;
 
 
-/*package-private*/ class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{
+/*package-private*/ class CollectionServiceHandler implements LSPServiceStartEventHandler, LSPServiceEndEventHandler {
 
 
 	private static class ServiceTuple {
@@ -50,13 +51,13 @@ import lsp.eventhandlers.ServiceEndEventHandler;
 	}
 
 	@Override
-	public void handleEvent(ServiceEndEvent event) {
+	public void handleEvent(LSPServiceEndEvent event) {
 		System.out.println("Service Ends");
 		double loadingCosts = 0;
 		for(ServiceTuple tuple : tuples) {
 			if(tuple.getService() == event.getService()) {
 				double serviceDuration = event.getTime() - tuple.getStartTime();
-				loadingCosts = serviceDuration * event.getVehicle().getVehicleType().getCostInformation().getPerTimeUnit();
+				loadingCosts = serviceDuration * ((Vehicle) event.getVehicle()).getType().getCostInformation().getPerTimeUnit();
 				totalLoadingCosts = totalLoadingCosts + loadingCosts;
 				tuples.remove(tuple);
 				break;
@@ -65,7 +66,7 @@ import lsp.eventhandlers.ServiceEndEventHandler;
 	}
 
 	@Override
-	public void handleEvent(ServiceStartEvent event) {
+	public void handleEvent(LSPServiceStartEvent event) {
 		totalNumberOfShipments++;
 		totalWeightOfShipments = totalWeightOfShipments + event.getService().getCapacityDemand();
 		tuples.add(new ServiceTuple(event.getService(), event.getTime()));

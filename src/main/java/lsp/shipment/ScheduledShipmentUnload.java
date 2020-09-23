@@ -6,7 +6,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 class ScheduledShipmentUnload implements ShipmentPlanElement {
 
@@ -14,7 +14,7 @@ class ScheduledShipmentUnload implements ShipmentPlanElement {
 	private double startTime;
 	private double endTime;
 	private LogisticsSolutionElement element;
-	private Id<Resource> resourceId;
+	private Id<LSPResource> resourceId;
 	private Id<Carrier> carrierId;
 	private Id<Link> linkId;
 	private CarrierService carrierService;
@@ -52,7 +52,7 @@ class ScheduledShipmentUnload implements ShipmentPlanElement {
 	}
 
 	@Override
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

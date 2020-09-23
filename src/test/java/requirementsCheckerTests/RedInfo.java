@@ -2,13 +2,13 @@ package requirementsCheckerTests;
 
 import lsp.functions.*;
 
-public class RedInfo extends Info{
+public class RedInfo extends LSPInfo {
 
-	private InfoFunction redInfoFunction;
+	private LSPInfoFunction redInfoFunction;
 	
 	public RedInfo() {
-		redInfoFunction = InfoFunctionUtils.createDefaultInfoFunction();
-		InfoFunctionValue<String> value = InfoFunctionUtils.createInfoFunctionValue("red" );
+		redInfoFunction = LSPInfoFunctionUtils.createDefaultInfoFunction();
+		LSPInfoFunctionValue<String> value = LSPInfoFunctionUtils.createInfoFunctionValue("red" );
 		value.setValue("red");
 		redInfoFunction.getValues().add(value);
 	}
@@ -19,7 +19,7 @@ public class RedInfo extends Info{
 	}
 
 	@Override
-	public InfoFunction getFunction() {
+	public LSPInfoFunction getFunction() {
 		return redInfoFunction;
 	}
 

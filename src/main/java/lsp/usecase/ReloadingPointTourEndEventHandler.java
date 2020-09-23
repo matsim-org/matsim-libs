@@ -10,12 +10,12 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import lsp.events.TourEndEvent;
-import lsp.eventhandlers.TourEndEventHandler;
+import org.matsim.contrib.freight.events.LSPTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
-/*package-private*/  class ReloadingPointTourEndEventHandler implements TourEndEventHandler {
+/*package-private*/  class ReloadingPointTourEndEventHandler implements LSPTourEndEventHandler {
 
 	static class ReloadingPointEventHandlerPair{
 		public LSPShipment shipment;
@@ -30,7 +30,7 @@ import lsp.resources.Resource;
 	
 	private HashMap<CarrierService, ReloadingPointEventHandlerPair> servicesWaitedFor;
 	private ReloadingPoint reloadingPoint;
-	private Id<Resource> resourceId;
+	private Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 	
 	ReloadingPointTourEndEventHandler(ReloadingPoint reloadingPoint){
@@ -59,7 +59,7 @@ import lsp.resources.Resource;
 	}	
 	
 	@Override
-	public void handleEvent(TourEndEvent event) {
+	public void handleEvent(LSPTourEndEvent event) {
 		if((event.getTour().getEndLinkId() == this.linkId) && (shipmentsOfTourEndInPoint(event.getTour()))){
 			
 			for(TourElement tourElement : event.getTour().getTourElements()){
@@ -95,7 +95,7 @@ import lsp.resources.Resource;
 		return shipmentsEndInPoint;
 	}
 
-	private void logReloadAfterCollection(CarrierService carrierService, TourEndEvent event){
+	private void logReloadAfterCollection(CarrierService carrierService, LSPTourEndEvent event){
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -126,7 +126,7 @@ import lsp.resources.Resource;
 		return unloadEndTime;
 	}
 
-	private void logReloadAfterMainRun(CarrierService carrierService, TourEndEvent event){
+	private void logReloadAfterMainRun(CarrierService carrierService, LSPTourEndEvent event){
 		LSPShipment lspShipment = servicesWaitedFor.get(carrierService).shipment;
 		ShipmentUtils.LoggedShipmentHandleBuilder builder = ShipmentUtils.LoggedShipmentHandleBuilder.newInstance();
 		builder.setLinkId(linkId);
@@ -165,7 +165,7 @@ import lsp.resources.Resource;
 		return reloadingPoint;
 	}
 
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

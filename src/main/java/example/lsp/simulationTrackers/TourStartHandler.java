@@ -1,9 +1,10 @@
 package example.lsp.simulationTrackers;
 
-import lsp.events.TourStartEvent;
-import lsp.eventhandlers.TourStartEventHandler;
+import org.matsim.contrib.freight.events.LSPTourStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPTourStartEventHandler;
+import org.matsim.vehicles.Vehicle;
 
-/*package-private*/ class TourStartHandler implements TourStartEventHandler{
+/*package-private*/ class TourStartHandler implements LSPTourStartEventHandler {
 
 	private double vehicleFixedCosts;
 		
@@ -13,8 +14,8 @@ import lsp.eventhandlers.TourStartEventHandler;
 	}
 
 	@Override
-	public void handleEvent(TourStartEvent event) {
-		vehicleFixedCosts = vehicleFixedCosts + event.getVehicle().getVehicleType().getCostInformation().getFix();
+	public void handleEvent(LSPTourStartEvent event) {
+		vehicleFixedCosts = vehicleFixedCosts + ((Vehicle) event.getVehicle()).getType().getCostInformation().getFix();
 	}
 
 	public double getVehicleFixedCosts() {

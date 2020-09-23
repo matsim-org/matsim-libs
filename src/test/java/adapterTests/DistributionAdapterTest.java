@@ -12,11 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -24,8 +20,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
 
 
@@ -39,7 +35,7 @@ public class DistributionAdapterTest {
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;
-		private CarrierResource distributionAdapter;
+		private LSPCarrierResource distributionAdapter;
 		private Id<Link> distributionLinkId;
 		
 		@Before
@@ -63,18 +59,18 @@ public class DistributionAdapterTest {
 			distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 			Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 			distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-			distributionCarrierVehicle.setVehicleType(distributionType);
-			
+			distributionCarrierVehicle.setType( distributionType );
+
 			CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 			capabilitiesBuilder.addType(distributionType);
 			capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 			capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 			capabilities = capabilitiesBuilder.build();
-			distributionCarrier = CarrierImpl.newInstance(carrierId);
+			distributionCarrier = CarrierUtils.createCarrier( carrierId );
 			distributionCarrier.setCarrierCapabilities(capabilities);
 			
 			
-			Id<Resource> adapterId = Id.create("DistributionCarrierAdapter", Resource.class);
+			Id<LSPResource> adapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 			UsecaseUtils.DistributionCarrierAdapterBuilder builder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(adapterId, network);
 			builder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
 			builder.setCarrier(distributionCarrier);
@@ -87,8 +83,8 @@ public class DistributionAdapterTest {
 		public void testCollectionAdapter() {
 			assertTrue(distributionAdapter.getClientElements() != null);
 			assertTrue(distributionAdapter.getClientElements().isEmpty());
-			assertTrue(CarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
-			if(CarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
+			assertTrue(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass()));
+			if(LSPCarrierResource.class.isAssignableFrom(distributionAdapter.getClass())) {
 				assertTrue(Carrier.class.isAssignableFrom(distributionAdapter.getClassOfResource()));
 				assertTrue(distributionAdapter.getCarrier() == distributionCarrier);
 			}
@@ -122,7 +118,7 @@ public class DistributionAdapterTest {
 					ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles().values());
 					if(vehicles.size() == 1) {
 						assertTrue(vehicles.get(0) == distributionCarrierVehicle);
-						assertTrue(distributionCarrierVehicle.getVehicleType() == distributionType);
+						assertTrue(distributionCarrierVehicle.getType() == distributionType);
 						assertTrue(distributionCarrierVehicle.getLocation() == distributionLinkId);
 					}
 				}

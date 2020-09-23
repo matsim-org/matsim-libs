@@ -1,14 +1,14 @@
 package lspScoringTests;
 
-import lsp.functions.Info;
-import lsp.functions.InfoFunction;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunction;
 
-public class TipInfo extends Info{
+public class TipInfo extends LSPInfo {
 
-	private InfoFunction function;
+	private LSPInfoFunction function;
 	private String name = "TIPINFO";
 	
-	public TipInfo (InfoFunction function) {
+	public TipInfo (LSPInfoFunction function) {
 		this.function = function;
 	}
 	
@@ -18,7 +18,7 @@ public class TipInfo extends Info{
 	}
 
 	@Override
-	public InfoFunction getFunction() {
+	public LSPInfoFunction getFunction() {
 		return function;
 	}
 

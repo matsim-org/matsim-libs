@@ -5,17 +5,18 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Network;
 
-import lsp.events.FreightLinkEnterEvent;
-import lsp.events.FreightLinkLeaveEvent;
-import lsp.eventhandlers.FreightLinkLeaveEventHandler;
-import lsp.events.FreightVehicleLeavesTrafficEvent;
-import lsp.eventhandlers.FreightVehicleLeavesTrafficEventHandler;
-import lsp.eventhandlers.FreightLinkEnterEventHandler;
+import org.matsim.contrib.freight.events.LSPFreightLinkEnterEvent;
+import org.matsim.contrib.freight.events.LSPFreightLinkLeaveEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPLinkLeaveEventHandler;
+import org.matsim.contrib.freight.events.LSPFreightVehicleLeavesTrafficEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPVehicleLeavesTrafficEventHandler;
+import org.matsim.contrib.freight.events.eventhandler.LSPLinkEnterEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 
-/*package-private*/ class DistanceAndTimeHandler implements FreightLinkEnterEventHandler, FreightVehicleLeavesTrafficEventHandler, FreightLinkLeaveEventHandler {
+/*package-private*/ class DistanceAndTimeHandler implements LSPLinkEnterEventHandler, LSPVehicleLeavesTrafficEventHandler, LSPLinkLeaveEventHandler{
 
-	private Collection<FreightLinkEnterEvent> events;
+	private Collection<LSPFreightLinkEnterEvent> events;
 	private double distanceCosts;
 	private double timeCosts;
 	private Network network;
@@ -27,7 +28,7 @@ import lsp.eventhandlers.FreightLinkEnterEventHandler;
 	
 	
 	@Override
-	public void handleEvent(FreightLinkEnterEvent event) {
+	public void handleEvent(LSPFreightLinkEnterEvent event) {
 		events.add(event);
 		
 	}
@@ -39,14 +40,14 @@ import lsp.eventhandlers.FreightLinkEnterEventHandler;
 
 
 	@Override
-	public void handleEvent(FreightVehicleLeavesTrafficEvent leaveEvent) {
-		for(FreightLinkEnterEvent enterEvent : events) {
+	public void handleEvent(LSPFreightVehicleLeavesTrafficEvent leaveEvent) {
+		for(LSPFreightLinkEnterEvent enterEvent : events) {
 			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) && 
 			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
 				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();
-				timeCosts = timeCosts + (linkDuration * enterEvent.getCarrierVehicle().getVehicleType().getCostInformation().getPerTimeUnit());
+				timeCosts = timeCosts + (linkDuration * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerTimeUnit());
 				double linkLength = network.getLinks().get(enterEvent.getLinkId()).getLength();
-				distanceCosts = distanceCosts + (linkLength * enterEvent.getCarrierVehicle().getVehicleType().getCostInformation().getPerDistanceUnit());
+				distanceCosts = distanceCosts + (linkLength * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerDistanceUnit());
 				events.remove(enterEvent);
 				break;
 			}		
@@ -55,14 +56,14 @@ import lsp.eventhandlers.FreightLinkEnterEventHandler;
 
 
 	@Override
-	public void handleEvent(FreightLinkLeaveEvent leaveEvent) {
-		for(FreightLinkEnterEvent enterEvent : events) {
+	public void handleEvent(LSPFreightLinkLeaveEvent leaveEvent) {
+		for(LSPFreightLinkEnterEvent enterEvent : events) {
 			if((enterEvent.getLinkId() == leaveEvent.getLinkId()) && (enterEvent.getVehicleId() == leaveEvent.getVehicleId()) &&
 			   (enterEvent.getCarrierId() == leaveEvent.getCarrierId())   &&  (enterEvent.getDriverId() == leaveEvent.getDriverId())) {
 				double linkDuration = leaveEvent.getTime() - enterEvent.getTime();
-				timeCosts = timeCosts + (linkDuration * enterEvent.getCarrierVehicle().getVehicleType().getCostInformation().getPerTimeUnit());
+				timeCosts = timeCosts + (linkDuration * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerTimeUnit());
 				double linkLength = network.getLinks().get(enterEvent.getLinkId()).getLength();
-				distanceCosts = distanceCosts + (linkLength * enterEvent.getCarrierVehicle().getVehicleType().getCostInformation().getPerDistanceUnit());
+				distanceCosts = distanceCosts + (linkLength * ((Vehicle) enterEvent.getCarrierVehicle()).getType().getCostInformation().getPerDistanceUnit());
 				events.remove(enterEvent);
 				break;
 			}

@@ -6,14 +6,14 @@ import java.util.Collection;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
-import lsp.functions.InfoFunctionValue;
-import lsp.controler.SimulationTracker;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunctionValue;
+import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class LinearCostTracker implements SimulationTracker{
+/*package-private*/ class LinearCostTracker implements LSPSimulationTracker{
 
 	private Collection<EventHandler> eventHandlers;
-	private Collection<Info> infos;
+	private Collection<LSPInfo> infos;
 	private double distanceCosts;
 	private double timeCosts;
 	private double loadingCosts;
@@ -29,7 +29,7 @@ import lsp.controler.SimulationTracker;
 	public LinearCostTracker(double shareOfFixedCosts) {
 		this.shareOfFixedCosts = shareOfFixedCosts;
 		example.lsp.simulationTrackers.CostInfo costInfo = new example.lsp.simulationTrackers.CostInfo();
-		infos = new ArrayList<Info>();
+		infos = new ArrayList<LSPInfo>();
 		infos.add(costInfo);
 		this.eventHandlers = new ArrayList<EventHandler>();
 	}
@@ -41,7 +41,7 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 
@@ -71,7 +71,7 @@ import lsp.controler.SimulationTracker;
 		linearUnitCosts = (totalCosts * (1-shareOfFixedCosts))/totalWeightOfShipments;
 		
 		example.lsp.simulationTrackers.CostInfo info = (example.lsp.simulationTrackers.CostInfo) infos.iterator().next();
-		for(InfoFunctionValue value : info.getFunction().getValues()) {
+		for(LSPInfoFunctionValue value : info.getFunction().getValues()) {
 			if(value instanceof example.lsp.simulationTrackers.FixedCostFunctionValue) {
 				((example.lsp.simulationTrackers.FixedCostFunctionValue)value).setValue(fixedUnitCosts);
 			}

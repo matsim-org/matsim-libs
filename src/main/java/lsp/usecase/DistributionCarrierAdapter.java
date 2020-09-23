@@ -11,23 +11,23 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-import lsp.functions.Info;
+import lsp.functions.LSPInfo;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
-import lsp.controler.SimulationTracker;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
+import lsp.controler.LSPSimulationTracker;
 
-/*package-private*/ class DistributionCarrierAdapter implements CarrierResource {
+/*package-private*/ class DistributionCarrierAdapter implements LSPCarrierResource {
 
-	private Id<Resource>id;
+	private Id<LSPResource>id;
 	private Carrier carrier;
 	private Id<Link> locationLinkId;
 	private ArrayList<LogisticsSolutionElement> clientElements;
 	private DistributionCarrierScheduler distributionHandler;
 	private Network network;
 	private Collection<EventHandler> eventHandlers;
-	private Collection<Info> infos;
-	private Collection<SimulationTracker> trackers;
+	private Collection<LSPInfo> infos;
+	private Collection<LSPSimulationTracker> trackers;
 	private EventsManager eventsManager;
 
 	DistributionCarrierAdapter(UsecaseUtils.DistributionCarrierAdapterBuilder builder){
@@ -38,8 +38,8 @@ import lsp.controler.SimulationTracker;
 			this.carrier = builder.carrier;
 			this.network = builder.network;
 			this.eventHandlers = new ArrayList<EventHandler>();
-			this.infos = new ArrayList<Info>();
-			this.trackers = new ArrayList<SimulationTracker>();
+			this.infos = new ArrayList<LSPInfo>();
+			this.trackers = new ArrayList<LSPSimulationTracker>();
 		}
 	
 	@Override
@@ -76,7 +76,7 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public Id<Resource> getId() {
+	public Id<LSPResource> getId() {
 		return id;
 	}
 	
@@ -104,19 +104,19 @@ import lsp.controler.SimulationTracker;
 	}
 
 	@Override
-	public Collection<Info> getInfos() {
+	public Collection<LSPInfo> getInfos() {
 		return infos;
 	}
 	
 	@Override
-	public void addSimulationTracker(SimulationTracker tracker) {
+	public void addSimulationTracker( LSPSimulationTracker tracker ) {
 		this.trackers.add(tracker);
 		this.eventHandlers.addAll(tracker.getEventHandlers());
 		this.infos.addAll(tracker.getInfos());	
 	}
 
 	@Override
-	public Collection<SimulationTracker> getSimulationTrackers() {
+	public Collection<LSPSimulationTracker> getSimulationTrackers() {
 		return trackers;
 	}
 

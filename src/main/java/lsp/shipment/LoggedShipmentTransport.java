@@ -2,10 +2,9 @@ package lsp.shipment;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 public final class LoggedShipmentTransport implements ShipmentPlanElement {
 	// yyyy cannot make package-private since used outside package.  kai, jun'20
@@ -14,7 +13,7 @@ public final class LoggedShipmentTransport implements ShipmentPlanElement {
 	private final double startTime;
 	private double endTime;
 	private final LogisticsSolutionElement element;
-	private final Id<Resource> resourceId;
+	private final Id<LSPResource> resourceId;
 	private final Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
 
@@ -33,7 +32,7 @@ public final class LoggedShipmentTransport implements ShipmentPlanElement {
 	}
 
 	@Override
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

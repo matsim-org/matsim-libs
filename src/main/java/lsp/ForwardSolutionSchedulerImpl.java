@@ -2,38 +2,38 @@ package lsp;
 
 import java.util.ArrayList;
 
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 
 /* package-private */ class ForwardSolutionSchedulerImpl implements SolutionScheduler {
 
 	private class ResourceNeighbours{
-		private ArrayList<Resource> predecessors;
-		private ArrayList<Resource> successors;
-		private Resource resource;
+		private ArrayList<LSPResource> predecessors;
+		private ArrayList<LSPResource> successors;
+		private LSPResource resource;
 				
-		private ResourceNeighbours(Resource resource) {
+		private ResourceNeighbours(LSPResource resource) {
 			this.resource = resource;
-			this.predecessors = new ArrayList<Resource>();
-			this.successors = new ArrayList<Resource>();
+			this.predecessors = new ArrayList<LSPResource>();
+			this.successors = new ArrayList<LSPResource>();
 		}
 		
-		private void addPredecessor(Resource resource) {
+		private void addPredecessor(LSPResource resource) {
 			this.predecessors.add(resource);
 		}
 	
-		private void addSuccessor(Resource resource) {
+		private void addSuccessor(LSPResource resource) {
 			this.successors.add(resource);
 		}
 	}
 	
 	private LSP lsp;
-	private ArrayList<Resource> sortedResourceList;
+	private ArrayList<LSPResource> sortedResourceList;
 	private ArrayList<ResourceNeighbours> neighbourList;
 	private int bufferTime;
 	
 	ForwardSolutionSchedulerImpl() {
-		this.sortedResourceList = new ArrayList<Resource>();
+		this.sortedResourceList = new ArrayList<LSPResource>();
 		this.neighbourList = new ArrayList<ResourceNeighbours>();
 	}
 	
@@ -43,7 +43,7 @@ import lsp.shipment.LSPShipment;
 		insertShipmentsAtBeginning();
 		setResourceNeighbours();
 		sortResources();
-		for(Resource resource : sortedResourceList ) {
+		for(LSPResource resource : sortedResourceList ) {
 			resource.schedule(bufferTime);
 		}
 
@@ -56,14 +56,14 @@ import lsp.shipment.LSPShipment;
 
 	private void setResourceNeighbours() {
 		neighbourList.clear();
-		for(Resource resource : lsp.getResources()) {
+		for(LSPResource resource : lsp.getResources()) {
 			ResourceNeighbours neighbours = new ResourceNeighbours(resource);
 			for(LogisticsSolutionElement element : resource.getClientElements()) {
 				LogisticsSolutionElement predecessor = element.getPreviousElement();
-				Resource previousResource = predecessor.getResource();
+				LSPResource previousResource = predecessor.getResource();
 				neighbours.addPredecessor(previousResource);
 				LogisticsSolutionElement successor = element.getNextElement();
-				Resource nextResource = successor.getResource();
+				LSPResource nextResource = successor.getResource();
 				neighbours.addSuccessor(nextResource);
 			}
 		neighbourList.add(neighbours);
@@ -87,7 +87,7 @@ import lsp.shipment.LSPShipment;
 			return true;
 		}
 			
-		for(Resource predecessor : neighbours.predecessors) {
+		for(LSPResource predecessor : neighbours.predecessors) {
 			if(!sortedResourceList.contains(predecessor)) {
 				return true;
 			}
@@ -100,7 +100,7 @@ import lsp.shipment.LSPShipment;
 			return true;
 		}
 		
-		for(Resource successor : neighbours.successors) {
+		for(LSPResource successor : neighbours.successors) {
 			if(! sortedResourceList.contains(successor)) {
 				return true;
 			}

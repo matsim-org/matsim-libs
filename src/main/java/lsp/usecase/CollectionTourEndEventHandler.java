@@ -7,20 +7,20 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import lsp.events.TourEndEvent;
-import lsp.eventhandlers.TourEndEventHandler;
+import org.matsim.contrib.freight.events.LSPTourEndEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPTourEndEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
-import lsp.resources.Resource;
+import lsp.resources.LSPCarrierResource;
+import lsp.resources.LSPResource;
 
-/*package-private*/ class CollectionTourEndEventHandler implements TourEndEventHandler {
+/*package-private*/ class CollectionTourEndEventHandler implements LSPTourEndEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 	
-	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource){
+	CollectionTourEndEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource){
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
@@ -35,7 +35,7 @@ import lsp.resources.Resource;
 	}
 
 	@Override
-	public void handleEvent(TourEndEvent event) {
+	public void handleEvent(LSPTourEndEvent event) {
 		Tour tour = event.getTour();
 		for(TourElement element : tour.getTourElements()){
 			if(element instanceof ServiceActivity){
@@ -48,7 +48,7 @@ import lsp.resources.Resource;
 		}
 	}
 
-	private void logUnload(TourEndEvent event, Tour tour){
+	private void logUnload(LSPTourEndEvent event, Tour tour){
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder  =  ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setStartTime(event.getTime());
 		builder.setEndTime(event.getTime() + getTotalUnloadingTime(tour));
@@ -61,7 +61,7 @@ import lsp.resources.Resource;
 		lspShipment.getLog().getPlanElements().put(unloadId, unload);
 	}
 
-	private void logTransport(TourEndEvent event, Tour tour){
+	private void logTransport(LSPTourEndEvent event, Tour tour){
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
@@ -100,7 +100,7 @@ import lsp.resources.Resource;
 	}
 
 
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resource.getId();
 	}
 

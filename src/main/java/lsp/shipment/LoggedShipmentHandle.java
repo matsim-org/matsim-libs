@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import lsp.LogisticsSolutionElement;
-import lsp.resources.Resource;
+import lsp.resources.LSPResource;
 
 
 
@@ -14,7 +14,7 @@ import lsp.resources.Resource;
 	private double startTime;
 	private double endTime;
 	private LogisticsSolutionElement element;
-	private Id<Resource> resourceId;
+	private Id<LSPResource> resourceId;
 	private Id<Link> linkId;
 
 	LoggedShipmentHandle(ShipmentUtils.LoggedShipmentHandleBuilder builder){
@@ -31,7 +31,7 @@ import lsp.resources.Resource;
 	}
 
 	@Override
-	public Id<Resource> getResourceId() {
+	public Id<LSPResource> getResourceId() {
 		return resourceId;
 	}
 

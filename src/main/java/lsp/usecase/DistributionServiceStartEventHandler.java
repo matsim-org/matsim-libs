@@ -4,19 +4,19 @@ import lsp.shipment.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import lsp.events.ServiceStartEvent;
-import lsp.eventhandlers.ServiceStartEventHandler;
+import org.matsim.contrib.freight.events.LSPServiceStartEvent;
+import org.matsim.contrib.freight.events.eventhandler.LSPServiceStartEventHandler;
 import lsp.LogisticsSolutionElement;
-import lsp.resources.CarrierResource;
+import lsp.resources.LSPCarrierResource;
 
-/*package-private*/  class DistributionServiceStartEventHandler implements ServiceStartEventHandler {
+/*package-private*/  class DistributionServiceStartEventHandler implements LSPServiceStartEventHandler {
 
 	private CarrierService carrierService;
 	private LSPShipment lspShipment;
 	private LogisticsSolutionElement solutionElement;
-	private CarrierResource resource;
+	private LSPCarrierResource resource;
 
-	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, CarrierResource resource) {
+	DistributionServiceStartEventHandler(CarrierService carrierService, LSPShipment lspShipment, LogisticsSolutionElement element, LSPCarrierResource resource) {
 		this.carrierService = carrierService;
 		this.lspShipment = lspShipment;
 		this.solutionElement = element;
@@ -30,14 +30,14 @@ import lsp.resources.CarrierResource;
 	}
 
 	@Override
-	public void handleEvent(ServiceStartEvent event) {
+	public void handleEvent(LSPServiceStartEvent event) {
 		if (event.getService().getId() == carrierService.getId() && event.getCarrierId() == resource.getCarrier().getId()) {
 			logTransport(event);
 			logUnload(event);
 		}
 	}
 
-	private void logTransport(ServiceStartEvent event) {
+	private void logTransport(LSPServiceStartEvent event) {
 		String idString = resource.getId() + "" + solutionElement.getId() + "" + "TRANSPORT";
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
 		ShipmentPlanElement abstractPlanElement = lspShipment.getLog().getPlanElements().get(id);
@@ -47,7 +47,7 @@ import lsp.resources.CarrierResource;
 		}		
 	}
 
-	private void logUnload(ServiceStartEvent event) {
+	private void logUnload(LSPServiceStartEvent event) {
 		ShipmentUtils.LoggedShipmentUnloadBuilder builder = ShipmentUtils.LoggedShipmentUnloadBuilder.newInstance();
 		builder.setCarrierId(event.getCarrierId());
 		builder.setLinkId(event.getService().getLocationLinkId());
@@ -73,7 +73,7 @@ import lsp.resources.CarrierResource;
 		return solutionElement;
 	}
 
-	public CarrierResource getResource() {
+	public LSPCarrierResource getResource() {
 		return resource;
 	}
 

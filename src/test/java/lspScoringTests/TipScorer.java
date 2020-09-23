@@ -1,9 +1,9 @@
 package lspScoringTests;
 
 import lsp.LSP;
-import lsp.functions.Info;
-import lsp.functions.InfoFunction;
-import lsp.functions.InfoFunctionValue;
+import lsp.functions.LSPInfo;
+import lsp.functions.LSPInfoFunction;
+import lsp.functions.LSPInfoFunctionValue;
 import lsp.scoring.LSPScorer;
 
 public class TipScorer implements LSPScorer {
@@ -19,10 +19,10 @@ public class TipScorer implements LSPScorer {
 	@Override
 	public double scoreCurrentPlan(LSP lsp) {
 		double score = 0;
-		for(Info info : tracker.getInfos()) {
+		for(LSPInfo info : tracker.getInfos()) {
 			if(info.getName() == "TIPINFO") {
-				InfoFunction function = info.getFunction(); 
-					for(InfoFunctionValue<?> value : function.getValues()) {
+				LSPInfoFunction function = info.getFunction();
+					for(LSPInfoFunctionValue<?> value : function.getValues()) {
 						if(value.getName() == "TIP IN EUR" && value.getValue() instanceof Double) {
 							double tipValue = (Double)value.getValue();
 							score += tipValue;
