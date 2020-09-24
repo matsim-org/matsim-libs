@@ -24,9 +24,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jfree.chart.ChartUtils;
@@ -71,7 +74,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		this.drtRequestAnalyzer = drtRequestAnalyzer;
 		this.drtCfg = drtCfg;
 		this.qSimCfg = config.qsim();
-		runId = config.controler().getRunId();
+		runId = Optional.ofNullable(config.controler().getRunId()).orElse("N/A");
 		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleet);
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -162,9 +165,9 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_customer_stats", ".csv")) {
 			if (!headerWritten) {
 				headerWritten = true;
-				bw.write(
-						"runId;iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean;rejections;rejectionRate");
-				bw.newLine();
+				bw.write(line("runId", "iteration", "rides", "wait_average", "wait_max", "wait_p95", "wait_p75",
+						"wait_median", "inVehicleTravelTime_mean", "distance_m_mean", "directDistance_m_mean",
+						"totalTravelTime_mean", "rejections", "rejectionRate"));
 			}
 			bw.write(runId + ";" + it + ";" + summarizeTrips);
 			bw.newLine();
@@ -180,12 +183,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private void writeIterationVehicleStats(String summarizeVehicles, String vehOcc, int it) {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
-				bw.write(
-						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det");
-				bw.newLine();
+				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
+						"totalRevenueDistance", "averageDrivenDistance", "averageEmptyDistance",
+						"averageRevenueDistance", "d_r/d_t", "l_det"));
 			}
-			bw.write(runId + ";" + it + ";" + summarizeVehicles);
-			bw.newLine();
+			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -193,7 +195,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_detailed_distanceStats", ".csv")) {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
-				bw.write("runId;iteration");
+				bw.write("runId;iteration;");
 				for (int i = 0; i <= maxcap; i++) {
 					bw.write(";" + i + " pax distance_m");
 				}
@@ -212,18 +214,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = IOUtils.getBufferedWriter(textFileName)) {
 			XYSeries times = new XYSeries("waittimes", true, true);
 
-			bw.append("RequestId;actualWaitTime;estimatedWaitTime;deviate");
+			bw.append(line("RequestId", "actualWaitTime", "estimatedWaitTime", "deviate"));
 			for (PerformedRequestEventSequence seq : performedRequestEventSequences) {
-				bw.newLine();
-				double actualWaitTime = seq.getPickedUp().getTime() - seq.getSubmitted().getTime();
-				double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
-
-				bw.append(seq.getSubmitted().getRequestId() + "").append(";").append(actualWaitTime + "")
-						.append(";")
-						.append(estimatedWaitTime + "")
-						.append(";")
-						.append((actualWaitTime - estimatedWaitTime) + "");
-				times.add(actualWaitTime, estimatedWaitTime);
+				if (seq.getPickedUp().isPresent()) {
+					double actualWaitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+					double estimatedWaitTime = seq.getScheduled().getPickupTime() - seq.getSubmitted().getTime();
+					bw.append(line(seq.getSubmitted().getRequestId(), actualWaitTime, estimatedWaitTime,
+							actualWaitTime - estimatedWaitTime));
+					times.add(actualWaitTime, estimatedWaitTime);
+				}
 			}
 
 			if (createChart) {
@@ -236,6 +235,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private static String line(Object... cells) {
+		return Arrays.stream(cells).map(Object::toString).collect(Collectors.joining(";", "", "\n"));
 	}
 
 	private BufferedWriter getAppendingBufferedWriter(String prefix, String extension) {
