@@ -118,22 +118,15 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 
 	private Map<String, DescriptiveStatistics> createZonalStats(String delimiter) {
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
-		for (PerformedRequestEventSequence data : requestAnalyzer.getPerformedRequestSequences().values()) {
-			DrtZone zone = zones.getZoneForLinkId(data.getSubmitted().getFromLinkId());
-			final String zoneStr;
-			if (zone != null) {
-				//request submission inside drtServiceArea
-				zoneStr = zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY();
-			} else {
-				zoneStr = "outsideOfDrtZonalSystem;-;-";
+		for (PerformedRequestEventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
+			if (seq.getPickedUp().isPresent()) {
+				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+				final String zoneStr = zone != null ?
+						zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY() :
+						"outsideOfDrtZonalSystem;-;-";
+				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+				zoneStats.computeIfAbsent(zoneStr, z -> new DescriptiveStatistics()).addValue(waitTime);
 			}
-			DescriptiveStatistics waitingTimeStats = zoneStats.get(zoneStr);
-			if (waitingTimeStats == null) {
-				waitingTimeStats = new DescriptiveStatistics();
-			}
-			double waitTime = data.getPickedUp().getTime() - data.getSubmitted().getTime();
-			waitingTimeStats.addValue(waitTime);
-			zoneStats.put(zoneStr, waitingTimeStats);
 		}
 		return zoneStats;
 	}

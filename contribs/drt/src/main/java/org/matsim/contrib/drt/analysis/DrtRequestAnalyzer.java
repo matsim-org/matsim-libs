@@ -24,6 +24,9 @@ package org.matsim.contrib.drt.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
@@ -52,7 +55,10 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 	public static class PerformedRequestEventSequence {
 		private final DrtRequestSubmittedEvent submitted;
 		private final PassengerRequestScheduledEvent scheduled;
+		//pickedUp and droppedOff may be null if QSim ends before the request is actually handled
+		@Nullable
 		private PassengerPickedUpEvent pickedUp;
+		@Nullable
 		private PassengerDroppedOffEvent droppedOff;
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
@@ -69,12 +75,12 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 			return scheduled;
 		}
 
-		public PassengerPickedUpEvent getPickedUp() {
-			return pickedUp;
+		public Optional<PassengerPickedUpEvent> getPickedUp() {
+			return Optional.ofNullable(pickedUp);
 		}
 
-		public PassengerDroppedOffEvent getDroppedOff() {
-			return droppedOff;
+		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
+			return Optional.ofNullable(droppedOff);
 		}
 	}
 
