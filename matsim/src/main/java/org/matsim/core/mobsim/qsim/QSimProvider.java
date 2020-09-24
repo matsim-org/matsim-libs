@@ -22,9 +22,10 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.*;
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Named;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.IterationCounter;
@@ -39,26 +40,34 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.List;
+import com.google.inject.AbstractModule;
+import com.google.inject.ConfigurationException;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 
 public class QSimProvider implements Provider<QSim> {
 	private static final Logger log = Logger.getLogger(QSimProvider.class);
 
 	private Injector injector;
 	private Config config;
+	private IterationCounter iterationCounter;
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
 	private QSimComponentsConfig components;
 
 	@Inject
-	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			 QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
+	QSimProvider(Injector injector, Config config, IterationCounter iterationCounter,
+			Collection<AbstractQSimModule> modules, QSimComponentsConfig components,
+			@Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
 		this.config = config;
+		this.iterationCounter = iterationCounter;
 		this.components = components;
 		this.overridingModules = overridingModules;
 	}
@@ -69,6 +78,10 @@ public class QSimProvider implements Provider<QSim> {
 
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
+
+		int iterationNumber = iterationCounter.getIterationNumber();
+		modules.forEach(m -> m.setIterationNumber(iterationNumber));
+		overridingModules.forEach(m -> m.setIterationNumber(iterationNumber));
 
 		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
