@@ -26,12 +26,15 @@ public class RLS19NoiseImmission implements NoiseImmission {
     private final NoiseContext noiseContext;
 
     private final ShieldingContext shielding;
+    private final IntersectionContext intersection;
 
     @Inject
-    RLS19NoiseImmission(NoiseContext noiseContext, ShieldingContext shielding) {
+    RLS19NoiseImmission(NoiseContext noiseContext, ShieldingContext shielding,
+                        IntersectionContext intersection) {
         this.noiseParams = noiseContext.getNoiseParams();
         this.noiseContext = noiseContext;
         this.shielding = shielding;
+        this.intersection = intersection;
     }
 
     @Override
@@ -137,17 +140,26 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
     private double calculateCorrection(Coordinate nrp, LineSegment segment) {
 
-        double distance = Math.max(1, segment.midPoint().distance(nrp));
+        final Coordinate coordinate = segment.midPoint();
+        double distance = Math.max(1, coordinate.distance(nrp));
 
+        //Intersection correction is actually part of the emission calculation. However, since it is
+        //independent from time and speed, we calculate it now and merge it with the correction term
+        //This way, we are more efficient in memory (no extra values needed) and also we don't need
+        //to memorize how links were segmented. The information on segments is not available during
+        //emission calculation. We have to _subtract_ the correction from the other correction terms
+        //to maintain the correct signs. nk, Sep'20
+        double intersectionCorrection = intersection.calculateIntersectionCorrection(coordinate);
 
         double geometricDivergence = 20 * Math.log10(distance) + 10 * Math.log10(2 * Math.PI);
         double airDampeningFactor = distance / 200.;
         double groundDampening = Math.max(4.8 - (AVERAGE_GROUND_HEIGHT / distance) * (34 + 600 / distance), 0);
 
         if (noiseParams.isConsiderNoiseBarriers()) {
-            return geometricDivergence + airDampeningFactor + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
+            return geometricDivergence + airDampeningFactor - intersectionCorrection
+                    + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
         } else {
-            return geometricDivergence + airDampeningFactor + groundDampening ;
+            return geometricDivergence + airDampeningFactor - intersectionCorrection + groundDampening ;
         }
 
         //TODO: implement reflection - if someone is looking for a (bachelor) thesis...

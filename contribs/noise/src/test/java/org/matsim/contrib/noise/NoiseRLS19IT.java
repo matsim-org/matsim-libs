@@ -110,8 +110,7 @@ public class NoiseRLS19IT {
         Assert.assertEquals("Wrong base pkw emission!", 97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON);
 
         double singleVehicleEmission =
-                emission.calculateSingleVehicleEmission(RLS19VehicleType.pkw, 40, 0,
-                        RLS19NoiseEmission.RLS19IntersectionType.other, 0);
+                emission.calculateSingleVehicleEmission(RLS19VehicleType.pkw, 40, 0);
         Assert.assertEquals("Wrong single pkw emission!", 97.70334139531323, singleVehicleEmission, MatsimTestUtils.EPSILON);
 
         final double vehicleTypePart = emission.calculateVehicleTypeNoise(1, 40, singleVehicleEmission);
@@ -179,7 +178,7 @@ public class NoiseRLS19IT {
         NoiseReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
 
 
-        RLS19NoiseImmission immission = new RLS19NoiseImmission(noiseContext, shieldingContext);
+        RLS19NoiseImmission immission = new RLS19NoiseImmission(noiseContext, shieldingContext, new IntersectionContext(network));
 
         noiseLink.setEmission(65);
         noiseLink2.setEmission(55);
