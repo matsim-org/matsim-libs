@@ -19,13 +19,17 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
-import org.locationtech.jts.geom.Geometry;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
@@ -33,70 +37,71 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import javax.annotation.Nullable;
+import one.util.streamex.EntryStream;
+import one.util.streamex.StreamEx;
 
 /**
  * @author jbischoff
  * @author Michal Maciejewski (michalm)
+ * @author Tilmann Schlenther (tschlenther)
  */
 public class DrtZonalSystem {
+
 	public static DrtZonalSystem createFromPreparedGeometries(Network network,
 			Map<String, PreparedGeometry> geometries) {
-		return new DrtZonalSystem(network, geometries.entrySet()
-				.stream()
-				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
-	}
 
-	public static DrtZonalSystem createFromGeometries(Network network, Map<String, Geometry> geometries) {
-		return new DrtZonalSystem(network, geometries.entrySet()
-				.stream()
-				.collect(toMap(Entry::getKey, e -> new DrtZone(e.getKey(), e.getValue()))));
-	}
+		//geometries without links are skipped
+		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
+				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+				.filterKeys(Objects::nonNull)
+				.grouping(toList());
 
-	private static final DrtZone NO_ZONE = new DrtZone(null, null, null, null);
+		//the zonal system contains only zones that have at least one link
+		Map<String, DrtZone> zones = EntryStream.of(linksByGeometryId).mapKeyValue((id, links) -> {
+			PreparedGeometry geometry = geometries.get(id);
+			return new DrtZone(id, geometry, links);
+		}).collect(toMap(DrtZone::getId, z -> z));
 
-	private final Map<Id<Link>, DrtZone> link2zone = new HashMap<>();
-	private final Network network;
-	private final Map<String, DrtZone> zones;
-
-	public DrtZonalSystem(Network network, Map<String, DrtZone> zones) {
-		this.network = network;
-		this.zones = zones;
+		return new DrtZonalSystem(zones);
 	}
 
 	/**
-	 *
+	 * @param link
+	 * @return the the {@code PreparedGeometry} that contains the {@code linkId}.
+	 * If a given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
+	 * Result may be null in case the given link is outside of the service area.
+	 */
+	@Nullable
+	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
+		//TODO use endNode.getCoord() ?
+		Point linkCoord = MGC.coord2Point(link.getCoord());
+		return geometries.entrySet()
+				.stream()
+				.filter(e -> e.getValue().intersects(linkCoord))
+				.findAny()
+				.map(Entry::getKey)
+				.orElse(null);
+	}
+
+	private final Map<String, DrtZone> zones;
+	private final Map<Id<Link>, DrtZone> link2zone;
+
+	public DrtZonalSystem(Map<String, DrtZone> zones) {
+		this.zones = zones;
+		this.link2zone = zones.values()
+				.stream()
+				.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
+				.collect(toMap(Pair::getKey, Pair::getValue));
+	}
+
+	/**
 	 * @param linkId
 	 * @return the the {@code DrtZone} that contains the {@code linkId}. If the given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
 	 * Result may be null in case the given link is outside of the service area.
-	 *
 	 */
 	@Nullable
 	public DrtZone getZoneForLinkId(Id<Link> linkId) {
-		DrtZone zone = link2zone.get(linkId);
-		if (zone != null) {
-			return zone == NO_ZONE ? null : zone;
-		}
-
-		Point linkCoord = MGC.coord2Point(network.getLinks().get(linkId).getCoord());
-		for (DrtZone z : zones.values()) {
-			if (intersects(z, linkCoord)) {
-				//if a link Coord borders two or more cells, the allocation to a cell is random.
-				// Seems hard to overcome, but most likely better than returning no zone at
-				// all and mostly not too relevant in non-grid networks.
-				// jb, june 2019
-				link2zone.put(linkId, z);
-				return z;
-			}
-		}
-
-		link2zone.put(linkId, NO_ZONE);
-		return null;
-	}
-
-	private boolean intersects(DrtZone zone, Point point) {
-		PreparedGeometry preparedGeometry = zone.getPreparedGeometry();
-		return preparedGeometry != null ? preparedGeometry.intersects(point) : zone.getGeometry().intersects(point);
+		return link2zone.get(linkId);
 	}
 
 	/**

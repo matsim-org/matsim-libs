@@ -42,6 +42,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
+import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.collections.Tuple;
@@ -51,6 +53,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 
+import javax.inject.Inject;
+
 
 /**
  * @author jbischoff / SBB
@@ -58,7 +62,7 @@ import org.matsim.pt.routes.TransitPassengerRoute;
 public class TripsAndLegsCSVWriter {
     public static final String[] TRIPSHEADER_BASE = {"person", "trip_number", "trip_id",
             "dep_time", "trav_time", "wait_time", "traveled_distance", "euclidean_distance",
-            "longest_distance_mode", "modes", "start_activity_type",
+            "main_mode", "longest_distance_mode", "modes", "start_activity_type",
             "end_activity_type", "start_facility_id", "start_link",
             "start_x", "start_y", "end_facility_id",
             "end_link", "end_x", "end_y", "first_pt_boarding_stop", "last_pt_egress_stop"};
@@ -73,17 +77,20 @@ public class TripsAndLegsCSVWriter {
     private final CustomTripsWriterExtension tripsWriterExtension;
     private final Scenario scenario;
     private final CustomLegsWriterExtension legsWriterExtension;
+    private final AnalysisMainModeIdentifier mainModeIdentifier;
 
     private static final Logger log = Logger.getLogger(TripsAndLegsCSVWriter.class);
 
-
-    public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension, CustomLegsWriterExtension legWriterExtension) {
+    public TripsAndLegsCSVWriter(Scenario scenario, CustomTripsWriterExtension tripsWriterExtension,
+                                 CustomLegsWriterExtension legWriterExtension,
+                                 AnalysisMainModeIdentifier mainModeIdentifier) {
         this.scenario = scenario;
         this.separator = scenario.getConfig().global().getDefaultDelimiter();
         TRIPSHEADER = ArrayUtils.addAll(TRIPSHEADER_BASE, tripsWriterExtension.getAdditionalTripHeader());
         LEGSHEADER = ArrayUtils.addAll(LEGSHEADER_BASE, legWriterExtension.getAdditionalLegHeader());
         this.tripsWriterExtension = tripsWriterExtension;
         this.legsWriterExtension = legWriterExtension;
+        this.mainModeIdentifier = mainModeIdentifier;
     }
 
     public void write(IdMap<Person, Plan> experiencedPlans, String tripsFilename, String legsFilename) {
@@ -110,6 +117,15 @@ public class TripsAndLegsCSVWriter {
         List<List<String>> legRecords = new ArrayList<>();
         Tuple<Iterable<?>, Iterable<?>> record = new Tuple<>(tripRecords, legRecords);
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(experiencedPlan);
+
+        /*
+         * The (unlucky) default RoutingModeMainModeIdentifier needs routing modes set in the legs. Unfortunately the
+         * plans recreated based on events do not have the routing mode attribute, because routing mode is not transmitted
+         * in any event. So RoutingModeMainModeIdentifier cannot identify a main mode and throws log errors.
+         * Avoid this and check if the AnalysisMainModeIdentifier was bound to something more useful before calling it.
+         */
+        boolean workingMainModeIdentifier = mainModeIdentifier != null &&
+                !mainModeIdentifier.getClass().equals(RoutingModeMainModeIdentifier.class);
 
         for (int i = 0; i < trips.size(); i++) {
             TripStructureUtils.Trip trip = trips.get(i);
@@ -141,6 +157,14 @@ public class TripsAndLegsCSVWriter {
             String firstPtBoardingStop = null;
             String lastPtEgressStop = null;
 
+            String mainMode = "";
+            if (workingMainModeIdentifier) {
+                try {
+                    mainMode = mainModeIdentifier.identifyMainMode(trip.getTripElements());
+                } catch (Exception e) {
+                    // leave field empty
+                }
+            }
 
             for (Leg leg : trip.getLegsOnly()) {
                 modes.add(leg.getMode());
@@ -169,6 +193,7 @@ public class TripsAndLegsCSVWriter {
             tripRecord.add(Time.writeTime(totalWaitingTime));
             tripRecord.add(Integer.toString((int) Math.round(distance)));
             tripRecord.add(Integer.toString(euclideanDistance));
+            tripRecord.add(mainMode);
             tripRecord.add(currentModeWithLongestShare);
             tripRecord.add(modes.stream().collect(Collectors.joining("-")));
             tripRecord.add(lastActivityType);
