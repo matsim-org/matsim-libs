@@ -14,22 +14,7 @@ import static org.matsim.contrib.noise.RLS19VehicleType.*;
  */
 class RLS19NoiseEmission implements NoiseEmission {
 
-    enum RLS19IntersectionType {
 
-        signalized(3),
-        roundabout(2),
-        other(0);
-
-        private final double correction;
-
-        RLS19IntersectionType(double correction) {
-            this.correction = correction;
-        }
-
-        public double getCorrection() {
-            return correction;
-        }
-    }
 
     private final NoiseConfigGroup noiseParams;
     private final Network network;
@@ -119,15 +104,13 @@ class RLS19NoiseEmission implements NoiseEmission {
             g = (Double) gradient;
         }
 
-        RLS19IntersectionType intersectionType = RLS19IntersectionType.other;
-        double intersectionDistance = 0;
 
         double singlePkwEmission
-                = calculateSingleVehicleEmission(pkw, vPkw, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(pkw, vPkw, g);
         double singleLkw1Emission
-                = calculateSingleVehicleEmission(lkw1, vLkw1, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(lkw1, vLkw1, g);
         double singleLkw2Emission
-                = calculateSingleVehicleEmission(lkw2, vLkw2, g, intersectionType, intersectionDistance);
+                = calculateSingleVehicleEmission(lkw2, vLkw2, g);
 
         double partPkw = calculateVehicleTypeNoise(1 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
         double partLkw1 = calculateVehicleTypeNoise(pLkw1, vLkw1, singleLkw1Emission);
@@ -147,31 +130,16 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g,
-                                                  RLS19IntersectionType intersectionType, double intersectionDistance) {
+    double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g) {
         double baseValue = calculateBaseVehicleTypeEmission(vehicleType, v);
         double surfaceCorrection = calculateSurfaceCorrection();
         double gradientCorrection = calculateGradientCorrection(g, v, vehicleType);
-        double intersectionCorrection = calculateIntersectionCorrection(intersectionType, intersectionDistance);
         double reflectionCorrection = calculateReflectionCorrection();
 
-        double emission = baseValue + surfaceCorrection + gradientCorrection + intersectionCorrection + reflectionCorrection;
+        double emission = baseValue + surfaceCorrection + gradientCorrection + reflectionCorrection;
         return emission;
     }
 
-    /**
-     * Die Stoerwirkung durch das Anfahren und Bremsen der Fahrzeuge an Knotenpunkten wird in Abhaengigkeit
-     * vom Knotenpunkttyp {@link RLS19IntersectionType} und von der Entfernung zum Schnittpunkt von sich
-     * kreuzenden oder zusammentreffenden Quellinien bestimmt (=nodes)
-     *
-     * <p> The disturbance caused by the starting and braking of vehicles at junctions is determined
-     * according to the type of junction {@link RLS19IntersectionType} and the distance to the point of
-     * intersection of intersecting or converging source lines (=nodes)
-     */
-    double calculateIntersectionCorrection(RLS19IntersectionType intersectionType, double distance) {
-        double correction = intersectionType.correction * Math.max(1 - (distance / 120.), 0);
-        return correction;
-    }
 
     /**
      * Auf Steigungs- und Gefaellestrecken treten erhoehte Schallemissionen auf.
