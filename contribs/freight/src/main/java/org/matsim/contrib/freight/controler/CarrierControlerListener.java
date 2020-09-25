@@ -29,9 +29,7 @@
 package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -47,7 +45,7 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.replanning.GenericStrategyManager;
 
 import javax.inject.Inject;
-import java.util.Map;
+
 /**
  * Controls the workflow of the simulation.
  * <p></p>
@@ -62,45 +60,35 @@ import java.util.Map;
 class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener {
 	private static final Logger log = Logger.getLogger( CarrierControlerListener.class ) ;
 
-	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
+	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
-	private CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
+	private final CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
 
 	private CarrierAgentTracker carrierAgentTracker;
 
 	@Inject EventsManager eventsManager;
-	@Inject Network network;
 	@Inject Scenario scenario;
 
 	/**
 	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
 	 */
-	@Inject
-	CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
+	@Inject CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
 //		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
 		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
 		this.carrierScoringFunctionFactory = scoringFunctionFactory;
 	}
 
-	public Map<Id<Carrier>, Carrier> getCarriers() {
-		return FreightUtils.getCarriers(scenario).getCarriers();
-	}
-
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), network, carrierScoringFunctionFactory);
+	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
 		eventsManager.addHandler(carrierAgentTracker);
 		// (add and remove per mobsim run)
 	}
 
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
+	@Override public void notifyAfterMobsim(AfterMobsimEvent event) {
 		eventsManager.removeHandler(carrierAgentTracker);
 	}
 
-	@Override
-	public void notifyScoring(ScoringEvent event) {
-//		log.warn( "calling notifyScoring" );
+	@Override public void notifyScoring(ScoringEvent event) {
 		carrierAgentTracker.scoreSelectedPlans();
 	}
 
@@ -108,8 +96,7 @@ class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListe
 		return carrierAgentTracker;
 	}
 
-	@Override
-	public void notifyReplanning(final ReplanningEvent event) {
+	@Override public void notifyReplanning(final ReplanningEvent event) {
 		if (carrierPlanStrategyManagerFactory == null) {
 			return;
 		}

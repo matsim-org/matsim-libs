@@ -69,7 +69,7 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 	private InternalInterface internalInterface;
 
 	private final Multimap<Id<Person>, PassengerRequest> advanceRequests = ArrayListMultimap.create();
-	private final PassengerHandler passengerHandler;
+	private final InternalPassengerHandling internalPassengerHandling;
 	private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
 
 	private final Map<Id<Request>, RequestEntry> activeRequests = new HashMap<>();
@@ -86,14 +86,14 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 		this.network = network;
 		this.requestValidator = requestValidator;
 
-		passengerHandler = new PassengerHandler(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		passengerHandler.setInternalInterface(internalInterface);
+		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
 
 	public String getMode() {
@@ -140,9 +140,10 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
-		PassengerRequest request = requestCreator.createRequest(passengerHandler.createRequestId(), passenger.getId(),
-				tripInfo.getOriginalRequest().getPlannedRoute(), getLink(tripInfo.getPickupLocation().getLinkId()),
-				getLink(tripInfo.getDropoffLocation().getLinkId()), tripInfo.getExpectedBoardingTime(), now);
+		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+				passenger.getId(), tripInfo.getOriginalRequest().getPlannedRoute(),
+				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
+				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, tripInfo.getOriginalRequest(), now);
 		advanceRequests.put(request.getPassengerId(), request);
 	}
@@ -193,14 +194,14 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request,
 			TripInfo.Request originalRequest, double now) {
 		activeRequests.put(request.getId(), new RequestEntry(request, passenger, originalRequest));
-		if (passengerHandler.validateRequest(request, requestValidator, now)) {
+		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
 		}
 	}
 
 	// ================ PICKUP / DROPOFF
 
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
 		Id<Link> linkId = driver.getCurrentLinkId();
 		RequestEntry requestEntry = activeRequests.get(request.getId());
@@ -213,7 +214,7 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 			return false;// wait for the passenger
 		}
 
-		if (!passengerHandler.tryPickUpPassenger(driver, passenger, now)) {
+		if (!internalPassengerHandling.tryPickUpPassenger(driver, passenger, request.getId(), now)) {
 			// the passenger has already been picked up and is on another taxi trip
 			// seems there have been at least 2 requests made by this passenger for this location
 			awaitingPickups.put(request.getId(), pickupActivity);
@@ -224,7 +225,8 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 	}
 
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activeRequests.remove(request.getId()).passenger, now);
+		internalPassengerHandling.dropOffPassenger(driver, activeRequests.remove(request.getId()).passenger,
+				request.getId(), now);
 	}
 
 	// ================ REJECTED/SCHEDULED EVENTS

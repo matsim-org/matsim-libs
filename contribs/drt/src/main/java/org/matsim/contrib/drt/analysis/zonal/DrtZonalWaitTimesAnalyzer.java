@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -117,22 +118,15 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 
 	private Map<String, DescriptiveStatistics> createZonalStats(String delimiter) {
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
-		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
-			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
-			DrtZone zone = zones.getZoneForLinkId(submission.getFromLinkId());
-			final String zoneStr;
-			if (zone != null) {
-				//request submission inside drtServiceArea
-				zoneStr = zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY();
-			} else {
-				zoneStr = "outsideOfDrtZonalSystem;-;-";
+		for (PerformedRequestEventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
+			if (seq.getPickedUp().isPresent()) {
+				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+				final String zoneStr = zone != null ?
+						zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY() :
+						"outsideOfDrtZonalSystem;-;-";
+				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+				zoneStats.computeIfAbsent(zoneStr, z -> new DescriptiveStatistics()).addValue(waitTime);
 			}
-			DescriptiveStatistics waitingTimeStats = zoneStats.get(zoneStr);
-			if (waitingTimeStats == null) {
-				waitingTimeStats = new DescriptiveStatistics();
-			}
-			waitingTimeStats.addValue(requestAnalyzer.getWaitTimeCompare().get(requestId).getFirst());
-			zoneStats.put(zoneStr, waitingTimeStats);
 		}
 		return zoneStats;
 	}
