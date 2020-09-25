@@ -355,11 +355,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
          */
 		new NetworkCleaner().run(network);
 		new LanesAndSignalsCleaner().run(scenario);
+
 		/*
 		 * Write the files out: network, lanes, signalSystems, signalGroups,
 		 * signalControl
 		 */
-
 		new NetworkWriter(network).write(outputDir + "network.xml");
 		new LanesWriter(lanes).write(outputDir + "lanes.xml");
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
