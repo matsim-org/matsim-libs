@@ -146,6 +146,10 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (!event.getMode().equals(mode)) {
+			return;
+		}
+
 		MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
 		//not much else can be done for immediate requests
 		//set the passenger agent to abort - the event will be thrown by the QSim
