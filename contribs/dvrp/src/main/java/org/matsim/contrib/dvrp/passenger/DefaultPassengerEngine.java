@@ -47,7 +47,7 @@ import com.google.common.base.Verify;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public final class DefaultPassengerEngine implements PassengerEngine {
+public final class DefaultPassengerEngine implements PassengerEngine, PassengerRequestRejectedEventHandler {
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
@@ -65,7 +65,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
-			PassengerRequestValidator requestValidator, PassengerRequestEventForwarder passengerRequestEventForwarder) {
+			PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.requestCreator = requestCreator;
@@ -74,7 +74,6 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		this.requestValidator = requestValidator;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
-		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
@@ -146,17 +145,12 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event) {
+	public void handleEvent(PassengerRequestRejectedEvent event) {
 		MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
 		//not much else can be done for immediate requests
 		//set the passenger agent to abort - the event will be thrown by the QSim
 		passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
 		internalInterface.arrangeNextAgentState(passenger);
-	}
-
-	@Override
-	public void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event) {
-		//nothing needed here
 	}
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
@@ -167,14 +161,11 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 			@Inject
 			private MobsimTimer mobsimTimer;
 
-			@Inject
-			private PassengerRequestEventForwarder passengerRequestEventForwarder;
-
 			@Override
 			public DefaultPassengerEngine get() {
-				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
-						passengerRequestEventForwarder);
+				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer,
+						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
+						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}
