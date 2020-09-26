@@ -24,6 +24,10 @@ package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -36,36 +40,42 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "taxifare";
 
 	public static final String BASEFARE = "basefare";
-    public static final String MINFARE_PER_TRIP = "minFarePerTrip";
+	public static final String MINFARE_PER_TRIP = "minFarePerTrip";
 	public static final String DAILY_FEE = "dailySubscriptionFee";
 	public static final String TIMEFARE = "timeFare_h";
 	public static final String DISTANCEFARE = "distanceFare_m";
 	public static final String MODE = "mode";
 
+	@PositiveOrZero
 	private double basefare;
-    private double minFarePerTrip = 0.0;
+	@PositiveOrZero
+	private double minFarePerTrip = 0.0;
+	@PositiveOrZero
 	private double dailySubscriptionFee;
+	@PositiveOrZero
 	private double timeFare_h;
+	@PositiveOrZero
 	private double distanceFare_m;
-	private String mode = "taxi";
+	@NotBlank
+	private String mode = TransportMode.taxi;
 
 	public TaxiFareConfigGroup() {
 		super(GROUP_NAME);
 
 	}
 
-    @Override
-    public Map<String, String> getComments()
-    {
-        Map<String, String> map = super.getComments();
-        map.put(BASEFARE, "Basefare per Trip (fare = positive value)");
-        map.put(MINFARE_PER_TRIP, "Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, fee = positive value).");
-        map.put(DAILY_FEE, "Daily subscription fee (fee = positive value)");
-        map.put(TIMEFARE , "taxi fare per hour (fee = positive value)");
-        map.put(DISTANCEFARE, "taxi fare per meter (fee = positive value)");
-        map.put(MODE, "transport mode for which the fare applies. Default: taxi");
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(BASEFARE, "Basefare per trip (positive or zero value)");
+		map.put(MINFARE_PER_TRIP,
+				"Minimum fare per trip (paid instead of the sum of base, time and distance fare if that sum would be lower than the minimum fare, positive or zero value).");
+		map.put(DAILY_FEE, "Daily subscription fee (positive or zero value)");
+		map.put(TIMEFARE, "taxi fare per hour (positive or zero value)");
+		map.put(DISTANCEFARE, "taxi fare per meter (positive or zero value)");
+		map.put(MODE, "transport mode for which the fare applies. Default: taxi");
 		return map;
-    }
+	}
 
 
 	@StringGetter(BASEFARE)
