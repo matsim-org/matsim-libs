@@ -65,8 +65,7 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 
 	public TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
-			Network network, PassengerRequestValidator requestValidator,
-			PassengerRequestEventForwarder passengerRequestEventForwarder) {
+			Network network, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -76,7 +75,6 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 		this.requestValidator = requestValidator;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
-		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
@@ -154,14 +152,6 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 		throw new UnsupportedOperationException("No dropping-off when teleporting");
 	}
 
-	@Override
-	public void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event) {
-	}
-
-	@Override
-	public void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event) {
-	}
-
 	public static Provider<PassengerEngine> createProvider(String mode) {
 		return new ModalProviders.AbstractProvider<>(mode) {
 			@Inject
@@ -170,15 +160,12 @@ public class TeleportingPassengerEngine implements PassengerEngine {
 			@Inject
 			private MobsimTimer mobsimTimer;
 
-			@Inject
-			private PassengerRequestEventForwarder passengerRequestEventForwarder;
-
 			@Override
 			public TeleportingPassengerEngine get() {
 				return new TeleportingPassengerEngine(getMode(), eventsManager, mobsimTimer,
 						getModalInstance(PassengerRequestCreator.class),
 						getModalInstance(TeleportedRouteCalculator.class), getModalInstance(Network.class),
-						getModalInstance(PassengerRequestValidator.class), passengerRequestEventForwarder);
+						getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}
