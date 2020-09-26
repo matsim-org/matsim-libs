@@ -78,9 +78,16 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 	private InternalInterface internalInterface;
 
-	public TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
 			Network network, PassengerRequestValidator requestValidator, Scenario scenario) {
+		this(mode, eventsManager, mobsimTimer, requestCreator, teleportedRouteCalculator, network, requestValidator,
+				new DefaultTeleportationEngine(scenario, eventsManager, false));
+	}
+
+	TeleportingPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
+			PassengerRequestCreator requestCreator, TeleportedRouteCalculator teleportedRouteCalculator,
+			Network network, PassengerRequestValidator requestValidator, TeleportationEngine teleportationEngine) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
@@ -88,9 +95,9 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		this.teleportedRouteCalculator = teleportedRouteCalculator;
 		this.network = network;
 		this.requestValidator = requestValidator;
+		this.teleportationEngine = teleportationEngine;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
-		teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, false);
 	}
 
 	@Override
@@ -138,7 +145,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			adaptRouteForTeleportation(passenger, request, now);
 			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
-			teleportationEngine.handleDeparture(now, agent, fromLinkId);
+			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
 			teleportedRequests.add(ImmutablePair.of(now + route.getTravelTime().seconds(), request));
 		} else {
 			//not much else can be done for immediate requests
