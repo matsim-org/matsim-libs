@@ -155,19 +155,23 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void addHandler (final EventHandler handler) {
-		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
+		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
-		while (test != Object.class) {
-			for (Class<?> theInterface: test.getInterfaces()) {
-				if (!addedHandlers.contains(theInterface)) {
-					log.info("  " + theInterface.getName());
-					addHandlerInterfaces(handler, theInterface);
-					addedHandlers.add(theInterface);
+		do {
+			for (Class<?> theInterface : test.getInterfaces()) {
+				if (EventHandler.class.isAssignableFrom(theInterface)) {
+					Class<? extends EventHandler> eventHandlerInterface = (Class<? extends EventHandler>)theInterface;
+					if (!addedHandlers.contains(theInterface)) {
+						log.info("  " + theInterface.getName());
+						addHandlerInterfaces(handler, eventHandlerInterface);
+						addedHandlers.add(theInterface);
+					}
 				}
 			}
 			test = test.getSuperclass();
-		}
+		} while ((EventHandler.class.isAssignableFrom(test)));
+
 		this.cacheHandlers.clear();
 		log.info("");
 	}
@@ -213,7 +217,7 @@ public final class EventsManagerImpl implements EventsManager {
 		// nothing to do in this implementation
 	}
 
-	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
+	private void addHandlerInterfaces(final EventHandler handler, final Class<? extends EventHandler> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
 			if (method.getName().equals("handleEvent")) {
