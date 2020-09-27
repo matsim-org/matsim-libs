@@ -103,18 +103,19 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 				.collect(toList());
 
 		DrtTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejectedRequestSequences().values(),
-				filename(event, "drt_rejections", ".csv"), "time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY",
-				seq -> {
+				filename(event, "drt_rejections", ".csv"),
+				String.join(";", "time", "personId", "fromLinkId", "toLinkId", "fromX", "fromY", "toX", "toY"), seq -> {
 					DrtRequestSubmittedEvent submission = seq.getSubmitted();
 					Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
 					Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();
-					return submission.getTime() + ";" + submission.getPersonId()
-							+ ";"
-							+ submission.getFromLinkId()
-							+ ";"
-							+ submission.getToLinkId()
-							+ ";"
-							+ fromCoord.getX() + ";" + fromCoord.getY() + ";" + toCoord.getX() + ";" + toCoord.getY();
+					return String.join(";", submission.getTime() + "",//
+							submission.getPersonId() + "",//
+							submission.getFromLinkId() + "",//
+							submission.getToLinkId() + "",//
+							fromCoord.getX() + "",//
+							fromCoord.getY() + "",//
+							toCoord.getX() + "",//
+							toCoord.getY() + "");
 				});
 
 		double rejectionRate = (double)drtRequestAnalyzer.getRejectedRequestSequences().size()

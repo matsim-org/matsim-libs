@@ -142,27 +142,18 @@ public class DrtTripsAnalyser {
 			rideStats.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime);
 			distanceStats.addValue(travelDistances.get(trip.request));
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
-			traveltimes.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime + trip.waitTime);
+			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
-		return format.format(waitStats.getValues().length)
-				+ delimiter
-				+ format.format(waitStats.getMean())
-				+ delimiter
-				+ format.format(waitStats.getMax())
-				+ delimiter
-				+ format.format(waitStats.getPercentile(95))
-				+ delimiter
-				+ format.format(waitStats.getPercentile(75))
-				+ delimiter
-				+ format.format(waitStats.getPercentile(50))
-				+ delimiter
-				+ format.format(rideStats.getMean())
-				+ delimiter
-				+ format.format(distanceStats.getMean())
-				+ delimiter
-				+ format.format(directDistanceStats.getMean())
-				+ delimiter
-				+ format.format(traveltimes.getMean());
+		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
+				format.format(waitStats.getMean()) + "",//
+				format.format(waitStats.getMax()) + "",//
+				format.format(waitStats.getPercentile(95)) + "",//
+				format.format(waitStats.getPercentile(75)) + "",//
+				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(rideStats.getMean()) + "",//
+				format.format(distanceStats.getMean()) + "",//
+				format.format(directDistanceStats.getMean()) + "",//
+				format.format(traveltimes.getMean()));
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {
@@ -195,26 +186,20 @@ public class DrtTripsAnalyser {
 			}
 
 			double travelDistance = travelDistances.get(trip.request);
-			double travelTime = trip.arrivalTime - trip.departureTime - trip.waitTime + trip.waitTime;
+			double travelTime = trip.arrivalTime - trip.departureTime;
 			distances.add(travelDistance, trip.unsharedDistanceEstimate_m);
 			travelTimes.add(travelTime, trip.unsharedTimeEstimate_m);
 			rideTimes.add(trip.arrivalTime - trip.departureTime - trip.waitTime, trip.unsharedTimeEstimate_m);
 
 			double distanceDetour = travelDistance / trip.unsharedDistanceEstimate_m;
 			double timeDetour = travelTime / trip.unsharedTimeEstimate_m;
-			detours.add(trip.person
-					+ ";"
-					+ travelDistance
-					+ ";"
-					+ trip.unsharedDistanceEstimate_m
-					+ ";"
-					+ distanceDetour
-					+ ";"
-					+ travelTime
-					+ ";"
-					+ trip.unsharedTimeEstimate_m
-					+ ";"
-					+ timeDetour);
+			detours.add(String.join(";", trip.person + "",//
+					travelDistance + "",//
+					trip.unsharedDistanceEstimate_m + "",//
+					distanceDetour + "",//
+					travelTime + "",//
+					trip.unsharedTimeEstimate_m + "",//
+					timeDetour + ""));
 		}
 
 		collection2Text(detours, fileName + ".csv",
@@ -297,25 +282,16 @@ public class DrtTripsAnalyser {
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
 				requests.addOrUpdate(h, rides * 3600. / binsize_s);// normalised [req/h]
 				bw.newLine();
-				bw.write(Time.writeTime(e.getKey())
-						+ ";"
-						+ rides
-						+ ";"
-						+ format.format(averageWait)
-						+ ";"
-						+ format.format(min)
-						+ ";"
-						+ format.format(p_5)
-						+ ";"
-						+ format.format(p_25)
-						+ ";"
-						+ format.format(median)
-						+ ";"
-						+ format.format(p_75)
-						+ ";"
-						+ format.format(p_95)
-						+ ";"
-						+ format.format(max));
+				bw.write(String.join(";", Time.writeTime(e.getKey()) + "",//
+						rides + "",//
+						format.format(averageWait) + "",//
+						format.format(min) + "",//
+						format.format(p_5) + "",//
+						format.format(p_25) + "",//
+						format.format(median) + "",//
+						format.format(p_75) + "",//
+						format.format(p_95) + "",//
+						format.format(max) + ""));
 
 			}
 			bw.flush();
@@ -442,14 +418,15 @@ public class DrtTripsAnalyser {
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		return vehicleDistances.size() + del + format.format(driven.getSum())
-				+ del
-				+ format.format(empty.getSum())
-				+ del
-				+ format.format(empty.getSum() / driven.getSum())
-				+ del
-				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del + format.format(
-				empty.getMean()) + del + format.format(revenue.getMean()) + del + format.format(d_r_d_t);
+		return String.join(del, vehicleDistances.size() + "",//
+				format.format(driven.getSum()) + "",//
+				format.format(empty.getSum()) + "",//
+				format.format(empty.getSum() / driven.getSum()) + "",//
+				format.format(revenue.getSum()) + "",//
+				format.format(driven.getMean()) + "",//
+				format.format(empty.getMean()) + "",//
+				format.format(revenue.getMean()) + "",//
+				format.format(d_r_d_t) + "");
 	}
 
 	public static double getTotalDistance(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances) {
@@ -469,7 +446,8 @@ public class DrtTripsAnalyser {
 				.values()
 				.stream()
 				.mapToInt(DvrpVehicleSpecification::getCapacity)
-				.max().getAsInt();
+				.max()
+				.getAsInt();
 	}
 
 	public static String summarizeDetailedOccupancyStats(
