@@ -80,7 +80,7 @@ public class DrtTripsAnalyser {
 
 		for (DrtTrip trip : trips) {
 			int[] board = boardings.getOrDefault(trip.fromLinkId, new int[bins]);
-			int startTimeBin = (int)((trip.departureTime - startTime) / timeBinSize);
+			int startTimeBin = (int)((trip.departureTime + trip.waitTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
 				boardings.put(trip.fromLinkId, board);
