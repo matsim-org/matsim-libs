@@ -1,25 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-/**
- *
- */
 package org.matsim.contrib.drt.analysis;
 
 import java.awt.BasicStroke;
@@ -32,7 +10,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,6 +38,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -71,27 +49,24 @@ public class DrtTripsAnalyser {
 	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
 			int binSize_s) {
 		LinkedList<DrtTrip> alltrips = new LinkedList<>(trips);
-		Collections.sort(alltrips);
 		DrtTrip currentTrip = alltrips.pollFirst();
-		if (currentTrip.getDepartureTime() > endTime) {
+		if (currentTrip.departureTime > endTime) {
 			Logger.getLogger(DrtTripsAnalyser.class).error("wrong end / start Times for analysis");
 		}
 		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtTrip> currentList = new ArrayList<>();
 			splitTrips.put((double)time, currentList);
-			while (currentTrip.getDepartureTime() < time + binSize_s) {
+			while (currentTrip.departureTime < time + binSize_s) {
 				currentList.add(currentTrip);
 				currentTrip = alltrips.pollFirst();
 				if (currentTrip == null) {
 					return splitTrips;
 				}
 			}
-
 		}
 
 		return splitTrips;
-
 	}
 
 	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
@@ -104,17 +79,17 @@ public class DrtTripsAnalyser {
 		int bins = (int)((endTime - startTime) / timeBinSize);
 
 		for (DrtTrip trip : trips) {
-			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
-			int startTimeBin = (int)((trip.getDepartureTime() - startTime) / timeBinSize);
+			int[] board = boardings.getOrDefault(trip.fromLinkId, new int[bins]);
+			int startTimeBin = (int)((trip.departureTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
-				boardings.put(trip.getFromLinkId(), board);
+				boardings.put(trip.fromLinkId, board);
 			}
-			int[] deboard = deboardings.getOrDefault(trip.getToLinkId(), new int[bins]);
-			int arrivalTimeBin = (int)((trip.getArrivalTime() - startTime) / timeBinSize);
+			int[] deboard = deboardings.getOrDefault(trip.toLink, new int[bins]);
+			int arrivalTimeBin = (int)((trip.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
-				deboardings.put(trip.getFromLinkId(), deboard);
+				deboardings.put(trip.fromLinkId, deboard);
 			}
 		}
 		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
@@ -144,7 +119,8 @@ public class DrtTripsAnalyser {
 		}
 	}
 
-	public static String summarizeTrips(List<DrtTrip> trips, String delimiter) {
+	public static String summarizeTrips(List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
+			String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
@@ -159,14 +135,14 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue;
 			}
-			waitStats.addValue(trip.getWaitTime());
-			rideStats.addValue(trip.getInVehicleTravelTime());
-			distanceStats.addValue(trip.getTravelDistance());
-			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
-			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
+			waitStats.addValue(trip.waitTime);
+			rideStats.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime);
+			distanceStats.addValue(travelDistances.get(trip.request));
+			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
+			traveltimes.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime + trip.waitTime);
 		}
 		return format.format(waitStats.getValues().length)
 				+ delimiter
@@ -194,17 +170,17 @@ public class DrtTripsAnalyser {
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue;
 			}
 
-			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
+			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 		}
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg, String fileName,
-			boolean createGraphs) {
+	public static void analyseDetours(Network network, List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
+			DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
 		if (trips == null)
 			return;
 
@@ -214,28 +190,29 @@ public class DrtTripsAnalyser {
 		XYSeries rideTimes = new XYSeries("ride times");
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue; // unfinished trip (simulation stopped before arrival)
 			}
 
-			double travelTime = trip.getInVehicleTravelTime() + trip.getWaitTime();
-			distances.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
-			travelTimes.add(travelTime, trip.getUnsharedTimeEstimate_m());
-			rideTimes.add(trip.getInVehicleTravelTime(), trip.getUnsharedTimeEstimate_m());
+			double travelDistance = travelDistances.get(trip.request);
+			double travelTime = trip.arrivalTime - trip.departureTime - trip.waitTime + trip.waitTime;
+			distances.add(travelDistance, trip.unsharedDistanceEstimate_m);
+			travelTimes.add(travelTime, trip.unsharedTimeEstimate_m);
+			rideTimes.add(trip.arrivalTime - trip.departureTime - trip.waitTime, trip.unsharedTimeEstimate_m);
 
-			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
-			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
-			detours.add(trip.getPerson()
+			double distanceDetour = travelDistance / trip.unsharedDistanceEstimate_m;
+			double timeDetour = travelTime / trip.unsharedTimeEstimate_m;
+			detours.add(trip.person
 					+ ";"
-					+ trip.getTravelDistance()
+					+ travelDistance
 					+ ";"
-					+ trip.getUnsharedDistanceEstimate_m()
+					+ trip.unsharedDistanceEstimate_m
 					+ ";"
 					+ distanceDetour
 					+ ";"
 					+ travelTime
 					+ ";"
-					+ trip.getUnsharedTimeEstimate_m()
+					+ trip.unsharedTimeEstimate_m
 					+ ";"
 					+ timeDetour);
 		}
@@ -261,11 +238,10 @@ public class DrtTripsAnalyser {
 	}
 
 	public static void analyseWaitTimes(String fileName, List<DrtTrip> trips, int binsize_s, boolean createGraphs) {
-		Collections.sort(trips);
 		if (trips.size() == 0)
 			return;
-		int startTime = ((int)(trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
-		int endTime = ((int)(trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
+		int startTime = ((int)(trips.get(0).departureTime / binsize_s)) * binsize_s;
+		int endTime = ((int)(trips.get(trips.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DrtTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
@@ -300,7 +276,7 @@ public class DrtTripsAnalyser {
 				if (!e.getValue().isEmpty()) {
 					DescriptiveStatistics stats = new DescriptiveStatistics();
 					for (DrtTrip t : e.getValue()) {
-						stats.addValue(t.getWaitTime());
+						stats.addValue(t.waitTime);
 					}
 					rides = stats.getN();
 					averageWait = stats.getMean();
@@ -410,8 +386,8 @@ public class DrtTripsAnalyser {
 	 * @param vehicleDistances
 	 * @param iterationFilename
 	 */
-	public static void writeVehicleDistances(
-			Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances, String iterationFilename) {
+	public static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
+			String iterationFilename) {
 		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;revenueDistance_pm";
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
@@ -422,7 +398,7 @@ public class DrtTripsAnalyser {
 		try {
 			bw.write(header);
 			bw.newLine();
-			for (Entry<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> e : vehicleDistances.entrySet()) {
+			for (Entry<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> e : vehicleDistances.entrySet()) {
 				var vehicleId = e.getKey();
 				var vehicleState = e.getValue();
 				bw.write(vehicleId + ";"//
@@ -445,7 +421,7 @@ public class DrtTripsAnalyser {
 	 * @param del              Delimiter tag
 	 * @return
 	 */
-	public static String summarizeVehicles(Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances,
+	public static String summarizeVehicles(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
 			String del) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -458,7 +434,7 @@ public class DrtTripsAnalyser {
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
-		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			driven.addValue(state.totalDistance);
 			revenue.addValue(state.totalRevenueDistance);
 			occupied.addValue(state.totalOccupiedDistance);
@@ -466,28 +442,19 @@ public class DrtTripsAnalyser {
 		}
 		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		return vehicleDistances.size()
-				+ del
-				+ format.format(driven.getSum())
+		return vehicleDistances.size() + del + format.format(driven.getSum())
 				+ del
 				+ format.format(empty.getSum())
 				+ del
 				+ format.format(empty.getSum() / driven.getSum())
 				+ del
-				+ format.format(revenue.getSum())
-				+ del
-				+ format.format(driven.getMean())
-				+ del
-				+ format.format(empty.getMean())
-				+ del
-				+ format.format(revenue.getMean())
-				+ del
-				+ format.format(d_r_d_t);
+				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del + format.format(
+				empty.getMean()) + del + format.format(revenue.getMean()) + del + format.format(d_r_d_t);
 	}
 
-	public static double getTotalDistance(Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances) {
+	public static double getTotalDistance(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances) {
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			driven.addValue(state.totalDistance);
 		}
 		return driven.getSum();
@@ -502,12 +469,11 @@ public class DrtTripsAnalyser {
 				.values()
 				.stream()
 				.mapToInt(DvrpVehicleSpecification::getCapacity)
-				.max()
-				.getAsInt();
+				.max().getAsInt();
 	}
 
 	public static String summarizeDetailedOccupancyStats(
-			Map<Id<Vehicle>, DrtPassengerAndVehicleStats.VehicleState> vehicleDistances, String del, int maxcap) {
+			Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del, int maxcap) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -516,7 +482,7 @@ public class DrtTripsAnalyser {
 
 		double[] sum = new double[maxcap + 1];
 
-		for (DrtPassengerAndVehicleStats.VehicleState state : vehicleDistances.values()) {
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			for (int i = 0; i <= maxcap; i++) {
 				sum[i] += state.totalDistanceByOccupancy[i];
 			}
