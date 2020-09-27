@@ -236,12 +236,16 @@ public final class PassengerEngineWithPrebooking
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		rejectedEvents.add(event);
+		if (event.getMode().equals(mode)) {
+			rejectedEvents.add(event);
+		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		scheduledEvents.add(event);
+		if (event.getMode().equals(mode)) {
+			scheduledEvents.add(event);
+		}
 	}
 
 	private void processPassengerRequestEvents() {

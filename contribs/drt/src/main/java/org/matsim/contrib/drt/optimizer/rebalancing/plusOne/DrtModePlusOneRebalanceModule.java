@@ -52,7 +52,7 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 			@Override
 			protected void configureQSim() {
 				bindModal(PlusOneRebalancingStrategy.class).toProvider(modalProvider(
-						getter -> new PlusOneRebalancingStrategy(getter.getModal(Network.class),
+						getter -> new PlusOneRebalancingStrategy(getMode(), getter.getModal(Network.class),
 								getter.getModal(LinkBasedRelocationCalculator.class))))
 						.asEagerSingleton();
 

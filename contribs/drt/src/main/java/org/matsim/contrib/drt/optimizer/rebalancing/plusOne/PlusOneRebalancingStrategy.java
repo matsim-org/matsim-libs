@@ -35,14 +35,16 @@ public class PlusOneRebalancingStrategy
 		PassengerRequestRejectedEventHandler, MobsimScopeEventHandler {
 	private static final Logger log = Logger.getLogger(PlusOneRebalancingStrategy.class);
 
+	private final String mode;
 	private final Network network;
-
 	private final LinkBasedRelocationCalculator linkBasedRelocationCalculator;
 
 	private final List<Id<Link>> targetLinkIdList = new ArrayList<>();
 	private final Map<Id<Request>, Id<Link>> potentialDrtTripMap = new HashMap<>();
 
-	public PlusOneRebalancingStrategy(Network network, LinkBasedRelocationCalculator linkBasedRelocationCalculator) {
+	public PlusOneRebalancingStrategy(String mode, Network network,
+			LinkBasedRelocationCalculator linkBasedRelocationCalculator) {
+		this.mode = mode;
 		this.network = network;
 		this.linkBasedRelocationCalculator = linkBasedRelocationCalculator;
 	}
@@ -63,16 +65,22 @@ public class PlusOneRebalancingStrategy
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
-		potentialDrtTripMap.put(event.getRequestId(), event.getFromLinkId());
+		if (event.getMode().equals(mode)) {
+			potentialDrtTripMap.put(event.getRequestId(), event.getFromLinkId());
+		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		targetLinkIdList.add(potentialDrtTripMap.remove(event.getRequestId()));
+		if (event.getMode().equals(mode)) {
+			targetLinkIdList.add(potentialDrtTripMap.remove(event.getRequestId()));
+		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		potentialDrtTripMap.remove(event.getRequestId());
+		if (event.getMode().equals(mode)) {
+			potentialDrtTripMap.remove(event.getRequestId());
+		}
 	}
 }
