@@ -64,7 +64,6 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.utils.misc.ClassUtils;
 
 /**
  * EventHandling
@@ -248,17 +247,8 @@ public final class EventsManagerImpl implements EventsManager {
 			}
 			klass = klass.getSuperclass();
 		}
-		// now search in implemented interfaces
-		for (Class<?> intfc : ClassUtils.getAllInterfaces(eventClass )) {
-			HandlerData dat = findHandler(intfc);
-			if (dat != null) {
-				for(EventHandler handler: dat.handlerList) {
-					info.add(new HandlerInfo(intfc, handler, dat.method));
-				}
-			}
-		}
 
-		cache = info.toArray(new HandlerInfo[info.size()]);
+		cache = info.toArray(new HandlerInfo[0]);
 		this.cacheHandlers.put(eventClass, cache);
 		return cache;
 	}
