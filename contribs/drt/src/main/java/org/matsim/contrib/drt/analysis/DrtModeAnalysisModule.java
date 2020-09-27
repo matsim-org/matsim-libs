@@ -60,10 +60,10 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 		bindModal(DrtPassengerAndVehicleStats.class).toProvider(modalProvider(
 				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), drtCfg,
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
-		addEventHandlerBinding().to(modalKey(DrtPassengerAndVehicleStats.class));
+		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
-		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(getter -> new DrtRequestAnalyzer(drtCfg)))
-				.asEagerSingleton();
+		bindModal(DrtRequestAnalyzer.class).toProvider(
+				modalProvider(getter -> new DrtRequestAnalyzer(drtCfg.getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtRequestAnalyzer.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
