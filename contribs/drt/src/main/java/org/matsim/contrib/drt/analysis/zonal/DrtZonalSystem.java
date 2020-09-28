@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.analysis.zonal;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -57,10 +58,9 @@ public class DrtZonalSystem {
 				.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
-		Map<String, DrtZone> zones = EntryStream.of(linksByGeometryId).mapKeyValue((id, links) -> {
-			PreparedGeometry geometry = geometries.get(id);
-			return new DrtZone(id, geometry, links);
-		}).collect(toMap(DrtZone::getId, z -> z));
+		List<DrtZone> zones = EntryStream.of(linksByGeometryId)
+				.mapKeyValue((id, links) -> new DrtZone(id, geometries.get(id), links))
+				.collect(toList());
 
 		return new DrtZonalSystem(zones);
 	}
@@ -86,10 +86,9 @@ public class DrtZonalSystem {
 	private final Map<String, DrtZone> zones;
 	private final Map<Id<Link>, DrtZone> link2zone;
 
-	public DrtZonalSystem(Map<String, DrtZone> zones) {
-		this.zones = zones;
-		this.link2zone = zones.values()
-				.stream()
+	public DrtZonalSystem(Collection<DrtZone> zones) {
+		this.zones = zones.stream().collect(toMap(DrtZone::getId, z -> z));
+		this.link2zone = zones.stream()
 				.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
 				.collect(toMap(Pair::getKey, Pair::getValue));
 	}

@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.optimizer.rebalancing.demandestimator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -49,7 +48,7 @@ public class PreviousIterationDRTDemandEstimatorTest {
 
 	private final DrtZone zone1 = DrtZone.createDummyZone("zone_1", List.of(link1), new Coord());
 	private final DrtZone zone2 = DrtZone.createDummyZone("zone_2", List.of(link2), new Coord());
-	private final DrtZonalSystem zonalSystem = new DrtZonalSystem(Map.of(zone1.getId(), zone1, zone2.getId(), zone2));
+	private final DrtZonalSystem zonalSystem = new DrtZonalSystem(List.of(zone1, zone2));
 
 	@Test
 	public void noDepartures() {
