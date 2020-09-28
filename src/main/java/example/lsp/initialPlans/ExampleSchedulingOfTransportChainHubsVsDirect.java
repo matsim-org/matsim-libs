@@ -194,7 +194,7 @@ import java.util.Random;
 		completeLSPBuilder.setId(completeLSPId);
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
-		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
+		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
@@ -207,8 +207,8 @@ import java.util.Random;
 	}
 	
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
-		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
-		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
+		ArrayList<LSPShipment> shipmentList = new ArrayList<>();
+		ArrayList <Link> linkList = new ArrayList<>(network.getLinks().values());
 		Random rand = new Random(1);
 		 for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
@@ -268,8 +268,8 @@ import java.util.Random;
         
       //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
-			Collections.sort(elementList, new ShipmentPlanElementComparator());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
+			elementList.sort(new ShipmentPlanElementComparator());
 			System.out.println("Shipment: " + shipment.getId());
 			for(ShipmentPlanElement element : elementList) {
 				System.out.println(element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());	
