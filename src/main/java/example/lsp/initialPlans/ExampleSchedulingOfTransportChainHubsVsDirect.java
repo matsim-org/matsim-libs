@@ -7,6 +7,7 @@ import lsp.shipment.ShipmentPlanElement;
 import lsp.shipment.ShipmentPlanElementComparator;
 import lsp.shipment.ShipmentUtils;
 import lsp.usecase.UsecaseUtils;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -34,9 +35,12 @@ import java.util.Random;
 
 /*package-private*/ class ExampleSchedulingOfTransportChainHubsVsDirect {
 
+	static Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class);
+
 	private static LSP createInitialLSP(Network network) {
 
-
+		log.info("");
+		log.info("The first reloading adapter i.e. the Resource is created");
 		//The first reloading adapter i.e. the Resource is created
         Id<LSPResource> depotId = Id.create("Depot", LSPResource.class);
         Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)");
@@ -58,6 +62,8 @@ import java.util.Random;
 		LogisticsSolutionElement firstReloadElement = DepotElementBuilder.build();
 
 
+		log.info("");
+		log.info("The Carrier for the main run Resource is created");
 		//The Carrier for the main run Resource is created
 		Id<Carrier> mainRunCarrierId = Id.create("MainRunCarrier", Carrier.class);
 		Id<VehicleType> mainRunVehicleTypeId = Id.create("MainRunCarrierVehicleType", VehicleType.class);
@@ -101,6 +107,8 @@ import java.util.Random;
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 
 
+		log.info("");
+		log.info("The second reloading adapter i.e. the Resource is created");
 		//The second reloading adapter i.e. the Resource is created
         Id<LSPResource> secondReloadingId = Id.create("ReloadingPoint2", LSPResource.class);
         Id<Link> secondReloadingLinkId = Id.createLinkId("(14 2) (14 3)");
@@ -161,9 +169,11 @@ import java.util.Random;
 		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(distributionElementId );
 		distributionBuilder.setResource(distributionAdapter);
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
-		
-		//The Order of the logisticsSolutionElements is now specified
 
+
+		log.info("");
+		log.info("The Order of the logisticsSolutionElements is now specified");
+		//The Order of the logisticsSolutionElements is now specified
 		firstReloadElement.setNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.setNextElement(secondReloadElement);
@@ -180,8 +190,10 @@ import java.util.Random;
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		LogisticsSolution completeSolution = completeSolutionBuilder.build();
-		
-		
+
+
+		log.info("");
+		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
 		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
@@ -192,7 +204,9 @@ import java.util.Random;
 		completeLSPBuilder.setInitialPlan(completePlan);
 		Id<LSP> completeLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(completeLSPId);
-		
+
+		log.info("");
+		log.info("The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(firstReloadingPointAdapter);
@@ -246,27 +260,36 @@ import java.util.Random;
 
 
 	public static void main (String [] args) {
-		
+
+		log.info("Starting ...");
+		log.info("Set up required MATSim classes");
+
 		//Set up required MATSim classes
 		Config config = new Config();
 		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
-		
+
+
 		 //Create LSP and shipments
+		log.info("create LSP");
         LSP lsp = createInitialLSP(network);
+		log.info("create initial LSPShipments");
         Collection<LSPShipment> shipments =  createInitialLSPShipments(network);
-        
+
         //assign the shipments to the LSP
+		log.info("assign the shipments to the LSP");
         for(LSPShipment shipment : shipments) {
         	lsp.assignShipmentToLSP(shipment);
         }
         
         //schedule the LSP with the shipments and according to the scheduler of the Resource
+		log.info("schedule the LSP with the shipments and according to the scheduler of the Resource");
         lsp.scheduleSoultions();
         
-      //print the schedules for the assigned LSPShipments
+     	 //print the schedules for the assigned LSPShipments
+		log.info("print the schedules for the assigned LSPShipments");
         for(LSPShipment shipment : lsp.getShipments()) {
 			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
 			elementList.sort(new ShipmentPlanElementComparator());
@@ -277,7 +300,7 @@ import java.util.Random;
 			System.out.println();
 		}
 		
-	
+		log.info("Done.");
 	
 	}
 	
