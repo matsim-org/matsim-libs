@@ -36,47 +36,6 @@ import java.util.Random;
 
 	private static LSP createInitialLSP(Network network) {
 
-		//The Carrier for collection is created
-		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
-		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
-		vehicleTypeBuilder.setCapacity(10);
-		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		vehicleTypeBuilder.setFixCost(49);
-		vehicleTypeBuilder.setMaxVelocity(50/3.6);
-		VehicleType collectionType = vehicleTypeBuilder.build();
-
-		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> vollectionVehicleId = Id.createVehicleId("CollectionVehicle");
-		CarrierVehicle carrierVehicle = CarrierVehicle.newInstance(vollectionVehicleId, collectionLinkId);
-		carrierVehicle.setType( collectionType );
-
-		CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		capabilitiesBuilder.addType(collectionType);
-		capabilitiesBuilder.addVehicle(carrierVehicle);
-		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		CarrierCapabilities capabilities = capabilitiesBuilder.build();
-
-		Carrier collectionCarrier = CarrierUtils.createCarrier( collectionCarrierId );
-		collectionCarrier.setCarrierCapabilities(capabilities);
-
-		//The collection adapter i.e. the Resource is created
-		Id<LSPResource> adapterId = Id.create("CollectionCarrierAdapter", LSPResource.class);
-		UsecaseUtils.CollectionCarrierAdapterBuilder adapterBuilder = UsecaseUtils.CollectionCarrierAdapterBuilder.newInstance(adapterId, network);
-
-		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
-		adapterBuilder.setCollectionScheduler(UsecaseUtils.createDefaultCollectionCarrierScheduler());
-		adapterBuilder.setCarrier(collectionCarrier);
-		adapterBuilder.setLocationLinkId(collectionLinkId);
-		LSPResource collectionAdapter = adapterBuilder.build();
-
-		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
-		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
-		collectionElementBuilder.setResource(collectionAdapter);
-		LogisticsSolutionElement collectionElement = collectionElementBuilder.build();
-
 
 		//The first reloading adapter i.e. the Resource is created
         Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
@@ -204,8 +163,7 @@ import java.util.Random;
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 		
 		//The Order of the logisticsSolutionElements is now specified
-		collectionElement.setNextElement(firstReloadElement);
-		firstReloadElement.setPreviousElement(collectionElement);
+
 		firstReloadElement.setNextElement(mainRunElement);
 		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.setNextElement(secondReloadElement);
@@ -217,7 +175,6 @@ import java.util.Random;
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
-		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
@@ -238,7 +195,6 @@ import java.util.Random;
 		
 		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
-		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
@@ -274,19 +230,8 @@ import java.util.Random;
 	        		}
 	        	
 	        	}
-	        	
-	        	while(true) {
-	        		Collections.shuffle(linkList, rand);
-	        		Link pendingFromLink = linkList.get(0);
-	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
-	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
-	        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
-	        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
-	        		   builder.setFromLinkId(pendingFromLink.getId());
-	        		   break;	
-	        		}
-	        	
-	        	}
+
+			 	builder.setFromLinkId(Id.createLinkId("(4 2) (4 3)")); //Here was the "first" reloading Point, now called depot.
 	        	
 	        	TimeWindow endTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setEndTimeWindow(endTimeWindow);
@@ -294,7 +239,7 @@ import java.util.Random;
 	        	builder.setStartTimeWindow(startTimeWindow);
 	        	builder.setServiceTime(capacityDemand * 60);
 	        	LSPShipment shipment = builder.build();
-        	shipmentList.add(builder.build());
+        	shipmentList.add(shipment);
 		} 	
 		return shipmentList;
 	}
