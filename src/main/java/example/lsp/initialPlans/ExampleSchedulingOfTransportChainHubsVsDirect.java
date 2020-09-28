@@ -38,9 +38,9 @@ import java.util.Random;
 
 
 		//The first reloading adapter i.e. the Resource is created
-        Id<LSPResource> firstReloadingId = Id.create("ReloadingPoint1", LSPResource.class);
-        Id<Link> firstReloadingLinkId = Id.createLinkId("(4 2) (4 3)");
-        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(firstReloadingId, firstReloadingLinkId);
+        Id<LSPResource> depotId = Id.create("Depot", LSPResource.class);
+        Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)");
+        UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(depotId, depotLinkId);
 
         //The scheduler for the first reloading point is created
     	UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
@@ -52,10 +52,10 @@ import java.util.Random;
         LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
 
         //The SolutionElement for the first reloading point is created
-        Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
-		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(firstReloadingElementId );
-		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
-		LogisticsSolutionElement firstReloadElement = firstReloadingElementBuilder.build();
+        Id<LogisticsSolutionElement> DepotElementId = Id.create("DepotElement", LogisticsSolutionElement.class);
+		LSPUtils.LogisticsSolutionElementBuilder DepotElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(DepotElementId );
+		DepotElementBuilder.setResource(firstReloadingPointAdapter);
+		LogisticsSolutionElement firstReloadElement = DepotElementBuilder.build();
 
 
 		//The Carrier for the main run Resource is created
@@ -90,7 +90,7 @@ import java.util.Random;
         mainRunAdapterBuilder.setToLinkId(Id.createLinkId("(14 2) (14 3)"));
         mainRunAdapterBuilder.setCarrier(mainRunCarrier);
 
-        //The scheduler for the main run Rescource is created and added to the Resource
+        //The scheduler for the main run Resource is created and added to the Resource
 		mainRunAdapterBuilder.setMainRunCarrierScheduler(UsecaseUtils.createDefaultMainRunCarrierScheduler());
         LSPResource mainRunAdapter = mainRunAdapterBuilder.build();
 
@@ -125,32 +125,32 @@ import java.util.Random;
 		//The Carrier for distribution is created
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
-		CarrierVehicleType.Builder dsitributionVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
-		dsitributionVehicleTypeBuilder.setCapacity(10);
-		dsitributionVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
-		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
-		dsitributionVehicleTypeBuilder.setFixCost(49);
-		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		CarrierVehicleType.Builder distributionCarrierVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
+		distributionCarrierVehicleTypeBuilder.setCapacity(10);
+		distributionCarrierVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		distributionCarrierVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		distributionCarrierVehicleTypeBuilder.setFixCost(49);
+		distributionCarrierVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		VehicleType distributionVehicleType = distributionCarrierVehicleTypeBuilder.build();
 		
-		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> distributionCarrierVehicleLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
-		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
-		distributionCarrierVehicle.setType( distributionType );
+		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionCarrierVehicleLinkId);
+		distributionCarrierVehicle.setType( distributionVehicleType );
 
-		CarrierCapabilities.Builder distributionCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
-		distributionCapabilitiesBuilder.addType(distributionType);
-		distributionCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
-		distributionCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
-		CarrierCapabilities distributionCapabilities = distributionCapabilitiesBuilder.build();
+		CarrierCapabilities.Builder distributionCarrierCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
+		distributionCarrierCapabilitiesBuilder.addType(distributionVehicleType);
+		distributionCarrierCapabilitiesBuilder.addVehicle(distributionCarrierVehicle);
+		distributionCarrierCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
+		CarrierCapabilities distributionCarrierCapabilities = distributionCarrierCapabilitiesBuilder.build();
 		Carrier distributionCarrier = CarrierUtils.createCarrier( distributionCarrierId );
-		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
+		distributionCarrier.setCarrierCapabilities(distributionCarrierCapabilities);
 		
 		//The distribution adapter i.e. the Resource is created
 		Id<LSPResource> distributionAdapterId = Id.create("DistributionCarrierAdapter", LSPResource.class);
 		UsecaseUtils.DistributionCarrierAdapterBuilder distributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setCarrier(distributionCarrier);
-		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
+		distributionAdapterBuilder.setLocationLinkId(distributionCarrierVehicleLinkId);
 		
 		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
 		distributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
