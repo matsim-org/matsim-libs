@@ -22,29 +22,24 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEventHandler;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.vehicles.Vehicle;
@@ -55,9 +50,9 @@ import com.google.common.base.Preconditions;
  * @author jbischoff
  * @author Michal Maciejewski
  */
-public class DrtPassengerAndVehicleStats
-		implements PersonDepartureEventHandler, DrtRequestSubmittedEventHandler, PersonEntersVehicleEventHandler,
-		LinkEnterEventHandler, TeleportationArrivalEventHandler, PersonArrivalEventHandler {
+public class DrtVehicleDistanceStats
+		implements PassengerPickedUpEventHandler, LinkEnterEventHandler, PassengerDroppedOffEventHandler,
+		TeleportationArrivalEventHandler {
 
 	static class VehicleState {
 		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
@@ -83,34 +78,23 @@ public class DrtPassengerAndVehicleStats
 		}
 	}
 
-	private final Map<Id<Person>, PersonDepartureEvent> departureEvents = new HashMap<>();
-	private final Map<Id<Person>, DrtRequestSubmittedEvent> requestSubmittedEvents = new HashMap<>();
-
-	private final List<DrtTrip> drtTrips = new ArrayList<>();
-	private final Map<Id<Person>, DrtTrip> currentTrips = new HashMap<>();
-
 	private final Map<Id<Vehicle>, VehicleState> vehicleStates = new HashMap<>();
+	private final Map<Id<Request>, Double> travelDistances = new HashMap<>();
 
 	private final String mode;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
 
-	public DrtPassengerAndVehicleStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
+	public DrtVehicleDistanceStats(Network network, DrtConfigGroup drtCfg, FleetSpecification fleetSpecification) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		this.fleetSpecification = fleetSpecification;
-
 		initializeVehicles();
 	}
 
 	@Override
 	public void reset(int iteration) {
-		departureEvents.clear();
-		requestSubmittedEvents.clear();
-		drtTrips.clear();
-		currentTrips.clear();
 		vehicleStates.clear();
-
 		initializeVehicles();
 	}
 
@@ -124,29 +108,12 @@ public class DrtPassengerAndVehicleStats
 	}
 
 	@Override
-	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(mode)) {
-			Preconditions.checkState(departureEvents.put(event.getPersonId(), event) == null,
-					"There is already a departure event associated with this person");
-		}
-	}
-
-	@Override
-	public void handleEvent(DrtRequestSubmittedEvent event) {
+	public void handleEvent(PassengerPickedUpEvent event) {
 		if (event.getMode().equals(mode)) {
-			Preconditions.checkState(requestSubmittedEvents.put(event.getPersonId(), event) == null,
-					"There is already a request associated with this person");
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
-		if (departureEvent != null) {
-			double waitTime = event.getTime() - departureEvent.getTime();
-			createAndStoreTrip(departureEvent, event.getVehicleId(), waitTime);
-
-			vehicleStates.get(event.getVehicleId()).distanceByPersonId.put(event.getPersonId(), new MutableDouble());
+			if (event.getVehicleId() != null) {
+				vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.put(event.getPersonId(),
+						new MutableDouble());
+			}
 		}
 	}
 
@@ -158,49 +125,29 @@ public class DrtPassengerAndVehicleStats
 		}
 	}
 
+	private final Map<Id<Person>, Id<Request>> soonArrivingTeleportedRequests = new HashMap<>();
+
+	@Override
+	public void handleEvent(PassengerDroppedOffEvent event) {
+		if (event.getMode().equals(mode)) {
+			if (event.getVehicleId() != null) {
+				double distance = vehicleStates.get(Id.createVehicleId(event.getVehicleId())).distanceByPersonId.remove(
+						event.getPersonId()).doubleValue();
+				travelDistances.put(event.getRequestId(), distance);
+			} else {
+				Preconditions.checkArgument(
+						soonArrivingTeleportedRequests.put(event.getPersonId(), event.getRequestId()) == null,
+						"Duplicate entry for arriving passenger: (%s)", event.getPersonId());
+			}
+		}
+	}
+
 	@Override
 	public void handleEvent(TeleportationArrivalEvent event) {
-		PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
-		if (departureEvent != null) {
-			double waitTime = 0;
-			DrtTrip trip = createAndStoreTrip(departureEvent, null, waitTime);
-
-			trip.setTravelDistance(event.getDistance());
+		if (event.getMode().equals(mode)) {
+			Id<Request> requestId = Objects.requireNonNull(soonArrivingTeleportedRequests.remove(event.getPersonId()));
+			travelDistances.put(requestId, event.getDistance());
 		}
-	}
-
-	private DrtTrip createAndStoreTrip(PersonDepartureEvent event, Id<Vehicle> vehicleId, double waitTime) {
-		Coord departureCoord = network.getLinks().get(event.getLinkId()).getCoord();
-		DrtRequestSubmittedEvent requestSubmittedEvent = requestSubmittedEvents.remove(event.getPersonId());
-		DrtTrip trip = new DrtTrip(event.getTime(), event.getPersonId(), vehicleId, event.getLinkId(), departureCoord,
-				waitTime, requestSubmittedEvent.getUnsharedRideDistance(), requestSubmittedEvent.getUnsharedRideTime());
-
-		drtTrips.add(trip);
-		Preconditions.checkState(currentTrips.put(event.getPersonId(), trip) == null,
-				"There is already an ongoing trip associated with this person");
-		return trip;
-	}
-
-	@Override
-	public void handleEvent(PersonArrivalEvent event) {
-		if (event.getLegMode().equals(mode)) {
-			DrtTrip trip = currentTrips.remove(event.getPersonId());
-			if (trip.getVehicle() != null) {// not teleported
-				double distance = vehicleStates.get(trip.getVehicle()).distanceByPersonId.remove(event.getPersonId())
-						.doubleValue();
-				trip.setTravelDistance(distance);
-			}
-			trip.setArrivalTime(event.getTime());
-			trip.setToLink(event.getLinkId());
-			trip.setToCoord(network.getLinks().get(event.getLinkId()).getCoord());
-		}
-	}
-
-	/**
-	 * @return the drtTrips
-	 */
-	List<DrtTrip> getDrtTrips() {
-		return drtTrips;
 	}
 
 	/**
@@ -208,5 +155,9 @@ public class DrtPassengerAndVehicleStats
 	 */
 	Map<Id<Vehicle>, VehicleState> getVehicleStates() {
 		return vehicleStates;
+	}
+
+	Map<Id<Request>, Double> getTravelDistances() {
+		return travelDistances;
 	}
 }

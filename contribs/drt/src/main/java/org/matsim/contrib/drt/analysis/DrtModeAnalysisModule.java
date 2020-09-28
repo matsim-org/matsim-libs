@@ -57,18 +57,18 @@ public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
-		bindModal(DrtPassengerAndVehicleStats.class).toProvider(modalProvider(
-				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), drtCfg,
+		bindModal(DrtVehicleDistanceStats.class).toProvider(modalProvider(
+				getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg,
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
-		addEventHandlerBinding().to(modalKey(DrtPassengerAndVehicleStats.class));
+		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
-		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(getter -> new DrtRequestAnalyzer(drtCfg)))
-				.asEagerSingleton();
+		bindModal(DrtRequestAnalyzer.class).toProvider(
+				modalProvider(getter -> new DrtRequestAnalyzer(drtCfg.getMode()))).asEagerSingleton();
 		addEventHandlerBinding().to(modalKey(DrtRequestAnalyzer.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(FleetSpecification.class), getter.getModal(DrtPassengerAndVehicleStats.class),
+						getter.getModal(FleetSpecification.class), getter.getModal(DrtVehicleDistanceStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
 

@@ -19,192 +19,50 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
+import static org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
+
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerPickedUpEvent;
 
-public class DrtTrip implements Comparable<DrtTrip> {
-	private final double departureTime;
-	private final Id<Person> person;
-	private final Id<Vehicle> vehicle;
-	private final Id<Link> fromLinkId;
-	private final Coord fromCoord;
-	private final double waitTime;
-	private final double unsharedDistanceEstimate_m;
-	private final double unsharedTimeEstimate_m;
+import com.google.common.base.Preconditions;
 
-	private double travelDistance_m = Double.NaN;
-	private double arrivalTime = Double.NaN;
-	private Id<Link> toLink = null;
-	private Coord toCoord = null;
+final class DrtTrip {
+	final Id<Request> request;
+	final double departureTime;
+	final Id<Person> person;
+	final Id<DvrpVehicle> vehicle;
+	final Id<Link> fromLinkId;
+	final Coord fromCoord;
+	final Id<Link> toLink;
+	final Coord toCoord;
+	final double waitTime;
+	final double unsharedDistanceEstimate_m;
+	final double unsharedTimeEstimate_m;
+	final double arrivalTime;
 
-	private final DecimalFormat format = new DecimalFormat();
-	static final String delimitter = ";";
-	public static final String HEADER = "departureTime"
-			+ delimitter
-			+ "personId"
-			+ delimitter
-			+ "vehicleId"
-			+ delimitter
-			+ "fromLinkId"
-			+ delimitter
-			+ "fromX"
-			+ delimitter
-			+ "fromY"
-			+ delimitter
-			+ "toLinkId"
-			+ delimitter
-			+ "toX"
-			+ delimitter
-			+ "toY"
-			+ delimitter
-			+ "waitTime"
-			+ delimitter
-			+ "arrivalTime"
-			+ delimitter
-			+ "travelTime"
-			+ delimitter
-			+ "travelDistance_m"
-			+ delimitter
-			+ "direcTravelDistance_m";
-
-	DrtTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
-			double waitTime, double unsharedDistanceEstimate_m, double unsharedTimeEstimate_m) {
-		this.departureTime = departureTime;
-		this.person = person;
-		this.vehicle = vehicle;
-		this.fromLinkId = fromLinkId;
-		this.fromCoord = fromCoord;
-		this.waitTime = waitTime;
-		this.unsharedDistanceEstimate_m = unsharedDistanceEstimate_m;
-		this.unsharedTimeEstimate_m = unsharedTimeEstimate_m;
-
-		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-		format.setMinimumIntegerDigits(1);
-		format.setMaximumFractionDigits(2);
-		format.setGroupingUsed(false);
-	}
-
-	public Double getDepartureTime() {
-		return departureTime;
-	}
-
-	public Id<Person> getPerson() {
-		return person;
-	}
-
-	public Id<Vehicle> getVehicle() {
-		return vehicle;
-	}
-
-	public Id<Link> getFromLinkId() {
-		return fromLinkId;
-	}
-
-	public double getWaitTime() {
-		return waitTime;
-	}
-
-	public double getInVehicleTravelTime() {
-		return arrivalTime - departureTime - waitTime;
-	}
-
-	public double getTravelDistance() {
-		return travelDistance_m;
-	}
-
-	public double getUnsharedDistanceEstimate_m() {
-		return unsharedDistanceEstimate_m;
-	}
-
-	public double getUnsharedTimeEstimate_m() {
-		return unsharedTimeEstimate_m;
-	}
-
-	void setTravelDistance(double travelDistance_m) {
-		this.travelDistance_m = travelDistance_m;
-	}
-
-	public Id<Link> getToLinkId() {
-		return toLink;
-	}
-
-	void setToLink(Id<Link> toLink) {
-		this.toLink = toLink;
-	}
-
-	public double getArrivalTime() {
-		return arrivalTime;
-	}
-
-	void setArrivalTime(double arrivalTime) {
-		this.arrivalTime = arrivalTime;
-	}
-
-	public Coord getToCoord() {
-		return toCoord;
-	}
-
-	void setToCoord(Coord toCoord) {
-		this.toCoord = toCoord;
-	}
-
-	public Coord getFromCoord() {
-		return fromCoord;
-	}
-
-	@Override
-	public int compareTo(DrtTrip o) {
-		return getDepartureTime().compareTo(o.getDepartureTime());
-	}
-
-	@Override
-	public String toString() {
-		double fromCoordX = Double.NaN;
-		double fromCoordY = Double.NaN;
-
-		double toCoordX = Double.NaN;
-		double toCoordY = Double.NaN;
-		if (toCoord != null) {
-			toCoordX = toCoord.getX();
-			toCoordY = toCoord.getY();
-		}
-		if (fromCoord != null) {
-			fromCoordX = fromCoord.getX();
-			fromCoordY = fromCoord.getY();
-		}
-		return getDepartureTime()
-				+ delimitter
-				+ getPerson()
-				+ delimitter
-				+ getVehicle()
-				+ delimitter
-				+ getFromLinkId()
-				+ delimitter
-				+ format.format(fromCoordX)
-				+ delimitter
-				+ format.format(fromCoordY)
-				+ delimitter
-				+ getToLinkId()
-				+ delimitter
-				+ format.format(toCoordX)
-				+ delimitter
-				+ format.format(toCoordY)
-				+ delimitter
-				+ getWaitTime()
-				+ delimitter
-				+ getArrivalTime()
-				+ delimitter
-				+ getInVehicleTravelTime()
-				+ delimitter
-				+ format.format(getTravelDistance())
-				+ delimitter
-				+ format.format(unsharedDistanceEstimate_m);
+	DrtTrip(PerformedRequestEventSequence sequence, Function<Id<Link>, ? extends Link> linkProvider) {
+		Preconditions.checkArgument(sequence.isCompleted());
+		DrtRequestSubmittedEvent submittedEvent = sequence.getSubmitted();
+		PassengerPickedUpEvent pickedUpEvent = sequence.getPickedUp().get();
+		this.request = submittedEvent.getRequestId();
+		this.departureTime = submittedEvent.getTime();
+		this.person = submittedEvent.getPersonId();
+		this.vehicle = pickedUpEvent.getVehicleId();
+		this.fromLinkId = submittedEvent.getFromLinkId();
+		this.fromCoord = linkProvider.apply(fromLinkId).getCoord();
+		this.toLink = submittedEvent.getToLinkId();
+		this.toCoord = linkProvider.apply(toLink).getCoord();
+		this.waitTime = pickedUpEvent.getTime() - submittedEvent.getTime();
+		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
+		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();
+		this.arrivalTime = sequence.getDroppedOff().get().getTime();
 	}
 }
