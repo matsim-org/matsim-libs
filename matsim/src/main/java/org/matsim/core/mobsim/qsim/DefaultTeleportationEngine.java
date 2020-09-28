@@ -128,20 +128,19 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		handleTeleportationArrivals();
+		handleTeleportationArrivals(time);
 	}
 
-	private void handleTeleportationArrivals() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-		while (teleportationList.peek() != null) {
+	private void handleTeleportationArrivals(double now) {
+		while (!teleportationList.isEmpty()) {
 			Tuple<Double, MobsimAgent> entry = teleportationList.peek();
 			if (entry.getFirst() <= now) {
 				teleportationList.poll();
 				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
-						.getDestinationLinkId());
+				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance, personAgent.getMode()));
+				this.eventsManager.processEvent(
+						new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);
