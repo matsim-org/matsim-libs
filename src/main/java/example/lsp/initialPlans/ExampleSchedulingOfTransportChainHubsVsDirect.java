@@ -130,7 +130,7 @@ import java.util.Random;
 		LogisticsSolutionElement secondReloadElement = secondReloadingElementBuilder.build();
 
 
-		//The Carrier for distribution is created
+		//The Carrier for distribution from reloading Point is created
 		Id<Carrier> distributionCarrierId = Id.create("DistributionCarrier", Carrier.class);
 		Id<VehicleType> distributionVehicleTypeId = Id.create("DistributionCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder distributionCarrierVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(distributionVehicleTypeId);
@@ -141,7 +141,7 @@ import java.util.Random;
 		distributionCarrierVehicleTypeBuilder.setMaxVelocity(50/3.6);
 		VehicleType distributionVehicleType = distributionCarrierVehicleTypeBuilder.build();
 		
-		Id<Link> distributionCarrierVehicleLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> distributionCarrierVehicleLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionCarrierVehicleLinkId);
 		distributionCarrierVehicle.setType( distributionVehicleType );
@@ -171,6 +171,52 @@ import java.util.Random;
 		LogisticsSolutionElement distributionElement =    distributionBuilder.build();
 
 
+		//### New (KMT): Carrier for direct distribution from Depot (without 2nd reloading Point)
+		//The Carrier for distribution from reloading Point is created
+		Id<Carrier> directDistributionCarrierId = Id.create("DirectDistributionCarrier", Carrier.class);
+		Id<VehicleType> directDistributionVehicleTypeId = Id.create("DirectDistributionCarrierVehicleType", VehicleType.class);
+		CarrierVehicleType.Builder directDistributionCarrierVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(directDistributionVehicleTypeId);
+		directDistributionCarrierVehicleTypeBuilder.setCapacity(10);
+		directDistributionCarrierVehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
+		directDistributionCarrierVehicleTypeBuilder.setCostPerTimeUnit(0.38);
+		directDistributionCarrierVehicleTypeBuilder.setFixCost(49);
+		directDistributionCarrierVehicleTypeBuilder.setMaxVelocity(50/3.6);
+		VehicleType directDistributionVehicleType = directDistributionCarrierVehicleTypeBuilder.build();
+
+		Id<Link> directDistributionCarrierVehicleLinkId = Id.createLinkId("(4 2) (4 3)");			//= location of the depot.
+		Id<Vehicle> directDistributionVehicleId = Id.createVehicleId("DirectDistributionVehicle");
+		CarrierVehicle directDistributionCarrierVehicle = CarrierVehicle.newInstance(directDistributionVehicleId, directDistributionCarrierVehicleLinkId);
+		directDistributionCarrierVehicle.setType( directDistributionVehicleType );
+
+		CarrierCapabilities.Builder directDistributionCarrierCapabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
+		directDistributionCarrierCapabilitiesBuilder.addType(directDistributionVehicleType);
+		directDistributionCarrierCapabilitiesBuilder.addVehicle(directDistributionCarrierVehicle);
+		directDistributionCarrierCapabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
+		CarrierCapabilities directDistributionCarrierCapabilities = directDistributionCarrierCapabilitiesBuilder.build();
+		Carrier directDistributionCarrier = CarrierUtils.createCarrier( directDistributionCarrierId );
+		directDistributionCarrier.setCarrierCapabilities(directDistributionCarrierCapabilities);
+
+		//The distribution adapter i.e. the Resource is created
+		Id<LSPResource> directDistributionAdapterId = Id.create("DirectDistributionCarrierAdapter", LSPResource.class);
+		UsecaseUtils.DistributionCarrierAdapterBuilder directDistributionAdapterBuilder = UsecaseUtils.DistributionCarrierAdapterBuilder.newInstance(directDistributionAdapterId, network);
+		directDistributionAdapterBuilder.setCarrier(directDistributionCarrier);
+		directDistributionAdapterBuilder.setLocationLinkId(directDistributionCarrierVehicleLinkId);
+
+		//The scheduler for the Resource is created and added. This is where jsprit comes into play.
+		directDistributionAdapterBuilder.setDistributionScheduler(UsecaseUtils.createDefaultDistributionCarrierScheduler());
+		LSPResource directDistributionAdapter = directDistributionAdapterBuilder.build();
+
+		//The adapter is now inserted into the corresponding LogisticsSolutionElement of the only LogisticsSolution of the LSP
+		Id<LogisticsSolutionElement> directDistributionElementId = Id.create("DirectDistributionElement", LogisticsSolutionElement.class);
+		LSPUtils.LogisticsSolutionElementBuilder directDistributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(directDistributionElementId );
+		directDistributionBuilder.setResource(directDistributionAdapter);
+		LogisticsSolutionElement directDistributionElement =    directDistributionBuilder.build();
+
+		//### end new
+
+		log.info("");
+		log.info("(existing) locisitc Solution - via relaoding Point2 is created");
+
 		log.info("");
 		log.info("The Order of the logisticsSolutionElements is now specified");
 		//The Order of the logisticsSolutionElements is now specified
@@ -178,8 +224,8 @@ import java.util.Random;
 		mainRunElement.setPreviousElement(firstReloadElement);
 		mainRunElement.setNextElement(secondReloadElement);
 		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(distributionElement);
-		distributionElement.setPreviousElement(secondReloadElement);	
+		secondReloadElement.setNextElement(directDistributionElement);
+		directDistributionElement.setPreviousElement(secondReloadElement);
 		
 		
 		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
@@ -188,9 +234,14 @@ import java.util.Random;
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolutionBuilder.addSolutionElement(secondReloadElement);
-		completeSolutionBuilder.addSolutionElement(distributionElement);
+		completeSolutionBuilder.addSolutionElement(directDistributionElement);
 		LogisticsSolution completeSolution = completeSolutionBuilder.build();
 
+		//TODO: Create Logistic solution with direct delivery
+
+		//TODO: Beide Lösungen anbieten und "bessere" oder zunächst "eine" auswählen"
+
+		//TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
 		log.info("");
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
@@ -212,7 +263,7 @@ import java.util.Random;
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
-		resourcesList.add(distributionAdapter);
+		resourcesList.add(directDistributionAdapter);
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		
