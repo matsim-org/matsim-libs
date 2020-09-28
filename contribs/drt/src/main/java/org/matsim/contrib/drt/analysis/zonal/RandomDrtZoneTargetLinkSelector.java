@@ -20,21 +20,27 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.util.Random;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
-
-import java.util.Random;
 
 /**
  * @author tschlenther
  */
-public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector{
+public class RandomDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSelector {
+	private final Random random;
 
-	private final Random random = MatsimRandom.getLocalInstance();
+	public RandomDrtZoneTargetLinkSelector() {
+		this(MatsimRandom.getLocalInstance());
+	}
+
+	public RandomDrtZoneTargetLinkSelector(Random random) {
+		this.random = random;
+	}
 
 	@Override
 	public Link selectTargetLink(DrtZone zone) {
 		return zone.getLinks().get(random.nextInt(zone.getLinks().size()));
 	}
-
 }
