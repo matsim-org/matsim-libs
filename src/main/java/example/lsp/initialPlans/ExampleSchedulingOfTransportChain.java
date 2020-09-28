@@ -168,7 +168,7 @@ import lsp.resources.LSPResource;
 		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
 		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 		
-		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
 		distributionCarrierVehicle.setType( distributionType );
