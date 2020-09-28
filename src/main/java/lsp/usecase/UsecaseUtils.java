@@ -61,8 +61,8 @@ public class UsecaseUtils {
 			}
 
 
-			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionHandler){
-				this.collectionScheduler = collectionHandler;
+			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
+				this.collectionScheduler = collectionCarrierScheduler;
 				return this;
 			}
 
@@ -103,8 +103,8 @@ public class UsecaseUtils {
 			}
 
 
-			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionHandler){
-				this.distributionHandler = distributionHandler;
+			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler){
+				this.distributionHandler = distributionCarrierScheduler;
 				return this;
 			}
 
@@ -241,8 +241,8 @@ public class UsecaseUtils {
 			this.locationLinkId = locationLinkId;
 		}
 
-		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingHandler){
-			this.reloadingScheduler = reloadingHandler;
+		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingPointScheduler){
+			this.reloadingScheduler = reloadingPointScheduler;
 			return this;
 		}
 
