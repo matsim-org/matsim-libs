@@ -143,10 +143,10 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
-			adaptRouteForTeleportation(passenger, request, now);
+			Route teleportedRoute = adaptLegRouteForTeleportation(passenger, request, now);
 			eventsManager.processEvent(new PassengerPickedUpEvent(now, mode, request.getId(), passenger.getId(), null));
 			teleportationEngine.handleDeparture(now, passenger, fromLinkId);
-			teleportedRequests.add(ImmutablePair.of(now + route.getTravelTime().seconds(), request));
+			teleportedRequests.add(ImmutablePair.of(now + teleportedRoute.getTravelTime().seconds(), request));
 		} else {
 			//not much else can be done for immediate requests
 			//set the passenger agent to abort - the event will be thrown by the QSim
@@ -157,7 +157,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 		return true;
 	}
 
-	private void adaptRouteForTeleportation(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
+	private Route adaptLegRouteForTeleportation(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		Route teleportedRoute = teleportedRouteCalculator.calculateRoute(request);
 
 		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
@@ -171,6 +171,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 
 		eventsManager.processEvent(new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
 				request.getPassengerId(), null, now, now + teleportedRoute.getTravelTime().seconds()));
+		return teleportedRoute;
 	}
 
 	private Link getLink(Id<Link> linkId) {
