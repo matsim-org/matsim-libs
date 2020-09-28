@@ -97,6 +97,5 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 				getter -> new DrtZonalWaitTimesAnalyzer(drtCfg, getter.getModal(DrtRequestAnalyzer.class),
 						getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
 		addControlerListenerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
-		addEventHandlerBinding().to(modalKey(DrtZonalWaitTimesAnalyzer.class));
 	}
 }
