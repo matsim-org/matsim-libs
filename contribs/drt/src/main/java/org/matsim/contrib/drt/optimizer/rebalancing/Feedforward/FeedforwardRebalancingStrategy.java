@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -124,8 +125,10 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				// vehileToSend after scaling.
 				int numAvailableVehiclesInZone = 0;
 				if (rebalancableVehiclesPerZone.get(departureZone) != null) {
-					numAvailableVehiclesInZone = (int) rebalancableVehiclesPerZone.get(departureZone).stream()
-							.filter(v -> !relocatedVehicles.contains(v)).count();
+					List<DvrpVehicle> actualRebalancableVehicles = rebalancableVehiclesPerZone.get(departureZone)
+							.stream().filter(v -> !relocatedVehicles.contains(v)).collect(Collectors.toList());
+					numAvailableVehiclesInZone = actualRebalancableVehicles.size();
+					rebalancableVehiclesPerZone.put(departureZone, actualRebalancableVehicles);
 				}
 
 				if (vehicleToSend > numAvailableVehiclesInZone) {
