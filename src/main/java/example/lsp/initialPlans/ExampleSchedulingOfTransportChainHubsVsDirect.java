@@ -46,20 +46,21 @@ import java.util.Random;
         Id<Link> depotLinkId = Id.createLinkId("(4 2) (4 3)");
         UsecaseUtils.ReloadingPointBuilder firstReloadingPointBuilder = UsecaseUtils.ReloadingPointBuilder.newInstance(depotId, depotLinkId);
 
-        //The scheduler for the first reloading point is created
-    	UsecaseUtils.ReloadingPointSchedulerBuilder firstReloadingSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
-        firstReloadingSchedulerBuilder.setCapacityNeedFixed(10);
-        firstReloadingSchedulerBuilder.setCapacityNeedLinear(1);
+        //The scheduler for the first reloading point is created --> this will be the depot in this usecase
+    	UsecaseUtils.ReloadingPointSchedulerBuilder depotSchedulerBuilder =  UsecaseUtils.ReloadingPointSchedulerBuilder.newInstance();
+        depotSchedulerBuilder.setCapacityNeedFixed(10);
+        depotSchedulerBuilder.setCapacityNeedLinear(1);
 
         //The scheduler is added to the Resource and the Resource is created
-        firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
-        LSPResource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
+        firstReloadingPointBuilder.setReloadingScheduler(depotSchedulerBuilder.build());
+        LSPResource depotAdapter = firstReloadingPointBuilder.build();
 
         //The SolutionElement for the first reloading point is created
         Id<LogisticsSolutionElement> DepotElementId = Id.create("DepotElement", LogisticsSolutionElement.class);
 		LSPUtils.LogisticsSolutionElementBuilder DepotElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(DepotElementId );
-		DepotElementBuilder.setResource(firstReloadingPointAdapter);
-		LogisticsSolutionElement firstReloadElement = DepotElementBuilder.build();
+		DepotElementBuilder.setResource(depotAdapter);
+		LogisticsSolutionElement depotElement = DepotElementBuilder.build(); //Niocht unbedingt nötig, aber nehme das alte Hub nun als Depot. Waren werden dann dort "Zusammengestellt".
+		//Maybe TODO: Depot als LogisticSolutionElement raus nehmen.(?)
 
 
 		log.info("");
@@ -214,61 +215,104 @@ import java.util.Random;
 
 		//### end new
 
-		log.info("");
-		log.info("(existing) locisitc Solution - via relaoding Point2 is created");
-
-		log.info("");
-		log.info("The Order of the logisticsSolutionElements is now specified");
-		//The Order of the logisticsSolutionElements is now specified
-		firstReloadElement.setNextElement(mainRunElement);
-		mainRunElement.setPreviousElement(firstReloadElement);
-		mainRunElement.setNextElement(secondReloadElement);
-		secondReloadElement.setPreviousElement(mainRunElement);
-		secondReloadElement.setNextElement(directDistributionElement);
-		directDistributionElement.setPreviousElement(secondReloadElement);
-		
-		
-		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
-		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
-		completeSolutionBuilder.addSolutionElement(firstReloadElement);
-		completeSolutionBuilder.addSolutionElement(mainRunElement);
-		completeSolutionBuilder.addSolutionElement(secondReloadElement);
-		completeSolutionBuilder.addSolutionElement(directDistributionElement);
-		LogisticsSolution completeSolution = completeSolutionBuilder.build();
-
-		//TODO: Create Logistic solution with direct delivery
-
 		//TODO: Beide Lösungen anbieten und "bessere" oder zunächst "eine" auswählen"
 
 		//TODO: Für die Auswahl "CostInfo an die Solutions dran heften.
 
+//		log.info("");
+//		log.info("(existing) logistic Solution - via reloadingPoint2 is created");
+//
+//		log.info("");
+//		log.info("The Order of the logisticsSolutionElements is now specified");
+//		//The Order of the logisticsSolutionElements is now specified
+//		firstReloadElement.setNextElement(mainRunElement);
+//		mainRunElement.setPreviousElement(firstReloadElement);
+//		mainRunElement.setNextElement(secondReloadElement);
+//		secondReloadElement.setPreviousElement(mainRunElement);
+//		secondReloadElement.setNextElement(directDistributionElement);
+//		directDistributionElement.setPreviousElement(secondReloadElement);
+		
+		
+		//The SolutionElements are now inserted into the only LogisticsSolution of the LSP
+		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
+
+//	// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
+//		Id<LogisticsSolution> solutionWithReloadingId = Id.create("SolutionWithReloadingId", LogisticsSolution.class);
+//		LSPUtils.LogisticsSolutionBuilder completeSolutionWithReloadingBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionWithReloadingId );
+//		completeSolutionWithReloadingBuilder.addSolutionElement(firstReloadElement);
+//		completeSolutionWithReloadingBuilder.addSolutionElement(mainRunElement);
+//		completeSolutionWithReloadingBuilder.addSolutionElement(secondReloadElement);
+//		completeSolutionWithReloadingBuilder.addSolutionElement(directDistributionElement);
+//		LogisticsSolution completeSolutionWithReloading = completeSolutionWithReloadingBuilder.build();
+//
+//		log.info("");
+//		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
+//		//The initial plan of the lsp is generated and the assigner and the solution from above are added
+//		LSPPlan completePlan = LSPUtils.createLSPPlan();
+//		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
+//		completePlan.setAssigner(assigner);
+//		completePlan.addSolution(completeSolutionWithReloading);
+//
+//		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
+//		completeLSPBuilder.setInitialPlan(completePlan);
+//		Id<LSP> completeLSPId = Id.create("CollectionLSP", LSP.class);
+//		completeLSPBuilder.setId(completeLSPId);
+//
+//		log.info("");
+//		log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
+//		//The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
+//		ArrayList<LSPResource> resourcesList = new ArrayList<>();
+//		resourcesList.add(firstReloadingPointAdapter);
+//		resourcesList.add(mainRunAdapter);
+//		resourcesList.add(secondReloadingPointAdapter);
+//		resourcesList.add(distributionAdapter);
+//		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+//		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
+//
+//		return completeLSPBuilder.build();
+
+	// ### This is the new solution with with directDistribution from the Depot.
+
+		log.info("");
+		log.info("set up logistic Solution - direct distribution from the depot is created");
+
+		log.info("");
+		log.info("The order of the logisticsSolutionElements is now specified");
+		//The order of the logisticsSolutionElements is now specified
+		depotElement.setNextElement(directDistributionElement);
+		directDistributionElement.setPreviousElement(depotElement);
+
+		Id<LogisticsSolution> solutionDirectId = Id.create("SolutionDirectId", LogisticsSolution.class);
+		LSPUtils.LogisticsSolutionBuilder completeSolutionDirectBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionDirectId );
+		completeSolutionDirectBuilder.addSolutionElement(depotElement);
+		completeSolutionDirectBuilder.addSolutionElement(directDistributionElement);
+		LogisticsSolution completeSolutionDirect = completeSolutionDirectBuilder.build();
+
 		log.info("");
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
 		//The initial plan of the lsp is generated and the assigner and the solution from above are added
-		LSPPlan completePlan = LSPUtils.createLSPPlan();
+		LSPPlan completePlanDirect = LSPUtils.createLSPPlan();
 		ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-		completePlan.setAssigner(assigner);
-		completePlan.addSolution(completeSolution);
-		
+		completePlanDirect.setAssigner(assigner);
+		completePlanDirect.addSolution(completeSolutionDirect);
+
 		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
-		completeLSPBuilder.setInitialPlan(completePlan);
-		Id<LSP> completeLSPId = Id.create("CollectionLSP", LSP.class);
+		completeLSPBuilder.setInitialPlan(completePlanDirect);
+		Id<LSP> completeLSPId = Id.create("MyLSP", LSP.class);
 		completeLSPBuilder.setId(completeLSPId);
 
 		log.info("");
-		log.info("The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
-		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
+		log.info("The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder");
+		//The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
-		resourcesList.add(firstReloadingPointAdapter);
-		resourcesList.add(mainRunAdapter);
-		resourcesList.add(secondReloadingPointAdapter);
-		resourcesList.add(directDistributionAdapter);
+		resourcesList.add(depotAdapter);
+		resourcesList.add(directDistributionAdapter); // TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
-		
+
 		return completeLSPBuilder.build();
-		
+
+
 	}
 	
 	private static Collection<LSPShipment> createInitialLSPShipments(Network network){
