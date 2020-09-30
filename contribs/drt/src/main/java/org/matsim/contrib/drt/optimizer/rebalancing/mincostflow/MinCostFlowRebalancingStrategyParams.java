@@ -43,13 +43,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
-			+ " Used only for LinearRebalancingTarget";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
-			+ " Used only for LinearRebalancingTarget";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String REBALANCING_TARGET_CALCULATOR_TYPE = "rebalancingTargetCalculatorType";
 	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =
@@ -57,7 +55,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 					+ " (i.e. number of the desired vehicles)."
 					+ " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
 					+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
-					+ " Current default is LinearRebalancingTarget";
+					+ " Current default is EstimatedDemand";
 
 	public static final String ZONAL_DEMAND_ESTIMATOR_TYPE = "zonalDemandEstimatorType";
 	static final String ZONAL_DEMAND_ESTIMATOR_TYPE_EXP = "Defines the methodology for demand estimation."
