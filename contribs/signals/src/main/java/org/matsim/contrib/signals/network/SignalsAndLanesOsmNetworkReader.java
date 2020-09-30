@@ -635,10 +635,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					if (this.acceptFourPlusCrossings) {
 						createPlansForOneWayJunction(signalSystem, node);
 						LOG.warn("Signal system with more than four in-links detected @ Node "
-								+ node.getId().toString());
+								+ node.getId().toString()+"\n\t\t\t -> Reader will create only ONE SignalGroup for this System");
 					} else {
 						throw new RuntimeException("Signal system with more than four in-links detected @ Node "
-								+ node.getId().toString());
+								+ node.getId().toString()+"\n\t\t\t -> Set acceptFourPlusCrossings=true to resolve");
 					}
 				}
 			}
