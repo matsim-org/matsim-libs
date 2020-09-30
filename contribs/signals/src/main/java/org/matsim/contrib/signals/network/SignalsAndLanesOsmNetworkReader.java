@@ -53,7 +53,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -674,17 +673,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (Id<SignalSystem> signalsystem : this.systems.getSignalSystemData().keySet()){
 			if (this.systems.getSignalSystemData().get(signalsystem).getSignalData()==null) {
 				badSignalSystemData.add(signalsystem);
-			} else {
-//				for (SignalData signalData : this.systems.getSignalSystemData().get(signalsystem).getSignalData().values()){
-//					//TODO delete this if signals can be without lanes
-//					if ((signalData.getLaneIds()==null)){
-//						this.systems.getSignalSystemData().get(signalsystem).getSignalData().clear();
-//						this.groups.getSignalGroupDataBySignalSystemId().remove(signalsystem);
-//						this.control.getSignalSystemControllerDataBySystemId().remove(signalsystem);
-//						badSignalSystemData.add(signalsystem);
-//						break;
-//					}
-//				}
 			}
 		}
 		LOG.warn("Bad SignalSystemData: "+badSignalSystemData.size()+" ->remove them from the system");
@@ -695,106 +683,81 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		LOG.warn(a);
 
-		//sbraun 09042020 ideas to resolve the problem that there are to many small links in the network.
-		//1. delete Lanes on Link if there ite through link
-		//2. explicity delete ToLink which would be the U turn on those lanes
-
-//		for (Link link: network.getLinks().values()){
-//			Node toNode = link.getToNode();
-//			if (toNode.getOutLinks().size()==2){
-//				LinkVector lvecFromLink = new LinkVector(link);
-//				double degreeFromLink = lvecFromLink.theta;
-//				for (Link outlink: toNode.getOutLinks().values()){
-//					LinkVector lvecToLink = new LinkVector(outlink);
-//					double degreeToLink = lvecToLink.theta;
-//					double degreeToLinkRev = (degreeToLink+Math.PI)%(2.*Math.PI);
-//					if ((Math.abs(degreeToLinkRev-degreeFromLink)/(2.*Math.PI))<0.1){
-//						link.setNumberOfLanes(1);
-//						lanes.getLanesToLinkAssignments().remove(link.getId());
-////						lanes.getLanesToLinkAssignments().get(link.getId()).getLanes();
-////						HashSet<Lane> laneset = new HashSet<Lane>();
-////						if (lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
-////							for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()) {
-////								if (lane.getToLinkIds().contains(outlink.getId())) {
-////									laneset.add(lane);
-////
-////								}
-////							}
-////							for (Lane lane : laneset) {
-////								lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(lane.getId());
-////								link.setNumberOfLanes(link.getNumberOfLanes() - 1);
-////							}
-////							//lane.getToLinkIds().remove(outlink.getId());
-////						}
-////						break;
-//					}
-//
-//				}
-//			}
-//
-//		}
 
 	}
-	//added check if node is in bbox for speed up -> is that right
+	//sbraun 30092020 Attempt to speed up this method:
+    // 1. Try to parse over Long objects instead of OsmNodes in inner Loops
+    // 2. Create Set with only OSMNodes in Boundingbox (to reduce size of each set)//TODO Was passiert an den Rändern der BoundingBox
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
-		for (OsmNode node : this.nodes.values()) {
-			if (this.bbox.contains(node.coord)) {
-				List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
-				if (signalizedOsmNodes.contains(node.id) && isNodeAtJunction(node)
-						&& !oldToMergedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
-					junctionNodes.add(node);
-					for (OsmNode otherNode : this.nodes.values()) {
-						if (this.bbox.contains(otherNode.coord)) {
-							if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
-									&& NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
-									otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
-									&& !oldToMergedJunctionNodeMap.containsKey(otherNode.id)
-									&& hasNodeOneway(otherNode)) {
-								junctionNodes.add(otherNode);
-							}
-						}
-					}
-				}
+	    //Find all nodes within BoundingBox
+        Set<Long> nodesInBB = new HashSet<>();
+        for (OsmNode node : this.nodes.values()) {
+            if (this.bbox.contains(node.coord)) {
+                nodesInBB.add(node.id);
+            }
+        }
 
-				if (junctionNodes.size() > 1) {
-					double repXmin = 0;
-					double repXmax = 0;
-					double repYmin = 0;
-					double repYmax = 0;
-					double repX;
-					double repY;
-					for (OsmNode tempNode : junctionNodes) {
-						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
-							repXmin = tempNode.coord.getX();
-						if (repXmax == 0 || tempNode.coord.getX() > repXmax)
-							repXmax = tempNode.coord.getX();
-						if (repYmin == 0 || tempNode.coord.getY() < repYmin)
-							repYmin = tempNode.coord.getY();
-						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
-							repYmax = tempNode.coord.getY();
-					}
-					repX = repXmin + (repXmax - repXmin) / 2;
-					repY = repYmin + (repYmax - repYmin) / 2;
-					BoundingBox box = new BoundingBox(repYmin, repXmin, repYmax, repXmax);
-					for (OsmNode betweenNode : this.nodes.values()) {
-						if (box.contains(betweenNode.coord))
-							junctionNodes.add(betweenNode);
-					}
-					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
-					signalizedOsmNodes.add(junctionNode.id);
-					junctionNode.used = true;
-					for (OsmNode tempNode : junctionNodes) {
-						// TODO tempNode.used = false; node in way ersetzen -> repJunNode nicht noetig?!
-						oldToMergedJunctionNodeMap.put(tempNode.id, junctionNode);
-						if (osmNodeRestrictions.containsKey(tempNode.id)) {
-							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));
-						}
-						checkedNodes.add(tempNode);
-					}
-					addingNodes.add(junctionNode);
-					id++;
-				}
-			}
+		for (Long nodeID : nodesInBB) {
+//				List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
+            List<Long> junctionNodes = new ArrayList<>();
+            if (signalizedOsmNodes.contains(nodeID) && isNodeAtJunction(this.nodes.get(nodeID))
+                    && !oldToMergedJunctionNodeMap.containsKey(nodeID) && hasNodeOneway(this.nodes.get(nodeID))) {
+                junctionNodes.add(nodeID);
+                for (Long otherNodeID : nodesInBB) {
+
+                    if (signalizedOsmNodes.contains(otherNodeID) && isNodeAtJunction(this.nodes.get(otherNodeID))
+                            && NetworkUtils.getEuclideanDistance(this.nodes.get(nodeID).coord.getX(), this.nodes.get(nodeID).coord.getY(),
+                            this.nodes.get(otherNodeID).coord.getX(), this.nodes.get(otherNodeID).coord.getY()) < SIGNAL_MERGE_DISTANCE
+                            && !oldToMergedJunctionNodeMap.containsKey(otherNodeID)
+                            && hasNodeOneway(this.nodes.get(otherNodeID))) {
+                        junctionNodes.add(otherNodeID);
+                    }
+
+                }
+            }
+
+            //TODO sbraun30092020 This is maybe redundant? Closeby nodes are already found by method above??
+            if (junctionNodes.size() > 1) {
+                double repXmin = 0;
+                double repXmax = 0;
+                double repYmin = 0;
+                double repYmax = 0;
+                double repX;
+                double repY;
+                for (Long jnID : junctionNodes) {
+                    OsmNode tempNode = this.nodes.get(jnID) ;
+                    if (repXmin == 0 || tempNode.coord.getX() < repXmin)
+                        repXmin = tempNode.coord.getX();
+                    if (repXmax == 0 || tempNode.coord.getX() > repXmax)
+                        repXmax = tempNode.coord.getX();
+                    if (repYmin == 0 || tempNode.coord.getY() < repYmin)
+                        repYmin = tempNode.coord.getY();
+                    if (repYmax == 0 || tempNode.coord.getY() > repYmax)
+                        repYmax = tempNode.coord.getY();
+                }
+                repX = repXmin + (repXmax - repXmin) / 2;
+                repY = repYmin + (repYmax - repYmin) / 2;
+
+                BoundingBox box = new BoundingBox(repYmin, repXmin, repYmax, repXmax);
+                for (Long betweenNodeID : nodesInBB) {
+                    if (box.contains(this.nodes.get(betweenNodeID).coord))
+                        junctionNodes.add(betweenNodeID);
+                }
+                OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
+                signalizedOsmNodes.add(junctionNode.id);
+                junctionNode.used = true;
+                for (Long jnID : junctionNodes) {
+                    OsmNode tempNode = this.nodes.get(jnID);
+                    oldToMergedJunctionNodeMap.put(jnID, junctionNode);
+                    if (osmNodeRestrictions.containsKey(jnID)) {
+                        osmNodeRestrictions.put(jnID, osmNodeRestrictions.get(jnID));
+                    }
+                    checkedNodes.add(tempNode);
+                }
+                addingNodes.add(junctionNode);
+                id++;
+            }
+
 		}
 	}
 
@@ -1685,7 +1648,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 		fillConflictingLanesData(pair, criticalSignalLanes);
-		SignalGroupSettingsData settingsFirst = null;
+		SignalGroupSettingsData settingsFirst;
 		if (first)
 			settingsFirst = createSetting(0, changeTime - (2 * INTERGREENTIME + MIN_GREENTIME), node, groupOne.getId());
 		else
@@ -2262,8 +2225,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		if (reverseLink.getRotation() < (2. - THROUGHLINK_ANGLE_TOLERANCE) * Math.PI
 				&& reverseLink.getRotation() > THROUGHLINK_ANGLE_TOLERANCE * Math.PI)
 			reverseLink = null;
-		int it = 1;
-		boolean insertedUTurnOnLeftLane = false;
+        int it = 1;
+        boolean insertedUTurnOnLeftLane = false;
 
 		while (!laneStack.isEmpty()) {
 
@@ -2545,10 +2508,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				toLinkList.add(toLink);
 
 			}
-
-
-			//toLink.calculateRotation(fromLink);
-			//toLinkList.add(toLink);
 		}
 		Collections.sort(toLinkList);
 		return toLinkList;
