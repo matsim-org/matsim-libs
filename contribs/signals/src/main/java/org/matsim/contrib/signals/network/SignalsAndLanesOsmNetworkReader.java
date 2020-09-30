@@ -110,16 +110,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final String OSM_TURN_INFO = "osmTurnInfo";
 
 
-	// specify turn restrictions of lanes without turn:lanes information on OSM
-	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
 	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
 	private final boolean SAVE_TURN_LANES = false; // add turn info as attribute in lane file
 	private Set<Id<Link>> linksNotMatchingTagsANDnoLanes = new HashSet<>();
 
-	public enum MiddleLaneRestriction {
-		REGULATION_BASED, // all turns are allowed from middle lanes, except u-turns
-		REALISTIC // only straight traffic allowed from middle lanes
-	}
+
 	public enum OuterLaneRestriction {
 		VERY_RESTRICTIVE, // only left and u-turns at the left most lane, only right turns at the right most lane
 		RESTRICTIVE, // only left and u-turns at the left most lane, right and straight turns at the right most lane
@@ -2253,17 +2248,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 
-				if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REGULATION_BASED)) {
-					// add all other out-links except u-turn to middle lanes
-					for (int i = (int) link.getNumberOfLanes() - 1; i > 1; i--) {
-						Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-								.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-						if (midLink > 0 && (midLink - 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
-							lane.addToLinkId(toLinks.get(midLink - 1).getLink().getId());
-						if (midLink < toLinks.size() - 1 && (midLink + 1 != reverseLink || !this.allowUTurnAtLeftLaneOnly))
-							lane.addToLinkId(toLinks.get(midLink + 1).getLink().getId());
-					}
-				}
 				// check for all toLinks can be reached. If not, add to second farthest right
 				// Lane
 				if (link.getNumberOfLanes() > 2) {
@@ -2318,41 +2302,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			// log.info("Trying to Fill " + lane.getId().toString() + " with
 			// Direction: " + tempDir + " with #ofToLinks: " + toLinks.size() );
 			if (tempDir == null) { // no direction for lane available
-				if (MIDDLE_LANE_TYPE.equals(MiddleLaneRestriction.REALISTIC)) {
-					// only add straight to-link
-					LOG.warn("Did not not understand direction of lane " + lane.getId().toString() +
-							" - MiddleLane type is realistic. Therefore only add straight direction.");
-					lane.addToLinkId(throughLink.getLink().getId());
-					writeOutLinkInfo(lane, throughLink.getLink().getId(), "through");
+                // only add straight to-link
+                LOG.warn("Did not not understand direction of lane " + lane.getId().toString() +
+                        " - MiddleLane type is realistic. Therefore only add straight direction.");
+                lane.addToLinkId(throughLink.getLink().getId());
+                writeOutLinkInfo(lane, throughLink.getLink().getId(), "through");
 
-//					if (this.SAVE_TURN_LANES) {
-//						String toLinkId = throughLink.getLink().getId().toString();
-//						if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-//							lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":through");
-//						} else {
-//							String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-//							lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":through");
-//						}
-//					}
-				}else {
-					for (LinkVector lvec : toLinks) {
-						// add all to-links except u-turn
-						if (!lvec.equals(reverseLink) || !this.allowUTurnAtLeftLaneOnly) {
-							lane.addToLinkId(lvec.getLink().getId());
-							writeOutLinkInfo(lane, lvec.getLink().getId(), "unclear");
 
-//							if (this.SAVE_TURN_LANES) {
-//								String toLinkId = lvec.getLink().getId().toString();
-//								if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
-//									lane.getAttributes().putAttribute(OSM_TURN_INFO, toLinkId + ":unclear");
-//								} else {
-//									String newTurn = lane.getAttributes().getAttribute(OSM_TURN_INFO).toString();
-//									lane.getAttributes().putAttribute(OSM_TURN_INFO, newTurn + "|" + toLinkId + ":unclear");
-//								}
-//							}
-						}
-					}
-				}
 				lane.setAlignment(0);
 				//sbraun 24072020 change break to continue-
 				// if there are unreadable tags in between than the the other lanes remain unconsidered
