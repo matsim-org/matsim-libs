@@ -110,16 +110,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final String OSM_TURN_INFO = "osmTurnInfo";
 
 
-	private final OuterLaneRestriction OUTER_LANE_TYPE = OuterLaneRestriction.RESTRICTIVE;
 	private final boolean SAVE_TURN_LANES = false; // add turn info as attribute in lane file
 	private Set<Id<Link>> linksNotMatchingTagsANDnoLanes = new HashSet<>();
 
-
-	public enum OuterLaneRestriction {
-		VERY_RESTRICTIVE, // only left and u-turns at the left most lane, only right turns at the right most lane
-		RESTRICTIVE, // only left and u-turns at the left most lane, right and straight turns at the right most lane
-		NON_RESTRICTIVE // left, u- and straight turns at the left most lane, right and straight turns at the right most lane
-	}
 
 	private final Map<Id<Link>, Stack<Stack<Integer>>> laneStacks = new HashMap<>();
 	private final Map<Long, OsmNode> roundaboutNodes = new HashMap<>();
@@ -2196,28 +2189,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
 				}
 
-				if (!OUTER_LANE_TYPE.equals(OuterLaneRestriction.RESTRICTIVE)) {
-					// add straight turn to right lane
-					Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-							.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-					if (reverseLink != 0)
-						lane.addToLinkId(toLinks.get(1).getLink().getId());
-					else if (straightLink != 1)
-						lane.addToLinkId(toLinks.get(2).getLink().getId());
-					lane.setAlignment(-1);
-					if (OUTER_LANE_TYPE.equals(OuterLaneRestriction.NON_RESTRICTIVE)) {
-						// add straight turn to left lane
-						lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-								.get(Id.create("Lane" + link.getId() + "." + "1", Lane.class));
-						if (straightLink < toLinks.size() - 2) {
-							if (reverseLink == toLinks.size() - 1)
-								lane.addToLinkId(toLinks.get(toLinks.size() - 3).getLink().getId());
-							else
-								lane.addToLinkId(toLinks.get(toLinks.size() - 2).getLink().getId());
-						}
-						lane.setAlignment(1);
-					}
-				}
 				// check for all toLinks can be reached. If not, add to right Lane
 				if (link.getNumberOfLanes() == 2) {
 					Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
