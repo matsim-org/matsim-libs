@@ -146,11 +146,11 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				}
 
 				for (int i = 0; i < vehicleToSend; i++) {
-					int indexOfLastElement = rebalancableVehiclesInDepartureZone.size() - 1;
 					Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
-					relocationList.add(new Relocation(rebalancableVehiclesInDepartureZone.get(indexOfLastElement),
-							destinationLink));
-					rebalancableVehiclesInDepartureZone.remove(indexOfLastElement);
+					relocationList.add(new Relocation(
+							rebalancableVehiclesInDepartureZone.get(numAvailableVehiclesInZone - 1), destinationLink));
+					rebalancableVehiclesInDepartureZone.remove(numAvailableVehiclesInZone - 1);
+					numAvailableVehiclesInZone -= 1;
 				}
 			}
 		}
