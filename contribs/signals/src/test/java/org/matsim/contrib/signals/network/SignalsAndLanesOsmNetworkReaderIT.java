@@ -96,7 +96,6 @@ public class SignalsAndLanesOsmNetworkReaderIT {
 
 //        signalReader.setMinimizeSmallRoundabouts(false);
         signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setUseRadiusReduction(false);
         signalReader.setAllowUTurnAtLeftLaneOnly(true);
         signalReader.setMakePedestrianSignals(false);
 
@@ -194,7 +193,6 @@ public class SignalsAndLanesOsmNetworkReaderIT {
         //TODO Parameterize - but than we have 2^5= 32 combinations
 //        signalReader.setMinimizeSmallRoundabouts(true);
         signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setUseRadiusReduction(true);
         signalReader.setAllowUTurnAtLeftLaneOnly(true);
         signalReader.setMakePedestrianSignals(false);
 

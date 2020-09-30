@@ -131,7 +131,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final Map<Id<Link>, Map<Id<Link>, Double>> allToLinksAngles = new HashMap<>();
 	private final Map<Id<Lane>, List<Id<Lane>>> nonCritLanes = new HashMap<>();
 	private final Map<Id<Lane>, List<Id<Lane>>> critLanes = new HashMap<>();
-	private final Map<Long, Double> turnRadii = new HashMap<>();
 	private Map<Id<Link>, Coord> linkToOrigToNodeCoord = new HashMap<>();
 	private Map<Id<Link>, Coord> linkToOrigFromNodeCoord = new HashMap<>();
 	private Set<Id<Link>> loopLinks = new HashSet<>();
@@ -145,7 +144,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap();
 	
 	private boolean mergeOnewaySignalSystems = true;
-	private boolean useRadiusReduction = true;
 	private boolean allowUTurnAtLeftLaneOnly = true;
 	private boolean makePedestrianSignals = false;
 	private boolean acceptFourPlusCrossings = true;
@@ -191,7 +189,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		reader.setMergeOnewaySignalSystems(true);       //TODO check was passiert
-		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
 		reader.setMakePedestrianSignals(false);         //TODO check was passiert
 
@@ -412,9 +409,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
         this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
     }
 
-    public void setUseRadiusReduction(boolean useRadiusReduction){
-        this.useRadiusReduction = useRadiusReduction;
-    }
     public void setAllowUTurnAtLeftLaneOnly(boolean allowUTurnAtLeftLaneOnly){
         this.allowUTurnAtLeftLaneOnly = allowUTurnAtLeftLaneOnly;
     }
@@ -826,17 +820,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						.values()) {
 					if (!lane.getId().toString().endsWith("ol")) {
 						lane.setCapacityVehiclesPerHour(SIGNAL_LANES_CAPACITY * lane.getNumberOfRepresentedLanes());
-						if (this.useRadiusReduction) {
-							Long key = Long.valueOf(lvec.getLink().getToNode().getId().toString());
-							if (lane.getAlignment() == 2 && this.turnRadii.containsKey(key)) {
-								double radius = this.turnRadii.get(key);
-								double reductionFactor = getRadiusCapacityReductionFactor(radius);
-								lane.setCapacityVehiclesPerHour(lane.getCapacityVehiclesPerHour() * reductionFactor);
-							} else if (lane.getAlignment() == 2 || lane.getAlignment() == -2) {
-								double reductionFactor = getRadiusCapacityReductionFactor(0);
-								lane.setCapacityVehiclesPerHour(lane.getCapacityVehiclesPerHour() * reductionFactor);
-							}
-						}
 						olCapacity += lane.getCapacityVehiclesPerHour();
 					} else {
 						origLane = lane;
@@ -905,7 +888,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					double repYmax = 0;
 					double repX;
 					double repY;
-					double leftTurnRadius = 0;
 					boolean signalized = false;
 					for (OsmNode tempNode : junctionNodes) {
 						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
@@ -921,7 +903,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 					repX = repXmin + (repXmax - repXmin) / 2;
 					repY = repYmin + (repYmax - repYmin) / 2;
-					leftTurnRadius = ((repXmax - repXmin) + (repYmax - repYmin)) / 2;
 					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
 					if (signalized)
 						signalizedOsmNodes.add(junctionNode.id);
@@ -934,7 +915,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						checkedNodes.add(tempNode);
 					}
 					addingNodes.add(junctionNode);
-					this.turnRadii.put(junctionNode.id, leftTurnRadius);
 					id++;
 				}
 			}
@@ -1107,16 +1087,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (junctionNodes.size() == 4) {
 					double repX = 0;
 					double repY = 0;
-					double leftTurnRadius = 0;
-					OsmNode lastNode = junctionNodes.get(junctionNodes.size() - 1);
 					for (OsmNode tempNode : junctionNodes) {
 						repX += tempNode.coord.getX();
 						repY += tempNode.coord.getY();
-                        leftTurnRadius += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
-                                lastNode.coord.getX(), lastNode.coord.getY());
-						lastNode = tempNode;
 					}
-					leftTurnRadius /= junctionNodes.size();
 					repX /= junctionNodes.size();
 					repY /= junctionNodes.size();
 					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
@@ -1130,7 +1104,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						checkedNodes.add(tempNode);
 					}
 					addingNodes.add(junctionNode);
-					this.turnRadii.put(junctionNode.id, leftTurnRadius);
 					id++;
 				}
 			}
@@ -2156,16 +2129,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		} else {
 			setToLinksForLanesDefault(link, linkVectors);
 		}
-	}
-
-	// Source: HBS 2001
-	//TODO Catch exception, negative numbers
-	private double getRadiusCapacityReductionFactor(double radius) {
-		if (radius <= 10)
-			return 0.85;
-		if (radius <= 15)
-			return 0.9;
-		return 1;
 	}
 
 	private void setToLinksForLanesDefault(Link link, List<LinkVector> toLinks) {
