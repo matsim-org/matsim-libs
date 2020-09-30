@@ -400,7 +400,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
             Coord se = this.transform.transform(new Coord(east, south));
             this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
         } else {
-	        LOG.warn("Invalid Bounding Box. Use Reader without.");
+	    	if (!(north > south)){
+				throw new RuntimeException("Double value of north coordinate should be larger than south value but was: N:"+north+" <= S:"+south);
+			} else {
+				throw new RuntimeException("Double value of east coordinate should be larger than west value but was: E:"+east+" <= W:"+west);
+			}
         }
 	}
 
@@ -435,6 +439,38 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		pushingSingnalsIntoEndpoints();
 		pushSignalsOverShortWays();
 		removeSignalsAtDeadEnds();
+
+		//BoundingBox validation check - check if all if the BoundingBox is set within the range of available Nodes:
+		if (this.bbox !=null){
+			double maxX = Double.NaN;	//only relevant for the first node
+			double minX = 0.;
+			double maxY = 0.;
+			double minY = 0.;
+
+			// find the range of parsed OSM nodes
+			for (OsmNode node : nodes.values()){
+				if (Double.isNaN(maxX)){
+					maxX = node.coord.getX();
+					minX = node.coord.getX();
+					maxY = node.coord.getY();
+					minY = node.coord.getY();
+				} else {
+					if (node.coord.getX()> maxX) maxX = node.coord.getX();
+					if (node.coord.getX()< minX) minX = node.coord.getX();
+					if (node.coord.getY()> maxY) maxY = node.coord.getY();
+					if (node.coord.getY()< minY) minY = node.coord.getY();
+				}
+			}
+			// Check if the BoundBox is within that range
+			if (!(minX <= this.bbox.west) || !(maxX >= this.bbox.east) || !(minY <= this.bbox.south) || !(maxY >= this.bbox.north)) {
+				throw new RuntimeException("The bounding box is not within the range of parsed coordinates. Please verify the box correspond to OSM data.");
+			}
+			LOG.info("BoundingBox was checked and is valid...");
+		} else {
+			LOG.warn("No bounding box was set. Convert the whole network...");
+		}
+
+
 	}
 
 	/**
