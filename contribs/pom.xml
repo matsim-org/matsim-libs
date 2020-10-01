@@ -175,6 +175,7 @@
 		<module>roadpricing</module>
 		<module>signals</module>
 		<module>socnetsim</module>
+		<module>sumo</module>
 		<module>taxi</module>
 		<module>vsp</module>
 	</modules>
