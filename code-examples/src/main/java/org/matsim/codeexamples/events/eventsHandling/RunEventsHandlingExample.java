@@ -64,9 +64,11 @@ public class RunEventsHandlingExample {
 		events.addHandler(handler3);
 		
         //create the reader and read the file
+		events.initProcessing();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
-		
+		events.finishProcessing();
+
 		System.out.println("average travel time: " + handler2.getTotalTravelTime());
 		handler3.writeChart("output/departuresPerHour.png");
 		

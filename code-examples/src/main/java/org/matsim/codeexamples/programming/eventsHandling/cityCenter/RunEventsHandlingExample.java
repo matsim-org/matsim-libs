@@ -57,8 +57,10 @@ public class RunEventsHandlingExample {
 
         //create the reader and read the file
 		MatsimEventsReader reader = new MatsimEventsReader(events);
+		events.initProcessing();
 		reader.readFile(inputFile);
-		
+		events.finishProcessing();
+
 		System.out.println(cityCenterEventEnterHandler.getVehiclesInCityCenter());
 		
 		System.out.println("Events file read!");

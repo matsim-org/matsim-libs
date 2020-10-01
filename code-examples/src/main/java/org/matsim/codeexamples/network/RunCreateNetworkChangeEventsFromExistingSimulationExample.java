@@ -79,7 +79,9 @@ public class RunCreateNetworkChangeEventsFromExistingSimulationExample{
 		TravelTimeCalculator.Builder builder = new TravelTimeCalculator.Builder( network );
 		TravelTimeCalculator tcc = builder.build();
 		manager.addHandler(tcc);
+		manager.initProcessing();
 		new MatsimEventsReader(manager).readFile(SIMULATION_EVENTS_FILE);
+		manager.finishProcessing();
 		return tcc ;
 	}
 

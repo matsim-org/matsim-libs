@@ -41,8 +41,10 @@ public class RunEventsHandler {
 		
 		CarTravelDistanceEvaluator carTravelDistanceEvaluator = new CarTravelDistanceEvaluator(scenario.getNetwork());
 		eventsManager.addHandler(carTravelDistanceEvaluator);
+		eventsManager.initProcessing();
 		new MatsimEventsReader(eventsManager).readFile("output/davis-basecase1/davis01.output_events.xml.gz");
-		
+		eventsManager.finishProcessing();
+
 		writeDistancesToFile(carTravelDistanceEvaluator.getDistanceDistribution(), "output/davis-basecase1/cardistances.txt");
 		
 	}
