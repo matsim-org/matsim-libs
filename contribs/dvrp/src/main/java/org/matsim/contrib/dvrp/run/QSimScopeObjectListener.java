@@ -23,6 +23,7 @@ package org.matsim.contrib.dvrp.run;
 /**
  * @author Michal Maciejewski (michalm)
  */
+@Deprecated //prefer using events to monitor the state of mobsim from outside (i.e. controller scope)
 public interface QSimScopeObjectListener<T> {
 	void objectCreated(T object);
 }

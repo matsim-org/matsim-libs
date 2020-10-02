@@ -28,83 +28,82 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
+import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import com.google.inject.Inject;
 
 /**
  * @author jbischoff
+ * @author Michal Maciejewski
  * A simple implementation for drt fares.
  * Note that these fares are scored in excess to anything set in the modeparams in the config file.
  */
-public class DrtFareHandler
-        implements DrtRequestSubmittedEventHandler, PersonArrivalEventHandler {
+public class DrtFareHandler implements DrtRequestSubmittedEventHandler, PassengerDroppedOffEventHandler {
+	@Inject
+	private EventsManager events;
 
+	private final double distanceFare_Meter;
+	private final double baseFare;
+	private final double minFarePerTrip;
+	private final double timeFare_sec;
+	private final double dailyFee;
+	private final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
+	private final String mode;
 
-    @Inject
-    private EventsManager events;
+	/**
+	 * @params drtFareConfigGroup: DrtFareConfigGroup for the specific mode
+	 */
+	public DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup) {
+		this.mode = drtFareConfigGroup.getMode();
+		this.distanceFare_Meter = drtFareConfigGroup.getDistanceFare_m();
+		this.baseFare = drtFareConfigGroup.getBasefare();
+		this.minFarePerTrip = drtFareConfigGroup.getMinFarePerTrip();
+		this.dailyFee = drtFareConfigGroup.getDailySubscriptionFee();
+		this.timeFare_sec = drtFareConfigGroup.getTimeFare_h() / 3600.0;
+	}
 
-    private final double distanceFare_Meter;
-    private final double baseFare;
-    private final double minFarePerTrip;
-    private final double timeFare_sec;
-    private final double dailyFee;
-    final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
-    final Map<Id<Person>, DrtRequestSubmittedEvent> lastRequestSubmission = new HashMap<>();
-    private final String mode;
+	DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup, EventsManager events) {
+		this(drtFareConfigGroup);
+		this.events = events;
+	}
 
-    /**
-     * @params drtFareConfigGroup: DrtFareConfigGroup for the specific mode
-     */
-    public DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup) {
-        this.mode = drtFareConfigGroup.getMode();
-        this.distanceFare_Meter = drtFareConfigGroup.getDistanceFare_m();
-        this.baseFare = drtFareConfigGroup.getBasefare();
-        this.minFarePerTrip = drtFareConfigGroup.getMinFarePerTrip();
-        this.dailyFee = drtFareConfigGroup.getDailySubscriptionFee();
-        this.timeFare_sec = drtFareConfigGroup.getTimeFare_h() / 3600.0;
-    }
+	@Override
+	public void reset(int iteration) {
+		dailyFeeCharged.clear();
+		requestSubmissions.clear();
+	}
 
-    DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup, EventsManager events) {
-        this(drtFareConfigGroup);
-        this.events = events;
+	@Override
+	public void handleEvent(PassengerDroppedOffEvent event) {
+		if (event.getMode().equals(mode)) {
+			if (!dailyFeeCharged.contains(event.getPersonId())) {
+				dailyFeeCharged.add(event.getPersonId());
+				events.processEvent(
+						new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "drtFare", mode));
+			}
 
-    }
+			DrtRequestSubmittedEvent submission = requestSubmissions.get(event.getRequestId());
+			double fare = distanceFare_Meter * submission.getUnsharedRideDistance()
+					+ timeFare_sec * submission.getUnsharedRideTime()
+					+ baseFare;
+			double actualFare = Math.max(fare, minFarePerTrip);
+			events.processEvent(
+					new PersonMoneyEvent(event.getTime(), event.getPersonId(), -actualFare, "drtFare", mode));
+		}
+	}
 
-    @Override
-    public void reset(int iteration) {
-        dailyFeeCharged.clear();
-    }
-
-    @Override
-    public void handleEvent(PersonArrivalEvent event) {
-        if (event.getLegMode().equals(this.mode)) {
-            if (!dailyFeeCharged.contains(event.getPersonId())) {
-                dailyFeeCharged.add(event.getPersonId());
-                events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "drtFare", mode));
-            }
-            DrtRequestSubmittedEvent e = this.lastRequestSubmission.get(event.getPersonId());
-            double fare = distanceFare_Meter * e.getUnsharedRideDistance() + timeFare_sec * e.getUnsharedRideTime() + baseFare;
-            if (fare < minFarePerTrip) {
-            	fare = minFarePerTrip;
-            }
-            events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare, "drtFare", mode));
-        }
-
-    }
-
-
-    @Override
-    public void handleEvent(DrtRequestSubmittedEvent event) {
-        if (this.mode.equals(event.getMode())) {
-            this.lastRequestSubmission.put(event.getPersonId(), event);
-        }
-    }
-
+	@Override
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		if (this.mode.equals(event.getMode())) {
+			requestSubmissions.put(event.getRequestId(), event);
+		}
+	}
 }

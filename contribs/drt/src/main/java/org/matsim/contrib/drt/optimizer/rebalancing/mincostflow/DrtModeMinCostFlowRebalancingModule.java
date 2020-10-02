@@ -60,14 +60,13 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(RelocationCalculator.class), params))).asEagerSingleton();
+								getter.getModal(ZonalRelocationCalculator.class), params))).asEagerSingleton();
 
 				switch (strategyParams.getRebalancingTargetCalculatorType()) {
 					case EstimatedDemand:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new DemandEstimatorAsTargetCalculator(
-										getter.getModal(ZonalDemandEstimator.class), strategyParams)))
-								.asEagerSingleton();
+										getter.getModal(ZonalDemandEstimator.class)))).asEagerSingleton();
 						break;
 
 					case EqualRebalancableVehicleDistribution:
@@ -95,7 +94,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								+ strategyParams.getZonalDemandEstimatorType());
 				}
 
-				bindModal(RelocationCalculator.class).toProvider(modalProvider(
+				bindModal(ZonalRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(
 								getter.getModal(DrtZoneTargetLinkSelector.class)))).asEagerSingleton();
 			}
@@ -108,6 +107,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 								drtCfg))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
+				break;
+
+			case None:
 				break;
 
 			default:

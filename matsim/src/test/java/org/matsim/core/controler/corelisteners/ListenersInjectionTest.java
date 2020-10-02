@@ -25,9 +25,13 @@ import org.junit.Test;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.controler.ControlerListenerManager;
+import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,12 +82,15 @@ public class ListenersInjectionTest {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        // put dummy dependencies to get the listenners happy
+						// put dummy dependencies to get the listenners happy
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, config.controler().getCompressionType() ) );
-						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
+						bind(OutputDirectoryHierarchy.class).toInstance(new OutputDirectoryHierarchy(outputDir,
+								OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
+								config.controler().getCompressionType()));
+						bind(IterationStopWatch.class).toInstance(new IterationStopWatch());
+						bind(IterationCounter.class).toInstance(() -> 0);
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
-                    }
+					}
                 },
 				new ControlerDefaultCoreListenersModule());
 

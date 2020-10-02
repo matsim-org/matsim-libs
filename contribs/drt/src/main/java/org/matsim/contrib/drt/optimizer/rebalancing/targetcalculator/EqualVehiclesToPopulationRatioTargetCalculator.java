@@ -23,10 +23,14 @@
  */
 package org.matsim.contrib.drt.optimizer.rebalancing.targetcalculator;
 
-import java.util.HashMap;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.counting;
+
 import java.util.List;
 import java.util.Map;
-import java.util.function.ToIntFunction;
+import java.util.Objects;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
@@ -49,54 +53,38 @@ public final class EqualVehiclesToPopulationRatioTargetCalculator implements Reb
 
 	private static final Logger log = Logger.getLogger(EqualVehiclesToPopulationRatioTargetCalculator.class);
 
-	private final DrtZonalSystem zonalSystem;
-	private final FleetSpecification fleetSpecification;
-	private final Map<DrtZone, Integer> activitiesPerZone = new HashMap<>();
-	private Integer totalNrActivities;
+	private final int fleetSize;
+	private final Map<DrtZone, Integer> activitiesPerZone;
+	private final int totalNrActivities;
 
 	public EqualVehiclesToPopulationRatioTargetCalculator(DrtZonalSystem zonalSystem, Population population,
 			@NotNull FleetSpecification fleetSpecification) {
-		this.zonalSystem = zonalSystem;
-		prepareZones();
-		countFirstActsPerZone(population);
-		this.fleetSpecification = fleetSpecification;
+		log.debug("nr of zones: " + zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
+				.size());
+		fleetSize = fleetSpecification.getVehicleSpecifications().size();
+		activitiesPerZone = countFirstActsPerZone(zonalSystem, population);
+		totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
+		log.debug("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
 	}
 
-	private void countFirstActsPerZone(Population population) {
-		log.info("start counting how many first activities each rebalancing zone has");
-		log.info("nr of zones: " + this.zonalSystem.getZones().size() + "\t nr of persons = " + population.getPersons()
-				.size());
-
-		population.getPersons()
+	private Map<DrtZone, Integer> countFirstActsPerZone(DrtZonalSystem zonalSystem, Population population) {
+		return population.getPersons()
 				.values()
 				.stream()
-				.map(person -> person.getSelectedPlan().getPlanElements().get(0))
-				.forEach(element -> {
-					if (!(element instanceof Activity))
-						throw new RuntimeException("first plan element is not an activity");
-					Activity activity = (Activity)element;
-					DrtZone zone = zonalSystem.getZoneForLinkId(activity.getLinkId());
-					if (zone != null) {
-						Integer oldDemandValue = this.activitiesPerZone.get(zone);
-						this.activitiesPerZone.put(zone, oldDemandValue + 1);
-					}
-				});
-
-		this.totalNrActivities = this.activitiesPerZone.values().stream().mapToInt(Integer::intValue).sum();
-		log.info("nr of persons that have their first activity inside the service area = " + this.totalNrActivities);
+				.map(person -> (Activity)person.getSelectedPlan().getPlanElements().get(0))
+				.map(activity -> zonalSystem.getZoneForLinkId(activity.getLinkId()))
+				.filter(Objects::nonNull)
+				.collect(Collectors.groupingBy(zone -> zone, collectingAndThen(counting(), Long::intValue)));
 	}
 
 	@Override
-	public ToIntFunction<DrtZone> calculate(double time, Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		//decided to take Math.floor rather than Math.round as we want to avoid global undersupply which would 'paralyze' the rebalancing algorithm
-		int fleetSize = this.fleetSpecification.getVehicleSpecifications().size();
-		return zoneId -> (int)Math.floor(
-				(this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() / totalNrActivities) * fleetSize);
-	}
-
-	private void prepareZones() {
-		for (DrtZone zone : zonalSystem.getZones().values()) {
-			activitiesPerZone.put(zone, 0);
+	public ToDoubleFunction<DrtZone> calculate(double time,
+			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
+		if (totalNrActivities == 0) {
+			return zoneId -> 0;
 		}
+
+		double factor = (double)fleetSize / totalNrActivities;
+		return zoneId -> this.activitiesPerZone.getOrDefault(zoneId, 0).doubleValue() * factor;
 	}
 }

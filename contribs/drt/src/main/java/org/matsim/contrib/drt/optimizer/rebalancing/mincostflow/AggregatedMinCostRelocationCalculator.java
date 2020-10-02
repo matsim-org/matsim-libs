@@ -23,7 +23,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
@@ -38,7 +37,7 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  *
  * @author michalm
  */
-public class AggregatedMinCostRelocationCalculator implements RelocationCalculator {
+public class AggregatedMinCostRelocationCalculator implements ZonalRelocationCalculator {
 	public static class DrtZoneVehicleSurplus {
 		public final DrtZone zone;
 		public final int surplus;
@@ -58,22 +57,7 @@ public class AggregatedMinCostRelocationCalculator implements RelocationCalculat
 	@Override
 	public List<Relocation> calcRelocations(List<DrtZoneVehicleSurplus> vehicleSurplus,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		List<Pair<DrtZone, Integer>> supply = new ArrayList<>();
-		List<Pair<DrtZone, Integer>> demand = new ArrayList<>();
-		for (DrtZoneVehicleSurplus s : vehicleSurplus) {
-			if (s.surplus > 0) {
-				supply.add(Pair.of(s.zone, s.surplus));
-			} else if (s.surplus < 0) {
-				demand.add(Pair.of(s.zone, -s.surplus));
-			}
-		}
-
-		return calcRelocations(rebalancableVehiclesPerZone,
-				new TransportProblem<>(this::calcStraightLineDistance).solve(supply, demand));
-	}
-
-	private int calcStraightLineDistance(DrtZone zone1, DrtZone zone2) {
-		return (int)DistanceUtils.calculateDistance(zone1.getCentroid(), zone2.getCentroid());
+		return calcRelocations(rebalancableVehiclesPerZone, TransportProblem.solveForVehicleSurplus(vehicleSurplus));
 	}
 
 	private List<Relocation> calcRelocations(Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone,

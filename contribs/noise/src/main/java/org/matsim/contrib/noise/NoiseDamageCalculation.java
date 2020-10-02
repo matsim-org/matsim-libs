@@ -196,41 +196,19 @@ public class NoiseDamageCalculation {
      * Noise allocation approach: AverageCost
      */
     private void calculateCostSharesPerLinkPerTimeInterval(NoiseReceiverPoint rp) {
-
-        Map<Id<Link>, Double> linkId2costShare = new HashMap<>();
-
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
-
         if (rp.getDamageCosts() != 0.) {
             for (Id<Link> linkId : rp.getLinkId2IsolatedImmission().keySet()) {
-
                 double linkImmission = rp.getLinkId2IsolatedImmission().get(linkId);
-                double costs = 0.;
-
                 if (!(linkImmission == 0.)) {
                     double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(linkImmission, rp.getCurrentImmission());
-                    costs = costShare * rp.getDamageCosts();
-                }
-                linkId2costShare.put(linkId, costs);
-            }
-        }
-
-//		}
-
-        // summing up the link-based costs
-//		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-
-        if (rp.getDamageCosts() != 0.) {
-
-            for (Id<Link> linkId : rp.getRelevantLinks()) {
-                NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
-                if ( noiseLink != null) {
-                    noiseLink.addDamageCost(linkId2costShare.get(linkId));
+                    double costs = costShare * rp.getDamageCosts();
+                    NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
+                    if ( noiseLink != null) {
+                        noiseLink.addDamageCost(costs);
+                    }
                 }
             }
         }
-//		}
     }
 
     /*
@@ -242,31 +220,33 @@ public class NoiseDamageCalculation {
             NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
             if (noiseLink != null) {
                 double damageCostSum = noiseLink.getDamageCost();
+                if(damageCostSum > 0) {
 
-                int[] counts = new int[vehicleTypes.size()];
-                double[] levels = new double[vehicleTypes.size()];
+                    int[] counts = new int[vehicleTypes.size()];
+                    double[] levels = new double[vehicleTypes.size()];
 
-                int i = 0;
-                for(NoiseVehicleType type: vehicleTypes) {
-                    counts[i] = noiseLink.getAgentsEntering(type);
-                    levels[i] = emission.calculateSingleVehicleLevel(type, noiseLink);
-                    i++;
-                }
-
-                double[] shares = NoiseEquations.calculateShare(counts, levels);
-
-                NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
-
-                int j = 0;
-                for(NoiseVehicleType type: vehicleTypes) {
-                    double damageCostSumVehicle = shares[j] * damageCostSum;
-                    if (!(counts[j] == 0)) {
-                        double damageCostPerVehicle = damageCostSumVehicle / (counts[j] * noiseParams.getScaleFactor());
-                        if (damageCostPerVehicle > 0.) {
-                            noiseLink.setAverageDamageCostPerVehicle(type, damageCostPerVehicle);
-                        }
+                    int i = 0;
+                    for (NoiseVehicleType type : vehicleTypes) {
+                        counts[i] = noiseLink.getAgentsEntering(type);
+                        levels[i] = emission.calculateSingleVehicleLevel(type, noiseLink);
+                        i++;
                     }
-                    j++;
+
+                    double[] shares = NoiseEquations.calculateShare(counts, levels);
+
+                    NoiseConfigGroup noiseParams = this.noiseContext.getNoiseParams();
+
+                    int j = 0;
+                    for (NoiseVehicleType type : vehicleTypes) {
+                        double damageCostSumVehicle = shares[j] * damageCostSum;
+                        if (counts[j] > 0) {
+                            double damageCostPerVehicle = damageCostSumVehicle / (counts[j] * noiseParams.getScaleFactor());
+                            if (damageCostPerVehicle > 0.) {
+                                noiseLink.setAverageDamageCostPerVehicle(type, damageCostPerVehicle);
+                            }
+                        }
+                        j++;
+                    }
                 }
             }
         }

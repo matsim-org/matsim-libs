@@ -22,9 +22,11 @@ package org.matsim.contrib.drt.analysis.zonal;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.annotation.Nullable;
 
@@ -46,18 +48,19 @@ import one.util.streamex.StreamEx;
  */
 public class DrtZonalSystem {
 
-	public static DrtZonalSystem createFromPreparedGeometries(Network network, Map<String, PreparedGeometry> geometries) {
+	public static DrtZonalSystem createFromPreparedGeometries(Network network,
+			Map<String, PreparedGeometry> geometries) {
 
 		//geometries without links are skipped
 		Map<String, List<Link>> linksByGeometryId = StreamEx.of(network.getLinks().values())
 				.mapToEntry(l -> getGeometryIdForLink(l, geometries), l -> l)
+				.filterKeys(Objects::nonNull)
 				.grouping(toList());
 
 		//the zonal system contains only zones that have at least one link
-		Map<String, DrtZone> zones = EntryStream.of(linksByGeometryId).mapKeyValue((id, links) -> {
-			PreparedGeometry geometry = geometries.get(id);
-			return new DrtZone(id, geometry, links);
-		}).collect(toMap(DrtZone::getId, z -> z));
+		List<DrtZone> zones = EntryStream.of(linksByGeometryId)
+				.mapKeyValue((id, links) -> new DrtZone(id, geometries.get(id), links))
+				.collect(toList());
 
 		return new DrtZonalSystem(zones);
 	}
@@ -68,6 +71,7 @@ public class DrtZonalSystem {
 	 * If a given link's {@code Coord} borders two or more cells, the allocation to a cell is random.
 	 * Result may be null in case the given link is outside of the service area.
 	 */
+	@Nullable
 	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
 		//TODO use endNode.getCoord() ?
 		Point linkCoord = MGC.coord2Point(link.getCoord());
@@ -82,10 +86,9 @@ public class DrtZonalSystem {
 	private final Map<String, DrtZone> zones;
 	private final Map<Id<Link>, DrtZone> link2zone;
 
-	public DrtZonalSystem(Map<String, DrtZone> zones) {
-		this.zones = zones;
-		this.link2zone = zones.values()
-				.stream()
+	public DrtZonalSystem(Collection<DrtZone> zones) {
+		this.zones = zones.stream().collect(toMap(DrtZone::getId, z -> z));
+		this.link2zone = zones.stream()
 				.flatMap(zone -> zone.getLinks().stream().map(link -> Pair.of(link.getId(), zone)))
 				.collect(toMap(Pair::getKey, Pair::getValue));
 	}

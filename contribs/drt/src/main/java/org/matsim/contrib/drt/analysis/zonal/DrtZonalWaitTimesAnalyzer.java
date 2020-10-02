@@ -29,41 +29,24 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer.PerformedRequestEventSequence;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, DrtRequestSubmittedEventHandler {
+public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 
 	private final DrtConfigGroup drtCfg;
 	private final DrtRequestAnalyzer requestAnalyzer;
 	private final DrtZonalSystem zones;
-	private Map<Id<Request>, DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtRequestAnalyzer requestAnalyzer,
 			DrtZonalSystem zones) {
 		this.drtCfg = configGroup;
 		this.requestAnalyzer = requestAnalyzer;
 		this.zones = zones;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		submittedRequests.clear();
-	}
-
-	@Override
-	public void handleEvent(DrtRequestSubmittedEvent event) {
-		if (!event.getMode().equals(drtCfg.getMode())) {
-			return;
-		}
-		this.submittedRequests.put(event.getRequestId(), event);
 	}
 
 	@Override
@@ -117,22 +100,15 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, D
 
 	private Map<String, DescriptiveStatistics> createZonalStats(String delimiter) {
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
-		for (Id<Request> requestId : requestAnalyzer.getWaitTimeCompare().keySet()) {
-			DrtRequestSubmittedEvent submission = this.submittedRequests.get(requestId);
-			DrtZone zone = zones.getZoneForLinkId(submission.getFromLinkId());
-			final String zoneStr;
-			if (zone != null) {
-				//request submission inside drtServiceArea
-				zoneStr = zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY();
-			} else {
-				zoneStr = "outsideOfDrtZonalSystem;-;-";
+		for (PerformedRequestEventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
+			if (seq.getPickedUp().isPresent()) {
+				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
+				final String zoneStr = zone != null ?
+						zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY() :
+						"outsideOfDrtZonalSystem;-;-";
+				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
+				zoneStats.computeIfAbsent(zoneStr, z -> new DescriptiveStatistics()).addValue(waitTime);
 			}
-			DescriptiveStatistics waitingTimeStats = zoneStats.get(zoneStr);
-			if (waitingTimeStats == null) {
-				waitingTimeStats = new DescriptiveStatistics();
-			}
-			waitingTimeStats.addValue(requestAnalyzer.getWaitTimeCompare().get(requestId).getFirst());
-			zoneStats.put(zoneStr, waitingTimeStats);
 		}
 		return zoneStats;
 	}
