@@ -92,9 +92,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocationList = new ArrayList<>();
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
-
 		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = RebalancingUtils
 				.groupRebalancableVehicles(zonalSystem, generalParams, rebalancableVehicles, time);
+		Map<DrtZone, List<DvrpVehicle>> actualRebalancableVehiclesPerZone = new HashMap<>();
 
 		// Feedback part
 		if (feedbackSwitch) {
@@ -112,15 +112,15 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 			relocationList.addAll(
 					fastHeuristicRelocationCalculator.calcRelocations(vehicleSurplusList, rebalancableVehiclesPerZone));
-		}
-
-		// Connection between feedback and feedforward part
-		Set<DvrpVehicle> relocatedVehicles = relocationList.stream().map(relocation -> relocation.vehicle)
-				.collect(toSet());
-		Map<DrtZone, List<DvrpVehicle>> actualRebalancableVehiclesPerZone = new HashMap<>();
-		for (DrtZone zone : rebalancableVehiclesPerZone.keySet()) {
-			actualRebalancableVehiclesPerZone.put(zone, rebalancableVehiclesPerZone.get(zone).stream()
-					.filter(v -> !relocatedVehicles.contains(v)).collect(Collectors.toList()));
+			// Connection between feedback and feedforward part
+			Set<DvrpVehicle> relocatedVehicles = relocationList.stream().map(relocation -> relocation.vehicle)
+					.collect(toSet());
+			for (DrtZone zone : rebalancableVehiclesPerZone.keySet()) {
+				actualRebalancableVehiclesPerZone.put(zone, rebalancableVehiclesPerZone.get(zone).stream()
+						.filter(v -> !relocatedVehicles.contains(v)).collect(Collectors.toList()));
+			}
+		} else {
+			actualRebalancableVehiclesPerZone = rebalancableVehiclesPerZone;
 		}
 
 		// Feedforward part
