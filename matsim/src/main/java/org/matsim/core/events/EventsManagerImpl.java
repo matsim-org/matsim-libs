@@ -64,7 +64,6 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.utils.misc.ClassUtils;
 
 /**
  * EventHandling
@@ -87,40 +86,43 @@ public final class EventsManagerImpl implements EventsManager {
 
 	static private class HandlerData {
 
-		protected Class<?> eventklass;
+		protected Class<? extends Event> eventClass;
 		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
 		protected Method method;
-		protected HandlerData(final Class<?> eventklass, final Method method) {
-			this.eventklass = eventklass;
+
+		protected HandlerData(final Class<? extends Event> eventClass, final Method method) {
+			this.eventClass = eventClass;
 			this.method = method;
 		}
+
 		protected void removeHandler(final EventHandler handler) {
 			this.handlerList.remove(handler);
 		}
 	}
 
 	static private class HandlerInfo {
-		protected final Class<?> eventClass;
+		protected final Class<? extends Event> eventClass;
 		protected final EventHandler eventHandler;
 		protected final Method method;
 
-		protected HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
+		protected HandlerInfo(final Class<? extends Event> eventClass, final EventHandler eventHandler,
+				final Method method) {
 			this.eventClass = eventClass;
 			this.eventHandler = eventHandler;
 			this.method = method;
 		}
 	}
 
-	private final List<HandlerData> handlerData = new ArrayList<HandlerData>();
+	private final List<HandlerData> handlerData = new ArrayList<>();
 
-	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<Class<?>, HandlerInfo[]>(15);
+	private final Map<Class<? extends Event>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<>(15);
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
 
-	private HandlerData findHandler(final Class<?> evklass) {
+	private HandlerData findHandler(final Class<? extends Event> evklass) {
 		for (HandlerData handler : this.handlerData) {
-			if (handler.eventklass == evklass) {
+			if (handler.eventClass == evklass) {
 				return handler;
 			}
 		}
@@ -153,19 +155,23 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void addHandler (final EventHandler handler) {
-		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
+		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
-		while (test != Object.class) {
-			for (Class<?> theInterface: test.getInterfaces()) {
-				if (!addedHandlers.contains(theInterface)) {
-					log.info("  " + theInterface.getName());
-					addHandlerInterfaces(handler, theInterface);
-					addedHandlers.add(theInterface);
+		do {
+			for (Class<?> theInterface : test.getInterfaces()) {
+				if (EventHandler.class.isAssignableFrom(theInterface)) {
+					Class<? extends EventHandler> eventHandlerInterface = (Class<? extends EventHandler>)theInterface;
+					if (!addedHandlers.contains(theInterface)) {
+						log.info("  " + theInterface.getName());
+						addHandlerInterfaces(handler, eventHandlerInterface);
+						addedHandlers.add(theInterface);
+					}
 				}
 			}
 			test = test.getSuperclass();
-		}
+		} while ((EventHandler.class.isAssignableFrom(test)));
+
 		this.cacheHandlers.clear();
 		log.info("");
 	}
@@ -211,13 +217,13 @@ public final class EventsManagerImpl implements EventsManager {
 		// nothing to do in this implementation
 	}
 
-	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
+	private void addHandlerInterfaces(final EventHandler handler, final Class<? extends EventHandler> handlerClass) {
 		Method[] classmethods = handlerClass.getMethods();
 		for (Method method : classmethods) {
 			if (method.getName().equals("handleEvent")) {
 				Class<?>[] params = method.getParameterTypes();
 				if (params.length == 1) {
-					Class<?> eventClass = params[0];
+					Class<? extends Event> eventClass = params[0].asSubclass(Event.class);
 					log.info("    > " + eventClass.getName());
 					HandlerData dat = findHandler(eventClass);
 					if (dat == null) {
@@ -230,41 +236,34 @@ public final class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-	private HandlerInfo[] getHandlersForClass(final Class<?> eventClass) {
-		Class<?> klass = eventClass;
+	private HandlerInfo[] getHandlersForClass(final Class<? extends Event> eventClass) {
 		HandlerInfo[] cache = this.cacheHandlers.get(eventClass);
 		if (cache != null) {
 			return cache;
 		}
 
-		ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
-		// first search in class-hierarchy
-		while (klass != Object.class) {
-			HandlerData dat = findHandler(klass);
+		ArrayList<HandlerInfo> info = new ArrayList<>();
+		// search in class hierarchy
+		Class<?> klass = eventClass;
+		do {
+			Class<? extends Event> eventKlass = (Class<? extends Event>)klass;
+			HandlerData dat = findHandler(eventKlass);
 			if (dat != null) {
-				for(EventHandler handler: dat.handlerList) {
-					info.add(new HandlerInfo(klass, handler, dat.method));
+				for (EventHandler handler : dat.handlerList) {
+					info.add(new HandlerInfo(eventKlass, handler, dat.method));
 				}
 			}
 			klass = klass.getSuperclass();
-		}
-		// now search in implemented interfaces
-		for (Class<?> intfc : ClassUtils.getAllInterfaces(eventClass )) {
-			HandlerData dat = findHandler(intfc);
-			if (dat != null) {
-				for(EventHandler handler: dat.handlerList) {
-					info.add(new HandlerInfo(intfc, handler, dat.method));
-				}
-			}
-		}
+		} while (Event.class.isAssignableFrom(klass));
 
-		cache = info.toArray(new HandlerInfo[info.size()]);
+		cache = info.toArray(new HandlerInfo[0]);
 		this.cacheHandlers.put(eventClass, cache);
 		return cache;
 	}
 
 	// this method is purely for performance reasons and need not be implemented
-	private static boolean callHandlerFast( final Class<?> klass, final Event ev, final EventHandler handler ) {
+	private static boolean callHandlerFast(final Class<? extends Event> klass, final Event ev,
+			final EventHandler handler) {
 		if (klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
 			return true;
@@ -320,7 +319,7 @@ public final class EventsManagerImpl implements EventsManager {
 	public void printEventHandlers() {
 		log.info("currently registered event-handlers:");
 		for (HandlerData handlerType : this.handlerData) {
-			log.info("+ " + handlerType.eventklass.getName());
+			log.info("+ " + handlerType.eventClass.getName());
 			for (EventHandler handler : handlerType.handlerList) {
 				log.info("  - " + handler.getClass().getName());
 			}
