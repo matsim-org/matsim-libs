@@ -38,6 +38,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
+
 import java.util.*;
 
 import static org.matsim.contrib.emissions.Pollutant.*;
@@ -81,8 +82,9 @@ public class TestWarmEmissionAnalysisModule {
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
+
+
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
@@ -458,10 +460,21 @@ public class TestWarmEmissionAnalysisModule {
 
 			// for that road-vehicle category key, add traffic situation and speed value from current emissions factor:
 			hbefaRoadTrafficSpeeds.putIfAbsent( roadVehicleCategoryKey, new HashMap<>() );
-			//Fixme: Don't throw exception if value is not set (returning null).
-			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != emissionFactor.getSpeed()){
-				throw new RuntimeException("Try to override speeds from average table with speed from detailled table. This may lead to wrong emission calculations. KMT/GR Aug'20");
+
+
+			// if the value is not set (returnig null) no exeption is thrown
+			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) == null) {
+
 			}
+			// avoid overriding of speeds from average table with speed from detailled table
+			else {
+				if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != emissionFactor.getSpeed()){
+					System.out.println(hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()));
+					System.out.println(emissionFactor.getSpeed());
+					throw new RuntimeException("Try to override speeds from average table with speed from detailled table. This may lead to wrong emission calculations. KMT/GR Aug'20");
+				}
+			}
+
 
 			hbefaRoadTrafficSpeeds.get( roadVehicleCategoryKey ).put( warmEmissionFactorKey.getHbefaTrafficSituation(), emissionFactor.getSpeed() );
 		}
