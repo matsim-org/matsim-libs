@@ -27,16 +27,16 @@ import javax.validation.constraints.PositiveOrZero;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.plusOne.PlusOneRebalancingStrategyParams;
+import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 import com.google.common.base.Preconditions;
 
 /**
  * @author michalm
  */
-public final class RebalancingParams extends ReflectiveConfigGroup {
+public final class RebalancingParams extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	public interface RebalancingStrategyParams {
 	}
 
@@ -70,10 +70,20 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 
 	public RebalancingParams() {
 		super(SET_NAME);
+		initSingletonParameterSets();
 	}
 
-	public RebalancingStrategyParams getRebalancingStrategyParams() {
-		return rebalancingStrategyParams;
+	private void initSingletonParameterSets() {
+		//rebalancing strategies (one of: min cost flow, feedforward, plus one)
+		addDefinition(MinCostFlowRebalancingStrategyParams.SET_NAME, MinCostFlowRebalancingStrategyParams::new,
+				() -> (ConfigGroup)rebalancingStrategyParams,
+				params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+		addDefinition(FeedforwardRebalancingStrategyParams.SET_NAME, FeedforwardRebalancingStrategyParams::new,
+				() -> (ConfigGroup)rebalancingStrategyParams,
+				params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
+		addDefinition(PlusOneRebalancingStrategyParams.SET_NAME, PlusOneRebalancingStrategyParams::new,
+				() -> (ConfigGroup)rebalancingStrategyParams,
+				params -> rebalancingStrategyParams = (RebalancingStrategyParams)params);
 	}
 
 	@Override
@@ -141,39 +151,7 @@ public final class RebalancingParams extends ReflectiveConfigGroup {
 		this.maxTimeBeforeIdle = maxTimeBeforeIdle;
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case MinCostFlowRebalancingStrategyParams.SET_NAME:
-				return new MinCostFlowRebalancingStrategyParams();
-			case FeedforwardRebalancingStrategyParams.SET_NAME:
-				return new FeedforwardRebalancingStrategyParams();
-			case PlusOneRebalancingStrategyParams.SET_NAME:
-				return new PlusOneRebalancingStrategyParams();
-		}
-
-		return super.createParameterSet(type);
-	}
-
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		if (set instanceof RebalancingStrategyParams) {
-			Preconditions.checkState(rebalancingStrategyParams == null,
-					"Remove the existing rebalancingStrategyParams before adding a new one");
-			this.rebalancingStrategyParams = (RebalancingStrategyParams)set;
-		}
-
-		super.addParameterSet(set);
-	}
-
-	@Override
-	public boolean removeParameterSet(ConfigGroup set) {
-		if (set instanceof RebalancingStrategyParams) {
-			Preconditions.checkState(rebalancingStrategyParams.equals(set),
-					"The existing rebalancingStrategyParams is null. Cannot remove it.");
-			rebalancingStrategyParams = null;
-		}
-
-		return super.removeParameterSet(set);
+	public RebalancingStrategyParams getRebalancingStrategyParams() {
+		return rebalancingStrategyParams;
 	}
 }
