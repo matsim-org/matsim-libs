@@ -135,9 +135,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		}
 		
 	}
-	
 
-	
 	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
