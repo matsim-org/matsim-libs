@@ -209,7 +209,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 				Assert.assertEquals(11715.609756097561, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 				break;
 
-			//@KMT Why here the SAT Index has it something to do with the +5 addition to the actualSpeed variable?? If so it is a bit confusing
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 				break;
@@ -222,11 +221,13 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
 		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
-		//@KMT isn´t something missing here?
+
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
+				Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
 				break;
 			case AverageSpeed:
+				Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
 				break;
 			default:
 				throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );

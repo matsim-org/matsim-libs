@@ -73,7 +73,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	private static final int tableAccDistance = 1;
 	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private final int numberOfColdEmissions = pollutants.size();
-	// strings for test cases
+
 	
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
 	// size classes, and "<1,4L" or ">=2L" for the emissions concept.  Tried to make it consistent,

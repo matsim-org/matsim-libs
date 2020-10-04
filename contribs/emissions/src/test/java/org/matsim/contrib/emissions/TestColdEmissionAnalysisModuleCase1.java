@@ -128,7 +128,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(),
 				linkId, startTime, parkingDuration, tableAccDistance);
 
-		//Find a better way of doing this. Delete getSum()
+
 		String message = "The expected emissions for " + testCase1.toString() + " are "
 				+ numberOfColdEmissions * (Double) testCase1.get(4) + " but were "
 				+ HandlerToTestEmissionAnalysisModules.getSum();
