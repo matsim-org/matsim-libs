@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
@@ -220,6 +221,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private DrtFareParams drtFareParams;
 
+	@Nullable
+	private DrtSpeedUpParams drtSpeedUpParams;
+
 	@NotNull
 	private String drtSpeedUpMode = "";
 
@@ -248,6 +252,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		//drt fare
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
 				params -> drtFareParams = (DrtFareParams)params);
+
+		//drt speedup
+		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
+				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
 	}
 
 	@Override
@@ -685,5 +693,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	public Optional<DrtFareParams> getDrtFareParams() {
 		return Optional.ofNullable(drtFareParams);
+	}
+
+	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
+		return Optional.ofNullable(drtSpeedUpParams);
 	}
 }
