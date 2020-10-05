@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,25 +15,20 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- *
+ * *********************************************************************** *
  */
-package org.matsim.contrib.av.robotaxi.fares.drt;
+
+package org.matsim.contrib.drt.fare;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.ParallelEventsManager;
 
 /**
@@ -46,21 +41,18 @@ public class DrtFareHandlerTest {
 	 */
 	@Test
 	public void testDrtFareHandler() {
+		String mode = "mode_0";
+		DrtFareParams fareParams = new DrtFareParams();
+		fareParams.setBasefare(1);
+		fareParams.setMinFarePerTrip(1.5);
+		fareParams.setDailySubscriptionFee(1);
+		fareParams.setDistanceFare_m(1.0 / 1000.0);
+		fareParams.setTimeFare_h(15);
 
-		Config config = ConfigUtils.createConfig();
-		DrtFareConfigGroup tccg = new DrtFareConfigGroup();
-		config.addModule(tccg);
-		tccg.setBasefare(1);
-		tccg.setMinFarePerTrip(1.5);
-		tccg.setDailySubscriptionFee(1);
-		tccg.setDistanceFare_m(1.0 / 1000.0);
-		tccg.setTimeFare_h(15);
-		tccg.setMode(TransportMode.drt);
+		ParallelEventsManager events = new ParallelEventsManager(false);
+		events.addHandler(new DrtFareHandler(mode, fareParams, events));
 
 		final MutableDouble fare = new MutableDouble(0);
-		ParallelEventsManager events = new ParallelEventsManager(false);
-		DrtFareHandler tfh = new DrtFareHandler(tccg, events);
-		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
@@ -71,10 +63,10 @@ public class DrtFareHandlerTest {
 			public void reset(int iteration) {
 			}
 		});
+
 		events.initProcessing();
 
 		var personId = Id.createPersonId("p1");
-		String mode = TransportMode.drt;
 		{
 			var requestId = Id.create(0, Request.class);
 			events.processEvent(new DrtRequestSubmittedEvent(0.0, mode, requestId, personId, Id.createLinkId("12"),

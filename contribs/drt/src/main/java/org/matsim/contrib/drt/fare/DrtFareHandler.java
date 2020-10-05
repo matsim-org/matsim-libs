@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,12 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- *
+ * *********************************************************************** *
  */
-package org.matsim.contrib.av.robotaxi.fares.drt;
+
+package org.matsim.contrib.drt.fare;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,17 +59,17 @@ public class DrtFareHandler implements DrtRequestSubmittedEventHandler, Passenge
 	/**
 	 * @params drtFareConfigGroup: DrtFareConfigGroup for the specific mode
 	 */
-	public DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup) {
-		this.mode = drtFareConfigGroup.getMode();
-		this.distanceFare_Meter = drtFareConfigGroup.getDistanceFare_m();
-		this.baseFare = drtFareConfigGroup.getBasefare();
-		this.minFarePerTrip = drtFareConfigGroup.getMinFarePerTrip();
-		this.dailyFee = drtFareConfigGroup.getDailySubscriptionFee();
-		this.timeFare_sec = drtFareConfigGroup.getTimeFare_h() / 3600.0;
+	public DrtFareHandler(String mode, DrtFareParams drtFareParams) {
+		this.mode = mode;
+		this.distanceFare_Meter = drtFareParams.getDistanceFare_m();
+		this.baseFare = drtFareParams.getBasefare();
+		this.minFarePerTrip = drtFareParams.getMinFarePerTrip();
+		this.dailyFee = drtFareParams.getDailySubscriptionFee();
+		this.timeFare_sec = drtFareParams.getTimeFare_h() / 3600.0;
 	}
 
-	DrtFareHandler(DrtFareConfigGroup drtFareConfigGroup, EventsManager events) {
-		this(drtFareConfigGroup);
+	DrtFareHandler(String mode, DrtFareParams drtFareParams, EventsManager events) {
+		this(mode, drtFareParams);
 		this.events = events;
 	}
 
