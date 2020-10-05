@@ -50,8 +50,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup(), new EvConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl,
+				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup());
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, otfvis).run();
 	}
