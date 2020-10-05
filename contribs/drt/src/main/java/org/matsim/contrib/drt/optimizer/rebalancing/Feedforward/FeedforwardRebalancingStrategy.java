@@ -3,10 +3,12 @@ package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -23,13 +25,15 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 
 /**
- * This strategy is created based on the Feedforward Fluidic rebalancing algorithm in AMoDeus.
- * The algorithm send rebalancing vehicles based on the DRT demand flow of previous iteration.
- * This strategy is comparable to the MinCostFlowRebalancing Strategy with Previous Iteration Zonal DRT Demand
- * Aggregator. But, instead of setting a rebalance target for each zone, the concept of flow is
- * used.
+ * This strategy is created based on the Feedforward Fluidic rebalancing
+ * algorithm in AMoDeus. The algorithm send rebalancing vehicles based on the
+ * DRT demand flow of previous iteration. This strategy is comparable to the
+ * MinCostFlowRebalancing Strategy with Previous Iteration Zonal DRT Demand
+ * Aggregator. But, instead of setting a rebalance target for each zone, the
+ * concept of flow is used.
  * <p>
- * Important: At least 2 iterations are needed in order to make this strategy function properly.
+ * Important: At least 2 iterations are needed in order to make this strategy
+ * function properly.
  *
  * @author Chengqi Lu
  */
@@ -88,9 +92,9 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 	public List<Relocation> calcRelocations(Stream<? extends DvrpVehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocationList = new ArrayList<>();
 		double timeBin = Math.floor((time + feedforwardSignalLead) / timeBinSize);
-
 		Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone = RebalancingUtils
 				.groupRebalancableVehicles(zonalSystem, generalParams, rebalancableVehicles, time);
+		Map<DrtZone, List<DvrpVehicle>> actualRebalancableVehiclesPerZone = new HashMap<>();
 
 		// Feedback part
 		if (feedbackSwitch) {
@@ -108,9 +112,16 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 			relocationList.addAll(
 					fastHeuristicRelocationCalculator.calcRelocations(vehicleSurplusList, rebalancableVehiclesPerZone));
+			// Connection between feedback and feedforward part
+			Set<DvrpVehicle> relocatedVehicles = relocationList.stream().map(relocation -> relocation.vehicle)
+					.collect(toSet());
+			for (DrtZone zone : rebalancableVehiclesPerZone.keySet()) {
+				actualRebalancableVehiclesPerZone.put(zone, rebalancableVehiclesPerZone.get(zone).stream()
+						.filter(v -> !relocatedVehicles.contains(v)).collect(Collectors.toList()));
+			}
+		} else {
+			actualRebalancableVehiclesPerZone = rebalancableVehiclesPerZone;
 		}
-		Set<DvrpVehicle> relocatedVehicles = relocationList.stream().map(relocation -> relocation.vehicle)
-				.collect(toSet());
 
 		// Feedforward part
 		// assign rebalance vehicles based on the rebalance plan
@@ -122,10 +133,12 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 				int vehicleToSend = (int) Math.floor(scaling * rebalanceInfo.amount + rnd.nextDouble());
 				// Note: we use probability to solve the problem of non-integer value of
 				// vehileToSend after scaling.
+
+				List<DvrpVehicle> rebalancableVehiclesInDepartureZone = actualRebalancableVehiclesPerZone
+						.get(departureZone);
 				int numAvailableVehiclesInZone = 0;
-				if (rebalancableVehiclesPerZone.get(departureZone) != null) {
-					numAvailableVehiclesInZone = (int) rebalancableVehiclesPerZone.get(departureZone).stream()
-							.filter(v -> !relocatedVehicles.contains(v)).count();
+				if (rebalancableVehiclesInDepartureZone != null) {
+					numAvailableVehiclesInZone = rebalancableVehiclesInDepartureZone.size();
 				}
 
 				if (vehicleToSend > numAvailableVehiclesInZone) {
@@ -134,9 +147,10 @@ public class FeedforwardRebalancingStrategy implements RebalancingStrategy {
 
 				for (int i = 0; i < vehicleToSend; i++) {
 					Link destinationLink = drtZoneTargetLinkSelector.selectTargetLink(arrivalZone);
-					relocationList.add(
-							new Relocation(rebalancableVehiclesPerZone.get(departureZone).get(0), destinationLink));
-					rebalancableVehiclesPerZone.get(departureZone).remove(0);
+					relocationList.add(new Relocation(
+							rebalancableVehiclesInDepartureZone.get(numAvailableVehiclesInZone - 1), destinationLink));
+					rebalancableVehiclesInDepartureZone.remove(numAvailableVehiclesInZone - 1);
+					numAvailableVehiclesInZone -= 1;
 				}
 			}
 		}
