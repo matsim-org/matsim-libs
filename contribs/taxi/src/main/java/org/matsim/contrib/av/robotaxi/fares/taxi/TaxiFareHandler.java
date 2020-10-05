@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,7 +15,8 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
  *
@@ -54,7 +55,6 @@ public class TaxiFareHandler
 		implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
 		PersonArrivalEventHandler {
 
-
 	@Inject
 	private EventsManager events;
 	@Inject
@@ -62,7 +62,7 @@ public class TaxiFareHandler
 
 	private final double distanceFare_Meter;
 	private final double baseFare;
-    private final double minFarePerTrip;
+	private final double minFarePerTrip;
 	private final double timeFare_hour;
 	private final double dailyFee;
 
@@ -73,20 +73,17 @@ public class TaxiFareHandler
 	private final Set<Id<Person>> dailyFeeCharged = new HashSet<>();
 	private final String mode;
 
-	/**
-	 * @params taxiFareConfigGroup: TaxiFareConfigGroup for the specific mode
-	 */
-	public TaxiFareHandler(TaxiFareConfigGroup taxiFareConfigGroup) {
-		this.mode = taxiFareConfigGroup.getMode();
-		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
-		this.baseFare = taxiFareConfigGroup.getBasefare();
-        this.minFarePerTrip = taxiFareConfigGroup.getMinFarePerTrip();
-		this.dailyFee = taxiFareConfigGroup.getDailySubscriptionFee();
-		this.timeFare_hour = taxiFareConfigGroup.getTimeFare_h();
+	public TaxiFareHandler(String mode, TaxiFareParams taxiFareParams) {
+		this.distanceFare_Meter = taxiFareParams.getDistanceFare_m();
+		this.baseFare = taxiFareParams.getBasefare();
+		this.minFarePerTrip = taxiFareParams.getMinFarePerTrip();
+		this.dailyFee = taxiFareParams.getDailySubscriptionFee();
+		this.timeFare_hour = taxiFareParams.getTimeFare_h();
+		this.mode = mode;
 	}
 
-	TaxiFareHandler(TaxiFareConfigGroup taxiFareConfigGroup, Network network, EventsManager events) {
-		this(taxiFareConfigGroup);
+	TaxiFareHandler(String mode, TaxiFareParams taxiFareParams, Network network, EventsManager events) {
+		this(mode, taxiFareParams);
 		this.network = network;
 		this.events = events;
 
@@ -108,9 +105,9 @@ public class TaxiFareHandler
 			double distance = currentRideDistance.remove(vid).doubleValue();
 			double rideTime = (event.getTime() - vehicleEnterTime.remove(event.getPersonId())) / 3600.0;
 			double fare = baseFare + distance * distanceFare_Meter + rideTime * timeFare_hour;
-            if (fare < minFarePerTrip) {
-            	fare = minFarePerTrip;
-            }
+			if (fare < minFarePerTrip) {
+				fare = minFarePerTrip;
+			}
 			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -fare, "taxiFare", mode));
 		}
 	}
@@ -121,7 +118,8 @@ public class TaxiFareHandler
 			waitingPax.add(event.getPersonId());
 			if (!dailyFeeCharged.contains(event.getPersonId())) {
 				dailyFeeCharged.add(event.getPersonId());
-				events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "taxiFare", mode));
+				events.processEvent(
+						new PersonMoneyEvent(event.getTime(), event.getPersonId(), -dailyFee, "taxiFare", mode));
 			}
 		}
 	}

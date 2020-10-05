@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareHandler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
@@ -56,6 +57,9 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
+
+		taxiCfg.getTaxiFareParams()
+				.ifPresent(params -> addEventHandlerBinding().toInstance(new TaxiFareHandler(getMode(), params)));
 
 		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
 				.mode(getMode())

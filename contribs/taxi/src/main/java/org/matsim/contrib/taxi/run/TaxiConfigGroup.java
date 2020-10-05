@@ -22,6 +22,7 @@ package org.matsim.contrib.taxi.run;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -31,6 +32,7 @@ import javax.validation.constraints.Positive;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
@@ -149,6 +151,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	@NotNull
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
+	@Nullable
+	private TaxiFareParams taxiFareParams;
+
 	public TaxiConfigGroup() {
 		super(GROUP_NAME);
 		initSingletonParameterSets();
@@ -160,6 +165,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		addOptimizerParamsDefinition(FifoTaxiOptimizerParams.SET_NAME, FifoTaxiOptimizerParams::new);
 		addOptimizerParamsDefinition(RuleBasedTaxiOptimizerParams.SET_NAME, RuleBasedTaxiOptimizerParams::new);
 		addOptimizerParamsDefinition(ZonalTaxiOptimizerParams.SET_NAME, ZonalTaxiOptimizerParams::new);
+
+		//taxi fare
+		addDefinition(TaxiFareParams.SET_NAME, TaxiFareParams::new, () -> taxiFareParams,
+				params -> taxiFareParams = (TaxiFareParams)params);
 	}
 
 	public void addOptimizerParamsDefinition(String name, Supplier<AbstractTaxiOptimizerParams> creator) {
@@ -409,6 +418,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroupWithConfigurable
 
 	public AbstractTaxiOptimizerParams getTaxiOptimizerParams() {
 		return taxiOptimizerParams;
+	}
+
+	public Optional<TaxiFareParams> getTaxiFareParams() {
+		return Optional.ofNullable(taxiFareParams);
 	}
 
 	public URL getTaxisFileUrl(URL context) {

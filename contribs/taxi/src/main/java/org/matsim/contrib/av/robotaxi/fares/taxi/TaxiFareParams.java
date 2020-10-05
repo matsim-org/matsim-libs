@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,7 +15,8 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
  *
@@ -24,27 +25,23 @@ package org.matsim.contrib.av.robotaxi.fares.taxi;
 
 import java.util.Map;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  * Config Group to set taxi or drt fares.
- *
  */
-public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
+public final class TaxiFareParams extends ReflectiveConfigGroup {
 
-	public static final String GROUP_NAME = "taxifare";
+	public static final String SET_NAME = "taxifare";
 
 	public static final String BASEFARE = "basefare";
 	public static final String MINFARE_PER_TRIP = "minFarePerTrip";
 	public static final String DAILY_FEE = "dailySubscriptionFee";
 	public static final String TIMEFARE = "timeFare_h";
 	public static final String DISTANCEFARE = "distanceFare_m";
-	public static final String MODE = "mode";
 
 	@PositiveOrZero
 	private double basefare;
@@ -56,12 +53,9 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	private double timeFare_h;
 	@PositiveOrZero
 	private double distanceFare_m;
-	@NotBlank
-	private String mode = TransportMode.taxi;
 
-	public TaxiFareConfigGroup() {
-		super(GROUP_NAME);
-
+	public TaxiFareParams() {
+		super(SET_NAME);
 	}
 
 	@Override
@@ -73,7 +67,6 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 		map.put(DAILY_FEE, "Daily subscription fee (positive or zero value)");
 		map.put(TIMEFARE, "taxi fare per hour (positive or zero value)");
 		map.put(DISTANCEFARE, "taxi fare per meter (positive or zero value)");
-		map.put(MODE, "transport mode for which the fare applies. Default: taxi");
 		return map;
 	}
 
@@ -128,15 +121,5 @@ public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(DISTANCEFARE)
 	public void setDistanceFare_m(double distanceFare_m) {
 		this.distanceFare_m = distanceFare_m;
-	}
-
-	@StringGetter(MODE)
-	public String getMode() {
-		return mode;
-	}
-
-	@StringSetter(MODE)
-	public void setMode(String mode) {
-		this.mode = mode;
 	}
 }

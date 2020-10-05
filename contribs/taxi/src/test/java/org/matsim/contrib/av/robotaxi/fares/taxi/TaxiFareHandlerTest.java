@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,7 +15,8 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 /**
  *
@@ -36,10 +37,6 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -55,25 +52,20 @@ public class TaxiFareHandlerTest {
 	 */
 	@Test
 	public void testTaxiFareHandler() {
-		Network network = createNetwork();
-		Config config = ConfigUtils.createConfig();
-		TaxiFareConfigGroup tccg = new TaxiFareConfigGroup();
-		config.addModule(tccg);
-		tccg.setBasefare(1);
-        tccg.setMinFarePerTrip(1.5);
-		tccg.setDailySubscriptionFee(1);
-		tccg.setDistanceFare_m(1.0/1000.0);
-		tccg.setTimeFare_h(36);
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		MultiModeTaxiConfigGroup multiTaxiCfg = new MultiModeTaxiConfigGroup();
-		multiTaxiCfg.addParameterSet(taxiCfg);
-		config.addModule(multiTaxiCfg);
+		String mode = "mode_0";
+		TaxiFareParams fareParams = new TaxiFareParams();
+		fareParams.setBasefare(1);
+		fareParams.setMinFarePerTrip(1.5);
+		fareParams.setDailySubscriptionFee(1);
+		fareParams.setDistanceFare_m(1.0 / 1000.0);
+		fareParams.setTimeFare_h(36);
 		final MutableDouble fare = new MutableDouble(0);
+
+		Network network = createNetwork();
 		ParallelEventsManager events = new ParallelEventsManager(false);
-        TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
+		TaxiFareHandler tfh = new TaxiFareHandler(mode, fareParams, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
-
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
 				fare.add(event.getAmount());
@@ -81,36 +73,39 @@ public class TaxiFareHandlerTest {
 			}
 
 			@Override
-			public void reset(int iteration) {}
+			public void reset(int iteration) {
+			}
 		});
+
 		events.initProcessing();
+
 		Id<Person> p1 = Id.createPersonId("p1");
 		Id<Vehicle> t1 = Id.createVehicleId("v1");
-		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
-		events.processEvent(new PersonEntersVehicleEvent(60.0, p1 , t1));
-		events.processEvent(new LinkEnterEvent(61,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
+		events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("12"), mode));
+		events.processEvent(new PersonEntersVehicleEvent(60.0, p1, t1));
+		events.processEvent(new LinkEnterEvent(61, t1, Id.createLinkId("23")));
+		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), mode));
 
-		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
-		events.processEvent(new PersonEntersVehicleEvent(240.0, p1 , t1));
-		events.processEvent(new LinkEnterEvent(241,t1,Id.createLinkId("23")));
-		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
+		events.processEvent(new PersonDepartureEvent(180.0, p1, Id.createLinkId("12"), mode));
+		events.processEvent(new PersonEntersVehicleEvent(240.0, p1, t1));
+		events.processEvent(new LinkEnterEvent(241, t1, Id.createLinkId("23")));
+		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), mode));
 		events.flush();
 
 		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2
 		Assert.assertEquals(-6.2, fare.getValue(), 0);
 
 		// test minFarePerTrip
-		events.processEvent(new PersonDepartureEvent(360.0, p1 , Id.createLinkId("23"), taxiCfg.getMode()));
-		events.processEvent(new PersonEntersVehicleEvent(400.0, p1 , t1));
-		events.processEvent(new LinkEnterEvent(401,t1,Id.createLinkId("34")));
-		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), taxiCfg.getMode()));
+		events.processEvent(new PersonDepartureEvent(360.0, p1, Id.createLinkId("23"), mode));
+		events.processEvent(new PersonEntersVehicleEvent(400.0, p1, t1));
+		events.processEvent(new LinkEnterEvent(401, t1, Id.createLinkId("34")));
+		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), mode));
 		events.finishProcessing();
 
 		/*
-         * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
-         * --> new total fare: 6.2 (previous trip) + 1.5 (minFarePerTrip for new trip) = 7.7
-         */
+		 * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
+		 * --> new total fare: 6.2 (previous trip) + 1.5 (minFarePerTrip for new trip) = 7.7
+		 */
 		Assert.assertEquals(-7.7, fare.getValue(), 0);
 	}
 
@@ -128,7 +123,5 @@ public class TaxiFareHandlerTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(23), n2, n3, 1000.0, 100 , 100 , 1 , "1", "");
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(34), n3, n4, 100.0, 100 , 100 , 1 , "1", "");
 		return network;
-
 	}
-
 }
