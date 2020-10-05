@@ -90,6 +90,10 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		currentAvgInVehicleBeelineSpeed = drtSpeedUpParams.getInitialInVehicleBeelineSpeed();
 	}
 
+	public DrtTeleportedRouteCalculator createTeleportedRouteCalculator() {
+		return new DrtTeleportedRouteCalculator(currentAvgWaitingTime, currentAvgInVehicleBeelineSpeed);
+	}
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
