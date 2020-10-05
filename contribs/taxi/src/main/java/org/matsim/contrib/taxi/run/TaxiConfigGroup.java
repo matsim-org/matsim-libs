@@ -32,9 +32,9 @@ import javax.validation.constraints.Positive;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.taxi.fare.TaxiFareParams;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;

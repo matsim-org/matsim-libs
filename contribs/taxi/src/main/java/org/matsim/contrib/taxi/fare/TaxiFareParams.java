@@ -18,10 +18,7 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
-package org.matsim.contrib.av.robotaxi.fares.taxi;
+package org.matsim.contrib.taxi.fare;
 
 import java.util.Map;
 
@@ -70,7 +67,6 @@ public final class TaxiFareParams extends ReflectiveConfigGroup {
 		return map;
 	}
 
-
 	@StringGetter(BASEFARE)
 	public double getBasefare() {
 		return basefare;
@@ -81,21 +77,20 @@ public final class TaxiFareParams extends ReflectiveConfigGroup {
 		this.basefare = basefare;
 	}
 
-    @StringGetter(MINFARE_PER_TRIP)
-    public double getMinFarePerTrip() {
-        return minFarePerTrip;
-    }
+	@StringGetter(MINFARE_PER_TRIP)
+	public double getMinFarePerTrip() {
+		return minFarePerTrip;
+	}
 
-    @StringSetter(MINFARE_PER_TRIP)
-    public void setMinFarePerTrip(double minFarePerTrip) {
-        this.minFarePerTrip = minFarePerTrip;
-    }
+	@StringSetter(MINFARE_PER_TRIP)
+	public void setMinFarePerTrip(double minFarePerTrip) {
+		this.minFarePerTrip = minFarePerTrip;
+	}
 
 	@StringGetter(DAILY_FEE)
 	public double getDailySubscriptionFee() {
 		return dailySubscriptionFee;
 	}
-
 
 	@StringSetter(DAILY_FEE)
 	public void setDailySubscriptionFee(double dailySubscriptionFee) {
@@ -106,7 +101,6 @@ public final class TaxiFareParams extends ReflectiveConfigGroup {
 	public double getTimeFare_h() {
 		return timeFare_h;
 	}
-
 
 	@StringSetter(TIMEFARE)
 	public void setTimeFare_h(double timeFare_h) {

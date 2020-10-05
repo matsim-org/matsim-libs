@@ -18,10 +18,7 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
-package org.matsim.contrib.av.robotaxi.fares.taxi;
+package org.matsim.contrib.taxi.fare;
 
 import java.util.HashMap;
 import java.util.HashSet;

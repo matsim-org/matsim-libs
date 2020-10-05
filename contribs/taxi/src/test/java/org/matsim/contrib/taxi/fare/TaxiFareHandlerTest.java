@@ -18,10 +18,7 @@
  * *********************************************************************** *
  */
 
-/**
- *
- */
-package org.matsim.contrib.av.robotaxi.fares.taxi;
+package org.matsim.contrib.taxi.fare;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
@@ -42,13 +39,12 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * @author  jbischoff
- *
+ * @author jbischoff
  */
 public class TaxiFareHandlerTest {
 
 	/**
-     * Test method for {@link TaxiFareHandler}.
+	 * Test method for {@link TaxiFareHandler}.
 	 */
 	@Test
 	public void testTaxiFareHandler() {
@@ -59,17 +55,16 @@ public class TaxiFareHandlerTest {
 		fareParams.setDailySubscriptionFee(1);
 		fareParams.setDistanceFare_m(1.0 / 1000.0);
 		fareParams.setTimeFare_h(36);
-		final MutableDouble fare = new MutableDouble(0);
 
 		Network network = createNetwork();
 		ParallelEventsManager events = new ParallelEventsManager(false);
-		TaxiFareHandler tfh = new TaxiFareHandler(mode, fareParams, network, events);
-		events.addHandler(tfh);
+		events.addHandler(new TaxiFareHandler(mode, fareParams, network, events));
+
+		final MutableDouble fare = new MutableDouble(0);
 		events.addHandler(new PersonMoneyEventHandler() {
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
 				fare.add(event.getAmount());
-
 			}
 
 			@Override
@@ -109,19 +104,19 @@ public class TaxiFareHandlerTest {
 		Assert.assertEquals(-7.7, fare.getValue(), 0);
 	}
 
-	private Network createNetwork(){
+	private Network createNetwork() {
 		Network network = NetworkUtils.createNetwork();
-		Node n1 = NetworkUtils.createNode(Id.createNodeId(1), new Coord(0,0));
-		Node n2 = NetworkUtils.createNode(Id.createNodeId(2), new Coord(2000,0));
-		Node n3 = NetworkUtils.createNode(Id.createNodeId(3), new Coord(2000,2000));
-		Node n4 = NetworkUtils.createNode(Id.createNodeId(4), new Coord(2100,2000));
+		Node n1 = NetworkUtils.createNode(Id.createNodeId(1), new Coord(0, 0));
+		Node n2 = NetworkUtils.createNode(Id.createNodeId(2), new Coord(2000, 0));
+		Node n3 = NetworkUtils.createNode(Id.createNodeId(3), new Coord(2000, 2000));
+		Node n4 = NetworkUtils.createNode(Id.createNodeId(4), new Coord(2100, 2000));
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);
 		network.addNode(n4);
-		NetworkUtils.createAndAddLink(network, Id.createLinkId(12), n1, n2, 1000.0, 100 , 100 , 1 , "1", "");
-		NetworkUtils.createAndAddLink(network, Id.createLinkId(23), n2, n3, 1000.0, 100 , 100 , 1 , "1", "");
-		NetworkUtils.createAndAddLink(network, Id.createLinkId(34), n3, n4, 100.0, 100 , 100 , 1 , "1", "");
+		NetworkUtils.createAndAddLink(network, Id.createLinkId(12), n1, n2, 1000.0, 100, 100, 1, "1", "");
+		NetworkUtils.createAndAddLink(network, Id.createLinkId(23), n2, n3, 1000.0, 100, 100, 1, "1", "");
+		NetworkUtils.createAndAddLink(network, Id.createLinkId(34), n3, n4, 100.0, 100, 100, 1, "1", "");
 		return network;
 	}
 }
