@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,20 +15,25 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.etaxi.run;
 
-public interface EnumAdder<K extends Enum<K>, N extends Number> {
-	K[] getKeys();
+import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
+import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 
-	N get(K e);
-
-	N getTotal();
-
-	void increment(K e);
-
-	void add(K e, Number value);
-
-	void addAll(EnumAdder<K, ?> enumAdder);
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class ETaxiConfigGroups {
+	public static TaxiConfigGroup createWithCustomETaxiOptimizerParams() {
+		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+		taxiCfg.addOptimizerParamsDefinition(AssignmentETaxiOptimizerParams.SET_NAME,
+				AssignmentETaxiOptimizerParams::new);
+		taxiCfg.addOptimizerParamsDefinition(RuleBasedETaxiOptimizerParams.SET_NAME,
+				RuleBasedETaxiOptimizerParams::new);
+		return taxiCfg;
+	}
 }

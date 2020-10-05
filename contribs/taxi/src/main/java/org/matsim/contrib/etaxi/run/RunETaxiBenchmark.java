@@ -65,8 +65,9 @@ import com.google.common.collect.ImmutableSet;
  */
 public class RunETaxiBenchmark {
 	public static void run(URL configUrl, int runs) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new EvConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl,
+				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+				new DvrpConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, runs).run();
 	}
@@ -112,7 +113,8 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class).mode(mode)
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
+				.mode(mode)
 				.objectClass(Fleet.class)
 				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
 				.build());
