@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +18,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package org.matsim.contrib.dvrp.fleet;
 
-public interface EnumAdder<K extends Enum<K>, N extends Number> {
-	K[] getKeys();
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 
-	N get(K e);
+class FleetControlerListener implements ShutdownListener {
 
-	N getTotal();
+	private static final String OUTPUT_FILE_NAME = "_vehicles.xml.gz";
+	private final OutputDirectoryHierarchy controlerIO;
+	private FleetSpecification fleetSpecification;
+	private final String mode;
 
-	void increment(K e);
+	FleetControlerListener(String mode, OutputDirectoryHierarchy controlerIO, FleetSpecification fleetSpecification) {
+		this.mode = mode;
+		this.controlerIO = controlerIO;
+		this.fleetSpecification = fleetSpecification;
+	}
 
-	void add(K e, Number value);
-
-	void addAll(EnumAdder<K, ?> enumAdder);
+	@Override
+	public void notifyShutdown(ShutdownEvent event) {
+		FleetWriter writer = new FleetWriter(fleetSpecification.getVehicleSpecifications().values().stream());
+		writer.write(controlerIO.getOutputFilename(mode + "_" +  OUTPUT_FILE_NAME));
+	}
 }
