@@ -10,7 +10,7 @@ Converting from OSM to SUMO and then to MATSim allows integrating lane informati
 
 ### Example Usage
 
-This examples assumes that [osmosis](https://wiki.openstreetmap.org/wiki/Osmosis#Downloading) and SUMO variables are present on the computer and set correctly.
+This example assumes that [osmosis](https://wiki.openstreetmap.org/wiki/Osmosis#Downloading) and SUMO variables are present on the computer and set correctly.
 
 First, convert an osm rbf file into .osm format. This step can also be used to do some first filtering:
 
