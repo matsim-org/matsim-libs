@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
+import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
@@ -154,6 +155,9 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}).asEagerSingleton();
 
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
+
+		drtCfg.getDrtFareParams()
+				.ifPresent(params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DrtRouteCreator> {

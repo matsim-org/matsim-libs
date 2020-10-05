@@ -36,6 +36,7 @@ import javax.validation.constraints.PositiveOrZero;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
@@ -216,6 +217,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private RebalancingParams rebalancingParams;
 
+	@Nullable
+	private DrtFareParams drtFareParams;
+
 	@NotNull
 	private String drtSpeedUpMode = "";
 
@@ -240,6 +244,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+
+		//drt fare
+		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
+				params -> drtFareParams = (DrtFareParams)params);
 	}
 
 	@Override
@@ -673,5 +681,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	public Optional<RebalancingParams> getRebalancingParams() {
 		return Optional.ofNullable(rebalancingParams);
+	}
+
+	public Optional<DrtFareParams> getDrtFareParams() {
+		return Optional.ofNullable(drtFareParams);
 	}
 }

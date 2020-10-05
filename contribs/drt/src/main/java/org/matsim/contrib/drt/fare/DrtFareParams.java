@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,28 +15,24 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- *
+ * *********************************************************************** *
  */
-package org.matsim.contrib.av.robotaxi.fares.drt;
+
+package org.matsim.contrib.drt.fare;
 
 import java.util.Map;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author jbischoff
  * Config Group to set taxi or drt fares.
  */
-public final class DrtFareConfigGroup extends ReflectiveConfigGroup {
+public final class DrtFareParams extends ReflectiveConfigGroup {
 
-    public static final String GROUP_NAME = "drtfare";
+	public static final String SET_NAME = "drtfare";
 
 	public static final String BASEFARE = "basefare";
 	public static final String MINFARE_PER_TRIP = "minFarePerTrip";
@@ -55,11 +51,9 @@ public final class DrtFareConfigGroup extends ReflectiveConfigGroup {
 	private double timeFare_h;
 	@PositiveOrZero
 	private double distanceFare_m;
-	@NotBlank
-	private String mode = TransportMode.drt;
 
-	public DrtFareConfigGroup() {
-		super(GROUP_NAME);
+	public DrtFareParams() {
+		super(SET_NAME);
 
 	}
 
@@ -76,66 +70,53 @@ public final class DrtFareConfigGroup extends ReflectiveConfigGroup {
 		return map;
 	}
 
+	@StringGetter(BASEFARE)
+	public double getBasefare() {
+		return basefare;
+	}
 
-    @StringGetter(BASEFARE)
-    public double getBasefare() {
-        return basefare;
-    }
+	@StringSetter(BASEFARE)
+	public void setBasefare(double basefare) {
+		this.basefare = basefare;
+	}
 
-    @StringSetter(BASEFARE)
-    public void setBasefare(double basefare) {
-        this.basefare = basefare;
-    }
+	@StringGetter(MINFARE_PER_TRIP)
+	public double getMinFarePerTrip() {
+		return minFarePerTrip;
+	}
 
-    @StringGetter(MINFARE_PER_TRIP)
-    public double getMinFarePerTrip() {
-        return minFarePerTrip;
-    }
+	@StringSetter(MINFARE_PER_TRIP)
+	public void setMinFarePerTrip(double minFarePerTrip) {
+		this.minFarePerTrip = minFarePerTrip;
+	}
 
-    @StringSetter(MINFARE_PER_TRIP)
-    public void setMinFarePerTrip(double minFarePerTrip) {
-        this.minFarePerTrip = minFarePerTrip;
-    }
+	@StringGetter(DAILY_FEE)
+	public double getDailySubscriptionFee() {
+		return dailySubscriptionFee;
+	}
 
-    @StringGetter(DAILY_FEE)
-    public double getDailySubscriptionFee() {
-        return dailySubscriptionFee;
-    }
+	@StringSetter(DAILY_FEE)
+	public void setDailySubscriptionFee(double dailySubscriptionFee) {
+		this.dailySubscriptionFee = dailySubscriptionFee;
+	}
 
+	@StringGetter(TIMEFARE)
+	public double getTimeFare_h() {
+		return timeFare_h;
+	}
 
-    @StringSetter(DAILY_FEE)
-    public void setDailySubscriptionFee(double dailySubscriptionFee) {
-        this.dailySubscriptionFee = dailySubscriptionFee;
-    }
+	@StringSetter(TIMEFARE)
+	public void setTimeFare_h(double timeFare_h) {
+		this.timeFare_h = timeFare_h;
+	}
 
-    @StringGetter(TIMEFARE)
-    public double getTimeFare_h() {
-        return timeFare_h;
-    }
+	@StringGetter(DISTANCEFARE)
+	public double getDistanceFare_m() {
+		return distanceFare_m;
+	}
 
-
-    @StringSetter(TIMEFARE)
-    public void setTimeFare_h(double timeFare_h) {
-        this.timeFare_h = timeFare_h;
-    }
-
-    @StringGetter(DISTANCEFARE)
-    public double getDistanceFare_m() {
-        return distanceFare_m;
-    }
-
-    @StringSetter(DISTANCEFARE)
-    public void setDistanceFare_m(double distanceFare_m) {
-        this.distanceFare_m = distanceFare_m;
-    }
-
-    @StringGetter(MODE)
-    public String getMode() {
-        return mode;
-    }
-
-    @StringSetter(MODE)
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
+	@StringSetter(DISTANCEFARE)
+	public void setDistanceFare_m(double distanceFare_m) {
+		this.distanceFare_m = distanceFare_m;
+	}
 }
