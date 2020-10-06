@@ -237,8 +237,12 @@ import lsp.resources.LSPResource;
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
 		resourcesList.add(distributionAdapter);
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
+
+		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler(); //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenLsite oder ähnliches? --> Offenbar ja, weil Null Pointer. argh! 
+		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);
+
+		//SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+		//completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		
 		return completeLSPBuilder.build();
 		
