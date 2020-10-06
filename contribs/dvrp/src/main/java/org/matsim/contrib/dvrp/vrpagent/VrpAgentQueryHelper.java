@@ -48,7 +48,7 @@ import com.google.inject.Inject;
 /**
  * The class is designed for inheritance. Overrride createLeg() and createActivity() to obtain different visualisation
  * of VRP schedules/vehicles
- * 
+ *
  * @author michalm
  */
 public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
@@ -114,7 +114,7 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 	}
 
 	private final class VrpSchedulePlan implements Plan {
-		private List<PlanElement> unmodifiablePlanElements;
+		private final List<PlanElement> unmodifiablePlanElements;
 
 		private VrpSchedulePlan(DvrpVehicle vehicle) {
 			unmodifiablePlanElements = Collections.unmodifiableList(initPlanElements(vehicle));

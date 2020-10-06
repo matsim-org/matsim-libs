@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditTrips;
@@ -65,10 +66,10 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		// If there is no trip after the activity.
 		if (trip == null) return false;
 		
-		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = TripStructureUtils.getDepartureTime(trip);
+		String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
+		OptionalTime departureTime = TripStructureUtils.getDepartureTime(trip);
 		// To replan pt legs, we would need internalInterface of type InternalInterface.class
-		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
+		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, routingMode, departureTime.seconds() );
 		
 		return true;
 	}

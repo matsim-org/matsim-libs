@@ -28,13 +28,22 @@ package org.matsim.contrib.emissions;
 class HbefaColdEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaComponent;
+	private Pollutant hbefaComponent;
 	private int hbefaParkingTime;
 	private int hbefaDistance;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaColdEmissionFactorKey(){
 	}
+
+	public HbefaColdEmissionFactorKey(HbefaColdEmissionFactorKey key) {
+		this.hbefaVehicleCategory = key.getHbefaVehicleCategory();
+		this.hbefaComponent = key.getHbefaComponent();
+		this.hbefaParkingTime = key.getHbefaParkingTime();
+		this.hbefaDistance = key.getHbefaDistance();
+		this.hbefaVehicleAttributes = key.getHbefaVehicleAttributes();
+	}
+
 
 	HbefaVehicleCategory getHbefaVehicleCategory() {
 		return hbefaVehicleCategory;
@@ -44,11 +53,11 @@ class HbefaColdEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	public String getHbefaComponent() {
+	public Pollutant getHbefaComponent() {
 		return hbefaComponent;
 	}
 
-	public void setHbefaComponent(String hbefaComponent) {
+	public void setHbefaComponent( Pollutant hbefaComponent ) {
 		this.hbefaComponent = hbefaComponent;
 	}
 

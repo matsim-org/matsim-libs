@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import com.sun.org.apache.bcel.internal.classfile.Unknown;
-import org.matsim.contrib.emissions.EmissionUtils;
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -29,9 +28,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class EmissionsConfigGroup
-	  extends ReflectiveConfigGroup
-{
+public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger( EmissionsConfigGroup.class );
+
 	public static final String GROUP_NAME = "emissions";
 
 	@Deprecated // See elsewhere in this class.  kai, oct'18
@@ -45,8 +44,12 @@ public final class EmissionsConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
 	private String averageFleetColdEmissionFactorsFile = null;
 
+	/**
+	 * @deprecated -- use {{@link #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR}}
+	 */
+	@Deprecated
 	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
-	private boolean isUsingDetailedEmissionCalculation = false;
+//	private boolean isUsingDetailedEmissionCalculation = false;
 
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
@@ -57,7 +60,9 @@ public final class EmissionsConfigGroup
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	@Deprecated // see comments at getter/setter
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
+	@Deprecated // see comments at getter/setter
 	private double emissionEfficiencyFactor = 1.0;
 
 	@Deprecated // kai, oct'18
@@ -72,6 +77,7 @@ public final class EmissionsConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
+	// yyyy should become an enum.  kai, jan'20
 
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
@@ -88,15 +94,29 @@ public final class EmissionsConfigGroup
 
 	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
-	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
+	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
+
+	public enum DetailedVsAverageLookupBehavior{onlyTryDetailedElseAbort, tryDetailedThenTechnologyAverageElseAbort, tryDetailedThenTechnologyAverageThenAverageTable, directlyTryAverageTable}
+	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR = "detailedVsAverageLookupBehavior";
+	private DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort;
 
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
-	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
-	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
-	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
-	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
-	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
+	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average cold emission factors";
+	@Deprecated //Use DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR instead
+	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "This is now deprecated. Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead to declare if detailed or average tables should be used.";
+	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT = "Should the calculation bases on average or detailed emission factors? " + "\n\t\t" +
+			DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name() + " : try detailed values. Abort if values are not found. Requires DETAILED" +
+											      " emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort.name() + " : try detailed values first, if not found try to use " +
+											      "semi-detailed values for 'vehicleType,technology,average,average', if then not found abort. Requires DETAILED emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable.name() + "try detailed values first, if not found try to " +
+											      "use semi-detailed values for 'vehicleType,technology,average,average', if then not found try lookup in average table. Requires DETAILED and AVERAGE emission factors. \n\t\t" +
+			DetailedVsAverageLookupBehavior.directlyTryAverageTable.name() + "only calculate from average table. Requires AVERAGE emission factors. " +
+			"Default is " + DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort.name();
+	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "file with HBEFA detailed warm emission factors";
+	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "file with HBEFA detailed cold emission factors";
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
 															   "The definition of emission specifications:" +  "\n\t\t" +
@@ -154,7 +174,8 @@ public final class EmissionsConfigGroup
 
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT);
 
-		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);
+//		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);	//is deprecated now. This functionality is integrated in DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR.
+		map.put(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR, DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT);
 
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, EMISSION_FACTORS_WARM_FILE_DETAILED_CMT) ;
 
@@ -183,6 +204,7 @@ public final class EmissionsConfigGroup
 
 	/**
 	 * @param roadTypeMappingFile -- {@value #EMISSION_ROADTYPE_MAPPING_FILE_CMT}
+	 * @noinspection JavadocReference
 	 */
 	@StringSetter(EMISSION_ROADTYPE_MAPPING_FILE)
 	@Deprecated // See elsewhere in this class.  kai, oct'18
@@ -231,18 +253,63 @@ public final class EmissionsConfigGroup
 	public URL getAverageColdEmissionFactorsFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.averageFleetColdEmissionFactorsFile);
 	}
-
+	// ===============
+	private static final String message = "The " + USING_DETAILED_EMISSION_CALCULATION + " switch is deprecated and will eventually be disabled.  Please use " + DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR + " instead.";
+	/** @noinspection MethodMayBeStatic*/ // ---
 	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
-	public boolean isUsingDetailedEmissionCalculation(){
-		return this.isUsingDetailedEmissionCalculation;
+	@Deprecated
+	public Boolean isUsingDetailedEmissionCalculationStringGetter(){
+		log.warn( message + " Returning null here so that the code does not abort.");
+		return null ;
 	}
 	/**
-	 * @param isUsingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
+	 * @param usingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
 	 */
 	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
-	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
-		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
+	public void setUsingDetailedEmissionCalculationStringSetter(final Boolean usingDetailedEmissionCalculation) {
+		log.warn( message + " Will try to retrofit ...");
+		if ( usingDetailedEmissionCalculation==null ){
+			log.warn( "null as entry in " + USING_DETAILED_EMISSION_CALCULATION + " has no meaning; ignoring it." );
+		} else if ( usingDetailedEmissionCalculation ) {
+			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable;
+		} else {
+			this.detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.directlyTryAverageTable;
+		}
 	}
+	// ---
+	/**
+	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #getDetailedVsAverageLookupBehavior()}
+	 * instead.
+	 * @noinspection MethodMayBeStatic
+	 */
+	@Deprecated
+	public boolean isUsingDetailedEmissionCalculation() {
+		throw new RuntimeException( message );
+	}
+	/**
+	 * @deprecated -- This method is only there to tell people who have used it from code what to do.  Use {@link #setHbefaVehicleDescriptionSource(HbefaVehicleDescriptionSource)}
+	 * instead.
+	 * @noinspection MethodMayBeStatic
+	 */
+	@Deprecated
+	public boolean setUsingDetailedEmissionCalculation( boolean val ) {
+		throw new RuntimeException( message );
+	}
+	// ---
+	/**
+	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
+	 * @noinspection JavadocReference
+	 */
+	@StringSetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
+	public void setDetailedVsAverageLookupBehavior(DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior) {
+		this.detailedVsAverageLookupBehavior = detailedVsAverageLookupBehavior;
+	}
+
+	@StringGetter(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR)
+	public DetailedVsAverageLookupBehavior getDetailedVsAverageLookupBehavior() {
+		return this.detailedVsAverageLookupBehavior;
+	}
+	// ===============
 	/**
 	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}
 	 */
@@ -311,8 +378,8 @@ public final class EmissionsConfigGroup
 			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
 	}
-	// ============================================
-	// ============================================
+	// ---
+	// ---
 	// yy I now think that one can get away without the following.  kai, mar'19
 	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
 	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT="Each vehicle in matsim points to a VehicleType.  For the emissions package to work, " +
@@ -351,22 +418,32 @@ public final class EmissionsConfigGroup
 	public void setWritingEmissionsEvents(boolean writingEmissionsEvents) {
 		isWritingEmissionsEvents = writingEmissionsEvents;
 	}
-	// ---
-	/**
-	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 */
-	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
-	public double getEmissionEfficiencyFactor() {
-		return emissionEfficiencyFactor;
-	}
-	/**
-	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 */
-	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
-	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-	}
-	// ---
+	// ============================================
+//	// ============================================
+//	/**
+//	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
+//	public double getEmissionEfficiencyFactor() {
+//		return emissionEfficiencyFactor;
+//	}
+//	/**
+//	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
+//	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
+//		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+//	}
+//	// ============================================
+	// ============================================
 //	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
@@ -382,7 +459,8 @@ public final class EmissionsConfigGroup
 	public void setEmissionCostMultiplicationFactor(double emissionCostMultiplicationFactor) {
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 	}
-	// ---
+	// ============================================
+	// ============================================
 	// 	@StringGetter(CONSIDERING_CO2_COSTS)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
 	@Deprecated // kai, oct'18
@@ -398,7 +476,8 @@ public final class EmissionsConfigGroup
 	public void setConsideringCO2Costs(boolean consideringCO2Costs) {
 		this.consideringCO2Costs = consideringCO2Costs;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(HANDLE_HIGH_AVERAGE_SPEEDS)
 	public boolean handlesHighAverageSpeeds() {
 		return handleHighAverageSpeeds;
@@ -410,33 +489,34 @@ public final class EmissionsConfigGroup
 	public void setHandlesHighAverageSpeeds(boolean handleHighAverageSpeeds) {
 		this.handleHighAverageSpeeds = handleHighAverageSpeeds;
 	}
+	// ============================================
+	// ============================================
 	@StringGetter(Hbefa_ROADTYPE_SOURCE)
-	@Deprecated // kai, oct'18
+	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
 	public HbefaRoadTypeSource getHbefaRoadTypeSource() {
 		return hbefaRoadTypeSource;
 	}
-
 	@StringSetter(Hbefa_ROADTYPE_SOURCE)
-	@Deprecated // kai, oct'18
+	//	@Deprecated // kai, oct'18 // I now think that this is ok: It just writes the categories directly into the network and then keeps them there, e.g. for output. kai, feb'20
 	public void setHbefaRoadTypeSource(HbefaRoadTypeSource hbefaRoadTypeSource) {
 		this.hbefaRoadTypeSource = hbefaRoadTypeSource;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(NON_SCENARIO_VEHICLES)
 	public NonScenarioVehicles getNonScenarioVehicles() {
 		return nonScenarioVehicles;
 	}
-
 	@StringSetter(NON_SCENARIO_VEHICLES)
 	public void setNonScenarioVehicles(NonScenarioVehicles nonScenarioVehicles) {
 		this.nonScenarioVehicles = nonScenarioVehicles;
 	}
-
+	// ============================================
+	// ============================================
 	@StringGetter(EMISSIONS_COMPUTATION_METHOD)
 	public EmissionsComputationMethod getEmissionsComputationMethod() {
 		return emissionsComputationMethod;
 	}
-
 	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
 	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;

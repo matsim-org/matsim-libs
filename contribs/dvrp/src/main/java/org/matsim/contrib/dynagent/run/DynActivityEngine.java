@@ -19,28 +19,28 @@
 
 package org.matsim.contrib.dynagent.run;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import com.google.common.base.Preconditions;
 
 /**
- * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
- * called before that of ActivityEngine)
+ * DynActivityEngine is not an ActivityEngine (as only one is allowed)
  */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
-	// This is now _additive_ to the normal ActivityEngine!
+	public final static String COMPONENT_NAME = "DynActivityEngine";
 
 	private InternalInterface internalInterface;
 
@@ -59,31 +59,28 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 		Iterator<DynAgent> dynAgentIter = dynAgents.iterator();
 		while (dynAgentIter.hasNext()) {
 			DynAgent agent = dynAgentIter.next();
-			if (agent.getState() == State.ACTIVITY) {
-				agent.doSimStep(time);
-				// ask agents about the current activity end time;
-				double currentEndTime = agent.getActivityEndTime();
+			Preconditions.checkState(agent.getState() == State.ACTIVITY);
+			agent.doSimStep(time);
+			// ask agents about the current activity end time;
+			double currentEndTime = agent.getActivityEndTime();
 
-				if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
-					unregisterAgentAtActivityLocation(agent);
-					internalInterface.getMobsim().getAgentCounter().decLiving();
-					dynAgentIter.remove();
-				} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
-					unregisterAgentAtActivityLocation(agent);
-					agent.endActivityAndComputeNextState(time);
-					internalInterface.arrangeNextAgentState(agent);
-					dynAgentIter.remove();
-				}
+			if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
+				unregisterAgentAtActivityLocation(agent);
+				internalInterface.getMobsim().getAgentCounter().decLiving();
+				dynAgentIter.remove();
+			} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
+				unregisterAgentAtActivityLocation(agent);
+				agent.endActivityAndComputeNextState(time);
+				internalInterface.arrangeNextAgentState(agent);
+				dynAgentIter.remove();
 			}
-			// TODO what if not activity?
 		}
 	}
 
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return false ;
-			// (this means "I am not responsible").
+			return false; // (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();

@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
@@ -53,6 +49,11 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 
 /**
  * @author nagel
@@ -127,15 +128,13 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private void readOrCreateKVals(long seed) {
 		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, this.scenario);
 		this.arekValsRead = computer.run();
-		ObjectAttributes personsKValues = computer.getPersonsKValues();
-		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
-		
+
 		this.personIndices = new TObjectIntHashMap<>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;
 		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
 			this.personIndices.put(personId, personIndex);
-			this.personsKValuesArray[personIndex] = (Double) personsKValues.getAttribute(personId.toString(), "k");
+			this.personsKValuesArray[personIndex] = (Double) scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("k");
 			personIndex++;
 		}		
 		
@@ -147,7 +146,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			Id<ActivityFacility> facilityId = facility.getId();
 			
 			this.facilityIndices.put(facilityId, facilityIndex);
-			this.facilitiesKValuesArray[facilityIndex] = (Double) facilitiesKValues.getAttribute(facilityId.toString(), "k");
+			this.facilitiesKValuesArray[facilityIndex] = (Double) facility.getAttributes().getAttribute("k");
 			this.faciliesWithIndexMap.put(facilityId, new ActivityFacilityWithIndex(facility, facilityIndex));
 			
 			facilityIndex++;
@@ -186,10 +185,14 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			log.warn("prefs are taken from the config and if available from the desires as there is no preferences file specified \n");
 			for (ActivityParams activityParams : this.scenario.getConfig().planCalcScore().getActivityParams()) {				
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
-					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
-					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(), activityParams.getMinimalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(),
+							activityParams.getTypicalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(),
+							activityParams.getLatestStartTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(),
+							activityParams.getEarliestEndTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(),
+							activityParams.getMinimalDuration());
 				}
 			}
 		}

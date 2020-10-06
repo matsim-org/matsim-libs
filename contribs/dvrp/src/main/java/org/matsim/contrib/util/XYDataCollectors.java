@@ -22,7 +22,6 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
 
 /**
@@ -30,13 +29,13 @@ import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
  */
 public class XYDataCollectors {
 	public static <T extends BasicLocation> XYDataCalculator<T> createCalculator(String[] header,
-			Function<T, Object[]> valueCalculator) {
+			Function<T, double[]> valueCalculator) {
 		return createCalculator(header, BasicLocation::getCoord, valueCalculator);
 	}
 
 	public static <T extends BasicLocation> XYDataCalculator<T> createCalculator(String[] header,
-			Function<T, Coord> coordGetter, Function<T, Object[]> valueCalculator) {
-		return new XYDataCalculator<T>() {
+			Function<T, Coord> coordGetter, Function<T, double[]> valueCalculator) {
+		return new XYDataCalculator<>() {
 			@Override
 			public String[] getHeader() {
 				return header;
@@ -48,7 +47,7 @@ public class XYDataCollectors {
 			}
 
 			@Override
-			public Object[] calculate(T object) {
+			public double[] calculate(T object) {
 				return valueCalculator.apply(object);
 			}
 		};

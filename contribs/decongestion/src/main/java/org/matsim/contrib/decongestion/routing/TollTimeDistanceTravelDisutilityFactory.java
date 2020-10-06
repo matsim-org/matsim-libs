@@ -37,8 +37,6 @@ import org.matsim.contrib.decongestion.data.DecongestionInfo;
 public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 	private static final Logger log = Logger.getLogger(TollTimeDistanceTravelDisutilityFactory.class);
 
-	private double sigma = 0. ;
-	
 	@Inject
 	private Scenario scenario;
 	
@@ -51,11 +49,7 @@ public final class TollTimeDistanceTravelDisutilityFactory implements TravelDisu
 
 	@Override
 	public final TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig().planCalcScore(), this.sigma, info);
-	}
-	
-	public void setSigma ( double val ) {
-		this.sigma = val;
+		return new TollTimeDistanceTravelDisutility(timeCalculator, scenario.getConfig(), info);
 	}
 
 }

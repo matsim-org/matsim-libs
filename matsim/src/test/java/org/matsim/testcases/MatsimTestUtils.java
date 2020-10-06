@@ -19,19 +19,22 @@
 
 package org.matsim.testcases;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.rules.TestWatchman;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -42,10 +45,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-import org.matsim.vehicles.VehicleWriteReadTest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -53,16 +52,17 @@ import static org.junit.Assert.assertTrue;
  *
  * @author mrieser
  */
-public final class MatsimTestUtils extends TestWatchman {
-	private static final Logger log = Logger.getLogger( MatsimTestUtils.class ) ;
+public final class MatsimTestUtils extends TestWatcher {
+	private static final Logger log = Logger.getLogger(MatsimTestUtils.class);
 
-	/** A constant for the exactness when comparing doubles. */
+	/**
+	 * A constant for the exactness when comparing doubles.
+	 */
 	public static final double EPSILON = 1e-10;
-	public static void compareFilesLineByLine( String inputFilename, String outputFilename ){
-		try (
-			BufferedReader readerV1Input = IOUtils.getBufferedReader( inputFilename );
-			BufferedReader readerV1Output = IOUtils.getBufferedReader( outputFilename );
-		){
+
+	public static void compareFilesLineByLine(String inputFilename, String outputFilename) {
+		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
+				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename);) {
 
 			String lineInput;
 			String lineOutput;
@@ -104,6 +104,7 @@ public final class MatsimTestUtils extends TestWatchman {
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
+	private String testParameterSetIndex = null;
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
@@ -136,7 +137,7 @@ public final class MatsimTestUtils extends TestWatchman {
 	public URL inputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
 	}
-	
+
 	/**
 	 * @return class input directory as URL
 	 */
@@ -232,7 +233,9 @@ public final class MatsimTestUtils extends TestWatchman {
 	 */
 	public String getOutputDirectory() {
 		if (this.outputDirectory == null) {
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/";
+			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
+					+ subDirectoryForParametrisedTests;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -256,9 +259,9 @@ public final class MatsimTestUtils extends TestWatchman {
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
-			
+
 			Logger.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
-			
+
 			this.classInputDirectory = "test/input/" +
 											   this.testClass.getCanonicalName().replace('.', '/') + "/";
 //			this.classInputDirectory = System.getProperty("user.dir") + "/test/input/" +
@@ -304,19 +307,30 @@ public final class MatsimTestUtils extends TestWatchman {
 		this.testMethodName = method.getName();
 	}
 
+	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
+	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
+	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
+			"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
+
 	/* inspired by
 	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
 	 */
 	@Override
-	public void starting(FrameworkMethod method) {
-		super.starting(method);
-		this.testClass = method.getMethod().getDeclaringClass();
-		this.testMethodName = method.getName();
+	public void starting(Description description) {
+		super.starting(description);
+		this.testClass = description.getTestClass();
+
+		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(description.getMethodName());
+		if (!matcher.matches()) {
+			throw new RuntimeException("The name of the test parameter set must start with {index}");
+		}
+		this.testMethodName = matcher.group(1);
+		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
 	}
 
 	@Override
-	public void finished(FrameworkMethod method) {
-		super.finished(method);
+	public void finished(Description description) {
+		super.finished(description);
 		this.testClass = null;
 		this.testMethodName = null;
 	}
@@ -340,14 +354,14 @@ public final class MatsimTestUtils extends TestWatchman {
   public static void enableSystemExitCall() {
     System.setSecurityManager(null);
   }
-  
+
   public static int compareEventsFiles( String filename1, String filename2 ) {
 	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
   }
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
-	  Assert.assertEquals( "different file checksums", checksum1, checksum2 ); 
+	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
   }
   public static boolean comparePopulations( Population pop1, Population pop2 ) {
 	  return PopulationUtils.equalPopulation(pop1, pop2) ;

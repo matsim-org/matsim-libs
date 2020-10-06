@@ -35,9 +35,12 @@ import org.matsim.core.population.routes.RouteUtils;
  * Calculates the average trip length of all routes in a plan. The trip length
  * is the sum of the length of all links, including the route's end link, but
  * <em>not</em> including the route's start link.
+ * 
+ * This class works only for NetworkRoutes and will likely fail for legs with other types of Routes.
  *
  * @author mrieser
  */
+@Deprecated
 public class CalcAverageTripLength extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private double sumLength = 0.0;
@@ -60,6 +63,7 @@ public class CalcAverageTripLength extends AbstractPersonAlgorithm implements Pl
 				Leg leg = (Leg) pe;
 				Route route = leg.getRoute();
 				if (route != null) {
+					// does not work for Routes which are not a NetworkRoute, e.g. DrtRoute
 					double dist = RouteUtils.calcDistanceExcludingStartEndLink((NetworkRoute) route, this.network);
 					if (route.getEndLinkId() != null && route.getStartLinkId() != route.getEndLinkId()) {
 						dist += this.network.getLinks().get(route.getEndLinkId()).getLength();

@@ -32,6 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
@@ -138,6 +139,9 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * Resets the active QSim components to the standard ones defined by MATSim.
 	 */
 	public QSimBuilder useDefaultComponents() {
+		// yy As an outside user, I find both the naming of this method and its javadoc confusing.  I would say that it is, in fact, _not_ resetting to the
+		// standard ones.  Instead, it is resetting to those coming from the config, whatever they are.  kai, nov'19
+
 		components.clear();
 		new StandardQSimComponentConfigurator(config).configure(components);
 		return this;
@@ -182,8 +186,12 @@ public class QSimBuilder implements AllowsConfiguration{
 	 * components.
 	 */
 	public QSim build(Scenario scenario, EventsManager eventsManager) {
+		return build(scenario, eventsManager, 0);
+	}
+
+	public QSim build(Scenario scenario, EventsManager eventsManager, int iterationNumber) {
 		// First, load standard QSim module
-		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager);
+		AbstractModule controllerModule = new StandaloneQSimModule(scenario, eventsManager, () -> iterationNumber);
 
 		// Add all overrides
 		for (AbstractModule override : overridingControllerModules) {
@@ -209,16 +217,19 @@ public class QSimBuilder implements AllowsConfiguration{
 	private static class StandaloneQSimModule extends AbstractModule {
 		private final Scenario scenario;
 		private final EventsManager eventsManager;
+		private final IterationCounter iterationCounter;
 
-		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager) {
+		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager, IterationCounter iterationCounter) {
 			this.scenario = scenario;
 			this.eventsManager = eventsManager;
+			this.iterationCounter = iterationCounter;
 		}
 
 		@Override
 		public void install() {
 			install(new ScenarioByInstanceModule(scenario));
 			bind(EventsManager.class).toInstance(eventsManager);
+			bind(IterationCounter.class).toInstance(iterationCounter);
 			install(new QSimModule(false));
 		}
 	}

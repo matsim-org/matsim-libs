@@ -44,7 +44,7 @@ import org.matsim.facilities.ActivityFacility;
 /**
  * @author dziemke
  */
-public final class AccessibilityComputationShutdownListener implements ShutdownListener {
+final class AccessibilityComputationShutdownListener implements ShutdownListener {
 	private static final Logger LOG = Logger.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
@@ -215,6 +215,7 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 
 		// Write header
+		writer.writeField(Labels.ID);
 		writer.writeField(Labels.X_COORDINATE);
 		writer.writeField(Labels.Y_COORDINATE);
 		writer.writeField(Labels.TIME);
@@ -230,6 +231,7 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 		// Write data
 		for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
 			ActivityFacility facility = tuple.getFirst();
+			writer.writeField(facility.getId().toString());
 			writer.writeField(facility.getCoord().getX());
 			writer.writeField(facility.getCoord().getY());
 			writer.writeField(tuple.getSecond());

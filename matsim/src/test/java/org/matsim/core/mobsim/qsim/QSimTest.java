@@ -26,8 +26,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,6 +68,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -80,6 +82,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -93,17 +96,24 @@ import org.matsim.vehicles.VehicleUtils;
 @RunWith(Parameterized.class)
 public class QSimTest {
 
-	private final static Logger log = Logger.getLogger(QSimTest.class);
+	private final static Logger log = LogManager.getLogger(QSimTest.class);
 
 	private final boolean isUsingFastCapacityUpdate;
+	private final int numberOfThreads;
 
-	public QSimTest(boolean isUsingFastCapacityUpdate) {
+	public QSimTest(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
+		this.numberOfThreads = numberOfThreads;
 	}
-
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
+//	
+	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}; numberOfThreads == {1};")
+	public static Collection<Object[]> parameterObjects () {
+		Object[][] capacityUpdates = new Object [][] {
+			new Object[] {true, 1},
+			new Object[] {false, 1},
+			new Object[] {true, 2},
+			new Object[] {false, 2}
+		};
 		return Arrays.asList(capacityUpdates);
 	}
 
@@ -133,7 +143,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -141,6 +151,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -172,7 +183,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgentWithEndOnLeg() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
 		final PopulationFactory pf = f.scenario.getPopulation().getFactory();
@@ -184,6 +195,7 @@ public class QSimTest {
 		}
 		{
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		{
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -191,6 +203,7 @@ public class QSimTest {
 		}
 		{
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		f.plans.addPerson(person);
 		
@@ -236,7 +249,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testTwoAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add two persons with leg from link1 to link3, the first starting at 6am, the second at 7am
 		for (int i = 0; i < 2; i++) {
@@ -245,6 +258,7 @@ public class QSimTest {
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -276,7 +290,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testTeleportationSingleAgent() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -284,6 +298,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, "other" );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		Route route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
 		route.setTravelTime(15.0);
 		leg.setRoute(route);
@@ -322,7 +337,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgentImmediateDeparture() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link3
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -330,6 +345,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(0);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -366,7 +382,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent_EmptyRoute() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a single person with leg from link1 to link1
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
@@ -374,6 +390,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		route.setLinkIds(f.link1.getId(), new ArrayList<Id<Link>>(0), f.link1.getId());
 		leg.setRoute(route);
@@ -438,7 +455,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testSingleAgent_LastLinkIsLoop() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
 
 		// add a single person with leg from link1 to loop-link
@@ -447,6 +464,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), loopLink.getId());
 		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>();
 		links.add(f.link2.getId());
@@ -507,7 +525,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithoutLeg() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -534,7 +552,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithoutLegWithEndtime() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
@@ -562,13 +580,14 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAgentWithLastActWithEndtime() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		leg.setRoute(RouteUtils.createGenericRouteImpl(f.link1.getId(), f.link2.getId()));
 		leg.getRoute().setTravelTime(0.); // retrofitting to repair failing test.  kai, apr'15
 		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "work", f.link2.getId());
@@ -596,7 +615,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityDriving() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -614,8 +633,12 @@ public class QSimTest {
 			 */
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -623,8 +646,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
@@ -657,7 +680,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityDrivingFraction() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
@@ -677,6 +700,7 @@ public class QSimTest {
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -711,7 +735,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityStarting() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
@@ -719,8 +743,12 @@ public class QSimTest {
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -728,8 +756,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
@@ -762,7 +790,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testFlowCapacityMixed() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
@@ -771,6 +799,7 @@ public class QSimTest {
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
@@ -783,8 +812,12 @@ public class QSimTest {
 			Plan plan = PersonUtils.createAndAddPlan(person, true);
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
-			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
+			Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg, TransportMode.car);
+			NetworkRoute route = f.scenario.getPopulation()
+					.getFactory()
+					.getRouteFactories()
+					.createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -792,8 +825,8 @@ public class QSimTest {
 		}
 
 		/* build events */
-		EventsManager events = EventsUtils.createEventsManager();
-		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9*3600, f.network);
+		EventsManager events = new ParallelEventsManager(false, 2 * 65536);
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(3600, 9 * 3600, f.network);
 		events.addHandler(vAnalyzer);
 
 		/* run sim */
@@ -825,17 +858,19 @@ public class QSimTest {
 	 */
 	@Test
 	public void testVehicleTeleportationTrue() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -878,19 +913,21 @@ public class QSimTest {
 	 */
 	@Test
 	public void testWaitingForCar() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -902,13 +939,15 @@ public class QSimTest {
 		Activity aa1 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
 		Leg ll1 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.car );
+		TripStructureUtils.setRoutingMode( ll1, TransportMode.car );
 		NetworkRoute route3 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId());
 		route3.setLinkIds(f.link1.getId(), f.linkIdsNone, f.link2.getId());
 		route3.setVehicleId(Id.create(1, Vehicle.class)); // We drive the car that person 1 needs.
 		ll1.setRoute(route3);
 		Activity aa2 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "w", f.link2.getId());
 		aa2.setEndTime(7.0*3600 + 60);
-		Leg ll2 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, "other" );
+		Leg ll2 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.other );
+		TripStructureUtils.setRoutingMode( ll2, TransportMode.other );
 		ll2.setTravelTime(10);
 		ll2.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId()));
 		PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "l", f.link3.getId());
@@ -969,18 +1008,20 @@ public class QSimTest {
 	 */
 	@Test
 	public void testVehicleTeleportationFalse() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -1020,12 +1061,13 @@ public class QSimTest {
 	 */
 	@Test
 	public void testAssignedVehicles() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class)); // do not add person to population, we'll do it ourselves for the test
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		NetworkRoute route1 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route1.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		route1.setVehicleId(Id.create(2, Vehicle.class));
@@ -1057,6 +1099,7 @@ public class QSimTest {
 		sim.doSimStep(); // agent should be moved to qlink2.buffer
 		sim.getSimTimer().setTime(102.0);
 		sim.doSimStep(); // agent should be moved to qlink3
+		events.finishProcessing();
 
 		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
 		Assert.assertEquals(1, vehicles.size());
@@ -1074,7 +1117,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testCircleAsRoute() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -1082,6 +1125,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -1131,7 +1175,7 @@ public class QSimTest {
 	 */
 	@Test
 	public void testRouteWithEndLinkTwice() {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -1139,6 +1183,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -1277,7 +1322,7 @@ public class QSimTest {
 	 * @author mrieser
 	 **/
 	private LogCounter runConsistentRoutesTestSim(final String startLinkId, final String linkIds, final String endLinkId, final EventsManager events) {
-		Fixture f = new Fixture(isUsingFastCapacityUpdate);
+		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 
 		/* enhance network */
 		Node node5 = NetworkUtils.createAndAddNode(f.network, Id.create("5", Node.class), new Coord(3100, 0));
@@ -1300,12 +1345,14 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), link5.getId());
 		route.setLinkIds(Id.create(startLinkId, Link.class), NetworkUtils.getLinkIds(linkIds), Id.create(endLinkId, Link.class));
 		leg.setRoute(route);
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 		a2.setEndTime(9*3600);
 		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, link5.getId(), link6.getId());
 		route.setLinkIds(link5.getId(), null, link6.getId());
 		leg.setRoute(route);
@@ -1314,9 +1361,9 @@ public class QSimTest {
 
 		/* run sim with special logger */
 		LogCounter logger = new LogCounter(Level.WARN);
-		Logger.getRootLogger().addAppender(logger);
+		logger.activate();
 		createQSim(f, events).run();
-		Logger.getRootLogger().removeAppender(logger);
+		logger.deactivate();
 
 		return logger;
 	}
@@ -1350,6 +1397,7 @@ public class QSimTest {
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
 		act1.setEndTime(7.0*3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg, TransportMode.walk );
 		Route route = RouteUtils.createGenericRouteImpl(link.getId(), link.getId());
 		route.setTravelTime(5.0*3600);
 		leg.setRoute(route);
@@ -1367,8 +1415,8 @@ public class QSimTest {
 		// first test without special settings
 		QSim sim = createQSim(scenario, events);
 		sim.run();
-		Assert.assertEquals(act1.getEndTime(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals(act1.getEndTime() + leg.getRoute().getTravelTime(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds(), collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals(act1.getEndTime().seconds() + leg.getRoute().getTravelTime().seconds(), collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		collector.reset(0);
 
 		// second test with special start/end times
@@ -1392,6 +1440,7 @@ public class QSimTest {
 		Config config = scenario.getConfig();
 
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+		config.qsim().setNumberOfThreads(numberOfThreads);
 
 		double simEndTime = 8.0*3600;
 
@@ -1421,6 +1470,7 @@ public class QSimTest {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode( leg1, TransportMode.car );
 		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
 		leg1.setTravelTime(5.0*3600);
@@ -1436,6 +1486,7 @@ public class QSimTest {
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
 		Leg leg2 = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg2, TransportMode.walk );
 		Route route2 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg2.setRoute(route2);
 		leg2.setTravelTime(2000);
@@ -1451,6 +1502,7 @@ public class QSimTest {
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg3, TransportMode.walk );
 		Route route3 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg3.setRoute(route3);
 		leg3.setTravelTime(1000);
@@ -1540,13 +1592,14 @@ public class QSimTest {
 		final ArrayList<Id<Link>> linkIdsNone;
 		final ArrayList<Id<Link>> linkIds2;
 
-		public Fixture(boolean isUsingFastCapacityUpdate) {
+		public Fixture(boolean isUsingFastCapacityUpdate, int numberOfThreads) {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
 			this.config.qsim().setFlowCapFactor(1.0);
 			this.config.qsim().setStorageCapFactor(1.0);
 
 			this.config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+			this.config.qsim().setNumberOfThreads(numberOfThreads);
 
 			/* build network */
 			this.network = this.scenario.getNetwork();

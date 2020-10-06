@@ -89,24 +89,24 @@ public class TimeTest extends TestCase {
 
 		// test reading
 		double iTime = 12*3600 + 34*60 + 56;
-		assertEquals(iTime, Time.parseTime( "12:34:56", ':'), 0.0);
-		assertEquals(iTime, Time.parseTime( "12/34/56", '/'), 0.0);
-		assertEquals(iTime, Time.parseTime( "12-34-56", '-'), 0.0);
+		assertEquals(iTime, Time.parseTime( "12:34:56", ':').seconds(), 0.0);
+		assertEquals(iTime, Time.parseTime( "12/34/56", '/').seconds(), 0.0);
+		assertEquals(iTime, Time.parseTime( "12-34-56", '-').seconds(), 0.0);
 
 		// test reading negative times
-		assertEquals(-iTime, Time.parseTime( "-12:34:56", ':'), 0.0);
-		assertEquals(-iTime, Time.parseTime( "-12/34/56", '/'), 0.0);
-		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-'), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12:34:56", ':').seconds(), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12/34/56", '/').seconds(), 0.0);
+		assertEquals(-iTime, Time.parseTime( "-12-34-56", '-').seconds(), 0.0);
 	}
 
 	public void testUndefined() {
 		// test writing
-		assertEquals("undefined", Time.writeTime(Time.UNDEFINED_TIME));
+		assertEquals("undefined", Time.writeTime(OptionalTime.undefined()));
 
 		// test reading
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime("undefined"), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(""), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(null), 0.0);
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime("undefined"));
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(""));
+		assertEquals(OptionalTime.undefined(), Time.parseOptionalTime(null));
 	}
 
 	public void testSetDefault() {

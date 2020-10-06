@@ -19,7 +19,7 @@
  *                                                                         *
  * *********************************************************************** */
 
- package org.matsim.utils.objectattributes.attributable;
+package org.matsim.utils.objectattributes.attributable;
 
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.io.XmlUtils;
@@ -48,11 +48,11 @@ public class AttributesXmlWriterDelegate {
 		try {
 			writer.write(indentation);
 			writer.write("<attributes>");
-			writer.newLine();
+			writer.write("\n");
 
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : attributes.getAsMap().entrySet()) {
-				Class<?> clazz = objAttribute.getValue().getClass();
+				Class<?> clazz = objAttribute.getValue().getClass(); // TODO: Does not work if value is null. Shall we allow for the value being null? - gl-oct'19
 				String converted = converter.convertToString(objAttribute.getValue());
 				if (converted != null) {
 					writer.write(indentation + "\t");
@@ -60,14 +60,14 @@ public class AttributesXmlWriterDelegate {
 					writer.write("class=\"" + clazz.getName() + "\">");
 					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
-					writer.newLine();
+					writer.write("\n");
 				}
 			}
 
 			writer.write(indentation);
 			writer.write("</attributes>");
 			if (emptyLineAfter) {
-				writer.newLine();
+				writer.write("\n");
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

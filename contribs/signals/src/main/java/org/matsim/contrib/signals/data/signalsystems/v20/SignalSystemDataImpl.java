@@ -23,14 +23,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
  * @author dgrether
  */
-public class SignalSystemDataImpl implements SignalSystemData {
+final class SignalSystemDataImpl implements SignalSystemData {
 
 	private Id<SignalSystem> id;
 	

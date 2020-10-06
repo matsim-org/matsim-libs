@@ -109,5 +109,15 @@ public class CarrierUtilsTest {
 		Assert.assertEquals(Id.createLinkId("link0"), carrierShipment1b.getFrom());
 		Assert.assertEquals(20, carrierShipment1b.getSize(), EPSILON);
 	}
+
+	@Test
+	public void testGetSetJspritIteration(){
+		Carrier carrier = new CarrierImpl(Id.create("carrier", Carrier.class));
+		//jspirtIterations is not set. should return Integer.Min_Value (null is not possible because returning (int)
+		Assert.assertEquals(Integer.MIN_VALUE, CarrierUtils.getJspritIterations(carrier) );
+
+		CarrierUtils.setJspritIterations(carrier, 125);
+		Assert.assertEquals(125, CarrierUtils.getJspritIterations(carrier) );
+	}
 	
 }

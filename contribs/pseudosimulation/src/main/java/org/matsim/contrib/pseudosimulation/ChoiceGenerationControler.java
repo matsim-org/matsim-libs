@@ -1,6 +1,8 @@
 package org.matsim.contrib.pseudosimulation;
 
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -21,8 +23,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.pt.router.TransitRouter;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import com.google.inject.Provider;
 
 /**
  * Created by pieterfourie on 4/20/15.
@@ -52,11 +53,11 @@ public ChoiceGenerationControler(String[] args) {
             controler.getScenario().getPopulation(),
             controler.getScenario().getTransitSchedule(),
             controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
-            (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+            (int) (controler.getConfig().qsim().getEndTime().seconds() - controler.getConfig().qsim().getStartTime().seconds()));
     stopStopTimeCalculator = new StopStopTimeCalculatorImpl(
             controler.getScenario().getTransitSchedule(),
             controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
-            (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+            (int) (controler.getConfig().qsim().getEndTime().seconds() - controler.getConfig().qsim().getStartTime().seconds()));
     controler.addOverridingModule(new AbstractModule() {
         @Override
         public void install() {

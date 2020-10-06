@@ -22,6 +22,8 @@ package org.matsim.contrib.dvrp.schedule;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
+
 /**
  * A Schedule contains Tasks. <br/>
  * <br/>
@@ -32,15 +34,18 @@ import java.util.stream.Stream;
  * <li>I am happy with Task as an interface. Otherwise casts like (List<DrtTask>)getTasks() would not work (directly).
  * michalm, aug'17
  * </ul>
- * 
+ *
  * @author michalm
  * @author (of documentation) nagel
- *
  */
 public interface Schedule {
+	static Schedule create(DvrpVehicleSpecification vehicleSpecification) {
+		return new ScheduleImpl(vehicleSpecification);
+	}
+
 	enum ScheduleStatus {
-		UNPLANNED, PLANNED, STARTED, COMPLETED;
-	};
+		UNPLANNED, PLANNED, STARTED, COMPLETED
+	}
 
 	/**
 	 * Tasks in the schedule.

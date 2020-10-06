@@ -102,7 +102,7 @@ public class CreatePseudoNetwork {
 				}
 
 				if (routeLinks.size() > 0) {
-					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks, this.network);
+					NetworkRoute route = RouteUtils.createNetworkRoute(routeLinks );
 					tRoute.setRoute(route);
 				} else {
 					System.err.println("Line " + tLine.getId() + " route " + tRoute.getId() + " has less than two stops. Removing this route from schedule.");

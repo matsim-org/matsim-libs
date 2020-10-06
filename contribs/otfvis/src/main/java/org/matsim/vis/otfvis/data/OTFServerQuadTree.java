@@ -22,6 +22,7 @@ package org.matsim.vis.otfvis.data;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -124,12 +125,14 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 			Collection<Class<OTFDataReader>> readerClasses = connect.getReadersForWriter(element.getClass());
 			for (Class<? extends OTFDataReader> readerClass : readerClasses) {
 				try {
-					Object reader = readerClass.newInstance();
-					client.addAdditionalElement((OTFDataReader)reader);
+					Constructor<? extends OTFDataReader> constructor = readerClass.getDeclaredConstructor();
+					if (!constructor.canAccess(null))
+						constructor.setAccessible(true);
+
+					OTFDataReader reader = constructor.newInstance();
+					client.addAdditionalElement(reader);
 					log.info("Connected additional element writer " + element.getClass().getName() + "(" + element + ")  to " + reader.getClass().getName() + " (" + reader + ")");
-				} catch (InstantiationException e) {
-					throw new RuntimeException(e);
-				} catch (IllegalAccessException e) {
+				} catch (ReflectiveOperationException e) {
 					throw new RuntimeException(e);
 				}
 			}
@@ -220,7 +223,13 @@ public abstract class OTFServerQuadTree extends QuadTree<OTFDataWriter> {
 			Collection<Class<?>> readerClasses = this.connect.getToEntries(writer.getClass());
 			for (Class readerClass : readerClasses) {
 				try {
-					OTFDataReader reader = (OTFDataReader)readerClass.newInstance();
+					Constructor constructor = readerClass.getDeclaredConstructor();
+
+					// some constructors are package private
+					if (!constructor.canAccess(null))
+						constructor.setAccessible(true);
+
+					OTFDataReader reader = (OTFDataReader) constructor.newInstance();
 					reader.setSrc(writer);
 					this.client.put(x, y, reader);
 				} catch (Exception e) {

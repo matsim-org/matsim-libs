@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.GeneralSecurityException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,7 +103,7 @@ import java.util.zip.GZIPOutputStream;
  * 
  * <h2>Compression</h2>
  * 
- * Compessed files are automatically assumed if ceraint file types are
+ * Compressed files are automatically assumed if certain file types are
  * encountered. Currently, the following patterns match certain compression
  * algorithms:
  * 
@@ -112,6 +113,11 @@ import java.util.zip.GZIPOutputStream;
  * <li><code>*.bz2</code>: Bzip2 compression</li>
  * <li><code>*.zst</code>: ZStandard compression</li>
  * </ul>
+ *
+ * <h2>Encryption</h2>
+ *
+ * Files ending with {@code .enc} are assumed to be encrypted and will be handled with {@link CipherUtils}.
+ *
  */
 final public class IOUtils {
 	/**
@@ -129,15 +135,15 @@ final public class IOUtils {
 		COMPRESSION_EXTENSIONS.put("gz", CompressionType.GZIP);
 		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
-		COMPRESSION_EXTENSIONS.put("zstd", CompressionType.ZSTD);
+		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
 	// Define a number of charsets that are / have been used.
 	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
 
-	// Define new line character depending on system
-	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
+	// We niw use Unix line endings everywhere.
+	public static final String NATIVE_NEWLINE = "\n";
 
 	// Logger
 	private final static Logger logger = Logger.getLogger(IOUtils.class);
@@ -218,7 +224,9 @@ final public class IOUtils {
 	 * not compression is assumed.
 	 */
 	private static CompressionType getCompression(URL url) {
-		String[] segments = url.getPath().split("\\.");
+
+		// .enc extension is ignored
+		String[] segments = url.getPath().replace(".enc", "").split("\\.");
 		String lastExtension = segments[segments.length - 1];
 		return COMPRESSION_EXTENSIONS.get(lastExtension.toLowerCase(Locale.ROOT));
 	}
@@ -233,6 +241,9 @@ final public class IOUtils {
 	public static InputStream getInputStream(URL url) throws UncheckedIOException {
 		try {
 			InputStream inputStream = url.openStream();
+
+			if (url.getPath().endsWith(".enc"))
+				inputStream = CipherUtils.getDecryptedInput(inputStream);
 
 			CompressionType compression = getCompression(url);
 			if (compression != null) {
@@ -253,7 +264,7 @@ final public class IOUtils {
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
-		} catch (IOException | CompressorException e) {
+		} catch (IOException | CompressorException | GeneralSecurityException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -298,7 +309,7 @@ final public class IOUtils {
 			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
-			if (compression != null && append && file.exists()) {
+			if ((compression != null && compression != CompressionType.ZSTD) && append && file.exists()) {
 				throw new UncheckedIOException("Cannot append to compressed files.");
 			}
 

@@ -30,6 +30,8 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
@@ -49,13 +51,21 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 		ProfileCalculator calc = createChargerOccupancyCalculator(chargingInfrastructure);
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles",
 				matsimServices);
-		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		if (matsimServices.getConfig().controler().isCreateGraphs()) {
+			collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
+		} else {
+			collector.setChartTypes();
+		}
 		return collector;
 	}
 
+	private static final String PLUGGED_ID = "plugged";
+	private static final String QUEUED_ID = "queued";
+	private static final String ASSIGNED_ID = "assigned";
+
 	public static ProfileCalculator createChargerOccupancyCalculator(
 			final ChargingInfrastructure chargingInfrastructure) {
-		String[] header = { "plugged", "queued", "assigned" };
+		ImmutableList<String> header = ImmutableList.of(PLUGGED_ID, QUEUED_ID, ASSIGNED_ID);
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			int plugged = 0;
 			int queued = 0;
@@ -68,7 +78,8 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 					assigned += ((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size();
 				}
 			}
-			return new Integer[] { plugged, queued, assigned };
+			return ImmutableMap.of(PLUGGED_ID, (double)plugged, QUEUED_ID, (double)queued, ASSIGNED_ID,
+					(double)assigned);
 		});
 	}
 }

@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -91,14 +93,14 @@ public class OneToManyPathSearch {
 	}
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime) {
-		Node fromNode = getFromNode(fromLink);
+		Node fromNode = getStartNode(fromLink);
 		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
 		calculatePaths(fromNode, toNodes, startTime);
 		return createPathDataArray(fromLink, toLinks, startTime, toNodes);
 	}
 
-	public Map<Id<Link>, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime) {
-		Node fromNode = getFromNode(fromLink);
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime) {
+		Node fromNode = getStartNode(fromLink);
 		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
 		calculatePaths(fromNode, toNodes, startTime);
 		return createPathDataMap(fromLink, toLinks, startTime, toNodes);
@@ -108,7 +110,7 @@ public class OneToManyPathSearch {
 		Map<Id<Node>, ToNode> toNodes = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
 			if (toLink != fromLink) {
-				Node toNode = getToNode(toLink);
+				Node toNode = getEndNode(toLink);
 				toNodes.putIfAbsent(toNode.getId(), new ToNode(toNode, 0, 0));
 			}
 		}
@@ -138,42 +140,42 @@ public class OneToManyPathSearch {
 		return pathDataArray;
 	}
 
-	private Map<Id<Link>, PathData> createPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+	private Map<Link, PathData> createPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			Map<Id<Node>, ToNode> toNodes) {
-		Map<Id<Link>, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
+		Map<Link, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
-			pathDataMap.put(toLink.getId(), createPathData(fromLink, toLink, startTime, toNodes));
+			pathDataMap.put(toLink, createPathData(fromLink, toLink, startTime, toNodes));
 		}
 		return pathDataMap;
 	}
 
 	private PathData createPathData(Link fromLink, Link toLink, double startTime, Map<Id<Node>, ToNode> toNodes) {
 		if (toLink == fromLink) {
-			return createZeroPathData(fromLink);
+			return createZeroPathData(getStartNode(fromLink));
 		} else {
-			ToNode toNode = toNodes.get(getToNode(toLink).getId());
+			ToNode toNode = toNodes.get(getEndNode(toLink).getId());
 			return new PathData(toNode.path, getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime));
 		}
 	}
 
-	private PathData createZeroPathData(Link fromLink) {
-		List<Node> singleNodeList = Collections.singletonList(getFromNode(fromLink));
-		List<Link> emptyLinkList = Collections.emptyList();
-		return new PathData(new Path(singleNodeList, emptyLinkList, 0, 0), 0);
+	private Node getEndNode(Link link) {
+		return forward ? link.getFromNode() : link.getToNode();
 	}
 
-	private Node getToNode(Link toLink) {
-		return forward ? toLink.getFromNode() : toLink.getToNode();
-	}
-
-	private Node getFromNode(Link fromLink) {
-		return forward ? fromLink.getToNode() : fromLink.getFromNode();
+	private Node getStartNode(Link link) {
+		return forward ? link.getToNode() : link.getFromNode();
 	}
 
 	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, Path path, double time) {
 		double lastLinkTT = forward ?
 				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) :
 				VrpPaths.getLastLinkTT(fromLink, time);
-		return VrpPaths.FIRST_LINK_TT + lastLinkTT;
+		return FIRST_LINK_TT + lastLinkTT;
+	}
+
+	public static PathData createZeroPathData(Node node) {
+		List<Node> singleNodeList = Collections.singletonList(node);
+		List<Link> emptyLinkList = Collections.emptyList();
+		return new PathData(new Path(singleNodeList, emptyLinkList, 0, 0), 0);
 	}
 }

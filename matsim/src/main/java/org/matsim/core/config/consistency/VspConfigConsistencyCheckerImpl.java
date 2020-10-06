@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -179,8 +180,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
-			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
-					"This is a bug and may be changed eventually.  kai, jun'11") ;
+			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
 		}
 		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
 			problem = true ;
@@ -195,7 +195,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// added oct'17:
-		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null ) {
+		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null || config.planCalcScore().getFractionOfIterationsToStartScoreMSA() >= 1. ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
@@ -243,8 +243,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		// === plansCalcRoute:
 		
 		// added feb'16
-		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should use `true' or talk to Kai. " ) ;
+		if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or some other value or talk to Kai." ) ;
 		}
 		
 		// === qsim:

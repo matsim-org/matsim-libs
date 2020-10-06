@@ -75,11 +75,7 @@ public class RouteCharts {
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
-		renderer.setDefaultItemLabelGenerator(new XYItemLabelGenerator() {
-			public String generateLabel(XYDataset dataset, int series, int item) {
-				return ((CoordDataset)dataset).getText(series, item);
-			}
-		});
+		renderer.setDefaultItemLabelGenerator((dataset, series, item) -> ((CoordDataset)dataset).getText(series, item));
 
 		for (int j = 1; j <= vehicles.size(); j++) {
 			renderer.setSeriesShapesVisible(j, true);

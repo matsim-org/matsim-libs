@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
@@ -59,7 +59,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 		
@@ -69,7 +69,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 
 	@Override
 	public QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
 		return builder.build( node ) ;
 	}
 

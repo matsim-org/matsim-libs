@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dynagent.DriverDynLeg;
@@ -29,9 +31,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
 
 public class ParkingDynLeg implements DriverDynLeg {
 	protected final NetworkRoute route;
@@ -137,7 +138,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 	}
 
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		// travel time estimation does not take into account time required for
 		// parking search
 		// TODO add travel time at the destination link??

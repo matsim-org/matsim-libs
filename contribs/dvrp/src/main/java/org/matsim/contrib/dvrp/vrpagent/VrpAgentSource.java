@@ -37,14 +37,16 @@ public class VrpAgentSource implements AgentSource {
 	private final DynActionCreator nextActionCreator;
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
+	private final String dvrpMode;
 	private final QSim qSim;
 	private final VehicleType vehicleType;
 
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
-			VehicleType vehicleType) {
+	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, String dvrpMode,
+			QSim qSim, VehicleType vehicleType) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
+		this.dvrpMode = dvrpMode;
 		this.qSim = qSim;
 		this.vehicleType = vehicleType;
 	}
@@ -53,11 +55,12 @@ public class VrpAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		VehiclesFactory vehicleFactory = this.qSim.getScenario().getVehicles().getFactory();
 
-		for (DvrpVehicle vrpVeh : fleet.getVehicles().values()) {
-			Id<DvrpVehicle> id = vrpVeh.getId();
-			Id<Link> startLinkId = vrpVeh.getStartLink().getId();
+		for (DvrpVehicle dvrpVehicle : fleet.getVehicles().values()) {
+			Id<DvrpVehicle> id = dvrpVehicle.getId();
+			Id<Link> startLinkId = dvrpVehicle.getStartLink().getId();
 
-			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
+			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, dvrpVehicle, dvrpMode,
+					qSim.getEventsManager());
 			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
 					vrpAgentLogic);
 			QVehicle mobsimVehicle = new QVehicleImpl(

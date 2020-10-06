@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
@@ -45,12 +45,12 @@ public final class FacilityOpeningIntervalCalculator implements OpeningIntervalC
 	}
 
 	@Override
-	public double[] getOpeningInterval(Activity act) {
+	public OptionalTime[] getOpeningInterval(Activity act) {
 
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		OptionalTime[] openInterval = {OptionalTime.undefined(), OptionalTime.undefined()};
 
 		boolean foundAct = false;
 
@@ -70,15 +70,16 @@ public final class FacilityOpeningIntervalCalculator implements OpeningIntervalC
 					// ignoring lunch breaks with the following procedure:
 					// if there is only one open time interval, use it
 					// if there are two or more, use the earliest start time and the latest end time
-					openInterval[0] = Double.MAX_VALUE;
-					openInterval[1] = Double.MIN_VALUE;
+					double opening = Double.MAX_VALUE;
+					double closing = Double.MIN_VALUE;
 
 					for (OpeningTime opentime : opentimes) {
-
-						openInterval[0] = Math.min(openInterval[0], opentime.getStartTime());
-						openInterval[1] = Math.max(openInterval[1], opentime.getEndTime());
+						opening = Math.min(opening, opentime.getStartTime());
+						closing = Math.max(closing, opentime.getEndTime());
 					}
 
+					openInterval[0] = OptionalTime.defined(opening);
+					openInterval[1] = OptionalTime.defined(closing);
 				}
 
 			}

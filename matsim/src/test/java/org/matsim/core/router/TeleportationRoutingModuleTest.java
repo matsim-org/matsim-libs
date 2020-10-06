@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -33,6 +32,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 /**
  * @author mrieser
@@ -46,8 +47,12 @@ public class TeleportationRoutingModuleTest {
 		RouteFactories routeFactory = new RouteFactories();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
-		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
-		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 0));
+//		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+		Facility fromAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
+				new Coord(0,0), Id.createLinkId( "h" ) ) ;
+//		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 0));
+		Facility toAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
+				new Coord(1000,0), Id.createLinkId( "h" ) ) ;
 
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
@@ -55,8 +60,8 @@ public class TeleportationRoutingModuleTest {
 						scenario, 10.0, 1.0);
 		double tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(100.0, tt, 10e-7);
-		Assert.assertEquals(100.0, leg.getTravelTime(), 10e-7);
-		Assert.assertEquals(100.0, leg.getRoute().getTravelTime(), 10e-7);
+		Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 10e-7);
+		Assert.assertEquals(100.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 
         router =
 				new TeleportationRoutingModule(
@@ -66,10 +71,12 @@ public class TeleportationRoutingModuleTest {
 						1.0);
 		tt = router.routeLeg(person, leg, fromAct, toAct, 7.0 * 3600);
 		Assert.assertEquals(50.0, tt, 10e-7);
-		Assert.assertEquals(50.0, leg.getTravelTime(), 10e-7);
-		Assert.assertEquals(50.0, leg.getRoute().getTravelTime(), 10e-7);
+		Assert.assertEquals(50.0, leg.getTravelTime().seconds(), 10e-7);
+		Assert.assertEquals(50.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 
-		Activity otherToAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 1000));
+//		Activity otherToAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 1000));
+		Facility otherToAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
+				new Coord(1000,1000), Id.createLinkId( "h" ) ) ;
 		double manhattanBeelineDistanceFactor = Math.sqrt(2.0);
 		router =
                 new TeleportationRoutingModule(
@@ -79,7 +86,7 @@ public class TeleportationRoutingModuleTest {
 						manhattanBeelineDistanceFactor);
 		tt = router.routeLeg(person, leg, fromAct, otherToAct, 7.0 * 3600);
 		Assert.assertEquals(200.0, tt, 10e-7);
-		Assert.assertEquals(200.0, leg.getTravelTime(), 10e-7);
-		Assert.assertEquals(200.0, leg.getRoute().getTravelTime(), 10e-7);
+		Assert.assertEquals(200.0, leg.getTravelTime().seconds(), 10e-7);
+		Assert.assertEquals(200.0, leg.getRoute().getTravelTime().seconds(), 10e-7);
 	}
 }

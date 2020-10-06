@@ -4,11 +4,7 @@
 
 package ch.sbb.matsim.config;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-
+import com.google.common.base.Verify;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser / SBB
@@ -28,12 +29,16 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";
     private static final String PARAM_USE_INTERMODAL_ACCESS_EGRESS = "useIntermodalAccessEgress";
     private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION = "intermodalAccessEgressModeSelection";
+    private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC = "Sets whether intermodal access and egress modes are selected by " +
+            "least cost (default) or randomly chosen out of the available access / egress modes.";
     private static final String PARAM_USE_MODE_MAPPING = "useModeMappingForPassengers";
     private static final String PARAM_SCORING_PARAMETERS = "scoringParameters";
     private static final String PARAM_TRANSFER_PENALTY_BASE = "transferPenaltyBaseCost";
     private static final String PARAM_TRANSFER_PENALTY_MIN = "transferPenaltyMinCost";
     private static final String PARAM_TRANSFER_PENALTY_MAX = "transferPenaltyMaxCost";
     private static final String PARAM_TRANSFER_PENALTY_PERHOUR = "transferPenaltyCostPerTravelTimeHour";
+    private static final String PARAM_TRANSFER_WALK_MARGIN = "transferWalkMargin";
+    private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
@@ -44,6 +49,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private double transferPenaltyMinCost = Double.NEGATIVE_INFINITY;
     private double transferPenaltyMaxCost = Double.POSITIVE_INFINITY;
     private double transferPenaltyHourlyCost = 0;
+    private double transferWalkMargin = 5;
 
     private ScoringParameters scoringParameters = ScoringParameters.Default;
 
@@ -51,7 +57,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private final Map<String, RouteSelectorParameterSet> routeSelectorPerSubpop = new HashMap<>();
     private final List<IntermodalAccessEgressParameterSet> intermodalAccessEgressSettings = new ArrayList<>();
     private final Map<String, ModeMappingForPassengersParameterSet> modeMappingForPassengersByRouteMode = new HashMap<>();
-    
+
+
     public enum IntermodalAccessEgressModeSelection {
     	CalcLeastCostModePerStop, RandomSelectOneModePerRoutingRequestAndDirection
     }
@@ -83,7 +90,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     public void setUseIntermodalAccessEgress(boolean useIntermodality) {
         this.useIntermodality = useIntermodality;
     }
-    
+
     @StringGetter(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION)
     public IntermodalAccessEgressModeSelection getIntermodalAccessEgressModeSelection() {
         return this.intermodalAccessEgressModeSelection;
@@ -92,6 +99,16 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION)
     public void setIntermodalAccessEgressModeSelection(IntermodalAccessEgressModeSelection intermodalAccessEgressModeSelection) {
         this.intermodalAccessEgressModeSelection = intermodalAccessEgressModeSelection;
+    }
+
+    @StringGetter(PARAM_TRANSFER_WALK_MARGIN)
+    public double getTransferWalkMargin() {
+        return transferWalkMargin;
+    }
+
+    @StringSetter(PARAM_TRANSFER_WALK_MARGIN)
+    public void setTransferWalkMargin(double transferWalkMargin) {
+        this.transferWalkMargin = transferWalkMargin;
     }
 
     @StringGetter(PARAM_USE_MODE_MAPPING)
@@ -390,8 +407,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
         private String mode;
         private double maxRadius;
-        private double initialSearchRadius = Double.POSITIVE_INFINITY;
-        private double searchExtensionRadius = 1000.0;
+        private double initialSearchRadius = Double.NEGATIVE_INFINITY;
+        private double searchExtensionRadius = Double.NEGATIVE_INFINITY;
         private String linkIdAttribute;
         private String personFilterAttribute;
         private String personFilterValue;
@@ -408,8 +425,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_MODE)
-        public void setMode(String mode) {
+        public IntermodalAccessEgressParameterSet setMode(String mode) {
             this.mode = mode;
+            return this ;
         }
 
         @StringGetter(PARAM_MAX_RADIUS)
@@ -418,8 +436,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_MAX_RADIUS)
-        public void setMaxRadius(double maxRadius) {
+        public IntermodalAccessEgressParameterSet setMaxRadius(double maxRadius) {
             this.maxRadius = maxRadius;
+            return this ;
         }
         
         @StringGetter(PARAM_INITIAL_SEARCH_RADIUS)
@@ -428,8 +447,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_INITIAL_SEARCH_RADIUS)
-        public void setInitialSearchRadius(double initialSearchRadius) {
+        public IntermodalAccessEgressParameterSet setInitialSearchRadius(double initialSearchRadius) {
             this.initialSearchRadius = initialSearchRadius;
+            return this ;
         }
         
         @StringGetter(PARAM_SEARCH_EXTENSION_RADIUS)
@@ -438,8 +458,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_SEARCH_EXTENSION_RADIUS)
-        public void setSearchExtensionRadius(double searchExtensionRadius) {
+        public IntermodalAccessEgressParameterSet setSearchExtensionRadius(double searchExtensionRadius) {
             this.searchExtensionRadius = searchExtensionRadius;
+            return this ;
         }
 
         @StringGetter(PARAM_LINKID_ATTRIBUTE)
@@ -448,8 +469,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_LINKID_ATTRIBUTE)
-        public void setLinkIdAttribute(String linkIdAttribute) {
+        public IntermodalAccessEgressParameterSet setLinkIdAttribute(String linkIdAttribute) {
             this.linkIdAttribute = linkIdAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_PERSON_FILTER_ATTRIBUTE)
@@ -458,8 +480,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_PERSON_FILTER_ATTRIBUTE)
-        public void setPersonFilterAttribute(String personFilterAttribute) {
+        public IntermodalAccessEgressParameterSet setPersonFilterAttribute(String personFilterAttribute) {
             this.personFilterAttribute = personFilterAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_PERSON_FILTER_VALUE)
@@ -468,8 +491,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_PERSON_FILTER_VALUE)
-        public void setPersonFilterValue(String personFilterValue) {
+        public IntermodalAccessEgressParameterSet setPersonFilterValue(String personFilterValue) {
             this.personFilterValue = personFilterValue;
+            return this ;
         }
 
         @StringGetter(PARAM_STOP_FILTER_ATTRIBUTE)
@@ -478,8 +502,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_STOP_FILTER_ATTRIBUTE)
-        public void setStopFilterAttribute(String stopFilterAttribute) {
+        public IntermodalAccessEgressParameterSet setStopFilterAttribute(String stopFilterAttribute) {
             this.stopFilterAttribute = stopFilterAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_STOP_FILTER_VALUE)
@@ -488,8 +513,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_STOP_FILTER_VALUE)
-        public void setStopFilterValue(String stopFilterValue) {
+        public IntermodalAccessEgressParameterSet setStopFilterValue(String stopFilterValue) {
             this.stopFilterValue = stopFilterValue;
+            return this ;
         }
 
         @Override
@@ -547,4 +573,37 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             this.passengerMode = passengerMode;
         }
     }
+
+    @Override
+    public Map<String, String> getComments() {
+        Map<String, String> comments = super.getComments();
+        comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
+        return comments;
+    }
+
+    // TODO: add more
+	@Override
+	protected void checkConsistency(Config config) {
+
+		if (useIntermodality) {
+			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress " 
+					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
+					+ "SwissRailRaptorConfigGroup is loaded correctly.");
+			
+			for (IntermodalAccessEgressParameterSet paramset: intermodalAccessEgressSettings) {
+				Verify.verifyNotNull(paramset.mode, "mode of an IntermodalAccessEgressParameterSet "
+						+ "is undefined. Please set a value in the config.");
+				Verify.verify(paramset.maxRadius > 0.0, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.initialSearchRadius > 0.0, "initialSearchRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				
+				Verify.verify(paramset.maxRadius >= paramset.initialSearchRadius, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is smaller than initialSearchRadius. This is inconsistent.");
+				
+			}
+		}
+	}
 }

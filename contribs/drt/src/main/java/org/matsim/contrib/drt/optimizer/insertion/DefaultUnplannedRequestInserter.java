@@ -26,23 +26,20 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestAcceptedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 /**
  * @author michalm
  */
-public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
+public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter {
 	private static final Logger log = Logger.getLogger(DefaultUnplannedRequestInserter.class);
 	public static final String NO_INSERTION_FOUND_CAUSE = "no_insertion_found";
 
@@ -54,28 +51,20 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
 	private final ForkJoinPool forkJoinPool;
-	private final ParallelMultiVehicleInsertionProblem insertionProblem;
+	private final DrtInsertionSearch<PathData> insertionSearch;
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculablePathDataProvider pathDataProvider,
-			InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
+			ForkJoinPool forkJoinPool) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.insertionScheduler = insertionScheduler;
 		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
-
-		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
-				penaltyCalculator);
-		insertionScheduler.initSchedules();
-	}
-
-	@Override
-	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		insertionProblem.shutdown();
+		this.forkJoinPool = forkJoinPool;
+		this.insertionSearch = insertionSearch;
 	}
 
 	@Override
@@ -90,29 +79,25 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			Optional<BestInsertion> best = insertionProblem.findBestInsertion(req, vData.getEntries());
-			if (!best.isPresent()) {
+			Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
+					vData.getEntries());
+			if (best.isEmpty()) {
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								req.getPassengerId(), NO_INSERTION_FOUND_CAUSE));
-				if (drtCfg.isPrintDetailedWarnings()) {
-					log.warn("No insertion found for drt request "
-							+ req
-							+ " from passenger id="
-							+ req.getPassengerId()
-							+ " fromLinkId="
-							+ req.getFromLink().getId());
-				}
+				log.debug("No insertion found for drt request "
+						+ req
+						+ " from passenger id="
+						+ req.getPassengerId()
+						+ " fromLinkId="
+						+ req.getFromLink().getId());
 			} else {
-				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId()));
-				BestInsertion bestInsertion = best.get();
-				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
-				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
+				InsertionWithDetourData<PathData> insertion = best.get();
+				insertionScheduler.scheduleRequest(req, insertion);
+				vData.updateEntry(insertion.getVehicleEntry().vehicle);
 				eventsManager.processEvent(
 						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId(), bestInsertion.vehicleEntry.vehicle.getId(),
+								req.getPassengerId(), insertion.getVehicleEntry().vehicle.getId(),
 								req.getPickupTask().getEndTime(), req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();

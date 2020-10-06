@@ -6,21 +6,22 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Provides public transport route search capabilities using an implementation of the
@@ -37,26 +38,25 @@ public class SwissRailRaptor implements TransitRouter {
     private final RaptorParametersForPerson parametersForPerson;
     private final RaptorRouteSelector defaultRouteSelector;
     private final RaptorStopFinder stopFinder;
-    private final String subpopulationAttribute;
+//    private final String subpopulationAttribute;
 
     private boolean treeWarningShown = false;
 
-    public SwissRailRaptor(final SwissRailRaptorData data, RaptorParametersForPerson parametersForPerson,
-                           RaptorRouteSelector routeSelector, RaptorStopFinder stopFinder) {
-        this(data, parametersForPerson, routeSelector, stopFinder, null );
-        log.info("SwissRailRaptor was initialized without support for subpopulations or intermodal access/egress legs.");
-    }
+//    public SwissRailRaptor(final SwissRailRaptorData data, RaptorParametersForPerson parametersForPerson,
+//                           RaptorRouteSelector routeSelector, RaptorStopFinder stopFinder) {
+//        this(data, parametersForPerson, routeSelector, stopFinder );
+//        log.info("SwissRailRaptor was initialized without support for subpopulations or intermodal access/egress legs.");
+//    }
 
     public SwissRailRaptor( final SwissRailRaptorData data, RaptorParametersForPerson parametersForPerson,
-				    RaptorRouteSelector routeSelector,
-				    RaptorStopFinder stopFinder,
-				    String subpopulationAttribute ) {
+                            RaptorRouteSelector routeSelector,
+                            RaptorStopFinder stopFinder ) {
         this.data = data;
         this.raptor = new SwissRailRaptorCore(data);
         this.parametersForPerson = parametersForPerson;
         this.defaultRouteSelector = routeSelector;
         this.stopFinder = stopFinder;
-        this.subpopulationAttribute = subpopulationAttribute;
+//        this.subpopulationAttribute = subpopulationAttribute;
     }
 
     @Override
@@ -100,17 +100,19 @@ public class SwissRailRaptor implements TransitRouter {
 		 * foundRoute.parts.size() == 0 can happen if SwissRasilRaptorCore.createRaptorRoute() finds a trip made up of,
 		 * only 2 parts which consists only of an access and an egress leg without any pt leg inbetween.
 		 */
-        if (foundRoute == null || foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts) || 
-        		directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
+        if (foundRoute == null || foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
         	if (person == null) {
             	log.debug("No route found for person null: trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + departureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
         	} else {
             	log.debug("No route found for person " + person.getId() + ": trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + departureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
         	}
+        	return null; 
+        }
+        if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
-        
-        List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute);
+
+		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         return legs;
     }
     
@@ -128,8 +130,9 @@ public class SwissRailRaptor implements TransitRouter {
         SwissRailRaptorConfigGroup srrConfig = parameters.getConfig();
 
 //        Object attr = this.personAttributes.getAttribute(person.getId().toString(), this.subpopulationAttribute);
-	    Object attr = person.getAttributes().getAttribute( this.subpopulationAttribute ) ;
-        String subpopulation = attr == null ? null : attr.toString();
+//	    Object attr = person.getAttributes().getAttribute( this.subpopulationAttribute ) ;
+//        String subpopulation = attr == null ? null : attr.toString();
+                String subpopulation = PopulationUtils.getSubpopulation( person );
         SwissRailRaptorConfigGroup.RangeQuerySettingsParameterSet rangeSettings = srrConfig.getRangeQuerySettings(subpopulation);
 
         double earliestDepartureTime = desiredDepartureTime - rangeSettings.getMaxEarlierDeparture();
@@ -161,10 +164,18 @@ public class SwissRailRaptor implements TransitRouter {
         RaptorRoute foundRoute = selector.selectOne(foundRoutes, desiredDepartureTime);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, desiredDepartureTime, person, parameters);
 
-        if (foundRoute == null || directWalk.getTotalCosts() < foundRoute.getTotalCosts()) {
+        if (foundRoute == null || foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
+        	if (person == null) {
+            	log.debug("No route found for person null: trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + desiredDepartureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
+        	} else {
+            	log.debug("No route found for person " + person.getId() + ": trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + desiredDepartureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
+        	}
+        	return null; 
+        }
+        if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
-        List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute);
+		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         // TODO adapt the activity end time of the activity right before this trip
         /* Sadly, it's not that easy to find the previous activity, as we only have from- and to-facility
          * and the departure time. One would have to search through the person's selectedPlan to find
@@ -191,7 +202,14 @@ public class SwissRailRaptor implements TransitRouter {
         if (foundRoutes == null) {
             foundRoutes = new ArrayList<>(1);
         }
-        if (foundRoutes.isEmpty() || directWalk.getTotalCosts() < foundRoutes.get(0).getTotalCosts()) {
+        Iterator<RaptorRoute> iter = foundRoutes.iterator();
+        while (iter.hasNext()) {
+        	RaptorRoute foundRoute = iter.next();
+        	if (foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
+        		iter.remove();
+        	}
+        }
+        if (foundRoutes.isEmpty() || directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoutes.get(0).getTotalCosts()) {
             foundRoutes.add(directWalk); // add direct walk if it seems plausible
         }
         return foundRoutes;
@@ -235,15 +253,16 @@ public class SwissRailRaptor implements TransitRouter {
         return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.EGRESS);
     }
 
+    // TODO: replace with call to FallbackRoutingModule ?!
     private RaptorRoute createDirectWalk(Facility fromFacility, Facility toFacility, double departureTime, Person person, RaptorParameters parameters) {
         double beelineDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
         double walkTime = beelineDistance / parameters.getBeelineWalkSpeed();
-        double walkCost_per_s = -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.transit_walk);
+        double walkCost_per_s = -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
         double walkCost = walkTime * walkCost_per_s;
         double beelineDistanceFactor = this.data.config.getBeelineWalkDistanceFactor();
 
         RaptorRoute route = new RaptorRoute(fromFacility, toFacility, walkCost);
-        route.addNonPt(null, null, departureTime, walkTime, beelineDistance * beelineDistanceFactor, TransportMode.transit_walk);
+        route.addNonPt(null, null, departureTime, walkTime, beelineDistance * beelineDistanceFactor, TransportMode.walk);
         return route;
     }
 

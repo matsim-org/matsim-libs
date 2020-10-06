@@ -31,7 +31,7 @@ public class ElectricFleets {
 	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
 			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
 			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
+		ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,

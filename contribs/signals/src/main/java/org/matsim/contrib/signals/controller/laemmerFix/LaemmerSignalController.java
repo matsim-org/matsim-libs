@@ -19,13 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.controller.laemmerFix;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +38,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import com.google.inject.Inject;
+import java.util.*;
 
 
 /**
@@ -98,6 +92,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 		laemmerSignals.clear();
 		activeRequest = null;
 		regulationQueue.clear();
+        systemOutflowCapacity = 0;
 
 		this.initializeSensoring();
 		for (SignalGroup group : this.system.getSignalGroups().values()) {
@@ -123,9 +118,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             signal.update(now);
         }
         
-        // TODO test what happens, when I move this up to the first line of this method. should save runtime. tt, dez'17
-        // note: stabilization has still to be done to increment 'a'... tt, dez'17
-        // if 'a' is be dependent on the time and not on the number of calls (as it is best anyway), this could be moved up. tt, dec'18
+        // note: signals need to be updated before to increment 'a' (in stabilization)... tt, dez'17
         if(activeRequest != null && activeRequest.signal.group.getState().equals(SignalGroupState.GREEN)) {
             double remainingMinG = activeRequest.onsetTime + laemmerConfig.getMinGreenTime() - now;
             if (remainingMinG > 0) {
@@ -191,13 +184,13 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 
     private void processSelection(double now, LaemmerSignal max) {
         if (activeRequest != null && (max == null || !max.equals(activeRequest.signal))) {
-        		/* quit the active request, when the next selection (max) is different from the current (activeRequest)
-        		 * or, when the next selection (max) is null
-        		 */
-        		if (activeRequest.onsetTime < now) {
-        			// do not schedule a dropping when the signal does not yet show green
-        			this.system.scheduleDropping(now, activeRequest.signal.group.getId());
-        		}
+        	/* quit the active request, when the next selection (max) is different from the current (activeRequest)
+        	 * or, when the next selection (max) is null
+        	 */
+        	if (activeRequest.onsetTime < now) {
+        		// do not schedule a dropping when the previous signal hasn't shown green yet
+        		this.system.scheduleDropping(now, activeRequest.signal.group.getId());
+        	}
             activeRequest = null;
         }
 
@@ -263,12 +256,12 @@ public final class LaemmerSignalController extends AbstractSignalController impl
                 if (signal.getLaneIds() != null && !(signal.getLaneIds().isEmpty())) {
                     for (Id<Lane> laneId : signal.getLaneIds()) {
                         this.sensorManager.registerNumberOfCarsOnLaneInDistanceMonitoring(signal.getLinkId(), laneId, 0.);
-                        this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoringOnLane(signal.getLinkId(), laneId);
+                        this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoringOnLane(signal.getLinkId(), laneId, laemmerConfig.getLookBackTime(), laemmerConfig.getTimeBucketSize());
                     }
                 }
                 //always register link in case only one lane is specified (-> no LaneEnter/Leave-Events?)
                 this.sensorManager.registerNumberOfCarsInDistanceMonitoring(signal.getLinkId(), 0.);
-                this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId());
+                this.sensorManager.registerAverageNumberOfCarsPerSecondMonitoring(signal.getLinkId(), laemmerConfig.getLookBackTime(), laemmerConfig.getTimeBucketSize());
             }
         }
         if (laemmerConfig.isCheckDownstream()){
@@ -493,8 +486,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
             if (n == 0) {
                 a = laemmerConfig.getIntergreenTime();
             } else {
-            		// TODO: a should be time dependent and not dependent on the simulation time step size as it is now. tt, jan'18
-                a++;
+            	a+=config.qsim().getTimeStepSize();
             }
 
             if (regulationQueue.contains(this)) {
@@ -513,15 +505,14 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 			 * becomes -Infinity and the signal is always selected for stabilization (which
 			 * makes sense). tt, dec'18
 			 */
-            if (n >= nCrit) {
+            if (n > 0 && n >= nCrit) {
             	/* TODO actually, this is the wrong place to check downstream conditions, since situation can change until the group has moved up to the queue front. 
             	 * a better moment would be while polling from the queue: poll the first element with downstream empty. but we would need a linked list instead of queue for this
             	 * and could no longer check for empty regulationQueue to decide for stabilization vs optimization... I would prefer to have some tests before! theresa, jul'17 */
 				if (!laemmerConfig.isCheckDownstream() || downstreamSensor.allDownstreamLinksEmpty(system.getId(), group.getId())) {
 					regulationQueue.add(this);
-					// signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + desiredPeriod + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" +
-					// tIdle);
-					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacityPerS / systemOutflowCapacity) * tIdle), laemmerConfig.getMinGreenTime());
+					this.regulationTime = Math.max(Math.rint(determiningLoad * laemmerConfig.getDesiredCycleTime() + (signalOutflowCapacityPerS / systemOutflowCapacity) * tIdle), 
+							laemmerConfig.getMinGreenTime());
 					this.stabilize = true;
 				}
             }

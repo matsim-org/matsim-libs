@@ -19,10 +19,15 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
  * @author michalm
  */
 public interface DetourTimeEstimator {
+	static DetourTimeEstimator createBeelineTimeEstimator(double beelineSpeed) {
+		return (from, to) -> DistanceUtils.calculateDistance(from, to) / beelineSpeed;
+	}
+
 	double estimateTime(Link from, Link to);
 }

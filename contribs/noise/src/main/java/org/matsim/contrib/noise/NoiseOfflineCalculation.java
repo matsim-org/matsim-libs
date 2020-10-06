@@ -29,6 +29,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 import java.io.File;
@@ -41,7 +42,7 @@ import java.io.IOException;
  * @author ikaddoura
  *
  */
-public class NoiseOfflineCalculation{
+public final class NoiseOfflineCalculation{
 	private static final Logger log = Logger.getLogger( NoiseOfflineCalculation.class );
 
 	private String outputDirectory;
@@ -95,11 +96,15 @@ public class NoiseOfflineCalculation{
 		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
 		timeTracker.setOutputFilePath(outputFilePath);
 
-		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
-			linkSpeedCalculator.setNoiseContext(noiseContext);
-			events.addHandler(linkSpeedCalculator);
-		}
+		//LinkSpeedCalculation is already injected with the NoiseModule! nk jul '20
+//		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+//			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
+//			linkSpeedCalculator.setNoiseContext(noiseContext);
+//			events.addHandler(linkSpeedCalculator);
+//		}
+
+		final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
+		noiseParams.checkConsistency(noiseContext.getScenario().getConfig());
 
 		EventWriterXML eventWriter = null;
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
@@ -138,8 +143,12 @@ public class NoiseOfflineCalculation{
 		return timeTracker;
 	}
 
-	public NoiseContext getNoiseContext() {
+	NoiseContext getNoiseContext() {
 		return noiseContext;
+	}
+
+	public final TravelDisutility getTollDisutility() {
+		return new NoiseTollCalculator( noiseContext );
 	}
 
 }

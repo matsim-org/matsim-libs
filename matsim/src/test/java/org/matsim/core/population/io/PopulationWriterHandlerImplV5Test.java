@@ -40,7 +40,6 @@ import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -155,7 +154,7 @@ public class PopulationWriterHandlerImplV5Test {
 //		Assert.assertTrue("read route is of class " + route2.getClass().getCanonicalName(), route2 instanceof GenericRouteImpl);
 		Assert.assertEquals("wrong start link", startLinkId, route2.getStartLinkId().toString());
 		Assert.assertEquals("wrong end link", endLinkId, route2.getEndLinkId().toString());
-		Assert.assertEquals("wrong travel time", travTime, route2.getTravelTime(), 1e-9);
+		Assert.assertEquals("wrong travel time", travTime, route2.getTravelTime().seconds(), 1e-9);
 		Assert.assertEquals("wrong distance", dist, route2.getDistance(), 1e-9);
 	}
 

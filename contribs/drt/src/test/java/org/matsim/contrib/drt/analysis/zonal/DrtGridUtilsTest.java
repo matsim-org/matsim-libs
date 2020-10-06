@@ -1,9 +1,13 @@
 package org.matsim.contrib.drt.analysis.zonal;
 
-import org.junit.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Map;
+
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -11,32 +15,40 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.Map;
-
 public class DrtGridUtilsTest {
 
 	@Test
 	public void test() {
 		Network network = createNetwork();
-		Map<String,Geometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
-		Assert.assertEquals(100,grid.size());
-		Geometry cell100 = grid.get("100");
-		Point p = cell100.getCentroid();
-		Assert.assertEquals(950, p.getX(),0.00001);
-		Assert.assertEquals(950, p.getY(),0.00001);
+		Map<String, PreparedGeometry> grid = DrtGridUtils.createGridFromNetwork(network, 100);
 
-		DrtZonalSystem drtZonalSystem = new DrtZonalSystem(network, 100);
-		Assert.assertEquals("5", drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")));
-		DrtZonalSystem drtZonalSystem2 = new DrtZonalSystem(network, 700);
-		Assert.assertEquals("1", drtZonalSystem2.getZoneForLinkId(Id.createLinkId("ab")));
+		assertThat(grid).hasSize(100);
+
+		int cell = 1;
+		for (int col = 0; col < 10; col++) {
+			for (int row = 0; row < 10; row++) {
+				Geometry geometry = grid.get(cell + "").getGeometry();
+
+				assertThat(geometry.getCoordinates()).containsExactly(//
+						new Coordinate(col * 100, row * 100),//
+						new Coordinate(col * 100 + 100, row * 100),//
+						new Coordinate(col * 100 + 100, row * 100 + 100),//
+						new Coordinate(col * 100, row * 100 + 100),//
+						new Coordinate(col * 100, row * 100));
+				assertThat(geometry.getCentroid().getCoordinate()).isEqualTo(
+						new Coordinate(col * 100 + 50, row * 100 + 50));
+
+				cell++;
+			}
+		}
 	}
 
-	private Network createNetwork(){
+	static Network createNetwork() {
 		Network network = NetworkUtils.createNetwork();
-		Node a = network.getFactory().createNode(Id.createNodeId("a"), new Coord(0,0));
-		Node b = network.getFactory().createNode(Id.createNodeId("b"), new Coord(0,1000));
-		Node c = network.getFactory().createNode(Id.createNodeId("c"), new Coord(1000,1000));
-		Node d = network.getFactory().createNode(Id.createNodeId("d"), new Coord(1000,0));
+		Node a = network.getFactory().createNode(Id.createNodeId("a"), new Coord(0, 0));
+		Node b = network.getFactory().createNode(Id.createNodeId("b"), new Coord(0, 1000));
+		Node c = network.getFactory().createNode(Id.createNodeId("c"), new Coord(1000, 1000));
+		Node d = network.getFactory().createNode(Id.createNodeId("d"), new Coord(1000, 0));
 		network.addNode(a);
 		network.addNode(b);
 		network.addNode(c);
@@ -52,5 +64,4 @@ public class DrtGridUtilsTest {
 		network.addLink(da);
 		return network;
 	}
-
 }

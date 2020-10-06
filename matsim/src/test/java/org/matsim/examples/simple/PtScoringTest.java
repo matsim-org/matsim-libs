@@ -25,7 +25,6 @@ package org.matsim.examples.simple;
 import java.util.List;
 
 import org.junit.Assert;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,7 +95,7 @@ public class PtScoringTest {
 
 
 
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 		
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -246,7 +245,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 		
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -402,7 +401,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 		
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
@@ -486,7 +485,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 
-		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
+		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration().seconds();
 		double priority = 1. ;
 
 //		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);

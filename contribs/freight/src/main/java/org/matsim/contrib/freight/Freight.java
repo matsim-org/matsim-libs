@@ -1,10 +1,9 @@
 package org.matsim.contrib.freight;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.ConfigUtils;
@@ -24,7 +23,11 @@ public class Freight{
 		Controler controler = (Controler) ao;
 		Carriers carriers = FreightUtils.getCarriers( controler.getScenario() );
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );;
-		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+		if ( true ){
+			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		} else{
+			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		}
 		final CarrierModule carrierModule = new CarrierModule( carriers );
 		ao.addOverridingModule( carrierModule ) ;
 

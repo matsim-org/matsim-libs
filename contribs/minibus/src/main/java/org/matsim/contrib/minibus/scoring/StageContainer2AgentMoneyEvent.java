@@ -51,7 +51,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 	public StageContainer2AgentMoneyEvent(MatsimServices controler, TicketMachineI ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
-		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime();
+		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime().seconds();
 		this.ticketMachine = ticketMachine;
 	}
 
@@ -63,7 +63,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent));
+			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), -totalFareOfAgent, "minibus", null));
 		}
 	}
 

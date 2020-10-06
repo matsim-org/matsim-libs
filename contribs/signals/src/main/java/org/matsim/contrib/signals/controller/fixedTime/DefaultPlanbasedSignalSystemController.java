@@ -33,7 +33,6 @@ import org.matsim.contrib.signals.controller.SignalControllerFactory;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
-import org.matsim.contrib.signals.model.SignalSystemImpl;
 
 
 /**
@@ -42,7 +41,7 @@ import org.matsim.contrib.signals.model.SignalSystemImpl;
  * @author dgrether, tthunig
  *
  */
-public class DefaultPlanbasedSignalSystemController extends AbstractSignalController implements SignalController {
+public final class DefaultPlanbasedSignalSystemController extends AbstractSignalController implements SignalController {
 	
 	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
@@ -126,7 +125,7 @@ public class DefaultPlanbasedSignalSystemController extends AbstractSignalContro
 //			if (nextPlan.getStartTime() > (now % (3600*24) + SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH)){
 			double diff = nextPlan.getStartTime() - this.activePlan.getEndTime() + 24*3600;
 			double mod = diff % (24*3600);
-			if (mod > SignalSystemImpl.SWITCH_OFF_SEQUENCE_LENGTH){
+			if (mod > SignalSystem.SWITCH_OFF_SEQUENCE_LENGTH){
 				// switch off the signals if next plan is starting in more than 5 seconds
 				this.system.switchOff(now);
 			}

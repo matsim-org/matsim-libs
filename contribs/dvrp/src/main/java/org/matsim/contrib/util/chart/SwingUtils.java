@@ -9,11 +9,9 @@ import javax.swing.SwingUtilities;
  */
 public class SwingUtils {
 	public static void showWindow(final Window window, boolean modal) {
-		Runnable r = new Runnable() {
-			public void run() {
-				window.pack();
-				window.setVisible(true);
-			}
+		Runnable r = () -> {
+			window.pack();
+			window.setVisible(true);
 		};
 
 		if (modal) {

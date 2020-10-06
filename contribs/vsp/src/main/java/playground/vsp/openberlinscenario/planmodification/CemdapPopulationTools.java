@@ -82,12 +82,13 @@ public class CemdapPopulationTools {
 				
 				if (firstActivity) {
 					// first activity (or stay home plan)
-					if (act.getEndTime() > 0. && act.getEndTime() <= 24. * 3600) {
+					if (act.getEndTime().seconds() > 0. && act.getEndTime().seconds() <= 24. * 3600) {
 						// first activity (end time specified via an end time)
-						duration = act.getEndTime() - dayStartTime;
-					} else if (act.getMaximumDuration() > 0. && act.getMaximumDuration() <= 24. * 3600) {
+						duration = act.getEndTime().seconds() - dayStartTime;
+					} else if (act.getMaximumDuration().seconds() > 0. && act.getMaximumDuration()
+							.seconds() <= 24. * 3600) {
 						// first activity (end time specified via a duration)
-						duration = act.getMaximumDuration();
+						duration = act.getMaximumDuration().seconds();
 					} else {
 						// stay home plan
 						duration = 24. * 3600;

@@ -19,25 +19,6 @@
 
 package org.matsim.pt.utils;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +28,25 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.xml.sax.SAXException;
 
 /**
  * An abstract class offering a number of static methods to validate several aspects of transit schedules.
@@ -188,19 +188,19 @@ public abstract class TransitScheduleValidator {
 				
 				if (stopCount > 0) {
 					TransitRouteStop stop = stops.get(0);
-					if (Time.isUndefinedTime(stop.getDepartureOffset())) {
+					if (stop.getDepartureOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The first stop does not contain any departure offset.");
 					}
 					
 					for (int i = 1; i < stopCount - 1; i++) {
 						stop = stops.get(i);
-						if (Time.isUndefinedTime(stop.getDepartureOffset())) {
+						if (stop.getDepartureOffset().isUndefined()) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": Stop " + i + " does not contain any departure offset.");
 						}
 					}
 					
 					stop = stops.get(stopCount - 1);
-					if (Time.isUndefinedTime(stop.getArrivalOffset())) {
+					if (stop.getArrivalOffset().isUndefined()) {
 						result.addError("Transit line " + line.getId() + ", route " + route.getId() + ": The last stop does not contain any arrival offset.");
 					}
 				} else {
@@ -391,6 +391,9 @@ public abstract class TransitScheduleValidator {
 
 		public void addIssue(final ValidationIssue issue) {
 			this.issues.add(issue);
+			if (issue.severity == Severity.ERROR) {
+				this.isValid = false;
+			}
 		}
 
 		public void add(final ValidationResult otherResult) {

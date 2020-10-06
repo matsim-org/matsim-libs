@@ -10,22 +10,7 @@ import java.util.Map;
 @SuppressWarnings("WeakerAccess")
 public class DistanceDistribution {
 
-	private Map<Id<DistanceBin>, DistanceBin> distanceBins = new HashMap<>();
-	private final double scalingFactor;
-
-	/**
-	 * Creates an empty distance distribution
-	 *
-	 * @param scalingFactor scaling factor by which the population sample is scaled. If a scenario is run with a 1% sample
-	 *                      of an original population the scaling factor must be set to 0.1
-	 */
-	public DistanceDistribution(double scalingFactor) {
-		this.scalingFactor = scalingFactor;
-	}
-
-	public double getScalingFactor() {
-		return scalingFactor;
-	}
+	private final Map<Id<DistanceBin>, DistanceBin> distanceBins = new HashMap<>();
 
 	public void add(String mode, double lowerLimit, double upperLimit, double standardDeviation, double value) {
 
@@ -60,7 +45,7 @@ public class DistanceDistribution {
 	}
 
 	public DistanceDistribution copyWithEmptyBins() {
-		DistanceDistribution result = new DistanceDistribution(this.scalingFactor);
+		DistanceDistribution result = new DistanceDistribution();
 		for (DistanceBin bin : distanceBins.values()) {
 			result.add(bin.getMode(), bin.getDistanceRange().getLowerLimit(), bin.getDistanceRange().getUpperLimit(), bin.getStandardDeviation(), 0);
 		}
@@ -83,11 +68,11 @@ public class DistanceDistribution {
 			this.id = Id.create(mode + "_" + lowerLimit + "_" + upperLimit, DistanceBin.class);
 		}
 
-		DistanceRange getDistanceRange() {
+		public DistanceRange getDistanceRange() {
 			return distanceRange;
 		}
 
-		double getValue() {
+		public double getValue() {
 			return value;
 		}
 
@@ -96,7 +81,7 @@ public class DistanceDistribution {
 			return id;
 		}
 
-		double getStandardDeviation() {
+		public double getStandardDeviation() {
 			return stdDev;
 		}
 
@@ -110,11 +95,11 @@ public class DistanceDistribution {
 
 		@Override
 		public String toString() {
-            return "Id: " + id + ", [" + distanceRange.lowerLimit + " - " + distanceRange.upperLimit + "], mode: " + mode + ", value " + value;
+			return "Id: " + id + ", " + distanceRange.toString() + ", mode: " + mode + ", value " + value;
 		}
 	}
 
-	static class DistanceRange {
+	public static class DistanceRange {
 		private final double lowerLimit;
 		private final double upperLimit; // allow infinity for upperLimit value
 
@@ -123,11 +108,11 @@ public class DistanceDistribution {
 			this.upperLimit = high;
 		}
 
-		double getLowerLimit() {
+		public double getLowerLimit() {
 			return lowerLimit;
 		}
 
-		double getUpperLimit() {
+		public double getUpperLimit() {
 			return upperLimit;
 		}
 
@@ -137,10 +122,7 @@ public class DistanceDistribution {
 
 		@Override
 		public String toString() {
-			return "DistanceRange[" +
-					"lowerLimit=" + lowerLimit +
-					", upperLimit=" + upperLimit +
-					']';
+			return "[" + lowerLimit + "-" + upperLimit + "]";
 		}
 	}
 }

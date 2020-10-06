@@ -21,7 +21,7 @@ package org.matsim.contrib.edrt;
 
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -35,6 +35,7 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.ev.dvrp.ChargingActivity;
+import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.OfflineETaskTracker;
 import org.matsim.contrib.ev.dvrp.tracker.OnlineEDriveTaskTracker;
@@ -47,17 +48,17 @@ public class EDrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final DrtActionCreator drtActionCreator;
 	private final MobsimTimer timer;
 
-	public EDrtActionCreator(PassengerEngine passengerEngine, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
+	public EDrtActionCreator(PassengerHandler passengerHandler, MobsimTimer timer, DvrpConfigGroup dvrpCfg) {
 		this.timer = timer;
-		drtActionCreator = new DrtActionCreator(passengerEngine, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
+		drtActionCreator = new DrtActionCreator(passengerHandler, v -> createLeg(dvrpCfg.getMobsimMode(), v, timer));
 	}
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		if (task instanceof EDrtChargingTask) {
+		if (task.getTaskType().equals(EDrtChargingTask.TYPE)) {
 			task.initTaskTracker(new OfflineETaskTracker((EvDvrpVehicle)vehicle, timer));
-			return new ChargingActivity((EDrtChargingTask)task);
+			return new ChargingActivity((ChargingTask)task);
 		} else {
 			DynAction dynAction = drtActionCreator.createAction(dynAgent, vehicle, now);
 			if (task.getTaskTracker() == null) {

@@ -22,65 +22,92 @@ package org.matsim.api.core.v01.events;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 
-public class ActivityStartEvent extends Event implements HasPersonId {
+public class ActivityStartEvent extends Event implements HasFacilityId, HasPersonId, HasLinkId, BasicLocation{
 
 	public static final String EVENT_TYPE = "actstart";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
+
 	private final Id<Person> personId;
+	private Coord coord;
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
-		
-	public ActivityStartEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+
+	/*
+	Possible transition path to "coordinates in event":
+	- invalidate previous constructor so that we see where we have problems.
+	- be minimalistic in repairing (e.g. only in matsim core).  As a tendency, when the event constructor already contains null args (e.g. for facility),
+	 then we can put null for coord as well.
+	- re-instantiate previous constructor.  I find this better than null because one can still set the constructor to deprecated and get compile time
+	warnings.  kai, dec'19
+	 */
+
+//	public ActivityStartEvent( final double time, final Id<Person> agentId, final Activity  activity ){
+//		this( time, agentId, activity.getLinkId(), activity ) ;
+//	}
+//	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Activity activity ) {
+//		this( time, agentId, linkId, activity.getFacilityId(), activity.getType(), activity.getCoord() ) ;
+//	}
+
+	/**
+	 * @deprecated -- add Coord as argument
+	 */
+	@Deprecated // add Coord as argument
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Id<ActivityFacility> facilityId, final String acttype ){
+		this( time, agentId, linkId, facilityId, acttype, null);
+	}
+	// this is the new constructor:
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+				   final Id<ActivityFacility> facilityId, final String acttype, final Coord coord ) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 		this.personId = agentId;
+		this.coord = coord;
 	}
 
-	@Override
-	public String getEventType() {
+	@Override public String getEventType() {
 		return EVENT_TYPE;
 	}
 
 	public String getActType() {
 		return this.acttype;
 	}
-
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return this.linkId;
 	}
-
-	public Id<ActivityFacility> getFacilityId() {
+	@Override public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
-	
-	public Id<Person> getPersonId() {
+	@Override public Id<Person> getPersonId() {
 		return this.personId;
 	}
 	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		if (this.linkId != null) {
-			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		}
-		if (this.facilityId != null) {
-			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
-		}
+		// personId is automatic in superclass
+		// coord is automatic in superclass
+		// linkId is automatic in superclass
+		// facilityId is automatic in superclass
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
+	}
+	@Override public Coord getCoord(){
+		return coord;
+	}
+	public void setCoord( Coord coord ) {
+		// yy  this is to retrofit the coordinate into existing events that don't have it.  :-(  kai, mar'20
+		this.coord = coord;
 	}
 }

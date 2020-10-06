@@ -41,9 +41,9 @@ import javax.xml.bind.annotation.XmlType;
     "signalSystem"
 })
 @XmlRootElement(name = "signalSystems")
-public class XMLSignalSystems {
+public final class XMLSignalSystems {
 
-    protected List<XMLSignalSystemType> signalSystem;
+    private List<XMLSignalSystemType> signalSystem;
 
     /**
      * Gets the value of the signalSystem property.

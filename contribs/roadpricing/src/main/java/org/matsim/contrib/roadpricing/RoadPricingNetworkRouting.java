@@ -17,6 +17,8 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.name.Named;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashSet;
@@ -60,6 +62,10 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
 	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	
+	@Inject
+	@Named(TransportMode.walk)
+	RoutingModule walkRouter;
 
 	private
 	Network filteredNetwork;
@@ -80,9 +86,9 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
-		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
+		if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
-					routeAlgo, scenario, filteredNetwork );
+					routeAlgo, scenario, filteredNetwork, walkRouter );
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);

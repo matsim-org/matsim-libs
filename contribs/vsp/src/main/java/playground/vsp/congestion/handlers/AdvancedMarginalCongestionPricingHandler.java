@@ -47,7 +47,6 @@ import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -179,12 +178,14 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		}
 	}
 
+	private final static double FINAL_CONGESTION_EVENT_TIME = Double.NEGATIVE_INFINITY;
+
 	/*
 	 * This method has to be called after the MobSim. Here, the disutility from being delayed at the last / overnight activity is taken into account.
 	 */
 	public void processFinalCongestionEvents() {
 		for (Id<Person> affectedPersonId : this.affectedPersonId2congestionEventsToProcess.keySet()) {
-			processCongestionEventsForAffectedPerson(affectedPersonId, Time.UNDEFINED_TIME, null);
+			processCongestionEventsForAffectedPerson(affectedPersonId, FINAL_CONGESTION_EVENT_TIME, null);//
 		}
 	}
 	
@@ -205,7 +206,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
 				// Yes, the plan seems to be completed.
 				
-				if (activityEndTime == Time.UNDEFINED_TIME) {
+				if (activityEndTime == FINAL_CONGESTION_EVENT_TIME) {
 					// The end time is undefined...
 												
 					// ... now handle the first and last OR overnight activity. This is figured out by the scoring function itself (depending on the activity types).
@@ -265,11 +266,11 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				double amount = this.factor * congestionEvent.getDelay() * delayCostPerSecond * (-1);
 				this.amountSum = this.amountSum + amount;
 				
-				if (activityEndTime == Time.UNDEFINED_TIME) {
-					activityEndTime = this.scenario.getConfig().qsim().getEndTime();
+				if (activityEndTime == FINAL_CONGESTION_EVENT_TIME) {
+					activityEndTime = this.scenario.getConfig().qsim().getEndTime().seconds();
 				}
 				
-				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);				
+				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount, "congestionPricing", null);				
 				this.events.processEvent(moneyEvent);
 				
 				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), congestionEvent.getLinkId(), amount, congestionEvent.getEmergenceTime(), "congestion");

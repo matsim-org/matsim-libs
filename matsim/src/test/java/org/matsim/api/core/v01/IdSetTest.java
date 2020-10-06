@@ -2,8 +2,10 @@ package org.matsim.api.core.v01;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -241,16 +243,27 @@ public class IdSetTest {
 		set.add(id4);
 
 		Id<Person>[] array1 = set.toArray();
+
 		Assert.assertEquals(3, array1.length);
-		Assert.assertEquals(id1, array1[0]);
-		Assert.assertEquals(id3, array1[1]);
-		Assert.assertEquals(id4, array1[2]);
+		Id<Person> tmp = array1[0];
+		for (int i = 1; i < array1.length; i++) {
+			if (tmp.index() > array1[i].index()) {
+				Assert.fail();
+			} else {
+				tmp = array1[i];
+			}
+		}
 
 		Id<Person>[] array2 = set.toArray((Id<Person>[]) new Id[3]);
 		Assert.assertEquals(3, array2.length);
-		Assert.assertEquals(id1, array2[0]);
-		Assert.assertEquals(id3, array2[1]);
-		Assert.assertEquals(id4, array2[2]);
+		tmp = array2[0];
+		for (int i = 1; i < array2.length; i++) {
+			if (tmp.index() > array2[i].index()) {
+				Assert.fail();
+			} else {
+				tmp = array2[i];
+			}
+		}
 
 		Id<Person>[] tmpArray = (Id<Person>[]) new Id[5]; // too big
 		tmpArray[0] = id5;
@@ -260,17 +273,87 @@ public class IdSetTest {
 		tmpArray[4] = id1;
 		Id<Person>[] array3 = set.toArray(tmpArray);
 		Assert.assertEquals(5, array3.length);
-		Assert.assertEquals(id1, array3[0]);
-		Assert.assertEquals(id3, array3[1]);
-		Assert.assertEquals(id4, array3[2]);
+		tmp = array3[0];
+		for (int i = 1; i < array1.length; i++) {
+			if (tmp.index() > array3[i].index()) {
+				Assert.fail();
+			} else {
+				tmp = array3[i];
+			}
+		}
 		Assert.assertNull(array3[3]);
 		Assert.assertNull(array3[4]);
 
 		Id<Person>[] array4 = set.toArray((Id<Person>[]) new Id[1]); // too small
 		Assert.assertEquals(3, array4.length);
-		Assert.assertEquals(id1, array4[0]);
-		Assert.assertEquals(id3, array4[1]);
-		Assert.assertEquals(id4, array4[2]);
+		tmp = array4[0];
+		for (int i = 1; i < array4.length; i++) {
+			if (tmp.index() > array4[i].index()) {
+				Assert.fail();
+			} else {
+				tmp = array4[i];
+			}
+		}
+	}
+
+	@Test
+	public void testEqualsAndHashCode() {
+		Id<Person> id1 = Id.create("1", Person.class);
+		Id<Person> id2 = Id.create("2", Person.class);
+		Id<Person> id3 = Id.create("3", Person.class);
+		Id<Person> id4 = Id.create("4", Person.class);
+		Id<Person> id5 = Id.create("5", Person.class);
+		Id<Person> id6 = Id.create("6", Person.class);
+
+		IdSet<Person> setA = new IdSet<>(Person.class, 4);
+		IdSet<Person> setB = new IdSet<>(Person.class, 4);
+		IdSet<Link> setWrongType = new IdSet<>(Link.class, 4);
+
+		Assert.assertEquals(setA, setA);
+		Assert.assertEquals(setA, setB);
+		Assert.assertNotEquals(setA, setWrongType);
+
+		setA.add(id1);
+
+		Assert.assertEquals(setA, setA);
+		Assert.assertNotEquals(setA, setB);
+		Assert.assertEquals(setA.hashCode(), setA.hashCode());
+		Assert.assertNotEquals(setA.hashCode(), setB.hashCode());
+
+		setB.add(id1);
+
+		Assert.assertEquals(setA, setB);
+		Assert.assertEquals(setA.hashCode(), setB.hashCode());
+
+		setA.add(id2);
+		setA.add(id3);
+
+		Assert.assertNotEquals(setA, setB);
+		Assert.assertNotEquals(setA.hashCode(), setB.hashCode());
+
+		setB.add(id3);
+		setB.add(id2);
+
+		Assert.assertEquals(setA, setB);
+		Assert.assertEquals(setA.hashCode(), setB.hashCode());
+
+		setA.add(id4);
+		setA.add(id5);
+		setA.add(id6);
+		setA.remove(id4);
+		setA.remove(id5);
+		setA.remove(id6);
+
+		Assert.assertEquals(setA, setB);
+		Assert.assertEquals(setA.hashCode(), setB.hashCode());
+
+		setA.add(id4);
+		HashSet<Id<Person>> hSetA = new HashSet<Id<Person>>(setA);
+
+		Assert.assertEquals(hSetA, setA);
+		Assert.assertNotEquals(hSetA, setB);
+//		Assert.assertEquals(hSetA.hashCode(), setA.hashCode()); // this does not work yet because the hashCode() of IdImpl still uses id instead of index
+		Assert.assertNotEquals(hSetA.hashCode(), setB.hashCode());
 	}
 
 }

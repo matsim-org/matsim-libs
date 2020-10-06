@@ -68,6 +68,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.utils.misc.ClassUtils;
 
 /**
  * Implementation of an EventsManager that serves exactly one EventHandler.
@@ -171,7 +172,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
-			this.nextCounterMsg *= 2;
+			this.nextCounterMsg *= 4;
 			log.info(" event # " + this.counter);
 		}
 		computeEvent(event);
@@ -225,7 +226,10 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		try {
 			Method method = this.getHandlersForClass(event.getClass());
 			if (method != null) method.invoke(this.eventHandler, event);
-		} catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
+		} catch(InvocationTargetException e) {
+			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e.getTargetException());
+		}
+		catch (IllegalArgumentException | IllegalAccessException e) {
 			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
 		}
 	}
@@ -250,7 +254,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		
 		// second search in implemented interfaces if no method was found yet
 		if (method == null) {
-			for (Class<?> intfc : getAllInterfaces(eventClass)) {
+			for (Class<?> intfc : ClassUtils.getAllInterfaces(eventClass )) {
 				info = this.methodToHandle.get(intfc);
 				if (info != null) {
 					method = info.method;
@@ -282,25 +286,14 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		}
 	}
 
-	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
-		Set<Class<?>> intfs = new HashSet<Class<?>>();
-		for (Class<?> intf : klass.getInterfaces()) {
-			intfs.add(intf);
-			intfs.addAll(getAllInterfaces(intf));
-		}
-		if (!klass.isInterface()) {
-			Class<?> superclass = klass.getSuperclass();
-			while (superclass != Object.class) {
-				intfs.addAll(getAllInterfaces(superclass));
-				superclass = superclass.getSuperclass();
-			}
-		}
-		return intfs;
-	}
-
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Event ev) {
+		boolean ret = false;
 		Class<?> klass = ev.getClass(); 
+		if (this.isBasicEventHandler) {
+			((BasicEventHandler) this.eventHandler).handleEvent(ev);
+			ret = true;
+		}
 		if (this.isLeaveLinkHandler && klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler) this.eventHandler).handleEvent((LinkLeaveEvent)ev);
 			return true;
@@ -373,10 +366,6 @@ public final class SingleHandlerEventsManager implements EventsManager {
 			((VehicleAbortsEventHandler) this.eventHandler).handleEvent((VehicleAbortsEvent) ev);
 			return true;
 		}
-		if (this.isBasicEventHandler && klass == Event.class) {
-			((BasicEventHandler) this.eventHandler).handleEvent(ev);
-			return true;
-		}
-		return false;
+		return ret;
 	}
 }

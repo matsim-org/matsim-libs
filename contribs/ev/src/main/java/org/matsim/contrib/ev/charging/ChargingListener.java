@@ -25,11 +25,11 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
  */
 public interface ChargingListener {
 	default void notifyVehicleQueued(ElectricVehicle ev, double now) {
-	};
+	}
 
 	default void notifyChargingStarted(ElectricVehicle ev, double now) {
-	};
+	}
 
 	default void notifyChargingEnded(ElectricVehicle ev, double now) {
-	};
+	}
 }

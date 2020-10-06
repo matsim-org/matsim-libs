@@ -118,7 +118,7 @@ public class FlowEfficiencyCalculatorTest {
 	}
 
 	private class LatestArrivalHandler implements PersonArrivalEventHandler {
-		double latestArrivalTime = Time.getUndefinedTime();
+		Double latestArrivalTime = null;
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {

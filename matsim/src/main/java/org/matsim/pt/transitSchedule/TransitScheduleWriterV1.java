@@ -34,7 +34,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -84,17 +83,17 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(5);
 		for (TransitStopFacility stop : this.schedule.getFacilities().values()) {
 			attributes.clear();
-			attributes.add(this.createTuple(Constants.ID, stop.getId().toString()));
+			attributes.add(createTuple(Constants.ID, stop.getId().toString()));
 			final Coord coord = coordinateTransformation.transform( stop.getCoord() );
-			attributes.add(this.createTuple("x", coord.getX()));
-			attributes.add(this.createTuple("y", coord.getY()));
+			attributes.add(createTuple("x", coord.getX()));
+			attributes.add(createTuple("y", coord.getY()));
 			if (stop.getLinkId() != null) {
-				attributes.add(this.createTuple("linkRefId", stop.getLinkId().toString()));
+				attributes.add(createTuple("linkRefId", stop.getLinkId().toString()));
 			}
 			if (stop.getName() != null) {
-				attributes.add(this.createTuple("name", stop.getName()));
+				attributes.add(createTuple("name", stop.getName()));
 			}
-			attributes.add(this.createTuple("isBlocking", stop.getIsBlockingLane()));
+			attributes.add(createTuple("isBlocking", stop.getIsBlockingLane()));
 			this.writeStartTag(Constants.STOP_FACILITY, attributes, true);
 		}
 
@@ -103,9 +102,9 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 
 	private void writeTransitLine(final TransitLine line) throws UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-		attributes.add(this.createTuple(Constants.ID, line.getId().toString()));
+		attributes.add(createTuple(Constants.ID, line.getId().toString()));
 		if (line.getName() != null) {
-			attributes.add(this.createTuple(Constants.NAME, line.getName()));
+			attributes.add(createTuple(Constants.NAME, line.getName()));
 		}
 		this.writeStartTag(Constants.TRANSIT_LINE, attributes);
 
@@ -118,7 +117,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 
 	private void writeTransitRoute(final TransitRoute route) throws UncheckedIOException {
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-		attributes.add(this.createTuple(Constants.ID, route.getId().toString()));
+		attributes.add(createTuple(Constants.ID, route.getId().toString()));
 		this.writeStartTag(Constants.TRANSIT_ROUTE, attributes);
 
 		if (route.getDescription() != null) {
@@ -145,14 +144,12 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 		List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(4);
 		for (TransitRouteStop stop : stops) {
 			attributes.clear();
-			attributes.add(this.createTuple(Constants.REF_ID, stop.getStopFacility().getId().toString()));
-			if (stop.getArrivalOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(Constants.ARRIVAL_OFFSET, stop.getArrivalOffset()));
-			}
-			if (stop.getDepartureOffset() != Time.UNDEFINED_TIME) {
-				attributes.add(this.createTimeTuple(Constants.DEPARTURE_OFFSET, stop.getDepartureOffset()));
-			}
-			attributes.add(this.createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
+			attributes.add(createTuple(Constants.REF_ID, stop.getStopFacility().getId().toString()));
+			stop.getArrivalOffset()
+					.ifDefined(offset -> attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, offset)));
+			stop.getDepartureOffset().ifDefined(offset->
+				attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, offset)));
+			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));
 			this.writeStartTag(Constants.STOP, attributes, true);
 		}
 
@@ -165,17 +162,17 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 
 			// optimization: only create one List for multiple departures
 			List<Tuple<String, String>> attributes = new ArrayList<Tuple<String, String>>(1);
-			attributes.add(this.createTuple(Constants.REF_ID, route.getStartLinkId().toString()));
+			attributes.add(createTuple(Constants.REF_ID, route.getStartLinkId().toString()));
 			this.writeStartTag(Constants.LINK, attributes, true);
 
 			for (Id<Link> linkId : route.getLinkIds()) {
 				attributes.clear();
-				attributes.add(this.createTuple(Constants.REF_ID, linkId.toString()));
+				attributes.add(createTuple(Constants.REF_ID, linkId.toString()));
 				this.writeStartTag(Constants.LINK, attributes, true);
 			}
 
 			attributes.clear();
-			attributes.add(this.createTuple(Constants.REF_ID, route.getEndLinkId().toString()));
+			attributes.add(createTuple(Constants.REF_ID, route.getEndLinkId().toString()));
 			this.writeStartTag(Constants.LINK, attributes, true);
 
 			this.writeEndTag(Constants.ROUTE);
@@ -190,10 +187,10 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 
 		for (Departure dep : departures.values()) {
 			attributes.clear();
-			attributes.add(this.createTuple(Constants.ID, dep.getId().toString()));
-			attributes.add(this.createTimeTuple(Constants.DEPARTURE_TIME, dep.getDepartureTime()));
+			attributes.add(createTuple(Constants.ID, dep.getId().toString()));
+			attributes.add(createTimeTuple(Constants.DEPARTURE_TIME, dep.getDepartureTime()));
 			if (dep.getVehicleId() != null) {
-				attributes.add(this.createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
+				attributes.add(createTuple(Constants.VEHICLE_REF_ID, dep.getVehicleId().toString()));
 			}
 			this.writeStartTag(Constants.DEPARTURE, attributes, true);
 		}

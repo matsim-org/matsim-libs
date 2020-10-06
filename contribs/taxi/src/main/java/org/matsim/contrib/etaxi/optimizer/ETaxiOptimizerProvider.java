@@ -21,6 +21,7 @@ package org.matsim.contrib.etaxi.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
@@ -48,10 +49,11 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelDisutility travelDisutility;
 	private final ETaxiScheduler eScheduler;
 	private final ChargingInfrastructure chargingInfrastructure;
+	private final ScheduleTimingUpdater scheduleTimingUpdater;
 
 	public ETaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
 			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutility travelDisutility, ETaxiScheduler eScheduler,
+			TravelDisutility travelDisutility, ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
 			ChargingInfrastructure chargingInfrastructure) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
@@ -61,6 +63,7 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.eScheduler = eScheduler;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.chargingInfrastructure = chargingInfrastructure;
 	}
 
@@ -68,11 +71,11 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public TaxiOptimizer get() {
 		String type = taxiCfg.getTaxiOptimizerParams().getName();
 		if (type.equals(RuleBasedETaxiOptimizerParams.SET_NAME)) {
-			return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer, travelTime,
+			return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, network, timer, travelTime,
 					travelDisutility, chargingInfrastructure);
 		} else if (type.equals(AssignmentETaxiOptimizerParams.SET_NAME)) {
 			return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-					travelDisutility, eScheduler, chargingInfrastructure);
+					travelDisutility, eScheduler, scheduleTimingUpdater, chargingInfrastructure);
 		} else {
 			throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().
 					getName());

@@ -20,13 +20,11 @@
 
 package org.matsim.pt.router;
 
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
@@ -153,8 +151,8 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			//   the time until the departure (``dpTime - now'')
 			//   + the travel time on the link (there.arrivalTime - here.departureTime)
 			// But quite often, we only have the departure time at the next stop.  Then we use that:
-			double arrivalOffset = (toStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? toStop.getArrivalOffset() : toStop.getDepartureOffset();
-			double time2 = (bestDepartureTime - time) + (arrivalOffset - fromStop.getDepartureOffset());
+			double arrivalOffset = toStop.getArrivalOffset().or(toStop::getDepartureOffset).seconds();
+			double time2 = (bestDepartureTime - time) + (arrivalOffset - fromStop.getDepartureOffset().seconds());
 			if (time2 < 0) {
 				// ( this can only happen, I think, when ``bestDepartureTime'' is after midnight but ``time'' was before )
 				time2 += MIDNIGHT;
@@ -189,9 +187,10 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		TransitRouteStop fromStop = wrapped.fromNode.stop;
 		
 		double nextDepartureTime = preparedTransitSchedule.getNextDepartureTime(wrapped.getRoute(), fromStop, now);
-		
-		double fromStopArrivalOffset = (fromStop.getArrivalOffset() != Time.UNDEFINED_TIME) ? fromStop.getArrivalOffset() : fromStop.getDepartureOffset();
-		double vehWaitAtStopTime = fromStop.getDepartureOffset() - fromStopArrivalOffset; //time in which the veh stops at station
+
+		double fromStopDepartureOffset = fromStop.getDepartureOffset().seconds();
+		double fromStopArrivalOffset = fromStop.getArrivalOffset().orElse(fromStopDepartureOffset);
+		double vehWaitAtStopTime = fromStopDepartureOffset - fromStopArrivalOffset; //time in which the veh stops at station
 		double vehArrivalTime = nextDepartureTime - vehWaitAtStopTime;
 		cachedVehArrivalTime = vehArrivalTime ;
 		return vehArrivalTime ;		

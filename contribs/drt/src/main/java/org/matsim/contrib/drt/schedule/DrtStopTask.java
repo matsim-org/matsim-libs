@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.schedule;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -27,7 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * A task representing stopping at a bus stop with at least one or more passengers being picked up or dropped off.
@@ -36,17 +40,14 @@ import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTaskImpl implements DrtTask {
+public class DrtStopTask extends StayTask {
+	public static final DrtTaskType TYPE = new DrtTaskType(STOP);
+
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
 	public DrtStopTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
-	}
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.STOP;
+		super(TYPE, beginTime, endTime, link);
 	}
 
 	/**
@@ -72,7 +73,11 @@ public class DrtStopTask extends StayTaskImpl implements DrtTask {
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("dropoffRequests", dropoffRequests)
+				.add("pickupRequests", pickupRequests)
+				.add("super", super.toString())
+				.toString();
 	}
 }

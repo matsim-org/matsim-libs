@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.passenger.PassengerRequests;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
@@ -51,8 +51,9 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, RuleBasedTaxiOptimizerParams params,
 			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry) {
-		this(scheduler, timer, new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility), params,
-				idleTaxiRegistry, unplannedRequestRegistry);
+		this(scheduler, timer,
+				new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime, travelDisutility),
+				params, idleTaxiRegistry, unplannedRequestRegistry);
 	}
 
 	public RuleBasedRequestInserter(TaxiScheduler scheduler, MobsimTimer timer, BestDispatchFinder dispatchFinder,
@@ -89,7 +90,8 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 			case DEMAND_SUPPLY_EQUIL:
 				double now = timer.getTimeOfDay();
-				long awaitingReqCount = unplannedRequests.stream().filter(r -> PassengerRequests.isUrgent(r, now))
+				long awaitingReqCount = unplannedRequests.stream()
+						.filter(r -> ((PassengerRequest)r).getEarliestStartTime() <= now)//urgent requests
 						.count();
 				return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 

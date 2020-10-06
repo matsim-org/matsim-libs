@@ -19,6 +19,14 @@
 
 package org.matsim.facilities;
 
+import static org.matsim.core.config.groups.FacilitiesConfigGroup.FacilitiesSource;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,12 +44,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import org.matsim.core.population.PopulationUtils;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -58,7 +61,8 @@ public final class FacilitiesFromPopulation {
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
-	private boolean oneFacilityPerLink ;
+	private Scenario scenario;
+	private FacilitiesSource facilitiesSource;
 	private String idPrefix = "";
 	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
@@ -79,26 +83,29 @@ public final class FacilitiesFromPopulation {
 		this.removeLinksAndCoordinates = false ;
 //		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
 		this.addEmptyActivityOptions = true ;
-		if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile ) {
-			oneFacilityPerLink = true;
-		} else if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile ) {
-			oneFacilityPerLink = false;
-		} else {
-			throw new RuntimeException( Gbl.INVALID );
-		}
+		this.facilitiesSource = facilityConfigGroup.getFacilitiesSource();
 		this.network = scenario.getNetwork() ;
 		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scenario = scenario;
 	}
-
+	public void setFacilitiesSource( final FacilitiesSource facilitiesSource ) {
+		this.facilitiesSource = facilitiesSource;
+	}
 	/**
 	 * Sets whether all activities on a link should be collected within one ActivityFacility.
 	 * Default is <code>true</code>. If set to <code>false</code>, for each coordinate
 	 * found in the population's activities a separate ActivityFacility will be created.
 	 *
 	 * @param oneFacilityPerLink
+	 *
+	 * @deprecated -- better use {@link #setFacilitiesSource(FacilitiesSource)}
 	 */
 	public void setOneFacilityPerLink(final boolean oneFacilityPerLink) {
-		this.oneFacilityPerLink = oneFacilityPerLink;
+		if ( oneFacilityPerLink ) {
+			this.facilitiesSource = FacilitiesSource.onePerActivityLinkInPlansFile;
+		} else{
+			this.facilitiesSource = FacilitiesSource.onePerActivityLocationInPlansFile;
+		}
 	}
 
 	public void setIdPrefix(final String prefix) {
@@ -160,17 +167,29 @@ public final class FacilitiesFromPopulation {
 						Activity activity = (Activity) pe;
 
 						Coord coord = activity.getCoord();
+						// (may be null, and we are not fixing it at this point)
+
 						Id<Link> linkId = activity.getLinkId();
-						ActivityFacility facility = null;
+						// (may be null, and we are not fixing it at this point)
+
+						Gbl.assertIf( coord!=null || linkId!=null );
+						// (need one of them non-null!)
+
+						ActivityFacility facility ;
 
 						if ( linkId == null ) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
 							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
 						}
+						if ( coord==null ) {
+							coord = PopulationUtils.decideOnCoordForActivity( activity, scenario );
+						}
 
 						Gbl.assertNotNull( linkId );
 
-						if ( this.oneFacilityPerLink ) {
+						if ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFile
+								     || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord==null )
+						) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
 								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
@@ -188,11 +207,14 @@ public final class FacilitiesFromPopulation {
 										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
 									}
 								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
-						} else {
+						} else if ( this.facilitiesSource==FacilitiesSource.onePerActivityLocationInPlansFile
+															      || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord!=null )
+						) {
 							if (coord == null)  {
 								throw new RuntimeException("Coordinate for the activity "+activity+" is null, cannot collect facilities per coordinate. " +
-										"Possibly use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " " +
+										"Possibly use " + FacilitiesSource.onePerActivityLinkInPlansFile + " " +
 													     "instead and collect facilities per link.");
 							}
 
@@ -212,7 +234,13 @@ public final class FacilitiesFromPopulation {
 										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
 									}
 								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
+						} else {
+							throw new RuntimeException( "should never get to this location; either class/method used with invalid" +
+												    " setting of facilitiesSource, or something there is " +
+												    "something that was not understood while implementing " +
+												    "this." );
 						}
 
 						if (this.addEmptyActivityOptions) {
@@ -246,7 +274,8 @@ public final class FacilitiesFromPopulation {
 						log.error("No information for activity type " + actType + " found in given configuration.");
 					}
 				} else {
-					ao.addOpeningTime(new OpeningTimeImpl(params.getOpeningTime(), params.getClosingTime()));
+					ao.addOpeningTime(OpeningTimeImpl.createFromOptionalTimes(params.getOpeningTime(),
+							params.getClosingTime()));
 				}
 			}
 		}
