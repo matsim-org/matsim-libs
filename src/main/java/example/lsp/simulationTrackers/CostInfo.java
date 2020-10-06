@@ -5,13 +5,13 @@ import lsp.functions.LSPInfoFunction;
 
 /*package-private*/ class CostInfo extends LSPInfo {
 
-private CostInfoFunction costFunction;
-	
-	public CostInfo() {
+	private CostInfoFunction costFunction;
+
+	CostInfo() {
 		this.costFunction = new CostInfoFunction();
 	}
-	
-	
+
+
 	@Override
 	public String getName() {
 		return "cost_function";
@@ -36,14 +36,14 @@ private CostInfoFunction costFunction;
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 	@Override
 	public void setName(String name) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

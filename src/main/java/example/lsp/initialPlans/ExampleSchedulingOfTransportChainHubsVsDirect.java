@@ -1,6 +1,8 @@
 package example.lsp.initialPlans;
 
+import example.lsp.simulationTrackers.SimulationTrackersUtils;
 import lsp.*;
+import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -282,11 +284,17 @@ import java.util.Random;
 		depotElement.setNextElement(directDistributionElement);
 		directDistributionElement.setPreviousElement(depotElement);
 
+		//TODO WIP: KostenInfo an das Element dran hängen.
+//		LSPInfo costInfo = SimulationTrackersUtils.createDefaultCostInfo();
+//		SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
+//		directDistributionElement.getInfos().add(costInfo);
+
 		Id<LogisticsSolution> solutionDirectId = Id.create("SolutionDirectId", LogisticsSolution.class);
 		LSPUtils.LogisticsSolutionBuilder completeSolutionDirectBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionDirectId );
 		completeSolutionDirectBuilder.addSolutionElement(depotElement);
 		completeSolutionDirectBuilder.addSolutionElement(directDistributionElement);
 		LogisticsSolution completeSolutionDirect = completeSolutionDirectBuilder.build();
+
 
 		log.info("");
 		log.info("The initial plan of the lsp is generated and the assigner and the solution from above are added");
