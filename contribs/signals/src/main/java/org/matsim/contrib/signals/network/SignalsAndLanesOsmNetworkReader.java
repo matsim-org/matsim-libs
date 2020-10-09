@@ -151,7 +151,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
  		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_09_19";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_10_09";
 // 		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/cottbus2020_09_18";
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -1410,92 +1410,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							signalizedOsmNodes.add(junctionNode.id);
 						}
 					}
-//					TODO sbraun 20200124 try to break here?  28.01.2020 doesnt do anything in Cottbus
-//					if (junctionNode!= null) break;
 				}
 			}
 		}
 	}
 
-//	private void simplifiyRoundaboutSignals() {
-//		for (OsmWay way : this.ways.values()) {
-//			String junction = way.tags.get(TAG_JUNCTION);
-//			if (junction != null && junction.equals("roundabout")) {
-//				for (int i = 1; i < way.nodes.size() - 1; i++) {
-//					OsmNode junctionNode = this.nodes.get(way.nodes.get(i));
-//					OsmNode otherNode = null;
-//					if (signalizedOsmNodes.contains(junctionNode.id))
-//						otherNode = findRoundaboutSignalNode(junctionNode, way, i);
-//					if (otherNode != null) {
-//						signalizedOsmNodes.remove(junctionNode.id);
-//						signalizedOsmNodes.add(otherNode.id);
-//						LOG.info("signal push around roundabout");
-//						roundaboutNodes.put(otherNode.id, otherNode);
-//					}
-//				}
-//			}
-//		}
-//	}
-
-//	// TODO was macht diese methode?? signalNode und index wird gar nicht verwendet
-//	private boolean isInfrontOfRoundabout(OsmNode signalNode, OsmWay way, int index) {
-//		OsmNode endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-//		if (endPoint.ways.size() == 2) { // TODO ist hier > 1 gemeint?
-//			for (OsmWay tempWay : endPoint.ways.values()) {
-//				if (!tempWay.equals(way))
-//					// hier wechseln wir auf einen (den?) anderen way des endPoints -- warum?
-//					way = tempWay;
-//				// TODO das break soll doch bestimmt ins if...
-//				break;
-//			}
-//			// endPoint vom neuen way
-//			endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-//			if (endPoint.ways.size() == 2) // TODO ist hier > 1 gemeint?
-//				// wenn der auch an intersection endet, sind wir aus irgendeinem grund fertig
-//				return false;
-//			else {
-//				if (roundaboutNodes.containsKey(endPoint.id)) {
-//					LOG.info("Roundabout found @ " + endPoint.id);
-//					return true;
-//				}
-//			}
-//		} else {
-//			if (roundaboutNodes.containsKey(endPoint.id)) {
-//				LOG.info("Roundabout found @ " + endPoint.id);
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-	// TODO keine ahnung, warum das hier noetig ist. probiere es deshalb erstmal ohne
-//	private OsmNode findRoundaboutSignalNode(OsmNode junctionNode, OsmWay way, int index) {
-//		OsmNode otherNode = null;
-//		for (int i = index + 1; i < way.nodes.size(); i++) {
-//			otherNode = this.nodes.get(way.nodes.get(i));
-//			if ((otherNode.ways.size() > 1 && !otherNode.endPoint) || (otherNode.ways.size() > 2 && otherNode.endPoint))
-//				return otherNode;
-//		}
-//		// hier wird ein anderer way des endpoints gewaehlt
-//		for (OsmWay tempWay : otherNode.ways.values()) {
-//			if (!tempWay.equals(way))
-//				way = tempWay;
-//			// TODO das break soll doch bestimmt ins if...?!
-//			break;
-//		}
-//		// alle nodes des anderen ways (wenn er auch roundabout ist) werden geprueft...
-//		// TODO wenn er nicht roundabout ist, wird nicht der naechste way gewaehlt sondern einfach aufgehoert
-//		String junction = way.tags.get(TAG_JUNCTION);
-//		if (junction != null && junction.equals("roundabout")) {
-//			for (int i = 0; i < way.nodes.size(); i++) {
-//				otherNode = this.nodes.get(way.nodes.get(i));
-//				if ((otherNode.ways.size() > 1 && !otherNode.endPoint)
-//						|| (otherNode.ways.size() > 2 && otherNode.endPoint))
-//					return otherNode;
-//			}
-//		}
-//		return null;
-//	}
 
 	private void createPlansForFourWayJunction(Node node, SignalSystemData signalSystem,
 			Tuple<LinkVector, LinkVector> firstPair, Tuple<LinkVector, LinkVector> secondPair) {
@@ -1965,9 +1884,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = 4;
 				} else if (directionsPerLane[j].equals("reverse")) {
 					tempDir = 5;
-				} else if (/*directionsPerLane[j].equals("none") ||*/ //29052020 geändert zu geradeausfahren als default
-						directionsPerLane[j].equals("through") /*|| //TODO sbraun07082020 Geradeausfahren als default ist nicht gut siehe Michelangelonstr,
-						directionsPerLane[j].equals("")*/) {
+				} else if (directionsPerLane[j].equals("through")) {
 					tempDir = 0;
 				} else if (directionsPerLane[j].equals("right")) {
 					tempDir = -1;
@@ -1977,7 +1894,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					tempDir = -3;
 				} else if (directionsPerLane[j].equals("merge_to_left")) {
 					tempDir = -5;
-				} else if (directionsPerLane[j].equals(null)) { //TODO Lane wird gelöscht
+				} else if (directionsPerLane[j].equals(null)) {
 					tempDir = null;
 					LOG.warn("Lane-Tag was Null " + directionsPerLane[j] + " -> at link "+id.toString());
 				} else {
@@ -2659,6 +2576,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		return hasOneway;
 	}
 
+
 	private void writeOutLinkInfo(Lane lane, Id<Link> linkId, String dir){
 		if (this.SAVE_TURN_LANES) {
 			if (lane.getAttributes().getAttribute(OSM_TURN_INFO) == null) {
@@ -2671,7 +2589,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 
-	//	//TODO hat er da was geändert von dem Original reader?
 	private final class SignalLanesOsmXmlParser extends OsmXmlParser {
 
 		private OsmRelation currentRelation = null;
