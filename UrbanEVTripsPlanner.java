@@ -109,7 +109,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	@Inject
 	Config config;
 
-
 	private QSim qsim;
 
 	private static final Logger log = Logger.getLogger(UrbanEVTripsPlanner.class);
@@ -164,7 +163,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					.mapToEntry(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())), leg -> leg)
 					.grouping(toList());
 
-			if(vehicleToLegs.size() > 1) throw new RuntimeException("person " + plan.getPerson().getId() + " uses more than one EV. Currently we can not handle that..");
+			if(vehicleToLegs.size() > 1) throw new RuntimeException("person " + plan.getPerson().getId() + " uses more than one EV. Currently we can not handle that.."); //TODO actually should work - test
 			replan(plan, vehicleToLegs.entrySet().stream().findFirst().orElseThrow());
 		}
 	}
@@ -226,8 +225,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Activity actWhileCharging = activityWhileChargingFinder.findActivityWhileChargingBeforeLeg(modifiablePlan, (Leg) modifiablePlan.getPlanElements().get(legIndex));
 
 		Preconditions.checkNotNull(actWhileCharging, "could not insert plugin activity in plan of agent " + plan.getPerson().getId() +
-		"this is probably because it's vehicle is running beyond energy threshold during the first leg of the day." +
-		"this might be avoidable by using EVNetworkRoutingModule...");
+		".\n One reason could be that the agent has no suitable activity prior to the leg for which the " +
+				" energy threshold is expected to be exceeded. \n" +
+				" Another reason  might be that it's vehicle is running beyond energy threshold during the first leg of the day." +
+		"That could possibly be avoided by using EVNetworkRoutingModule..."); //TODO let the sim just run and let the ev run empty!?
 
 		//TODO what if actWhileCharging does not hold a link id?
 		ChargerSpecification selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
@@ -238,14 +239,19 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		Leg nextEVLegAfterCharging = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
 		Activity actAfterCharging = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(nextEVLegAfterCharging));
 
-		{	//some consistency checks.. //TODO put in a JUnit test..
+		{	//some consistency checks.. //TODO consider to put in a JUnit test..
 			Preconditions.checkNotNull(actBeforeCharging, "actBeforeCharging is null. should never happen..");
 			Preconditions.checkState(!actBeforeCharging.equals(actWhileCharging), "actBeforeCharging is equal to actWhileCharging. should never happen..");
-			PlanElement legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(actBeforeCharging) - 1);
+
+			PlanElement legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(actBeforeCharging) + 1);
 			Preconditions.checkState(legToBeReplaced instanceof Leg);
 			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before actWhileCharging has the wrong routing mode. should not happen..");
+
 			Preconditions.checkState(!actAfterCharging.equals(actWhileCharging), "actAfterCharging is equal to actWhileCharging. should never happen..");
-			//TODO check act indices as well
+
+			Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(actBeforeCharging) < modifiablePlan.getPlanElements().indexOf(actWhileCharging));
+			Preconditions.checkState(modifiablePlan.getPlanElements().indexOf(actWhileCharging) < modifiablePlan.getPlanElements().indexOf(actAfterCharging));
+
 			legToBeReplaced = modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(actAfterCharging) - 1);
 			Preconditions.checkState(legToBeReplaced instanceof Leg);
 			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before actAfterCharging has the wrong routing mode. should not happen..");
@@ -367,32 +373,32 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	/**
 	 * this method has the side effect that the soc of the ev is altered by estimated energy consumption of the leg
 	 * @param ev
-	 * @param basicLeg
+	 * @param leg
 	 */
-	private void emulateVehicleDischarging(ElectricVehicle ev, Leg basicLeg) {
+	private void emulateVehicleDischarging(ElectricVehicle ev, Leg leg) {
 		//retrieve mode specific network
-		Network network = this.singleModeNetworksCache.getSingleModeNetworksCache().get(basicLeg.getMode());
+		Network network = this.singleModeNetworksCache.getSingleModeNetworksCache().get(leg.getMode());
 		//retrieve routin mode specific travel time
-		String routingMode = TripStructureUtils.getRoutingMode(basicLeg);
+		String routingMode = TripStructureUtils.getRoutingMode(leg);
 		TravelTime travelTime = this.travelTimes.get(routingMode);
 		if (travelTime == null) {
 			throw new RuntimeException("No TravelTime bound for mode " + routingMode + ".");
 		}
 
 //		Map<Link, Double> consumptions = new LinkedHashMap<>();
-		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
+		NetworkRoute route = (NetworkRoute)leg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
 
 		DriveEnergyConsumption driveEnergyConsumption = ev.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = ev.getAuxEnergyConsumption();
-		double linkEnterTime = basicLeg.getDepartureTime().seconds();
+		double linkEnterTime = leg.getDepartureTime().seconds();
 		for (Link l : links) {
-			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
+			double travelT = travelTime.getLinkTravelTime(l, leg.getDepartureTime().seconds(), null, null);
 
 			double driveConsumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime);
-			double auxConsumption = auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
+			double auxConsumption = auxEnergyConsumption.calcEnergyConsumption(leg.getDepartureTime().seconds(), travelT, l.getId());
 //			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
-//					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
+//					+ auxEnergyConsumption.calcEnergyConsumption(leg.getDepartureTime().seconds(), travelT, l.getId());
 			double consumption = driveConsumption + auxConsumption;
 			ev.getBattery().changeSoc(-consumption);
 			linkEnterTime += travelT;

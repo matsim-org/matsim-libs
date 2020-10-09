@@ -23,6 +23,7 @@ package org.matsim.urbanEV;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -40,6 +41,17 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class UrbanEVModule extends AbstractModule {
+
+	private final ActivityWhileChargingFinder activityWhileChargingFinder;
+
+	public UrbanEVModule(){
+		this.activityWhileChargingFinder = null;
+	}
+
+	UrbanEVModule(ActivityWhileChargingFinder activityWhileChargingFinder) {
+		this.activityWhileChargingFinder = activityWhileChargingFinder;
+	}
+
 	@Override
 	public void install() {
 		//standard EV stuff except for ElectricFleetModule
@@ -85,7 +97,9 @@ public class UrbanEVModule extends AbstractModule {
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
 			}
 		});
-		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(getOpenBerlinActivityTypes()));
+		//TODO find a better solution for this
+		bind(ActivityWhileChargingFinder.class).toInstance(
+				this.activityWhileChargingFinder == null ? new ActivityWhileChargingFinder(new HashSet<>(getConfig().planCalcScore().getActivityTypes())) : this.activityWhileChargingFinder);
 	}
 
 

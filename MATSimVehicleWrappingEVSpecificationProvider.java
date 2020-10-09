@@ -39,6 +39,7 @@ import org.matsim.vehicles.Vehicles;
 import javax.inject.Provider;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricFleetSpecification>, IterationStartsListener {
 
@@ -69,10 +70,11 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 	}
 
 	private void registerEVs(Plan plan){
-		TripStructureUtils.getLegs(plan).stream()
+		Set<Vehicle> vehSet = TripStructureUtils.getLegs(plan).stream()
 				.map(leg -> vehicles.getVehicles().get(VehicleUtils.getVehicleId(plan.getPerson(), leg.getMode())))
 				.filter(vehicle -> VehicleUtils.getHbefaTechnology(vehicle.getType().getEngineInformation()).equals("electricity"))
-				.forEach(vehicle -> wrapEV(vehicle));
+				.collect(Collectors.toSet());
+		vehSet.forEach(vehicle -> wrapEV(vehicle));
 	}
 
 	private void wrapEV(Vehicle vehicle) {
@@ -96,7 +98,6 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 		};
 		this.fleetSpecification.addVehicleSpecification(electricVehicleSpecification);
 	}
-
 
 	static Id<ElectricVehicle> getWrappedElectricVehicleId(Id<Vehicle> vehicleId) { return Id.create(vehicleId, ElectricVehicle.class); }
 
