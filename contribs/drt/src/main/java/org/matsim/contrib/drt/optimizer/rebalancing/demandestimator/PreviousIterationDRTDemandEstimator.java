@@ -35,6 +35,8 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 
+import com.google.common.base.Preconditions;
+
 /**
  * Aggregates PersonDepartureEvents per iteration for the given mode and returns the numbers from the previous iteration
  * as expected demand for the current iteration.
@@ -56,7 +58,7 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
-		timeBinSize = Math.max(drtCfg.getRebalancingParams().get().getInterval(), 1800);
+		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
 	}
 
 	@Override
