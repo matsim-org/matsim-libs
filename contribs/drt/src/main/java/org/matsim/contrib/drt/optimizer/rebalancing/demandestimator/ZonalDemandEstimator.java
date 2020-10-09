@@ -29,7 +29,8 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 
 /**
  * @author jbischoff
+ * @author Michal Maciejewski (michalm)
  */
 public interface ZonalDemandEstimator {
-	ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time);
+	ToDoubleFunction<DrtZone> getExpectedDemand(double fromTime, double estimationPeriod);
 }

@@ -51,14 +51,15 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 	private final String mode;
 	private final String drtSpeedUpMode;
 	private final int timeBinSize;
-	private Map<Double, Map<DrtZone, MutableInt>> currentIterationDepartures = new HashMap<>();
-	private Map<Double, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
+	private Map<Integer, Map<DrtZone, MutableInt>> currentIterationDepartures = new HashMap<>();
+	private Map<Integer, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
 
-	public PreviousIterationDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
+	public PreviousIterationDRTDemandEstimator(DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg,
+			int demandEstimationPeriod) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
 		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
-		timeBinSize = drtCfg.getRebalancingParams().get().getInterval();
+		timeBinSize = demandEstimationPeriod;
 	}
 
 	@Override
@@ -70,8 +71,6 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(mode) || event.getLegMode().equals(drtSpeedUpMode)) {
-			Double bin = getBinForTime(event.getTime());
-
 			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone == null) {
 				//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
@@ -79,7 +78,8 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 				return;
 			}
 
-			currentIterationDepartures.computeIfAbsent(bin, v -> new HashMap<>())
+			int timeBin = getBinForTime(event.getTime());
+			currentIterationDepartures.computeIfAbsent(timeBin, v -> new HashMap<>())
 					.computeIfAbsent(zone, z -> new MutableInt())
 					.increment();
 		}
@@ -87,13 +87,15 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 
 	private static final MutableInt ZERO = new MutableInt(0);
 
-	public ToDoubleFunction<DrtZone> getExpectedDemandForTimeBin(double time) {
-		Double bin = getBinForTime(time);
-		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(bin, Map.of());
+	@Override
+	public ToDoubleFunction<DrtZone> getExpectedDemand(double fromTime, double estimationPeriod) {
+		Preconditions.checkArgument(estimationPeriod == timeBinSize);//TODO add more flexibility later
+		int timeBin = getBinForTime(fromTime);
+		Map<DrtZone, MutableInt> expectedDemandForTimeBin = previousIterationDepartures.getOrDefault(timeBin, Map.of());
 		return zone -> expectedDemandForTimeBin.getOrDefault(zone, ZERO).intValue();
 	}
 
-	private Double getBinForTime(double time) {
-		return Math.floor(time / timeBinSize);
+	private int getBinForTime(double time) {
+		return (int)(time / timeBinSize);
 	}
 }

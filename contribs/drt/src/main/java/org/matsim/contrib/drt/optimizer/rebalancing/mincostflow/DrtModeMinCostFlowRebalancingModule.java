@@ -54,6 +54,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		RebalancingParams params = drtCfg.getRebalancingParams().orElseThrow();
 		MinCostFlowRebalancingStrategyParams strategyParams = (MinCostFlowRebalancingStrategyParams)params.getRebalancingStrategyParams();
 
+		//TODO make demandEstimationPeriod independent of the rebalancing interval
+		int demandEstimationPeriod = params.getInterval();
+
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
@@ -66,14 +69,16 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 					case EstimatedDemand:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new DemandEstimatorAsTargetCalculator(
-										getter.getModal(ZonalDemandEstimator.class)))).asEagerSingleton();
+										getter.getModal(ZonalDemandEstimator.class), demandEstimationPeriod)))
+								.asEagerSingleton();
 						break;
 
 					case EqualRebalancableVehicleDistribution:
 						bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 								getter -> new EqualRebalancableVehicleDistributionTargetCalculator(
 										getter.getModal(ZonalDemandEstimator.class),
-										getter.getModal(DrtZonalSystem.class)))).asEagerSingleton();
+										getter.getModal(DrtZonalSystem.class), demandEstimationPeriod)))
+								.asEagerSingleton();
 						break;
 
 					case EqualVehicleDensity:
@@ -103,8 +108,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 		switch (strategyParams.getZonalDemandEstimatorType()) {
 			case PreviousIterationDemand:
 				bindModal(PreviousIterationDRTDemandEstimator.class).toProvider(modalProvider(
-						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class),
-								drtCfg))).asEagerSingleton();
+						getter -> new PreviousIterationDRTDemandEstimator(getter.getModal(DrtZonalSystem.class), drtCfg,
+								demandEstimationPeriod))).asEagerSingleton();
 				bindModal(ZonalDemandEstimator.class).to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				addEventHandlerBinding().to(modalKey(PreviousIterationDRTDemandEstimator.class));
 				break;
