@@ -61,6 +61,7 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	private InternalInterface internalInterface;
 
+	//could be modified concurrently: on departure and on rejection events
 	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
 
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
@@ -115,6 +116,10 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
 		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
+			//need to synchronise to address cases where requestSubmitted() may:
+			// - be called from outside DepartureHandlers
+			// - interfere with VrpOptimizer.nextTask()
+			// - impact VrpAgentLogic.computeNextAction()
 			synchronized (optimizer) {
 				//optimizer can also reject request if cannot handle it
 				// (async operation, notification comes via the events channel)
