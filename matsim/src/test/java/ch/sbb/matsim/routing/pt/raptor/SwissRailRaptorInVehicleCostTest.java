@@ -1,6 +1,5 @@
 package ch.sbb.matsim.routing.pt.raptor;
 
-import org.apache.commons.lang3.event.EventUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -71,28 +70,39 @@ public class SwissRailRaptorInVehicleCostTest {
 	@Test
 	public void testBaseline_capacityDependentInVehicleCost_indifferent_uses_fastRoute() {
 		Fixture f = new Fixture();
-		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 1.0, 0.75), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.8), f.fastLineId);
 	}
 
 	@Test
 	public void test_capacityDependentInVehicleCost_prefersLowOccupancy_uses_slowRoute() {
 		Fixture f = new Fixture();
-		runTest(f, new CapacityDependentInVehicleCostCalculator(0.65, 0.3, 1.0, 0.75), f.slowLineId);
-		runTest(f, new CapacityDependentInVehicleCostCalculator(0.66, 0.3, 1.0, 0.75), f.fastLineId);
-		runTest(f, new CapacityDependentInVehicleCostCalculator(0.66, 0.3, 1.05, 0.75), f.slowLineId);
-		runTest(f, new CapacityDependentInVehicleCostCalculator(0.8, 0.3, 1.4, 0.75), f.slowLineId);
+
+		// from the note above:
+		// * fastRoute must get (870 + 420)/870 = 1.483 times more expensive. --> costFactor at least 1.49
+		// * slowRoute must get 420/1230 = 0.3414634146 less expensive --> costFactor at most 0.65
+		// from below (fillExecutionTracker):
+		// * dep at 07:00: 20% occupancy on fast line
+		// * dep at 07:10: 80% occupancy on fast line
+		// * dep at 07:20: 80% occupancy on fast line
+		// Use 1 + 0.49*2 as maximum cost factor, as this applies to 100% occupancy, so it still is 1.49 at 80%.
+
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(0.66, 0.2, 0.6, 1.0), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(0.65, 0.2, 0.6, 1.0), f.slowLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2*0.48), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.00, 0.2, 0.6, 1.0 + 2*0.49), f.slowLineId);
 	}
 
 	@Test
 	public void test_capacityDependentInVehicleCost_minorHighOccupancyAvoidance_uses_fastRoute() {
 		Fixture f = new Fixture();
-		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 1.2, 0.75), f.fastLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 1.2), f.fastLineId);
 	}
 
 	@Test
 	public void test_capacityDependentInVehicleCost_majorHighOccupancyAvoidance_uses_slowRoute() {
 		Fixture f = new Fixture();
-		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 1.5, 0.75), f.slowLineId);
+		runTest(f, new CapacityDependentInVehicleCostCalculator(1.0, 0.3, 0.6, 2.0), f.slowLineId);
 	}
 
 	private void runTest(Fixture f, RaptorInVehicleCostCalculator inVehCostCalcualtor, Id<TransitLine> expectedTransitLine) {

@@ -35,8 +35,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoreEventScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
@@ -72,10 +70,10 @@ public class CapacityDependentScoringTest {
 		System.out.println("capacity dependent score: " + capDepScore);
 
 		// in the normal case, it's a 15min trips at full cost, so it should be -6 * (1/4) = -1.5
-		// in the capacity dependent case, the vehicle is empty, thus the cost should only be 0.7 * original cost => -1.05
+		// in the capacity dependent case, the vehicle is empty plus the passenger => occupancy = 0.2, thus the cost should only be 0.8 * original cost => -1.2
 
 		Assert.assertEquals(-1.5, normalScore, 1e-7);
-		Assert.assertEquals(-1.05, capDepScore, 1e-7);
+		Assert.assertEquals(-1.2, capDepScore, 1e-7);
 	}
 
 	private double calcScore(Fixture f, boolean capacityDependent) {
@@ -84,7 +82,7 @@ public class CapacityDependentScoringTest {
 		ScoringParametersForPerson parameters = new SubpopulationScoringParameters(f.scenario);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		RaptorInVehicleCostCalculator inVehicleCostCalculator = capacityDependent ? (new CapacityDependentInVehicleCostCalculator(0.7, 0.3, 1.2, 0.8)) : (new DefaultRaptorInVehicleCostCalculator());
+		RaptorInVehicleCostCalculator inVehicleCostCalculator = capacityDependent ? (new CapacityDependentInVehicleCostCalculator(0.4, 0.3, 0.6, 1.8)) : (new DefaultRaptorInVehicleCostCalculator());
 		OccupancyData occData = new OccupancyData();
 		OccupancyTracker occTracker = new OccupancyTracker(occData, f.scenario, inVehicleCostCalculator, events, parameters);
 
