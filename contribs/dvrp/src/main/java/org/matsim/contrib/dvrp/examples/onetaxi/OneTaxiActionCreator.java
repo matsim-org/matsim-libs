@@ -41,7 +41,7 @@ import com.google.inject.Inject;
 /**
  * @author michalm
  */
-final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
+public final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final PassengerHandler passengerHandler;
 	private final MobsimTimer timer;
 	private final String mobsimMode;
