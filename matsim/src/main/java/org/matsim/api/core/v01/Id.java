@@ -46,7 +46,21 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	private final static ConcurrentMap<Class<?>, ConcurrentMap<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
 	private final static ConcurrentMap<Class<?>, List<Id<?>>> cacheIndex = new ConcurrentHashMap<>();
 
+	/** Resets all internal caches used by this class.
+	 * <em>This method must only be called from JUnit-Tests.</em>
+	 */
 	public static void resetCaches() {
+		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		boolean fromJUnit = false;
+		for (StackTraceElement element : elements) {
+			if (element.getClassName().contains("junit.")) {
+				fromJUnit = true;
+				break;
+			}
+		}
+		if (!fromJUnit) {
+			throw new RuntimeException("This method can only be called from JUnit-Tests, but not in normal code!");
+		}
 		cacheId.clear();
 		cacheIndex.clear();
 	}
