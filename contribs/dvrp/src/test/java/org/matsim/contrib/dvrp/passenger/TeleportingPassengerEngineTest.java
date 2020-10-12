@@ -20,8 +20,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.MODE;
-import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.PERSON_ID;
+import static org.matsim.contrib.dvrp.passenger.PassengerEngineTestFixture.*;
 
 import java.util.Set;
 
@@ -53,42 +52,49 @@ public class TeleportingPassengerEngineTest {
 	private final PassengerEngineTestFixture fixture = new PassengerEngineTestFixture();
 
 	@Test
-	public void test_teleported() {
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, 0);
+	public void test_valid_teleported() {
+		double departureTime = 0;
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
 
+		double travelTime = 999;
+		double travelDistance = 555;
 		TeleportedRouteCalculator teleportedRouteCalculator = request -> {
 			Route route = new GenericRouteImpl(request.getFromLink().getId(), request.getToLink().getId());
-			route.setTravelTime(999);
-			route.setDistance(555);
+			route.setTravelTime(travelTime);
+			route.setDistance(travelDistance);
 			return route;
 		};
 		PassengerRequestValidator requestValidator = request -> Set.of();//valid
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
+		double arrivalTime = departureTime + travelTime;
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
-				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestScheduledEvent(0, MODE, requestId, PERSON_ID, null, 0, 999),
-				new PassengerPickedUpEvent(0, MODE, requestId, PERSON_ID, null),
-				new PassengerDroppedOffEvent(999, MODE, requestId, PERSON_ID, null),
-				new TeleportationArrivalEvent(999, PERSON_ID, 555, MODE),
-				new PersonArrivalEvent(999, PERSON_ID, fixture.linkBA.getId(), MODE),
-				new ActivityStartEvent(999, PERSON_ID, fixture.linkBA.getId(), null, "end"));
+		fixture.assertPassengerEvents(
+				new ActivityEndEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PassengerRequestScheduledEvent(departureTime, MODE, requestId, PERSON_ID, null, departureTime,
+						arrivalTime), new PassengerPickedUpEvent(departureTime, MODE, requestId, PERSON_ID, null),
+				new PassengerDroppedOffEvent(arrivalTime, MODE, requestId, PERSON_ID, null),
+				new TeleportationArrivalEvent(arrivalTime, PERSON_ID, travelDistance, MODE),
+				new PersonArrivalEvent(arrivalTime, PERSON_ID, fixture.linkBA.getId(), MODE),
+				new ActivityStartEvent(arrivalTime, PERSON_ID, fixture.linkBA.getId(), null, END_ACTIVITY));
 	}
 
 	@Test
-	public void test_rejected() {
-		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, 0);
+	public void test_invalid_rejected() {
+		double departureTime = 0;
+		fixture.addPersonWithLeg(fixture.linkAB, fixture.linkBA, departureTime);
 
 		TeleportedRouteCalculator teleportedRouteCalculator = request -> null; // unused
 		PassengerRequestValidator requestValidator = request -> Set.of("invalid");
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
-				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
-				new PassengerRequestRejectedEvent(0, MODE, requestId, PERSON_ID, "invalid"),
-				new PersonStuckEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE));
+		fixture.assertPassengerEvents(
+				new ActivityEndEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), null, START_ACTIVITY),
+				new PersonDepartureEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE),
+				new PassengerRequestRejectedEvent(departureTime, MODE, requestId, PERSON_ID, "invalid"),
+				new PersonStuckEvent(departureTime, PERSON_ID, fixture.linkAB.getId(), MODE));
 	}
 
 	private QSim createQSim(TeleportedRouteCalculator teleportedRouteCalculator,
@@ -98,11 +104,16 @@ public class TeleportingPassengerEngineTest {
 				.addQSimModule(new AbstractDvrpModeQSimModule(MODE) {
 					@Override
 					protected void configureQSim() {
-						bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-						bindModal(PassengerRequestCreator.class).toInstance(fixture.requestCreator);
-						bindModal(TeleportedRouteCalculator.class).toInstance(teleportedRouteCalculator);
-						bindModal(PassengerRequestValidator.class).toInstance(requestValidator);
+						//general
 						bindModal(Network.class).toInstance(fixture.network);
+						bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+
+						//requests
+						bindModal(PassengerRequestCreator.class).toInstance(fixture.requestCreator);
+						bindModal(PassengerRequestValidator.class).toInstance(requestValidator);
+
+						//supply
+						bindModal(TeleportedRouteCalculator.class).toInstance(teleportedRouteCalculator);
 					}
 				})
 				.configureQSimComponents(components -> components.addComponent(DvrpModes.mode(MODE)))
