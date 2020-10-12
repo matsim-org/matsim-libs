@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -61,8 +63,11 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	private InternalInterface internalInterface;
 
-	//could be modified concurrently: on departure and on rejection events
-	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new ConcurrentHashMap<>();
+	//accessed in doSimStep() and handleDeparture() (no need to sync)
+	private final Map<Id<Request>, MobsimPassengerAgent> activePassengers = new HashMap<>();
+
+	//accessed in doSimStep() and handleEvent() (potential data races)
+	private final Queue<PassengerRequestRejectedEvent> rejectedRequestsEvents = new ConcurrentLinkedQueue<>();
 
 	DefaultPassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PassengerRequestCreator requestCreator, VrpOptimizer optimizer, Network network,
@@ -89,6 +94,13 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void doSimStep(double time) {
+		while (!rejectedRequestsEvents.isEmpty()) {
+			MobsimPassengerAgent passenger = activePassengers.remove(rejectedRequestsEvents.poll().getRequestId());
+			//not much else can be done for immediate requests
+			//set the passenger agent to abort - the event will be thrown by the QSim
+			passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
+			internalInterface.arrangeNextAgentState(passenger);
+		}
 	}
 
 	@Override
@@ -151,15 +163,9 @@ public final class DefaultPassengerEngine implements PassengerEngine, PassengerR
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		if (!event.getMode().equals(mode)) {
-			return;
+		if (event.getMode().equals(mode)) {
+			rejectedRequestsEvents.add(event);
 		}
-
-		MobsimPassengerAgent passenger = activePassengers.remove(event.getRequestId());
-		//not much else can be done for immediate requests
-		//set the passenger agent to abort - the event will be thrown by the QSim
-		passenger.setStateToAbort(mobsimTimer.getTimeOfDay());
-		internalInterface.arrangeNextAgentState(passenger);
 	}
 
 	public static Provider<PassengerEngine> createProvider(String mode) {
