@@ -60,8 +60,18 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(DrtConfigGroup.GROUP_NAME)) {
 			return new DrtConfigGroup();
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set type: " + type);
 		}
-		throw new IllegalArgumentException(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof DrtConfigGroup) {
+			super.addParameterSet(set);
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
+		}
 	}
 
 	@Override

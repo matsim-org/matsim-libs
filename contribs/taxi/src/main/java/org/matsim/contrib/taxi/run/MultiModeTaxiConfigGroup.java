@@ -69,8 +69,18 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
 			return taxiConfigGroupSupplier.get();
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set type: " + type);
 		}
-		throw new IllegalArgumentException(type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof TaxiConfigGroup) {
+			super.addParameterSet(set);
+		} else {
+			throw new IllegalArgumentException("Unsupported parameter set class: " + set);
+		}
 	}
 
 	@Override
