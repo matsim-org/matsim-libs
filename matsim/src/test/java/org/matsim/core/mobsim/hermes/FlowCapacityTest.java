@@ -52,7 +52,7 @@ public class FlowCapacityTest {
 
 	@Before
 	public void setup() {
-		Id.flush();
+		Id.resetCaches();
 	}
 
 	/**
