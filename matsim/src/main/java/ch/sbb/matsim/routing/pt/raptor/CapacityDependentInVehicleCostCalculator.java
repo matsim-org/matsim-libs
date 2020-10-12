@@ -5,25 +5,51 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the in-vehicle-cost depending on the occupancy per route section.
- * It supports different cost-factors for low and high occupany, assuming a cost factor of 1.0 for medium occupancy.
+ * It supports increasing costs for high-occupancy trips, and decreasing costs for low-occupancy trips.
+ *
+ * The costs are modified by a occupancy-dependent factor.
+ *
+ * <ul>
+ * 	<li>Between a <em>lower limit</em> and an <em>upper limit</em>, this factor is 1.0.</li>
+ *  <li>The cost factor at 0% occupancy is defined by a <em>minimum factor</em>, and then increases linearly up to a factor of 1.0 at the lower limit.</li>
+ *  <li>beginning at the upper limit with a factor of 1.0, the cost factor increases linearly up to a <em>maximum Factor</em> at 100% occupany.</li>
+ * </ul>
+ *
+ * <pre>
+ *             |
+ *       maxF  |-- - - - - - - - - - - - - - - -  __---+-
+ *             |                              __--     |
+ *             |                          __--         |
+ *        1.0  |-- - - ___-+-------------+             |
+ *             | ___---    |             |             |
+ *       minF  |-          |             |             |
+ *             |           |             |             |
+ *             +-----------+-------------+-------------+---
+ *             0%         ll%           ul%         100%
+ *
+ *    minF: minimum cost factor at 0% occupancy
+ *    maxF: maximum cost factor at 100% occupancy
+ *    ll:   lower limit of occupancy where the cost factor first reaches 1.0
+ *    ul:   upper limit of occupancy where the cost factor last is 1.0
+ * </pre>
  *
  * @author mrieser / Simunto GmbH
  */
 public class CapacityDependentInVehicleCostCalculator implements RaptorInVehicleCostCalculator {
 
-	double lowCapacityCostFactor = 0.9;
-	double lowCapacityLimit = 0.3;
-	double highCapacityCostFactor = 1.1;
-	double highCapacityLimit = 0.7;
+	double minimumCostFactor = 0.4;
+	double lowerCapacityLimit = 0.3;
+	double higherCapacityLimit = 0.6;
+	double maximumCostFactor = 1.8;
 
 	public CapacityDependentInVehicleCostCalculator() {
 	}
 
-	public CapacityDependentInVehicleCostCalculator(double lowCapacityCostFactor, double lowCapacityLimit, double highCapacityCostFactor, double highCapacityLimit) {
-		this.lowCapacityCostFactor = lowCapacityCostFactor;
-		this.lowCapacityLimit = lowCapacityLimit;
-		this.highCapacityCostFactor = highCapacityCostFactor;
-		this.highCapacityLimit = highCapacityLimit;
+	public CapacityDependentInVehicleCostCalculator(double minimumCostFactor, double lowerCapacityLimit, double higherCapacityLimit, double maximumCostFactor) {
+		this.minimumCostFactor = minimumCostFactor;
+		this.lowerCapacityLimit = lowerCapacityLimit;
+		this.higherCapacityLimit = higherCapacityLimit;
+		this.maximumCostFactor = maximumCostFactor;
 	}
 
 	@Override
@@ -42,13 +68,13 @@ public class CapacityDependentInVehicleCostCalculator implements RaptorInVehicle
 			double paxCount = iterator.getPassengerCount();
 			double occupancy = paxCount / relevantCapacity;
 			double baseCost = inVehTime * -marginalUtility_utl_s;
-			double factor = 1;
+			double factor = 1.0;
 
-			if (occupancy < lowCapacityLimit) {
-				factor = lowCapacityCostFactor;
+			if (occupancy < this.lowerCapacityLimit) {
+				factor = this.minimumCostFactor + (1.0 - this.minimumCostFactor) / this.lowerCapacityLimit * occupancy;
 			}
-			if (occupancy > highCapacityLimit) {
-				factor = highCapacityCostFactor;
+			if (occupancy > this.higherCapacityLimit) {
+				factor = 1.0 + (this.maximumCostFactor - 1.0) / (1.0 - this.higherCapacityLimit) * (occupancy - this.higherCapacityLimit);
 			}
 
 			costSum += baseCost * factor;
