@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -160,7 +161,7 @@ public class TeleportingPassengerEngine implements PassengerEngine, VisData {
 	private Route adaptLegRouteForTeleportation(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		Route teleportedRoute = teleportedRouteCalculator.calculateRoute(request);
 
-		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
+		Leg leg = (Leg)WithinDayAgentUtils.getCurrentPlanElement(passenger);//side effect: makes the plan modifiable
 		Route originalRoute = leg.getRoute();
 		Verify.verify(originalRoute.getStartLinkId().equals(teleportedRoute.getStartLinkId()));
 		Verify.verify(originalRoute.getEndLinkId().equals(teleportedRoute.getEndLinkId()));

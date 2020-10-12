@@ -51,7 +51,7 @@ import com.google.inject.Inject;
 /**
  * @author michalm
  */
-final class OneTaxiOptimizer implements VrpOptimizer {
+public final class OneTaxiOptimizer implements VrpOptimizer {
 	enum OneTaxiTaskType implements Task.TaskType {
 		EMPTY_DRIVE, OCCUPIED_DRIVE, PICKUP, DROPOFF, WAIT
 	}
@@ -64,8 +64,8 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	private final DvrpVehicle vehicle;// we have only one vehicle
 
-	private static final double PICKUP_DURATION = 120;
-	private static final double DROPOFF_DURATION = 60;
+	public static final double PICKUP_DURATION = 120;
+	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
 	public OneTaxiOptimizer(EventsManager eventsManager, @DvrpMode(TransportMode.taxi) Network network,
