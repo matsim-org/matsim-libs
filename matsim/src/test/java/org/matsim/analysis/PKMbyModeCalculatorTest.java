@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.stream.Collectors;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -217,9 +216,9 @@ public class PKMbyModeCalculatorTest {
 					Double ptStat = (pt > 0) ? Double.valueOf(column[pt]) : 0;
 					Double walkStat = (walk > 0) ? Double.valueOf(column[walk]) : 0;
 
-					Assert.assertEquals("Car stats score does not match", (totalCar / 1000), carStat, 0);
-					Assert.assertEquals("PT stats score does not match", (totalPt / 1000), ptStat, 0);
-					Assert.assertEquals("Walk stats score does not match", (totalWalk / 1000), walkStat, 0);
+					Assert.assertEquals("Car stats score does not match", Math.round((totalCar / 1000)), carStat, 0);
+					Assert.assertEquals("PT stats score does not match", Math.round((totalPt / 1000)), ptStat, 0);
+					Assert.assertEquals("Walk stats score does not match", Math.round((totalWalk / 1000)), walkStat, 0);
 					break;
 				}
 				iteration++;

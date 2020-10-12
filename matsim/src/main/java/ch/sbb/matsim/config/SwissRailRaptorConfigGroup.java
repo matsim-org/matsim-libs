@@ -11,7 +11,13 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author mrieser / SBB
@@ -32,8 +38,12 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_TRANSFER_PENALTY_MIN = "transferPenaltyMinCost";
     private static final String PARAM_TRANSFER_PENALTY_MAX = "transferPenaltyMaxCost";
     private static final String PARAM_TRANSFER_PENALTY_PERHOUR = "transferPenaltyCostPerTravelTimeHour";
+
     private static final String PARAM_USE_CAPACITY_CONSTRAINTS = "useCapacityConstraints";
     private static final String PARAM_USE_CAPACITY_CONSTRAINTS_DESC = "If true, SwissRailRaptor tries to detect when agents cannot board a vehicle in the previous iteration because it is already full and tries to find an alternative route instead.";
+
+    private static final String PARAM_TRANSFER_WALK_MARGIN = "transferWalkMargin";
+    private static final String PARAM_TRANSFER_WALK_MARGIN_DESC = "time deducted from transfer walk leg during transfers between pt legs in order to avoid missing a vehicle by a few seconds due to delays.";
 
     private boolean useRangeQuery = false;
     private boolean useIntermodality = false;
@@ -45,6 +55,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private double transferPenaltyMinCost = Double.NEGATIVE_INFINITY;
     private double transferPenaltyMaxCost = Double.POSITIVE_INFINITY;
     private double transferPenaltyHourlyCost = 0;
+    private double transferWalkMargin = 5;
 
     private ScoringParameters scoringParameters = ScoringParameters.Default;
 
@@ -85,7 +96,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     public void setUseIntermodalAccessEgress(boolean useIntermodality) {
         this.useIntermodality = useIntermodality;
     }
-    
+
     @StringGetter(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION)
     public IntermodalAccessEgressModeSelection getIntermodalAccessEgressModeSelection() {
         return this.intermodalAccessEgressModeSelection;
@@ -94,6 +105,16 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION)
     public void setIntermodalAccessEgressModeSelection(IntermodalAccessEgressModeSelection intermodalAccessEgressModeSelection) {
         this.intermodalAccessEgressModeSelection = intermodalAccessEgressModeSelection;
+    }
+
+    @StringGetter(PARAM_TRANSFER_WALK_MARGIN)
+    public double getTransferWalkMargin() {
+        return transferWalkMargin;
+    }
+
+    @StringSetter(PARAM_TRANSFER_WALK_MARGIN)
+    public void setTransferWalkMargin(double transferWalkMargin) {
+        this.transferWalkMargin = transferWalkMargin;
     }
 
     @StringGetter(PARAM_USE_MODE_MAPPING)
@@ -574,6 +595,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         Map<String, String> comments = super.getComments();
         comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
         comments.put(PARAM_USE_CAPACITY_CONSTRAINTS, PARAM_USE_CAPACITY_CONSTRAINTS_DESC);
+        comments.put(PARAM_TRANSFER_WALK_MARGIN, PARAM_TRANSFER_WALK_MARGIN_DESC);
         return comments;
     }
 

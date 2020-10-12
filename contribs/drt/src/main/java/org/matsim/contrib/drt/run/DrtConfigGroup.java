@@ -35,20 +35,23 @@ import javax.validation.constraints.PositiveOrZero;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
-public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
@@ -208,11 +211,43 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@NotNull
 	private DrtInsertionSearchParams drtInsertionSearchParams;
 
+	@Nullable
+	private DrtZonalSystemParams zonalSystemParams;
+
+	@Nullable
+	private RebalancingParams rebalancingParams;
+
+	@Nullable
+	private DrtFareParams drtFareParams;
+
 	@NotNull
 	private String drtSpeedUpMode = "";
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
+		initSingletonParameterSets();
+	}
+
+	private void initSingletonParameterSets() {
+		//rebalancing (optional)
+		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
+				params -> rebalancingParams = (RebalancingParams)params);
+
+		//zonal system (optional)
+		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
+				params -> zonalSystemParams = (DrtZonalSystemParams)params);
+
+		//insertion search params (one of: extensive, selective)
+		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (ExtensiveInsertionSearchParams)params);
+		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+
+		//drt fare
+		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
+				params -> drtFareParams = (DrtFareParams)params);
 	}
 
 	@Override
@@ -259,8 +294,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " in order to speed up the DRT route update during the replanning phase.");
 		}
 
-		Verify.verify(getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() <= 1,
-				"More then one rebalancing parameter sets is specified");
+		Verify.verify(getParameterSets(MinCostFlowRebalancingStrategyParams.SET_NAME).size() <= 1,
+				"More than one rebalancing parameter sets is specified");
 
 		if (useModeFilteredSubnetwork) {
 			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
@@ -640,51 +675,15 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return drtInsertionSearchParams;
 	}
 
-	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
-		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
-		if (parameterSets.size() > 1) {
-			throw new RuntimeException("More then one rebalancing parameter sets is specified");
-		}
-		return parameterSets.isEmpty() ?
-				Optional.empty() :
-				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
+	public Optional<DrtZonalSystemParams> getZonalSystemParams() {
+		return Optional.ofNullable(zonalSystemParams);
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case MinCostFlowRebalancingParams.SET_NAME:
-				return new MinCostFlowRebalancingParams();
-
-			case ExtensiveInsertionSearchParams.SET_NAME:
-				return new ExtensiveInsertionSearchParams();
-
-			case SelectiveInsertionSearchParams.SET_NAME:
-				return new SelectiveInsertionSearchParams();
-		}
-
-		return super.createParameterSet(type);
+	public Optional<RebalancingParams> getRebalancingParams() {
+		return Optional.ofNullable(rebalancingParams);
 	}
 
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		if (set instanceof DrtInsertionSearchParams) {
-			Preconditions.checkState(drtInsertionSearchParams == null,
-					"Remove the existing drtRequestInsertionParams before adding a new one");
-			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
-		}
-
-		super.addParameterSet(set);
-	}
-
-	@Override
-	public boolean removeParameterSet(ConfigGroup set) {
-		if (set instanceof DrtInsertionSearchParams) {
-			Preconditions.checkState(drtInsertionSearchParams != null,
-					"The existing drtRequestInsertionParams is null. Cannot remove it.");
-			drtInsertionSearchParams = null;
-		}
-
-		return super.removeParameterSet(set);
+	public Optional<DrtFareParams> getDrtFareParams() {
+		return Optional.ofNullable(drtFareParams);
 	}
 }

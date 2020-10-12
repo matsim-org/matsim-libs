@@ -5,6 +5,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
+import static org.matsim.contrib.noise.RLS90VehicleType.*;
+
 class NoiseTollCalculator implements TravelDisutility {
 
     private final NoiseContext noiseContext;
@@ -43,12 +45,12 @@ class NoiseTollCalculator implements TravelDisutility {
 
             if (isHGV) {
 
-                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
-                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerHgv();
+                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
+                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(hgv);
 
-                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
+                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
-                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerHgv();
+                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(hgv);
 
                 } else {
                     throw new RuntimeException("Unknown noise allocation approach. Aborting...");
@@ -56,12 +58,12 @@ class NoiseTollCalculator implements TravelDisutility {
 
             } else {
 
-                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
-                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerCar();
+                if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
+                    linkExpectedToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getAverageDamageCostPerVehicle(car);
 
-                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
+                } else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
                     linkExpectedToll =
-                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerCar();
+                                    this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get( link.getId() ).getMarginalDamageCostPerVehicle(car);
 
                 } else {
                     throw new RuntimeException("Unknown noise allocation approach. Aborting...");

@@ -71,8 +71,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	public enum AccessEgressType {@Deprecated none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant}
 
-	private static final String ISINSERTINGACCESSEGRESSWALK = "insertAccessEgressWalk";
-	private static final String ISINSERTINGACCESSEGRESSWALKCMT = "Inserts access and Egress walk legs to main mode routes. Either of [none, walkToLink, constantTimeToLink, walkToLinkPlusConstant], Current default=none ";
+	private static final String ACCESSEGRESSTYPE = "accessEgressType";
+	private static final String ACCESSEGRESSTYPE_CMT = "Defines how access and egress to main mode is simulated. Either of [none, accessEgressModeToLink, walkConstantTimeToLink, accessEgressModeToLinkPlusTimeConstant], Current default=none which means no access or egress trips are simulated.";
 	private AccessEgressType accessEgressType = AccessEgressType.none;
 
 	// ---
@@ -475,7 +475,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
 		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
-		map.put(ISINSERTINGACCESSEGRESSWALK,ISINSERTINGACCESSEGRESSWALKCMT);
+		map.put(ACCESSEGRESSTYPE, ACCESSEGRESSTYPE_CMT);
 		return map;
 	}
 
@@ -560,12 +560,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 
 
-	@StringGetter(ISINSERTINGACCESSEGRESSWALK)
+	@StringGetter(ACCESSEGRESSTYPE)
 	public AccessEgressType getAccessEgressType() {
 		return this.accessEgressType;
 	}
 
-	@StringSetter(ISINSERTINGACCESSEGRESSWALK)
+	@StringSetter(ACCESSEGRESSTYPE)
 	public void setAccessEgressType(AccessEgressType accessEgressType) {
 		this.accessEgressType = accessEgressType;
 	}

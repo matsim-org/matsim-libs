@@ -52,6 +52,7 @@ import javax.management.InvalidAttributeValueException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  *
@@ -76,10 +77,9 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 * Option 1: Tour is possible with the vehicle with the small battery and the
 	 * vehicle with the small battery is cheaper
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 	@Test
-	public final void CarrierSmallBatteryTest_Version1() throws InvalidAttributeValueException {
+	public final void CarrierSmallBatteryTest_Version1() throws ExecutionException, InterruptedException {
 
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
@@ -151,10 +151,9 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 * Option 2: Tour is not possible with the vehicle with the small battery. Thats
 	 * why one vehicle with a large battery is used.
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 	@Test
-	public final void CarrierLargeBatteryTest_Version2() throws InvalidAttributeValueException {
+	public final void CarrierLargeBatteryTest_Version2() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -227,11 +226,10 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 * Option 3: costs for using one long range vehicle are higher than the costs of
 	 * using two short range truck
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void Carrier2SmallBatteryTest_Version3() throws InvalidAttributeValueException {
+	public final void Carrier2SmallBatteryTest_Version3() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);
@@ -309,11 +307,10 @@ public class DistanceConstraintFromVehiclesFileTest {
 	 * Therefore one diesel vehicle must be used and one vehicle with a small
 	 * battery.
 	 *
-	 * @throws InvalidAttributeValueException
 	 */
 
 	@Test
-	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws InvalidAttributeValueException {
+	public final void CarrierWithAdditionalDieselVehicleTest_Version4() throws ExecutionException, InterruptedException {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		prepareConfig(config);

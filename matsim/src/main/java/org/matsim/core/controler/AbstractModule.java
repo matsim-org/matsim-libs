@@ -38,6 +38,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -80,7 +81,15 @@ public abstract class AbstractModule implements Module {
 	private Binder binder;
 	private Multibinder<EventHandler> eventHandlerMultibinder;
 	private Multibinder<ControlerListener> controlerListenerMultibinder;
+
+	/**
+	 * Contents retrieved (I think) by injected method QSim#addQueueSimulationListeners(...).  Is not public, and therefore cannot be referenced from here.
+	 * <br/>
+	 * I think that that method will be called every time the mobsim will be constructed.  If the injected classes are singletons, they will
+	 * presumably be re-used, otherwise they will be newly constructed.
+	 */
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
+
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
 	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
@@ -105,6 +114,7 @@ public abstract class AbstractModule implements Module {
 		// Guice error messages should give the code location of the error in the user's module,
 		// not in this class.
 		this.binder = binder.skipSources(AbstractModule.class);
+
 		this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
 		this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
 		this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);

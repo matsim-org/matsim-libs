@@ -21,6 +21,7 @@
 package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import javax.validation.Valid;
 
@@ -47,8 +48,15 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
 
+	private final Supplier<TaxiConfigGroup> taxiConfigGroupSupplier;
+
 	public MultiModeTaxiConfigGroup() {
+		this(TaxiConfigGroup::new);
+	}
+
+	public MultiModeTaxiConfigGroup(Supplier<TaxiConfigGroup> taxiConfigGroupSupplier) {
 		super(GROUP_NAME);
+		this.taxiConfigGroupSupplier = taxiConfigGroupSupplier;
 	}
 
 	@Override
@@ -62,7 +70,7 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(TaxiConfigGroup.GROUP_NAME)) {
-			return new TaxiConfigGroup();
+			return taxiConfigGroupSupplier.get();
 		}
 		throw new IllegalArgumentException(type);
 	}

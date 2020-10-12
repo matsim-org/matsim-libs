@@ -21,27 +21,17 @@ package org.matsim.contrib.av.robotaxi.run;
 
 import java.net.URL;
 
-import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareModule;
-import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFaresConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiControlerCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunRobotaxiExample {
-
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new TaxiFaresConfigGroup(),
-				new OTFVisConfigGroup(), new MultiModeTaxiConfigGroup());
-		createControler(config, otfvis).run();
-	}
-
-	public static Controler createControler(Config config, boolean otfvis) {
-		Controler controler = TaxiControlerCreator.createControler(config, otfvis);
-		controler.addOverridingModule(new TaxiFareModule());
-		return controler;
+		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup(),
+				new MultiModeTaxiConfigGroup());
+		TaxiControlerCreator.createControler(config, otfvis).run();
 	}
 }

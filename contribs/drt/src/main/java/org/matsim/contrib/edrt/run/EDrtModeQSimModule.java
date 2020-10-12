@@ -35,7 +35,6 @@ import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -43,8 +42,8 @@ import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
+import org.matsim.contrib.dvrp.passenger.PassengerHandler;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -59,6 +58,7 @@ import org.matsim.contrib.edrt.EDrtActionCreator;
 import org.matsim.contrib.edrt.optimizer.EDrtOptimizer;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.edrt.optimizer.depot.NearestChargerAsDepot;
+import org.matsim.contrib.edrt.schedule.EDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
@@ -173,10 +173,10 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(ScheduleTimingUpdater.class).toProvider(modalProvider(
 				getter -> new ScheduleTimingUpdater(getter.get(MobsimTimer.class),
-						new DrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
+						new EDrtStayTaskEndTimeCalculator(drtCfg)))).asEagerSingleton();
 
 		bindModal(VrpAgentLogic.DynActionCreator.class).
-				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerEngine.class),
+				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class),
 						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
 

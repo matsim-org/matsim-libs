@@ -11,36 +11,11 @@
 
 	<properties>
 		<matsim.version>13.0-SNAPSHOT</matsim.version>
+		<jsprit.version>1.8</jsprit.version>
 	</properties>
 
 	<build>
 		<plugins>
-			<!--<plugin>-->
-			<!--<groupId>org.apache.maven.plugins</groupId>-->
-			<!--<artifactId>maven-javadoc-plugin</artifactId>-->
-			<!--<version>2.7</version>-->
-			<!--<executions>-->
-			<!--<execution>-->
-			<!--<id>attach-javadoc</id>-->
-			<!--<goals>-->
-			<!--<goal>jar</goal>-->
-			<!--</goals>-->
-			<!--</execution>-->
-			<!--</executions>-->
-			<!--</plugin>-->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 			</plugin>
@@ -75,13 +50,13 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-core</artifactId>
-			<version>1.7.2</version>
+			<version>${jsprit.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-io</artifactId>
-			<version>1.7.2</version>
+			<version>${jsprit.version}</version>
 			<exclusions>
 				<!-- needed to compile in IntelliJ with Eclipse compiler -->
 				<!-- see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=536928 -->
@@ -95,7 +70,7 @@
 		<dependency>
 			<groupId>com.graphhopper</groupId>
 			<artifactId>jsprit-analysis</artifactId>
-			<version>1.7.2</version>
+			<version>${jsprit.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.jfree</groupId>

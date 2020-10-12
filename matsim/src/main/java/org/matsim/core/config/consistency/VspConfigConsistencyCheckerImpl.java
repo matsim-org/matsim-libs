@@ -244,7 +244,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// added feb'16
 		if ( config.plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
-			log.log( lvl, "found `plansCalcRoute.insertingAccessEgressWalk==false'; vsp should use `true' or talk to Kai. " ) ;
+			log.log( lvl, "found `PlansCalcRouteConfigGroup.AccessEgressType.none'; vsp should use `accessEgressModeToLink' or some other value or talk to Kai." ) ;
 		}
 		
 		// === qsim:

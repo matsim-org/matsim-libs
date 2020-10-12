@@ -6,6 +6,12 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -16,13 +22,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Provides public transport route search capabilities using an implementation of the
@@ -106,8 +105,8 @@ public class SwissRailRaptor implements TransitRouter {
         if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
-        
-        List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute);
+
+		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         return legs;
     }
     
@@ -167,7 +166,7 @@ public class SwissRailRaptor implements TransitRouter {
         if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
-        List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute);
+		List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute, this.data.config.getTransferWalkMargin());
         // TODO adapt the activity end time of the activity right before this trip
         /* Sadly, it's not that easy to find the previous activity, as we only have from- and to-facility
          * and the departure time. One would have to search through the person's selectedPlan to find

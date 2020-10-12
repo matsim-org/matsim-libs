@@ -34,6 +34,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
+import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -67,6 +69,7 @@ public class TripsAndLegsCSVWriterTest {
 	private static int trav_time;
 	private static int traveled_distance;
 	private static int euclidean_distance;
+	private static int main_mode;
 	private static int longest_distance_mode;
 	private static int modes;
 	private static int start_activity_type;
@@ -137,33 +140,39 @@ public class TripsAndLegsCSVWriterTest {
 		map.put(person3, plan3);
 		map.put(person4, plan4);
 		map.put(person5, plan5);
-		
-		performTest(utils.getOutputDirectory() + "/trip.csv", utils.getOutputDirectory() + "/leg.csv", map);
+
+		createNetwork();
+
+		//Test with useful AnalysisMainModeIdentifier
+		performTest(utils.getOutputDirectory() + "/trip.csv",
+				utils.getOutputDirectory() + "/leg.csv", map, new TransportPlanningMainModeIdentifier());
+
+		//Test it does not crash with ill-suited AnalysisMainModeIdentifier
+		performTest(utils.getOutputDirectory() + "/trip.csv",
+				utils.getOutputDirectory() + "/leg.csv", map, new RoutingModeMainModeIdentifier());
 	}
 	
-	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map) {
-
+	private void performTest(String tripsFilename, String legsFilename, IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
 		TripsAndLegsCSVWriter.NoTripWriterExtension tripsWriterExtension = new NoTripWriterExtension();
 		TripsAndLegsCSVWriter.NoLegsWriterExtension legWriterExtension = new NoLegsWriterExtension();
 		TripsAndLegsCSVWriter.CustomTripsWriterExtension customTripsWriterExtension = new CustomTripsWriterExtesion();
 		TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension = new CustomLegsWriterExtesion();
-		createNetwork();
 		TripsAndLegsCSVWriter tripsAndLegsWriter = new TripsAndLegsCSVWriter(scenario, tripsWriterExtension,
-				legWriterExtension);
+				legWriterExtension, mainModeIdentifier);
 		tripsAndLegsWriter.write(map, tripsFilename, legsFilename);
-		readTripsFromPlansFile(map);
+		readTripsFromPlansFile(map, mainModeIdentifier);
 		readAndValidateTrips(persontrips, tripsFilename);
 		readLegsFromPlansFile(map);
 		readAndValidateLegs(legsfromplan, legsFilename);
 		TripsAndLegsCSVWriter tripsAndLegsWriterTest = new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension,
-				customLegsWriterExtension);
+				customLegsWriterExtension, mainModeIdentifier);
 		tripsAndLegsWriterTest.write(map, tripsFilename, legsFilename);
 	}
 	
 	/***********************************************************
 	 * Reading all the trips from the plans file.
 	 ***********************************************************/
-	private void readTripsFromPlansFile(IdMap<Person, Plan> map) {	
+	private void readTripsFromPlansFile(IdMap<Person, Plan> map, AnalysisMainModeIdentifier mainModeIdentifier) {
 		//double trav_time = 0;
 		
 		for (Map.Entry<Id<Person>, Plan> entry : map.entrySet()) {
@@ -234,6 +243,10 @@ public class TripsAndLegsCSVWriterTest {
 				        last_pt_egress_stop = route.getEgressStopId().toString();
 					}
 				}
+
+				String mainMode = mainModeIdentifier.getClass().equals(RoutingModeMainModeIdentifier.class) ?
+						"" : mainModeIdentifier.identifyMainMode(trip.getTripElements());
+
 				Set<String> keyset = modeDistance.keySet();
 				Iterator<String> keysetitr = keyset.iterator();
 				String longest_distance_mode="";
@@ -278,6 +291,7 @@ public class TripsAndLegsCSVWriterTest {
 				tripvalues.put("traveled_distance", traveled_distance);
 				tripvalues.put("modes", modestrim);
 				tripvalues.put("waiting_time", Time.writeTime(waiting_time));
+				tripvalues.put("main_mode", mainMode);
 				tripvalues.put("longest_distance_mode", longest_distance_mode);
 				tripvalues.put("first_pt_boarding_stop", first_pt_boarding_stop);
 				tripvalues.put("last_pt_egress_stop", last_pt_egress_stop);
@@ -439,6 +453,8 @@ public class TripsAndLegsCSVWriterTest {
 						column[traveled_distance]);
 				Assert.assertEquals("Euclidean distance is not as expected", tripvalues.get("euclideanDistance"),
 						Integer.parseInt(column[euclidean_distance]));
+				Assert.assertEquals("Main mode is not as expected",
+						tripvalues.get("main_mode"), column[main_mode]);
 				Assert.assertEquals("Longest distance mode is not as expected",
 						tripvalues.get("longest_distance_mode"), column[longest_distance_mode]);
 				Assert.assertEquals("Modes is not as expected", String.valueOf(tripvalues.get("modes")), column[modes]);
@@ -460,11 +476,11 @@ public class TripsAndLegsCSVWriterTest {
 				Assert.assertEquals("person is not as expected", String.valueOf(tripvalues.get("person")), column[person]);
 				Assert.assertEquals("trip_number is not as expected", String.valueOf(tripvalues.get("trip_number")), column[trip_number]);
 				Assert.assertEquals("trip_id is not as expected", String.valueOf(tripvalues.get("trip_id")), column[trip_id]);
-				if(column.length > 20) {
+				if(column.length > 21) {
 					Assert.assertEquals("first_pt_boarding_stop is not as expected", String.valueOf(tripvalues.get("first_pt_boarding_stop")), column[first_pt_boarding_stop]);
 					Assert.assertEquals("last_pt_egress_stop is not as expected", String.valueOf(tripvalues.get("last_pt_egress_stop")), column[last_pt_egress_stop]);
 				}
-				if(column.length > 22) {
+				if(column.length > 23) {
 					Assert.assertEquals("transitStopsVisited is not as expected", String.valueOf(tripvalues.get("transitStopsVisited")), column[transitStopsVisited]);
 				}
 			}
@@ -496,6 +512,10 @@ public class TripsAndLegsCSVWriterTest {
 
 			case "euclidean_distance":
 				euclidean_distance = i;
+				break;
+
+			case "main_mode":
+				main_mode = i;
 				break;
 
 			case "longest_distance_mode":

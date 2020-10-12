@@ -22,22 +22,20 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import java.util.*;
+
 /**
  * 
  * Extends the basic information of a receiver point towards data required for the computation of noise.
  * 
- * @author ikaddoura
+ * @author ikaddoura, nkuehnel
  *
  */
 public class NoiseReceiverPoint extends ReceiverPoint {
@@ -45,7 +43,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	public NoiseReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
 		super(id, coord);
 	}
-
 
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = null;//new HashMap<>(0);
 
@@ -55,13 +52,13 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	 */
 	private boolean initialized = false;
 
-	// initialization
-	private Map<Id<Link>, Double> linkId2distanceCorrection = null;//new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2angleCorrection = null;//new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2ShieldingCorrection = null;
+	private TObjectDoubleMap<Id<Link>> linkId2Correction = null;
+	private TObjectDoubleMap<Id<Link>> linkId2IsolatedImmission = null;
 
 	// time-specific information
-	private double currentImmission = 0.;
+	private double currentImmission = 0;
+	private Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> linkId2IsolatedImmissionPlusOneVehicle = null;
+
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
@@ -89,49 +86,36 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		}
 		infos.add(info);
 	}
-	
-	Map<Id<Link>, Double> getLinkId2distanceCorrection() {
-		if(linkId2distanceCorrection == null) {
-			linkId2distanceCorrection = new HashMap<>();
+
+	Collection<Id<Link>> getRelevantLinks() {
+		if(linkId2Correction == null) {
+			return Collections.emptySet();
+		} else {
+			return linkId2Correction.keySet();
 		}
-		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	synchronized void setLinkId2distanceCorrection(Id<Link> linkId, Double distanceCorrection) {
-		if(linkId2distanceCorrection == null) {
-			linkId2distanceCorrection = new HashMap<>();
+	synchronized void setLinkId2Correction(Id<Link> linkId, double correction) {
+		if(linkId2Correction== null) {
+			linkId2Correction = new TObjectDoubleHashMap<>();
 		}
-		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
+		this.linkId2Correction.put(linkId, correction);
 	}
 
-	Map<Id<Link>, Double> getLinkId2angleCorrection() {
-		if(linkId2angleCorrection== null) {
-			linkId2angleCorrection = new HashMap<>();
+	double getLinkCorrection(Id<Link> linkId) {
+		if(linkId2Correction == null) {
+			return 0;
 		}
-		return Collections.unmodifiableMap(linkId2angleCorrection);
+		if(linkId2Correction.containsKey(linkId)) {
+			return linkId2Correction.get(linkId);
+		} else {
+			return 0;
+		}
 	}
 
-	synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
-		if(linkId2angleCorrection== null) {
-			linkId2angleCorrection = new HashMap<>();
-		}
-		this.linkId2angleCorrection.put(linkId, angleCorrection);
-	}
-
-	synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
-		if(linkId2ShieldingCorrection== null) {
-			linkId2ShieldingCorrection = new HashMap<>();
-		}
-		this.linkId2ShieldingCorrection.put(linkId, shieldingCorrection);
-	}
-
-	Map<Id<Link>, Double> getLinkId2ShieldingCorrection() {
-		if(linkId2ShieldingCorrection == null) {
-			linkId2ShieldingCorrection = new HashMap<>();
-		}
-		return Collections.unmodifiableMap(linkId2ShieldingCorrection);
-	}
-
+	/**
+	 * deliberately public for outside access
+	 */
 	public double getCurrentImmission() {
 		return currentImmission;
 	}
@@ -188,8 +172,8 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	@Override
 	public String toString() {
 		return "NoiseReceiverPoint [personId2actInfos=" + personId2actInfos
-				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
-				+ ", linkId2angleCorrection=" + linkId2angleCorrection
+//				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
+//				+ ", linkId2angleCorrection=" + linkId2angleCorrection
 //				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
 //				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
 //				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
@@ -202,22 +186,26 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
+		this.currentImmission = 0;
+		this.linkId2IsolatedImmission = null;
+		this.linkId2IsolatedImmissionPlusOneVehicle = null;
 		aggregatedImmissionTermLden = 0;
 		aggregatedImmissionTerm69 = 0;
 		aggregatedImmissionTerm1619 = 0;
 	}
 	
 	void resetTimeInterval() {
-//		linkId2IsolatedImmission.clear();
-		currentImmission = 0;
+		this.currentImmission = 0;
+		this.linkId2IsolatedImmission = null;
+		this.linkId2IsolatedImmissionPlusOneVehicle = null;
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
 		this.setDamageCostsPerAffectedAgentUnit(0.);
 	}
 
 	/**
-	 * @return the German L_DEN, where "L" stands for "Laerm" (=noise), and DEN for  DayEveningNight.  It is some weighted average according to the German
-	 * norm.
+	 * @return the L_DEN (day (D) - evening (E) - night (N) level (L).
+	 * A weighted average with added penalties for night and evening noise levels.
 	 */
 	public double getLden() {
 		return 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
@@ -237,5 +225,21 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 
 	boolean isInitialized() {
 		return initialized;
+	}
+
+	void setLinkId2IsolatedImmissionPlusOneVehicle(Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> linkId2IsolatedImmissionPlusOneVehicle) {
+		this.linkId2IsolatedImmissionPlusOneVehicle = linkId2IsolatedImmissionPlusOneVehicle;
+	}
+
+	void setLinkId2IsolatedImmission(TObjectDoubleMap<Id<Link>> linkId2IsolatedImmission) {
+		this.linkId2IsolatedImmission = linkId2IsolatedImmission;
+	}
+
+	Map<? extends NoiseVehicleType, TObjectDoubleMap<Id<Link>>> getLinkId2IsolatedImmissionPlusOneVehicle() {
+		return linkId2IsolatedImmissionPlusOneVehicle;
+	}
+
+	TObjectDoubleMap<Id<Link>> getLinkId2IsolatedImmission() {
+		return linkId2IsolatedImmission;
 	}
 }
