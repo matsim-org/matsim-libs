@@ -66,7 +66,7 @@ public class TeleportingPassengerEngineTest {
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
+		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
 				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
 				new PassengerRequestScheduledEvent(0, MODE, requestId, PERSON_ID, null, 0, 999),
 				new PassengerPickedUpEvent(0, MODE, requestId, PERSON_ID, null),
@@ -85,7 +85,7 @@ public class TeleportingPassengerEngineTest {
 		createQSim(teleportedRouteCalculator, requestValidator).run();
 
 		var requestId = Id.create("taxi_0", Request.class);
-		fixture.assertEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
+		fixture.assertPassengerEvents(new ActivityEndEvent(0, PERSON_ID, fixture.linkAB.getId(), null, "start"),
 				new PersonDepartureEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE),
 				new PassengerRequestRejectedEvent(0, MODE, requestId, PERSON_ID, "invalid"),
 				new PersonStuckEvent(0, PERSON_ID, fixture.linkAB.getId(), MODE));

@@ -21,7 +21,9 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,12 +42,14 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiRequest.OneTaxiRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.mockito.ArgumentCaptor;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -66,9 +70,15 @@ public class PassengerEngineTestFixture {
 	final Link linkBA = NetworkUtils.createAndAddLink(network, Id.createLinkId("BA"), nodeB, nodeA, 150, 15, 20, 1);
 
 	final Scenario scenario = new ScenarioUtils.ScenarioBuilder(config).setNetwork(network).build();
-	final EventsManager eventsManager = mock(EventsManager.class);
+	final EventsManager eventsManager = new EventsManagerImpl();
+	final List<Event> recordedEvents = new ArrayList<>();
 
 	final PassengerRequestCreator requestCreator = new OneTaxiRequestCreator();
+
+	public PassengerEngineTestFixture() {
+		eventsManager.addHandler((BasicEventHandler)recordedEvents::add);
+		eventsManager.initProcessing();
+	}
 
 	void addPersonWithLeg(Link fromLink, Link toLink, double departureTime) {
 		PopulationFactory factory = scenario.getPopulation().getFactory();
@@ -92,9 +102,10 @@ public class PassengerEngineTestFixture {
 		scenario.getPopulation().addPerson(person);
 	}
 
-	void assertEvents(Event... events) {
-		ArgumentCaptor<Event> captor = ArgumentCaptor.forClass(Event.class);
-		verify(eventsManager, times(events.length)).processEvent(captor.capture());
-		assertThat(captor.getAllValues()).usingFieldByFieldElementComparator().containsExactly(events);
+	void assertPassengerEvents(Event... events) {
+		assertThat(recordedEvents.size()).isGreaterThanOrEqualTo(events.length);
+		var recordedPassengerEvents = recordedEvents.stream()
+				.filter(e -> e instanceof HasPersonId && ((HasPersonId)e).getPersonId().equals(PERSON_ID));
+		assertThat(recordedPassengerEvents).usingFieldByFieldElementComparator().containsExactly(events);
 	}
 }
