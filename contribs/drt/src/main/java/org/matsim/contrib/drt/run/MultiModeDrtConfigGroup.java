@@ -22,8 +22,6 @@ package org.matsim.contrib.drt.run;
 
 import java.util.Collection;
 
-import javax.validation.Valid;
-
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
@@ -68,7 +66,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<@Valid DrtConfigGroup> getModalElements() {
+	public Collection<DrtConfigGroup> getModalElements() {
 		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 }

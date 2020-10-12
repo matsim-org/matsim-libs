@@ -23,8 +23,6 @@ package org.matsim.contrib.taxi.run;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-import javax.validation.Valid;
-
 import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
@@ -77,7 +75,7 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<@Valid TaxiConfigGroup> getModalElements() {
+	public Collection<TaxiConfigGroup> getModalElements() {
 		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }
