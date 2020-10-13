@@ -189,9 +189,6 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 			double waitTime = pickupTime - sequence.getSubmitted().getTime();
 			double rideTime = sequence.getDroppedOff().get().getTime() - pickupTime;
 
-			//TODO do we need these checks?
-			Preconditions.checkState(rideTime > 0);
-			Preconditions.checkState(beelineDistance > 0);
 			//TODO I would map unshared_ride_time to rideTime -- should be more precise
 			meanInVehicleBeelineSpeed.increment(beelineDistance / rideTime);
 			meanWaitTime.increment(waitTime);
