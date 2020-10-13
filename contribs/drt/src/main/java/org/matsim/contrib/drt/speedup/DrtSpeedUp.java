@@ -31,15 +31,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.utils.collections.Tuple;
 
 import com.google.common.base.Preconditions;
 
@@ -56,20 +55,21 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		if (iteration < drtSpeedUpParams.getFractionOfIterationsSwitchOn() * lastIteration
 				|| iteration >= drtSpeedUpParams.getFractionOfIterationsSwitchOff() * lastIteration) {
 			return false; // full drt simulation
-		} else {
-			//full drt simulation only with a defined interval
-			return iteration % drtSpeedUpParams.getIntervalDetailedIteration() != 0;
 		}
+
+		//full drt simulation only with a defined interval
+		return iteration % drtSpeedUpParams.getIntervalDetailedIteration() != 0;
 	}
 
 	private final String mode;
 	private final DrtSpeedUpParams drtSpeedUpParams;
-	private final Config config;
+	private final ControlerConfigGroup controlerConfig;
 	private final Network network;
 	private final FleetSpecification fleetSpecification;
 	private final DrtRequestAnalyzer drtRequestAnalyzer;
 
-	private final List<Tuple<Double, Double>> ridesPerVehicle2avgWaitingTime = new ArrayList<>();
+	private final SimpleRegression ridesPerVehicle2avgWaitingTimeRegression = new SimpleRegression();
+
 	private final List<Double> averageWaitingTimes = new ArrayList<>();
 	private final List<Double> averageInVehicleBeelineSpeeds = new ArrayList<>();
 
@@ -77,11 +77,11 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private double currentAvgInVehicleBeelineSpeed;
 	private boolean teleportDrtUsers;
 
-	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, Config config, Network network,
-			FleetSpecification fleetSpecification, DrtRequestAnalyzer drtRequestAnalyzer) {
+	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
+			Network network, FleetSpecification fleetSpecification, DrtRequestAnalyzer drtRequestAnalyzer) {
 		this.mode = mode;
 		this.drtSpeedUpParams = drtSpeedUpParams;
-		this.config = config;
+		this.controlerConfig = controlerConfig;
 		this.network = network;
 		this.fleetSpecification = fleetSpecification;
 		this.drtRequestAnalyzer = drtRequestAnalyzer;
@@ -97,7 +97,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
-		teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, config.controler(), iteration);
+		teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
 		if (teleportDrtUsers) {
 			log.info(
 					"Teleporting {} users in iteration {}. Current teleported mode speed: {}. Current waiting time: {}",
@@ -150,13 +150,12 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 				movingAverageInVehicleBeelineSpeed, currentAvgInVehicleBeelineSpeed);
 		currentAvgInVehicleBeelineSpeed = movingAverageInVehicleBeelineSpeed;
 
-		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp()
-				== DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
-			// store some additional statistics
+		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
+			// update regression model
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
 			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
 			double ridesPerVehicle = tripStats.count / fleetSize;
-			ridesPerVehicle2avgWaitingTime.add(new Tuple<>(ridesPerVehicle, currentAvgWaitingTime));
+			ridesPerVehicle2avgWaitingTimeRegression.addData(ridesPerVehicle, currentAvgWaitingTime);
 		}
 	}
 
@@ -210,24 +209,18 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	}
 
 	private void postprocessTeleportedDrtTrips() {
-		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp()
-				== DrtSpeedUpParams.WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
-			int tripCount = completedTripCount();
-			SimpleRegression regression = new SimpleRegression();
-			for (Tuple<Double, Double> x2y : ridesPerVehicle2avgWaitingTime) {
-				regression.addData(x2y.getFirst(), x2y.getSecond());
-			}
-
-			log.info("Current data points for {}: {}", mode, ridesPerVehicle2avgWaitingTime.toString());
+		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
 			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
 			log.info("Current fleet size for {}: {}", mode, fleetSize);
-			double predictedWaitingTime = regression.predict(tripCount / fleetSize);
+			double predictedWaitingTime = ridesPerVehicle2avgWaitingTimeRegression.predict(
+					completedTripCount() / fleetSize);
 			log.info("Predicted average waiting time for {}: {}", mode, predictedWaitingTime);
 
 			if (Double.isNaN(predictedWaitingTime)) {
 				log.info("Not enough data points for linear regression. Not updating the average waiting time!");
-			} else if (predictedWaitingTime <= 0.) {
+			} else if (predictedWaitingTime <= 0) {
+				//TODO why not setting it to 0 instead?
 				log.info(
 						"Predicted average waiting from linear regression is negative. Not updating the average waiting time!");
 			} else {
