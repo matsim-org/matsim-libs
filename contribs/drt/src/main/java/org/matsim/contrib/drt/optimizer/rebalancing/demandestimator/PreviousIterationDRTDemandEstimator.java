@@ -49,7 +49,6 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
-	private final String drtSpeedUpMode;
 	private final int timeBinSize;
 	private Map<Integer, Map<DrtZone, MutableInt>> currentIterationDepartures = new HashMap<>();
 	private Map<Integer, Map<DrtZone, MutableInt>> previousIterationDepartures = new HashMap<>();
@@ -58,7 +57,6 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 			int demandEstimationPeriod) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
-		drtSpeedUpMode = drtCfg.getDrtSpeedUpMode();
 		timeBinSize = demandEstimationPeriod;
 	}
 
@@ -70,7 +68,7 @@ public final class PreviousIterationDRTDemandEstimator implements ZonalDemandEst
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(mode) || event.getLegMode().equals(drtSpeedUpMode)) {
+		if (event.getLegMode().equals(mode)) {
 			DrtZone zone = zonalSystem.getZoneForLinkId(event.getLinkId());
 			if (zone == null) {
 				//might be that somebody walks into the service area or that service area is larger/different than DrtZonalSystem...
