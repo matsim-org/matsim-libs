@@ -8,7 +8,6 @@ import java.util.function.ToDoubleFunction;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.DrtZone;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.FeedforwardRebalancingStrategyParams;
@@ -45,10 +44,10 @@ public class NetDepartureReplenishDemandEstimator
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		// If a request is rejected, remove the request info from the temporary storage
-		// place
-		Id<Person> personId = event.getPersonId();
-		potentialDrtTripsMap.remove(personId);
+		if (event.getMode().equals(mode)) {
+			// If a request is rejected, remove the request info from the temporary storage place
+			potentialDrtTripsMap.remove(event.getPersonId());
+		}
 	}
 
 	@Override

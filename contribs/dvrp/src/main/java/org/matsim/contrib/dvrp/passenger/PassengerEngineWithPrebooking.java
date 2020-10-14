@@ -55,7 +55,9 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 
-public final class PassengerEngineWithPrebooking implements PassengerEngine, TripInfo.Provider {
+public final class PassengerEngineWithPrebooking
+		implements PassengerEngine, TripInfo.Provider, PassengerRequestRejectedEventHandler,
+		PassengerRequestScheduledEventHandler {
 
 	private final String mode;
 	private final MobsimTimer mobsimTimer;
@@ -76,8 +78,7 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 
 	PassengerEngineWithPrebooking(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
 			PreplanningEngine preplanningEngine, PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
-			Network network, PassengerRequestValidator requestValidator,
-			PassengerRequestEventForwarder passengerRequestEventForwarder) {
+			Network network, PassengerRequestValidator requestValidator) {
 		this.mode = mode;
 		this.mobsimTimer = mobsimTimer;
 		this.preplanningEngine = preplanningEngine;
@@ -87,7 +88,6 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 		this.requestValidator = requestValidator;
 
 		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
-		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
@@ -234,12 +234,18 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 	private final Queue<PassengerRequestRejectedEvent> rejectedEvents = new ConcurrentLinkedQueue<>();
 	private final Queue<PassengerRequestScheduledEvent> scheduledEvents = new ConcurrentLinkedQueue<>();
 
-	public void notifyPassengerRequestRejected(PassengerRequestRejectedEvent event) {
-		rejectedEvents.add(event);
+	@Override
+	public void handleEvent(PassengerRequestRejectedEvent event) {
+		if (event.getMode().equals(mode)) {
+			rejectedEvents.add(event);
+		}
 	}
 
-	public void notifyPassengerRequestScheduled(PassengerRequestScheduledEvent event) {
-		scheduledEvents.add(event);
+	@Override
+	public void handleEvent(PassengerRequestScheduledEvent event) {
+		if (event.getMode().equals(mode)) {
+			scheduledEvents.add(event);
+		}
 	}
 
 	private void processPassengerRequestEvents() {
@@ -292,15 +298,11 @@ public final class PassengerEngineWithPrebooking implements PassengerEngine, Tri
 			@Inject
 			private PreplanningEngine preplanningEngine;
 
-			@Inject
-			private PassengerRequestEventForwarder passengerRequestEventForwarder;
-
 			@Override
 			public PassengerEngineWithPrebooking get() {
 				return new PassengerEngineWithPrebooking(getMode(), eventsManager, mobsimTimer, preplanningEngine,
 						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
-						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
-						passengerRequestEventForwarder);
+						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class));
 			}
 		};
 	}

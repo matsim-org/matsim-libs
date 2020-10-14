@@ -43,13 +43,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
-			+ " Used only for LinearRebalancingTarget";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage."
-			+ " Used only for LinearRebalancingTarget";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String REBALANCING_TARGET_CALCULATOR_TYPE = "rebalancingTargetCalculatorType";
 	static final String REBALANCING_TARGET_CALCULATOR_TYPE_EXP =
@@ -57,11 +55,16 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 					+ " (i.e. number of the desired vehicles)."
 					+ " Can be one of [EstimatedDemand, EqualRebalancableVehicleDistribution,"
 					+ " EqualVehicleDensity, EqualVehiclesToPopulationRatio]."
-					+ " Current default is LinearRebalancingTarget";
+					+ " Current default is EstimatedDemand";
 
 	public static final String ZONAL_DEMAND_ESTIMATOR_TYPE = "zonalDemandEstimatorType";
 	static final String ZONAL_DEMAND_ESTIMATOR_TYPE_EXP = "Defines the methodology for demand estimation."
 			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand";
+
+	public static final String DEMAND_ESTIMATION_PERIOD = "demandEstimationPeriod";
+	static final String DEMAND_ESTIMATION_PERIOD_EXP = "Defines the time horizon for predicting the demand."
+			+ " Used when 'zonalDemandEstimatorType' is not set to 'None'."
+			+ " Default value is 1800 s.";
 
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
@@ -71,6 +74,9 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	@PositiveOrZero
 	private double targetBeta = Double.NaN;
+
+	@PositiveOrZero
+	private int demandEstimationPeriod = 1800;
 
 	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
@@ -85,6 +91,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(ZONAL_DEMAND_ESTIMATOR_TYPE, ZONAL_DEMAND_ESTIMATOR_TYPE_EXP);
+		map.put(DEMAND_ESTIMATION_PERIOD, DEMAND_ESTIMATION_PERIOD_EXP);
 		return map;
 	}
 
@@ -118,6 +125,22 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@StringSetter(TARGET_BETA)
 	public void setTargetBeta(double targetBeta) {
 		this.targetBeta = targetBeta;
+	}
+
+	/**
+	 * @return -- {@value #DEMAND_ESTIMATION_PERIOD_EXP}
+	 */
+	@StringGetter(DEMAND_ESTIMATION_PERIOD)
+	public int getDemandEstimationPeriod() {
+		return demandEstimationPeriod;
+	}
+
+	/**
+	 * @param demandEstimationPeriod -- {@value #DEMAND_ESTIMATION_PERIOD_EXP}
+	 */
+	@StringSetter(DEMAND_ESTIMATION_PERIOD)
+	public void setDemandEstimationPeriod(int demandEstimationPeriod) {
+		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 
 	/**

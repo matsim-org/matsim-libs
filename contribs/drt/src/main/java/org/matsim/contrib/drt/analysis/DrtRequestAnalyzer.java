@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -31,7 +32,6 @@ import javax.annotation.Nullable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerDroppedOffEventHandler;
@@ -63,8 +63,16 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled) {
-			this.submitted = submitted;
-			this.scheduled = scheduled;
+			this(submitted, scheduled, null, null);
+		}
+
+		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
+				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
+				PassengerDroppedOffEvent droppedOff) {
+			this.submitted = Objects.requireNonNull(submitted);
+			this.scheduled = Objects.requireNonNull(scheduled);
+			this.pickedUp = pickedUp;
+			this.droppedOff = droppedOff;
 		}
 
 		public DrtRequestSubmittedEvent getSubmitted() {
@@ -81,6 +89,10 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 		public Optional<PassengerDroppedOffEvent> getDroppedOff() {
 			return Optional.ofNullable(droppedOff);
+		}
+
+		public boolean isCompleted() {
+			return droppedOff != null;
 		}
 	}
 
@@ -103,13 +115,13 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		}
 	}
 
-	private final DrtConfigGroup drtCfg;
+	private final String mode;
 	private final Map<Id<Request>, DrtRequestSubmittedEvent> requestSubmissions = new HashMap<>();
 	private final Map<Id<Request>, RejectedRequestEventSequence> rejectedRequestSequences = new HashMap<>();
 	private final Map<Id<Request>, PerformedRequestEventSequence> performedRequestSequences = new HashMap<>();
 
-	public DrtRequestAnalyzer(DrtConfigGroup drtCfg) {
-		this.drtCfg = drtCfg;
+	public DrtRequestAnalyzer(String mode) {
+		this.mode = mode;
 	}
 
 	public Map<Id<Request>, DrtRequestSubmittedEvent> getRequestSubmissions() {
@@ -133,14 +145,14 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
-		if (event.getMode().equals(drtCfg.getMode())) {
+		if (event.getMode().equals(mode)) {
 			requestSubmissions.put(event.getRequestId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerRequestScheduledEvent event) {
-		if (event.getMode().equals(drtCfg.getMode())) {
+		if (event.getMode().equals(mode)) {
 			performedRequestSequences.put(event.getRequestId(),
 					new PerformedRequestEventSequence(requestSubmissions.get(event.getRequestId()), event));
 		}
@@ -148,7 +160,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 	@Override
 	public void handleEvent(PassengerRequestRejectedEvent event) {
-		if (event.getMode().equals(drtCfg.getMode())) {
+		if (event.getMode().equals(mode)) {
 			rejectedRequestSequences.put(event.getRequestId(),
 					new RejectedRequestEventSequence(requestSubmissions.get(event.getRequestId()), event));
 		}
@@ -156,14 +168,14 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 	@Override
 	public void handleEvent(PassengerPickedUpEvent event) {
-		if (event.getMode().equals(drtCfg.getMode())) {
+		if (event.getMode().equals(mode)) {
 			performedRequestSequences.get(event.getRequestId()).pickedUp = event;
 		}
 	}
 
 	@Override
 	public void handleEvent(PassengerDroppedOffEvent event) {
-		if (event.getMode().equals(drtCfg.getMode())) {
+		if (event.getMode().equals(mode)) {
 			performedRequestSequences.get(event.getRequestId()).droppedOff = event;
 		}
 	}

@@ -26,10 +26,12 @@ import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchQSimMo
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchQSimModule;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
+import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.passenger.TeleportingPassengerEngine.TeleportedRouteCalculator;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -51,8 +53,20 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		install(new VrpAgentSourceQSimModule(getMode()));
-		install(new PassengerEngineQSimModule(getMode()));
+		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
+				drtCfg.getDrtSpeedUpParams().get(), getConfig().controler(), getIterationNumber());
+		if (teleportDrtUsers) {
+			install(new PassengerEngineQSimModule(getMode(),
+					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
+			bindModal(TeleportedRouteCalculator.class).toProvider(
+					modalProvider(getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
+					.asEagerSingleton();
+		} else {
+			install(new VrpAgentSourceQSimModule(getMode()));
+			install(new PassengerEngineQSimModule(getMode()));
+			install(new DrtModeOptimizerQSimModule(drtCfg));
+		}
+
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
 		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
@@ -66,8 +80,6 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				return new DrtRequestCreator(getMode(), events, timer);
 			}
 		}).asEagerSingleton();
-
-		install(new DrtModeOptimizerQSimModule(drtCfg));
 	}
 
 	public static AbstractDvrpModeQSimModule getInsertionSearchQSimModule(DrtConfigGroup drtCfg) {

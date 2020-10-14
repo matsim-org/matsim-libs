@@ -36,21 +36,23 @@ import javax.validation.constraints.PositiveOrZero;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
+import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
-public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
@@ -145,9 +147,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
-	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
-	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
-
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
@@ -216,11 +215,41 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@Nullable
 	private RebalancingParams rebalancingParams;
 
-	@NotNull
-	private String drtSpeedUpMode = "";
+	@Nullable
+	private DrtFareParams drtFareParams;
+
+	@Nullable
+	private DrtSpeedUpParams drtSpeedUpParams;
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
+		initSingletonParameterSets();
+	}
+
+	private void initSingletonParameterSets() {
+		//rebalancing (optional)
+		addDefinition(RebalancingParams.SET_NAME, RebalancingParams::new, () -> rebalancingParams,
+				params -> rebalancingParams = (RebalancingParams)params);
+
+		//zonal system (optional)
+		addDefinition(DrtZonalSystemParams.SET_NAME, DrtZonalSystemParams::new, () -> zonalSystemParams,
+				params -> zonalSystemParams = (DrtZonalSystemParams)params);
+
+		//insertion search params (one of: extensive, selective)
+		addDefinition(ExtensiveInsertionSearchParams.SET_NAME, ExtensiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (ExtensiveInsertionSearchParams)params);
+		addDefinition(SelectiveInsertionSearchParams.SET_NAME, SelectiveInsertionSearchParams::new,
+				() -> drtInsertionSearchParams,
+				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
+
+		//drt fare
+		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
+				params -> drtFareParams = (DrtFareParams)params);
+
+		//drt speedup
+		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
+				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
 	}
 
 	@Override
@@ -297,7 +326,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
-		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -627,14 +655,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return this;
 	}
 
-	public String getDrtSpeedUpMode() {
-		return drtSpeedUpMode;
-	}
-
-	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
-		this.drtSpeedUpMode = drtSpeedUpMode;
-	}
-
 	public double getAdvanceRequestPlanningHorizon() {
 		return advanceRequestPlanningHorizon;
 	}
@@ -656,60 +676,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return Optional.ofNullable(rebalancingParams);
 	}
 
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case RebalancingParams.SET_NAME:
-				return new RebalancingParams();
-
-			case DrtZonalSystemParams.SET_NAME:
-				return new DrtZonalSystemParams();
-
-			case ExtensiveInsertionSearchParams.SET_NAME:
-				return new ExtensiveInsertionSearchParams();
-
-			case SelectiveInsertionSearchParams.SET_NAME:
-				return new SelectiveInsertionSearchParams();
-		}
-
-		return super.createParameterSet(type);
+	public Optional<DrtFareParams> getDrtFareParams() {
+		return Optional.ofNullable(drtFareParams);
 	}
 
-	@Override
-	public void addParameterSet(ConfigGroup set) {
-		if (set instanceof DrtInsertionSearchParams) {
-			Preconditions.checkState(drtInsertionSearchParams == null,
-					"Remove the existing drtRequestInsertionParams before adding a new one");
-			drtInsertionSearchParams = (DrtInsertionSearchParams)set;
-		} else if (set instanceof RebalancingParams) {
-			Preconditions.checkState(rebalancingParams == null,
-					"Remove the existing rebalancingParams before adding a new one");
-			rebalancingParams = (RebalancingParams)set;
-		} else if (set instanceof DrtZonalSystemParams) {
-			Preconditions.checkState(zonalSystemParams == null,
-					"Remove the existing zonalSystemParams before adding a new one");
-			zonalSystemParams = (DrtZonalSystemParams)set;
-		}
-
-		super.addParameterSet(set);
-	}
-
-	@Override
-	public boolean removeParameterSet(ConfigGroup set) {
-		if (set instanceof DrtInsertionSearchParams) {
-			Preconditions.checkState(drtInsertionSearchParams.equals(set),
-					"The existing drtRequestInsertionParams is null. Cannot remove it.");
-			drtInsertionSearchParams = null;
-		} else if (set instanceof RebalancingParams) {
-			Preconditions.checkState(rebalancingParams.equals(set),
-					"The existing rebalancingParams is null. Cannot remove it.");
-			rebalancingParams = null;
-		} else if (set instanceof DrtZonalSystemParams) {
-			Preconditions.checkState(zonalSystemParams.equals(set),
-					"The existing zonalSystemParams is null. Cannot remove it.");
-			zonalSystemParams = null;
-		}
-
-		return super.removeParameterSet(set);
+	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
+		return Optional.ofNullable(drtSpeedUpParams);
 	}
 }

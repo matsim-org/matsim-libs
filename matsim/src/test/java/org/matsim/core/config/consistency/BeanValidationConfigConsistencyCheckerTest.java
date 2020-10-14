@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.consistency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
@@ -42,37 +44,59 @@ import org.matsim.core.utils.collections.Tuple;
 public class BeanValidationConfigConsistencyCheckerTest {
 
 	@Test
-	public void checkConsistency() {
-		Assertions.assertThat(getViolationTuples(new Config())).isEmpty();
-		Assertions.assertThat(getViolationTuples(ConfigUtils.createConfig())).isEmpty();
+	public void emptyConfig_valid() {
+		assertThat(getViolationTuples(new Config())).isEmpty();
+	}
 
+	@Test
+	public void defaultConfig_valid() {
+		assertThat(getViolationTuples(ConfigUtils.createConfig())).isEmpty();
+	}
+
+	@Test
+	public void invalidConfigGroup_violationsReturned() {
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setFlowCapFactor(0);
-			Assertions.assertThat(getViolationTuples(config))
-					.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class));
+			assertThat(getViolationTuples(config)).containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class));
 		}
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setSnapshotPeriod(-1);
-			Assertions.assertThat(getViolationTuples(config))
-					.containsExactlyInAnyOrder(Tuple.of("snapshotPeriod", PositiveOrZero.class));
+			assertThat(getViolationTuples(config)).containsExactlyInAnyOrder(
+					Tuple.of("snapshotPeriod", PositiveOrZero.class));
 		}
 		{
 			Config config = ConfigUtils.createConfig();
 			config.global().setNumberOfThreads(-1);
-			Assertions.assertThat(getViolationTuples(config))
-					.containsExactlyInAnyOrder(Tuple.of("numberOfThreads", PositiveOrZero.class));
+			assertThat(getViolationTuples(config)).containsExactlyInAnyOrder(
+					Tuple.of("numberOfThreads", PositiveOrZero.class));
 		}
+	}
+
+	@Test
+	public void invalidParameterSet_violationsReturned() {
+		ConfigGroup configGroup = new ConfigGroup("config_group");
+		configGroup.addParameterSet(new ConfigGroup("invalid_param_set") {
+			@PositiveOrZero
+			private int time = -9;
+		});
+
+		Config config = ConfigUtils.createConfig(configGroup);
+		assertThat(getViolationTuples(config)).containsExactlyInAnyOrder(
+				Tuple.of("parameterSetsPerType[invalid_param_set].<map value>[0].time", PositiveOrZero.class));
+	}
+
+	@Test
+	public void manyConfigGroupsInvalid_violationsReturned() {
 		{
 			Config config = ConfigUtils.createConfig();
 			config.qsim().setFlowCapFactor(0);
 			config.qsim().setSnapshotPeriod(-1);
 			config.global().setNumberOfThreads(-1);
-			Assertions.assertThat(getViolationTuples(config))
-					.containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
-							Tuple.of("snapshotPeriod", PositiveOrZero.class),
-							Tuple.of("numberOfThreads", PositiveOrZero.class));
+			assertThat(getViolationTuples(config)).containsExactlyInAnyOrder(Tuple.of("flowCapFactor", Positive.class),
+					Tuple.of("snapshotPeriod", PositiveOrZero.class),
+					Tuple.of("numberOfThreads", PositiveOrZero.class));
 
 			Assertions.assertThatThrownBy(() -> new BeanValidationConfigConsistencyChecker().checkConsistency(config))
 					.isExactlyInstanceOf(ConstraintViolationException.class)
