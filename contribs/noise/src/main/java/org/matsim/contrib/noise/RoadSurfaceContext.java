@@ -59,10 +59,10 @@ class RoadSurfaceContext {
 
     double calculateSurfaceCorrection(RLS19VehicleType type, NoiseLink link, double velocity) {
         SurfaceType surfaceType = SurfaceType.paved;
-        final Object surface = network.getLinks().get(link.getId()).getAttributes().getAttribute(ROAD_SURFACE);
-        if(surface != null) {
-            surfaceType = SurfaceType.valueOf((String) surface);
-        }
+//        final Object surface = network.getLinks().get(link.getId()).getAttributes().getAttribute(ROAD_SURFACE);
+//        if(surface != null) {
+//            surfaceType = SurfaceType.valueOf((String) surface);
+//        }
         return surfaceType.getCorrection(type, velocity);
     }
 }
