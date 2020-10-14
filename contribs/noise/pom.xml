@@ -28,6 +28,11 @@
             <artifactId>gt-geojson</artifactId>
             <version>21.5</version>
         </dependency>
+        <dependency>
+            <groupId>org.openstreetmap.osmosis</groupId>
+            <artifactId>osmosis-xml</artifactId>
+            <version>0.47</version>
+        </dependency>
 
     </dependencies>
 </project>

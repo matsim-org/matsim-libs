@@ -14,15 +14,17 @@ import static org.matsim.contrib.noise.RLS19VehicleType.*;
  */
 class RLS19NoiseEmission implements NoiseEmission {
 
-
+    public static final String GRADIENT = "GRADIENT";
 
     private final NoiseConfigGroup noiseParams;
     private final Network network;
+    private final RoadSurfaceContext surfaceContext;
 
     @Inject
-    RLS19NoiseEmission(Scenario scenario) {
+    RLS19NoiseEmission(Scenario scenario, RoadSurfaceContext surfaceContext) {
         noiseParams = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class);
         network = scenario.getNetwork();
+        this.surfaceContext = surfaceContext;
     }
 
     /**
@@ -43,7 +45,6 @@ class RLS19NoiseEmission implements NoiseEmission {
         int nLkw2 = (int) ((noiseLink.getAgentsEntering(lkw2)
                 * (noiseParams.getScaleFactor()))
                 * (3600. / noiseParams.getTimeBinSizeNoiseComputation()));
-
 
         double vPkw = getV(noiseLink, pkw);
         double vLkw1 = getV(noiseLink, lkw1);
@@ -98,19 +99,14 @@ class RLS19NoiseEmission implements NoiseEmission {
         double pLkw1 = ((double) nLkw1) / m;
         double pLkw2 = ((double) nLkw2) / m;
 
-        double g = 0;
-        final Object gradient = network.getLinks().get(noiseLink.getId()).getAttributes().getAttribute("GRADIENT");
-        if(gradient != null) {
-            g = (Double) gradient;
-        }
 
 
         double singlePkwEmission
-                = calculateSingleVehicleEmission(pkw, vPkw, g);
+                = calculateSingleVehicleEmission(noiseLink, pkw, vPkw);
         double singleLkw1Emission
-                = calculateSingleVehicleEmission(lkw1, vLkw1, g);
+                = calculateSingleVehicleEmission(noiseLink, lkw1, vLkw1);
         double singleLkw2Emission
-                = calculateSingleVehicleEmission(lkw2, vLkw2, g);
+                = calculateSingleVehicleEmission(noiseLink, lkw2, vLkw2);
 
         double partPkw = calculateVehicleTypeNoise(1 - pLkw1 - pLkw2, vPkw, singlePkwEmission);
         double partLkw1 = calculateVehicleTypeNoise(pLkw1, vLkw1, singleLkw1Emission);
@@ -130,10 +126,10 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return emission in dB(A)
      */
-    double calculateSingleVehicleEmission(RLS19VehicleType vehicleType, double v, double g) {
+    double calculateSingleVehicleEmission(NoiseLink link, RLS19VehicleType vehicleType, double v) {
         double baseValue = calculateBaseVehicleTypeEmission(vehicleType, v);
-        double surfaceCorrection = calculateSurfaceCorrection();
-        double gradientCorrection = calculateGradientCorrection(g, v, vehicleType);
+        double surfaceCorrection = calculateSurfaceCorrection(vehicleType, link, v);
+        double gradientCorrection = calculateGradientCorrection(link, v, vehicleType);
         double reflectionCorrection = calculateReflectionCorrection();
 
         double emission = baseValue + surfaceCorrection + gradientCorrection + reflectionCorrection;
@@ -148,7 +144,12 @@ class RLS19NoiseEmission implements NoiseEmission {
      *
      * @return gradient correction in dB(A)
      */
-    double calculateGradientCorrection(double g, double v, RLS19VehicleType vehicleType) {
+    double calculateGradientCorrection(NoiseLink link, double v, RLS19VehicleType vehicleType) {
+        double g = 0;
+        final Object gradient = network.getLinks().get(link.getId()).getAttributes().getAttribute(GRADIENT);
+        if(gradient != null) {
+            g = (Double) gradient;
+        }
         double correction = 0;
         switch (vehicleType) {
             case pkw:
@@ -199,9 +200,9 @@ class RLS19NoiseEmission implements NoiseEmission {
         return 0;
     }
 
-    //TODO
-    private double calculateSurfaceCorrection() {
-        return 0;
+
+    private double calculateSurfaceCorrection(RLS19VehicleType type, NoiseLink link, double velocity) {
+        return surfaceContext.calculateSurfaceCorrection(type, link, velocity);
     }
 
     double getV(NoiseLink noiseLink, RLS19VehicleType type) {

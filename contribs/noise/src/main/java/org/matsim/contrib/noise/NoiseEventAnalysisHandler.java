@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura
  *
  */
-class NoiseEventAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
+public class NoiseEventAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
 
 	private SortedMap<Id<Person>, Double> id2causedNoiseCost = new TreeMap<Id<Person>, Double>();
 	private SortedMap<Id<Person>, Double> id2affectedNoiseCost = new TreeMap<Id<Person>, Double>();

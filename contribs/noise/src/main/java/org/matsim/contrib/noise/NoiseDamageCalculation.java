@@ -326,37 +326,38 @@ public class NoiseDamageCalculation {
         for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
             NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(linkId);
             if (noiseLink != null) {
+                if(noiseLink.getEnteringVehicleIds() != null) {
+                    for (Id<Vehicle> vehicleId : noiseLink.getEnteringVehicleIds()) {
 
-                for (Id<Vehicle> vehicleId : noiseLink.getEnteringVehicleIds()) {
+                        final NoiseVehicleType noiseVehicleType = noiseVehicleIdentifier.identifyVehicle(vehicleId);
+                        double amountVehicle;
 
-                    final NoiseVehicleType noiseVehicleType = noiseVehicleIdentifier.identifyVehicle(vehicleId);
-                    double amountVehicle;
-
-                    if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
-                        amountVehicle = noiseLink.getAverageDamageCostPerVehicle(noiseVehicleType);
-                    } else if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
-                        amountVehicle = noiseLink.getMarginalDamageCostPerVehicle(noiseVehicleType);
-                    } else {
-                        throw new RuntimeException("Unknown noise allocation approach. Aborting...");
-                    }
-
-                    if (amountVehicle != 0.) {
-
-                        if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(vehicleId)) {
-                            // skip
+                        if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.AverageCost) {
+                            amountVehicle = noiseLink.getAverageDamageCostPerVehicle(noiseVehicleType);
+                        } else if (noiseAllocationApproach == NoiseConfigGroup.NoiseAllocationApproach.MarginalCost) {
+                            amountVehicle = noiseLink.getMarginalDamageCostPerVehicle(noiseVehicleType);
                         } else {
-                            NoiseEventCaused noiseEvent = new NoiseEventCaused(
-                                    eventTime,
-                                    currentTimeBinEndTime,
-                                    this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId),
-                                    this.noiseContext.getVehicleId2PersonId().get(vehicleId),
-                                    vehicleId, amountVehicle, linkId);
-                            events.processEvent(noiseEvent);
+                            throw new RuntimeException("Unknown noise allocation approach. Aborting...");
+                        }
 
-                            if (this.collectNoiseEvents) {
-                                this.noiseEventsCaused.add(noiseEvent);
+                        if (amountVehicle != 0.) {
+
+                            if (this.noiseContext.getNotConsideredTransitVehicleIDs().contains(vehicleId)) {
+                                // skip
+                            } else {
+                                NoiseEventCaused noiseEvent = new NoiseEventCaused(
+                                        eventTime,
+                                        currentTimeBinEndTime,
+                                        this.noiseContext.getLinkId2vehicleId2lastEnterTime().get(linkId).get(vehicleId),
+                                        this.noiseContext.getVehicleId2PersonId().get(vehicleId),
+                                        vehicleId, amountVehicle, linkId);
+                                events.processEvent(noiseEvent);
+
+                                if (this.collectNoiseEvents) {
+                                    this.noiseEventsCaused.add(noiseEvent);
+                                }
+                                totalCausedNoiseCost = totalCausedNoiseCost + amountVehicle;
                             }
-                            totalCausedNoiseCost = totalCausedNoiseCost + amountVehicle;
                         }
                     }
                 }
