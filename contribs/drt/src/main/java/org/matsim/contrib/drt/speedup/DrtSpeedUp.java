@@ -153,7 +153,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
 			// update regression model
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
-			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
+			Preconditions.checkState(fleetSize >= 1, "No vehicles for drt mode %s. Aborting...", mode);
 			double ridesPerVehicle = tripStats.count / fleetSize;
 			ridesPerVehicle2avgWaitingTimeRegression.addData(ridesPerVehicle, currentAvgWaitingTime);
 		}
@@ -208,7 +208,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	private void postprocessTeleportedDrtTrips() {
 		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
-			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
+			Preconditions.checkState(fleetSize >= 1, "No vehicles for drt mode %s. Aborting...", mode);
 			log.info("Current fleet size for {}: {}", mode, fleetSize);
 			double predictedWaitingTime = ridesPerVehicle2avgWaitingTimeRegression.predict(
 					completedTripCount() / fleetSize);
