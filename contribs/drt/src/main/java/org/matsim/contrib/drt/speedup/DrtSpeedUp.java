@@ -75,7 +75,6 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private double currentAvgWaitingTime;
 	private double currentAvgInVehicleBeelineSpeed;
-	private boolean teleportDrtUsers;
 
 	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
 			Network network, FleetSpecification fleetSpecification, DrtRequestAnalyzer drtRequestAnalyzer) {
@@ -97,7 +96,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
-		teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
+		boolean teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
 		if (teleportDrtUsers) {
 			log.info(
 					"Teleporting {} users in iteration {}. Current teleported mode speed: {}. Current waiting time: {}",
@@ -110,6 +109,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
+		boolean teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
 		if (iteration < drtSpeedUpParams.getFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams()) {
 			String type = teleportDrtUsers ? "teleported" : "simulated";
 			log.info("Number of {} {} trips: {}", type, mode, completedTripCount());
