@@ -75,7 +75,6 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private double currentAvgWaitingTime;
 	private double currentAvgInVehicleBeelineSpeed;
-	private boolean teleportDrtUsers;
 
 	public DrtSpeedUp(String mode, DrtSpeedUpParams drtSpeedUpParams, ControlerConfigGroup controlerConfig,
 			Network network, FleetSpecification fleetSpecification, DrtRequestAnalyzer drtRequestAnalyzer) {
@@ -94,10 +93,18 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		return new DrtTeleportedRouteCalculator(currentAvgWaitingTime, currentAvgInVehicleBeelineSpeed);
 	}
 
+	double getCurrentAvgWaitingTime() {
+		return currentAvgWaitingTime;
+	}
+
+	double getCurrentAvgInVehicleBeelineSpeed() {
+		return currentAvgInVehicleBeelineSpeed;
+	}
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
-		teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
+		boolean teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
 		if (teleportDrtUsers) {
 			log.info(
 					"Teleporting {} users in iteration {}. Current teleported mode speed: {}. Current waiting time: {}",
@@ -110,6 +117,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		int iteration = event.getIteration();
+		boolean teleportDrtUsers = isTeleportDrtUsers(drtSpeedUpParams, controlerConfig, iteration);
 		if (iteration < drtSpeedUpParams.getFirstSimulatedDrtIterationToReplaceInitialDrtPerformanceParams()) {
 			String type = teleportDrtUsers ? "teleported" : "simulated";
 			log.info("Number of {} {} trips: {}", type, mode, completedTripCount());
@@ -153,7 +161,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
 			// update regression model
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
-			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
+			Preconditions.checkState(fleetSize >= 1, "No vehicles for drt mode %s. Aborting...", mode);
 			double ridesPerVehicle = tripStats.count / fleetSize;
 			ridesPerVehicle2avgWaitingTimeRegression.addData(ridesPerVehicle, currentAvgWaitingTime);
 		}
@@ -207,8 +215,11 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private void postprocessTeleportedDrtTrips() {
 		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
+			//FIXME potential race condition: fleet may be modified by opt-drt!!
+			// I suggest modifying them when an iteration starts
+			// (like modifying population plans happens at the beginning of an iteration)
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
-			Preconditions.checkState(fleetSize < 1, "No vehicles for drt mode %s. Aborting...", mode);
+			Preconditions.checkState(fleetSize >= 1, "No vehicles for drt mode %s. Aborting...", mode);
 			log.info("Current fleet size for {}: {}", mode, fleetSize);
 			double predictedWaitingTime = ridesPerVehicle2avgWaitingTimeRegression.predict(
 					completedTripCount() / fleetSize);
@@ -223,7 +234,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 			} else {
 				log.info("Setting waiting time for {} to: {} (previous value: {})", mode, predictedWaitingTime,
 						currentAvgWaitingTime);
-				currentAvgWaitingTime = predictedWaitingTime;
+				currentAvgWaitingTime = predictedWaitingTime; //TODO maybe combine with the moving average
 			}
 		}
 	}
