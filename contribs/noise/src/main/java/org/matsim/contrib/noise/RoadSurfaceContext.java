@@ -3,12 +3,12 @@ package org.matsim.contrib.noise;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Network;
 
-public class RoadSurfaceContext {
+class RoadSurfaceContext {
 
-    public static final String ROAD_SURFACE = "roadSurface";
+    static final String ROAD_SURFACE = "roadSurface";
     private final Network network;
 
-    private enum SurfaceType {
+    enum SurfaceType {
         /**
          * "nicht geriffelter Gussasphalt"
          */
