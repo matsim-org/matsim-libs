@@ -207,6 +207,9 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 	private void postprocessTeleportedDrtTrips() {
 		if (drtSpeedUpParams.getWaitingTimeUpdateDuringSpeedUp() == WaitingTimeUpdateDuringSpeedUp.LinearRegression) {
+			//FIXME potential race condition: fleet may be modified by opt-drt!!
+			// I suggest modifying them when an iteration starts
+			// (like modifying population plans happens at the beginning of an iteration)
 			double fleetSize = fleetSpecification.getVehicleSpecifications().size();
 			Preconditions.checkState(fleetSize >= 1, "No vehicles for drt mode %s. Aborting...", mode);
 			log.info("Current fleet size for {}: {}", mode, fleetSize);
@@ -223,7 +226,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 			} else {
 				log.info("Setting waiting time for {} to: {} (previous value: {})", mode, predictedWaitingTime,
 						currentAvgWaitingTime);
-				currentAvgWaitingTime = predictedWaitingTime;
+				currentAvgWaitingTime = predictedWaitingTime; //TODO maybe combine with the moving average
 			}
 		}
 	}
