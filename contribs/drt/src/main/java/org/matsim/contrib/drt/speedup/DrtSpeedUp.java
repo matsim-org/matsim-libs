@@ -93,6 +93,14 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 		return new DrtTeleportedRouteCalculator(currentAvgWaitingTime, currentAvgInVehicleBeelineSpeed);
 	}
 
+	double getCurrentAvgWaitingTime() {
+		return currentAvgWaitingTime;
+	}
+
+	double getCurrentAvgInVehicleBeelineSpeed() {
+		return currentAvgInVehicleBeelineSpeed;
+	}
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		int iteration = event.getIteration();
