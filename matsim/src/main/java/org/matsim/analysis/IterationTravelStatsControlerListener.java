@@ -39,6 +39,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -68,6 +69,9 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     @Inject
     TripsAndLegsCSVWriter.CustomLegsWriterExtension customLegsWriterExtension;
 
+    @Inject
+    AnalysisMainModeIdentifier mainModeIdentifier;
+
     Logger log = Logger.getLogger(IterationTravelStatsControlerListener.class);
 
 	@Override
@@ -80,7 +84,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
         final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
-            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension).write(experiencedPlansService.getExperiencedPlans()
+            new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.legscsv));
         }

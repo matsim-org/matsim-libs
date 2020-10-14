@@ -47,12 +47,12 @@ public abstract class AbstractTaskEvent extends Event implements HasPersonId, Ha
 	private final int taskIndex;
 	private final Id<Link> linkId;
 
-	protected AbstractTaskEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, TaskType taskType,
-			int taskIndex, Id<Link> linkId) {
+	protected AbstractTaskEvent(double time, String dvrpMode, Id<DvrpVehicle> dvrpVehicleId, Id<Person> driverId,
+			TaskType taskType, int taskIndex, Id<Link> linkId) {
 		super(time);
 		this.dvrpMode = dvrpMode;
 		this.dvrpVehicleId = dvrpVehicleId;
-		this.driverId = Id.createPersonId(dvrpVehicleId);
+		this.driverId = driverId;
 		this.taskType = taskType;
 		this.taskIndex = taskIndex;
 		this.linkId = linkId;

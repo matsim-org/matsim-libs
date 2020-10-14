@@ -44,6 +44,9 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
+/**
+ * @author Michal Maciejewski (michalm)
+ */
 public final class DefaultPassengerEngine implements PassengerEngine {
 
 	private final String mode;
@@ -54,7 +57,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	private final Network network;
 	private final PassengerRequestValidator requestValidator;
 
-	private final PassengerHandler passengerHandler;
+	private final InternalPassengerHandling internalPassengerHandling;
 
 	private InternalInterface internalInterface;
 
@@ -70,18 +73,14 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		this.network = network;
 		this.requestValidator = requestValidator;
 
-		passengerHandler = new PassengerHandler(mode, eventsManager);
+		internalPassengerHandling = new InternalPassengerHandling(mode, eventsManager);
 		passengerRequestEventForwarder.registerListenerForMode(mode, this);
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		passengerHandler.setInternalInterface(internalInterface);
-	}
-
-	public String getMode() {
-		return mode;
+		internalPassengerHandling.setInternalInterface(internalInterface);
 	}
 
 	@Override
@@ -108,15 +107,15 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 		Id<Link> toLinkId = passenger.getDestinationLinkId();
 
 		Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
-		PassengerRequest request = requestCreator.createRequest(passengerHandler.createRequestId(), passenger.getId(),
-				route, getLink(fromLinkId), getLink(toLinkId), now, now);
+		PassengerRequest request = requestCreator.createRequest(internalPassengerHandling.createRequestId(),
+				passenger.getId(), route, getLink(fromLinkId), getLink(toLinkId), now, now);
 		validateAndSubmitRequest(passenger, request, now);
 		return true;
 	}
 
 	private void validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request, double now) {
 		activePassengers.put(request.getId(), passenger);
-		if (passengerHandler.validateRequest(request, requestValidator, now)) {
+		if (internalPassengerHandling.validateRequest(request, requestValidator, now)) {
 			synchronized (optimizer) {
 				//optimizer can also reject request if cannot handle it
 				// (async operation, notification comes via the events channel)
@@ -132,16 +131,18 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 	}
 
 	@Override
-	public boolean pickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
+	public boolean tryPickUpPassenger(PassengerPickupActivity pickupActivity, MobsimDriverAgent driver,
 			PassengerRequest request, double now) {
-		boolean pickedUp = passengerHandler.tryPickUpPassenger(driver, activePassengers.get(request.getId()), now);
+		boolean pickedUp = internalPassengerHandling.tryPickUpPassenger(driver, activePassengers.get(request.getId()),
+				request.getId(), now);
 		Verify.verify(pickedUp, "Not possible without prebooking");
 		return pickedUp;
 	}
 
 	@Override
 	public void dropOffPassenger(MobsimDriverAgent driver, PassengerRequest request, double now) {
-		passengerHandler.dropOffPassenger(driver, activePassengers.remove(request.getId()), now);
+		internalPassengerHandling.dropOffPassenger(driver, activePassengers.remove(request.getId()), request.getId(),
+				now);
 	}
 
 	@Override
@@ -171,8 +172,7 @@ public final class DefaultPassengerEngine implements PassengerEngine {
 
 			@Override
 			public DefaultPassengerEngine get() {
-				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer,
-						getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
+				return new DefaultPassengerEngine(getMode(), eventsManager, mobsimTimer, getModalInstance(PassengerRequestCreator.class), getModalInstance(VrpOptimizer.class),
 						getModalInstance(Network.class), getModalInstance(PassengerRequestValidator.class),
 						passengerRequestEventForwarder);
 			}
