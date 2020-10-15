@@ -22,8 +22,8 @@ package org.matsim.core.utils.io;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4FrameInputStream;
+import net.jpountz.lz4.LZ4FrameOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
@@ -252,7 +252,7 @@ final public class IOUtils {
 						inputStream = new GZIPInputStream(inputStream);
 						break;
 					case LZ4:
-						inputStream = new LZ4BlockInputStream(inputStream);
+						inputStream = new LZ4FrameInputStream(inputStream);
 						break;
 					case BZIP2:
 						inputStream = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, inputStream);
@@ -321,7 +321,7 @@ final public class IOUtils {
 						outputStream = new GZIPOutputStream(outputStream);
 						break;
 					case LZ4:
-						outputStream = new LZ4BlockOutputStream(outputStream);
+						outputStream = new LZ4FrameOutputStream(outputStream);
 						break;
 					case BZIP2:
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
