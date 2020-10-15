@@ -18,11 +18,11 @@ import javax.inject.Inject;
 final class IntersectionContext {
 
     private final static Logger logger = Logger.getLogger(IntersectionContext.class);
-    public static final String INTERSECTION_TYPE = "IntersectionType";
+    static final String INTERSECTION_TYPE = "IntersectionType";
 
     private final QuadTree<Intersection> intersections;
 
-    private enum RLS19IntersectionType {
+    enum RLS19IntersectionType {
 
         signalized(3),
         roundabout(2),
@@ -58,11 +58,20 @@ final class IntersectionContext {
             try {
                 final Object intersectionType = node.getAttributes().getAttribute(INTERSECTION_TYPE);
                 final Coordinate coordinate = CoordUtils.createGeotoolsCoordinate(node.getCoord());
-                if(RLS19IntersectionType.roundabout.name().equals(intersectionType)) {
-                    this.intersections.put(node.getCoord().getX(), node.getCoord().getY(), new Intersection(RLS19IntersectionType.roundabout, coordinate));
-                } else if(RLS19IntersectionType.signalized.name().equals(intersectionType)) {
-                    this.intersections.put(node.getCoord().getX(), node.getCoord().getY(), new Intersection(RLS19IntersectionType.signalized, coordinate));
+                if(intersectionType != null) {
+                    switch ((IntersectionContext.RLS19IntersectionType) intersectionType) {
+                        case signalized:
+                            this.intersections.put(node.getCoord().getX(), node.getCoord().getY(), new Intersection(RLS19IntersectionType.signalized, coordinate));
+                            break;
+                        case roundabout:
+                            this.intersections.put(node.getCoord().getX(), node.getCoord().getY(), new Intersection(RLS19IntersectionType.roundabout, coordinate));
+                            break;
+                        case other:
+                            break;
+                        default:
+                    }
                 }
+
             } catch (IllegalArgumentException e) {
                 logger.warn("Exception when checking " + node.getId() + " for intersections. Ignoring it.");
             }
@@ -79,12 +88,15 @@ final class IntersectionContext {
      * intersection of intersecting or converging source lines (=nodes)
      */
     double calculateIntersectionCorrection(Coordinate coordinate) {
-        final Intersection closest = intersections.getClosest(coordinate.x, coordinate.y);
-        final double distance = closest.coordinate.distance(coordinate);
-        if(distance < 120) {
-            return closest.type.correction * Math.max(1 - (distance / 120.), 0);
-        } else {
-            return 0;
+        if(intersections != null) {
+            final Intersection closest = intersections.getClosest(coordinate.x, coordinate.y);
+            if(closest != null) {
+                final double distance = closest.coordinate.distance(coordinate);
+                if (distance < 120) {
+                    return closest.type.correction * Math.max(1 - (distance / 120.), 0);
+                }
+            }
         }
+        return 0;
     }
 }
