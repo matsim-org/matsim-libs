@@ -692,7 +692,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	    //Find all nodes within BoundingBox
         Set<Long> nodesInBB = new HashSet<>();
         for (OsmNode node : this.nodes.values()) {
-            if (this.bbox.contains(node.coord)) {
+            if (this.bbox == null||this.bbox.contains(node.coord)) {
                 nodesInBB.add(node.id);
             }
         }
