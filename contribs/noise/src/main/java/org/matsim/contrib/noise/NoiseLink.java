@@ -44,7 +44,7 @@ final class NoiseLink {
 
 	private final Id<Link> id;
 
-	private List<Id<Vehicle>> enteringVehicleIds = new ArrayList<>();
+	private List<Id<Vehicle>> enteringVehicleIds = null;
 
 	private final Map<NoiseVehicleType, Double> travelTimeByType = new HashMap<>();
 
@@ -73,8 +73,11 @@ final class NoiseLink {
 		return enteringVehicleIds;
 	}
 
-	void setEnteringVehicleIds(List<Id<Vehicle>> enteringVehicleIds) {
-		this.enteringVehicleIds = enteringVehicleIds;
+	void addEnteringVehicleId(Id<Vehicle> enteringVehicleId) {
+		if(this.enteringVehicleIds == null) {
+			enteringVehicleIds = new ArrayList<>();
+		}
+		enteringVehicleIds.add(enteringVehicleId);
 	}
 
 	int getAgentsEntering(NoiseVehicleType type) {

@@ -33,16 +33,16 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  */
 public class DemandEstimatorAsTargetCalculator implements RebalancingTargetCalculator {
 	private final ZonalDemandEstimator demandEstimator;
+	private final double demandEstimationPeriod;
 
-	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator) {
+	public DemandEstimatorAsTargetCalculator(ZonalDemandEstimator demandEstimator, double demandEstimationPeriod) {
 		this.demandEstimator = demandEstimator;
+		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 
 	@Override
 	public ToDoubleFunction<DrtZone> calculate(double time,
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		// TODO remove this hidden "+60"
-		// XXX this "time+60" (taken from old code) means probably "in the next time bin"
-		return demandEstimator.getExpectedDemandForTimeBin(time + 60);
+		return demandEstimator.getExpectedDemand(time, demandEstimationPeriod);
 	}
 }

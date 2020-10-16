@@ -132,6 +132,11 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 	}
 
 	@Override
+	public void addScore(double amount) {
+		// unsupported in deprecated class
+	}
+
+	@Override
 	public void agentStuck(double time) {
 		for (AgentStuckScoring agentStuckScoringFunction : agentStuckScoringFunctions) {
 			agentStuckScoringFunction.agentStuck(time);

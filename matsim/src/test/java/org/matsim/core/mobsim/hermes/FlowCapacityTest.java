@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -40,6 +40,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.Map;
+
 /**
  * Tests different aspects of flow capacity in Hermes
  *
@@ -47,6 +49,11 @@ import org.matsim.vehicles.VehicleUtils;
 public class FlowCapacityTest {
 
 	private final static Logger log = Logger.getLogger(FlowCapacityTest.class);
+
+	@Before
+	public void setup() {
+		Id.resetCaches();
+	}
 
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by

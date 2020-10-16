@@ -75,7 +75,7 @@ public final class MatsimEventsReader implements MatsimReader {
 	@Override
 	public void readFile(final String filename) {
 		String lcFilename = filename.toLowerCase(Locale.ROOT);
-		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz") || lcFilename.endsWith(".xml.zst")) {
+		if (lcFilename.endsWith(".xml") || lcFilename.endsWith(".xml.gz") || lcFilename.endsWith(".xml.zst") || lcFilename.endsWith(".xml.lz4")) {
 			new XmlEventsReader(this.events, this.customEventMappers).readFile(filename );
 		} else if (lcFilename.endsWith(".ndjson") || lcFilename.endsWith(".ndjson.gz") || lcFilename.endsWith(".ndjson.zst")) {
 			EventsReaderJson reader = new EventsReaderJson(this.events);

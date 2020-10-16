@@ -14,6 +14,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.*;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -58,7 +59,11 @@ class FeatureNoiseBarriersReader {
 
         final FeatureIterator features = featureCollection.features();
         int idCounter = 0;
+        Counter counter = new Counter(" noise barrier #");
         while (features.hasNext()) {
+
+            counter.incCounter();
+
             SimpleFeature feature = (SimpleFeature) features.next();
 
             final Object geometry = feature.getAttribute("geometry");
