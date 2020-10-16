@@ -17,10 +17,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.urbanEV.EVUtils;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -46,17 +43,23 @@ public class UrbanEVIT {
 		config.controler().setOutputDirectory(matsimTestUtils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(1);
+
+		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		//manually insert car vehicle type with attributes (hbefa technology, initial energy etc....)
 		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
+
 		VehicleType carVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.car, VehicleType.class));
 		VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
 		VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
 		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 5);
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
+
+//		Vehicle vehicle = vehiclesFactory.createVehicle(Id.createVehicleId("JonasGolf"), carVehicleType);
+//		scenario.getVehicles().addVehicle(vehicle);
 
 		scenario.getVehicles().addVehicleType(carVehicleType);
 
