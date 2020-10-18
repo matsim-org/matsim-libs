@@ -25,8 +25,8 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  * @author michalm
  */
 public interface DetourTimeEstimator {
-	static DetourTimeEstimator createBeelineTimeEstimator(double beelineSpeed) {
-		return (from, to) -> DistanceUtils.calculateDistance(from, to) / beelineSpeed;
+	static DetourTimeEstimator createNodeToNodeBeelineTimeEstimator(double beelineSpeed) {
+		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
 	}
 
 	double estimateTime(Link from, Link to);
