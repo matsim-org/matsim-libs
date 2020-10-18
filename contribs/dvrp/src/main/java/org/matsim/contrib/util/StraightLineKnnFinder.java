@@ -24,7 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
@@ -32,18 +31,18 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  */
 public class StraightLineKnnFinder<T, N> {
 	private final int k;
-	private final Function<T, Link> objectToLink;
-	private final Function<N, Link> neighbourToLink;
+	private final Function<T, Coord> objectToLink;
+	private final Function<N, Coord> neighbourToLink;
 
-	public StraightLineKnnFinder(int k, Function<T, Link> objectToLink, Function<N, Link> neighbourToLink) {
+	public StraightLineKnnFinder(int k, Function<T, Coord> objectToLink, Function<N, Coord> neighbourToLink) {
 		this.k = k;
 		this.objectToLink = objectToLink;
 		this.neighbourToLink = neighbourToLink;
 	}
 
 	public List<N> findNearest(T obj, Stream<N> neighbours) {
-		Coord objectCoord = objectToLink.apply(obj).getCoord();
+		Coord objectCoord = objectToLink.apply(obj);
 		return PartialSort.kSmallestElements(k, neighbours,
-				n -> DistanceUtils.calculateSquaredDistance(objectCoord, neighbourToLink.apply(n).getCoord()));
+				n -> DistanceUtils.calculateSquaredDistance(objectCoord, neighbourToLink.apply(n)));
 	}
 }
