@@ -20,9 +20,11 @@
 package org.matsim.contrib.util;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
@@ -30,10 +32,10 @@ import org.matsim.contrib.util.distance.DistanceUtils;
  */
 public class StraightLineKnnFinder<T, N> {
 	private final int k;
-	private final LinkProvider<T> objectToLink;
-	private final LinkProvider<N> neighbourToLink;
+	private final Function<T, Link> objectToLink;
+	private final Function<N, Link> neighbourToLink;
 
-	public StraightLineKnnFinder(int k, LinkProvider<T> objectToLink, LinkProvider<N> neighbourToLink) {
+	public StraightLineKnnFinder(int k, Function<T, Link> objectToLink, Function<N, Link> neighbourToLink) {
 		this.k = k;
 		this.objectToLink = objectToLink;
 		this.neighbourToLink = neighbourToLink;
