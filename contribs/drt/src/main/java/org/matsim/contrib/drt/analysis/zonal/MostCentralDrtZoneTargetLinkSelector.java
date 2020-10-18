@@ -23,11 +23,11 @@ package org.matsim.contrib.drt.analysis.zonal;
 import static java.util.stream.Collectors.toMap;
 import static org.matsim.contrib.util.distance.DistanceUtils.calculateSquaredDistance;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
-
-import one.util.streamex.StreamEx;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author tschlenther
@@ -39,13 +39,20 @@ public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSe
 		targetLinks = drtZonalSystem.getZones()
 				.values()
 				.stream()
-				.collect(toMap(zone -> zone, zone -> StreamEx.of(zone.getLinks())
-						.minByDouble(link -> calculateSquaredDistance(zone.getCentroid(), link.getToNode().getCoord()))
-						.orElseThrow()));
+				.collect(toMap(zone -> zone, zone -> zone.getLinks().stream().min(
+						//1. choose the most central toNode of all links (could be more than one node!)
+						//2. if more than one link (quite normal even if only one node found),
+						//   choose the one (potentially) easiest to access (most central fromNode)
+						Comparator.<Link>comparingDouble(link -> squaredDistance(zone, link.getToNode()))//
+								.thenComparing(link -> squaredDistance(zone, link.getFromNode()))).orElseThrow()));
 	}
 
 	@Override
 	public Link selectTargetLink(DrtZone zone) {
 		return this.targetLinks.get(zone);
+	}
+
+	private double squaredDistance(DrtZone zone, Node node) {
+		return calculateSquaredDistance(zone.getCentroid(), node.getCoord());
 	}
 }
