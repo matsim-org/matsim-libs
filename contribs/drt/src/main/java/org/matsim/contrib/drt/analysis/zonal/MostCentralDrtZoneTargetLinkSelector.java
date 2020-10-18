@@ -40,9 +40,9 @@ public class MostCentralDrtZoneTargetLinkSelector implements DrtZoneTargetLinkSe
 				.values()
 				.stream()
 				.collect(toMap(zone -> zone, zone -> zone.getLinks().stream().min(
-						//1. choose the most central toNode of all links (could be more than one node!)
-						//2. if more than one link (quite normal even if only one node found),
-						//   choose the one (potentially) easiest to access (most central fromNode)
+						//1. choose links with the most central toNode (there may be several "most central" nodes)
+						//2. if there is more than one such link (which is usually the case),
+						//   choose one with the most central fromNode
 						Comparator.<Link>comparingDouble(link -> squaredDistance(zone, link.getToNode()))//
 								.thenComparing(link -> squaredDistance(zone, link.getFromNode()))).orElseThrow()));
 	}
