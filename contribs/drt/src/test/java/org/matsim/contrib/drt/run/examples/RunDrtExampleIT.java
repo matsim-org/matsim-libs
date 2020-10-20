@@ -68,7 +68,7 @@ public class RunDrtExampleIT {
 
 
 	@Test
-	public void testRunServiceAreabasedExample() {
+	public void testRunServiceAreabasedExampleWithSpeedUp() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_serviceArea_based_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
