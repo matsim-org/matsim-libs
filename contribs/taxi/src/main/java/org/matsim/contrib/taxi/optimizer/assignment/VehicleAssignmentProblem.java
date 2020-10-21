@@ -78,10 +78,12 @@ public class VehicleAssignmentProblem<D> {
 		// TODO this kNN is slow
 		destinationFinder = nearestDestinationLimit < 0 ?
 				null :
-				new StraightLineKnnFinder<>(nearestDestinationLimit, veh -> veh.link, dest -> dest.link);
+				new StraightLineKnnFinder<>(nearestDestinationLimit, veh -> veh.link.getToNode().getCoord(),
+						dest -> dest.link.getFromNode().getCoord());
 		vehicleFinder = nearestVehicleLimit < 0 ?
 				null :
-				new StraightLineKnnFinder<>(nearestVehicleLimit, dest -> dest.link, veh -> veh.link);
+				new StraightLineKnnFinder<>(nearestVehicleLimit, dest -> dest.link.getFromNode().getCoord(),
+						veh -> veh.link.getToNode().getCoord());
 	}
 
 	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,

@@ -191,7 +191,7 @@ public final class DrtSpeedUp implements IterationStartsListener, IterationEndsL
 
 			Link depLink = network.getLinks().get(submittedEvent.getFromLinkId());
 			Link arrLink = network.getLinks().get(submittedEvent.getToLinkId());
-			double beelineDistance = DistanceUtils.calculateDistance(depLink, arrLink);
+			double beelineDistance = DistanceUtils.calculateDistance(depLink.getToNode(), arrLink.getToNode());
 
 			double pickupTime = sequence.getPickedUp().get().getTime();
 			double waitTime = pickupTime - sequence.getSubmitted().getTime();

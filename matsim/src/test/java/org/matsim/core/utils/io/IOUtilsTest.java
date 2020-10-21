@@ -231,7 +231,10 @@ public class IOUtilsTest {
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertEquals("compressed file should be equal 62 bytes, but is " + file.length(), 62, file.length());
+		Assert.assertEquals("compressed file should be equal 35 bytes, but is " + file.length(), 35, file.length());
+
+		String content = IOUtils.getBufferedReader(filename).readLine();
+		Assert.assertEquals("12345678901234567890123456789012345678901234567890", content);
 	}
 
 	@Test(expected = UncheckedIOException.class)

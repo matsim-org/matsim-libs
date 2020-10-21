@@ -60,7 +60,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
 
 		admissibleDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createBeelineTimeEstimator(admissibleBeelineSpeed));
+				DetourTimeEstimator.createNodeToNodeBeelineTimeEstimator(admissibleBeelineSpeed));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
