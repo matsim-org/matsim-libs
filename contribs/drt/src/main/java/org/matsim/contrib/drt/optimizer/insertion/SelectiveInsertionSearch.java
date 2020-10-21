@@ -55,7 +55,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
 
 		restrictiveDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createBeelineTimeEstimator(restrictiveBeelineSpeed));
+				DetourTimeEstimator.createNodeToNodeBeelineTimeEstimator(restrictiveBeelineSpeed));
 
 		initialInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue));
