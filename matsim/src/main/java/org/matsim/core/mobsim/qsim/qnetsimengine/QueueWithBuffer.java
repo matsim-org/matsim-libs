@@ -85,7 +85,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
             throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
         }
 
-        addToBuffer(veh, null);
+        addToBuffer(veh, prevVehicle);
 	}
 	
 	/**
@@ -164,6 +164,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double unscaledFlowCapacity_s = Double.NaN ;
 	private double effectiveNumberOfLanes = Double.NaN ;
 
+	/**
+	 * Points to the latest vehicle that left the queue.
+	 */
+	private QVehicle prevVehicle = null;
+	/**
+	 * The time when {@link #prevVehicle} left the queue.
+	 */
+	private double prevTime;
+
 	private final VisData visData = new VisDataImpl() ;
 	private final NetsimEngineContext context;
 
@@ -201,13 +210,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 
-    private void addToBuffer(final QVehicle veh, QVehicle followingVehicle) {
+    private void addToBuffer(final QVehicle veh, QVehicle prevVehicle) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 
 		double now = context.getSimTimer().getTimeOfDay() ;
-        this.
-                flowcap_accumulate.addValue(-getFlowCapacityConsumptionInEquivalents(veh, followingVehicle), now);
+        this.flowcap_accumulate.addValue(-getFlowCapacityConsumptionInEquivalents(veh, prevVehicle, now - prevTime), now);
 
 		buffer.add(veh);
 		if (buffer.size() == 1) {
@@ -276,9 +284,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
             }
 
             removeVehicleFromQueue(veh);
-            QVehicle followingVehicle = peekFromVehQueue();
+            addToBuffer(veh, prevVehicle);
 
-            addToBuffer(veh, followingVehicle);
             if (context.qsimConfig.isRestrictingSeepage()
                     && context.qsimConfig.getLinkDynamics() == LinkDynamics.SeepageQ
                     && context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode())) {
@@ -332,9 +339,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private double subtractSizeOfVehiclesThatAreAlreadyInTheBuffer() {
 		double remainingFlowCapThisTimeStep = flowCapacityPerTimeStep;
+		QVehicle prev = null;
 		for (QVehicle veh : buffer) {
 			// Subtract size of vehicles that are already in the buffer (from previous time steps)
-			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh);
+			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh, prev, null);
+			prev = veh;
 		}
 		return remainingFlowCapThisTimeStep;
 	}
@@ -550,9 +559,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
                 break;
             case kinematicWaves:
                 this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
-
-                //TODO: get and store previousVehicle
-                this.accumulatedInflowCap -= getFlowCapacityConsumptionInEquivalents(previousVeh, veh); //previousVehicle may be null...
+                this.accumulatedInflowCap -= getFlowCapacityConsumptionInEquivalents(veh, prevVehicle, now - prevTime);
                 break;
             default:
                 throw new RuntimeException("The traffic dynamics " + context.qsimConfig.getTrafficDynamics() + " is not implemented yet.");
@@ -574,6 +581,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			// do nothing
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
+			prevVehicle = veh2Remove;
+			prevTime = now;
 		}
 
 		switch (context.qsimConfig.getTrafficDynamics()) {
@@ -793,8 +802,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.remainingHolesStorageCapacity = this.storageCapacity;
     }
 
-    private double getFlowCapacityConsumptionInEquivalents(QVehicle vehicle, QVehicle followingVehicle) {
-        double flowEfficiency = flowEfficiencyCalculator.calculateFlowEfficiency(vehicle, followingVehicle, qLink.getLink());
+    private double getFlowCapacityConsumptionInEquivalents(QVehicle vehicle, QVehicle prevVehicle, Double prevTime) {
+        double flowEfficiency = flowEfficiencyCalculator.calculateFlowEfficiency(vehicle, prevVehicle, prevTime, qLink.getLink(), id);
         return vehicle.getSizeInEquivalents() / flowEfficiency;
 	}
 

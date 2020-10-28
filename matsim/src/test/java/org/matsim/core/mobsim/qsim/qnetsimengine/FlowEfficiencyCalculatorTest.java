@@ -44,7 +44,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.Lane;
 
 import java.util.Arrays;
 
@@ -112,7 +112,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 
 		@Override
-        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle followingQVehicle, Link link) {
+        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double previousTimeDiff, Link link, Id<Lane> laneId) {
 			return factor;
 		}
 	}
