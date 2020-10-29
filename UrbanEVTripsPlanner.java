@@ -358,7 +358,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	//TODO possibly put behind interface
 	private ChargerSpecification selectChargerNearToLink(Id<Link> linkId, ElectricVehicleSpecification vehicleSpecification, Network network){
 		StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
-				1, l -> l, s -> network.getLinks().get(s.getLinkId())); //TODO get closest X chargers and choose randomly?
+				1, l -> l.getFromNode().getCoord(), s -> network.getLinks().get(s.getLinkId()).getToNode().getCoord()); //TODO get closest X chargers and choose randomly?
 		List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(network.getLinks().get(linkId),
 				chargingInfrastructureSpecification.getChargerSpecifications()
 						.values()
