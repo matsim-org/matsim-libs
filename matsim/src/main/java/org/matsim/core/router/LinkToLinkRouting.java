@@ -19,23 +19,30 @@
 
 package org.matsim.core.router;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.*;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkInverter;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 
 public class LinkToLinkRouting
-    implements Provider<RoutingModule>
-{
+        implements Provider<RoutingModule> {
     private final String mode;
 
     @Inject
     PopulationFactory populationFactory;
+
+    @Inject
+    SingleModeNetworksCache singleModeNetworksCache;
 
     @Inject
     LeastCostPathCalculatorFactory leastCostPathCalcFactory;
@@ -53,17 +60,38 @@ public class LinkToLinkRouting
     NetworkTurnInfoBuilderI networkTurnInfoBuilder;
 
 
-    public LinkToLinkRouting(String mode)
-    {
+    public LinkToLinkRouting(String mode) {
         this.mode = mode;
     }
 
 
     @Override
-    public RoutingModule get()
-    {
-        return new LinkToLinkRoutingModule(mode, populationFactory, network,
-                leastCostPathCalcFactory, travelDisutilities.get(mode), travelTimes,
-                networkTurnInfoBuilder);
+    public RoutingModule get() {
+
+        // the network refers to the (transport)mode:
+        Network filteredNetwork = null;
+        Network invertedNetwork = null;
+
+        // Ensure this is not performed concurrently by multiple threads!
+        synchronized (this.singleModeNetworksCache.getSingleModeNetworksCache()) {
+            filteredNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode);
+            invertedNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(mode + "-inv");
+            if (filteredNetwork == null) {
+                TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+                Set<String> modes = new HashSet<>();
+                modes.add(mode);
+                filteredNetwork = NetworkUtils.createNetwork();
+                filter.filter(filteredNetwork, modes);
+
+                invertedNetwork = new NetworkInverter(filteredNetwork, networkTurnInfoBuilder.createAllowedTurnInfos()).getInvertedNetwork();
+
+                this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode, filteredNetwork);
+                this.singleModeNetworksCache.getSingleModeNetworksCache().put(mode + "-inv", invertedNetwork);
+            }
+        }
+
+        InvertedLeastPathCalculator leastCostPathCalculator = InvertedLeastPathCalculator.create(leastCostPathCalcFactory, travelDisutilities.get(mode), filteredNetwork, invertedNetwork, travelTimes);
+
+        return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
     }
 }

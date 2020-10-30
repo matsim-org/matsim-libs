@@ -31,8 +31,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 public final class DefaultRoutingModules {
 	// despite the fact that this class is in "old", I actually think that it is ok, providing a public interface to functionality that could be changed
 	// underneath.  Have to keep in in the "old" package in order to package-protect the infrastructure that is used underneath. kai, mar'15
-	
-	
+
+
 	private DefaultRoutingModules(){} // do not instantiate
 
 	public static RoutingModule createPseudoTransitRouter( String mode, PopulationFactory popFac, Network net, LeastCostPathCalculator routeAlgo,
@@ -57,13 +57,13 @@ public final class DefaultRoutingModules {
 	 * Creates network router without access/egress.
 	 */
 	public static RoutingModule createPureNetworkRouter( String mode, PopulationFactory popFact, Network net, final LeastCostPathCalculator routeAlgo ) {
-		return new NetworkRoutingModule(	
+		return new NetworkRoutingModule(
 				mode,
 				popFact,
 				net,
 				routeAlgo);
 	}
-	
+
 	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
 	public static RoutingModule createAccessEgressNetworkRouter( String mode,
@@ -72,7 +72,7 @@ public final class DefaultRoutingModules {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 			  routeAlgo,
-			  scenario, filteredNetwork, accessEgressToNetworkRouter, accessEgressToNetworkRouter );
+			  scenario, filteredNetwork, null, accessEgressToNetworkRouter, accessEgressToNetworkRouter );
 	}
 
 	// TODO: make package private again
@@ -83,7 +83,7 @@ public final class DefaultRoutingModules {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
 				routeAlgo,
-				scenario, filteredNetwork, accessToNetworkRouter, egressFromNetworkRouter);
+				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter);
 	}
 
 }

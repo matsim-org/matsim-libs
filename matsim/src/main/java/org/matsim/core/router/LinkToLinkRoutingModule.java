@@ -19,12 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,19 +28,14 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkInverter;
-import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
-import org.matsim.vehicles.Vehicle;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -58,39 +48,25 @@ import org.matsim.vehicles.Vehicle;
  * @author dgrether
  * @author michalm
  */
-class LinkToLinkRoutingModule implements RoutingModule
-{
-    private final Network invertedNetwork;
+class LinkToLinkRoutingModule implements RoutingModule {
     private final Network network;
+    private final Network invertedNetwork;
     private final LeastCostPathCalculator leastCostPathCalculator;
     private final PopulationFactory populationFactory;
     private final String mode;
 
     LinkToLinkRoutingModule(final String mode, final PopulationFactory populationFactory,
-            Network network, LeastCostPathCalculatorFactory leastCostPathCalcFactory,
-            TravelDisutilityFactory travelCostCalculatorFactory,
-            LinkToLinkTravelTime l2ltravelTimes, NetworkTurnInfoBuilderI turnInfoBuilder)
-    {
+            Network network, Network invertedNetwork, InvertedLeastPathCalculator leastCostPathCalc) {
     	this.network = network;
+    	this.invertedNetwork = invertedNetwork;
     	this.populationFactory = populationFactory;
     	this.mode = mode;
-    	
-        invertedNetwork = new NetworkInverter(network, turnInfoBuilder.createAllowedTurnInfos()).getInvertedNetwork();
-
-        // convert l2ltravelTimes into something that can be used by the inverted network router:
-        TravelTimesInvertedNetworkProxy invertedTravelTimes = new TravelTimesInvertedNetworkProxy(network, l2ltravelTimes);
-        // (method that takes a getLinkTravelTime( link , ...) with a link from the inverted network, converts it into links on the 
-        // original network, and looks up the link2link tttime in the l2ltravelTimes data structure)
-
-        TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(invertedTravelTimes);
-
-        leastCostPathCalculator = leastCostPathCalcFactory.createPathCalculator(invertedNetwork, travelCost, invertedTravelTimes);
+        this.leastCostPathCalculator = leastCostPathCalc;
     }
 
     @Override
     public List<? extends PlanElement> calcRoute( final Facility fromFacility,
-								  final Facility toFacility, final double departureTime, final Person person)
-    {	      
+								  final Facility toFacility, final double departureTime, final Person person) {
         Leg newLeg = this.populationFactory.createLeg( this.mode );
 		
 		Gbl.assertNotNull(fromFacility);
@@ -102,13 +78,12 @@ class LinkToLinkRoutingModule implements RoutingModule
 		            .get(Id.create(fromFacility.getLinkId(), Node.class));
 		    Node toInvNode = this.invertedNetwork.getNodes().get(Id.create(toFacility.getLinkId(), Node.class));
 		
-		    Path invPath = leastCostPathCalculator.calcLeastCostPath(fromInvNode, toInvNode, departureTime, person, null);
-		    if (invPath == null) {
+		    Path path = leastCostPathCalculator.calcLeastCostPath(fromInvNode, toInvNode, departureTime, person, null);
+		    if (path == null) {
 		        throw new RuntimeException("No route found on inverted network from link "
 		                + fromFacility.getLinkId() + " to link " + toFacility.getLinkId() + ".");
 		    }		
-		    Path path = invertPath(invPath);
-		    
+
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromFacility.getLinkId(), toFacility.getLinkId());
 			route.setLinkIds(fromFacility.getLinkId(), NetworkUtils.getLinkIds(path.links), toFacility.getLinkId());
 			route.setTravelTime(path.travelTime);
@@ -128,66 +103,6 @@ class LinkToLinkRoutingModule implements RoutingModule
 		newLeg.setDepartureTime(departureTime);
 		return Arrays.asList( newLeg );
     }
-    
-    private Path invertPath(Path invPath)
-    {
-        int invLinkCount = invPath.links.size();//==> normal node count
 
-        //path search is called only if fromLinkId != toLinkId
-        //see: org.matsim.core.router.NetworkRoutingModule.routeLeg()
-        //implies: fromInvNode != toInvNode
-        if (invLinkCount == 0) {
-            throw new RuntimeException(
-                    "The path in the inverted network should consist of at least one link.");
-        }
-
-        List<Link> links = new ArrayList<>(invLinkCount - 1);
-        for (int i = 1; i < invLinkCount; i++) {
-            Id<Link> linkId = Id.create(invPath.nodes.get(i).getId(), Link.class);
-            links.add(network.getLinks().get(linkId));
-        }
-
-        List<Node> nodes = new ArrayList<>(invLinkCount);
-//        nodes.add(links.get(0).getFromNode());
-        /* use the first link of the inverted path instead of the first node of the just created link list. also works for invLinkCount 1. theresa, jan'17 */
-        nodes.add(network.getNodes().get(Id.create(invPath.links.get(0).getId(), Node.class)));
-        for (Link l : links) {
-            nodes.add(l.getToNode());
-        }
-
-        return new Path(nodes, links, invPath.travelTime, invPath.travelCost);
-    }
-    
-
-    private static class TravelTimesInvertedNetworkProxy
-        implements TravelTime
-    {
-        private Network network;
-        private LinkToLinkTravelTime linkToLinkTravelTime;
-
-
-        private TravelTimesInvertedNetworkProxy(Network network, LinkToLinkTravelTime l2ltt)
-        {
-            this.linkToLinkTravelTime = l2ltt;
-            this.network = network;
-        }
-
-
-        /**
-         * In this case the link given as parameter is a link from the inverted network.
-         * 
-         * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double, Person,
-         *      Vehicle)
-         */
-        @Override
-        public double getLinkTravelTime(Link invLink, double time, Person person, Vehicle vehicle)
-        {
-            Link fromLink = network.getLinks()
-                    .get(Id.create(invLink.getFromNode().getId(), Link.class));
-            Link toLink = network.getLinks()
-                    .get(Id.create(invLink.getToNode().getId(), Link.class));
-            return linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time, person, vehicle);
-        }
-    }
 
 }
