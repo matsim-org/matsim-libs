@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.zone;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 public class SquareGrid {
-	private final Network network;
 	private final double cellSize;
 
 	private double minX;
@@ -38,11 +38,10 @@ public class SquareGrid {
 
 	private Zone[] zones;
 
-	public SquareGrid(Network network, double cellSize) {
-		this.network = network;
+	public SquareGrid(Collection<? extends Node> nodes, double cellSize) {
 		this.cellSize = cellSize;
 
-		initBounds();
+		initBounds(nodes);
 
 		cols = (int)Math.ceil((maxX - minX) / cellSize);
 		rows = (int)Math.ceil((maxY - minY) / cellSize);
@@ -51,12 +50,12 @@ public class SquareGrid {
 	}
 
 	// This method's content has been copied from NetworkImpl
-	private void initBounds() {
+	private void initBounds(Collection<? extends Node> nodes) {
 		minX = Double.POSITIVE_INFINITY;
 		minY = Double.POSITIVE_INFINITY;
 		maxX = Double.NEGATIVE_INFINITY;
 		maxY = Double.NEGATIVE_INFINITY;
-		for (Node n : network.getNodes().values()) {
+		for (Node n : nodes) {
 			if (n.getCoord().getX() < minX) {
 				minX = n.getCoord().getX();
 			}

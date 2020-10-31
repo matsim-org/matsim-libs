@@ -38,17 +38,17 @@ import org.matsim.core.router.util.TravelTime;
 
 public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, URL context) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility, URL context) {
 		double cellSize = ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
 				.getCellSize();
-		return create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime, travelDisutility,
-				new SquareGridSystem(network, cellSize), context);
+		return create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime,
+				travelDisutility, new SquareGridSystem(network.getNodes().values(), cellSize), context);
 	}
 
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, ZonalSystem zonalSystem, URL context) {
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility, ZonalSystem zonalSystem, URL context) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler.getScheduleInquiry());
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		ZonalRequestInserter requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
@@ -59,8 +59,10 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	}
 
 	public ZonalTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-							  TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater,  IdleTaxiZonalRegistry idleTaxiRegistry,
-							  UnplannedRequestZonalRegistry unplannedRequestRegistry, ZonalRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
+			TaxiScheduler scheduler, ScheduleTimingUpdater scheduleTimingUpdater,
+			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
+			ZonalRequestInserter requestInserter) {
+		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, idleTaxiRegistry,
+				unplannedRequestRegistry, requestInserter);
 	}
 }

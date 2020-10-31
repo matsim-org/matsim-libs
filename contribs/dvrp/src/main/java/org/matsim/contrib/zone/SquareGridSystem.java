@@ -19,34 +19,24 @@
 
 package org.matsim.contrib.zone;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 public class SquareGridSystem implements ZonalSystem {
 	private final SquareGrid grid;
 	private final Map<Id<Zone>, Zone> zones = new HashMap<>();
 
-	public SquareGridSystem(Network network, double cellSize) {
-		this.grid = new SquareGrid(network, cellSize);
-
-		for (Node n : network.getNodes().values()) {
+	public SquareGridSystem(Collection<? extends Node> nodes, double cellSize) {
+		this.grid = new SquareGrid(nodes, cellSize);
+		for (Node n : nodes) {
 			Zone zone = grid.getZone(n.getCoord());
-			zones.put(zone.getId(), zone);
+			zones.putIfAbsent(zone.getId(), zone);
 		}
-	}
-
-	public static Map<Id<Zone>, Zone> filterZonesWithNodes(Network network, ZonalSystem zonalSystem) {
-		Map<Id<Zone>, Zone> zonesWithNodes = new HashMap<>();
-		for (Node n : network.getNodes().values()) {
-			Zone zone = zonalSystem.getZone(n);
-			zonesWithNodes.put(zone.getId(), zone);
-		}
-		return zonesWithNodes;
 	}
 
 	@Override
