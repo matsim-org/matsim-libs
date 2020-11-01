@@ -34,6 +34,8 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.core.controler.MatsimServices;
 
+import com.google.common.base.Preconditions;
+
 import one.util.streamex.EntryStream;
 
 /**
@@ -62,6 +64,7 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 							EntryStream.of(preparedGeometries).mapKeys(i -> (i + 1) + "").toMap());
 
 				case GridFromNetwork:
+					Preconditions.checkNotNull(params.getCellSize());
 					var gridZones = drtCfg.getOperationalScheme() == OperationalScheme.serviceAreaBased ?
 							createGridFromNetworkWithinServiceArea(network, params.getCellSize(),
 									loadPreparedGeometries(
@@ -75,14 +78,15 @@ public class DrtModeZonalSystemModule extends AbstractDvrpModeModule {
 		})).asEagerSingleton();
 
 		bindModal(DrtZoneTargetLinkSelector.class).toProvider(modalProvider(getter -> {
-				switch (params.getTargetLinkSelection()) {
-					case mostCentral:
-						return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class));
-					case random:
-						return new RandomDrtZoneTargetLinkSelector();
-					default:
-						throw new RuntimeException("Unsupported target link selection = " + params.getTargetLinkSelection());
-				}
+			switch (params.getTargetLinkSelection()) {
+				case mostCentral:
+					return new MostCentralDrtZoneTargetLinkSelector(getter.getModal(DrtZonalSystem.class));
+				case random:
+					return new RandomDrtZoneTargetLinkSelector();
+				default:
+					throw new RuntimeException(
+							"Unsupported target link selection = " + params.getTargetLinkSelection());
+			}
 		})).asEagerSingleton();
 
 		//zonal analysis
