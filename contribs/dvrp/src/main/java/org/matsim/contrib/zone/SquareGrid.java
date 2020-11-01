@@ -45,8 +45,7 @@ public class SquareGrid {
 
 		cols = (int)Math.ceil((maxX - minX) / cellSize);
 		rows = (int)Math.ceil((maxY - minY) / cellSize);
-
-		initZones();
+		zones = new Zone[rows * cols];
 	}
 
 	// This method's content has been copied from NetworkImpl
@@ -76,27 +75,24 @@ public class SquareGrid {
 		// yy the above four lines are problematic if the coordinate values are much smaller than one. kai, oct'15
 	}
 
-	private void initZones() {
-		zones = new Zone[rows * cols];
-		double x0 = minX + cellSize / 2;
-		double y0 = minY + cellSize / 2;
-
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < cols; c++) {
-				int idx = r * cols + c;
-				Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
-				zones[idx] = new Zone(Id.create(idx, Zone.class), "square", centroid);
-			}
-		}
-	}
-
-	public Zone[] getZones() {
-		return zones;
-	}
-
 	public Zone getZone(Coord coord) {
 		int r = (int)((coord.getY() - minY) / cellSize);// == Math.floor
 		int c = (int)((coord.getX() - minX) / cellSize);// == Math.floor
 		return zones[r * cols + c];
+	}
+
+	public Zone getOrCreateZone(Coord coord) {
+		int r = (int)((coord.getY() - minY) / cellSize);// == Math.floor
+		int c = (int)((coord.getX() - minX) / cellSize);// == Math.floor
+		Zone zone = zones[r * cols + c];
+		if (zone == null) {
+			double x0 = minX + cellSize / 2;
+			double y0 = minY + cellSize / 2;
+			int idx = r * cols + c;
+			Coord centroid = new Coord(c * cellSize + x0, r * cellSize + y0);
+			zone = new Zone(Id.create(idx, Zone.class), "square", centroid);
+			zones[idx] = zone;
+		}
+		return zone;
 	}
 }
