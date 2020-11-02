@@ -20,7 +20,9 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
+import java.util.Optional;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -30,13 +32,14 @@ import javax.validation.constraints.PositiveOrZero;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
+import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrixParams;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
 import com.google.common.collect.ImmutableSet;
 
-public final class DvrpConfigGroup extends ReflectiveConfigGroup {
+public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets {
 	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
 
 	public static final String GROUP_NAME = "dvrp";
@@ -47,7 +50,8 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	private static final String NETWORK_MODES = "networkModes";
-	private static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
+	private static final String NETWORK_MODES_EXP = ""
+			+ "Set of modes of which the network will be used for DVRP travel time "
 			+ "estimation and routing DVRP vehicles. "
 			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
 			+ "travelling only along a specified links or serving a limited area). "
@@ -70,7 +74,8 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 					+ " the free-speed TTs is used as the initial estimates";
 
 	private static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
-	private static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
+	private static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = ""
+			+ "Used for ONLINE estimation of travel times for VrpOptimizer"
 			+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
 			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
 			+ " or positive (mixed online-offline estimation)."
@@ -107,8 +112,18 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@PositiveOrZero
 	private double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
 
+	@Nullable
+	private DvrpTravelTimeMatrixParams travelTimeMatrixParams;
+
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);
+		initSingletonParameterSets();
+	}
+
+	private void initSingletonParameterSets() {
+		//travel time matrix (optional)
+		addDefinition(DvrpTravelTimeMatrixParams.SET_NAME, DvrpTravelTimeMatrixParams::new,
+				() -> travelTimeMatrixParams, params -> travelTimeMatrixParams = (DvrpTravelTimeMatrixParams)params);
 	}
 
 	@Override
@@ -219,5 +234,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public DvrpConfigGroup setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
 		return this;
+	}
+
+	public Optional<DvrpTravelTimeMatrixParams> getTravelTimeMatrixParams() {
+		return Optional.ofNullable(travelTimeMatrixParams);
 	}
 }
