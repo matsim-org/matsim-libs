@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
@@ -10,6 +10,14 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>dvrp</artifactId>
 	<name>dvrp</name>
+
+	<repositories>
+		<repository>
+			<id>SBB</id>
+			<url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -53,6 +61,11 @@
 			<groupId>one.util</groupId>
 			<artifactId>streamex</artifactId>
 			<version>0.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.sbb</groupId>
+			<artifactId>matsim-sbb-extensions</artifactId>
+			<version>12.13</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
