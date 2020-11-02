@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
+import org.matsim.contrib.zone.skims.DvrpTravelTimesMatrixModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -34,6 +35,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
+import com.google.inject.Inject;
 import com.google.inject.name.Names;
 
 /**
@@ -45,6 +47,9 @@ import com.google.inject.name.Names;
  * @author michalm
  */
 public final class DvrpModule extends AbstractModule {
+	@Inject
+	private DvrpConfigGroup dvrpConfigGroup;
+
 	@Override
 	public void install() {
 		// Visualisation of schedules for DVRP DynAgents
@@ -54,6 +59,9 @@ public final class DvrpModule extends AbstractModule {
 				.toInstance(VehicleUtils.getDefaultVehicleType());
 
 		install(new DvrpTravelTimeModule());
+
+		dvrpConfigGroup.getTravelTimeMatrixParams()
+				.ifPresent(params -> install(new DvrpTravelTimesMatrixModule(getConfig().global(), params)));
 
 		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
