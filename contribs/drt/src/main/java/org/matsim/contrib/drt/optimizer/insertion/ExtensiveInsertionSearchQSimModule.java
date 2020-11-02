@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -53,7 +54,8 @@ public class ExtensiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		}).toProvider(modalProvider(
 				getter -> new ExtensiveInsertionSearch(getter.getModal(DetourPathCalculator.class), drtCfg,
 						getter.get(MobsimTimer.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
+						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
+						getter.get(DvrpTravelTimeMatrix.class))));
 
 		addModalComponent(MultiInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject

@@ -30,6 +30,7 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -48,19 +49,17 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public ExtensiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator) {
+			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
+			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
 
 		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue);
 
-		// TODO use more sophisticated DetourTimeEstimator
-		double admissibleBeelineSpeed = insertionParams.getAdmissibleBeelineSpeedFactor()
-				* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
-
 		admissibleDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createNodeToNodeBeelineTimeEstimator(admissibleBeelineSpeed));
+				DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(insertionParams.getAdmissibleBeelineSpeedFactor(),
+						dvrpTravelTimeMatrix));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
