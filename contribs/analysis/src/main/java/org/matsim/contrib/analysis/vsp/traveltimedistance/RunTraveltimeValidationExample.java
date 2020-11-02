@@ -89,6 +89,7 @@ public class RunTraveltimeValidationExample {
             }
         });
         spr.readFile(plans);
+        System.out.println("populationId Size is " + populationIds.size());
 
 
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);

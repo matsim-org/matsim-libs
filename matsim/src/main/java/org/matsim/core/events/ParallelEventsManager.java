@@ -82,7 +82,8 @@ public final class ParallelEventsManager implements EventsManager {
 		this.eventsHandlers = new ArrayList<EventHandler>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
 		this.eventsQueueSize = eventsQueueSize;
-		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
+//		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
+		this.eventQueue = new ArrayBlockingQueue<>(1048576 * 64);
 		this.uncaughtExceptionHandler = new ExceptionHandler();
 	}
 

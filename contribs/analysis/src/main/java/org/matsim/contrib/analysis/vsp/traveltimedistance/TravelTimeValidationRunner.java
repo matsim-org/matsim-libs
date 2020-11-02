@@ -22,6 +22,13 @@
  */
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -35,19 +42,12 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author  jbischoff
@@ -83,12 +83,13 @@ public class TravelTimeValidationRunner {
 	}
 	
 	public void run(){
-		
-		EventsManager events = EventsUtils.createEventsManager();
+		ParallelEventsManager eventManager = (ParallelEventsManager) EventsUtils.createEventsManager();
+//		EventsManager events = EventsUtils.createEventsManager();
 		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(populationIds, network);
-		events.addHandler(carTripsExtractor);
-		new MatsimEventsReader(events).readFile(eventsFile);
+		eventManager.addHandler(carTripsExtractor);
+		new MatsimEventsReader(eventManager).readFile(eventsFile);
 		List<CarTrip> carTrips = carTripsExtractor.getTrips();
+		System.out.println("there are " + carTrips.size() + " car trips");
 		Collections.shuffle(carTrips, MatsimRandom.getRandom());
 		int i = 0;
 		for (CarTrip trip : carTrips){

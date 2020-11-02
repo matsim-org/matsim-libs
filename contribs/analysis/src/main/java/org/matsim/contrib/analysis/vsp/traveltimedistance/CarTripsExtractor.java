@@ -84,9 +84,12 @@ public class CarTripsExtractor implements PersonDepartureEventHandler, PersonArr
 	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+		System.out.println("person arrival event detected");
 		if (event.getLegMode().equals(TransportMode.car)){
+			System.out.println("car related arrival event identified");
 			if (this.personsWithPlan.contains(event.getPersonId()))
 			{
+				System.out.println("persons with plan contains that event");
 				Coord arrivalCoord = network.getLinks().get(event.getLinkId()).getCoord();
 				Coord departureCoord = this.lastDepartureLocation.remove(event.getPersonId());
 				double departureTime = this.lastDepartureTime.remove(event.getPersonId());
