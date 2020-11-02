@@ -87,6 +87,7 @@ public class TravelTimeValidationRunner {
 //		EventsManager events = EventsUtils.createEventsManager();
 		CarTripsExtractor carTripsExtractor = new CarTripsExtractor(populationIds, network);
 		eventManager.addHandler(carTripsExtractor);
+		eventManager.initProcessing();
 		new MatsimEventsReader(eventManager).readFile(eventsFile);
 		List<CarTrip> carTrips = carTripsExtractor.getTrips();
 		System.out.println("there are " + carTrips.size() + " car trips");
