@@ -47,8 +47,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
-	final String appId;
-	final String appCode;
+	final String apiAcessKey;
 	final String outputPath;
 	final String date;
 	final CoordinateTransformation transformation;
@@ -57,16 +56,14 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 	/**
 	 * 
 	 * @param outputFolder   folder to write gzipped json files
-	 * @param appId          your here App ID (not needed in the latest HERE API)
-	 * @param appCode        your API Access Code (to be request on the here.com)
+	 * @param apiAccessKey        your API Access Code (to be request on the here.com)
 	 * @param date           a date to run the validation for, format: 2017-06-08
 	 * @param transformation A coordinate transformation to WGS 84
 	 */
-	public HereMapsRouteValidator(String outputFolder, String appId, String appCode, String date,
+	public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
 			CoordinateTransformation transformation) {
 		this.outputPath = outputFolder;
-		this.appId = appId;
-		this.appCode = appCode;
+		this.apiAcessKey = apiAccessKey;
 		this.date = date;
 		this.transformation = transformation;
 		File outDir = new File(outputFolder);
@@ -96,12 +93,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 		DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
 		df.applyPattern(pattern);
 
-//		String urlString = "http://route.cit.api.here.com/routing/8.9.1/calculateroute.json?app_id=" + appId
-//				+ "&app_code=" + appCode + "&waypoint0=geo!" + df.format(from.getY()) + "," + df.format(from.getX())
-//				+ "&waypoint1=geo!" + df.format(to.getY()) + "," + df.format(to.getX()) + "&departure=" + date + "T"
-//				+ Time.writeTime(trip.getDepartureTime()) + "&mode=fastest;car;traffic:enabled";
-
-		String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + appCode + "&transportmode=car&origin="
+		String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAcessKey + "&transportmode=car&origin="
 				+ df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
 				+ df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(trip.getDepartureTime())
 				+ "&return=summary";
@@ -113,7 +105,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 			JSONParser jp = new JSONParser();
 
 			JSONObject jsonObject = (JSONObject) jp.parse(in);
-//			JSONObject route = (JSONObject) ((JSONArray) ((JSONObject) jsonObject.get("response")).get("route")).get(0);
 			JSONArray routes = (JSONArray) jsonObject.get("routes");
 			JSONObject route = (JSONObject) routes.get(0);
 			JSONArray sections = (JSONArray) route.get("sections");
@@ -122,7 +113,6 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 			travelTime = (long) summary.get("duration");
 			distance = (long) summary.get("length");
 
-			// System.out.println(travelTime + " "+ baseTime + " "+distance);
 			if (writeDetailedFiles) {
 				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 				bw.write(jsonObject.toString());
