@@ -38,6 +38,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.Key;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
@@ -73,8 +74,8 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 			dvrpConfigGroup.getTravelTimeMatrixParams().ifPresent(travelTimeMatrixParams ->//
 					bindModal(DvrpTravelTimeMatrix.class).toProvider(createProvider(getMode(),
 							getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class), travelTimeMatrixParams,
-									globalConfigGroup.getNumberOfThreads()))).asEagerSingleton());
-
+									globalConfigGroup.getNumberOfThreads())))//
+							.in(Singleton.class));//lazily initialised - in case this specific mode does not need it
 		} else {
 			bindModal(Network.class).to(
 					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
