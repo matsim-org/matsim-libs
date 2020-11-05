@@ -62,6 +62,9 @@ public final class NoiseComputationModule extends AbstractModule {
 				for(RLS19VehicleType type: RLS19VehicleType.values()) {
 					noiseVehicleTypeMultibinder.addBinding().toInstance(type);
 				}
+				this.bind(RoadSurfaceContext.class).in(Singleton.class);
+				this.bind(IntersectionContext.class).in(Singleton.class);
+
 				break;
 			default:
 				throw new IllegalStateException("Unrecognized noise computation method: " + noiseParameters.getNoiseComputationMethod());

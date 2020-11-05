@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +16,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package org.matsim.api.core.v01.events.handler;
 
-import java.util.function.Function;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
+import org.matsim.core.events.handler.EventHandler;
 
-import org.matsim.api.core.v01.network.Link;
-
-/**
- * @author michalm
- */
-public interface LinkProvider<T> extends Function<T, Link> {
-	Link apply(T object);
+public interface PersonScoreEventHandler extends EventHandler {
+	void handleEvent (PersonScoreEvent event);
 }

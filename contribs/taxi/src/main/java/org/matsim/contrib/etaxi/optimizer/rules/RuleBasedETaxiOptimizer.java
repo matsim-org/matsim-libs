@@ -54,7 +54,8 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 		double cellSize = ((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
 				.getCellSize();
 		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, network,
-				timer, travelTime, travelDisutility, chargingInfrastructure, new SquareGridSystem(network, cellSize));
+				timer, travelTime, travelDisutility, chargingInfrastructure,
+				new SquareGridSystem(network.getNodes().values(), cellSize));
 	}
 
 	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,

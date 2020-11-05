@@ -43,11 +43,13 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 
 	private final ZonalDemandEstimator demandEstimator;
 	private final DrtZonalSystem zonalSystem;
+	private final double demandEstimationPeriod;
 
 	public EqualRebalancableVehicleDistributionTargetCalculator(ZonalDemandEstimator demandEstimator,
-			DrtZonalSystem zonalSystem) {
+			DrtZonalSystem zonalSystem, double demandEstimationPeriod) {
 		this.demandEstimator = demandEstimator;
 		this.zonalSystem = zonalSystem;
+		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 
 	@Override
@@ -55,7 +57,8 @@ public class EqualRebalancableVehicleDistributionTargetCalculator implements Reb
 			Map<DrtZone, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
 		int numAvailableVehicles = rebalancableVehiclesPerZone.values().stream().mapToInt(List::size).sum();
 
-		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemandForTimeBin(time);
+		ToDoubleFunction<DrtZone> currentDemandEstimator = demandEstimator.getExpectedDemand(time,
+				demandEstimationPeriod);
 		Set<DrtZone> activeZones = zonalSystem.getZones()
 				.values()
 				.stream()

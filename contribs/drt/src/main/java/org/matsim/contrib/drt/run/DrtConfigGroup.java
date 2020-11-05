@@ -42,6 +42,7 @@ import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
@@ -146,9 +147,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
-	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
-	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
-
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
@@ -220,8 +218,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private DrtFareParams drtFareParams;
 
-	@NotNull
-	private String drtSpeedUpMode = "";
+	@Nullable
+	private DrtSpeedUpParams drtSpeedUpParams;
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -248,6 +246,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		//drt fare
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
 				params -> drtFareParams = (DrtFareParams)params);
+
+		//drt speedup
+		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
+				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
 	}
 
 	@Override
@@ -324,7 +326,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
-		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -654,14 +655,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		return this;
 	}
 
-	public String getDrtSpeedUpMode() {
-		return drtSpeedUpMode;
-	}
-
-	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
-		this.drtSpeedUpMode = drtSpeedUpMode;
-	}
-
 	public double getAdvanceRequestPlanningHorizon() {
 		return advanceRequestPlanningHorizon;
 	}
@@ -685,5 +678,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	public Optional<DrtFareParams> getDrtFareParams() {
 		return Optional.ofNullable(drtFareParams);
+	}
+
+	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
+		return Optional.ofNullable(drtSpeedUpParams);
 	}
 }

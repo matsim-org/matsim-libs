@@ -43,6 +43,7 @@ public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 
 	@Override
 	public Network get() {
+		//TODO add shape filtering (network area should contain the service area and possibly some buffer)
 		if (dvrpCfg.getNetworkModes().isEmpty()) { // no mode filtering
 			return network;
 		} else {

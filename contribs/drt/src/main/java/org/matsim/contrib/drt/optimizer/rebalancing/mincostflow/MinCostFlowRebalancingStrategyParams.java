@@ -61,6 +61,11 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	static final String ZONAL_DEMAND_ESTIMATOR_TYPE_EXP = "Defines the methodology for demand estimation."
 			+ " Can be one of [PreviousIterationDemand, None]. Current default is PreviousIterationDemand";
 
+	public static final String DEMAND_ESTIMATION_PERIOD = "demandEstimationPeriod";
+	static final String DEMAND_ESTIMATION_PERIOD_EXP = "Defines the time horizon for predicting the demand."
+			+ " Used when 'zonalDemandEstimatorType' is not set to 'None'."
+			+ " Default value is 1800 s.";
+
 	@NotNull
 	private RebalancingTargetCalculatorType rebalancingTargetCalculatorType = RebalancingTargetCalculatorType.EstimatedDemand;
 
@@ -69,6 +74,9 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 
 	@PositiveOrZero
 	private double targetBeta = Double.NaN;
+
+	@PositiveOrZero
+	private int demandEstimationPeriod = 1800;
 
 	@NotNull
 	private ZonalDemandEstimatorType zonalDemandEstimatorType = ZonalDemandEstimatorType.PreviousIterationDemand;
@@ -83,6 +91,7 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 		map.put(TARGET_ALPHA, TARGET_ALPHA_EXP);
 		map.put(TARGET_BETA, TARGET_BETA_EXP);
 		map.put(ZONAL_DEMAND_ESTIMATOR_TYPE, ZONAL_DEMAND_ESTIMATOR_TYPE_EXP);
+		map.put(DEMAND_ESTIMATION_PERIOD, DEMAND_ESTIMATION_PERIOD_EXP);
 		return map;
 	}
 
@@ -116,6 +125,22 @@ public final class MinCostFlowRebalancingStrategyParams extends ReflectiveConfig
 	@StringSetter(TARGET_BETA)
 	public void setTargetBeta(double targetBeta) {
 		this.targetBeta = targetBeta;
+	}
+
+	/**
+	 * @return -- {@value #DEMAND_ESTIMATION_PERIOD_EXP}
+	 */
+	@StringGetter(DEMAND_ESTIMATION_PERIOD)
+	public int getDemandEstimationPeriod() {
+		return demandEstimationPeriod;
+	}
+
+	/**
+	 * @param demandEstimationPeriod -- {@value #DEMAND_ESTIMATION_PERIOD_EXP}
+	 */
+	@StringSetter(DEMAND_ESTIMATION_PERIOD)
+	public void setDemandEstimationPeriod(int demandEstimationPeriod) {
+		this.demandEstimationPeriod = demandEstimationPeriod;
 	}
 
 	/**

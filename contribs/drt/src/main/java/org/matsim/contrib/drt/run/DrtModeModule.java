@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
 import org.matsim.contrib.drt.analysis.zonal.DrtModeZonalSystemModule;
 import org.matsim.contrib.drt.fare.DrtFareHandler;
 import org.matsim.contrib.drt.optimizer.rebalancing.Feedforward.DrtModeFeedforwardRebalanceModule;
@@ -45,7 +46,9 @@ import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
+import org.matsim.contrib.drt.speedup.DrtSpeedUp;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
+import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
@@ -158,6 +161,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		drtCfg.getDrtFareParams()
 				.ifPresent(params -> addEventHandlerBinding().toInstance(new DrtFareHandler(getMode(), params)));
+
+		drtCfg.getDrtSpeedUpParams().ifPresent(drtSpeedUpParams -> {
+			bindModal(DrtSpeedUp.class).toProvider(modalProvider(
+					getter -> new DrtSpeedUp(getMode(), drtSpeedUpParams, getConfig().controler(),
+							getter.get(Network.class), getter.getModal(FleetSpecification.class),
+							getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
+			addControlerListenerBinding().to(modalKey(DrtSpeedUp.class));
+		});
 	}
 
 	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DrtRouteCreator> {
