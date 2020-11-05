@@ -35,6 +35,9 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private static final String EXTRA_HOUR_PARKING_COST_LINK_ATTRIBUTE_NAME = "extraHourParkingCostLinkAttributeName";
 	private static final String MAX_DAILY_PARKING_COST_LINK_ATTRIBUTE_NAME = "maxDailyParkingCostLinkAttributeName";
 	private static final String HOME_ACTIVITY_PREFIX_TO_BE_EXCLUDED_FROM_PARKING_COSTS = "homeActivityPrefixToBeExcludedFromParkingCost";
+	private static final String MAX_PARKING_DURATION_ATTRIBUTE_NAME = "maxParkingDurationAttributeName";
+	private static final String PARKING_PENALTY_ATTRIBUTE_NAME = "parkingPenaltyAttributeName";
+	private static final String RESIDENTIAL_PARKING_FEE_PER_DAY = "residentialParkingFeePerDay";
 	
 	public ParkingCostConfigGroup() {
 		super(GROUP_NAME);
@@ -46,6 +49,9 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private String extraHourParkingCostLinkAttributeName = "extraHourPCost";
 	private String maxDailyParkingCostLinkAttributeName = "maxDailyPCost";
 	private String homeActivityPrefixToBeExcludedFromParkingCost = "home";
+	private String maxParkingDurationAttributeName = "maxPDuration";
+	private String parkingPenaltyAttributeName = "penalty";
+	private String residentialParkingFeePerDay = "residentialPFee";
 
 	@StringGetter( MODE )
 	public String getMode() {
@@ -106,6 +112,36 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	public void setHomeActivityPrefixToBeExcludedFromParkingCost(String homeActivityPrefixToBeExcludedFromParkingCost) {
 		this.homeActivityPrefixToBeExcludedFromParkingCost = homeActivityPrefixToBeExcludedFromParkingCost;
 	}
-	
+
+	@StringGetter( MAX_PARKING_DURATION_ATTRIBUTE_NAME )
+    public String getMaxParkingDurationAttributeName() {
+		return maxParkingDurationAttributeName;
+    }
+
+	@StringSetter( MAX_PARKING_DURATION_ATTRIBUTE_NAME )
+	public void setMaxParkingDurationAttributeName(String maxParkingDurationAttributeName) {
+		this.maxParkingDurationAttributeName = maxParkingDurationAttributeName;
+	}
+
+	@StringGetter( PARKING_PENALTY_ATTRIBUTE_NAME )
+	public String getParkingPenaltyAttributeName() {
+		return parkingPenaltyAttributeName;
+	}
+
+	@StringSetter( PARKING_PENALTY_ATTRIBUTE_NAME )
+	public void setParkingPenaltyAttributeName(String parkingPenaltyAttributeName) {
+		this.parkingPenaltyAttributeName = parkingPenaltyAttributeName;
+	}
+
+	@StringGetter( RESIDENTIAL_PARKING_FEE_PER_DAY )
+	public String getResidentialParkingFeeAttributeName() {
+		return residentialParkingFeePerDay;
+	}
+
+	@StringSetter( RESIDENTIAL_PARKING_FEE_PER_DAY )
+	public void setResidentialParkingFeeAttributeName(String residentialParkingFeePerDay) {
+		this.residentialParkingFeePerDay = residentialParkingFeePerDay;
+	}
+
 }
 
