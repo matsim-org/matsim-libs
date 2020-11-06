@@ -27,6 +27,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.locationtech.jts.geom.Geometry;
@@ -50,6 +51,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 	private final DrtZonalSystem zones;
 	private static final String zoneIdForOutsideOfZonalSystem = "outsideOfDrtZonalSystem";
 	private static final String notAvailableString = "NaN";
+	private static final Logger log = Logger.getLogger(DrtZonalWaitTimesAnalyzer.class);
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtRequestAnalyzer requestAnalyzer,
 			DrtZonalSystem zones) {
@@ -153,7 +155,12 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 
 	private Collection<SimpleFeature> convertGeometriesToSimpleFeatures(String targetCoordinateSystem) {
 		SimpleFeatureTypeBuilder simpleFeatureBuilder = new SimpleFeatureTypeBuilder();
-		simpleFeatureBuilder.setCRS(MGC.getCRS(targetCoordinateSystem));
+		try {
+			simpleFeatureBuilder.setCRS(MGC.getCRS(targetCoordinateSystem));
+		} catch (IllegalArgumentException e) {
+			log.warn("Coordinate reference system \"" + targetCoordinateSystem + "\" is unknown. Please set a crs in config global. Will try to create drt_waitStats_" + drtCfg.getMode() + "_zonal.shp anyway.");
+		}
+
 		simpleFeatureBuilder.setName("drtZoneFeature");
 		// note: column names may not be longer than 10 characters. Otherwise the name is cut after the 10th character and the avalue is NULL in QGis
 		simpleFeatureBuilder.add("the_geom", Polygon.class);
