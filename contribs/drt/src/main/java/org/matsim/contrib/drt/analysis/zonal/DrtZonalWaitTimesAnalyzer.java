@@ -24,9 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.drt.analysis.DrtRequestAnalyzer;
@@ -41,6 +39,8 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 	private final DrtConfigGroup drtCfg;
 	private final DrtRequestAnalyzer requestAnalyzer;
 	private final DrtZonalSystem zones;
+	private static final String zoneIdForOutsideOfZonalSystem = "outsideOfDrtZonalSystem";
+	private static final String notAvailableString = "NaN";
 
 	public DrtZonalWaitTimesAnalyzer(DrtConfigGroup configGroup, DrtRequestAnalyzer requestAnalyzer,
 			DrtZonalSystem zones) {
@@ -59,7 +59,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 
 	public void write(String fileName) {
 		String delimiter = ";";
-		Map<String, DescriptiveStatistics> zoneStats = createZonalStats(delimiter);
+		Map<String, DescriptiveStatistics> zoneStats = createZonalStats();
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		try {
 			DecimalFormat format = new DecimalFormat();
@@ -67,12 +67,22 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 			format.setMinimumIntegerDigits(1);
 			format.setMaximumFractionDigits(2);
 			format.setGroupingUsed(false);
-			bw.append("zone;centerX;centerY;nRequests;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75");
-			for (Map.Entry<String, DescriptiveStatistics> zoneStatsEntry : zoneStats.entrySet()) {
-				DescriptiveStatistics stats = zoneStatsEntry.getValue();
+			bw.append("zone;centerX;centerY;nRequests;sumWaitTime;meanWaitTime;min;max;p95;p90;p80;p75;p50");
+			// sorted output
+			SortedSet<String> zoneIdsAndOutside = new TreeSet<>(zones.getZones().keySet());
+			zoneIdsAndOutside.add(zoneIdForOutsideOfZonalSystem);
+
+			for (String zoneId: zoneIdsAndOutside) {
+				DrtZone drtZone = zones.getZones().get(zoneId);
+				String centerX = drtZone != null ? String.valueOf(drtZone.getCentroid().getX()) : notAvailableString;
+				String centerY = drtZone != null ? String.valueOf(drtZone.getCentroid().getY()) : notAvailableString;
+				DescriptiveStatistics stats = zoneStats.get(zoneId);
 				bw.newLine();
-				bw.append(zoneStatsEntry.getKey()
+				bw.append(zoneId
 						+ delimiter
+						+ centerX
+						+ delimiter
+						+ centerY
 						+ format.format(stats.getN())
 						+ delimiter
 						+ format.format(stats.getSum())
@@ -89,7 +99,9 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 						+ delimiter
 						+ stats.getPercentile(80)
 						+ delimiter
-						+ stats.getPercentile(75));
+						+ stats.getPercentile(75)
+						+ delimiter
+						+ stats.getPercentile(50));
 			}
 			bw.flush();
 			bw.close();
@@ -98,16 +110,22 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener {
 		}
 	}
 
-	private Map<String, DescriptiveStatistics> createZonalStats(String delimiter) {
+	private Map<String, DescriptiveStatistics> createZonalStats() {
 		Map<String, DescriptiveStatistics> zoneStats = new HashMap<>();
+		// prepare stats for all zones
+		for (String zoneId: zones.getZones().keySet()) {
+			zoneStats.put(zoneId, new DescriptiveStatistics());
+		}
+		zoneStats.put(zoneIdForOutsideOfZonalSystem, new DescriptiveStatistics());
+
 		for (PerformedRequestEventSequence seq : requestAnalyzer.getPerformedRequestSequences().values()) {
 			if (seq.getPickedUp().isPresent()) {
 				DrtZone zone = zones.getZoneForLinkId(seq.getSubmitted().getFromLinkId());
 				final String zoneStr = zone != null ?
-						zone.getId() + delimiter + zone.getCentroid().getX() + delimiter + zone.getCentroid().getY() :
-						"outsideOfDrtZonalSystem;-;-";
+						zone.getId() :
+						zoneIdForOutsideOfZonalSystem;
 				double waitTime = seq.getPickedUp().get().getTime() - seq.getSubmitted().getTime();
-				zoneStats.computeIfAbsent(zoneStr, z -> new DescriptiveStatistics()).addValue(waitTime);
+				zoneStats.get(zoneStr).addValue(waitTime);
 			}
 		}
 		return zoneStats;
