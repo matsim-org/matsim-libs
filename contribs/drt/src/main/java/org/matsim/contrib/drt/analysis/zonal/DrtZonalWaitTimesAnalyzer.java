@@ -87,30 +87,30 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 				String centerY = drtZone != null ? String.valueOf(drtZone.getCentroid().getY()) : notAvailableString;
 				DescriptiveStatistics stats = zoneStats.get(zoneId);
 				bw.newLine();
-				bw.append(zoneId
-						+ delimiter
-						+ centerX
-						+ delimiter
-						+ centerY
-						+ format.format(stats.getN())
-						+ delimiter
-						+ format.format(stats.getSum())
-						+ delimiter
-						+ stats.getMean()
-						+ delimiter
-						+ stats.getMin()
-						+ delimiter
-						+ stats.getMax()
-						+ delimiter
-						+ stats.getPercentile(95)
-						+ delimiter
-						+ stats.getPercentile(90)
-						+ delimiter
-						+ stats.getPercentile(80)
-						+ delimiter
-						+ stats.getPercentile(75)
-						+ delimiter
-						+ stats.getPercentile(50));
+				bw.append(zoneId).
+						append(delimiter).
+						append(centerX).
+						append(delimiter).
+						append(centerY).
+						append(format.format(stats.getN())).
+						append(delimiter).
+						append(format.format(stats.getSum())).
+						append(delimiter).
+						append(String.valueOf(stats.getMean())).
+						append(delimiter).
+						append(String.valueOf(stats.getMin())).
+						append(delimiter).
+						append(String.valueOf(stats.getMax())).
+						append(delimiter).
+						append(String.valueOf(stats.getPercentile(95))).
+						append(delimiter).
+						append(String.valueOf(stats.getPercentile(90))).
+						append(delimiter).
+						append(String.valueOf(stats.getPercentile(80))).
+						append(delimiter).
+						append(String.valueOf(stats.getPercentile(75))).
+						append(delimiter).
+						append(String.valueOf(stats.getPercentile(50)));
 			}
 			bw.flush();
 			bw.close();
@@ -178,7 +178,7 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 
 		for (DrtZone zone: zones.getZones().values()) {
 			Object[] routeFeatureAttributes = new Object[14];
-			Geometry geometry = zone.getPreparedGeometry().getGeometry();
+			Geometry geometry = zone.getPreparedGeometry() != null ? zone.getPreparedGeometry().getGeometry() : null;
 			DescriptiveStatistics stats = zoneStats.get(zone.getId());
 			routeFeatureAttributes[0] = geometry;
 			routeFeatureAttributes[1] = zone.getId();
