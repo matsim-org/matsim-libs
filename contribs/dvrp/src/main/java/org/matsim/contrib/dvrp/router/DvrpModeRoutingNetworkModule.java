@@ -71,17 +71,15 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 				return subnetwork;
 			})).asEagerSingleton();
 
-			dvrpConfigGroup.getTravelTimeMatrixParams().ifPresent(travelTimeMatrixParams ->//
-					bindModal(DvrpTravelTimeMatrix.class).toProvider(createProvider(getMode(),
-							getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class), travelTimeMatrixParams,
-									globalConfigGroup.getNumberOfThreads())))//
-							.in(Singleton.class));//lazily initialised - in case this specific mode does not need it
+			//lazily initialised: optimisers may do not need it
+			bindModal(DvrpTravelTimeMatrix.class).toProvider(createProvider(getMode(),
+					getter -> new DvrpTravelTimeMatrix(getter.getModal(Network.class),
+							dvrpConfigGroup.getTravelTimeMatrixParams(), globalConfigGroup.getNumberOfThreads())))
+					.in(Singleton.class);
 		} else {
 			bindModal(Network.class).to(
 					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
-			if (dvrpConfigGroup.getTravelTimeMatrixParams().isPresent()) {
-				bindModal(DvrpTravelTimeMatrix.class).to(DvrpTravelTimeMatrix.class);
-			}
+			bindModal(DvrpTravelTimeMatrix.class).to(DvrpTravelTimeMatrix.class);
 		}
 	}
 

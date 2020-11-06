@@ -62,10 +62,11 @@ public final class DvrpModule extends AbstractModule {
 
 		install(new DvrpTravelTimeModule());
 
-		dvrpConfigGroup.getTravelTimeMatrixParams().ifPresent(travelTimeMatrixParams ->//
-				bind(DvrpTravelTimeMatrix.class).toProvider(
-						new DvrpGlobalTravelTimesMatrixProvider(getConfig().global(), travelTimeMatrixParams))
-						.in(Singleton.class));//lazily initialised - in case we have only mode-filtered subnetworks!
+		//lazily initialised:
+		// 1. we have only mode-filtered subnetworks
+		// 2. optimisers may do not use it
+		bind(DvrpTravelTimeMatrix.class).toProvider(new DvrpGlobalTravelTimesMatrixProvider(getConfig().global(),
+				dvrpConfigGroup.getTravelTimeMatrixParams())).in(Singleton.class);
 
 		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)

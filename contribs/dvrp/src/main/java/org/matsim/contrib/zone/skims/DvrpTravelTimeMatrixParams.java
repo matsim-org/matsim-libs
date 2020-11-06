@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.validation.constraints.Positive;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -64,5 +65,10 @@ public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
 	@StringSetter(CELL_SIZE)
 	public void setCellSize(int cellSize) {
 		this.cellSize = cellSize;
+	}
+
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		return super.createParameterSet(type);
 	}
 }
