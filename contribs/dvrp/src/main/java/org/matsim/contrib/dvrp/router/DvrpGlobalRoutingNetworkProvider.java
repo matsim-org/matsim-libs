@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.router;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.network.NetworkUtils;
@@ -30,6 +31,8 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
  * @author michalm
  */
 public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
+	private static final Logger log = Logger.getLogger(DvrpGlobalRoutingNetworkProvider.class);
+
 	public static final String DVRP_ROUTING = "dvrp_routing";
 
 	private final Network network;
@@ -43,13 +46,24 @@ public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 
 	@Override
 	public Network get() {
-		//TODO add shape filtering (network area should contain the service area and possibly some buffer)
+		//input/output network may not be connected
+		logNetworkSize("unfiltered", network);
 		if (dvrpCfg.getNetworkModes().isEmpty()) { // no mode filtering
 			return network;
-		} else {
-			Network dvrpNetwork = NetworkUtils.createNetwork();
-			new TransportModeNetworkFilter(network).filter(dvrpNetwork, dvrpCfg.getNetworkModes());
-			return dvrpNetwork;
 		}
+
+		Network filteredNetwork = NetworkUtils.createNetwork();
+		new TransportModeNetworkFilter(network).filter(filteredNetwork, dvrpCfg.getNetworkModes());
+		logNetworkSize("filtered", filteredNetwork);
+		return filteredNetwork;
+	}
+
+	private void logNetworkSize(String description, Network network) {
+		log.info("DVRP global routing network "
+				+ description
+				+ ": #nodes="
+				+ network.getNodes().size()
+				+ " #links:"
+				+ network.getLinks().size());
 	}
 }

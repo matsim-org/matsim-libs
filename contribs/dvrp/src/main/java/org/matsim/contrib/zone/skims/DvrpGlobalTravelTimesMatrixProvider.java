@@ -25,7 +25,6 @@ import javax.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -33,26 +32,21 @@ import com.google.inject.name.Named;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimesMatrixModule extends AbstractModule {
+public class DvrpGlobalTravelTimesMatrixProvider implements Provider<DvrpTravelTimeMatrix> {
 	private final DvrpTravelTimeMatrixParams params;
 	private final int numberOfThreads;
 
-	public DvrpTravelTimesMatrixModule(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
+	@Inject
+	@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
+	private Network network;
+
+	public DvrpGlobalTravelTimesMatrixProvider(GlobalConfigGroup globalConfig, DvrpTravelTimeMatrixParams params) {
 		this.params = params;
 		this.numberOfThreads = globalConfig.getNumberOfThreads();
 	}
 
 	@Override
-	public void install() {
-		bind(DvrpTravelTimeMatrix.class).toProvider(new Provider<>() {
-			@Inject
-			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Override
-			public DvrpTravelTimeMatrix get() {
-				return new DvrpTravelTimeMatrix(network, params, numberOfThreads);
-			}
-		}).asEagerSingleton();
+	public DvrpTravelTimeMatrix get() {
+		return new DvrpTravelTimeMatrix(network, params, numberOfThreads);
 	}
 }

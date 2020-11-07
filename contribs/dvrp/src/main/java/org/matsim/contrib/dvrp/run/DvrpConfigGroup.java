@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMax;
@@ -236,7 +235,10 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		return this;
 	}
 
-	public Optional<DvrpTravelTimeMatrixParams> getTravelTimeMatrixParams() {
-		return Optional.ofNullable(travelTimeMatrixParams);
+	public DvrpTravelTimeMatrixParams getTravelTimeMatrixParams() {
+		if (travelTimeMatrixParams == null) {
+			addParameterSet(new DvrpTravelTimeMatrixParams());
+		}
+		return travelTimeMatrixParams;
 	}
 }
