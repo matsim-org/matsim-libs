@@ -20,6 +20,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 
 /**
  * @author michalm
@@ -27,6 +28,10 @@ import org.matsim.contrib.util.distance.DistanceUtils;
 public interface DetourTimeEstimator {
 	static DetourTimeEstimator createNodeToNodeBeelineTimeEstimator(double beelineSpeed) {
 		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
+	}
+
+	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double factor, DvrpTravelTimeMatrix matrix) {
+		return (from, to) -> factor * matrix.getFreeSpeedTravelTime(from.getToNode(), to.getToNode());
 	}
 
 	double estimateTime(Link from, Link to);

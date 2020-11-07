@@ -27,7 +27,8 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
-import org.matsim.contrib.zone.skims.DvrpTravelTimesMatrixModule;
+import org.matsim.contrib.zone.skims.DvrpGlobalTravelTimesMatrixProvider;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -36,6 +37,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
@@ -60,8 +62,11 @@ public final class DvrpModule extends AbstractModule {
 
 		install(new DvrpTravelTimeModule());
 
-		dvrpConfigGroup.getTravelTimeMatrixParams()
-				.ifPresent(params -> install(new DvrpTravelTimesMatrixModule(getConfig().global(), params)));
+		//lazily initialised:
+		// 1. we have only mode-filtered subnetworks
+		// 2. optimisers may do not use it
+		bind(DvrpTravelTimeMatrix.class).toProvider(new DvrpGlobalTravelTimesMatrixProvider(getConfig().global(),
+				dvrpConfigGroup.getTravelTimeMatrixParams())).in(Singleton.class);
 
 		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
