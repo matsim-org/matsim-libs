@@ -39,6 +39,10 @@
 		</parameterset>
 	</module>
 
+	<module name="global">
+		<param name="coordinateSystem" value="WGS84" />
+	</module>
+
 	<module name="network">
 		<param name="inputNetworkFile" value="network.xml"/>
 	</module>
