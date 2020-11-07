@@ -92,7 +92,9 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
-		int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
+
+		//handle negative times (e.g. in backward shortest path search)
+		int idx = Math.max(0, TimeBinUtils.getTimeBinIndex(time, interval, intervalCount));
 		return linkTTs.get(link.getId())[idx];
 	}
 
