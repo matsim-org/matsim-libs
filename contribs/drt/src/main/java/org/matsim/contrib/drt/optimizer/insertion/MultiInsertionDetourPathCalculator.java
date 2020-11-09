@@ -31,8 +31,10 @@ import java.util.concurrent.Future;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
@@ -42,6 +44,8 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import ch.sbb.matsim.routing.graph.Graph;
 
 /**
  * @author michalm
@@ -89,10 +93,14 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	public MultiInsertionDetourPathCalculator(Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
-		toPickupPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
-		fromPickupPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
-		toDropoffPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
-		fromDropoffPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
+		Graph graph = new Graph(network);
+		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
+		nodeMap.putAll(network.getNodes());
+
+		toPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility);
+		fromPickupPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility);
+		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility);
+		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility);
 		stopDuration = drtCfg.getStopDuration();
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
@@ -116,25 +124,25 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		// highest computation time (approx. 45% total CPU time)
 		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
 				() -> toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
-						earliestPickupTime));
+						earliestPickupTime, false));
 
 		// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
 		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Link, PathData>> pathsFromPickupFuture = executorService.submit(
 				() -> fromPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourEndLinks.values(),
-						earliestPickupTime));
+						earliestPickupTime, true));
 
 		// calc backward dijkstra from dropoff to ends of selected stops
 		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Link, PathData>> pathsToDropoffFuture = executorService.submit(
 				() -> toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
-						earliestDropoffTime));
+						earliestDropoffTime, false));
 
 		// calc forward dijkstra from dropoff to beginnings of selected stops
 		// lowest computation time (approx. 5% total CPU time)
 		Future<Map<Link, PathData>> pathsFromDropoffFuture = executorService.submit(
 				() -> fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
-						earliestDropoffTime));
+						earliestDropoffTime, true));
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
