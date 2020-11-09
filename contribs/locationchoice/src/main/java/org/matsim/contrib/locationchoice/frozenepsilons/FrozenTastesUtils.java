@@ -6,7 +6,7 @@ class FrozenTastesUtils{
 
 	private static final String LOCATIONCHOICE_MAXDCSCORE = "locationchoice_maxDCScore_";
 
-	public static double getMaxDcScore( Person person, String activityType ) {
+	public static Double getMaxDcScore( Person person, String activityType ) {
 		Double result = (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType );
 		if ( result == null ) {
 			result =  (Double) person.getAttributes().getAttribute( activityType );
