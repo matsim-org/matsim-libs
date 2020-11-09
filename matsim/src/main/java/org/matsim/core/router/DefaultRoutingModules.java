@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
+import javax.annotation.Nullable;
+
 /**
  * @author nagel
  *
@@ -84,6 +86,19 @@ public final class DefaultRoutingModules {
 				mode,
 				routeAlgo,
 				scenario, filteredNetwork,null, accessToNetworkRouter, egressFromNetworkRouter);
+	}
+
+	/**
+	 * Creates a new access egress network router.
+	 *
+	 * @param invertedNetwork if not null, routing will be on the inverted network, in which case routeAlgo needs to be an {@link InvertedLeastPathCalculator}
+	 */
+	public static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
+																 Network filteredNetwork, @Nullable Network invertedNetwork,
+																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
+		return new NetworkRoutingInclAccessEgressModule(
+				mode, routeAlgo, scenario, filteredNetwork, invertedNetwork, accessToNetworkRouter, egressFromNetworkRouter
+		);
 	}
 
 }

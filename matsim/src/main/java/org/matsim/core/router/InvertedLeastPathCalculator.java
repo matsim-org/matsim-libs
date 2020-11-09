@@ -12,6 +12,12 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A least cost path calculator supposed to work on an inverted network (created with {@link org.matsim.core.network.algorithms.NetworkInverter}).
+ * The returned path of this calculator will be inverted again so it is valid on the actual non-inverted network.
+ * <p>
+ * The nodes in {@link #calcLeastCostPath(Node, Node, double, Person, Vehicle)} have to be pseudo nodes from the inverted network, i.e. link ids.
+ */
 class InvertedLeastPathCalculator implements LeastCostPathCalculator {
 
     private final Network network;
@@ -23,6 +29,9 @@ class InvertedLeastPathCalculator implements LeastCostPathCalculator {
     }
 
 
+    /**
+     * Create a new {@link InvertedLeastPathCalculator}.s
+     */
     static InvertedLeastPathCalculator create(LeastCostPathCalculatorFactory costFactory, TravelDisutilityFactory travelTimeFactory,
                                               Network network, Network invertedNetwork, LinkToLinkTravelTime l2ltravelTimes) {
 

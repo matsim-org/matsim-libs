@@ -112,6 +112,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
 					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress ");
 		}
+		if (invertedNetwork != null && !(routeAlgo instanceof InvertedLeastPathCalculator)) {
+			throw new IllegalArgumentException("Inverted network must be used with inverted least path calculator.");
+		}
 	}
 
 	@Override

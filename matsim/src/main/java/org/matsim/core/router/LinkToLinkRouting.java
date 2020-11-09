@@ -25,8 +25,12 @@ import java.util.Set;
 
 import javax.inject.*;
 
+import com.google.inject.name.Named;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkInverter;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
@@ -45,7 +49,13 @@ public class LinkToLinkRouting
     SingleModeNetworksCache singleModeNetworksCache;
 
     @Inject
+    PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+
+    @Inject
     LeastCostPathCalculatorFactory leastCostPathCalcFactory;
+
+    @Inject
+    Scenario scenario;
 
     @Inject
     Map<String, TravelDisutilityFactory> travelDisutilities;
@@ -59,12 +69,19 @@ public class LinkToLinkRouting
     @Inject
     NetworkTurnInfoBuilderI networkTurnInfoBuilder;
 
+    @Inject
+    @Named(TransportMode.walk)
+    private RoutingModule walkRouter;
 
     public LinkToLinkRouting(String mode) {
         this.mode = mode;
     }
 
 
+    /**
+     * Similar logic as in the {@link NetworkRoutingProvider}. regarding access egress behaviour.
+     * @see NetworkRoutingProvider#get()
+     */
     @Override
     public RoutingModule get() {
 
@@ -90,8 +107,24 @@ public class LinkToLinkRouting
             }
         }
 
-        InvertedLeastPathCalculator leastCostPathCalculator = InvertedLeastPathCalculator.create(leastCostPathCalcFactory, travelDisutilities.get(mode), filteredNetwork, invertedNetwork, travelTimes);
+        InvertedLeastPathCalculator leastCostPathCalculator = InvertedLeastPathCalculator.create(
+                leastCostPathCalcFactory, travelDisutilities.get(mode),
+                filteredNetwork, invertedNetwork, travelTimes
+        );
 
-        return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
+        // see NetworkRoutingProvider for some notes
+        if (!plansCalcRouteConfigGroup.getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none)) {
+            if (mode.equals(TransportMode.walk)) {
+                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+                        filteredNetwork, invertedNetwork, null,null);
+            } else {
+                return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, leastCostPathCalculator, scenario,
+                        filteredNetwork, invertedNetwork, walkRouter, walkRouter);
+            }
+
+        } else {
+            // pure inverted router
+            return new LinkToLinkRoutingModule(mode, populationFactory, filteredNetwork, invertedNetwork, leastCostPathCalculator);
+        }
     }
 }
