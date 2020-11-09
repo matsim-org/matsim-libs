@@ -67,9 +67,11 @@ class ReadOrComputeMaxDCScore {
 				maxEpsReader.readFile(maxEpsValuesFileName);
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					for (String flexibleType : this.flexibleTypes){
-						double maxType = (Double) personsMaxDCScoreUnscaled.getAttribute(p.getId().toString(), flexibleType);
+//						double maxType = (Double) personsMaxDCScoreUnscaled.getAttribute(p.getId().toString(), flexibleType);
+						double maxType = (Double) FrozenTastesUtils.getMaxDcScore(p, flexibleType);
 						if (maxType != 0) {
-							p.getAttributes().putAttribute(flexibleType, maxType);
+//							p.getAttributes().putAttribute(flexibleType, maxType);
+							FrozenTastesUtils.setMaxDcScore(p, flexibleType, maxType);
 						}
 					}
 				}
@@ -95,7 +97,8 @@ class ReadOrComputeMaxDCScore {
 			for (String flexibleType : this.flexibleTypes) {
 				for (Activity activity : activities) {
 					if (activity.getType().equals(flexibleType)) {
-						if (person.getAttributes().getAttribute(flexibleType) == null) {
+//						if (person.getAttributes().getAttribute(flexibleType) == null) {
+						if (FrozenTastesUtils.getMaxDcScore(person, flexibleType) == null) {
 							return false;
 						}
 					}
