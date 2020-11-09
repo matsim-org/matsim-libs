@@ -88,13 +88,15 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 	 private boolean existingKValues() {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Object kAttribute = person.getAttributes().getAttribute("k");
+//			Object kAttribute = person.getAttributes().getAttribute("k");
+			Object kAttribute = FrozenTastesUtils.getPersonalKeyValue(person);
 			if (kAttribute == null) {
 				return false;
 			}
 		}
 		for (ActivityFacility activityFacility : scenario.getActivityFacilities().getFacilities().values()) {
-			Object kAttribute = activityFacility.getAttributes().getAttribute("k");
+//			Object kAttribute = activityFacility.getAttributes().getAttribute("k");
+			Object kAttribute = FrozenTastesUtils.getOwnFacilityValue(activityFacility);
 			if (kAttribute == null) {
 				return false;
 			}
