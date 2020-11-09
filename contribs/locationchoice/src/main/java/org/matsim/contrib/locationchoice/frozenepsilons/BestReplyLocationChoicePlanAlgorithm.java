@@ -212,8 +212,9 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxDCScore = 0.0;
 		double scale = this.scaleEpsilon.getEpsilonFactor(type);
-		if(person.getAttributes().getAttribute(type) != null) {
-			maxDCScore = (Double) person.getAttributes().getAttribute(type);
+		if(FrozenTastesUtils.getMaxDcScore(person, type) != null) {
+//			maxDCScore = (Double) person.getAttributes().getAttribute(type);
+			maxDCScore = FrozenTastesUtils.getMaxDcScore(person, type);
 			maxDCScore *= scale;
 		}
 

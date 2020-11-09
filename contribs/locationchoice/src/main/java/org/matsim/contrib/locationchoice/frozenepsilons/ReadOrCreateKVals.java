@@ -111,12 +111,14 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 	// does not matter which distribution is chosen here
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
+//			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
+			FrozenTastesUtils.setPersonalKeyValue(p, rnd.getUniform(1.0));
 		}
 	}
 	private void assignKValuesAlternatives() {
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
+//			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
+			FrozenTastesUtils.setOwnFacilityValue(facility, rnd.getUniform(1.0));
 		}
 	}
 	

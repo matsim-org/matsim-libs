@@ -134,7 +134,8 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		int personIndex = 0;
 		for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
 			this.personIndices.put(personId, personIndex);
-			this.personsKValuesArray[personIndex] = (Double) scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("k");
+//			this.personsKValuesArray[personIndex] = (Double) scenario.getPopulation().getPersons().get(personId).getAttributes().getAttribute("k");
+			this.personsKValuesArray[personIndex] = (Double) FrozenTastesUtils.getPersonalKeyValue(scenario.getPopulation().getPersons().get(personId));
 			personIndex++;
 		}		
 		
@@ -146,7 +147,8 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			Id<ActivityFacility> facilityId = facility.getId();
 			
 			this.facilityIndices.put(facilityId, facilityIndex);
-			this.facilitiesKValuesArray[facilityIndex] = (Double) facility.getAttributes().getAttribute("k");
+//			this.facilitiesKValuesArray[facilityIndex] = (Double) facility.getAttributes().getAttribute("k");
+			this.facilitiesKValuesArray[facilityIndex] = (Double) FrozenTastesUtils.getOwnFacilityValue(facility);
 			this.faciliesWithIndexMap.put(facilityId, new ActivityFacilityWithIndex(facility, facilityIndex));
 			
 			facilityIndex++;

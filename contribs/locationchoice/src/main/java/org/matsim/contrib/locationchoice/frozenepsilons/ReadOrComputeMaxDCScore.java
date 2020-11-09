@@ -129,7 +129,8 @@ class ReadOrComputeMaxDCScore {
 			for (String flexibleType : this.flexibleTypes) {
 				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
 				if (maxType != 0.0) {
-					person.getAttributes().putAttribute(flexibleType, maxType);
+//					person.getAttributes().putAttribute(flexibleType, maxType);
+					FrozenTastesUtils.setMaxDcScore(person, flexibleType, maxType);
 				}
 			}
 		}
