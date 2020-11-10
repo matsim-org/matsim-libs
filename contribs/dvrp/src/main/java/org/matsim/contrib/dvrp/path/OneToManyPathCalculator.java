@@ -28,6 +28,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
@@ -71,12 +72,24 @@ class OneToManyPathCalculator {
 		}
 	}
 
-	PathData createPathData(Link toLink) {
+	PathData createPathDataLazily(Link toLink) {
+		if (toLink == fromLink) {
+			Supplier<Path> pathSupplier = () -> new Path(List.of(getStartNode(fromLink)), List.of(), 0, 0);
+			return new PathData(pathSupplier, 0, 0);
+		} else {
+			double pathTravelTime = getTravelTime(getEndNode(toLink).getId().index());
+			Supplier<Path> pathSupplier = () -> createPath(getEndNode(toLink));
+			return new PathData(pathSupplier, pathTravelTime,
+					getFirstAndLastLinkTT(fromLink, toLink, pathTravelTime, startTime));
+		}
+	}
+
+	PathData createPathDataEagerly(Link toLink) {
 		if (toLink == fromLink) {
 			return new PathData(new Path(List.of(getStartNode(fromLink)), List.of(), 0, 0), 0);
 		} else {
 			Path path = createPath(getEndNode(toLink));
-			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path, startTime));
+			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
 		}
 	}
 
@@ -84,10 +97,14 @@ class OneToManyPathCalculator {
 		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
 		var links = constructLinkSequence(nodes);
 		int toNodeIndex = toNode.getId().index();
-		int travelTimeMultiplier = forwardSearch ? 1 : -1;
-		double travelTime = travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
+		double travelTime = getTravelTime(toNodeIndex);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
+	}
+
+	private double getTravelTime(int toNodeIndex) {
+		int travelTimeMultiplier = forwardSearch ? 1 : -1;
+		return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
 	}
 
 	private List<Node> constructNodeSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
@@ -132,9 +149,9 @@ class OneToManyPathCalculator {
 		return forwardSearch ? link.getToNode() : link.getFromNode();
 	}
 
-	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, Path path, double time) {
+	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, double pathTravelTime, double time) {
 		double lastLinkTT = forwardSearch ?
-				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) :
+				VrpPaths.getLastLinkTT(toLink, time + pathTravelTime) :
 				VrpPaths.getLastLinkTT(fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
 	}

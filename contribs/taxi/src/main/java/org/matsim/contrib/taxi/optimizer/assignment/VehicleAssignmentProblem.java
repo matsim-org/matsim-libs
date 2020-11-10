@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(new Graph(network), nodeMap, travelTime, travelDisutility);
+		pathSearch = OneToManyPathSearch.createSearch(new Graph(network), nodeMap, travelTime, travelDisutility, false);
 
 		// TODO this kNN is slow
 		destinationFinder = nearestDestinationLimit < 0 ?
@@ -104,7 +103,7 @@ public class VehicleAssignmentProblem<D> {
 	// private static int calcPathsForDestinationsCount = 0;
 
 	private PathData[][] createPathDataMatrix() {
-		PathData[][] pathDataMatrix = (PathData[][])Array.newInstance(PathData.class, vData.getSize(), dData.getSize());
+		PathData[][] pathDataMatrix = new PathData[vData.getSize()][dData.getSize()];
 
 		if (dData.getSize() > vData.getSize()) {
 			calcPathsForVehicles(pathDataMatrix);
