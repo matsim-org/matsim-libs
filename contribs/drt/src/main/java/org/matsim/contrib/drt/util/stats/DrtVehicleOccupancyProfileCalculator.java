@@ -85,7 +85,8 @@ public class DrtVehicleOccupancyProfileCalculator
 				.isDefined()) {
 			analysisEndTime = qsimConfig.getEndTime().seconds();
 		} else {
-			analysisEndTime = fleet.getVehicleSpecifications().values()
+			analysisEndTime = fleet.getVehicleSpecifications()
+					.values()
 					.stream()
 					.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
 					.max()
@@ -149,9 +150,10 @@ public class DrtVehicleOccupancyProfileCalculator
 	}
 
 	private void increment(double[] values, double beginTime, double endTime) {
-		if (beginTime == endTime) {
+		if (beginTime == endTime && beginTime >= analysisEndTime) {
 			return;
 		}
+		endTime = Math.min(endTime, analysisEndTime);
 
 		int timeInterval = timeDiscretizer.getTimeInterval();
 		int fromIdx = timeDiscretizer.getIdx(beginTime);

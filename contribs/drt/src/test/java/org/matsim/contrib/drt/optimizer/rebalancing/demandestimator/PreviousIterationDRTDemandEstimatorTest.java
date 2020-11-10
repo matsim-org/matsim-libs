@@ -41,7 +41,6 @@ import org.matsim.testcases.fakes.FakeLink;
  */
 public class PreviousIterationDRTDemandEstimatorTest {
 
-	private static final String DRT_SPEEDUP = "drt_speedup";
 	private static final int ESTIMATION_PERIOD = 1800;
 
 	private final Link link1 = new FakeLink(Id.createLinkId("link_1"));
@@ -72,16 +71,16 @@ public class PreviousIterationDRTDemandEstimatorTest {
 
 		//time bin 0-1800
 		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
-		estimator.handleEvent(departureEvent(200, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(200, link1, TransportMode.drt));
 		estimator.handleEvent(departureEvent(500, link2, TransportMode.drt));
 		estimator.handleEvent(departureEvent(1500, link1, TransportMode.drt));
 		//time bin 1800-3600
-		estimator.handleEvent(departureEvent(2500, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(2500, link1, TransportMode.drt));
 		//time bin 3600-5400
 		estimator.handleEvent(departureEvent(4000, link2, TransportMode.drt));
 		//time bin 5400-7200
 		estimator.handleEvent(departureEvent(7000, link1, TransportMode.drt));
-		estimator.handleEvent(departureEvent(7100, link2, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(7100, link2, TransportMode.drt));
 		estimator.reset(1);
 
 		//time bin 0-1800
@@ -117,7 +116,7 @@ public class PreviousIterationDRTDemandEstimatorTest {
 	public void currentCountsAreCopiedToPreviousAfterReset() {
 		PreviousIterationDRTDemandEstimator estimator = createEstimator();
 
-		estimator.handleEvent(departureEvent(100, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
 		estimator.handleEvent(departureEvent(200, link2, TransportMode.drt));
 
 		assertDemand(estimator, 0, zone1, 0);
@@ -133,7 +132,7 @@ public class PreviousIterationDRTDemandEstimatorTest {
 	public void timeBinsAreRespected() {
 		PreviousIterationDRTDemandEstimator estimator = createEstimator();
 
-		estimator.handleEvent(departureEvent(100, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(100, link1, TransportMode.drt));
 		estimator.handleEvent(departureEvent(2200, link2, TransportMode.drt));
 		estimator.reset(1);
 
@@ -151,7 +150,7 @@ public class PreviousIterationDRTDemandEstimatorTest {
 	public void noTimeLimitIsImposed() {
 		PreviousIterationDRTDemandEstimator estimator = createEstimator();
 
-		estimator.handleEvent(departureEvent(10000000, link1, DRT_SPEEDUP));
+		estimator.handleEvent(departureEvent(10000000, link1, TransportMode.drt));
 		estimator.reset(1);
 
 		assertDemand(estimator, 10000000, zone1, 1);
@@ -162,7 +161,6 @@ public class PreviousIterationDRTDemandEstimatorTest {
 		rebalancingParams.setInterval(ESTIMATION_PERIOD);
 
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
-		drtConfigGroup.setDrtSpeedUpMode(DRT_SPEEDUP);
 		drtConfigGroup.addParameterSet(rebalancingParams);
 
 		return new PreviousIterationDRTDemandEstimator(zonalSystem, drtConfigGroup, ESTIMATION_PERIOD);

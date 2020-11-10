@@ -52,7 +52,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 			TravelTime travelTime, TravelDisutility travelDisutility) {
 		double cellSize = ((RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getCellSize();
 		return create(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater, network, timer, travelTime,
-				travelDisutility, new SquareGridSystem(network, cellSize));
+				travelDisutility, new SquareGridSystem(network.getNodes().values(), cellSize));
 	}
 
 	public static RuleBasedTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,

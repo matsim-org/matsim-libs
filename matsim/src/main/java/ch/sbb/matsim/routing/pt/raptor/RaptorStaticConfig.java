@@ -43,6 +43,8 @@ public class RaptorStaticConfig {
     private boolean useModeMappingForPassengers = false;
     private final Map<String, String> passengerModeMappings = new HashMap<>();
 
+    private boolean useCapacityConstraints = false;
+
     private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
 
     public double getBeelineWalkConnectionDistance() {
@@ -91,6 +93,14 @@ public class RaptorStaticConfig {
 
     public void setUseModeMappingForPassengers(boolean useModeMappingForPassengers) {
         this.useModeMappingForPassengers = useModeMappingForPassengers;
+    }
+
+    public boolean isUseCapacityConstraints() {
+        return this.useCapacityConstraints;
+    }
+
+    public void setUseCapacityConstraints(boolean useCapacityConstraints) {
+        this.useCapacityConstraints = useCapacityConstraints;
     }
 
     public void addModeMappingForPassengers(String routeMode, String passengerMode) {

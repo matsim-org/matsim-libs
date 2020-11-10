@@ -115,28 +115,14 @@ public final class NetworkFilterManager {
 		Network net = NetworkUtils.createNetwork();
 		if (!this.nodeFilters.isEmpty()) {
 			for (Node n : this.network.getNodes().values()) {
-				boolean add = true;
-				for (NetworkNodeFilter f : nodeFilters) {
-					if (!f.judgeNode(n)) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
+				if (nodeFilters.stream().allMatch(f -> f.judgeNode(n))) {
 					this.addNode(net, n);
 				}
 			}
 		}
 		if (!this.linkFilters.isEmpty()) {
 			for (Link l : this.network.getLinks().values()) {
-				boolean add = true;
-				for (NetworkLinkFilter f : linkFilters) {
-					if (!f.judgeLink(l)) {
-						add = false;
-						break;
-					}
-				}
-				if (add) {
+				if (linkFilters.stream().allMatch(f -> f.judgeLink(l))) {
 					this.addLink(net, l);
 				}
 			}

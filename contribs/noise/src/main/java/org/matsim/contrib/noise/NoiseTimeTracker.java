@@ -291,17 +291,14 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				this.noiseContext.getLinkId2vehicleId2lastEnterTime().put(event.getLinkId(), vehicleId2enterTime);
 			}
 
-			if (this.noiseContext.getNoiseLinks().get(event.getLinkId()) != null) {
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
-
-			} else {
-
-				NoiseLink noiseLink = new NoiseLink(event.getLinkId());
-				List<Id<Vehicle>> enteringVehicleIds = new ArrayList<>();
-				enteringVehicleIds.add(event.getVehicleId());
-				noiseLink.setEnteringVehicleIds(enteringVehicleIds);
-
+			NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(event.getLinkId());
+			if (noiseLink == null) {
+				noiseLink = new NoiseLink(event.getLinkId());
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
+			}
+
+			if(noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+				noiseLink.addEnteringVehicleId(event.getVehicleId());
 			}
 
             NoiseVehicleType noiseVehicleType = vehicleIdentifier.identifyVehicle(event.getVehicleId());

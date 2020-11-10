@@ -1,6 +1,12 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
+	<module name="dvrp">
+		<parameterset type="travelTimeMatrix">
+			<param name="cellSize" value="100"/>
+		</parameterset>
+	</module>
+
 	<module name="multiModeDrt">
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>
@@ -26,7 +32,15 @@
 					<param name="targetBeta" value="0.5"/>
 				</parameterset>
 			</parameterset>
+
+			<parameterset type="drtSpeedUp">
+				<param name="intervalDetailedIteration" value="2"/>
+			</parameterset>
 		</parameterset>
+	</module>
+
+	<module name="global">
+		<param name="coordinateSystem" value="WGS84" />
 	</module>
 
 	<module name="network">
@@ -53,7 +67,7 @@
 		<param name="outputDirectory" value="test/output/mielec_stop_based_drt"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="firstIteration" value="0"/>
-		<param name="lastIteration" value="0"/>
+		<param name="lastIteration" value="2"/>
 	</module>
 
 	<module name="planCalcScore">
