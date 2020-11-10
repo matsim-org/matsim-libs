@@ -234,7 +234,8 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 			if ( betaTime >= 0. ) {
 				throw new RuntimeException("betaTime >= 0 in location choice; method not designed for this; aborting ...") ;
 			}
-			maxTravelTime = Math.abs(maxDCScore / (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
+			double typicalduration = this.scenario.getConfig().planCalcScore().getScoringParameters(PopulationUtils.getSubpopulation(person)).getActivityParams(type).getTypicalDuration().seconds();
+			maxTravelTime = Math.abs((maxDCScore + (typicalduration/3600.0) * -1.0 * betaTime)/ (-1.0 * betaTime) * 3600.0); //[s] // abs used for the case when somebody defines beta > 0
 			// yy maybe one can still used it with betaTime>0 (i.e. traveling brings utility), but taking the "abs" of it is almost certainly not the
 			// correct way.  kai, jan'13
 		}

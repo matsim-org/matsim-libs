@@ -6,8 +6,8 @@ import org.matsim.facilities.ActivityFacility;
 class FrozenTastesUtils{
 
 	private static final String LOCATIONCHOICE_MAXDCSCORE = "locationchoice_maxDCScore_";
-	private static final String LOCATIONCHOICE_PERSONALKEYVALUE = "locationchoice_personalKeyValue";
-	private static final String LOCATIONCHOICE_OWNFACILITYVALUE = "locationchoice_ownFacilityValue";
+	private static final String LOCATIONCHOICE_PERSONALKEYVALUE = "locationchoice_personKValue";
+	private static final String LOCATIONCHOICE_OWNFACILITYVALUE = "locationchoice_facilityKValue";
 
 	public static Double getMaxDcScore( Person person, String activityType ) {
 		return (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType );

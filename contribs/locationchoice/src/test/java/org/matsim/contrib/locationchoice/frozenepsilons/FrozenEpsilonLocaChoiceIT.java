@@ -310,8 +310,24 @@ public class FrozenEpsilonLocaChoiceIT{
 			Node node = nf.createNode( Id.createNodeId( ii ) , new Coord( ii*100, 0.) ) ;
 			scenario.getNetwork().addNode( node );
 			// ---
-			addLinkAndFacility( scenario, nf, ff, prevNode, node );
-			addLinkAndFacility( scenario, nf, ff, node, prevNode );
+			final String str1 = prevNode.getId() + "-" + node.getId();
+			Link link1 = addLink(scenario, nf, prevNode, node, str1);
+			// ---
+			if (ii > 1) {
+				addFacility(scenario, ff, str1, link1, "shop");
+			}
+			if (ii == 1) {
+				addFacility(scenario, ff, str1, link1, "home");
+			}
+			final String str = node.getId() + "-" + prevNode.getId();
+			Link link = addLink(scenario, nf, node, prevNode, str);
+			// ---
+			if (ii > 1) {
+				addFacility(scenario, ff, str, link, "shop");
+			}
+			if (ii == 1) {
+				addFacility(scenario, ff, str, link, "home");
+			}
 			// ---
 			prevNode = node ;
 		}
@@ -362,12 +378,12 @@ public class FrozenEpsilonLocaChoiceIT{
 		FrozenTastes.configure( controler );
 
 		// bind locachoice strategy (selected in localCreateConfig):
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
-			}
-		});
+//		controler.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
+//			}
+//		});
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
@@ -441,8 +457,14 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	}
 
-	public static void addLinkAndFacility( Scenario scenario, NetworkFactory nf, ActivityFacilitiesFactory ff, Node prevNode, Node node ){
-		final String str = prevNode.getId() + "-" + node.getId();
+	private static void addFacility(Scenario scenario, ActivityFacilitiesFactory ff, String str, Link link, String type) {
+		ActivityFacility af = ff.createActivityFacility( Id.create( str, ActivityFacility.class ), link.getCoord(), link.getId() ) ;
+		ActivityOption option = ff.createActivityOption( type ) ;
+		af.addActivityOption( option );
+		scenario.getActivityFacilities().addActivityFacility( af );
+	}
+
+	private static Link addLink(Scenario scenario, NetworkFactory nf, Node prevNode, Node node, String str) {
 		Link link = nf.createLink( Id.createLinkId( str ), prevNode, node ) ;
 		Set<String> set = new HashSet<>() ;
 		set.add("car" ) ;
@@ -451,11 +473,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		link.setCapacity( 3600. );
 		link.setFreespeed( 50./3.6 );
 		scenario.getNetwork().addLink( link );
-		// ---
-		ActivityFacility af = ff.createActivityFacility( Id.create( str, ActivityFacility.class ), link.getCoord(), link.getId() ) ;
-		ActivityOption option = ff.createActivityOption( "shop" ) ;
-		af.addActivityOption( option );
-		scenario.getActivityFacilities().addActivityFacility( af );
+		return link;
 	}
 
 
