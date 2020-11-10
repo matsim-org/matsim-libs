@@ -324,7 +324,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// update counters:
-		// yy I don't know what this is good for; I would base downstream analysis rather on events.  kai, jan'20
+		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20
 		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
