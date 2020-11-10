@@ -10,16 +10,14 @@ class FrozenTastesUtils{
 	private static final String LOCATIONCHOICE_OWNFACILITYVALUE = "locationchoice_ownFacilityValue";
 
 	public static Double getMaxDcScore( Person person, String activityType ) {
-		Double result = (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType );
-		return result;
+		return (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType );
 	}
 	public static void setMaxDcScore( Person person, String activityType, double score ) {
 		person.getAttributes().putAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType, score );
 	}
 
 	public static Double getPersonalKeyValue( Person person) {
-		Double result = (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_PERSONALKEYVALUE);
-		return result;
+		return (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_PERSONALKEYVALUE);
 	}
 
 	public static void setPersonalKeyValue( Person person, double keyValue ) {
@@ -27,8 +25,7 @@ class FrozenTastesUtils{
 	}
 
 	public static Double getOwnFacilityValue( ActivityFacility facility) {
-		Double result = (Double) facility.getAttributes().getAttribute( LOCATIONCHOICE_OWNFACILITYVALUE);
-		return result;
+		return (Double) facility.getAttributes().getAttribute( LOCATIONCHOICE_OWNFACILITYVALUE);
 	}
 
 	public static void setOwnFacilityValue(ActivityFacility facility, double facilityValue ) {
