@@ -130,7 +130,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	private PathData calcPathData(LeastCostPathCalculator router, Link fromLink, Link toLink, double departureTime) {
 		if (fromLink == toLink) {
-			return new PathData(new Path(List.of(fromLink.getToNode()), List.of(), 0, 0), 0);
+			return PathData.EMPTY;
 		}
 
 		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,

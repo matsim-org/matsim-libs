@@ -181,10 +181,9 @@ public class OneToManyPathCalculatorTest {
 		pathCalculator.calculateDijkstraTree(List.of(linkBC));
 
 		//path: BA -> AB -> BC
-		assertThat(pathCalculator.createPathData(linkBC)).usingRecursiveComparison()
-				.isEqualTo(
-						new PathData(new Path(null, ImmutableList.of(linkAB), travelTime(linkAB), travelTime(linkAB)),
-								1 + travelTime(linkBC)));
+		assertPathData(pathCalculator.createPathDataLazily(linkBC),
+				new Path(ImmutableList.of(nodeA, nodeB), ImmutableList.of(linkAB), travelTime(linkAB),
+						travelTime(linkAB)), 1 + travelTime(linkBC));
 	}
 
 	@Test
@@ -195,10 +194,9 @@ public class OneToManyPathCalculatorTest {
 		pathCalculator.calculateDijkstraTree(List.of(linkCB));
 
 		//path: CB -> BA -> AB
-		assertThat(pathCalculator.createPathData(linkCB)).usingRecursiveComparison()
-				.isEqualTo(
-						new PathData(new Path(null, ImmutableList.of(linkBA), travelTime(linkBA), travelTime(linkBA)),
-								1 + travelTime(linkAB)));
+		assertPathData(pathCalculator.createPathDataLazily(linkCB),
+				new Path(ImmutableList.of(nodeB, nodeA), ImmutableList.of(linkBA), travelTime(linkBA),
+						travelTime(linkBA)), 1 + travelTime(linkAB));
 	}
 
 	@Test
@@ -208,9 +206,12 @@ public class OneToManyPathCalculatorTest {
 
 		pathCalculator.calculateDijkstraTree(List.of(linkAB));
 
-		//path: CB -> BA -> AB
-		assertThat(pathCalculator.createPathData(linkAB)).usingRecursiveComparison()
-				.isEqualTo(new PathData(new Path(null, ImmutableList.of(), 0, 0), 0));
+		assertPathData(pathCalculator.createPathDataLazily(linkAB), new Path(null, null, 0, 0), 0);
+	}
+
+	private void assertPathData(PathData pathData, Path expectedPath, double firstAndLastLinkTT) {
+		assertThat(pathData.getPath()).isEqualToComparingFieldByField(expectedPath);
+		assertThat(pathData.getTravelTime()).isEqualTo(expectedPath.travelTime + firstAndLastLinkTT);
 	}
 
 	private Node createAndAddNode(String id, Coord coord) {

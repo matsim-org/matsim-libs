@@ -19,14 +19,16 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -38,31 +40,56 @@ import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
 public class OneToManyPathSearch {
 	public static OneToManyPathSearch createSearch(Graph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
-			TravelDisutility travelDisutility) {
-		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility));
+			TravelDisutility travelDisutility, boolean lazyPathCreation) {
+		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility),
+				lazyPathCreation);
 	}
 
 	public static class PathData {
-		final LeastCostPathCalculator.Path path;// shortest path
-		private final double firstAndLastLinkTT;// at both the first and last links
+		public static final PathData EMPTY = new PathData();
 
-		public PathData(LeastCostPathCalculator.Path path, double firstAndLastLinkTT) {
-			this.path = new LeastCostPathCalculator.Path(null, ImmutableList.copyOf(path.links), path.travelTime,
-					path.travelCost);
-			this.firstAndLastLinkTT = firstAndLastLinkTT;
+		private final Supplier<Path> pathSupplier;
+		private Path path;
+
+		private final double travelTime;
+
+		private PathData() {
+			this.pathSupplier = null;
+			this.path = new Path(null, null, 0, 0);
+			this.travelTime = 0;
+		}
+
+		public PathData(Path path, double firstAndLastLinkTT) {
+			this.pathSupplier = null;
+			this.path = new Path(null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
+			this.travelTime = path.travelTime + firstAndLastLinkTT;
+		}
+
+		public PathData(Supplier<Path> pathSupplier, double pathTravelTime, double firstAndLastLinkTT) {
+			this.pathSupplier = pathSupplier;
+			this.travelTime = pathTravelTime + firstAndLastLinkTT;
 		}
 
 		public double getTravelTime() {
-			return path.travelTime + firstAndLastLinkTT;
+			return travelTime;
+		}
+
+		Path getPath() {
+			if (path == null) {
+				path = pathSupplier.get();
+			}
+			return path;
 		}
 	}
 
 	private final IdMap<Node, Node> nodeMap;
 	private final LeastCostPathTree dijkstraTree;
+	private final boolean lazyPathCreation;
 
-	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree) {
+	private OneToManyPathSearch(IdMap<Node, Node> nodeMap, LeastCostPathTree dijkstraTree, boolean lazyPathCreation) {
 		this.nodeMap = nodeMap;
 		this.dijkstraTree = dijkstraTree;
+		this.lazyPathCreation = lazyPathCreation;
 	}
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward) {
@@ -83,7 +110,7 @@ public class OneToManyPathSearch {
 	private PathData[] createPathDataArray(List<Link> toLinks, OneToManyPathCalculator pathCalculator) {
 		PathData[] pathDataArray = new PathData[toLinks.size()];
 		for (int i = 0; i < pathDataArray.length; i++) {
-			pathDataArray[i] = pathCalculator.createPathData(toLinks.get(i));
+			pathDataArray[i] = createPathData(pathCalculator, toLinks.get(i));
 		}
 		return pathDataArray;
 	}
@@ -91,8 +118,14 @@ public class OneToManyPathSearch {
 	private Map<Link, PathData> createPathDataMap(Collection<Link> toLinks, OneToManyPathCalculator pathCalculator) {
 		Map<Link, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
-			pathDataMap.put(toLink, pathCalculator.createPathData(toLink));
+			pathDataMap.put(toLink, createPathData(pathCalculator, toLink));
 		}
 		return pathDataMap;
+	}
+
+	private PathData createPathData(OneToManyPathCalculator pathCalculator, Link toLink) {
+		return lazyPathCreation ?
+				pathCalculator.createPathDataLazily(toLink) :
+				pathCalculator.createPathDataEagerly(toLink);
 	}
 }
