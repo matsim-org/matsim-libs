@@ -11,21 +11,13 @@ class FrozenTastesUtils{
 
 	public static Double getMaxDcScore( Person person, String activityType ) {
 		Double result = (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType );
-		if ( result == null ) {
-			result =  (Double) person.getAttributes().getAttribute( activityType );
-//			// write under new key
-//			setMaxDcScore( person, activityType, result );
-//			// remove under old key 
-//			person.getAttributes().removeAttribute( activityType );
-			// maybe not helpful
-		}
 		return result;
 	}
 	public static void setMaxDcScore( Person person, String activityType, double score ) {
 		person.getAttributes().putAttribute( LOCATIONCHOICE_MAXDCSCORE + activityType, score );
 	}
 
-	public static double getPersonalKeyValue( Person person) {
+	public static Double getPersonalKeyValue( Person person) {
 		Double result = (Double) person.getAttributes().getAttribute( LOCATIONCHOICE_PERSONALKEYVALUE);
 		return result;
 	}
@@ -34,7 +26,7 @@ class FrozenTastesUtils{
 		person.getAttributes().putAttribute( LOCATIONCHOICE_PERSONALKEYVALUE, keyValue );
 	}
 
-	public static double getOwnFacilityValue( ActivityFacility facility) {
+	public static Double getOwnFacilityValue( ActivityFacility facility) {
 		Double result = (Double) facility.getAttributes().getAttribute( LOCATIONCHOICE_OWNFACILITYVALUE);
 		return result;
 	}

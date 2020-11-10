@@ -65,10 +65,10 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 				facKValuesReader.readFile(fkValuesFileName);
 				log.info("reading kvals from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName);
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
-					p.getAttributes().putAttribute( "k", personsKValues.getAttribute(p.getId().toString(), "k"));
+					FrozenTastesUtils.setPersonalKeyValue(p, (Double) personsKValues.getAttribute(p.getId().toString(), "k"));
 				}
 				for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-					facility.getAttributes().putAttribute("k", facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
+					FrozenTastesUtils.setOwnFacilityValue(facility, (Double) facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
 				}
 
 				return 0;
@@ -88,14 +88,12 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 	 private boolean existingKValues() {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-//			Object kAttribute = person.getAttributes().getAttribute("k");
 			Object kAttribute = FrozenTastesUtils.getPersonalKeyValue(person);
 			if (kAttribute == null) {
 				return false;
 			}
 		}
 		for (ActivityFacility activityFacility : scenario.getActivityFacilities().getFacilities().values()) {
-//			Object kAttribute = activityFacility.getAttributes().getAttribute("k");
 			Object kAttribute = FrozenTastesUtils.getOwnFacilityValue(activityFacility);
 			if (kAttribute == null) {
 				return false;
@@ -113,13 +111,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 	// does not matter which distribution is chosen here
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-//			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
 			FrozenTastesUtils.setPersonalKeyValue(p, rnd.getUniform(1.0));
 		}
 	}
 	private void assignKValuesAlternatives() {
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-//			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
 			FrozenTastesUtils.setOwnFacilityValue(facility, rnd.getUniform(1.0));
 		}
 	}
