@@ -291,7 +291,9 @@ import java.util.Random;
 		ArrayList<LSPResource> resourcesList = new ArrayList<>();
 		resourcesList.add(depotAdapter);
 		resourcesList.add(directDistributionAdapter); // TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
-		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+		SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
+//		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 
 		return completeLSPBuilder.build();
