@@ -12,12 +12,12 @@ import java.util.stream.IntStream;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
+import org.matsim.contrib.zone.Zone;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.OptionalTime;
 
-import ch.sbb.matsim.analysis.skims.FloatMatrix;
 import ch.sbb.matsim.routing.graph.Graph;
 import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
@@ -28,7 +28,7 @@ import ch.sbb.matsim.routing.graph.LeastCostPathTree;
  */
 public final class TravelTimeMatrices {
 
-	public static <T> FloatMatrix<T> calculateTravelTimeMatrix(Network routingNetwork, Map<T, Node> centralNodes,
+	public static Matrix calculateTravelTimeMatrix(Network routingNetwork, Map<Zone, Node> centralNodes,
 			double departureTime, TravelTime travelTime, TravelDisutility travelDisutility, int numberOfThreads) {
 		Graph graph = new Graph(routingNetwork);
 		ExecutorServiceWithResource<LeastCostPathTree> executorService = new ExecutorServiceWithResource<>(
@@ -36,7 +36,7 @@ public final class TravelTimeMatrices {
 						.mapToObj(i -> new LeastCostPathTree(graph, travelTime, travelDisutility))
 						.collect(toList()));
 
-		FloatMatrix<T> travelTimeMatrix = new FloatMatrix<>(centralNodes.keySet(), Float.NaN);
+		Matrix travelTimeMatrix = new Matrix(centralNodes.keySet());
 		Counter counter = new Counter("DVRP free-speed TT matrix: zone ", " / " + centralNodes.size());
 		executorService.submitRunnablesAndWait(centralNodes.keySet()
 				.stream()
@@ -47,19 +47,19 @@ public final class TravelTimeMatrices {
 		return travelTimeMatrix;
 	}
 
-	private static <T> void computeForDepartureZone(T fromZoneId, Map<T, Node> centralNodes, double departureTime,
-			FloatMatrix<T> travelTimeMatrix, LeastCostPathTree lcpTree, Counter counter) {
+	private static void computeForDepartureZone(Zone fromZone, Map<Zone, Node> centralNodes, double departureTime,
+			Matrix travelTimeMatrix, LeastCostPathTree lcpTree, Counter counter) {
 		counter.incCounter();
-		Node fromNode = centralNodes.get(fromZoneId);
+		Node fromNode = centralNodes.get(fromZone);
 		lcpTree.calculate(fromNode.getId().index(), departureTime, null, null);
 
-		for (T toZoneId : centralNodes.keySet()) {
-			Node toNode = centralNodes.get(toZoneId);
+		for (Zone toZone : centralNodes.keySet()) {
+			Node toNode = centralNodes.get(toZone);
 			int nodeIndex = toNode.getId().index();
 			OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
 			double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
 			double tt = currTime - departureTime;
-			travelTimeMatrix.set(fromZoneId, toZoneId, (float)tt);
+			travelTimeMatrix.set(fromZone, toZone, tt);
 		}
 	}
 }

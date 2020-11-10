@@ -25,17 +25,14 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystems;
-import org.matsim.contrib.zone.Zone;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-
-import ch.sbb.matsim.analysis.skims.FloatMatrix;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpTravelTimeMatrix {
 	private final SquareGridSystem gridSystem;
-	private final FloatMatrix<Zone> freeSpeedTravelTimeMatrix;
+	private final Matrix freeSpeedTravelTimeMatrix;
 
 	public DvrpTravelTimeMatrix(Network dvrpNetwork, DvrpTravelTimeMatrixParams params, int numberOfThreads) {
 		gridSystem = new SquareGridSystem(dvrpNetwork.getNodes().values(), params.getCellSize());
