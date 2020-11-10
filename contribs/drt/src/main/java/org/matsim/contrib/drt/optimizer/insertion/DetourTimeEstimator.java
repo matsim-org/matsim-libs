@@ -30,8 +30,8 @@ public interface DetourTimeEstimator {
 		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
 	}
 
-	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double factor, DvrpTravelTimeMatrix matrix) {
-		return (from, to) -> factor * matrix.getFreeSpeedTravelTime(from.getToNode(), to.getToNode());
+	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double speedFactor, DvrpTravelTimeMatrix matrix) {
+		return (from, to) -> matrix.getFreeSpeedTravelTime(from.getToNode(), to.getToNode()) / speedFactor;
 	}
 
 	double estimateTime(Link from, Link to);
