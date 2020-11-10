@@ -206,9 +206,7 @@ public class OneToManyPathCalculatorTest {
 
 		pathCalculator.calculateDijkstraTree(List.of(linkAB));
 
-		//path: CB -> BA -> AB
-		assertPathData(pathCalculator.createPathDataLazily(linkAB),
-				new Path(ImmutableList.of(nodeB), ImmutableList.of(), 0, 0), 0);
+		assertPathData(pathCalculator.createPathDataLazily(linkAB), new Path(null, null, 0, 0), 0);
 	}
 
 	private void assertPathData(PathData pathData, Path expectedPath, double firstAndLastLinkTT) {

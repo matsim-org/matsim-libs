@@ -46,10 +46,18 @@ public class OneToManyPathSearch {
 	}
 
 	public static class PathData {
+		public static final PathData EMPTY = new PathData();
+
 		private final Supplier<Path> pathSupplier;
 		private Path path;
 
 		private final double travelTime;
+
+		private PathData() {
+			this.pathSupplier = null;
+			this.path = new Path(null, null, 0, 0);
+			this.travelTime = 0;
+		}
 
 		public PathData(Path path, double firstAndLastLinkTT) {
 			this.pathSupplier = null;
@@ -58,7 +66,6 @@ public class OneToManyPathSearch {
 		}
 
 		public PathData(Supplier<Path> pathSupplier, double pathTravelTime, double firstAndLastLinkTT) {
-			//this.path = new Path(null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
 			this.pathSupplier = pathSupplier;
 			this.travelTime = pathTravelTime + firstAndLastLinkTT;
 		}

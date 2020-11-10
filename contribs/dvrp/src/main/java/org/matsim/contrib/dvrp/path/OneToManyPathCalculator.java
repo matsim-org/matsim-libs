@@ -74,8 +74,7 @@ class OneToManyPathCalculator {
 
 	PathData createPathDataLazily(Link toLink) {
 		if (toLink == fromLink) {
-			Supplier<Path> pathSupplier = () -> new Path(List.of(getStartNode(fromLink)), List.of(), 0, 0);
-			return new PathData(pathSupplier, 0, 0);
+			return PathData.EMPTY;
 		} else {
 			double pathTravelTime = getTravelTime(getEndNode(toLink).getId().index());
 			Supplier<Path> pathSupplier = () -> createPath(getEndNode(toLink));
@@ -86,7 +85,7 @@ class OneToManyPathCalculator {
 
 	PathData createPathDataEagerly(Link toLink) {
 		if (toLink == fromLink) {
-			return new PathData(new Path(List.of(getStartNode(fromLink)), List.of(), 0, 0), 0);
+			return PathData.EMPTY;
 		} else {
 			Path path = createPath(getEndNode(toLink));
 			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
