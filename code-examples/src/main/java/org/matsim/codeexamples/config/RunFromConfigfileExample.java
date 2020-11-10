@@ -29,6 +29,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.util.Map;
@@ -36,28 +37,34 @@ import java.util.Map;
 
 /**
  * runs a mobsim and writes events output.  See the config file for configuration details.
- * 
- * @author nagel
  *
+ * @author nagel
  */
 public final class RunFromConfigfileExample {
 
-	public static void main( final String[] args ) {
+	public static void main(final String[] args) {
 
-		Config config ;
-		if ( args!=null && args.length>=1 ) {
-			config = ConfigUtils.loadConfig( args ) ; // note that this may process command line options
+		Config config;
+		if (args != null && args.length >= 1) {
+			config = ConfigUtils.loadConfig(args); // note that this may process command line options
 		} else {
-			config = ConfigUtils.loadConfig(  "scenarios/equil/config.xml" ) ;
+			config = ConfigUtils.loadConfig("scenarios/equil/config.xml");
 		}
 
-		Scenario scenario = ScenarioUtils.loadScenario(config );
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// if vehicles are not auto generated but explicitly loaded from a vehicles file, vehicles have to be attached to agents.
 		if (config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)) {
+
+			// Sets the network mode for bicycles correctly
+			Id<VehicleType> bicycle = Id.create("bicycle", VehicleType.class);
+			if (scenario.getVehicles().getVehicleTypes().containsKey(bicycle)) {
+				scenario.getVehicles().getVehicleTypes().get(bicycle).setNetworkMode("bicycle");
+			}
+
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Vehicle vehicle = scenario.getVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
-				VehicleUtils.insertVehicleIdsIntoAttributes( person, Map.of( vehicle.getType().getNetworkMode(), vehicle.getId() ) );
+				VehicleUtils.insertVehicleIdsIntoAttributes(person, Map.of(vehicle.getType().getNetworkMode(), vehicle.getId()));
 			}
 		}
 
