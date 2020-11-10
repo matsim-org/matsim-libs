@@ -19,8 +19,8 @@ public interface FlowEfficiencyCalculator {
      * @param previousQVehicle the vehicle previously traveling on this link before {@code qVehicle}, may be null
      * @param previousTimeDiff time difference of the previous vehicle traveling on this link. Can be null if two vehicles are in the buffer
      *                         simultaneously.
-     * @param link             the link the qVehicle is currently ons
-     * @param laneId           id of the lane lane the vehicle is traveling on
+     * @param link             the link the qVehicle is currently on
+     * @param laneId           id of the lane the vehicle is traveling on
      */
     double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, Double previousTimeDiff, Link link, Id<Lane> laneId);
 }
