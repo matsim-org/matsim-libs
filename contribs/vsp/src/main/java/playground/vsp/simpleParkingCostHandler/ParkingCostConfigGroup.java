@@ -20,6 +20,10 @@
 package playground.vsp.simpleParkingCostHandler;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -34,7 +38,11 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private static final String FIRST_HOUR_PARKING_COST_LINK_ATTRIBUTE_NAME = "firstHourParkingCostLinkAttributeName";
 	private static final String EXTRA_HOUR_PARKING_COST_LINK_ATTRIBUTE_NAME = "extraHourParkingCostLinkAttributeName";
 	private static final String MAX_DAILY_PARKING_COST_LINK_ATTRIBUTE_NAME = "maxDailyParkingCostLinkAttributeName";
-	private static final String HOME_ACTIVITY_PREFIX_TO_BE_EXCLUDED_FROM_PARKING_COSTS = "homeActivityPrefixToBeExcludedFromParkingCost";
+	private static final String MAX_PARKING_DURATION_ATTRIBUTE_NAME = "maxParkingDurationAttributeName";
+	private static final String PARKING_PENALTY_ATTRIBUTE_NAME = "parkingPenaltyAttributeName";
+	private static final String RESIDENTIAL_PARKING_FEE_PER_DAY = "residentialParkingFeePerDay";
+	private static final String ACTIVITY_PREFIXES_TO_BE_EXCLUDED_FROM_PARKING_COSTS = "activityPrefixesToBeExcludedFromParkingCosts";
+	private static final String ACTIVITY_PREFIX_FOR_DAILY_PARKING_COSTS = "activityPrefixForDailyParkingCosts";
 	
 	public ParkingCostConfigGroup() {
 		super(GROUP_NAME);
@@ -45,7 +53,11 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 	private String firstHourParkingCostLinkAttributeName = "oneHourPCost";
 	private String extraHourParkingCostLinkAttributeName = "extraHourPCost";
 	private String maxDailyParkingCostLinkAttributeName = "maxDailyPCost";
-	private String homeActivityPrefixToBeExcludedFromParkingCost = "home";
+	private String maxParkingDurationAttributeName = "maxPDuration";
+	private String parkingPenaltyAttributeName = "penalty";
+	private String residentialParkingFeePerDay = "residentialPFee";
+	private String activityPrefixForDailyParkingCosts = "home";
+	private final Set<String> activityPrefixToBeExcludedFromParkingCost = new HashSet<>();
 
 	@StringGetter( MODE )
 	public String getMode() {
@@ -97,15 +109,64 @@ public class ParkingCostConfigGroup extends ReflectiveConfigGroup {
 		this.maxDailyParkingCostLinkAttributeName = maxDailyParkingCostLinkAttributeName;
 	}
 
-	@StringGetter( HOME_ACTIVITY_PREFIX_TO_BE_EXCLUDED_FROM_PARKING_COSTS )
-	public String getHomeActivityPrefixToBeExcludedFromParkingCost() {
-		return homeActivityPrefixToBeExcludedFromParkingCost;
+	@StringGetter(ACTIVITY_PREFIXES_TO_BE_EXCLUDED_FROM_PARKING_COSTS)
+	public String getActivityPrefixesToBeExcludedFromParkingCostAsString() {
+		return CollectionUtils.setToString(this.activityPrefixToBeExcludedFromParkingCost);
 	}
 
-	@StringSetter( HOME_ACTIVITY_PREFIX_TO_BE_EXCLUDED_FROM_PARKING_COSTS )
-	public void setHomeActivityPrefixToBeExcludedFromParkingCost(String homeActivityPrefixToBeExcludedFromParkingCost) {
-		this.homeActivityPrefixToBeExcludedFromParkingCost = homeActivityPrefixToBeExcludedFromParkingCost;
+	public Set<String> getActivityPrefixesToBeExcludedFromParkingCost() {
+		return this.activityPrefixToBeExcludedFromParkingCost;
 	}
-	
+
+	@StringSetter(ACTIVITY_PREFIXES_TO_BE_EXCLUDED_FROM_PARKING_COSTS)
+	public void setActivityPrefixToBeExcludedFromParkingCost(String prefixes) {
+		setActivityPrefixToBeExcludedFromParkingCost(CollectionUtils.stringToSet(prefixes));
+	}
+
+	public void setActivityPrefixToBeExcludedFromParkingCost(Set<String> prefixes) {
+		this.activityPrefixToBeExcludedFromParkingCost.clear();
+		this.activityPrefixToBeExcludedFromParkingCost.addAll(prefixes);
+	}
+
+	@StringGetter( MAX_PARKING_DURATION_ATTRIBUTE_NAME )
+    public String getMaxParkingDurationAttributeName() {
+		return maxParkingDurationAttributeName;
+    }
+
+	@StringSetter( MAX_PARKING_DURATION_ATTRIBUTE_NAME )
+	public void setMaxParkingDurationAttributeName(String maxParkingDurationAttributeName) {
+		this.maxParkingDurationAttributeName = maxParkingDurationAttributeName;
+	}
+
+	@StringGetter( PARKING_PENALTY_ATTRIBUTE_NAME )
+	public String getParkingPenaltyAttributeName() {
+		return parkingPenaltyAttributeName;
+	}
+
+	@StringSetter( PARKING_PENALTY_ATTRIBUTE_NAME )
+	public void setParkingPenaltyAttributeName(String parkingPenaltyAttributeName) {
+		this.parkingPenaltyAttributeName = parkingPenaltyAttributeName;
+	}
+
+	@StringGetter( RESIDENTIAL_PARKING_FEE_PER_DAY )
+	public String getResidentialParkingFeeAttributeName() {
+		return residentialParkingFeePerDay;
+	}
+
+	@StringSetter( RESIDENTIAL_PARKING_FEE_PER_DAY )
+	public void setResidentialParkingFeeAttributeName(String residentialParkingFeePerDay) {
+		this.residentialParkingFeePerDay = residentialParkingFeePerDay;
+	}
+
+	@StringGetter( ACTIVITY_PREFIX_FOR_DAILY_PARKING_COSTS )
+	public String getActivityPrefixForDailyParkingCosts() {
+		return activityPrefixForDailyParkingCosts;
+	}
+
+	@StringSetter( ACTIVITY_PREFIX_FOR_DAILY_PARKING_COSTS )
+	public void setActivityPrefixForDailyParkingCosts(String activityPrefixForDailyParkingCosts) {
+		this.activityPrefixForDailyParkingCosts = activityPrefixForDailyParkingCosts;
+	}
+
 }
 
