@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -34,7 +32,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -53,7 +50,7 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 
 	private final int interval;
 	private final int intervalCount;
-	private final Map<Id<Link>, double[]> linkTTs;
+	private final double[][] linkTTs;
 	private final double alpha;
 
 	@Inject
@@ -77,37 +74,32 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 		interval = ttCalcConfig.getTraveltimeBinSize();
 		intervalCount = TimeBinUtils.getTimeBinCount(ttCalcConfig.getMaxTime(), interval);
 
-		linkTTs = Maps.newHashMapWithExpectedSize(network.getLinks().size());
-		init(initialTT);
-	}
-
-	private void init(TravelTime initialTT) {
-		for (Link link : network.getLinks().values()) {
-			double[] tt = new double[intervalCount];
-			updateTTs(link, tt, initialTT, 1.);
-			linkTTs.put(link.getId(), tt);
-		}
+		linkTTs = new double[Id.getNumberOfIds(Link.class)][intervalCount];
+		updateTTs(initialTT, 1.);
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
-		int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
-		return linkTTs.get(link.getId())[idx];
+
+		//handle negative times (e.g. in backward shortest path search)
+		int idx = Math.max(0, TimeBinUtils.getTimeBinIndex(time, interval, intervalCount));
+		return linkTTs[link.getId().index()][idx];
 	}
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		for (Link link : network.getLinks().values()) {
-			updateTTs(link, linkTTs.get(link.getId()), observedTT, alpha);
-		}
+		updateTTs(observedTT, alpha);
 	}
 
-	private void updateTTs(Link link, double[] tt, TravelTime travelTime, double alpha) {
-		for (int i = 0; i < intervalCount; i++) {
-			double oldEstimatedTT = tt[i];
-			double experiencedTT = travelTime.getLinkTravelTime(link, i * interval, null, null);
-			tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+	private void updateTTs(TravelTime travelTime, double alpha) {
+		for (Link link : network.getLinks().values()) {
+			double[] tt = linkTTs[link.getId().index()];
+			for (int i = 0; i < intervalCount; i++) {
+				double oldEstimatedTT = tt[i];
+				double experiencedTT = travelTime.getLinkTravelTime(link, i * interval, null, null);
+				tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+			}
 		}
 	}
 }

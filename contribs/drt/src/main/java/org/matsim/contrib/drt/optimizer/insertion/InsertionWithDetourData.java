@@ -24,6 +24,8 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.InsertionPoint;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author michalm
  */
@@ -100,5 +102,16 @@ public class InsertionWithDetourData<D> {
 	 */
 	public D getDetourFromDropoff() {
 		return detourFromDropoff;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("insertion", insertion)
+				.add("detourToPickup", detourToPickup)
+				.add("detourFromPickup", detourFromPickup)
+				.add("detourToDropoff", detourToDropoff)
+				.add("detourFromDropoff", detourFromDropoff)
+				.toString();
 	}
 }
