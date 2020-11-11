@@ -24,9 +24,8 @@
  */
 package org.matsim.core.utils.geometry;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,15 +42,19 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author kainagel
  *
  */
 public class GeometryUtilsTest {
 
+	private final static Logger LOG = LogManager.getLogger(GeometryUtilsTest.class);
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	@SuppressWarnings("static-method")
 	@Test
 	public final void testIntersectingLinks() {
 		
@@ -78,6 +81,11 @@ public class GeometryUtilsTest {
 			LineString testSegment = new GeometryFactory().createLineString(new Coordinate[]{new Coordinate(xx,0),new Coordinate(xx,10000)}) ;
 
 			List<Link> results = GeometryUtils.findIntersectingLinks(testSegment, network);
+
+			LOG.info("found results:");
+			for (Link link : results) {
+				LOG.info(link.getId());
+			}
 
 			List<Id<Link>> expecteds = new ArrayList<>() ;
 			expecteds.add( Id.createLinkId(2) ) ;
