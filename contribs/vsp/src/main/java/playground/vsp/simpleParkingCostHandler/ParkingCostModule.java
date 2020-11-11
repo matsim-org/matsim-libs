@@ -29,10 +29,8 @@ public class ParkingCostModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		ParkingCostHandler parkingCostHandler = new ParkingCostHandler();
 
-		addEventHandlerBinding().toInstance(parkingCostHandler);
-		addControlerListenerBinding().toInstance(parkingCostHandler);
+		addEventHandlerBinding().to(ParkingCostHandler.class);
 	}
 
 }
