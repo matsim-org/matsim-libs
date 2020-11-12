@@ -3,19 +3,14 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.net.URL;
 import java.util.*;
 
-import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteCreator;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -23,29 +18,40 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpOfflineTravelTimeEstimator;
-import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+/**
+ * This set of tests examines how the pooling (car-sharing) behavior varies based on parameters in the drt config group:
+ * maxWaitTime, maxTravelTimeAlpha and maxTravelTimeBeta.
+ *
+ * In this case, rejectRequestIfMaxWaitOrTravelTimeViolated=true (default value), which means that maxTravelTime and
+ * maxWaitTime are seen as hard constraints; if those conditions aren't met, the request is rejected.
+ *
+ * The mielec scenario is used for this purpose. There are only four agents present in this case, which matched the vehicle
+ * capacity of the drt vehicles. All four agents have their home location in a small area (links are adjacent to one another).
+ * The same is true of their work locations. The purpose of this is to push for pooling.
+ *
+ * While there are 10 DRT vehicles overall, there are only two that are closeby: drt_veh_1_1 and drt_veh_1_2. These two vehicles
+ * should be used for all of the test cases.
+ *
+ * I attempted to calculate specific thresholds for the varios parameters using my own calculations. This was not successful, in part,
+ * because during my work the calculation process to find the detourTime changed: within the class DetourTimesProvider.java, the method
+ * createNodeToNodeBeelineTimeEstimator was replaced by createFreeSpeedZonalTimeEstimator. Therefore, the following task:
+ * TODO: Calculate specific thresholds for parameters and demonstrate those calculations
+ *
+ * The stopDuration is set to 0. //TODO: SET BACK TO DEFAULT OF 60s
+ */
 public class DrtPoolingTest {
 
 	private Controler controler;
@@ -53,107 +59,33 @@ public class DrtPoolingTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
+
+	/*
+	The following tests vary the maxWaitTime, while keeping maxTravelTimeAlpha and maxTravelBeta fixed at high values
+	 */
+
+	/**
+	 * With a low maxWaitTime of 100s, no DRT vehicle should have time to any agents.
+	 */
 	@Test
 	public void testMaxWaitTimeLow() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(100,
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(50,
 			10.0,
 			10000.);
 		Assert.assertEquals("There should be no vehicle used" , 0, handler.getVehRequestCount().size());
 
 	}
 
-	@Test
-	public void testMaxWaitTimeOneVehicleUsed() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(150,
-			10.0,
-			10000.);
-		Assert.assertEquals("There should be one vehicle used" , 1, handler.getVehRequestCount().size());
-		Assert.assertTrue("Each vehicle should be requested once", handler.getVehRequestCount().values().contains(1));;
-
-	}
-	@Test
-	public void testMaxWaitTimeTwoSeperateCarsUsed() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(160,
-			10.0,
-			10000.);
-		Assert.assertEquals("There should be two vehicles used" , 2, handler.getVehRequestCount().size());
-		Assert.assertTrue("Each vehicle should be requested once", handler.getVehRequestCount().values().contains(1));;
-
-
-	}
-
-
-	@Test
-	public void testMaxWaitTimeHigh() {
-
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			10.0,
-			10000.);
-		Assert.assertEquals("There should only be one vehicle used", 1, handler.getVehRequestCount().size());
-		Assert.assertTrue("One Vehicle should have been requested twice", handler.getVehRequestCount().values().contains(2));
-
-	}
-
-	@Test
-	public void testAlphaBetaHigh() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			5.0,
-			500);
-
-		System.out.println(handler.getVehRequestCount());
-		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
-		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_1),0);
-
-	}
-
-	@Test
-	public void testAlphaBetaLow() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			1.0,
-			0.);
-
-		System.out.println(handler.getVehRequestCount());
-		Assert.assertEquals("There should only be zero vehicles used" , 0, handler.getVehRequestCount().size());
-
-	}
-
 	/**
-	 *
-	 * p1:  12631.819285714286-526.3638571428572 = 12105.45542857143
-	 * p2:  11627.663571428571-325.532714285714 = 11302.130857142856
-	 *
-	 * 100 --> 0 vehicles used
-	 * 150 --> 0
-	 * 175 --> 1 veh used for one passenger
-	 * 200 --> 2 vehicles
-	 * 300 --> 2 vehicles used
-	 * 500 --> pooling
-	 * 700 --> pooling
-	 *
+	 * With a maxWaitTime of 120s, the two closest drt vehicles should be able to reach 2 agents, but be
+	 * unable to then pickup the other 2 agents without surpassing the maxWaitTime. All other DRT Vehicles
+	 * too far away to reach those agents.
 	 */
-
-
-//TODO: Calculate specific thresholds once ExtensiveInsertionSearch methodology is finalized. New calculation based on zonal Freespeed travel time matrix.
 	@Test
-	public void testAlphaBetaOnlyP1Served() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			1.0,
-			160);
-
-		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
-		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_1),0);
-
-	}
-
-	@Test
-	public void testAlphaBetaP1AndP2ServedSeperately() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			1.0,
-			200);
+	public void testMaxWaitTimeTwoVehiclesForTwoAgents() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(120,
+			10.0,
+			10000.);
 
 		Assert.assertEquals("There should two vehicle used" , 2, handler.getVehRequestCount().size());
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
@@ -162,10 +94,109 @@ public class DrtPoolingTest {
 		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_1),0);
 		Assert.assertTrue("drt_veh_1_2 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_2));
 		Assert.assertEquals("drt_veh_1_2 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_2),0);
+
 	}
 
+	/**
+	 * With a maxWaitTime of 250s, both drt vehicles should have time to each pick up two passengers.
+	 */
 	@Test
-	public void testAlphaBetaP1AndP2ServedTogether() {
+	public void testMaxWaitTimeTwoVehiclesForFourAgents() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(250,
+			10.0,
+			10000.);
+
+		Assert.assertEquals("There should two vehicle used" , 2, handler.getVehRequestCount().size());
+		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
+		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
+		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_1),0);
+		Assert.assertTrue("drt_veh_1_2 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_2));
+		Assert.assertEquals("drt_veh_1_2 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_2),0);
+
+
+	}
+
+	/**
+	 * With a high maxWaitTime of 500s, a single DRT vehicle should be able to pick up all four agents.
+	 */
+	@Test
+	public void testMaxWaitTimeOneVehicleForFourAgents() {
+
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(500,
+			10.0,
+			10000.);
+		System.out.println(handler.getVehRequestCount());
+		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
+		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
+		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly four times", 4, handler.getVehRequestCount().get(drt_veh_1_1),0);
+
+	}
+
+	/*
+	  The following tests vary the maxTravelTimeBeta parameter. maxTravelTimeAlpha is fixed to 1.0, while maxWaitTime is
+	  fixed to a high value: 5000s.
+	 */
+
+	/**
+	 * With a low Beta of 0s, no DRT vehicles should be assigned to the agents.
+	 */
+	@Test
+	public void testBetaLow() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+			1.0,
+			0.);
+
+		Assert.assertEquals("There should only be zero vehicles used" , 0, handler.getVehRequestCount().size());
+
+	}
+
+	/**
+	 * With a low Beta of 150s, both vehicles should have enough time to pick up one passenger each;
+	 * the remaining two agents will be left stranded
+	 */
+	@Test
+	public void testBetaTwoVehiclesForTwoAgents() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+			1.0,
+			150);
+
+		Assert.assertEquals("There should two vehicle used" , 2, handler.getVehRequestCount().size());
+		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
+		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
+		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_1),0);
+		Assert.assertTrue("drt_veh_1_2 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_2));
+		Assert.assertEquals("drt_veh_1_2 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_2),0);
+
+	}
+
+
+	/**
+	 * With a Beta value of 250s, two DRT vehicles should have enough time to pick up two passengers each.
+	 */
+	@Test
+	public void testBetaTwoVehiclesForFourAgents() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+			1.0,
+			250);
+
+		Assert.assertEquals("There should two vehicle used" , 2, handler.getVehRequestCount().size());
+		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
+		Id<DvrpVehicle> drt_veh_1_2 = Id.create("drt_veh_1_2", DvrpVehicle.class);
+		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_1),0);
+		Assert.assertTrue("drt_veh_1_2 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_2));
+		Assert.assertEquals("drt_veh_1_2 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_2),0);
+	}
+
+
+	/**
+	 * With a high Beta of 400s, one DRT vehicle should be used to pick up all four agents
+	 */
+	@Test
+	public void testBetaOneVehicleForFourAgents() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
 			1.0,
 			400);
@@ -173,12 +204,9 @@ public class DrtPoolingTest {
 		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
 		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
 		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly twice", 2, handler.getVehRequestCount().get(drt_veh_1_1),0);
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly four times", 4, handler.getVehRequestCount().get(drt_veh_1_1),0);
 
 	}
-
-
-
 
 	private PersonEnterDrtVehicleEventHandler setupAndRunScenario(double maxWaitTime, double maxTravelTimeAlpha, double maxTravelTimeBeta) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
@@ -188,9 +216,6 @@ public class DrtPoolingTest {
 		config.plans().setInputFile(null);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-
-//		config.facilities().setInputFile("");
-
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		mm.getModalElements()
@@ -209,12 +234,12 @@ public class DrtPoolingTest {
 		ActivityFacilitiesFactory ff = controler.getScenario().getActivityFacilities().getFactory();
 
 		ActivityFacility homeFac1 = ff.createActivityFacility(Id.create("hf1", ActivityFacility.class), Id.createLinkId("359"));
-		ActivityFacility homeFac2 = ff.createActivityFacility(Id.create("hf2", ActivityFacility.class), Id.createLinkId("302"));
-		ActivityFacility homeFac3 = ff.createActivityFacility(Id.create("hf3", ActivityFacility.class), Id.createLinkId("359"));
+		ActivityFacility homeFac2 = ff.createActivityFacility(Id.create("hf2", ActivityFacility.class), Id.createLinkId("364"));
+		ActivityFacility homeFac3 = ff.createActivityFacility(Id.create("hf3", ActivityFacility.class), Id.createLinkId("373"));
 		ActivityFacility homeFac4 = ff.createActivityFacility(Id.create("hf4", ActivityFacility.class), Id.createLinkId("353"));
 
 		ActivityFacility workFac1 = ff.createActivityFacility(Id.create("wf1", ActivityFacility.class), Id.createLinkId("185"));
-		ActivityFacility workFac2 = ff.createActivityFacility(Id.create("wf2", ActivityFacility.class), Id.createLinkId("185"));
+		ActivityFacility workFac2 = ff.createActivityFacility(Id.create("wf2", ActivityFacility.class), Id.createLinkId("245"));
 		ActivityFacility workFac3 = ff.createActivityFacility(Id.create("wf3", ActivityFacility.class), Id.createLinkId("237"));
 		ActivityFacility workFac4 = ff.createActivityFacility(Id.create("wf4", ActivityFacility.class), Id.createLinkId("240"));
 
@@ -229,88 +254,22 @@ public class DrtPoolingTest {
 
 		Person p1 = makePerson(8 * 3600 + 0.,  homeFac1, workFac1, "1", pf);
 		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
-//		Person p3 = makePerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
-//		Person p4 = makePerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
+		Person p3 = makePerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
+		Person p4 = makePerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
 
-//		Person p1 = makePerson(8 * 3600 + 0. , "360", "285", "1", pf);
-//		Person p2 = makePerson(8 * 3600 + 10., "359", "239", "2", pf);
-//		Person p3 = makePerson(8 * 3600 + 20., "361", "237", "3", pf);
-//		Person p4 = makePerson(8 * 3600 + 30., "353", "240", "4", pf);
 		population.addPerson(p1);
-		population.addPerson(p2); //TODO
-//		population.addPerson(p3);
-//		population.addPerson(p4);
-
-
-//		RouteFactory drtRouteFactory = new DrtRouteFactory();
-//		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, drtRouteFactory);
-
-
+		population.addPerson(p2);
+		population.addPerson(p3);
+		population.addPerson(p4);
 
 		EventsManager events = controler.getEvents();
 		PersonEnterDrtVehicleEventHandler handler = new PersonEnterDrtVehicleEventHandler();
 		events.addHandler(handler);
 
-//		new PopulationWriter(population).write("C:\\Users\\jakob\\projects\\matsim-libs\\contribs\\drt\\src\\test\\java\\org\\matsim\\contrib\\drt\\optimizer\\insertion\\revisedPop2.xml");
-//		new FacilitiesWriter(controler.getScenario().getActivityFacilities()).write("C:\\Users\\jakob\\projects\\matsim-libs\\contribs\\drt\\src\\test\\java\\org\\matsim\\contrib\\drt\\optimizer\\insertion\\facilities.xml");
-//		new ConfigWriter(config).write("C:\\Users\\jakob\\projects\\matsim-libs\\contribs\\drt\\src\\test\\java\\org\\matsim\\contrib\\drt\\optimizer\\insertion\\revisedConfig2.xml");
-
 		controler.run();
 
 		return handler;
 	}
-
-//	private Double getDirectTT(ActivityFacility homeFac1, ActivityFacility workFac1, Person p1, TripRouter router) {
-//
-//		List<? extends PlanElement> planElements = router.calcRoute("car", homeFac1, workFac1, 8 * 3600 + 0., p1);
-//
-//		Leg leg = (Leg) planElements.get(0);
-//
-//		Id<Link> startLinkId = leg.getRoute().getEndLinkId();
-//		Link startLink = controler.getScenario().getNetwork().getLinks().get(startLinkId);
-//		double travelTimeStartLink = startLink.getLength() / startLink.getFreespeed();
-//
-//
-//		Id<Link> endLinkId = leg.getRoute().getEndLinkId();
-//		Link endLink = controler.getScenario().getNetwork().getLinks().get(endLinkId);
-//		double travelTimeEndLink = endLink.getLength() / endLink.getFreespeed();
-//
-//		double travelTimeBetweenEnds = leg.getTravelTime().seconds();
-//
-//		return travelTimeStartLink + travelTimeBetweenEnds + travelTimeEndLink;
-//	}
-
-
-	private Double getDirectTT(ActivityFacility homeFac1, ActivityFacility workFac1, Person p1, TripRouter router) {
-
-		List<? extends PlanElement> tripP1 = router.getRoutingModule("drt").calcRoute(homeFac1, workFac1, 0., p1);
-		DrtRoute routeP1 = (DrtRoute) ((Leg) tripP1.get(2)).getRoute();
-		return routeP1.getDirectRideTime();
-	}
-
-
-	private Double getDirectTT(ActivityFacility[] facilities, Person p1, TripRouter router) {
-		Double tt = 0.;
-		for (int i = 0; i < facilities.length - 1; i++) {
-			tt += getDirectTT(facilities[i], facilities[i + 1], p1, router);
-		}
-		return tt;
-	}
-//	private Person makePerson(double depTime, ActivityFacility homeFacility, ActivityFacility workFacility, String pId, PopulationFactory pf) {
-//		Id<Person> personId = Id.createPersonId(pId);
-//		Person person = pf.createPerson(personId);
-//		Plan plan = pf.createPlan();
-//		Activity activity1 = pf.createActivityFromActivityFacilityId("dummý", homeFacility.getId());
-//		activity1.setEndTime(depTime);
-//		plan.addActivity(activity1);
-//		plan.addLeg(pf.createLeg("drt"));
-//		Activity activity2 = pf.createActivityFromActivityFacilityId("dummy", workFacility.getId());
-//		activity2.setEndTimeUndefined();
-//		plan.addActivity(activity2);
-//		person.addPlan(plan);
-//		return person;
-//	}
-
 
 	private Person makePerson(double depTime, ActivityFacility homeFacility, ActivityFacility workFacility, String pId, PopulationFactory pf) {
 		Id<Person> personId = Id.createPersonId(pId);
@@ -321,21 +280,6 @@ public class DrtPoolingTest {
 		plan.addActivity(activity1);
 		plan.addLeg(pf.createLeg("drt"));
 		Activity activity2 = pf.createActivityFromActivityFacilityId("dummy", workFacility.getId());
-		activity2.setEndTimeUndefined();
-		plan.addActivity(activity2);
-		person.addPlan(plan);
-		return person;
-	}
-
-	private Person makePerson(double depTime, String homeLink, String workLink, String pId, PopulationFactory pf) {
-		Id<Person> personId = Id.createPersonId(pId);
-		Person person = pf.createPerson(personId);
-		Plan plan = pf.createPlan();
-		Activity activity1 = pf.createActivityFromLinkId("dummy", Id.createLinkId(homeLink));
-		activity1.setEndTime(depTime);
-		plan.addActivity(activity1);
-		plan.addLeg(pf.createLeg("drt"));
-		Activity activity2 = pf.createActivityFromLinkId("dummy", Id.createLinkId(workLink));
 		activity2.setEndTimeUndefined();
 		plan.addActivity(activity2);
 		person.addPlan(plan);
@@ -356,219 +300,98 @@ public class DrtPoolingTest {
 
 		}
 
-		public Map<Id<DvrpVehicle>, Integer> getVehRequestCount() {
+		Map<Id<DvrpVehicle>, Integer> getVehRequestCount() {
 			return vehRequestCount;
 		}
 	}
 
 
-	@Test
-	public void testOneAgentBetaBelowThreshold() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			1.0,
-			130);
-
-		System.out.println(handler.getVehRequestCount());
-		Assert.assertEquals("There should only be zero vehicle used" , 0, handler.getVehRequestCount().size());
-
-	}
-
-
-	// Threshold at 141. However 150 fails.
-	@Test
-	public void testOneAgentBetaAboveThreshold() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			1.0,
-			160);
-
-		System.out.println(handler.getVehRequestCount());
-		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
-		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
-		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
-		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_1),0);
-
-	}
-
-	@Test
-	public void getParams() {
-		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
-			5.0,
-			10000.); // 116 does not work! 120 does work!
-
-		Scenario scenario = controler.getScenario();
-		TripRouter tripRouter = controler.getTripRouterProvider().get();
-
-		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
-
-		ActivityFacility homeFac1 = facilities.get(Id.create("hf1", ActivityFacility.class));
-		ActivityFacility homeFac2 = facilities.get(Id.create("hf2", ActivityFacility.class));
-		ActivityFacility workFac1 = facilities.get(Id.create("wf1", ActivityFacility.class));
-		ActivityFacility workFac2 = facilities.get(Id.create("wf2", ActivityFacility.class));
-
-		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId("1"));
-		ActivityFacility vehLoc = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("vehLoc", ActivityFacility.class), Id.createLinkId(385));
-
-		double directRideTimeP1 = getDirectTT(homeFac1, workFac1, p1, tripRouter);
-		double directRideTimeP2 = getDirectTT(homeFac2, workFac2, p1, tripRouter);
-		double directRideTimeVehToP1 =getDirectTT(vehLoc, homeFac1, p1, tripRouter);
-		double directRideTimeVehToP2 =getDirectTT(vehLoc, homeFac2, p1, tripRouter);
-
-//		double rideTime_Veh_H1_W1 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac1, workFac1}, p1, tripRouter);
-//		double rideTime_Veh_H2_W2 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac2, workFac2}, p1, tripRouter);
-
-
-
-		DrtConfigGroup drtCfg = ConfigUtils.addOrGetModule( scenario.getConfig(), DrtConfigGroup.class );
-		double beelineTimeV_H1 = findBeelineTime(vehLoc, homeFac1, drtCfg);
-		double beelineTimeH1_W1 = findBeelineTime(homeFac1, workFac1, drtCfg);
-		double beelineTimeP1 = beelineTimeV_H1 + beelineTimeH1_W1;
-
-		double beta_threshold_expected = beelineTimeP1 - directRideTimeP1;
-
-		// maxTT = alpha * usual_TT + Beta
-		// Beta = maxTT - usualTT
-
-		System.out.println("direct ride time p1: " + directRideTimeP1); // 526.36
-		System.out.println("beeline time p1 (veh to h1 to w1): " + beelineTimeP1); // 668.2
-		System.out.println("expected beta threshold: " + beta_threshold_expected); // 141.84
-
-//		double beelineTimeP2 = findBeelineTime(vehLoc, homeFac2, drtCfg)
-//			+findBeelineTime(homeFac2, workFac2, drtCfg);
+	/*
+	The following is an attempt to find very specific thresholds for the various pooling parameters. Unfortunately,
+	this process wasn't completed. Once the ExtensiveInsertionSearch methodology is completed, and a the method
+	for finding DetourTimes is finalized, this process can be continued. See todos at top of class.
+	 */
+//	@Test
+//	public void getParams() {
+//		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+//			5.0,
+//			10000.); // 116 does not work! 120 does work!
 //
-//		System.out.println("");
-
-
+//		Scenario scenario = controler.getScenario();
+//		TripRouter tripRouter = controler.getTripRouterProvider().get();
 //
-//		List<? extends PlanElement> tripP2 = tripRouter.getRoutingModule("drt").calcRoute(homeFac2, workFac2, 0., p1);
-//		DrtRoute routeP2 = (DrtRoute) ((Leg) tripP2.get(2)).getRoute();
-//		double directRideTimeP2 = routeP2.getDirectRideTime();
-//		double ttP2 = routeP2.getTravelTime().seconds();
-//		double waitP2 = ttP2 - directRideTimeP2;
+//		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 //
-//		List<? extends PlanElement> vehToP1 = tripRouter.getRoutingModule("drt").calcRoute(vehLoc, homeFac1, 0., p1);
-//		DrtRoute routeVehToP1 = (DrtRoute) ((Leg) vehToP1.get(2)).getRoute();
-//		double directRideTimeVehToP1 = routeVehToP1.getDirectRideTime();
-//		double ttVehToP1 = routeVehToP1.getTravelTime().seconds();
-//		double waitVehToP1 = ttVehToP1 - directRideTimeVehToP1;
+//		ActivityFacility homeFac1 = facilities.get(Id.create("hf1", ActivityFacility.class));
+//		ActivityFacility homeFac2 = facilities.get(Id.create("hf2", ActivityFacility.class));
+//		ActivityFacility workFac1 = facilities.get(Id.create("wf1", ActivityFacility.class));
+//		ActivityFacility workFac2 = facilities.get(Id.create("wf2", ActivityFacility.class));
 //
-//		List<? extends PlanElement> vehToP2 = tripRouter.getRoutingModule("drt").calcRoute(vehLoc, homeFac2, 0., p1);
-//		DrtRoute routeVehToP2 = (DrtRoute) ((Leg) vehToP2.get(2)).getRoute();
-//		double directRideTimeVehToP2 = routeVehToP2.getDirectRideTime();
-//		double ttVehToP2 = routeVehToP2.getTravelTime().seconds();
-//		double waitVehToP2 = ttVehToP2 - directRideTimeVehToP2;
-
-
-//		List<? extends PlanElement> usualTripP2 = tripRouter1.getRoutingModule("drt").calcRoute(homeFac2, workFac2, 0., p1);
-//		double ttUsualP2 = ((Leg) usualTripP2.get(2)).getTravelTime().seconds();
-
-		// direct ride time : 526.3638571428572
-		//  travTime : 12631.819285714286
-
-
-//		List<? extends PlanElement> car = tripRouter1.getRoutingModule("car").calcRoute(homeFac1, workFac1, 0., p1);
-//		double ttCAR = ((Leg) car.get(0)).getTravelTime().seconds();
-
-
-		////		Double r1 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac1, homeFac2, workFac1, workFac2}, p1, tripRouter1);
-////		Double r2 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac1, homeFac2, workFac2, workFac1}, p1, tripRouter1);
-////		Double r3 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac2, homeFac1, workFac1, workFac2}, p1, tripRouter1);
-////		Double r4 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac2, homeFac1, workFac2, workFac1}, p1, tripRouter1);
-//		Double usual1 = getDirectTT(homeFac1, workFac1, p1, tripRouter);
-//		Double usual2 = getDirectTT(homeFac2, workFac2, p1, tripRouter);
+//		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId("1"));
+//		ActivityFacility vehLoc = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("vehLoc", ActivityFacility.class), Id.createLinkId(385));
 //
-//		System.out.println("usual travel time - p1: " + usual1);
-//
-//		System.out.println("usual travel time - p2: " + usual2);
-
-//
-//		DrtRouteFactory drtRouteFactory = new DrtRouteFactory();
-////		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, drtRouteFactory);
-//
-//
-////		Route route1 = drtRouteFactory.createRoute(homeFac1.getLinkId(), workFac1.getLinkId());
-//		Route route2 = scenario.getPopulation().getFactory().getRouteFactories().createRoute(DrtRoute.class, homeFac1.getLinkId(), workFac1.getLinkId());
-//		route2.getTravelTime();
-//
-//
-//
+//		double directRideTimeP1 = getDirectTT(homeFac1, workFac1, p1, tripRouter);
 //
 //		DrtConfigGroup drtCfg = ConfigUtils.addOrGetModule( scenario.getConfig(), DrtConfigGroup.class );
-//		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(scenario.getConfig().global());
-//		TravelTime travelTime =  new QSimFreeSpeedTravelTime(scenario.getConfig().qsim());
-//		TravelDisutilityFactory travelDisutilityFactory = new OnlyTimeDependentTravelDisutilityFactory();
-////		RouteFactories routeFactories = new RouteFactories();
-//		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
-//			leastCostPathCalculatorFactory,
-//			travelTime,
-//			travelDisutilityFactory);
+//		double beelineTimeV_H1 = findBeelineTime(vehLoc, homeFac1, drtCfg);
+//		double beelineTimeH1_W1 = findBeelineTime(homeFac1, workFac1, drtCfg);
+//		double beelineTimeP1 = beelineTimeV_H1 + beelineTimeH1_W1;
+//
+//		double beta_threshold_expected = beelineTimeP1 - directRideTimeP1;
 //
 //
-////		DvrpTravelTimeModule.DVRP_ESTIMATED
-//		Route route = drtRouteCreator.createRoute(0.,
-//			scenario.getNetwork().getLinks().get(homeFac1.getLinkId()),
-//			scenario.getNetwork().getLinks().get(workFac1.getLinkId()),
-//			new RouteFactories());
+//		System.out.println("direct ride time p1: " + directRideTimeP1); // 526.36
+//		System.out.println("beeline time p1 (veh to h1 to w1): " + beelineTimeP1); // 668.2
+//		System.out.println("expected beta threshold: " + beta_threshold_expected); // 141.84
+//
+//	}
+//
+//	private double findBeelineTime(ActivityFacility actFac1, ActivityFacility actFac2, DrtConfigGroup drtCfg) {
+//		ExtensiveInsertionSearchParams drtInsertionSearchParams = (ExtensiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
+////		double admissibleBeelineSpeed = drtInsertionSearchParams.getAdmissibleBeelineSpeedFactor()
+////			* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
+//		double admissibleBeelineSpeed = 8.012820512820513;
+//		Coord fromCoord = controler.getScenario().getNetwork().getLinks().get(actFac1.getLinkId()).getCoord();
+//		Coord toCoord = controler.getScenario().getNetwork().getLinks().get(actFac2.getLinkId()).getCoord();
+//		double beelineDistance = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+//
+//		return beelineDistance / admissibleBeelineSpeed;
+//
+//	}
+//	private Double getDirectTT(ActivityFacility homeFac1, ActivityFacility workFac1, Person p1, TripRouter router) {
+//
+//		List<? extends PlanElement> tripP1 = router.getRoutingModule("drt").calcRoute(homeFac1, workFac1, 0., p1);
+//		DrtRoute routeP1 = (DrtRoute) ((Leg) tripP1.get(2)).getRoute();
+//		return routeP1.getDirectRideTime();
+//	}
 //
 //
+//	private Double getDirectTT(ActivityFacility[] facilities, Person p1, TripRouter router) {
+//		Double tt = 0.;
+//		for (int i = 0; i < facilities.length - 1; i++) {
+//			tt += getDirectTT(facilities[i], facilities[i + 1], p1, router);
+//		}
+//		return tt;
+//	}
+//	private Double getDirectTT_OLD(ActivityFacility homeFac1, ActivityFacility workFac1, Person p1, TripRouter router) {
+//
+//		List<? extends PlanElement> planElements = router.calcRoute("car", homeFac1, workFac1, 8 * 3600 + 0., p1);
+//
+//		Leg leg = (Leg) planElements.get(0);
+//
+//		Id<Link> startLinkId = leg.getRoute().getEndLinkId();
+//		Link startLink = controler.getScenario().getNetwork().getLinks().get(startLinkId);
+//		double travelTimeStartLink = startLink.getLength() / startLink.getFreespeed();
 //
 //
-//		route.getTravelTime().seconds();
+//		Id<Link> endLinkId = leg.getRoute().getEndLinkId();
+//		Link endLink = controler.getScenario().getNetwork().getLinks().get(endLinkId);
+//		double travelTimeEndLink = endLink.getLength() / endLink.getFreespeed();
 //
+//		double travelTimeBetweenEnds = leg.getTravelTime().seconds();
 //
-//
-//		TravelTime initialTT = new QSimFreeSpeedTravelTime(scenario.getConfig().qsim());
-//		Network network = scenario.getNetwork();
-//		TravelTimeCalculatorConfigGroup configGroup = new TravelTimeCalculatorConfigGroup();
-//		DvrpOfflineTravelTimeEstimator travelTimeEstimator = new DvrpOfflineTravelTimeEstimator(initialTT, initialTT, network, configGroup, 1.);
-//		Vehicle vehicle = scenario.getVehicles().getVehicles().get(Id.createVehicleId("drt_veh_1_1"));
-//		double linkTravelTime = travelTimeEstimator.getLinkTravelTime(
-//			scenario.getNetwork().getLinks().get(Id.createLinkId(362)),
-//			0.,
-//			null,
-//			null);
-//
-//		System.out.println(linkTravelTime);
-//
-//
-//
-////		TravelTimeUtils.initTravelTimeCalculatorFromEvents();
-////
-////		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
-////			tripRouter1, travelTime);
-////		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-////		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-//
-////		Leg h1_h2 = (Leg) tripRouter1.calcRoute("car",facilities.get("hf1"), facilities.get("hf2"), 8 * 3600 + 0., p1).get(0);
-////		Double tt_h1_h2 = h1_h2.getTravelTime().seconds();
-////		System.out.println("h1_h2: " + tt_h1_h2);
-//		Double tt_vehLoc_h1 = getDirectTT(vehLoc, homeFac1, p1, tripRouter);
-////		System.out.println("vehLoc_h1: " + tt_vehLoc_h1);
-////
-//		Double tt_vehLoc_h2 = getDirectTT(vehLoc, homeFac2, p1, tripRouter);
-//		System.out.println("vehLoc_h2: " + tt_vehLoc_h2);
-//
-//
-//		Double tt_h1_w1 = getDirectTT(homeFac1,workFac1 , p1, tripRouter);
-//
-//		System.out.println(tt_h1_w1);
-
-//		Double deltaPool = Double.max(tt_vehLoc_h1, tt_vehLoc_h2) + tt_h1_h2 + tt_w1_w2 + 4*60.;
-	}
-
-	private double findBeelineTime(ActivityFacility actFac1, ActivityFacility actFac2, DrtConfigGroup drtCfg) {
-		ExtensiveInsertionSearchParams drtInsertionSearchParams = (ExtensiveInsertionSearchParams) drtCfg.getDrtInsertionSearchParams();
-//		double admissibleBeelineSpeed = drtInsertionSearchParams.getAdmissibleBeelineSpeedFactor()
-//			* drtCfg.getEstimatedDrtSpeed() / drtCfg.getEstimatedBeelineDistanceFactor();
-
-
-		double admissibleBeelineSpeed = 8.012820512820513;
-		Coord fromCoord = controler.getScenario().getNetwork().getLinks().get(actFac1.getLinkId()).getCoord();
-		Coord toCoord = controler.getScenario().getNetwork().getLinks().get(actFac2.getLinkId()).getCoord();
-		double beelineDistance = CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-
-		return beelineDistance / admissibleBeelineSpeed;
-
-	}
+//		return travelTimeStartLink + travelTimeBetweenEnds + travelTimeEndLink;
+//	}
 
 }
 
