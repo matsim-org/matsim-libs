@@ -228,7 +228,7 @@ public class DrtPoolingTest {
 		scenario.getActivityFacilities().addActivityFacility(workFac4);
 
 		Person p1 = makePerson(8 * 3600 + 0.,  homeFac1, workFac1, "1", pf);
-		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
+//		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
 //		Person p3 = makePerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
 //		Person p4 = makePerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
 
@@ -237,7 +237,7 @@ public class DrtPoolingTest {
 //		Person p3 = makePerson(8 * 3600 + 20., "361", "237", "3", pf);
 //		Person p4 = makePerson(8 * 3600 + 30., "353", "240", "4", pf);
 		population.addPerson(p1);
-		population.addPerson(p2);
+//		population.addPerson(p2); //TODO
 //		population.addPerson(p3);
 //		population.addPerson(p4);
 
@@ -363,32 +363,48 @@ public class DrtPoolingTest {
 
 
 	@Test
+	public void testOneAgentBetaBelowThreshold() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+			1.0,
+			130);
+
+		System.out.println(handler.getVehRequestCount());
+		Assert.assertEquals("There should only be zero vehicle used" , 0, handler.getVehRequestCount().size());
+
+	}
+
+
+	// Threshold at 141. However 150 fails.
+	@Test
+	public void testOneAgentBetaAboveThreshold() {
+		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
+			1.0,
+			160);
+
+		System.out.println(handler.getVehRequestCount());
+		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
+		Id<DvrpVehicle> drt_veh_1_1 = Id.create("drt_veh_1_1", DvrpVehicle.class);
+		Assert.assertTrue("drt_veh_1_1 should be requested in general", handler.getVehRequestCount().containsKey(drt_veh_1_1));
+		Assert.assertEquals("drt_veh_1_1 should be requested exactly once", 1, handler.getVehRequestCount().get(drt_veh_1_1),0);
+
+	}
+
+	@Test
 	public void getParams() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
 			5.0,
 			10000.); // 116 does not work! 120 does work!
 
-//		System.out.println(handler.getVehRequestCount());
-//		Assert.assertEquals("There should only be one vehicle used" , 1, handler.getVehRequestCount().size());
-//		Assert.assertTrue("One Vehicle should have been requested twice", handler.getVehRequestCount().values().contains(2));;
-
 		Scenario scenario = controler.getScenario();
 		TripRouter tripRouter = controler.getTripRouterProvider().get();
 
-
-
-
-
-////		ArrayList<ActivityFacility> route =(ArrayList<ActivityFacility>) Arrays.asList(homeFac1, homeFac2,workFac1,workFac2);
-//
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
-		System.out.println(facilities);
 
 		ActivityFacility homeFac1 = facilities.get(Id.create("hf1", ActivityFacility.class));
 		ActivityFacility homeFac2 = facilities.get(Id.create("hf2", ActivityFacility.class));
 		ActivityFacility workFac1 = facilities.get(Id.create("wf1", ActivityFacility.class));
 		ActivityFacility workFac2 = facilities.get(Id.create("wf2", ActivityFacility.class));
-//
+
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId("1"));
 		ActivityFacility vehLoc = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("vehLoc", ActivityFacility.class), Id.createLinkId(385));
 
@@ -397,19 +413,26 @@ public class DrtPoolingTest {
 		double directRideTimeVehToP1 =getDirectTT(vehLoc, homeFac1, p1, tripRouter);
 		double directRideTimeVehToP2 =getDirectTT(vehLoc, homeFac2, p1, tripRouter);
 
-		double rideTime_Veh_H1_W1 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac1, workFac1}, p1, tripRouter);
-		double rideTime_Veh_H2_W2 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac2, workFac2}, p1, tripRouter);
+//		double rideTime_Veh_H1_W1 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac1, workFac1}, p1, tripRouter);
+//		double rideTime_Veh_H2_W2 = getDirectTT(new ActivityFacility[]{vehLoc, homeFac2, workFac2}, p1, tripRouter);
 
 
 
 		DrtConfigGroup drtCfg = ConfigUtils.addOrGetModule( scenario.getConfig(), DrtConfigGroup.class );
-		double beelineTimeP1 = findBeelineTime(vehLoc, homeFac1, drtCfg)
-			+findBeelineTime(homeFac1, workFac1, drtCfg);
+		double beelineTimeV_H1 = findBeelineTime(vehLoc, homeFac1, drtCfg);
+		double beelineTimeH1_W1 = findBeelineTime(homeFac1, workFac1, drtCfg);
+		double beelineTimeP1 = beelineTimeV_H1 + beelineTimeH1_W1;
 
-		double beelineTimeP2 = findBeelineTime(vehLoc, homeFac2, drtCfg)
-			+findBeelineTime(homeFac2, workFac2, drtCfg);
+		double beta_threshold_expected = beelineTimeP1 - directRideTimeP1;
 
-		System.out.println("");
+		System.out.println("direct ride time p1: " + directRideTimeP1); // 526.36
+		System.out.println("beeline time p1 (veh to h1 to w1): " + beelineTimeP1); // 668.2
+		System.out.println("expected beta threshold: " + beta_threshold_expected); // 141.84
+
+//		double beelineTimeP2 = findBeelineTime(vehLoc, homeFac2, drtCfg)
+//			+findBeelineTime(homeFac2, workFac2, drtCfg);
+//
+//		System.out.println("");
 
 
 //
