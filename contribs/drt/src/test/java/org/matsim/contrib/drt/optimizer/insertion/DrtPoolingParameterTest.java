@@ -6,12 +6,9 @@ import java.util.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -23,8 +20,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.*;
@@ -38,21 +33,24 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * In this case, rejectRequestIfMaxWaitOrTravelTimeViolated=true (default value), which means that maxTravelTime and
  * maxWaitTime are seen as hard constraints; if those conditions aren't met, the request is rejected.
  *
- * The mielec scenario is used for this purpose. There are only four agents present in this case, which matched the vehicle
+ * The mielec scenario is used for this purpose. There are only four agents present in this case, which matches the vehicle
  * capacity of the drt vehicles. All four agents have their home location in a small area (links are adjacent to one another).
- * The same is true of their work locations. The purpose of this is to push for pooling.
+ * The same is true of their work locations. The purpose of this is to encourage pooling.
  *
  * While there are 10 DRT vehicles overall, there are only two that are closeby: drt_veh_1_1 and drt_veh_1_2. These two vehicles
  * should be used for all of the test cases.
  *
- * I attempted to calculate specific thresholds for the varios parameters using my own calculations. This was not successful, in part,
+ * I attempted to calculate specific thresholds for the various parameters using my own calculations. This was not successful, in part,
  * because during my work the calculation process to find the detourTime changed: within the class DetourTimesProvider.java, the method
  * createNodeToNodeBeelineTimeEstimator was replaced by createFreeSpeedZonalTimeEstimator. Therefore, the following task:
  * TODO: Calculate specific thresholds for parameters and demonstrate those calculations
+ * ^The beginning of this process is commented at the end of this class
  *
- * The stopDuration is set to 0. //TODO: SET BACK TO DEFAULT OF 60s
+ * What happens if rejectRequestIfMaxWaitOrTravelTimeViolated = false? --> TODO: verify how soft constraints work.
+ * The stopDuration is set to 1s --> potential TODO: reset to default of 60s
+ * TODO: write tests for maxTravelTimeAlpha
  */
-public class DrtPoolingTest {
+public class DrtPoolingParameterTest {
 
 	private Controler controler;
 
@@ -68,7 +66,7 @@ public class DrtPoolingTest {
 	 * With a low maxWaitTime of 100s, no DRT vehicle should have time to any agents.
 	 */
 	@Test
-	public void testMaxWaitTimeLow() {
+	public void testMaxWaitTimeNoVehicles() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(50,
 			10.0,
 			10000.);
@@ -143,7 +141,7 @@ public class DrtPoolingTest {
 	 * With a low Beta of 0s, no DRT vehicles should be assigned to the agents.
 	 */
 	@Test
-	public void testBetaLow() {
+	public void testBetaNoVehicles() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
 			1.0,
 			0.);
@@ -252,10 +250,10 @@ public class DrtPoolingTest {
 		scenario.getActivityFacilities().addActivityFacility(workFac3);
 		scenario.getActivityFacilities().addActivityFacility(workFac4);
 
-		Person p1 = makePerson(8 * 3600 + 0.,  homeFac1, workFac1, "1", pf);
-		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
-		Person p3 = makePerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
-		Person p4 = makePerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
+		Person p1 = createPerson(8 * 3600 + 0.,  homeFac1, workFac1, "1", pf);
+		Person p2 = createPerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
+		Person p3 = createPerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
+		Person p4 = createPerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
 
 		population.addPerson(p1);
 		population.addPerson(p2);
@@ -271,7 +269,7 @@ public class DrtPoolingTest {
 		return handler;
 	}
 
-	private Person makePerson(double depTime, ActivityFacility homeFacility, ActivityFacility workFacility, String pId, PopulationFactory pf) {
+	private Person createPerson(double depTime, ActivityFacility homeFacility, ActivityFacility workFacility, String pId, PopulationFactory pf) {
 		Id<Person> personId = Id.createPersonId(pId);
 		Person person = pf.createPerson(personId);
 		Plan plan = pf.createPlan();
@@ -312,7 +310,7 @@ public class DrtPoolingTest {
 	for finding DetourTimes is finalized, this process can be continued. See todos at top of class.
 	 */
 //	@Test
-//	public void getParams() {
+//	public void findThresholdsForParameters() {
 //		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
 //			5.0,
 //			10000.); // 116 does not work! 120 does work!
