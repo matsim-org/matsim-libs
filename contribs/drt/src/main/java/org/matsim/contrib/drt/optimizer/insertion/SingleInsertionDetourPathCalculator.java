@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import static org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import static org.matsim.contrib.dvrp.path.OneToManyPathSearch.createZeroPathData;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 
 import java.util.List;
@@ -131,7 +130,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 
 	private PathData calcPathData(LeastCostPathCalculator router, Link fromLink, Link toLink, double departureTime) {
 		if (fromLink == toLink) {
-			return createZeroPathData(fromLink.getToNode());
+			return PathData.EMPTY;
 		}
 
 		Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,

@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,23 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.insertion;
+package playground.vsp.simpleParkingCostHandler;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author michalm
- */
-public interface DetourTimeEstimator {
-	static DetourTimeEstimator createNodeToNodeBeelineTimeEstimator(double beelineSpeed) {
-		return (from, to) -> DistanceUtils.calculateDistance(from.getToNode(), to.getToNode()) / beelineSpeed;
+* @author ikaddoura
+*/
+
+public class ParkingCostModule extends AbstractModule {
+
+	@Override
+	public void install() {
+
+		addEventHandlerBinding().to(ParkingCostHandler.class);
 	}
 
-	static DetourTimeEstimator createFreeSpeedZonalTimeEstimator(double speedFactor, DvrpTravelTimeMatrix matrix) {
-		return (from, to) -> matrix.getFreeSpeedTravelTime(from.getToNode(), to.getToNode()) / speedFactor;
-	}
-
-	double estimateTime(Link from, Link to);
 }
+

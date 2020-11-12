@@ -18,57 +18,36 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.zone.skims;
+package org.matsim.contrib.util;
 
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.validation.constraints.Positive;
-
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.zone.ZonalSystems;
+import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.network.filter.NetworkFilterManager;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DvrpTravelTimeMatrixParams extends ReflectiveConfigGroup {
-	public static final String SET_NAME = "travelTimeMatrix";
+public class NetworkAreaFiltering {
+	public static Network filterNetworkUsingShapefile(Network network, List<PreparedGeometry> areaGeometries,
+			boolean runNetworkCleaner) {
+		Set<Node> nodesWithinArea = new HashSet<>(
+				ZonalSystems.selectNodesWithinArea(network.getNodes().values(), areaGeometries));
 
-	public static final String CELL_SIZE = "cellSize";
-	private static final String CELL_SIZE_EXP = "size of square cells (meters) used for computing travel time matrix."
-			+ " Default value is 200 m";
+		NetworkFilterManager networkFilterManager = new NetworkFilterManager(network);
+		networkFilterManager.addLinkFilter(
+				l -> nodesWithinArea.contains(l.getFromNode()) || nodesWithinArea.contains(l.getToNode()));
+		Network filteredNetwork = networkFilterManager.applyFilters();
 
-	@Positive
-	private int cellSize = 200; //[m]
-
-	public DvrpTravelTimeMatrixParams() {
-		super(SET_NAME);
-	}
-
-	@Override
-	public Map<String, String> getComments() {
-		var map = super.getComments();
-		map.put(CELL_SIZE, CELL_SIZE_EXP);
-		return map;
-	}
-
-	/**
-	 * @return {@value #CELL_SIZE_EXP}
-	 */
-	@StringGetter(CELL_SIZE)
-	public int getCellSize() {
-		return cellSize;
-	}
-
-	/**
-	 * @param cellSize {@value #CELL_SIZE_EXP}
-	 */
-	@StringSetter(CELL_SIZE)
-	public void setCellSize(int cellSize) {
-		this.cellSize = cellSize;
-	}
-
-	@Override
-	public ConfigGroup createParameterSet(String type) {
-		return super.createParameterSet(type);
+		if (runNetworkCleaner) {
+			new NetworkCleaner().run(filteredNetwork);
+		}
+		return filteredNetwork;
 	}
 }

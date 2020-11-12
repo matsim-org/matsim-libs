@@ -45,11 +45,10 @@ public class ZonalSystems {
 		return nodes.stream().map(zonalSystem::getZone).collect(toSet());
 	}
 
-	public static List<Node> selectNodesWithinServiceArea(Collection<? extends Node> nodes,
-			List<PreparedGeometry> serviceAreaGeoms) {
+	public static List<Node> selectNodesWithinArea(Collection<? extends Node> nodes, List<PreparedGeometry> areaGeoms) {
 		return nodes.stream().filter(node -> {
 			Point point = MGC.coord2Point(node.getCoord());
-			return serviceAreaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(point));
+			return areaGeoms.stream().anyMatch(serviceArea -> serviceArea.intersects(point));
 		}).collect(toList());
 	}
 
