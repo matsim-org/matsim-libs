@@ -135,7 +135,7 @@ public class DrtPoolingTest {
 	 */
 
 
-
+//TODO: Calculate specific thresholds once ExtensiveInsertionSearch methodology is finalized. New calculation based on zonal Freespeed travel time matrix.
 	@Test
 	public void testAlphaBetaOnlyP1Served() {
 		PersonEnterDrtVehicleEventHandler handler = setupAndRunScenario(5000,
@@ -228,7 +228,7 @@ public class DrtPoolingTest {
 		scenario.getActivityFacilities().addActivityFacility(workFac4);
 
 		Person p1 = makePerson(8 * 3600 + 0.,  homeFac1, workFac1, "1", pf);
-//		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
+		Person p2 = makePerson(8 * 3600 + 10., homeFac2, workFac2, "2", pf);
 //		Person p3 = makePerson(8 * 3600 + 20., homeFac3, workFac3, "3", pf);
 //		Person p4 = makePerson(8 * 3600 + 30., homeFac4, workFac4, "4", pf);
 
@@ -237,7 +237,7 @@ public class DrtPoolingTest {
 //		Person p3 = makePerson(8 * 3600 + 20., "361", "237", "3", pf);
 //		Person p4 = makePerson(8 * 3600 + 30., "353", "240", "4", pf);
 		population.addPerson(p1);
-//		population.addPerson(p2); //TODO
+		population.addPerson(p2); //TODO
 //		population.addPerson(p3);
 //		population.addPerson(p4);
 
@@ -424,6 +424,9 @@ public class DrtPoolingTest {
 		double beelineTimeP1 = beelineTimeV_H1 + beelineTimeH1_W1;
 
 		double beta_threshold_expected = beelineTimeP1 - directRideTimeP1;
+
+		// maxTT = alpha * usual_TT + Beta
+		// Beta = maxTT - usualTT
 
 		System.out.println("direct ride time p1: " + directRideTimeP1); // 526.36
 		System.out.println("beeline time p1 (veh to h1 to w1): " + beelineTimeP1); // 668.2
