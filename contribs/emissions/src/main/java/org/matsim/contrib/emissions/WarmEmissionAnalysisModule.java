@@ -101,6 +101,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
 					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
 					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
+					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
+					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
 					if (detailedHbefaWarmTable != null) {
 						Set<String> roadCategories = new HashSet<>();
 						Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
