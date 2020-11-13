@@ -21,12 +21,10 @@
 package org.matsim.contrib.dvrp.path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,8 +89,7 @@ public class OneToManyPathCalculatorTest {
 		nodeMap.values()
 				.stream()
 				.filter(node -> node != nodeB)
-				.forEach(node -> assertThatThrownBy(() -> pathCalculator.createPath(node)).isExactlyInstanceOf(
-						NoSuchElementException.class).hasMessage("Undefined time"));
+				.forEach(node -> assertThat(pathCalculator.createPath(node)).isNull());
 	}
 
 	@Test
@@ -122,8 +119,7 @@ public class OneToManyPathCalculatorTest {
 				new Path(List.of(nodeB), List.of(), 0, 0));
 
 		//nodeD beyond max time range
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeD)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
+		assertThat(pathCalculator.createPath(nodeD)).isNull();
 	}
 
 	@Test
@@ -141,8 +137,7 @@ public class OneToManyPathCalculatorTest {
 		nodeMap.values()
 				.stream()
 				.filter(node -> node != nodeD)
-				.forEach(node -> assertThatThrownBy(() -> pathCalculator.createPath(node)).isExactlyInstanceOf(
-						NoSuchElementException.class).hasMessage("Undefined time"));
+				.forEach(node -> assertThat(pathCalculator.createPath(node)).isNull());
 	}
 
 	@Test
@@ -172,8 +167,7 @@ public class OneToManyPathCalculatorTest {
 				new Path(List.of(nodeD), List.of(), 0, 0));
 
 		//nodeB beyond max time range
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeB)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
+		assertThat(pathCalculator.createPath(nodeB)).isNull();
 	}
 
 	@Test
@@ -216,12 +210,20 @@ public class OneToManyPathCalculatorTest {
 
 	@Test
 	public void pathData_fromLinkEqualsToLink() {
-		//forward search starting from linkBA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+		for (boolean forward : List.of(true, false)) {
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, linkAB, 0);
+			pathCalculator.calculateDijkstraTree(List.of(linkAB));
+			assertThat(pathCalculator.createPathDataLazily(linkAB)).isEqualTo(PathData.EMPTY);
+		}
+	}
 
-		pathCalculator.calculateDijkstraTree(List.of(linkAB));
-
-		assertPathData(pathCalculator.createPathDataLazily(linkAB), new Path(null, null, 0, 0), 0);
+	@Test
+	public void pathData_nodeNotReached() {
+		for (boolean forward : List.of(true, false)) {
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, linkAB, 0);
+			pathCalculator.calculateDijkstraTree(List.of(linkBC));
+			assertThat(pathCalculator.createPathDataLazily(linkDE)).isEqualTo(PathData.INFEASIBLE);
+		}
 	}
 
 	private void assertPathData(PathData pathData, Path expectedPath, double firstAndLastLinkTT) {

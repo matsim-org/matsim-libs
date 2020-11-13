@@ -46,17 +46,18 @@ public class OneToManyPathSearch {
 	}
 
 	public static class PathData {
-		public static final PathData EMPTY = new PathData();
+		public static final PathData EMPTY = new PathData(0, 0);
+		public static final PathData INFEASIBLE = new PathData(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
 		private final Supplier<Path> pathSupplier;
 		private Path path;
 
 		private final double travelTime;
 
-		private PathData() {
+		private PathData(double travelTime, double travelCost) {
 			this.pathSupplier = null;
-			this.path = new Path(null, null, 0, 0);
-			this.travelTime = 0;
+			this.path = new Path(null, null, travelTime, travelCost);
+			this.travelTime = travelTime;
 		}
 
 		public PathData(Path path, double firstAndLastLinkTT) {

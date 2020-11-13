@@ -32,11 +32,14 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.base.Preconditions;
 
@@ -89,8 +92,12 @@ class OneToManyPathCalculator {
 		if (toLink == fromLink) {
 			return PathData.EMPTY;
 		} else {
-			double pathTravelTime = getTravelTime(getEndNode(toLink).getId().index());
-			Supplier<Path> pathSupplier = () -> createPath(getEndNode(toLink));
+			Node endNode = getEndNode(toLink);
+			double pathTravelTime = getTravelTime(endNode.getId().index());
+			if (pathTravelTime == Double.POSITIVE_INFINITY) {
+				return PathData.INFEASIBLE;
+			}
+			Supplier<Path> pathSupplier = () -> createPath(endNode);
 			return new PathData(pathSupplier, pathTravelTime,
 					getFirstAndLastLinkTT(fromLink, toLink, pathTravelTime, startTime));
 		}
@@ -100,21 +107,33 @@ class OneToManyPathCalculator {
 		if (toLink == fromLink) {
 			return PathData.EMPTY;
 		} else {
-			Path path = createPath(getEndNode(toLink));
+			Node endNode = getEndNode(toLink);
+			if (dijkstraTree.getTime(endNode.getId().index()).isUndefined()) {
+				return PathData.INFEASIBLE;
+			}
+			Path path = createPath(endNode);
 			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
 		}
 	}
 
+	@Nullable
 	Path createPath(Node toNode) {
-		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
-		var links = constructLinkSequence(nodes);
 		int toNodeIndex = toNode.getId().index();
 		double travelTime = getTravelTime(toNodeIndex);
+		if (travelTime == Double.POSITIVE_INFINITY) {
+			return null;
+		}
+		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
+		var links = constructLinkSequence(nodes);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
 	}
 
 	private double getTravelTime(int toNodeIndex) {
+		OptionalTime endTime = dijkstraTree.getTime(toNodeIndex);
+		if (endTime.isUndefined()) {
+			return Double.POSITIVE_INFINITY;
+		}
 		int travelTimeMultiplier = forwardSearch ? 1 : -1;
 		return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
 	}
