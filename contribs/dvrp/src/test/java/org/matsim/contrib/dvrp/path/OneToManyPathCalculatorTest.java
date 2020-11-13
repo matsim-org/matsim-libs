@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
@@ -111,6 +111,22 @@ public class OneToManyPathCalculatorTest {
 	}
 
 	@Test
+	public void forward_fromNodeB_toNodesBD_maxTravelTime() {
+		//forward search starting from nodeB at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
+
+		//search until nodes B and D are reached with max travel time of 5
+		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkDE), 5);
+
+		assertThat(pathCalculator.createPath(nodeB)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeB), List.of(), 0, 0));
+
+		//nodeD beyond max time range
+		assertThatThrownBy(() -> pathCalculator.createPath(nodeD)).isExactlyInstanceOf(NoSuchElementException.class)
+				.hasMessage("Undefined time");
+	}
+
+	@Test
 	public void backward_fromNodeD_toNodeD() {
 		//backward search starting from nodeD at time 0
 		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
@@ -142,6 +158,22 @@ public class OneToManyPathCalculatorTest {
 
 		assertThat(pathCalculator.createPath(nodeB)).isEqualToComparingFieldByField(
 				new Path(List.of(nodeB, nodeC, nodeD), List.of(linkBC, linkCD), 20, 20));
+	}
+
+	@Test
+	public void backward_fromNodeD_toNodesBD_maxTravelTime() {
+		//backward search starting from nodeD at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+
+		//search until nodes B and D are reached with max travel time of 5
+		pathCalculator.calculateDijkstraTree(List.of(linkAB, linkCD), 5);
+
+		assertThat(pathCalculator.createPath(nodeD)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeD), List.of(), 0, 0));
+
+		//nodeB beyond max time range
+		assertThatThrownBy(() -> pathCalculator.createPath(nodeB)).isExactlyInstanceOf(NoSuchElementException.class)
+				.hasMessage("Undefined time");
 	}
 
 	@Test

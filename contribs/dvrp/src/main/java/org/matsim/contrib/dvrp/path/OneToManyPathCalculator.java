@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import static ch.sbb.matsim.routing.graph.LeastCostPathTree.StopCriterion;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -36,6 +37,8 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+
+import com.google.common.base.Preconditions;
 
 import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
@@ -59,11 +62,21 @@ class OneToManyPathCalculator {
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks) {
+		calculateDijkstraTree(toLinks, Double.POSITIVE_INFINITY);
+	}
+
+	void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
+		Preconditions.checkArgument(!Double.isNaN(maxTravelTime) && maxTravelTime >= 0);
+
 		int fromNodeIdx = getStartNode(fromLink).getId().index();
 		Stream<Node> toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode);
-		MultiNodeStopCriterion stopCriterion = new MultiNodeStopCriterion(toNodes);
+		var multiNodeStopCriterion = new MultiNodeStopCriterion(toNodes);
 
-		if (stopCriterion.counter > 0) {
+		StopCriterion stopCriterion = maxTravelTime < Double.POSITIVE_INFINITY ?
+				new MaxTravelTimeStopCriterion(maxTravelTime, multiNodeStopCriterion) :
+				multiNodeStopCriterion;
+
+		if (multiNodeStopCriterion.counter > 0) {
 			if (forwardSearch) {
 				dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
 			} else {
@@ -155,7 +168,24 @@ class OneToManyPathCalculator {
 		return FIRST_LINK_TT + lastLinkTT;
 	}
 
-	private static class MultiNodeStopCriterion implements LeastCostPathTree.StopCriterion {
+	private static class MaxTravelTimeStopCriterion implements StopCriterion {
+		private final double maxTravelTime;
+		private final MultiNodeStopCriterion multiNodeStopCriterion;
+
+		private MaxTravelTimeStopCriterion(double maxTravelTime, MultiNodeStopCriterion multiNodeStopCriterion) {
+			this.maxTravelTime = maxTravelTime;
+			this.multiNodeStopCriterion = multiNodeStopCriterion;
+		}
+
+		@Override
+		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
+				double departureTime) {
+			return arrivalTime - departureTime > maxTravelTime //
+					|| multiNodeStopCriterion.stop(nodeIndex, arrivalTime, travelCost, distance, departureTime);
+		}
+	}
+
+	private static class MultiNodeStopCriterion implements StopCriterion {
 		private final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
 		private int counter;
 
@@ -164,7 +194,6 @@ class OneToManyPathCalculator {
 			counter = nodesToVisit.cardinality();
 		}
 
-		@Override
 		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
 				double departureTime) {
 			if (nodesToVisit.get(nodeIndex)) {

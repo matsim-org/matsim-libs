@@ -93,17 +93,27 @@ public class OneToManyPathSearch {
 	}
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward) {
+		return calcPathDataArray(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
+			double maxTravelTime) {
 		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
 				startTime);
-		pathConstructor.calculateDijkstraTree(toLinks);
+		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataArray(toLinks, pathConstructor);
 	}
 
 	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			boolean forward) {
+		return calcPathDataMap(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+			boolean forward, double maxTravelTime) {
 		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
 				startTime);
-		pathCalculator.calculateDijkstraTree(toLinks);
+		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataMap(toLinks, pathCalculator);
 	}
 
