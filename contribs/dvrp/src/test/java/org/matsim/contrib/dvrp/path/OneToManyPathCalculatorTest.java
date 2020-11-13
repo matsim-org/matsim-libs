@@ -55,15 +55,14 @@ public class OneToManyPathCalculatorTest {
 
 	private final Node nodeA = createAndAddNode("A", new Coord(0, 0));
 	private final Node nodeB = createAndAddNode("B", new Coord(150, 0));
-	private final Node nodeC = createAndAddNode("C", new Coord(150, 150));
+	private final Node nodeC = createAndAddNode("C", new Coord(300, 0));
+	private final Node nodeD = createAndAddNode("D", new Coord(450, 0));
+	private final Node nodeE = createAndAddNode("E", new Coord(600, 0));
 
 	private final Link linkAB = createAndAddLink("AB", nodeA, nodeB, 10 * 15, 15);
-	private final Link linkBC = createAndAddLink("BC", nodeB, nodeC, 11 * 15, 15);
-	private final Link linkAC = createAndAddLink("AC", nodeA, nodeC, 15 * 15, 15);
-
-	private final Link linkBA = createAndAddLink("BA", nodeB, nodeA, 8 * 20, 20);
-	private final Link linkCB = createAndAddLink("CB", nodeC, nodeB, 9 * 20, 20);
-	private final Link linkCA = createAndAddLink("CA", nodeC, nodeA, 12 * 20, 20);
+	private final Link linkBC = createAndAddLink("BC", nodeB, nodeC, 10 * 15, 15);
+	private final Link linkCD = createAndAddLink("CD", nodeC, nodeD, 10 * 15, 15);
+	private final Link linkDE = createAndAddLink("DE", nodeD, nodeE, 10 * 15, 15);
 
 	private final IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 
@@ -72,131 +71,115 @@ public class OneToManyPathCalculatorTest {
 
 	@Before
 	public void init() {
-		for (Node node : List.of(nodeA, nodeB, nodeC)) {
+		for (Node node : List.of(nodeA, nodeB, nodeC, nodeD, nodeE)) {
 			nodeMap.put(node.getId(), node);
 		}
 	}
 
 	@Test
-	public void forward_fromNodeA_toNodeA() {
-		//forward search starting from nodeA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkBA, 0);
+	public void forward_fromNodeB_toNodeB() {
+		//forward search starting from nodeB at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
 
-		//search until node A is reached (i.e. links AB and AC)
-		pathCalculator.calculateDijkstraTree(List.of(linkAB, linkAC));
-
-		assertThat(pathCalculator.createPath(nodeA)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA), List.of(), 0, 0));
-
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeB)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
-
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeC)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
-	}
-
-	@Test
-	public void forward_fromNodeA_toNodesBC() {
-		//forward search starting from nodeA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkBA, 0);
-
-		//search until node B and C are visited
-		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkCB));
-
-		assertThat(pathCalculator.createPath(nodeA)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA), List.of(), 0, 0));
+		//search until node B is reached
+		pathCalculator.calculateDijkstraTree(List.of(linkBC));
 
 		assertThat(pathCalculator.createPath(nodeB)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA, nodeB), List.of(linkAB), travelTime(linkAB), travelTime(linkAB)));
+				new Path(List.of(nodeB), List.of(), 0, 0));
 
-		assertThat(pathCalculator.createPath(nodeC)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA, nodeC), List.of(linkAC), linkAC.getLength() / linkAC.getFreespeed(),
-						linkAC.getLength() / linkAC.getFreespeed()));
+		//no other nodes are visited
+		nodeMap.values()
+				.stream()
+				.filter(node -> node != nodeB)
+				.forEach(node -> assertThatThrownBy(() -> pathCalculator.createPath(node)).isExactlyInstanceOf(
+						NoSuchElementException.class).hasMessage("Undefined time"));
 	}
 
 	@Test
-	public void forward_fromLinkAB_toLinkAB() {
-		LeastCostPathTree mockedTree = mock(LeastCostPathTree.class);
-		//forward search starting from linkAB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, mockedTree, true, linkAB, 0);
+	public void forward_fromNodeB_toNodesBD() {
+		//forward search starting from nodeB at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
 
-		//toLink == fromLink, so no search is done
-		pathCalculator.calculateDijkstraTree(List.of(linkAB));
-		verify(mockedTree, never()).calculate(anyInt(), anyDouble(), any(), any(), any());
-	}
-
-	@Test
-	public void backward_fromNodeA_toNodeA() {
-		//backward search starting from nodeA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkAB, 0);
-
-		//search until node A is reached (i.e. links BA and CA)
-		pathCalculator.calculateDijkstraTree(List.of(linkBA, linkCA));
-
-		assertThat(pathCalculator.createPath(nodeA)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA), List.of(), 0, 0));
-
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeB)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
-
-		assertThatThrownBy(() -> pathCalculator.createPath(nodeC)).isExactlyInstanceOf(NoSuchElementException.class)
-				.hasMessage("Undefined time");
-	}
-
-	@Test
-	public void backward_fromNodeA_toNodesBC() {
-		//backward search starting from nodeA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkAB, 0);
-
-		//search until node B and C are visited
-		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkCB));
-
-		assertThat(pathCalculator.createPath(nodeA)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeA), List.of(), 0, 0));
+		//search until nodes B and D are reached
+		pathCalculator.calculateDijkstraTree(List.of(linkBC, linkDE));
 
 		assertThat(pathCalculator.createPath(nodeB)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeB, nodeA), List.of(linkBA), travelTime(linkBA), travelTime(linkBA)));
+				new Path(List.of(nodeB), List.of(), 0, 0));
 
-		assertThat(pathCalculator.createPath(nodeC)).isEqualToComparingFieldByField(
-				new Path(List.of(nodeC, nodeA), List.of(linkCA), travelTime(linkCA), travelTime(linkCA)));
+		assertThat(pathCalculator.createPath(nodeD)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeB, nodeC, nodeD), List.of(linkBC, linkCD), 20, 20));
 	}
 
 	@Test
-	public void backward_fromLinkAB_toLinkAB() {
+	public void backward_fromNodeD_toNodeD() {
+		//backward search starting from nodeD at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+
+		//search until node D is reached
+		pathCalculator.calculateDijkstraTree(List.of(linkCD));
+
+		assertThat(pathCalculator.createPath(nodeD)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeD), List.of(), 0, 0));
+
+		//no other nodes are visited
+		nodeMap.values()
+				.stream()
+				.filter(node -> node != nodeD)
+				.forEach(node -> assertThatThrownBy(() -> pathCalculator.createPath(node)).isExactlyInstanceOf(
+						NoSuchElementException.class).hasMessage("Undefined time"));
+	}
+
+	@Test
+	public void backward_fromNodeD_toNodesBD() {
+		//backward search starting from nodeD at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
+
+		//search until nodes B and D are reached
+		pathCalculator.calculateDijkstraTree(List.of(linkAB, linkCD));
+
+		assertThat(pathCalculator.createPath(nodeD)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeD), List.of(), 0, 0));
+
+		assertThat(pathCalculator.createPath(nodeB)).isEqualToComparingFieldByField(
+				new Path(List.of(nodeB, nodeC, nodeD), List.of(linkBC, linkCD), 20, 20));
+	}
+
+	@Test
+	public void equalFromLinkAndToLink() {
 		LeastCostPathTree mockedTree = mock(LeastCostPathTree.class);
-		//backward search starting from linkAB at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, mockedTree, false, linkAB, 0);
 
-		//toLink == fromLink, so no search is done
-		pathCalculator.calculateDijkstraTree(List.of(linkAB));
+		for (boolean forward : List.of(true, false)) {
+			var pathCalculator = new OneToManyPathCalculator(nodeMap, mockedTree, forward, linkAB, 0);
 
-		verify(mockedTree, never()).calculate(anyInt(), anyDouble(), any(), any(), any());
+			//toLink == fromLink, so no search is done
+			pathCalculator.calculateDijkstraTree(List.of(linkAB));
+
+			verify(mockedTree, never()).calculate(anyInt(), anyDouble(), any(), any(), any());
+		}
 	}
 
 	@Test
 	public void pathData_forward() {
-		//forward search starting from linkBA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkBA, 0);
+		//forward search starting from linkAB at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, true, linkAB, 0);
 
-		pathCalculator.calculateDijkstraTree(List.of(linkBC));
+		pathCalculator.calculateDijkstraTree(List.of(linkDE));
 
-		//path: BA -> AB -> BC
-		assertPathData(pathCalculator.createPathDataLazily(linkBC),
-				new Path(ImmutableList.of(nodeA, nodeB), ImmutableList.of(linkAB), travelTime(linkAB),
-						travelTime(linkAB)), 1 + travelTime(linkBC));
+		//path: B -> C -> D
+		assertPathData(pathCalculator.createPathDataLazily(linkDE),
+				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 1 + 10);
 	}
 
 	@Test
 	public void pathData_backward() {
-		//forward search starting from linkBA at time 0
-		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkAB, 0);
+		//backward search starting from linkDE at time 0
+		var pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, false, linkDE, 0);
 
-		pathCalculator.calculateDijkstraTree(List.of(linkCB));
+		pathCalculator.calculateDijkstraTree(List.of(linkAB));
 
-		//path: CB -> BA -> AB
-		assertPathData(pathCalculator.createPathDataLazily(linkCB),
-				new Path(ImmutableList.of(nodeB, nodeA), ImmutableList.of(linkBA), travelTime(linkBA),
-						travelTime(linkBA)), 1 + travelTime(linkAB));
+		//path: B -> C -> D
+		assertPathData(pathCalculator.createPathDataLazily(linkAB),
+				new Path(ImmutableList.of(nodeB, nodeC, nodeD), ImmutableList.of(linkBC, linkCD), 20, 20), 1 + 10);
 	}
 
 	@Test
