@@ -102,6 +102,7 @@ env:
      - MODULE=contribs/multimodal
      - MODULE=contribs/protobuf
      - MODULE=contribs/socnetsim
+     - MODULE=contribs/sumo
      - MODULE=contribs/pseudosimulation
      - MODULE=contribs/roadpricing
      - MODULE=contribs/analysis
