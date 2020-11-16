@@ -155,6 +155,11 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 		if (event.getMode().equals(mode)) {
 			performedRequestSequences.put(event.getRequestId(),
 					new PerformedRequestEventSequence(requestSubmissions.get(event.getRequestId()), event));
+			
+			// Remove rejections that could be handled due to PassengerEngineWithRetryLogic
+			if (rejectedRequestSequences.containsKey(event.getRequestId())) {
+				rejectedRequestSequences.remove(event.getRequestId());
+			}
 		}
 	}
 

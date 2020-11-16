@@ -39,6 +39,7 @@ import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
+ * @author Steffen Axer
  */
 public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
@@ -56,15 +57,31 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp.isTeleportDrtUsers(
-				drtCfg.getDrtSpeedUpParams().get(), getConfig().controler(), getIterationNumber());
+		boolean teleportDrtUsers = drtCfg.getDrtSpeedUpParams().isPresent() && DrtSpeedUp
+				.isTeleportDrtUsers(drtCfg.getDrtSpeedUpParams().get(), getConfig().controler(), getIterationNumber());
+
+		boolean retryRequest = drtCfg.getRetryRequestHandling();
+
 		if (teleportDrtUsers) {
+
+			if (retryRequest) {
+				throw new RuntimeException("DrtSpeedUp in combination with RequestRetry not ready yet");
+			}
+
 			install(new PassengerEngineQSimModule(getMode(),
 					PassengerEngineQSimModule.PassengerEngineType.TELEPORTING));
-			bindModal(TeleportedRouteCalculator.class).toProvider(
-					modalProvider(getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
+			bindModal(TeleportedRouteCalculator.class)
+					.toProvider(modalProvider(
+							getter -> getter.getModal(DrtSpeedUp.class).createTeleportedRouteCalculator()))
 					.asEagerSingleton();
-		} else {
+
+		} else if (retryRequest) {
+			install(new VrpAgentSourceQSimModule(getMode()));
+			install(new PassengerEngineQSimModule(getMode(), PassengerEngineQSimModule.PassengerEngineType.WITH_RETRY));
+			install(optimizerQSimModule);
+		}
+
+		else {
 			install(new VrpAgentSourceQSimModule(getMode()));
 			install(new PassengerEngineQSimModule(getMode()));
 			install(optimizerQSimModule);

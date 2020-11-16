@@ -4,9 +4,11 @@ import static org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule.Passen
 
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 
+
 public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
+		
 	public enum PassengerEngineType {
-		DEFAULT, WITH_PREBOOKING, TELEPORTING
+		DEFAULT, WITH_PREBOOKING, TELEPORTING, WITH_RETRY
 	}
 
 	private final PassengerEngineType type;
@@ -22,6 +24,8 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 
 	@Override
 	protected void configureQSim() {
+		
+		
 		bindModal(PassengerHandler.class).to(modalKey(PassengerEngine.class));
 		addMobsimScopeEventHandlerBinding().to(modalKey(PassengerEngine.class));
 		switch (type) {
@@ -33,6 +37,9 @@ public class PassengerEngineQSimModule extends AbstractDvrpModeQSimModule {
 				return;
 			case TELEPORTING:
 				addModalComponent(PassengerEngine.class, TeleportingPassengerEngine.createProvider(getMode()));
+				return;
+			case WITH_RETRY:
+				addModalComponent(PassengerEngine.class, PassengerEngineWithRetryLogic.createProvider(getMode()));
 				return;
 			default:
 				throw new IllegalStateException("Type: " + type + " is not supported");

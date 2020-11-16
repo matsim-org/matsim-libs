@@ -111,6 +111,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
 
+	
+	public static final String RETRY_REQUEST_HANDLING = "retryRequestHandling";
+	static final String RETRY_REQUEST_HANDLING_EXP = "Enable request repetition for rejected request. See: DvrpRequestRetryParams for available parameters";
+
+	
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 	static final String OPERATIONAL_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
@@ -164,6 +169,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	private boolean idleVehiclesReturnToDepots = false;
+	
+	private boolean retryRequestHandling = false;
 
 	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
@@ -206,6 +213,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@Nullable
 	private DrtSpeedUpParams drtSpeedUpParams;
+	
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -236,6 +244,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		//drt speedup
 		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
 				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
+		
+
 	}
 
 	@Override
@@ -310,6 +320,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
+		map.put(RETRY_REQUEST_HANDLING,RETRY_REQUEST_HANDLING_EXP);
 		return map;
 	}
 
@@ -497,6 +508,23 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
+	 * @return -- {@value #RETRY_REQUEST_HANDLING_EXP}}
+	 */
+	@StringGetter(RETRY_REQUEST_HANDLING)
+	public boolean getRetryRequestHandling() {
+		return retryRequestHandling;
+	}
+
+	/**
+	 * @param retryRequestHandling -- {@value #RETRY_REQUEST_HANDLING_EXP}
+	 */
+	@StringSetter(RETRY_REQUEST_HANDLING)
+	public DrtConfigGroup setRetryRequestHandling(boolean retryRequestHandling) {
+		this.retryRequestHandling = retryRequestHandling;
+		return this;
+	}
+	
+	/**
 	 * @return -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}}
 	 */
 	@StringGetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
@@ -512,6 +540,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
 		return this;
 	}
+	
+	
 
 	/**
 	 * @return -- {@value #OPERATIONAL_SCHEME_EXP}
@@ -633,4 +663,5 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
 		return Optional.ofNullable(drtSpeedUpParams);
 	}
+	
 }

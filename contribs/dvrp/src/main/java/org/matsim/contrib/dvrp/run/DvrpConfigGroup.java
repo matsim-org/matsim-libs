@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMax;
@@ -113,6 +114,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 
 	@Nullable
 	private DvrpTravelTimeMatrixParams travelTimeMatrixParams;
+	
+	@Nullable 
+	private DvrpRequestRetryParams dvrpRequestRetryParams;
 
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);
@@ -123,6 +127,10 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 		//travel time matrix (optional)
 		addDefinition(DvrpTravelTimeMatrixParams.SET_NAME, DvrpTravelTimeMatrixParams::new,
 				() -> travelTimeMatrixParams, params -> travelTimeMatrixParams = (DvrpTravelTimeMatrixParams)params);
+		
+		//dvrp request retry handling (optional)
+		addDefinition(DvrpRequestRetryParams.SET_NAME, DvrpRequestRetryParams::new, () -> dvrpRequestRetryParams,
+				params -> dvrpRequestRetryParams = (DvrpRequestRetryParams)params);
 	}
 
 	@Override
@@ -233,6 +241,16 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroupWithConfigurable
 	public DvrpConfigGroup setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
 		return this;
+	}
+	
+	
+	public Optional<DvrpRequestRetryParams> getDvrpRequestRetryParams() {
+		
+		if (dvrpRequestRetryParams == null) {
+			addParameterSet(new DvrpRequestRetryParams());
+		}
+		
+		return Optional.ofNullable(dvrpRequestRetryParams);
 	}
 
 	public DvrpTravelTimeMatrixParams getTravelTimeMatrixParams() {
