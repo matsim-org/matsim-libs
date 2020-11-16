@@ -61,6 +61,7 @@ public class TravelTimeValidationRunner {
 	private final Set<Id<Person>> populationIds;
 	private final String outputfolder;
 	private final int eventsQueueSize = 1048576 * 32;
+	private final Tuple<Double, Double> timeWindow;
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
 			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate) {
@@ -70,6 +71,7 @@ public class TravelTimeValidationRunner {
 		this.numberOfTripsToValidate = numberOfTripsToValidate;
 		this.outputfolder = outputFolder;
 		this.populationIds = populationIds;
+		this.timeWindow = new Tuple<Double, Double>((double) 0, (double) 3600 * 30);
 	}
 
 	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
@@ -80,6 +82,23 @@ public class TravelTimeValidationRunner {
 		this.numberOfTripsToValidate = Integer.MAX_VALUE;
 		this.outputfolder = outputFolder;
 		this.populationIds = populationIds;
+		this.timeWindow = new Tuple<Double, Double>((double) 0, (double) 3600 * 30);
+	}
+
+	public TravelTimeValidationRunner(Network network, Set<Id<Person>> populationIds, String eventsFile,
+			String outputFolder, TravelTimeDistanceValidator travelTimeValidator, int numberOfTripsToValidate,
+			Tuple<Double, Double> timeWindow) {
+		this.network = network;
+		this.eventsFile = eventsFile;
+		this.travelTimeValidator = travelTimeValidator;
+		this.numberOfTripsToValidate = numberOfTripsToValidate;
+		this.outputfolder = outputFolder;
+		this.populationIds = populationIds;
+		this.timeWindow = timeWindow;
+		if (timeWindow.getFirst() > timeWindow.getSecond()) {
+			throw new IllegalArgumentException(
+					"Time window is not valid (the first element should be smaller than the second element in the Time Window Tuple)");
+		}
 	}
 
 	public void run() {
@@ -94,11 +113,14 @@ public class TravelTimeValidationRunner {
 		Collections.shuffle(carTrips, MatsimRandom.getRandom());
 		int i = 0;
 		for (CarTrip trip : carTrips) {
-			Tuple<Double, Double> timeDistance = travelTimeValidator.getTravelTime(trip);
-			double validatedTravelTime = timeDistance.getFirst();
-			trip.setValidatedTravelTime(validatedTravelTime);
-			trip.setValidatedTravelDistance(timeDistance.getSecond());
-			i++;
+			if (trip.getDepartureTime() >= timeWindow.getFirst() && trip.getDepartureTime() <= timeWindow.getSecond()) {
+				Tuple<Double, Double> timeDistance = travelTimeValidator.getTravelTime(trip);
+				double validatedTravelTime = timeDistance.getFirst();
+				trip.setValidatedTravelTime(validatedTravelTime);
+				trip.setValidatedTravelDistance(timeDistance.getSecond());
+				i++;
+			}
+
 			if (i >= numberOfTripsToValidate) {
 				break;
 			}

@@ -46,17 +46,18 @@ public class OneToManyPathSearch {
 	}
 
 	public static class PathData {
-		public static final PathData EMPTY = new PathData();
+		public static final PathData EMPTY = new PathData(0, 0);
+		public static final PathData INFEASIBLE = new PathData(Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
 
 		private final Supplier<Path> pathSupplier;
 		private Path path;
 
 		private final double travelTime;
 
-		private PathData() {
+		private PathData(double travelTime, double travelCost) {
 			this.pathSupplier = null;
-			this.path = new Path(null, null, 0, 0);
-			this.travelTime = 0;
+			this.path = new Path(null, null, travelTime, travelCost);
+			this.travelTime = travelTime;
 		}
 
 		public PathData(Path path, double firstAndLastLinkTT) {
@@ -93,17 +94,27 @@ public class OneToManyPathSearch {
 	}
 
 	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward) {
+		return calcPathDataArray(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime, boolean forward,
+			double maxTravelTime) {
 		OneToManyPathCalculator pathConstructor = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
 				startTime);
-		pathConstructor.calculateDijkstraTree(toLinks);
+		pathConstructor.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataArray(toLinks, pathConstructor);
 	}
 
 	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
 			boolean forward) {
+		return calcPathDataMap(fromLink, toLinks, startTime, forward, Double.POSITIVE_INFINITY);
+	}
+
+	public Map<Link, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+			boolean forward, double maxTravelTime) {
 		OneToManyPathCalculator pathCalculator = new OneToManyPathCalculator(nodeMap, dijkstraTree, forward, fromLink,
 				startTime);
-		pathCalculator.calculateDijkstraTree(toLinks);
+		pathCalculator.calculateDijkstraTree(toLinks, maxTravelTime);
 		return createPathDataMap(toLinks, pathCalculator);
 	}
 

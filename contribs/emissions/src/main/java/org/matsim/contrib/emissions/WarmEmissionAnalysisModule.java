@@ -95,78 +95,92 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Gbl.assertNotNull( eventsManager );
 		this.eventsManager = eventsManager;
 
-		if ( detailedHbefaWarmTable!=null ){
-			// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
-			// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
-			// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
-			Set<String> roadCategories = new HashSet<>();
-			Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf( HbefaTrafficSituation.class );
-			Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf( HbefaVehicleCategory.class );
-			Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
-			Set<Pollutant> pollutantsInTable = EnumSet.noneOf( Pollutant.class );
-			for( HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet() ){
-				roadCategories.add( emissionFactorKey.getHbefaRoadCategory() );
-				trafficSituations.add( emissionFactorKey.getHbefaTrafficSituation() );
-				vehicleCategories.add( emissionFactorKey.getHbefaVehicleCategory() );
-				vehicleAttributes.add( emissionFactorKey.getHbefaVehicleAttributes() );
-				pollutantsInTable.add( emissionFactorKey.getHbefaComponent() );
-			}
-			for( String roadCategory : roadCategories ){
-				for( HbefaTrafficSituation trafficSituation : trafficSituations ){
-					for( HbefaVehicleCategory vehicleCategory : vehicleCategories ){
-						for( HbefaVehicleAttributes vehicleAttribute : vehicleAttributes ){
-							for( Pollutant pollutant : pollutantsInTable ){
-								HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
-								key.setHbefaRoadCategory( roadCategory );
-								key.setHbefaTrafficSituation( trafficSituation );
-								key.setHbefaVehicleCategory( vehicleCategory );
-								key.setHbefaVehicleAttributes( vehicleAttribute );
-								key.setHbefaComponent( pollutant );
-								HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get( key );
-								if( result == null ){
-									throw new RuntimeException( "emissions factor for key=" + key + " is missing." +
-														    "  There used to be some " +
-														    "fallback, but it was " +
-														    "inconsistent and confusing, so " +
-														    "we are now just aborting." );
+		if ( detailedHbefaWarmTable!=null ) {
+			switch (ecg.gethbefaTableConsistencyCheckingLevel()) {
+				case allCombinations:
+					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
+					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
+					// If this causes too many problems, we could insert a switch (or attach it to the fallback behavior switch).  kai, feb'20
+					// Eventually vehicle category and vehicle attribute should be alligned in order to make the allCombinations setting useful
+					// see discussion in  https://github.com/matsim-org/matsim-libs/issues/1226 kturner, nov'20
+					if (detailedHbefaWarmTable != null) {
+						Set<String> roadCategories = new HashSet<>();
+						Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
+						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
+						Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+						Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+						for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
+							roadCategories.add(emissionFactorKey.getHbefaRoadCategory());
+							trafficSituations.add(emissionFactorKey.getHbefaTrafficSituation());
+							vehicleCategories.add(emissionFactorKey.getHbefaVehicleCategory());
+							vehicleAttributes.add(emissionFactorKey.getHbefaVehicleAttributes());
+							pollutantsInTable.add(emissionFactorKey.getHbefaComponent());
+						}
+						for (String roadCategory : roadCategories) {
+							for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+								for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+									for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+										for (Pollutant pollutant : pollutantsInTable) {
+											HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+											key.setHbefaRoadCategory(roadCategory);
+											key.setHbefaTrafficSituation(trafficSituation);
+											key.setHbefaVehicleCategory(vehicleCategory);
+											key.setHbefaVehicleAttributes(vehicleAttribute);
+											key.setHbefaComponent(pollutant);
+											HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+											if (result == null) {
+												throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+														"  There used to be some " +
+														"fallback, but it was " +
+														"inconsistent and confusing, so " +
+														"we are now just aborting.");
+											}
+										}
+									}
 								}
 							}
 						}
 					}
-				}
-			}
-			// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
-			// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
-			// where some detailed values exist and others don't.  So the thing to check would be if for each existing
-			//   roadCategory x vehicleCategory x vehicleAttribute x pollutant
-			// there is a freeflow and a stopgo entry.  Maybe something like this here:
-			Set<String> freeflowSet = new HashSet<>();
-			Set<String> stopgoSet = new HashSet<>();
-			for( HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet() ){
-				String syntheticKey = key.getHbefaRoadCategory() + "--" + key.getHbefaVehicleCategory() + "--" + key.getHbefaVehicleAttributes() + "--" + key.getHbefaComponent() ;
-				switch(key.getHbefaTrafficSituation()){
-					case FREEFLOW:
-						freeflowSet.add( syntheticKey );
-						break;
-					case STOPANDGO:
-						stopgoSet.add( syntheticKey );
-						break;
-					default:
-						// do nothing
-				}
-			}
-			for( String syntheticKey : freeflowSet ){
-				if ( !stopgoSet.contains( syntheticKey ) ) {
-					throw new RuntimeException( "inconsistent" );
-				}
-			}
-			for( String syntheticKey : stopgoSet ){
-				if ( !freeflowSet.contains( syntheticKey ) ) {
-					throw new RuntimeException( "inconsistent" );
-				}
+					break;
+
+				case consistent:
+					// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
+					// conditions exist for a certain lookup.  So we could still have some road categories, vehicle categories or vehicle attributes
+					// where some detailed values exist and others don't.  So the thing to check would be if for each existing
+					//   roadCategory x vehicleCategory x vehicleAttribute x pollutant
+					// there is a freeflow and a stopgo entry.  Maybe something like this here:
+					Set<String> freeflowSet = new HashSet<>();
+					Set<String> stopgoSet = new HashSet<>();
+					for (HbefaWarmEmissionFactorKey key : detailedHbefaWarmTable.keySet()) {
+						String syntheticKey = key.getHbefaRoadCategory() + "--" + key.getHbefaVehicleCategory() + "--" + key.getHbefaVehicleAttributes() + "--" + key.getHbefaComponent();
+						switch (key.getHbefaTrafficSituation()) {
+							case FREEFLOW:
+								freeflowSet.add(syntheticKey);
+								break;
+							case STOPANDGO:
+								stopgoSet.add(syntheticKey);
+								break;
+							default:
+								// do nothing
+						}
+					}
+					for (String syntheticKey : freeflowSet) {
+						if (!stopgoSet.contains(syntheticKey)) {
+							throw new RuntimeException("inconsistent");
+						}
+					}
+					for (String syntheticKey : stopgoSet) {
+						if (!freeflowSet.contains(syntheticKey)) {
+							throw new RuntimeException("inconsistent");
+						}
+					}
+					break;
+				case none:
+					break;
+				default:
+					throw new IllegalStateException("Unexpected value: " + ecg.gethbefaTableConsistencyCheckingLevel());
 			}
 		}
-
 	}
 
 	void reset() {
