@@ -124,7 +124,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		// highest computation time (approx. 45% total CPU time)
 		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
 				() -> toPickupPathSearch.calcPathDataMap(pickup, detourLinksSet.pickupDetourStartLinks.values(),
-						earliestPickupTime, false));
+						earliestPickupTime, false, drtRequest.getLatestStartTime() - earliestPickupTime));
 
 		// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
 		// medium computation time (approx. 25% total CPU time)
