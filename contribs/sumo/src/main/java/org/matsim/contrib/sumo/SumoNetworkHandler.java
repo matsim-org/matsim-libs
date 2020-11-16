@@ -16,9 +16,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Parses specific information from sumo network xml file.
+ * Parses and holds specific information from sumo network xml file.
  */
-class SumoNetworkHandler extends DefaultHandler {
+public class SumoNetworkHandler extends DefaultHandler {
 
     final double[] netOffset = new double[2];
 
@@ -53,6 +53,26 @@ class SumoNetworkHandler extends DefaultHandler {
     private Edge tmpEdge = null;
 
     private SumoNetworkHandler() {
+    }
+
+    public Map<String, Junction> getJunctions() {
+        return junctions;
+    }
+
+    public Map<String, Edge> getEdges() {
+        return edges;
+    }
+
+    public Map<String, Edge> getLanes() {
+        return lanes;
+    }
+
+    public Map<String, List<Connection>> getConnections() {
+        return connections;
+    }
+
+    public Map<String, Type> getTypes() {
+        return types;
     }
 
     /**

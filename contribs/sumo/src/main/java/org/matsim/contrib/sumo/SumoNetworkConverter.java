@@ -88,6 +88,13 @@ public class SumoNetworkConverter implements Callable<Integer> {
         return new SumoNetworkConverter(input, output, shapeFile, fromCRS, toCRS);
     }
 
+    /**
+     * Reads network from input file.
+     */
+    public static SumoNetworkHandler readNetwork(File input) throws IOException, SAXException, ParserConfigurationException {
+        return SumoNetworkHandler.read(input);
+    }
+
     public static void main(String[] args) {
         System.exit(new CommandLine(new SumoNetworkConverter()).execute(args));
     }
