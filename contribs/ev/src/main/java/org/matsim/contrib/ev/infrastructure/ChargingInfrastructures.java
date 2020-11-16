@@ -20,10 +20,11 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.util.function.Function;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -33,7 +34,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public class ChargingInfrastructures {
 	public static ChargingInfrastructure createChargingInfrastructure(
-			ChargingInfrastructureSpecification infrastructureSpecification, LinkProvider<Id<Link>> linkProvider,
+			ChargingInfrastructureSpecification infrastructureSpecification, Function<Id<Link>, Link> linkProvider,
 			ChargingLogic.Factory chargingLogicFactory) {
 		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
@@ -46,6 +47,7 @@ public class ChargingInfrastructures {
 	public static ImmutableListMultimap<Id<Link>, Charger> getChargersAtLinks(ChargingInfrastructure infrastructure) {
 		return infrastructure.getChargers()
 				.values()
-				.stream().collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
+				.stream()
+				.collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
 	}
 }

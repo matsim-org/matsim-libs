@@ -27,11 +27,10 @@ public class FastHeuristicLinkBasedRelocationCalculator implements LinkBasedRelo
 	}
 
 	private DvrpVehicle findNearestVehicle(Link targetLink, List<? extends DvrpVehicle> rebalancableVehicles) {
-		Coord toCoord = targetLink.getCoord();
+		Coord toCoord = targetLink.getFromNode().getCoord();
 		return rebalancableVehicles.stream()
-				.min(Comparator.comparing(
-						v -> DistanceUtils.calculateSquaredDistance(Schedules.getLastLinkInSchedule(v).getCoord(),
-								toCoord)))
+				.min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(
+						Schedules.getLastLinkInSchedule(v).getToNode().getCoord(), toCoord)))
 				.get();
 	}
 }

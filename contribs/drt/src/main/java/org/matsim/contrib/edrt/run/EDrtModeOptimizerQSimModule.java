@@ -20,10 +20,9 @@
 
 package org.matsim.contrib.edrt.run;
 
-import static org.matsim.contrib.drt.run.DrtModeQSimModule.getInsertionSearchQSimModule;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleData;
@@ -33,7 +32,6 @@ import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearch;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
-import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
@@ -41,11 +39,7 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
-import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerHandler;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -53,7 +47,6 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.edrt.EDrtActionCreator;
 import org.matsim.contrib.edrt.optimizer.EDrtOptimizer;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
@@ -69,26 +62,22 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
+public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 	private final DrtConfigGroup drtCfg;
 
-	public EDrtModeQSimModule(DrtConfigGroup drtCfg) {
+	public EDrtModeOptimizerQSimModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
 	}
 
 	@Override
 	protected void configureQSim() {
-		install(new VrpAgentSourceQSimModule(getMode()));
-		install(new PassengerEngineQSimModule(getMode()));
-
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new EDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(EmptyVehicleChargingScheduler.class))));
@@ -103,8 +92,6 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge
 		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
-
-		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
@@ -132,7 +119,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
-		install(getInsertionSearchQSimModule(drtCfg));
+		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
@@ -179,18 +166,6 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				toProvider(modalProvider(getter -> new EDrtActionCreator(getter.getModal(PassengerHandler.class),
 						getter.get(MobsimTimer.class), getter.get(DvrpConfigGroup.class)))).
 				asEagerSingleton();
-
-		bindModal(PassengerRequestCreator.class).toProvider(new Provider<DrtRequestCreator>() {
-			@Inject
-			private EventsManager events;
-			@Inject
-			private MobsimTimer timer;
-
-			@Override
-			public DrtRequestCreator get() {
-				return new DrtRequestCreator(getMode(), events, timer);
-			}
-		}).asEagerSingleton();
 
 		bindModal(VrpOptimizer.class).to(modalKey(DrtOptimizer.class));
 	}

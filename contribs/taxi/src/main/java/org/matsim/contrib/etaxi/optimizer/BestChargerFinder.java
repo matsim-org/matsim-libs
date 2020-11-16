@@ -25,14 +25,11 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
-import org.matsim.contrib.util.LinkProvider;
 
 /**
  * @author michalm
  */
 public class BestChargerFinder {
-	private static final LinkProvider<Charger> CHARGER_TO_LINK = Charger::getLink;
-
 	private final BestDispatchFinder dispatchFinder;
 
 	public BestChargerFinder(BestDispatchFinder dispatchFinder) {
@@ -40,6 +37,6 @@ public class BestChargerFinder {
 	}
 
 	public Dispatch<Charger> findBestChargerForVehicle(DvrpVehicle veh, Stream<Charger> chargers) {
-		return dispatchFinder.findBestDestination(veh, chargers, CHARGER_TO_LINK);
+		return dispatchFinder.findBestDestination(veh, chargers, Charger::getLink);
 	}
 }

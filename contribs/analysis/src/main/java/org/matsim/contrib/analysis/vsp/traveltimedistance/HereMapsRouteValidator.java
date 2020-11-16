@@ -47,8 +47,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
-	final String appId;
-	final String appCode;
+	final String apiAcessKey;
 	final String outputPath;
 	final String date;
 	final CoordinateTransformation transformation;
@@ -56,22 +55,15 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
 	/**
 	 * 
-	 * @param outputFolder
-	 *            folder to write gzipped json files
-	 * @param appId
-	 *            your here App ID
-	 * @param appCode
-	 *            your here App Code
-	 * @param date
-	 *            a date to run the validation for, format: 2017-06-08
-	 * @param transformation
-	 *            A coordinate transformation to WGS 84
+	 * @param outputFolder   folder to write gzipped json files
+	 * @param apiAccessKey        your API Access Code (to be request on the here.com)
+	 * @param date           a date to run the validation for, format: 2017-06-08
+	 * @param transformation A coordinate transformation to WGS 84
 	 */
-	public HereMapsRouteValidator(String outputFolder, String appId, String appCode, String date,
+	public HereMapsRouteValidator(String outputFolder, String apiAccessKey, String date,
 			CoordinateTransformation transformation) {
 		this.outputPath = outputFolder;
-		this.appId = appId;
-		this.appCode = appCode;
+		this.apiAcessKey = apiAccessKey;
 		this.date = date;
 		this.transformation = transformation;
 		File outDir = new File(outputFolder);
@@ -101,10 +93,10 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 		DecimalFormat df = (DecimalFormat) NumberFormat.getNumberInstance(locale);
 		df.applyPattern(pattern);
 
-		String urlString = "http://route.cit.api.here.com/routing/7.2/calculateroute.json?app_id=" + appId
-				+ "&app_code=" + appCode + "&waypoint0=geo!" + df.format(from.getY()) + "," + df.format(from.getX())
-				+ "&waypoint1=geo!" + df.format(to.getY()) + "," + df.format(to.getX()) + "&departure=" + date + "T"
-				+ Time.writeTime(trip.getDepartureTime()) + "&mode=fastest;car;traffic:enabled";
+		String urlString = "https://router.hereapi.com/v8/routes?" + "&apiKey=" + apiAcessKey + "&transportmode=car&origin="
+				+ df.format(from.getY()) + "," + df.format(from.getX()) + "&destination=" + df.format(to.getY()) + ","
+				+ df.format(to.getX()) + "&departureTime=" + date + "T" + Time.writeTime(trip.getDepartureTime())
+				+ "&return=summary";
 
 		try {
 			System.out.println(urlString);
@@ -113,17 +105,21 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 			JSONParser jp = new JSONParser();
 
 			JSONObject jsonObject = (JSONObject) jp.parse(in);
-			JSONObject route = (JSONObject) ((JSONArray) ((JSONObject) jsonObject.get("response")).get("route")).get(0);
-			JSONObject summary = (JSONObject) route.get("summary");
-			travelTime = (long) summary.get("travelTime");
-			distance = (long) summary.get("distance");
+			JSONArray routes = (JSONArray) jsonObject.get("routes");
+			if (!routes.isEmpty()) {
+				JSONObject route = (JSONObject) routes.get(0);
+				JSONArray sections = (JSONArray) route.get("sections");
+				JSONObject section = (JSONObject) sections.get(0);
+				JSONObject summary = (JSONObject) section.get("summary");
+				travelTime = (long) summary.get("duration");
+				distance = (long) summary.get("length");
 
-			// System.out.println(travelTime + " "+ baseTime + " "+distance);
-			if (writeDetailedFiles){
-			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-			bw.write(jsonObject.toString());
-			bw.flush();
-			bw.close();
+				if (writeDetailedFiles) {
+					BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+					bw.write(jsonObject.toString());
+					bw.flush();
+					bw.close();
+				}
 			}
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
@@ -141,8 +137,7 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 	}
 
 	/**
-	 * @param writeDetailedFiles
-	 *            the writeDetailedFiles to set
+	 * @param writeDetailedFiles the writeDetailedFiles to set
 	 */
 	public void setWriteDetailedFiles(boolean writeDetailedFiles) {
 		this.writeDetailedFiles = writeDetailedFiles;

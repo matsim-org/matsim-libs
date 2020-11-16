@@ -210,8 +210,6 @@ public class PtAlongALine2Test{
 						.setMaxWaitTime(Double.MAX_VALUE)
 						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
 						.setUseModeFilteredSubnetwork(true)
-						.setEstimatedBeelineDistanceFactor(1.0)
-						.setEstimatedDrtSpeed(15)
 						.setAdvanceRequestPlanningHorizon(99999);
 				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
 				mm.addParameterSet(drtConfigGroup);

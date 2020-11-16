@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,15 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util;
+package playground.vsp.simpleParkingCostHandler;
 
-import java.util.function.Function;
-
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author michalm
- */
-public interface LinkProvider<T> extends Function<T, Link> {
-	Link apply(T object);
+* @author ikaddoura
+*/
+
+public class ParkingCostModule extends AbstractModule {
+
+	@Override
+	public void install() {
+
+		addEventHandlerBinding().to(ParkingCostHandler.class);
+	}
+
 }
+

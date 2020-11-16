@@ -89,6 +89,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 					break;
 
 				case PLANNED:
+					//TODO schedule started event ?
 					break;
 
 				default:
@@ -97,7 +98,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 
 			optimizer.nextTask(vehicle);
 
-			switch (schedule.getStatus()) {
+			switch (schedule.getStatus()) {// refresh status
 				case STARTED:
 					Task task = schedule.getCurrentTask();
 					eventsManager.processEvent(
@@ -105,6 +106,7 @@ public final class VrpAgentLogic implements DynAgentLogic {
 					return dynActionCreator.createAction(agent, vehicle, now);
 
 				case COMPLETED:
+					//TODO schedule ended event?
 					return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
 
 				default:
