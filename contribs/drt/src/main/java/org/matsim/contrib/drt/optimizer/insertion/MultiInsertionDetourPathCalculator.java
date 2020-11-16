@@ -111,8 +111,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		Link dropoff = drtRequest.getToLink();
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
-		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
+		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
 
 		// with vehicle insertion filtering -- pathsToPickup is the most computationally demanding task, while
 		// pathsFromDropoff is the least demanding one
@@ -136,13 +135,13 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		// medium computation time (approx. 25% total CPU time)
 		Future<Map<Link, PathData>> pathsToDropoffFuture = executorService.submit(
 				() -> toDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourStartLinks.values(),
-						earliestDropoffTime, false));
+						latestDropoffTime, false));
 
 		// calc forward dijkstra from dropoff to beginnings of selected stops
 		// lowest computation time (approx. 5% total CPU time)
 		Future<Map<Link, PathData>> pathsFromDropoffFuture = executorService.submit(
 				() -> fromDropoffPathSearch.calcPathDataMap(dropoff, detourLinksSet.dropoffDetourEndLinks.values(),
-						earliestDropoffTime, true));
+						latestDropoffTime, true));
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
