@@ -31,7 +31,7 @@ public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
 
 	public static final String NEAREST_INSERTIONS_AT_END_LIMIT = "nearestInsertionsAtEndLimit";
 	@Positive
-	private int nearestInsertionsAtEndLimit = 40;
+	private int nearestInsertionsAtEndLimit = 10;
 
 	public static final String ADMISSIBLE_BEELINE_SPEED_FACTOR = "admissibleBeelineSpeedFactor";
 	@DecimalMin("1.0")
