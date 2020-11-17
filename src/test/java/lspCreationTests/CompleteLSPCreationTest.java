@@ -236,7 +236,8 @@ public class CompleteLSPCreationTest {
 		assertTrue(selectedPlan.getAssigner() == assigner);
 		assertTrue(selectedPlan.getSolutions().iterator().next() == completeSolution);
 		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == completeLSP);
-		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
+//		assertTrue(selectedPlan.getAssigner().getLSP()== completeLSP);
+		assertTrue(selectedPlan.getLsp()== completeLSP);
 	}
 
 }

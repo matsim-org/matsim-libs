@@ -29,9 +29,9 @@ public class TomorrowAssigner implements ShipmentAssigner{
 		
 	}
 
-	@Override
-	public LSP getLSP() {
-		return lsp;
-	}
+//	@Override
+//	public LSP getLSP() {
+//		return lsp;
+//	}
 
 }

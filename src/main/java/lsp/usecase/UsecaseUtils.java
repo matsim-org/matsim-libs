@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UsecaseUtils {
 
@@ -23,7 +24,7 @@ public class UsecaseUtils {
 		return new MainRunCarrierScheduler();
 	}
 
-	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(ArrayList<LSPResource> resources) {
+	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler( List<LSPResource> resources ) {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 

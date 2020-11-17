@@ -36,7 +36,8 @@ public class TomorrowShipmentAssignerStrategyFactory  {
 			@Override
 			public void handlePlan(LSPPlan plan) {
 				plan.setAssigner(assigner);
-				LSP lsp = assigner.getLSP();
+//				LSP lsp = assigner.getLSP();
+				LSP lsp = plan.getLsp();
 				Collection<LSPShipment> shipments = lsp.getShipments();
 				for(LSPShipment shipment : shipments) {
 					assigner.assignShipment(shipment);
