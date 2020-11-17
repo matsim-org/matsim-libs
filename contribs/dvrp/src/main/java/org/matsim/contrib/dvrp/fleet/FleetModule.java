@@ -22,11 +22,13 @@ package org.matsim.contrib.dvrp.fleet;
 
 import java.net.URL;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -70,5 +72,11 @@ public class FleetModule extends AbstractDvrpModeModule {
 							getter -> new VehicleStartLinkToLastLinkUpdater(getter.getModal(FleetSpecification.class)))
 					.build());
 		}
+
+		bindModal(FleetControlerListener.class).toProvider(modalProvider(getter ->
+				new FleetControlerListener(getMode(),
+						getter.get(OutputDirectoryHierarchy.class),
+						getter.getModal(FleetSpecification.class)))).in(Singleton.class);
+		addControlerListenerBinding().to(modalKey(FleetControlerListener.class));
 	}
 }
