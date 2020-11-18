@@ -41,7 +41,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 		planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
 
 		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
-		personParams.setMarginalUtilityOfMoney(5000);
+		personParams.setMarginalUtilityOfMoney(1);
 		personParams.setMarginalUtlOfWaitingPt_utils_hr(0.5 * 3600);
 
 		PlanCalcScoreConfigGroup.ScoringParameterSet freightParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("freight");
@@ -52,6 +52,16 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 		PopulationFactory factory = population.getFactory();
 
 		{ //fill population
+			Person negativeIncome = factory.createPerson(Id.createPersonId("negativeIncome"));
+			PopulationUtils.putSubpopulation(negativeIncome, "person");
+			PopulationUtils.putPersonAttribute(negativeIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, -100d);
+			population.addPerson(negativeIncome);
+
+			Person zeroIncome = factory.createPerson(Id.createPersonId("zeroIncome"));
+			PopulationUtils.putSubpopulation(zeroIncome, "person");
+			PopulationUtils.putPersonAttribute(zeroIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0d);
+			population.addPerson(zeroIncome);
+
 			Person lowIncome = factory.createPerson(Id.createPersonId("lowIncome"));
 			PopulationUtils.putSubpopulation(lowIncome, "person");
 			PopulationUtils.putPersonAttribute(lowIncome, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
@@ -71,14 +81,33 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 			PopulationUtils.putSubpopulation(freight, "freight");
 			population.addPerson(freight);
 
-			//a person living in a specifically poor are - average income is provided in person's attribute and might differ from global average
-			Person mediumIncomeWithSpecificAverage = factory.createPerson(Id.createPersonId("mediumIncomeWithSpecificAverage"));
-			PopulationUtils.putSubpopulation(mediumIncomeWithSpecificAverage, "person");
-			PopulationUtils.putPersonAttribute(mediumIncomeWithSpecificAverage, PERSONAL_INCOME_ATTRIBUTE_NAME, 1d);
-			PopulationUtils.putPersonAttribute(mediumIncomeWithSpecificAverage, INCOME_AVG_RELEVANT_FOR_PERSON_ATTRIBUTE_NAME, 0.1d);
-			population.addPerson(mediumIncomeWithSpecificAverage);
+			Person freightWithIncome1 = factory.createPerson(Id.createPersonId("freightWithIncome1"));
+			PopulationUtils.putSubpopulation(freightWithIncome1, "freight");
+			PopulationUtils.putPersonAttribute(freightWithIncome1, PERSONAL_INCOME_ATTRIBUTE_NAME, 1.5d);
+			population.addPerson(freightWithIncome1);
+
+			Person freightWithIncome2 = factory.createPerson(Id.createPersonId("freightWithIncome2"));
+			PopulationUtils.putSubpopulation(freightWithIncome2, "freight");
+			PopulationUtils.putPersonAttribute(freightWithIncome2, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
+			population.addPerson(freightWithIncome2);
 		}
 		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population, planCalcScoreConfigGroup, scenarioConfigGroup, transitConfigGroup);
+	}
+
+	@Test
+	public void testPersonWithNegativeIncome(){
+		Id<Person> id = Id.createPersonId("negativeIncome");
+		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
+		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
+		makeAssert(params, 1d, 0.5d);
+	}
+
+	@Test
+	public void testPersonWithNoIncome(){
+		Id<Person> id = Id.createPersonId("zeroIncome");
+		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
+		//person's attribute says it has 0 income which is considered invalid and therefore the subpopulation's mgnUtilityOfMoney is taken (which is 1)
+		makeAssert(params, 1d, 0.5d);
 	}
 
 	@Test
@@ -111,12 +140,13 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 	}
 
 	@Test
-	public void testPersonWithSpecificIncomeAverage(){
-		Id<Person> id = Id.createPersonId("mediumIncomeWithSpecificAverage");
+	public void testFreightWithIncome(){
+		Id<Person> id = Id.createPersonId("freightWithIncome1");
 		ScoringParameters params = personScoringParams.getScoringParameters(population.getPersons().get(id));
-		//this agent actually has income attribute set to 1, but it's person-specific average income attribute is set to 0.1.
-		// the resulting marginal utility of money should thus be 1/10 which is the same as if it used the global average income (1) and had an income of 10.
-		makeAssert(params, 10d, 0.5d);
+		makeAssert(params, 1.5/444d, 1d);
+		Id<Person> id2 = Id.createPersonId("freightWithIncome2");
+		ScoringParameters params2 = personScoringParams.getScoringParameters(population.getPersons().get(id2));
+		makeAssert(params2, 0.5/444d, 1d);
 	}
 
 	@Test
