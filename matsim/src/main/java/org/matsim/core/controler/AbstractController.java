@@ -83,7 +83,7 @@ import org.matsim.utils.MemoryObserver;
 
             @Override
             public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration);
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
             }
         };
         MatsimRuntimeModifications.run(runnable);
@@ -112,7 +112,9 @@ import org.matsim.utils.MemoryObserver;
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
     	int iteration = config.controler().getFirstIteration();
-    	boolean doTerminate = false;
+    	
+    	// Special case if lastIteration == -1 -> Do not run any Mobsim
+    	boolean doTerminate = config.controler().getLastIteration() < 0;
     	
     	while (!doTerminate) {
     		boolean isLastIteration = mayTerminateAfterIteration(iteration);
