@@ -77,7 +77,7 @@ public class DrtRouteCreator implements DefaultMainLegRouter.RouteCreator {
 		DrtRoute route = routeFactories.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
 		route.setDistance(unsharedDistance);
 		route.setTravelTime(maxTravelTime);
-		route.setUnsharedRideTime(unsharedRideTime);
+		route.setDirectRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 		return route;
 	}
