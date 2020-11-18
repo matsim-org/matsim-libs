@@ -114,7 +114,7 @@ import org.matsim.utils.MemoryObserver;
     	int iteration = config.controler().getFirstIteration();
     	
     	// Special case if lastIteration == -1 -> Do not run any Mobsim
-    	boolean doTerminate = config.controler().getLastIteration() < 0;
+    	boolean doTerminate = config.controler().getLastIteration() < iteration;
     	
     	while (!doTerminate) {
     		boolean isLastIteration = mayTerminateAfterIteration(iteration);
