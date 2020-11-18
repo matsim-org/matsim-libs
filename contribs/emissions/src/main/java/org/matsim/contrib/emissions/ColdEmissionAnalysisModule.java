@@ -85,11 +85,15 @@ final class ColdEmissionAnalysisModule {
 	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
 													Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
 													Set<Pollutant> coldPollutants, EventsManager eventsManager ){
+
+		Gbl.assertIf( avgHbefaColdTable!=null || detailedHbefaColdTable!=null );
 		this.avgHbefaColdTable = avgHbefaColdTable;
 		this.detailedHbefaColdTable = detailedHbefaColdTable;
-		this.eventsManager = eventsManager;
 		this.ecg = ecg;
 		this.coldPollutants = coldPollutants;
+
+		Gbl.assertNotNull( eventsManager );
+		this.eventsManager = eventsManager;
 	}
 
 	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(

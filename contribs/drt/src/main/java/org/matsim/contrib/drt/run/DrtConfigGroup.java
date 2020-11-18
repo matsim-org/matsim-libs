@@ -118,14 +118,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
-	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	static final String ESTIMATED_DRT_SPEED_EXP =
-			"Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
-					+ "and in plans file, [m/s]. The default value is 25 km/h";
-
-	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
-	static final String ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP = "Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.";
-
 	public static final String VEHICLES_FILE = "vehiclesFile";
 	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
 
@@ -178,12 +170,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@PositiveOrZero // used only for stopbased DRT scheme
 	private double maxWalkDistance = Double.MAX_VALUE;// [m];
-
-	@PositiveOrZero
-	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
-
-	@DecimalMin("1.0")
-	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
@@ -320,8 +306,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(OPERATIONAL_SCHEME, OPERATIONAL_SCHEME_EXP);
 		map.put(MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_EXP);
 		map.put(TRANSIT_STOP_FILE, TRANSIT_STOP_FILE_EXP);
-		map.put(ESTIMATED_DRT_SPEED, ESTIMATED_DRT_SPEED_EXP);
-		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
@@ -584,40 +568,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@StringSetter(MAX_WALK_DISTANCE)
 	public DrtConfigGroup setMaxWalkDistance(double maximumWalkDistance) {
 		this.maxWalkDistance = maximumWalkDistance;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #ESTIMATED_DRT_SPEED_EXP}
-	 */
-	@StringGetter(ESTIMATED_DRT_SPEED)
-	public double getEstimatedDrtSpeed() {
-		return estimatedDrtSpeed;
-	}
-
-	/**
-	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
-	 */
-	@StringSetter(ESTIMATED_DRT_SPEED)
-	public DrtConfigGroup setEstimatedDrtSpeed(double estimatedSpeed) {
-		this.estimatedDrtSpeed = estimatedSpeed;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
-	 */
-	@StringGetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
-	public double getEstimatedBeelineDistanceFactor() {
-		return estimatedBeelineDistanceFactor;
-	}
-
-	/**
-	 * @param-- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
-	 */
-	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
-	public DrtConfigGroup setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
-		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
 		return this;
 	}
 

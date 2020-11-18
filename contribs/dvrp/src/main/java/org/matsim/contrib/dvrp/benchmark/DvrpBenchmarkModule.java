@@ -22,27 +22,41 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
+import org.matsim.contrib.zone.skims.DvrpGlobalTravelTimesMatrixProvider;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
 public class DvrpBenchmarkModule extends AbstractModule {
+	@Inject
+	private DvrpConfigGroup dvrpConfigGroup;
+
 	@Override
 	public void install() {
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(VehicleUtils.getDefaultVehicleType());
 
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
+
+		//lazily initialised:
+		// 1. we have only mode-filtered subnetworks
+		// 2. optimisers may do not use it
+		bind(DvrpTravelTimeMatrix.class).toProvider(new DvrpGlobalTravelTimesMatrixProvider(getConfig().global(),
+				dvrpConfigGroup.getTravelTimeMatrixParams())).in(Singleton.class);
 
 		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
