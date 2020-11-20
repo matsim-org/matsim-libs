@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -15,6 +16,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -34,11 +37,14 @@ public class ChargerSelectionTest {
 	@Test
 	public void testUrbanEVExample(){
 		//config. vehicle source = modeVehicleTypeFromData ??
+
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
-		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
+		evConfigGroup.setTimeProfiles(true);
+		evConfigGroup.setChargersFile("C:/Users/admin/Desktop/chargers.xml");
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
 				evConfigGroup);
+		//config.network().setInputFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/input/1%network.xml");
 
 		//prepare config
 		RunUrbanEVExample.prepareConfig(config);
@@ -88,15 +94,18 @@ public class ChargerSelectionTest {
 		plan.addActivity(home1);
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work = factory.createActivityFromLinkId("work", Id.createLinkId("176"));
+		Activity work = factory.createActivityFromLinkId("work", Id.createLinkId("96"));
 		work.setEndTime(10*3600);
 		plan.addActivity(work);
+
 
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
 		Activity home2 = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
-//		home1.setEndTime(14*3600);
+		home1.setEndTime(14*3600);
 		plan.addActivity(home2);
+
+
 
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
