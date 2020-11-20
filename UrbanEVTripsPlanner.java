@@ -257,6 +257,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before actAfterCharging has the wrong routing mode. should not happen..");
 		}
 
+		//TODO fix bug! this is wrong in cases where we decided not to charge on the precedent link but earlier...
 		//set SOC back to the second last value as we reroute the last leg and the current leg
 		pseudoVehicle.getBattery().setSoc(secondLastSOC);
 
