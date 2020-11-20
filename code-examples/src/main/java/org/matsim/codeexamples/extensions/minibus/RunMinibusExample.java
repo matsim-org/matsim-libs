@@ -39,7 +39,7 @@ public class RunMinibusExample {
 
 		if(args.length == 0){
 			log.info("Arg 1: config.xml is missing.");
-			log.info("Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
+			log.info("Check https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/config.xml for an example.");
 			System.exit(1);
 		}
 
