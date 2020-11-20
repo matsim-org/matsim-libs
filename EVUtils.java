@@ -21,9 +21,14 @@
 package org.matsim.urbanEV;
 
 import com.google.common.collect.ImmutableList;
-import org.matsim.vehicles.EngineInformation;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.*;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 class EVUtils {
 
@@ -54,6 +59,25 @@ class EVUtils {
 
 	static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes ){
 		engineInformation.getAttributes().putAttribute(CHARGERTYPES,  chargerTypes);
+	}
+
+	static void createAndRegisterEVForPersonsAndMode(Scenario scenario, Set<Id<Person>> persons, VehicleType eVehiclyType, String mode){
+		if(! VehicleUtils.getHbefaTechnology(eVehiclyType.getEngineInformation()).equals("electricity")) throw new IllegalArgumentException();
+
+		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
+
+		for (Id<Person> personId : persons) {
+			Person person = scenario.getPopulation().getPersons().get(personId);
+			Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode);
+
+			Vehicle vehicle = vFactory.createVehicle(vehicleId, eVehiclyType);
+			scenario.getVehicles().addVehicle(vehicle);
+
+			Map<String, Id<Vehicle>> mode2Vehicle = VehicleUtils.getVehicleIds(person);
+			mode2Vehicle.put(mode, vehicleId);
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2Vehicle);//probably unnecessary
+		}
+
 	}
 
 }
