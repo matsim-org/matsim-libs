@@ -26,6 +26,7 @@ import org.matsim.vehicles.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChargerSelectionTest3 {
 
@@ -35,13 +36,16 @@ public class ChargerSelectionTest3 {
 	@Test
 	public void testUrbanEVExample3() {
 		//config. vehicle source = modeVehicleTypeFromData ??
+
+
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
 		evConfigGroup.setTimeProfiles(true);
-		evConfigGroup.setChargersFile("C:/Users/admin/Desktop/chargers.xml");
+//		evConfigGroup.setChargersFile("C:/Users/admin/Desktop/chargers.xml");
+		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
 				evConfigGroup);
-		config.network().setInputFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/input/1%network.xml");
+//		config.network().setInputFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/input/1%network.xml");
 
 		//prepare config
 		RunUrbanEVExample.prepareConfig(config);
@@ -52,7 +56,7 @@ public class ChargerSelectionTest3 {
 		config.planCalcScore().addModeParams(new PlanCalcScoreConfigGroup.ModeParams(TransportMode.bike));
 
 		//set VehicleSource
-		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -68,18 +72,20 @@ public class ChargerSelectionTest3 {
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
 		VehicleType bikeVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
-		VehicleUtils.setHbefaTechnology(carVehicleType.getEngineInformation(), "electricity");
-		VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 10);
-		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 4);
-		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
+//		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
+		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), 4);
+		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
 		scenario.getVehicles().addVehicleType(carVehicleType);
 		scenario.getVehicles().addVehicleType(bikeVehicleType);
 
 		overridePopulation3(scenario);
 
-		EVUtils.createAndRegisterEVForPersonsAndMode(scenario, scenario.getPopulation().getPersons().keySet(), carVehicleType, TransportMode.car);
-		EVUtils.createAndRegisterEVForPersonsAndMode(scenario, scenario.getPopulation().getPersons().keySet(), bikeVehicleType, TransportMode.bike);
+		Map<String, VehicleType> mode2VehicleType = new HashMap<>();
+		mode2VehicleType.put(TransportMode.car, carVehicleType);
+		mode2VehicleType.put(TransportMode.bike, bikeVehicleType);
+		createAndRegisterVehicles(scenario, mode2VehicleType);
 
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -115,9 +121,9 @@ public class ChargerSelectionTest3 {
 		Activity home2 = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
 		home2.setEndTime(14 * 3600);
 		plan.addActivity(home2);
-
-
 		person.addPlan(plan);
+		person.setSelectedPlan(plan);
+
 		scenario.getPopulation().addPerson(person);
 
 		Person person2 = factory.createPerson(Id.createPersonId("Jonas' kleiner GeheimAgent2"));
@@ -139,8 +145,25 @@ public class ChargerSelectionTest3 {
 		home4.setEndTime(14 * 3600);
 		plan2.addActivity(home4);
 		person2.addPlan(plan2);
+		person2.setSelectedPlan(plan2);
 
 		scenario.getPopulation().addPerson(person2);
 
 	}
+
+	private void createAndRegisterVehicles(Scenario scenario, Map<String, VehicleType> mode2VehicleType){
+		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
+		for(Person person : scenario.getPopulation().getPersons().values()) {
+			Map<String,Id<Vehicle>> mode2VehicleId = new HashMap<>();
+			for (String mode : mode2VehicleType.keySet()) {
+				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode);
+				Vehicle vehicle = vFactory.createVehicle(vehicleId, mode2VehicleType.get(mode));
+				scenario.getVehicles().addVehicle(vehicle);
+				mode2VehicleId.put(mode, vehicleId);
+			}
+			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2VehicleId);//probably unnecessary
+		}
+	}
+
+
 }
