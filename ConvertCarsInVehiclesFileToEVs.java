@@ -21,6 +21,7 @@
 package org.matsim.urbanEV;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.vehicles.*;
 
 import java.util.Arrays;
@@ -30,9 +31,10 @@ public class ConvertCarsInVehiclesFileToEVs {
 	public static void main(String[] args) {
 
 		String openBerlinVehiclesFile = "https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v5.5-10pct/input/berlin-v5-mode-vehicle-types.xml";
-		String outputVehiclesFile = "scenarios/berlin-v5.5-1pct/input/ev/berlin-v5-mode-vehicle-types-ev-cars.xml";
+		String outputVehiclesFile = "C:/Users/admin/IdeaProjects/matsim-berlin/test/input/berlin-v5.5-1pct/input/ev/berlin-v5-mode-vehicle-types-ev-cars.xml";
 
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+
 
 		new MatsimVehicleReader(vehicles).readFile(openBerlinVehiclesFile);
 
@@ -41,6 +43,12 @@ public class ConvertCarsInVehiclesFileToEVs {
 		VehicleUtils.setEnergyCapacity(carVehicleType.getEngineInformation(), 100);
 		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 100);
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b"));
+
+		VehicleType bikeVehicleType = vehicles.getVehicleTypes().get(Id.create("bike", VehicleType.class));
+		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
+		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), 4);
+		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
 		new MatsimVehicleWriter(vehicles).writeFile(outputVehiclesFile);
 
