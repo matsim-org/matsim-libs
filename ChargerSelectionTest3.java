@@ -49,14 +49,7 @@ public class ChargerSelectionTest3 {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(1);
 
-
-
 		config.planCalcScore().addModeParams(new PlanCalcScoreConfigGroup.ModeParams(TransportMode.bike));
-
-
-
-
-
 
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -64,7 +57,6 @@ public class ChargerSelectionTest3 {
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		overridePopulation3(scenario);
 
 		//manually insert car vehicle type with attributes (hbefa technology, initial energy etc....)
 		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
@@ -81,16 +73,13 @@ public class ChargerSelectionTest3 {
 		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 4);
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
-
-
-
-		Vehicle vehicle = vehiclesFactory.createVehicle(Id.createVehicleId("Bike"), bikeVehicleType);
-		scenario.getVehicles().addVehicle(vehicle);
-
-
 		scenario.getVehicles().addVehicleType(carVehicleType);
 		scenario.getVehicles().addVehicleType(bikeVehicleType);
 
+		overridePopulation3(scenario);
+
+		EVUtils.createAndRegisterEVForPersonsAndMode(scenario, scenario.getPopulation().getPersons().keySet(), carVehicleType, TransportMode.car);
+		EVUtils.createAndRegisterEVForPersonsAndMode(scenario, scenario.getPopulation().getPersons().keySet(), bikeVehicleType, TransportMode.bike);
 
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
@@ -99,23 +88,13 @@ public class ChargerSelectionTest3 {
 
 	private void overridePopulation3(Scenario scenario) {
 
-
-
 		//delete all persons that are there already
 		scenario.getPopulation().getPersons().clear();
 
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		Person person = factory.createPerson(Id.createPersonId("Jonas' kleiner GeheimAgent"));
 
-
-		HashMap<String, Id<Vehicle>> modetoVehicle = new HashMap<String, Id<Vehicle>>();
-		//VehicleUtils.createVehicle(Id.create(<"bike">, VehicleType.class));
-
-	//	Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-	//	modetoVehicle.put(TransportMode.bike, vehicles.getvehicleId());
-		//VehicleUtils.insertVehicleIdsIntoAttributes(person, modetoVehicle);
 		Plan plan = factory.createPlan();
-
 
 		Activity home = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
 		home.setEndTime(8 * 3600);
@@ -162,18 +141,6 @@ public class ChargerSelectionTest3 {
 		person2.addPlan(plan2);
 
 		scenario.getPopulation().addPerson(person2);
-
-		//HashMap<String, Id<Vehicle>> modetoVehicle = new HashMap<String, Id<Vehicle>>();
-		//for (Person p : scenario.getPopulation().getPersons().values()) {
-
-		//	modetoVehicle = new HashMap<>();
-			//HashMap<String, Id<Vehicle>> modetoVehicle = new HashMap<>();
-		//	modetoVehicle.put(TransportMode.bike, Id.createVehicleId(TransportMode.bike + person.getId().toString()));
-		//	VehicleUtils.insertVehicleIdsIntoAttributes(person, modetoVehicle);
-		//}
-
-
-
 
 	}
 }
