@@ -19,15 +19,6 @@
 
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -74,6 +65,14 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ScenarioImporter {
 
@@ -252,41 +251,35 @@ public class ScenarioImporter {
 
 	private void generatePT() {
 		initRoutesStations();
-		Set<Integer> stopIds = new HashSet<>();
-		TransitSchedule ts = scenario.getTransitSchedule();
-		int transit_line_counter = 0;
+		TransitSchedule ts = this.scenario.getTransitSchedule();
 
 		for (TransitLine tl : ts.getTransitLines().values()) {
 			int tid = tl.getId().index();
-			transit_line_counter += 1;
 			for (TransitRoute tr : tl.getRoutes().values()) {
 				int rid = tr.getId().index();
 
 				// Initialize line of route
-				line_of_route[rid] = tid;
+				this.line_of_route[rid] = tid;
 				// Initialize stops in route
-				route_stops_by_index.set(rid, new ArrayList<>(tr.getStops().size()));
+				this.route_stops_by_index.set(rid, new ArrayList<>(tr.getStops().size()));
 				for (TransitRouteStop trs : tr.getStops()) {
 					int sid = trs.getStopFacility().getId().index();
-					if (stopIds.contains(sid)) {
-					} else {
-						stopIds.add(sid);
-					}
-
 					// Initialize stops in route
-					route_stops_by_index.get(rid).add(sid);
+					this.route_stops_by_index.get(rid).add(sid);
 				}
 			}
 		}
 
 		// Initialize agent_stops.
-		agent_stops = new ArrayList<>(stopIds.size());
-		for (int i = 0; i < stopIds.size(); i++) {
-			ArrayList<Map<Integer, ArrayDeque<Agent>>> agent_lines = new ArrayList<>(transit_line_counter);
-			for (int j = 0; j < transit_line_counter; j++) {
+		int stopIdCount = Id.getNumberOfIds(TransitStopFacility.class);
+		int lineIdCount = Id.getNumberOfIds(TransitLine.class);
+		this.agent_stops = new ArrayList<>(stopIdCount);
+		for (int i = 0; i < stopIdCount; i++) {
+			ArrayList<Map<Integer, ArrayDeque<Agent>>> agent_lines = new ArrayList<>(lineIdCount);
+			for (int j = 0; j < lineIdCount; j++) {
 				agent_lines.add(new HashMap<>());
 			}
-			agent_stops.add(agent_lines);
+			this.agent_stops.add(agent_lines);
 		}
 	}
 
