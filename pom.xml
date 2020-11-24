@@ -11,8 +11,8 @@
 	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
 
 	<properties>
-		<matsim.version>13.0-SNAPSHOT</matsim.version>
-		<!--<matsim.version>13.0-2020w40-SNAPSHOT</matsim.version> -->
+<!--		<matsim.version>13.0-SNAPSHOT</matsim.version>-->
+		<matsim.version>13.0-2020w40-SNAPSHOT</matsim.version>
 	</properties>
 
 	<repositories>
@@ -71,21 +71,30 @@
 			<version>${matsim.version}</version>
 			<!--(not in weekly release!)-->
 		</dependency>
-		
+
+<!--		<dependency>-->
+<!--			<groupId>org.matsim</groupId>-->
+<!--			<artifactId>matsim</artifactId>-->
+<!--			<type>test-jar</type>-->
+<!--			<exclusions>-->
+<!--				<exclusion>-->
+<!--					<artifactId>jai_core</artifactId>-->
+<!--					<groupId>javax.media</groupId>-->
+<!--				</exclusion>-->
+<!--				<exclusion>-->
+<!--					<artifactId>jgridshift</artifactId>-->
+<!--					<groupId>jgridshift</groupId>-->
+<!--				</exclusion>-->
+<!--			</exclusions>-->
+<!--			<version>${matsim.version}</version>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
+
+		<!-- to get MatsimTestUtils -->
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<type>test-jar</type>
-			<exclusions>
-				<exclusion>
-					<artifactId>jai_core</artifactId>
-					<groupId>javax.media</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>jgridshift</artifactId>
-					<groupId>jgridshift</groupId>
-				</exclusion>
-			</exclusions>
 			<version>${matsim.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -128,6 +137,7 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.17</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

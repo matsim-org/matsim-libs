@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -33,10 +34,10 @@ import java.util.*;
  */
 /*package-private*/ class ExampleSchedulingOfTransportChainHubsVsDirect {
 
-	private static Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class);
+	private static final Logger log = Logger.getLogger(ExampleSchedulingOfTransportChainHubsVsDirect.class );
 
 	enum SolutionType { original, direct }
-	private static final SolutionType solutionType = SolutionType.original;
+	private static SolutionType solutionType = SolutionType.direct;
 
 	private static LSP createInitialLSP(Network network) {
 		LSPResource depotResource;
@@ -243,6 +244,8 @@ import java.util.*;
 			return LSPUtils.LSPBuilder.getInstance().setInitialPlan( completePlan ).setId( Id.create( "CollectionLSP", LSP.class ) ).setSolutionScheduler( simpleScheduler ).build();
 		}
 
+		else
+
 		// ### This is the new solution with with directDistribution from the Depot.
 		{
 			log.info( "" );
@@ -335,7 +338,18 @@ import java.util.*;
 	}
 
 
-	public static void main (String [] args) {
+	public static void main (String [] args) throws CommandLine.ConfigurationException{
+
+		for( String arg : args ){
+			log.warn(arg);
+		}
+
+		CommandLine cmd = new CommandLine.Builder( args )
+						  .allowAnyOption( true )
+						  .build();
+
+		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
+		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
 
 		log.info("Starting ...");
 		log.info("Set up required MATSim classes");
