@@ -216,8 +216,11 @@ import java.util.*;
 		//Die Reihenfolge des Hinzufügens ist egal, da weiter oben die jeweils direkten Vorgänger/Nachfolger bestimmt wurden.
 
 		if ( solutionType==SolutionType.original ){
-
 			// ### This is the original solution with mainRun - ReloadingPoint - distributionRun
+
+			log.info( "" );
+			log.info( "set up logistic Solution - original solution is created" );
+
 			LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
 					Id.create( "SolutionWithReloadingId", LogisticsSolution.class ) ).addSolutionElement( depotElement ).addSolutionElement( mainRunElement ).addSolutionElement( secondReloadElement ).addSolutionElement( distributionElement ).build();
 
@@ -225,35 +228,22 @@ import java.util.*;
 			log.info( "" );
 			log.info( "The initial plan of the lsp is generated and the assigner and the solution from above are added" );
 
-			LSPPlan completePlan = LSPUtils.createLSPPlan();
-			ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-			completePlan.setAssigner( assigner ); // later assigns shipments to this plan
-			completePlan.addSolution( completeSolutionWithReloading );
+			LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createDeterministicShipmentAssigner() ).addSolution( completeSolutionWithReloading );
 
 			log.info( "" );
 			log.info( "The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder" );
 
-			List<LSPResource> resourcesList = new ArrayList<>();
-			resourcesList.add( depotResource );
-			resourcesList.add( mainRunResource );
-			resourcesList.add( secondReloadingPointResource );
-			resourcesList.add( distributionResource );
+			List<LSPResource> resourcesList = new ArrayList<>( Arrays.asList( depotResource, mainRunResource, secondReloadingPointResource, distributionResource ));
 
 			SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler( resourcesList );
 
 			return LSPUtils.LSPBuilder.getInstance().setInitialPlan( completePlan ).setId( Id.create( "CollectionLSP", LSP.class ) ).setSolutionScheduler( simpleScheduler ).build();
-		}
 
-		else
-
-		// ### This is the new solution with with directDistribution from the Depot.
-		{
-			log.info( "" );
-			log.info( "set up logistic Solution - direct distribution from the depot is created" );
+		} else {
+			// ### This is the new solution with with directDistribution from the Depot.
 
 			log.info( "" );
 			log.info( "The order of the logisticsSolutionElements is now specified" );
-			//The order of the logisticsSolutionElements is now specified
 			depotElement.setNextElement( directDistributionElement );
 			directDistributionElement.setPreviousElement( depotElement );
 
@@ -262,39 +252,27 @@ import java.util.*;
 //		SimulationTrackersUtils.getFixedCostFunctionValue(costInfo.getFunction());
 //		directDistributionElement.getInfos().add(costInfo);
 
-			Id<LogisticsSolution> solutionDirectId = Id.create( "SolutionDirectId", LogisticsSolution.class );
-			LSPUtils.LogisticsSolutionBuilder completeSolutionDirectBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance( solutionDirectId );
-			completeSolutionDirectBuilder.addSolutionElement( depotElement );
-			completeSolutionDirectBuilder.addSolutionElement( directDistributionElement );
-			LogisticsSolution completeSolutionDirect = completeSolutionDirectBuilder.build();
+			log.info( "" );
+			log.info( "set up logistic Solution - direct distribution from the depot is created" );
 
+			LogisticsSolution completeSolutionDirect = LSPUtils.LogisticsSolutionBuilder.newInstance(
+					Id.create( "SolutionDirectId", LogisticsSolution.class ) ).addSolutionElement( depotElement ).addSolutionElement( directDistributionElement ).build();
 
 			log.info( "" );
 			log.info( "The initial plan of the lsp is generated and the assigner and the solution from above are added" );
-			//The initial plan of the lsp is generated and the assigner and the solution from above are added
-			LSPPlan completePlanDirect = LSPUtils.createLSPPlan();
-			ShipmentAssigner assigner = UsecaseUtils.createDeterministicShipmentAssigner();
-			completePlanDirect.setAssigner( assigner );
-			completePlanDirect.addSolution( completeSolutionDirect );
 
-			LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
-			completeLSPBuilder.setInitialPlan( completePlanDirect );
-			Id<LSP> completeLSPId = Id.create( "MyLSP", LSP.class );
-			completeLSPBuilder.setId( completeLSPId );
+			LSPPlan completePlan = LSPUtils.createLSPPlan().setAssigner( UsecaseUtils.createDeterministicShipmentAssigner() ).addSolution( completeSolutionDirect );
 
 			log.info( "" );
 			log.info( "The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder" );
-			//The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
-			ArrayList<LSPResource> resourcesList = new ArrayList<>();
-			resourcesList.add( depotResource );
-			resourcesList.add(
-					directDistributionAdapter ); // TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
 
-			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
-//		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
-			completeLSPBuilder.setSolutionScheduler( simpleScheduler );
+			ArrayList<LSPResource> resourcesList = new ArrayList<>( Arrays.asList( depotResource, directDistributionAdapter ));
+			// TODO: Wenn hier der "falsche" distributionAdapter, dann läuft es dennoch durch, auch wenn es keine Lösung geben kann. Zumindest wird es im Output nicht angezeigt.
 
-			return completeLSPBuilder.build();
+//			SolutionScheduler simpleScheduler = LSPUtils.createForwardSolutionScheduler();
+			SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
+
+			return LSPUtils.LSPBuilder.getInstance().setInitialPlan( completePlan ).setId( Id.create( "MyLSP", LSP.class ) ).setSolutionScheduler( simpleScheduler ).build();
 		}
 
 	}
