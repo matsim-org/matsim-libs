@@ -70,6 +70,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private int saturatedCounter = 0;
 	private int heavyFlowCounter = 0;
 	private int stopGoCounter = 0;
+	private int heavyStopGoCounter = 0;
 	private int fractionCounter = 0;
 	private int emissionEventCounter = 0;
 
@@ -78,6 +79,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private double heavyFlowKmCounter = 0.0;
 	private double saturatedKmCounter = 0.0;
 	private double stopGoKmCounter = 0.0;
+	private double heavyStopGoKmCounter = 0.0;
 
 	public WarmEmissionAnalysisModule(
 			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
@@ -176,6 +178,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		saturatedCounter = 0;
 		heavyFlowCounter = 0;
 		stopGoCounter = 0;
+		heavyStopGoCounter = 0;
 		emissionEventCounter = 0;
 
 		kmCounter = 0.0;
@@ -184,6 +187,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		saturatedKmCounter = 0.0;
 		fractionCounter = 0;
 		stopGoKmCounter = 0.0;
+		heavyStopGoKmCounter = 0.0;
 	}
 
 	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> warmEmissions ){
@@ -547,7 +551,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(roadTrafficKey);
 
 		if (trafficSpeeds == null || !trafficSpeeds.containsKey(FREEFLOW)) {
-			throw new RuntimeException("At least the FREEFLOW condition must be specifed for all emission factor keys. " +
+			throw new RuntimeException("At least the FREEFLOW condition must be specified for all emission factor keys. " +
 					"It was not found for " + efkey);
 		}
 
@@ -563,11 +567,17 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				trafficSituation = STOPANDGO;
 			}
 		}
+		/*FIXME The following lines should be added to account for the HBEFA 4.1's additiona traffic situation,
+		   but it currently causes a test failure (jwj, Nov'20) */
+//		if (trafficSpeeds.containsKey(STOPANDGO_HEAVY) && averageSpeed_kmh <= trafficSpeeds.get(STOPANDGO_HEAVY)) {
+//			if (averageSpeed_kmh != trafficSpeeds.get(FREEFLOW)) { //handle case testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent6
+//				trafficSituation = STOPANDGO_HEAVY;
+//			}
+//		}
 		return trafficSituation;
 	}
 
 	private void incrementCountersFractional(double linkLength_km, double fractionStopGo) {
-
 		kmCounter = kmCounter + linkLength_km;
 		emissionEventCounter++;
 
@@ -604,7 +614,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				stopGoKmCounter += linkLength_km;
 				break;
 			}
-
+			case STOPANDGO_HEAVY: {
+				heavyStopGoCounter++;
+				heavyStopGoKmCounter += linkLength_km;
+				break;
+			}
 		}
 	}
 	/*package-private*/ int getFreeFlowOccurences() {
@@ -612,9 +626,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	}
 	/*package-private*/ private int getHeavyOccurences() { return heavyFlowCounter; }
 	/*package-private*/ private int getSaturatedOccurences() { return saturatedCounter; }
-	/*package-private*/ int getStopGoOccurences() {
-		return stopGoCounter;
-	}
+	/*package-private*/ int getStopGoOccurences() { return stopGoCounter; }
+	/*package-private*/ int getHeavyStopGoCounter(){ return heavyStopGoCounter; }
 	/*package-private*/ double getKmCounter() {
 		return kmCounter;
 	}
@@ -629,6 +642,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	}
 	/*package-private*/ double getStopGoKmCounter() {
 		return stopGoKmCounter;
+	}
+	/*package-private*/ double getHeavyStopGoKmCounter() {
+		return heavyStopGoKmCounter;
 	}
 	/*package-private*/ int getWarmEmissionEventCounter() {
 		return emissionEventCounter;

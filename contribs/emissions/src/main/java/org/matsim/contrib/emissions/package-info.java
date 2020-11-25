@@ -81,7 +81,7 @@
  * This way a calculation of emissions for undefined vehicle types can be performed.
  * Any instance of {@link org.matsim.contrib.emissions.HbefaWarmEmissionFactorKey} contains a vehicle category, a warm pollutant; a road category,
  * a traffic situation and three vehicle attributes (technology, size class, em concept).
- * Any instance of {@link org.matsim.contrib.emissions.HbefaTrafficSituation} specifies one of 4 traffic situations.
+ * Any instance of {@link org.matsim.contrib.emissions.HbefaTrafficSituation} specifies one of 5 traffic situations.
  * Instances of {@link org.matsim.contrib.emissions.HbefaColdEmissionFactorKey} contain a vehicle category, a cold pollutant, a parking time range,
  * a distance, which is driven after parking and, again, vehicle attributes.
  * The cold/warm emission factor keys are mapped to the values of cold/warm emissions, the cold/warm emission factors.
