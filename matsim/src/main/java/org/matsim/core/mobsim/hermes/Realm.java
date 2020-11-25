@@ -198,14 +198,8 @@ public class Realm {
     }
 
     protected boolean processAgentStopDelay(Agent agent, long planentry) {
-        int routeid = Agent.getRoutePlanEntry(planentry);
-        int stopid = Agent.getStopPlanEntry(planentry);
         int stopidx = Agent.getStopIndexPlanEntry(planentry);
-        int lineid = line_of_route[routeid];
         int departure = Agent.getDeparture(planentry);
-        ArrayList<Integer> next_stops = stops_in_route.get(routeid);
-        Map<Integer, ArrayDeque<Agent>> agents_next_stops =
-            agent_stops.get(stopid).get(lineid);
 
         // consume stop delay
         add_delayed_agent(agent, Math.max(secs + 1, departure));
