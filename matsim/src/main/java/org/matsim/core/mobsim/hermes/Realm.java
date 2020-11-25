@@ -49,7 +49,7 @@ public class Realm {
     // nqsim_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
     private final ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
     // stop ids per route id
-    private final ArrayList<ArrayList<Integer>> stops_in_route;
+    private final ArrayList<int[]> stops_in_route;
     // line id of a particular route
     private final int[] line_of_route;
     // queue of sorted events by time
@@ -231,11 +231,11 @@ public class Realm {
         int lineid = line_of_route[routeid];
         Map<Integer, ArrayDeque<Agent>> agents_next_stops =
                 agent_stops.get(stopid).get(lineid);
-        ArrayList<Integer> next_stops = stops_in_route.get(routeid);
+        int[] next_stops = stops_in_route.get(routeid);
 
         // take agents
-        for (int idx = stopidx; idx < next_stops.size(); idx++) {
-            ArrayDeque<Agent> in_agents = agents_next_stops.get(next_stops.get(idx));
+        for (int idx = stopidx; idx < next_stops.length; idx++) {
+            ArrayDeque<Agent> in_agents = agents_next_stops.get(next_stops[idx]);
 
             if (in_agents == null) {
                 continue;

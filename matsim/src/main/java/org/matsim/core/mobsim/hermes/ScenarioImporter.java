@@ -89,7 +89,7 @@ public class ScenarioImporter {
 
 	// hermes stop ids per route id. Should be used as follows:
 	// bla.get(route id).get(station index) -> station id
-	protected ArrayList<ArrayList<Integer>> route_stops_by_index;
+	protected ArrayList<int[]> route_stops_by_index;
 
 	// hermes line id of a particular route. Should be used as follows:
 	// line_of_route[route id] -> line id.
@@ -238,11 +238,12 @@ public class ScenarioImporter {
 	}
 
 	private void initRoutesStations() {
+		int[] emptyArray = new int[0];
 		route_stops_by_index = new ArrayList<>();
 		TransitSchedule ts = scenario.getTransitSchedule();
 		for (TransitLine tl : ts.getTransitLines().values()) {
 			for (TransitRoute tr : tl.getRoutes().values()) {
-				route_stops_by_index.add(new ArrayList<>());
+				route_stops_by_index.add(emptyArray);
 			}
 		}
 		line_of_route = new int[Id.getNumberOfIds(TransitRoute.class)];
@@ -261,11 +262,13 @@ public class ScenarioImporter {
 				// Initialize line of route
 				this.line_of_route[rid] = tid;
 				// Initialize stops in route
-				this.route_stops_by_index.set(rid, new ArrayList<>(tr.getStops().size()));
-				for (TransitRouteStop trs : tr.getStops()) {
+				List<TransitRouteStop> stops = tr.getStops();
+				this.route_stops_by_index.set(rid, new int[stops.size()]);
+				for (int i = 0; i < stops.size(); i++) {
+					TransitRouteStop trs = stops.get(i);
 					int sid = trs.getStopFacility().getId().index();
 					// Initialize stops in route
-					this.route_stops_by_index.get(rid).add(sid);
+					this.route_stops_by_index.get(rid)[i] = sid;
 				}
 			}
 		}
@@ -547,7 +550,7 @@ public class ScenarioImporter {
 		NetworkRoute nr = tr.getRoute();
 		int pcuCategory = 0;
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
-		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
+		int[] stop_ids = route_stops_by_index.get(rid);
 		List<Double> averageSpeedbetweenStops = calculateSpeedsBetweenStops(tr);
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
@@ -567,11 +570,11 @@ public class ScenarioImporter {
 		// Adding first link and possibly the first stop.
 		if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
 			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
-			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids[stopidx], stopidx));
 			// no event associated to stop delay
-			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids[stopidx], stopidx));
 			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
-			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids[stopidx], stopidx));
 			timerunning = (int) arrivalOffsetHelper(depart, next) + 1;
 			stopidx += 1;
 			flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
@@ -588,7 +591,7 @@ public class ScenarioImporter {
 			if (nextStopFacility.getLinkId().equals(link)) {
 
 				int stopArrival = (int) arrivalOffsetHelper(depart, next);
-				int stopid = stop_ids.get(stopidx);
+				int stopid = stop_ids[stopidx];
 				flatevents.add(new LinkEnterEvent(0, v.getId(), link));
 				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), stopArrival));
 				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stopid, stopidx));
@@ -617,7 +620,7 @@ public class ScenarioImporter {
 			TransitStopFacility nextStopFacility = next.getStopFacility();
 		if (nextStopFacility.getLinkId().equals(nr.getEndLinkId())) {
 			int stopArrival = (int) arrivalOffsetHelper(depart, next);
-			int stopid = stop_ids.get(stopidx);
+			int stopid = stop_ids[stopidx];
 			flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
 			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), stopArrival));
 			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stopid, stopidx));
@@ -646,7 +649,7 @@ public class ScenarioImporter {
 		int endid = nr.getEndLinkId().index();
 		int pcuCategory = 0;
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
-		ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
+		int[] stop_ids = route_stops_by_index.get(rid);
 		int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
@@ -666,11 +669,11 @@ public class ScenarioImporter {
 		// Adding first link and possibly the first stop.
 		if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
 			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
-			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stop_ids[stopidx], stopidx));
 			// no event associated to stop delay
-			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), rid, stop_ids[stopidx], stopidx));
 			flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
-			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids.get(stopidx), stopidx));
+			flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, rid, stop_ids[stopidx], stopidx));
 			flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
 
 			stopidx += 1;
@@ -682,7 +685,7 @@ public class ScenarioImporter {
 		// For each link (excluding the first and the last)
 		for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
 			int linkid = link.index();
-			int stopid = stop_ids.get(stopidx);
+			int stopid = stop_ids[stopidx];
 			flatevents.add(new LinkEnterEvent(0, v.getId(), link));
 			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, velocity, pcuCategory));
 			// Adding link and possibly a stop.
@@ -706,7 +709,7 @@ public class ScenarioImporter {
 		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, velocity, pcuCategory));
 		TransitStopFacility nextStopFacility = next.getStopFacility();
 		if (nextStopFacility.getLinkId().equals(nr.getEndLinkId())) {
-			int stopid = stop_ids.get(stopidx);
+			int stopid = stop_ids[stopidx];
 			flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
 			flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, rid, stopid, stopidx));
 			// no event associated to stop delay
