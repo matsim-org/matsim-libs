@@ -20,7 +20,9 @@ jdk: openjdk11
 # https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
 install: true
 
-if: type == push OR (fork == true AND type == pull_request)
+# if: type == push OR (fork == true AND type == pull_request)
+# due to the current quotas, run only for PRs coming from forks
+if: fork == true AND type == pull_request
 
 # For the following, see
 # https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
@@ -30,7 +32,7 @@ if: type == push OR (fork == true AND type == pull_request)
 
 # define the order of the stages:
 stages:
-  # - package
+   # - package
   - test
 
 # yyyy It would be good to install matsim-main in the package stage
