@@ -118,7 +118,7 @@ public class TestColdEmissionAnalysisModule {
 	// this will help to sort things out.  kai (for warm emissions) / kmt, apr'20
 
 
-	//@KMT is this to be delete or does it need to be repaired?
+	//@KMT is this to be delete or does it need to be repaired? --> "repaired" it
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 

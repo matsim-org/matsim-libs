@@ -116,7 +116,6 @@ public class TestColdEmissionAnalysisModuleCase2 {
 
 		testCases.add( testCase2 );
 
-
 		logger.info("Running testcase: " + testCases.indexOf( testCase2 ) + " " + testCase2.toString());
 		HandlerToTestEmissionAnalysisModules.reset();
 		Id<Link> linkId = Id.create( "linkId" + testCase2, Link.class );
@@ -216,8 +215,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );

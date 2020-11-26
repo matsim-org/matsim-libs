@@ -138,23 +138,21 @@ public class TestColdEmissionAnalysisModuleCase4 {
 
 		testCases.add( testCase4 );
 
-		
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
-			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+
+
+		logger.info("Running testcase: " + testCases.indexOf( 0 ) + " " + testCases.toString());
+		HandlerToTestEmissionAnalysisModules.reset();
+		Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( 0 ), Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( 0 ), Vehicle.class );
+		Id<VehicleType> vehicleTypeId = Id.create( testCases.get( 0 ) + ";" + testCases.get( 1 ) + ";" + testCases.get( 2 ) + ";" + testCases.get( 3 ), VehicleType.class );
 			
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-			logger.info("VehicleId: " + vehicle.getId().toString());
-			logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
+		logger.info("VehicleId: " + vehicle.getId().toString());
+		logger.info("VehicleTypeId: " + vehicle.getType().getId());
 			
-			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-			String message = "The expected emissions for " + tc.toString() + " are " +
-							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		}
+		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		String message = "The expected emissions for " + testCases.toString() + " are " + numberOfColdEmissions * (Double) testCase4.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase4.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 		
 	}
 	
@@ -245,8 +243,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );

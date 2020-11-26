@@ -72,8 +72,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 	// same values as int for table
 	private static final int tableParkingDuration = (int) Math.round(parkingDuration);
 	private static final int tableAccDistance = 1;
-	private static final Set<Pollutant> pollutants = new HashSet<>(
-			Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2));
+	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2));
 	private final int numberOfColdEmissions = pollutants.size();
 	// strings for test cases
 
