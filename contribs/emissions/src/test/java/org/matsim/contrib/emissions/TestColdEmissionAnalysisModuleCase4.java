@@ -144,7 +144,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		HandlerToTestEmissionAnalysisModules.reset();
 		Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( 0 ), Link.class );
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( 0 ), Vehicle.class );
-		Id<VehicleType> vehicleTypeId = Id.create( testCases.get( 0 ) + ";" + testCases.get( 1 ) + ";" + testCases.get( 2 ) + ";" + testCases.get( 3 ), VehicleType.class );
+		Id<VehicleType> vehicleTypeId = Id.create( testCase4.get( 0 ) + ";" + testCase4.get( 1 ) + ";" + testCase4.get( 2 ) + ";" + testCase4.get( 3 ), VehicleType.class );
 			
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 		logger.info("VehicleId: " + vehicle.getId().toString());
