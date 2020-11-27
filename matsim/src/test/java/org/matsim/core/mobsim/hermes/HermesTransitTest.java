@@ -161,6 +161,105 @@ public class HermesTransitTest {
 	}
 
 	/**
+	 * Makes sure Hermes works also when transit routes in different lines have the same Id
+	 */
+	@Test
+	public void testRepeatedRouteIds() {
+		Fixture f = new Fixture();
+		f.config.transit().setUseTransit(true);
+
+		Vehicles ptVehicles = f.scenario.getTransitVehicles();
+
+		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehicles.addVehicleType(ptVehType1);
+
+		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehicles.addVehicle(ptVeh1);
+
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();
+
+		TransitStopFacility stop0 = sf.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new Coord(0, 0), false); // create an unused Id<TransitStopFacility> first
+		TransitStopFacility stop1 = sf.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(1000, 10), false);
+		TransitStopFacility stop2 = sf.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(2000, 20), false);
+		TransitStopFacility stop3 = sf.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord(3000, 30), false);
+
+		stop0.setLinkId(f.link1.getId());
+		stop1.setLinkId(f.link1.getId());
+		stop2.setLinkId(f.link2.getId());
+		stop3.setLinkId(f.link3.getId());
+
+		schedule.addStopFacility(stop0);
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		TransitLine line1;
+		TransitRoute route1;
+		{
+			line1 = sf.createTransitLine(Id.create(1, TransitLine.class));
+			NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId()), f.link3.getId());
+			List<TransitRouteStop> stops = List.of(
+					new TransitRouteStopImpl.Builder().stop(stop1).departureOffset(0).build(),
+					new TransitRouteStopImpl.Builder().stop(stop2).departureOffset(300).build(),
+					new TransitRouteStopImpl.Builder().stop(stop3).arrivalOffset(600).build()
+			);
+			route1 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+			Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 7 * 3600);
+			dep1.setVehicleId(ptVeh1.getId());
+			route1.addDeparture(dep1);
+			line1.addRoute(route1);
+
+			schedule.addTransitLine(line1);
+		}
+
+		TransitLine line2;
+		TransitRoute route2;
+		{
+			line2 = sf.createTransitLine(Id.create(2, TransitLine.class));
+			NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId()), f.link3.getId());
+			// the second route should be shorter. when the first will be used, it originally triggered an ArrayOutOfBounds exception as this route only has 2 stops, vs. in line 1 it has 3 stops
+			List<TransitRouteStop> stops = List.of(
+					new TransitRouteStopImpl.Builder().stop(stop1).departureOffset(0).build(),
+					new TransitRouteStopImpl.Builder().stop(stop3).arrivalOffset(600).build()
+			);
+			route2 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+			Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 6 * 3600);
+			dep1.setVehicleId(ptVeh1.getId());
+			route2.addDeparture(dep1);
+			line2.addRoute(route2);
+
+			schedule.addTransitLine(line2);
+		}
+
+		// add a single person with leg from link1 to link3
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+		a1.setEndTime(6*3600);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		leg.setRoute(new DefaultTransitPassengerRoute(f.link1.getId(), f.link3.getId(), stop1.getId(), stop2.getId(), line1.getId(), route1.getId()));
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		Hermes sim = createHermes(f, events);
+		sim.run();
+
+		/* finish */
+		// Not having an Exception here is already good :-)
+		Assert.assertEquals("wrong number of link enter events.", 4, collector.events.size());
+		Assert.assertEquals("wrong link in first event.", f.link2.getId(), collector.events.get(0).getLinkId());
+		Assert.assertEquals("wrong link in second event.", f.link3.getId(), collector.events.get(1).getLinkId());
+	}
+
+	/**
 	 * Initializes some commonly used data in the tests.
 	 *
 	 * @author mrieser

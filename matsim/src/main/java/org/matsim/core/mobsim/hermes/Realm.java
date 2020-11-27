@@ -48,8 +48,8 @@ public class Realm {
     // Agents waiting in pt stations. Should be used as follows:
     // nqsim_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
     private final ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
-    // stop ids per route id
-    private final ArrayList<int[]> stops_in_route;
+    // stop ids for each route: int[] stop_ids = route_stops_by_route_no[route_no]
+    protected int[][] route_stops_by_route_no;
     // line id of a particular route
     private final int[] line_of_route;
     // queue of sorted events by time
@@ -67,7 +67,7 @@ public class Realm {
         this.delayedLinksByWakeupTime = new ArrayList<>();
         this.delayedAgentsByWakeupTime = new ArrayList<>();
         this.agent_stops = scenario.agent_stops;
-        this.stops_in_route = scenario.route_stops_by_index;
+        this.route_stops_by_route_no = scenario.route_stops_by_route_no;
         this.line_of_route = scenario.line_of_route;
         this.sorted_events = new EventArray();
         this.eventsManager = (ParallelEventsManager)eventsManager;
@@ -169,11 +169,11 @@ public class Realm {
 
     protected boolean processAgentWait(Agent agent, long planentry) {
         advanceAgentandSetEventTime(agent);
-        int routeid = Agent.getRoutePlanEntry(planentry);
+        int routeNo = Agent.getRoutePlanEntry(planentry);
         int accessStop = Agent.getStopPlanEntry(planentry);
         // Note: getNextStop needs to be called after advanveAgent.
         int egressStop = agent.getNextStopPlanEntry();
-        int lineid = line_of_route[routeid];
+        int lineid = line_of_route[routeNo];
 
         ArrayList<Map<Integer, ArrayDeque<Agent>>> list;
         Map<Integer, ArrayDeque<Agent>> list2;
@@ -184,7 +184,7 @@ public class Realm {
             list3 = list2.get(egressStop);
             list3.add(agent);
         } catch (NullPointerException npe) {
-        	System.out.println(String.format("ETHZ NPE agent=%d routeid=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeid, accessStop, egressStop, lineid));
+        	System.out.println(String.format("ETHZ NPE agent=%d routeNo=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeNo, accessStop, lineid, egressStop));
         }
         return true;
     }
@@ -219,13 +219,13 @@ public class Realm {
     }
 
     protected boolean processAgentStopDepart(Agent agent, long planentry) {
-        int routeid = Agent.getRoutePlanEntry(planentry);
+        int routeNo = Agent.getRoutePlanEntry(planentry);
         int stopid = Agent.getStopPlanEntry(planentry);
         int stopidx = Agent.getStopIndexPlanEntry(planentry);
-        int lineid = line_of_route[routeid];
+        int lineid = line_of_route[routeNo];
         Map<Integer, ArrayDeque<Agent>> agents_next_stops =
                 agent_stops.get(stopid).get(lineid);
-        int[] next_stops = stops_in_route.get(routeid);
+        int[] next_stops = this.route_stops_by_route_no[routeNo];
 
         // take agents
         for (int idx = stopidx; idx < next_stops.length; idx++) {
