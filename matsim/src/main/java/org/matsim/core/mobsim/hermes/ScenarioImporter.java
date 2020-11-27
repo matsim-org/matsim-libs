@@ -171,7 +171,7 @@ public class ScenarioImporter {
 	public static ScenarioImporter instance(Scenario scenario, EventsManager eventsManager) {
 		// if instance is null or the scenario changed or events manager changed, re-do everything.
 		if (instance == null || !scenario.equals(instance.scenario) || !eventsManager.equals(instance.eventsManager)) {
-			System.out.println("ETHZ rebuilding scenario!");
+			log.info("Hermes rebuilding scenario!");
 			instance = new ScenarioImporter(scenario, eventsManager);
 		}
 		return instance;
@@ -184,13 +184,13 @@ public class ScenarioImporter {
 			resetThread.join();
 		}
 
-		log.info(String.format("ETHZ reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
+		log.info(String.format("Hermes reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
 		time = System.currentTimeMillis();
 		generatePlans();
-		log.info(String.format("ETHZ generatePlans took %d ms", System.currentTimeMillis() - time));
+		log.info(String.format("Hermes generatePlans took %d ms", System.currentTimeMillis() - time));
 		time = System.currentTimeMillis();
 		generateRealms();
-		log.info(String.format("ETHZ generateRealms took %d ms", System.currentTimeMillis() - time));
+		log.info(String.format("Hermes generateRealms took %d ms", System.currentTimeMillis() - time));
 	}
 
 	public void reset() {
@@ -198,6 +198,7 @@ public class ScenarioImporter {
 
 			@Override
 			public void run() {
+				log.info("resetting hermes...");
 				// reset links
 				for (int i = 0; i < hermes_links.length; i++) {
 					HLink link = hermes_links[i];
@@ -327,13 +328,11 @@ public class ScenarioImporter {
 					realm.delayedAgents().get(Math.min(sleep, scenario.getConfig().hermes().getEndTime() + 1)).add(agent);
 					break;
 				default:
-					Logger.getLogger(getClass()).error(String.format("ERROR -> unknow plan element type %d", type));
+					Logger.getLogger(getClass()).error(String.format("ERROR -> unknown plan element type %d", type));
 			}
 		}
 
-		// TODO - couldn't this be folded in the prev loop?
-		for (int i = 0; i < hermes_links.length; i++) {
-			HLink link = hermes_links[i];
+		for (HLink link : this.hermes_links) {
 			if (link != null) {
 				int nextwakeup = link.nexttime();
 				if (nextwakeup > 0) {
@@ -435,11 +434,8 @@ public class ScenarioImporter {
 	}
 
 	private void populateStops(int srcStopId, int lineId, int dstStopId) {
-		Map<Integer, ArrayDeque<Agent>> agents = agent_stops.get(srcStopId).get(lineId);
-
-		if (!agents.containsKey(dstStopId)) {
-			agents.put(dstStopId, new ArrayDeque<>());
-		}
+		Map<Integer, ArrayDeque<Agent>> agents = this.agent_stops.get(srcStopId).get(lineId);
+		agents.computeIfAbsent(dstStopId, k -> new ArrayDeque<>());
 	}
 
 	private void processPlanTransitRoute(
@@ -550,7 +546,7 @@ public class ScenarioImporter {
 				depart.getDepartureTime(), trs.getDepartureOffset(), trs.getArrivalOffset());
 	}
 
-	private void generateDetermisticVehicleTrip(
+	private void generateDeterministicVehicleTrip(
 			PlanArray flatplan,
 			EventArray flatevents,
 			TransitLine tl,
@@ -559,19 +555,17 @@ public class ScenarioImporter {
 		List<TransitRouteStop> trs = tr.getStops();
 		TransitRouteStop next = trs.get(0);
 		int stopidx = 0;
-		Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
+		Vehicle v = this.scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
 		int pcuCategory = 0;
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
 		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
 		int[] stop_ids = this.route_stops_by_route_no[routeNo];
-		List<Double> averageSpeedbetweenStops = calculateSpeedsBetweenStops(tr);
+		List<Double> averageSpeedBetweenStops = calculateSpeedsBetweenStops(tr);
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
-		String legmode = null;
-
-		legmode = TransportMode.pt;
+		String legmode = TransportMode.pt;
 
 		// Sleep until the time of departure
 		flatplan.add(Agent.prepareSleepUntilEntry(0, (int) Math.max(0, Math.round(depart.getDepartureTime() - 1))));
@@ -624,7 +618,7 @@ public class ScenarioImporter {
 			} else {
 				deterministicPtEvents.get(timerunning).add(new LinkEnterEvent(timerunning, v.getId(), link));
 				double length = scenario.getNetwork().getLinks().get(link).getLength();
-				timerunning += length / averageSpeedbetweenStops.get(stopidx - 1);
+				timerunning += length / averageSpeedBetweenStops.get(stopidx - 1);
 				deterministicPtEvents.get(timerunning - 2).add(new LinkLeaveEvent(timerunning - 2, v.getId(), link));
 
 			}
@@ -632,7 +626,7 @@ public class ScenarioImporter {
 		}
 
 		// Adding last link and possibly the last stop.
-			TransitStopFacility nextStopFacility = next.getStopFacility();
+		TransitStopFacility nextStopFacility = next.getStopFacility();
 		if (nextStopFacility.getLinkId().equals(nr.getEndLinkId())) {
 			int stopArrival = (int) arrivalOffsetHelper(depart, next);
 			int stopid = stop_ids[stopidx];
@@ -743,9 +737,9 @@ public class ScenarioImporter {
 		TransitRouteStop lastStop = null;
 		for (var stop : tr.getStops()) {
 			var currentLinkId = stop.getStopFacility().getLinkId();
-			double offset = stop.getArrivalOffset().or(stop.getDepartureOffset()).orElseThrow((() -> new RuntimeException("Stop has neither arrivald nor departure offset")));
+			double offset = stop.getArrivalOffset().or(stop.getDepartureOffset()).orElseThrow((() -> new RuntimeException("Stop has neither arrival nor departure offset")));
 			if (lastStop != null) {
-				double lastDepartureOffset = lastStop.getDepartureOffset().or(lastStop.getArrivalOffset()).orElseThrow((() -> new RuntimeException("Stop has neither arrivald nor departure offset")));
+				double lastDepartureOffset = lastStop.getDepartureOffset().or(lastStop.getArrivalOffset()).orElseThrow((() -> new RuntimeException("Stop has neither arrival nor departure offset")));
 				var lastLink = lastStop.getStopFacility().getLinkId();
 				double distance = RouteUtils.calcDistance(tr.getRoute().getSubRoute(lastLink, currentLinkId), 1.0, 1.0, scenario.getNetwork());
 				double travelTime = offset - lastDepartureOffset;
@@ -771,7 +765,7 @@ public class ScenarioImporter {
 					hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
 					hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
 					if (deterministicPt) {
-						generateDetermisticVehicleTrip(plan, events, tl, tr, depart);
+						generateDeterministicVehicleTrip(plan, events, tl, tr, depart);
 					} else {
 						generateVehicleTrip(plan, events, tl, tr, depart);
 					}
@@ -798,7 +792,6 @@ public class ScenarioImporter {
 		Map<Id<Vehicle>, Vehicle> vehicles = scenario.getTransitVehicles().getVehicles();
 		agent_persons = Id.getNumberOfIds(Person.class);
 		int nagents = agent_persons + Id.getNumberOfIds(Vehicle.class);
-		System.out.flush();
 		hermes_agents = new Agent[nagents];
 
 		// Generate persons

@@ -104,16 +104,16 @@ public class Agent {
     // Timestamp of when the agent will be ready to exit link.
     protected int linkFinishTime;
 
-    // Number of passagers that this agent can take (zero for personal vehicles)
+    // Number of passengers that this agent can take (zero for personal vehicles)
     private int capacity;
 
-    // Number of passegers that are currently being transported.
+    // Number of passengers that are currently being transported.
     private int passengersInside;
 
     private float storageCapacityPCUE = -1;
     private float flowCapacityPCUE = -1;
 
-    // Array of passagers on this vehicle.
+    // Array of passengers on this vehicle.
     private ArrayList<ArrayList<Agent>> passengersByStop;
 
     public Agent(int id, int capacity, PlanArray plan, EventArray events) {
@@ -188,7 +188,7 @@ public class Agent {
     }
 
     /*
-     *Number of passagers that this agent can take (zero for personal vehicles)
+     * Number of passengers that this agent can take (zero for personal vehicles)
      */
     public int getCapacity() {
         return this.capacity;
@@ -225,11 +225,11 @@ public class Agent {
     public static int getPlanHeader         (long plan) { return (int)((plan >> 60) & 0x000000000000000FL); }
     public static int getPlanEvent          (long plan) { return (int)((plan >> 40) & 0x000000000000FFFFL); }
     public static int getDeparture          (long plan) { return (int)((plan >> 40) & 0x00000000000FFFFFL); }
-    public static int getLinkPlanEntry      (long plan) {return (int) ((plan >> 8) & 0x00000000FFFFFFFFL); }
+    public static int getLinkPlanEntry      (long plan) { return (int) ((plan >> 8) & 0x00000000FFFFFFFFL); }
     public static int getLinkPCEEntry       (long plan) {
         return (int) ((plan >> 56) & 0x000000000000000FL);
     }
-    public static int getVelocityPlanEntry  (long plan) {return (int) (plan & 0x00000000000000FFL); }
+    public static int getVelocityPlanEntry  (long plan) { return (int) (plan & 0x00000000000000FFL); }
     public static int getRoutePlanEntry     (long plan) { return (int)((plan >> 16) & 0x000000000000FFFFL); }
     public static int getStopPlanEntry      (long plan) { return (int)( plan        & 0x000000000000FFFFL); }
     public static int getStopIndexPlanEntry (long plan) { return (int)( plan >> 32  & 0x00000000000000FFL); }
@@ -373,7 +373,7 @@ public class Agent {
                 return String.format("type=wait; event=%d; route=%d stopid=%d stopidx=%d",
             		getPlanEvent(planEntry), getRoutePlanEntry(planEntry), getStopPlanEntry(planEntry), getStopIndexPlanEntry(planEntry));
             default:
-                return String.format("unknow plan type %d", type);
+                return String.format("unknown plan type %d", type);
         }
 
     }

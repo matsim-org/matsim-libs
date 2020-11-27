@@ -81,7 +81,7 @@ public class Realm {
 
     public void log(int time, String s) {
         if (HermesConfigGroup.DEBUG_REALMS) {
-            log.debug(String.format("ETHZ [ time = %d ] %s", time, s));
+            log.debug(String.format("Hermes [ time = %d ] %s", time, s));
         }
     }
 
@@ -171,7 +171,7 @@ public class Realm {
         advanceAgentandSetEventTime(agent);
         int routeNo = Agent.getRoutePlanEntry(planentry);
         int accessStop = Agent.getStopPlanEntry(planentry);
-        // Note: getNextStop needs to be called after advanveAgent.
+        // Note: getNextStop needs to be called after advanceAgent.
         int egressStop = agent.getNextStopPlanEntry();
         int lineid = line_of_route[routeNo];
 
@@ -184,7 +184,7 @@ public class Realm {
             list3 = list2.get(egressStop);
             list3.add(agent);
         } catch (NullPointerException npe) {
-        	System.out.println(String.format("ETHZ NPE agent=%d routeNo=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeNo, accessStop, lineid, egressStop));
+        	log.error(String.format("Hermes NPE agent=%d routeNo=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeNo, accessStop, lineid, egressStop), npe);
         }
         return true;
     }
