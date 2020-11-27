@@ -70,7 +70,7 @@ class ActivityWhileChargingFinder {
 		if(evLegsWithFollowingActs.isEmpty()) return null;
 		evLegsWithFollowingActs.sort(Comparator.comparingDouble(tuple -> tuple.getFirst().getDepartureTime().seconds()));
 
-		for (int i = evLegsWithFollowingActs.size() - 1; i >= 0; i++) {
+		for (int i = evLegsWithFollowingActs.size() - 1; i >= 0; i--) {
 			Tuple<Leg, Activity> tuple = evLegsWithFollowingActs.get(i);
 			//all legs should be routed at this time so we do not expect leg.getRoute().getTravelTime() to be undefined
 			double begin = tuple.getFirst().getDepartureTime().seconds() + tuple.getFirst().getRoute().getTravelTime().seconds();
