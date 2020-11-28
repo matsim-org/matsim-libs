@@ -18,11 +18,9 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -32,8 +30,13 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
+import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class Realm {
 	private final ScenarioImporter si;
@@ -46,8 +49,8 @@ public class Realm {
     // Agents on hold until a specific timestamp (in seconds).
     private final ArrayList<ArrayDeque<Agent>> delayedAgentsByWakeupTime;
     // Agents waiting in pt stations. Should be used as follows:
-    // nqsim_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
-    private final ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
+    // agent_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
+    private final IdMap<TransitStopFacility, IntArrayMap<IntArrayMap<ArrayDeque<Agent>>>> agent_stops;
     // stop ids for each route: int[] stop_ids = route_stops_by_route_no[route_no]
     protected int[][] route_stops_by_route_no;
     // line id of a particular route
@@ -175,14 +178,11 @@ public class Realm {
         int egressStop = agent.getNextStopPlanEntry();
         int lineid = line_of_route[routeNo];
 
-        ArrayList<Map<Integer, ArrayDeque<Agent>>> list;
-        Map<Integer, ArrayDeque<Agent>> list2;
-        ArrayDeque<Agent> list3;
         try {
-        	list = agent_stops.get(accessStop);
-            list2 = list.get(lineid);
-            list3 = list2.get(egressStop);
-            list3.add(agent);
+          agent_stops.get(accessStop)
+            .get(lineid)
+            .get(egressStop)
+            .add(agent);
         } catch (NullPointerException npe) {
         	log.error(String.format("Hermes NPE agent=%d routeNo=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeNo, accessStop, lineid, egressStop), npe);
         }
@@ -223,7 +223,7 @@ public class Realm {
         int stopid = Agent.getStopPlanEntry(planentry);
         int stopidx = Agent.getStopIndexPlanEntry(planentry);
         int lineid = line_of_route[routeNo];
-        Map<Integer, ArrayDeque<Agent>> agents_next_stops =
+        IntArrayMap<ArrayDeque<Agent>> agents_next_stops =
                 agent_stops.get(stopid).get(lineid);
         int[] next_stops = this.route_stops_by_route_no[routeNo];
 

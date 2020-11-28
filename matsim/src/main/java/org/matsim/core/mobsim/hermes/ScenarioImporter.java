@@ -54,6 +54,7 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.ArrayMap;
+import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.TransitPassengerRoute;
@@ -117,7 +118,7 @@ public class ScenarioImporter {
 	private final boolean deterministicPt;
 	// Agents waiting in pt stations. Should be used as follows:
 	// agent_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
-	protected ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
+	protected IdMap<TransitStopFacility, IntArrayMap<IntArrayMap<ArrayDeque<Agent>>>> agent_stops;
 	private float[] flowCapacityPCEs;
 	private float[] storageCapacityPCEs;
 	private Map<Id<VehicleType>, Integer> vehicleTypeMapping = new HashMap<>();
@@ -213,10 +214,10 @@ public class ScenarioImporter {
 					}
 				}
 				// reset agent_stops
-				for (ArrayList<Map<Integer, ArrayDeque<Agent>>> station_id : agent_stops) {
-					for (Map<Integer, ArrayDeque<Agent>> line_id : station_id) {
-						for (Map.Entry<Integer, ArrayDeque<Agent>> entry : line_id.entrySet()) {
-							entry.getValue().clear();
+				for (IntArrayMap<IntArrayMap<ArrayDeque<Agent>>> station_id : agent_stops) {
+					for (IntArrayMap<ArrayDeque<Agent>> line_id : station_id.values()) {
+						for (ArrayDeque<Agent> agents : line_id.values()) {
+							agents.clear();
 						}
 					}
 				}
@@ -290,15 +291,20 @@ public class ScenarioImporter {
 		initRoutesStations();
 
 		// Initialize agent_stops.
-		int stopIdCount = Id.getNumberOfIds(TransitStopFacility.class);
-		int lineIdCount = Id.getNumberOfIds(TransitLine.class);
-		this.agent_stops = new ArrayList<>(stopIdCount);
-		for (int i = 0; i < stopIdCount; i++) {
-			ArrayList<Map<Integer, ArrayDeque<Agent>>> agent_lines = new ArrayList<>(lineIdCount);
-			for (int j = 0; j < lineIdCount; j++) {
-				agent_lines.add(new HashMap<>());
+		this.agent_stops = new IdMap<>(TransitStopFacility.class);
+
+		TransitSchedule ts = this.scenario.getTransitSchedule();
+		for (TransitLine line : ts.getTransitLines().values()) {
+			for (TransitRoute route : line.getRoutes().values()) {
+				List<TransitRouteStop> stops = route.getStops();
+				for (int i = 0, stopsCount = stops.size(); i < stopsCount; i++) {
+					TransitRouteStop routeStop = stops.get(i);
+					TransitStopFacility stopFacility = routeStop.getStopFacility();
+
+					IntArrayMap<IntArrayMap<ArrayDeque<Agent>>> linesMap = this.agent_stops.computeIfAbsent(stopFacility.getId(), k -> new IntArrayMap<>());
+					linesMap.computeIfAbsent(line.getId().index(), k -> new IntArrayMap<>());
+				}
 			}
-			this.agent_stops.add(agent_lines);
 		}
 	}
 
@@ -434,7 +440,7 @@ public class ScenarioImporter {
 	}
 
 	private void populateStops(int srcStopId, int lineId, int dstStopId) {
-		Map<Integer, ArrayDeque<Agent>> agents = this.agent_stops.get(srcStopId).get(lineId);
+		IntArrayMap<ArrayDeque<Agent>> agents = this.agent_stops.get(srcStopId).get(lineId);
 		agents.computeIfAbsent(dstStopId, k -> new ArrayDeque<>());
 	}
 
