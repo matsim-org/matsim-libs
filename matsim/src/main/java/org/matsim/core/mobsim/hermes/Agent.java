@@ -19,9 +19,13 @@
 
 package org.matsim.core.mobsim.hermes;
 
+import org.matsim.core.events.EventArray;
+import org.matsim.core.utils.collections.IntArrayMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.matsim.core.events.EventArray;
+import java.util.Collections;
+import java.util.List;
 
 public class Agent {
 
@@ -113,17 +117,20 @@ public class Agent {
     private float storageCapacityPCUE = -1;
     private float flowCapacityPCUE = -1;
 
-    // Array of passengers on this vehicle.
-    private ArrayList<ArrayList<Agent>> passengersByStop;
+    // Map of passengers per destination stop on this vehicle.
+    private IntArrayMap<ArrayList<Agent>> passengersByStop;
+
+    private final static List<Agent> NO_PASSENGERS = Collections.emptyList();
 
     public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this.id = id;
         this.plan = plan;
         this.events = events;
         this.capacity = capacity;
-        this.passengersByStop = new ArrayList<>(HermesConfigGroup.MAX_STOP_IDX + 1);
-        for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-            this.passengersByStop.add(new ArrayList<>());
+        if (capacity == 0) {
+            this.passengersByStop = null;
+        } else {
+            this.passengersByStop = new IntArrayMap<>(20);
         }
     }
 
@@ -195,21 +202,23 @@ public class Agent {
     }
 
     public boolean isTransitVehicle() {
-        return this.passengersByStop == null;
+        return this.passengersByStop != null;
     }
 
-    public ArrayList<Agent> egress(int stopidx) {
-        ArrayList<Agent> ret = passengersByStop.get(stopidx);
+    public List<Agent> egress(int stopid) {
+        ArrayList<Agent> ret = passengersByStop.remove(stopid);
+        if (ret == null) {
+            return NO_PASSENGERS;
+        }
         passengersInside -= ret.size();
-        passengersByStop.set(stopidx, new ArrayList<>());
         return ret;
     }
 
-    public boolean access(int stopidx, Agent agent) {
+    public boolean access(int stopid, Agent agent) {
         if (passengersInside == capacity) {
             return false;
         } else {
-            passengersByStop.get(stopidx).add(agent);
+            passengersByStop.computeIfAbsent(stopid, k -> new ArrayList<>()).add(agent);
             passengersInside++;
             return true;
         }
@@ -297,11 +306,9 @@ public class Agent {
         planIndex = 0;
         eventsIndex = 0;
         linkFinishTime = 0;
-        if (capacity > 0) {
+        if (this.passengersByStop != null) {
             passengersInside = 0;
-            for (int i = 0; i < HermesConfigGroup.MAX_STOP_IDX + 1; i++) {
-                this.passengersByStop.get(i).clear();
-            }
+            this.passengersByStop.clear();
         }
     }
 

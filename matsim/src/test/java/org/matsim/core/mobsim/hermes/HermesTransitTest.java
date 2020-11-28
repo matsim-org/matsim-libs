@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -41,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -91,6 +93,7 @@ public class HermesTransitTest {
 	public void testSuperflousStopFacilities() {
 		Fixture f = new Fixture();
 		f.config.transit().setUseTransit(true);
+		f.config.hermes().setDeterministicPt(true);
 
 		Vehicles ptVehicles = f.scenario.getTransitVehicles();
 
@@ -148,12 +151,19 @@ public class HermesTransitTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		LinkEnterEventCollector collector = new LinkEnterEventCollector();
 		events.addHandler(collector);
+		EventsCollector allEventsCollector = new EventsCollector();
+		events.addHandler(allEventsCollector);
 
 		/* run sim */
 		Hermes sim = createHermes(f, events);
 		sim.run();
 
 		/* finish */
+
+		for (Event event : allEventsCollector.getEvents()) {
+			System.out.println(event.toString());
+		}
+
 		// Not having an Exception here is already good :-)
 		Assert.assertEquals("wrong number of link enter events.", 2, collector.events.size());
 		Assert.assertEquals("wrong link in first event.", f.link2.getId(), collector.events.get(0).getLinkId());

@@ -49,8 +49,8 @@ public class Realm {
     // Agents on hold until a specific timestamp (in seconds).
     private final ArrayList<ArrayDeque<Agent>> delayedAgentsByWakeupTime;
     // Agents waiting in pt stations. Should be used as follows:
-    // agent_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
-    private final IdMap<TransitStopFacility, IntArrayMap<IntArrayMap<ArrayDeque<Agent>>>> agent_stops;
+    // agent_stops.get(curr station id).get(line id) -> queue of agents
+    private final IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agent_stops;
     // stop ids for each route: int[] stop_ids = route_stops_by_route_no[route_no]
     protected int[][] route_stops_by_route_no;
     // line id of a particular route
@@ -175,16 +175,14 @@ public class Realm {
         int routeNo = Agent.getRoutePlanEntry(planentry);
         int accessStop = Agent.getStopPlanEntry(planentry);
         // Note: getNextStop needs to be called after advanceAgent.
-        int egressStop = agent.getNextStopPlanEntry();
         int lineid = line_of_route[routeNo];
 
         try {
           agent_stops.get(accessStop)
             .get(lineid)
-            .get(egressStop)
             .add(agent);
         } catch (NullPointerException npe) {
-        	log.error(String.format("Hermes NPE agent=%d routeNo=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeNo, accessStop, lineid, egressStop), npe);
+        	log.error(String.format("Hermes NPE agent=%d routeNo=%d accessStop=%d lineid=%d", agent.id, routeNo, accessStop, lineid), npe);
         }
         return true;
     }
@@ -198,7 +196,7 @@ public class Realm {
     }
 
     protected boolean processAgentStopDelay(Agent agent, long planentry) {
-        int stopidx = Agent.getStopIndexPlanEntry(planentry);
+        int stopid = Agent.getStopPlanEntry(planentry);
         int departure = Agent.getDeparture(planentry);
 
         // consume stop delay
@@ -206,7 +204,7 @@ public class Realm {
         advanceAgent(agent);
 
         // drop agents
-        for (Agent out : agent.egress(stopidx)) {
+        for (Agent out : agent.egress(stopid)) {
             add_delayed_agent(out, secs + 1);
             // consume access, activate egress
             advanceAgentandSetEventTime(out);
@@ -221,24 +219,20 @@ public class Realm {
     protected boolean processAgentStopDepart(Agent agent, long planentry) {
         int routeNo = Agent.getRoutePlanEntry(planentry);
         int stopid = Agent.getStopPlanEntry(planentry);
-        int stopidx = Agent.getStopIndexPlanEntry(planentry);
         int lineid = line_of_route[routeNo];
-        IntArrayMap<ArrayDeque<Agent>> agents_next_stops =
-                agent_stops.get(stopid).get(lineid);
-        int[] next_stops = this.route_stops_by_route_no[routeNo];
+        ArrayDeque<Agent> waiting_agents = agent_stops.get(stopid).get(lineid);
 
         // take agents
-        for (int idx = stopidx; idx < next_stops.length; idx++) {
-            ArrayDeque<Agent> in_agents = agents_next_stops.get(next_stops[idx]);
-
-            if (in_agents == null) {
-                continue;
-            }
-
+        if (waiting_agents != null) {
             ArrayList<Agent> removed = new ArrayList<>();
-            for (Agent in : in_agents) {
-                if (!agent.access(idx, in)) {
-                    break;
+            for (Agent in : waiting_agents) {
+                try {
+                    int egressStop = in.getNextStopPlanEntry();
+                    if (!agent.access(egressStop, in)) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
                 removed.add(in);
                 // consume wait in stop, activate access
@@ -246,7 +240,7 @@ public class Realm {
                 // set driver in agent's event
                 setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
             }
-            in_agents.removeAll(removed);
+            waiting_agents.removeAll(removed);
         }
         advanceAgentandSetEventTime(agent);
         // False is returned to force this agent to be processed in the next tick.
