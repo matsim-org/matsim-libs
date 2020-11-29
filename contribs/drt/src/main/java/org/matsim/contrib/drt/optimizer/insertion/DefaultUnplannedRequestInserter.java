@@ -20,7 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
@@ -49,6 +49,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final EventsManager eventsManager;
 	private final RequestInsertionScheduler insertionScheduler;
 	private final VehicleData.EntryFactory vehicleDataEntryFactory;
+	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
 	private final ForkJoinPool forkJoinPool;
 	private final DrtInsertionSearch<PathData> insertionSearch;
@@ -65,42 +66,56 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
 		this.forkJoinPool = forkJoinPool;
 		this.insertionSearch = insertionSearch;
+
+		insertionRetryQueue = new DrtRequestInsertionRetryQueue(drtCfg.getDrtRequestInsertionRetryParams().
+				orElse(new DrtRequestInsertionRetryParams()));
 	}
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
-		if (unplannedRequests.isEmpty()) {
+		double now = mobsimTimer.getTimeOfDay();
+
+		List<DrtRequest> requestsToRetry = insertionRetryQueue.getRequestsToRetryNow(now);
+		if (unplannedRequests.isEmpty() && requestsToRetry.isEmpty()) {
 			return;
 		}
 
-		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values().stream(),
-				vehicleDataEntryFactory, forkJoinPool);
+		VehicleData vData = new VehicleData(now, fleet.getVehicles().values().stream(), vehicleDataEntryFactory,
+				forkJoinPool);
 
-		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
-		while (reqIter.hasNext()) {
-			DrtRequest req = reqIter.next();
-			Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
-					vData.getEntries());
-			if (best.isEmpty()) {
+		//first retry scheduling old requests
+		insertionRetryQueue.getRequestsToRetryNow(now).forEach(req -> scheduleUnplannedRequest(req, vData, now));
+
+		//then schedule new requests
+		for (var reqIter = unplannedRequests.iterator(); reqIter.hasNext(); ) {
+			scheduleUnplannedRequest(reqIter.next(), vData, now);
+			reqIter.remove();
+		}
+	}
+
+	private void scheduleUnplannedRequest(DrtRequest req, VehicleData vData, double now) {
+		Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req, vData.getEntries());
+		if (best.isEmpty()) {
+			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
 				eventsManager.processEvent(
-						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId(), NO_INSERTION_FOUND_CAUSE));
+						new PassengerRequestRejectedEvent(now, drtCfg.getMode(), req.getId(), req.getPassengerId(),
+								NO_INSERTION_FOUND_CAUSE));
 				log.debug("No insertion found for drt request "
 						+ req
 						+ " from passenger id="
 						+ req.getPassengerId()
 						+ " fromLinkId="
 						+ req.getFromLink().getId());
-			} else {
-				InsertionWithDetourData<PathData> insertion = best.get();
-				insertionScheduler.scheduleRequest(req, insertion);
-				vData.updateEntry(insertion.getVehicleEntry().vehicle);
-				eventsManager.processEvent(
-						new PassengerRequestScheduledEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
-								req.getPassengerId(), insertion.getVehicleEntry().vehicle.getId(),
-								req.getPickupTask().getEndTime(), req.getDropoffTask().getBeginTime()));
 			}
-			reqIter.remove();
+		} else {
+			InsertionWithDetourData<PathData> insertion = best.get();
+			insertionScheduler.scheduleRequest(req, insertion);
+			vData.updateEntry(insertion.getVehicleEntry().vehicle);
+			eventsManager.processEvent(
+					new PassengerRequestScheduledEvent(now, drtCfg.getMode(), req.getId(), req.getPassengerId(),
+							insertion.getVehicleEntry().vehicle.getId(), req.getPickupTask().getEndTime(),
+							req.getDropoffTask().getBeginTime()));
 		}
+
 	}
 }
