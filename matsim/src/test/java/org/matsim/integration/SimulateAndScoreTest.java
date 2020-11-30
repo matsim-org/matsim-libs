@@ -216,7 +216,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 
@@ -283,7 +283,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 

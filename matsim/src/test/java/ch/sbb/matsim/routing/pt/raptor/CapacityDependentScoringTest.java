@@ -105,7 +105,7 @@ public class CapacityDependentScoringTest {
 		population.addPerson(person);
 
 		EventsToScore events2Score = EventsToScore.createWithoutScoreUpdating(f.scenario, testSFF, events);
-		events2Score.beginIteration(0);
+		events2Score.beginIteration(0, false);
 		events.addHandler(occTracker);
 
 		events.addHandler((BasicEventHandler) event -> {

@@ -136,7 +136,7 @@ public class GroupCompositionPenalizerTest {
 				},
 				events );
 
-		eventsToScore.beginIteration( 1 );
+		eventsToScore.beginIteration( 1, false );
 
 		new QSimBuilder(sc.getConfig()) //
 				.useDefaults()

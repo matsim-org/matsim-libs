@@ -255,7 +255,7 @@ public class DrtSpeedUpTest {
 	}
 
 	private void iterationEnds(DrtSpeedUp drtSpeedUp, int iteration) {
-		drtSpeedUp.notifyIterationEnds(new IterationEndsEvent(null, iteration));
+		drtSpeedUp.notifyIterationEnds(new IterationEndsEvent(null, iteration, false));
 	}
 
 	//mock request analyser instead of running simulations
