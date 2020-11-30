@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import static ch.sbb.matsim.routing.graph.LeastCostPathTree.StopCriterion;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -28,13 +29,19 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.utils.misc.OptionalTime;
+
+import com.google.common.base.Preconditions;
 
 import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
@@ -58,11 +65,21 @@ class OneToManyPathCalculator {
 	}
 
 	void calculateDijkstraTree(Collection<Link> toLinks) {
+		calculateDijkstraTree(toLinks, Double.POSITIVE_INFINITY);
+	}
+
+	void calculateDijkstraTree(Collection<Link> toLinks, double maxTravelTime) {
+		Preconditions.checkArgument(!Double.isNaN(maxTravelTime) && maxTravelTime >= 0);
+
 		int fromNodeIdx = getStartNode(fromLink).getId().index();
 		Stream<Node> toNodes = toLinks.stream().filter(link -> link != fromLink).map(this::getEndNode);
-		MultiNodeStopCriterion stopCriterion = new MultiNodeStopCriterion(toNodes);
+		var multiNodeStopCriterion = new MultiNodeStopCriterion(toNodes);
 
-		if (stopCriterion.counter > 0) {
+		StopCriterion stopCriterion = maxTravelTime < Double.POSITIVE_INFINITY ?
+				new MaxTravelTimeStopCriterion(maxTravelTime, multiNodeStopCriterion) :
+				multiNodeStopCriterion;
+
+		if (multiNodeStopCriterion.counter > 0) {
 			if (forwardSearch) {
 				dijkstraTree.calculate(fromNodeIdx, startTime, null, null, stopCriterion);
 			} else {
@@ -71,23 +88,54 @@ class OneToManyPathCalculator {
 		}
 	}
 
-	PathData createPathData(Link toLink) {
+	PathData createPathDataLazily(Link toLink) {
 		if (toLink == fromLink) {
-			return new PathData(new Path(List.of(getStartNode(fromLink)), List.of(), 0, 0), 0);
+			return PathData.EMPTY;
 		} else {
-			Path path = createPath(getEndNode(toLink));
-			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path, startTime));
+			Node endNode = getEndNode(toLink);
+			double pathTravelTime = getTravelTime(endNode.getId().index());
+			if (pathTravelTime == Double.POSITIVE_INFINITY) {
+				return PathData.INFEASIBLE;
+			}
+			Supplier<Path> pathSupplier = () -> createPath(endNode);
+			return new PathData(pathSupplier, pathTravelTime,
+					getFirstAndLastLinkTT(fromLink, toLink, pathTravelTime, startTime));
 		}
 	}
 
+	PathData createPathDataEagerly(Link toLink) {
+		if (toLink == fromLink) {
+			return PathData.EMPTY;
+		} else {
+			Node endNode = getEndNode(toLink);
+			if (dijkstraTree.getTime(endNode.getId().index()).isUndefined()) {
+				return PathData.INFEASIBLE;
+			}
+			Path path = createPath(endNode);
+			return new PathData(path, getFirstAndLastLinkTT(fromLink, toLink, path.travelTime, startTime));
+		}
+	}
+
+	@Nullable
 	Path createPath(Node toNode) {
+		int toNodeIndex = toNode.getId().index();
+		double travelTime = getTravelTime(toNodeIndex);
+		if (travelTime == Double.POSITIVE_INFINITY) {
+			return null;
+		}
 		var nodes = constructNodeSequence(dijkstraTree, toNode, forwardSearch);
 		var links = constructLinkSequence(nodes);
-		int toNodeIndex = toNode.getId().index();
-		int travelTimeMultiplier = forwardSearch ? 1 : -1;
-		double travelTime = travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
 		double cost = dijkstraTree.getCost(toNodeIndex);
 		return new Path(nodes, links, travelTime, cost);
+	}
+
+	private double getTravelTime(int toNodeIndex) {
+		OptionalTime endTime = dijkstraTree.getTime(toNodeIndex);
+		if (endTime.isUndefined()) {
+			return Double.POSITIVE_INFINITY;
+		}
+		int travelTimeMultiplier = forwardSearch ? 1 : -1;
+		return travelTimeMultiplier * (dijkstraTree.getTime(toNodeIndex).seconds() - startTime);
 	}
 
 	private List<Node> constructNodeSequence(LeastCostPathTree dijkstraTree, Node toNode, boolean forward) {
@@ -132,14 +180,31 @@ class OneToManyPathCalculator {
 		return forwardSearch ? link.getToNode() : link.getFromNode();
 	}
 
-	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, Path path, double time) {
+	private double getFirstAndLastLinkTT(Link fromLink, Link toLink, double pathTravelTime, double time) {
 		double lastLinkTT = forwardSearch ?
-				VrpPaths.getLastLinkTT(toLink, time + path.travelTime) :
+				VrpPaths.getLastLinkTT(toLink, time + pathTravelTime) :
 				VrpPaths.getLastLinkTT(fromLink, time);
 		return FIRST_LINK_TT + lastLinkTT;
 	}
 
-	private static class MultiNodeStopCriterion implements LeastCostPathTree.StopCriterion {
+	private static class MaxTravelTimeStopCriterion implements StopCriterion {
+		private final double maxTravelTime;
+		private final MultiNodeStopCriterion multiNodeStopCriterion;
+
+		private MaxTravelTimeStopCriterion(double maxTravelTime, MultiNodeStopCriterion multiNodeStopCriterion) {
+			this.maxTravelTime = maxTravelTime;
+			this.multiNodeStopCriterion = multiNodeStopCriterion;
+		}
+
+		@Override
+		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
+				double departureTime) {
+			return arrivalTime - departureTime > maxTravelTime //
+					|| multiNodeStopCriterion.stop(nodeIndex, arrivalTime, travelCost, distance, departureTime);
+		}
+	}
+
+	private static class MultiNodeStopCriterion implements StopCriterion {
 		private final BitSet nodesToVisit = new BitSet(Id.getNumberOfIds(Node.class));
 		private int counter;
 
@@ -148,7 +213,6 @@ class OneToManyPathCalculator {
 			counter = nodesToVisit.cardinality();
 		}
 
-		@Override
 		public boolean stop(int nodeIndex, double arrivalTime, double travelCost, double distance,
 				double departureTime) {
 			if (nodesToVisit.get(nodeIndex)) {
