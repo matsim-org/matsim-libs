@@ -23,20 +23,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -229,6 +227,70 @@ public class FrozenEpsilonLocaChoiceIT{
 	}
 
 	enum RunType { shortRun, medRun, longRun }
+
+	@Test public void testTypicalDurationUsage() {
+		//Config
+		Config config = ConfigUtils.createConfig();
+		config.controler().setLastIteration(1);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams( "home" ).setTypicalDuration( 12.*3600. ) );
+		config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams( "shop" ).setTypicalDuration( 2.*3600. ) );
+		config.strategy().addStrategySettings( new StrategyConfigGroup.StrategySettings( ).setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 1.0 ).setDisableAfter( 10 ) );
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
+		dccg.setEpsilonScaleFactors("0.0" );
+		dccg.setAlgorithm( bestResponse );
+		dccg.setFlexibleTypes( "shop" );
+		dccg.setTravelTimeApproximationLevel( FrozenTastesConfigGroup.ApproximationLevel.localRouting );
+		dccg.setRandomSeed( 2 );
+		dccg.setDestinationSamplePercent( 100. );
+		//scenario
+		Scenario scenario = ScenarioUtils.createScenario( config );
+		//network
+		Network network = scenario.getNetwork();
+		NetworkFactory nf = scenario.getNetwork().getFactory();
+		Node homeNode = nf.createNode(Id.createNodeId(1), new Coord(0, 0));
+		Node shopNode = nf.createNode(Id.createNodeId(2), new Coord(1, 0));
+		Node facilityNode = nf.createNode(Id.createNodeId(3), new Coord(-1, 0));
+		network.addNode(homeNode);
+		network.addNode(shopNode);
+		network.addNode(facilityNode);
+		addLink(scenario, nf, homeNode, shopNode, "1");
+		addLink(scenario, nf, shopNode, homeNode, "2");
+		addLink(scenario, nf, homeNode, facilityNode, "3");
+		addLink(scenario, nf, facilityNode, homeNode, "4");
+		//population
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		Person person = pf.createPerson(Id.createPersonId(1));
+		scenario.getPopulation().addPerson(person);
+		Plan plan = pf.createPlan();
+		person.addPlan(plan);
+		Activity home = pf.createActivityFromCoord("home", new Coord(0,0));
+		home.setEndTime(7. * 3600.);
+		plan.addActivity(home);
+		Leg leg = pf.createLeg("car");
+		plan.addLeg(leg);
+		Activity shop = pf.createActivityFromCoord("shop", new Coord(1,0));
+		shop.setEndTime(10. * 3600);
+		plan.addActivity(shop);
+		plan.addLeg(leg);
+		Activity home2 = pf.createActivityFromCoord("home", new Coord(0,0));
+		plan.addActivity( home2 );
+		//facilities
+		ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
+		ActivityFacility af = ff.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(1, 0));
+		ActivityOption option = ff.createActivityOption("shop");
+		af.addActivityOption(option);
+		scenario.getActivityFacilities().addActivityFacility(af);
+
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		FrozenTastes.configure( controler );
+
+		controler.run();
+
+		Assert.assertTrue(((Activity) controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("1")).getSelectedPlan().getPlanElements().get(2)).getFacilityId() != null);
+
+	}
 
 	@Test public void testFacilitiesAlongALine() {
 		RunType runType = RunType.shortRun ;
@@ -446,10 +508,8 @@ public class FrozenEpsilonLocaChoiceIT{
 						Assert.assertEquals( val, actual, 2.*Math.max( 5, Math.sqrt( val ) ) );
 					}
 
-				} );
-			}
+				} );			}
 		} ) ;
-
 		controler.run();
 
 		// yyyy todo make test such that far-away activities have strongly lower proba
