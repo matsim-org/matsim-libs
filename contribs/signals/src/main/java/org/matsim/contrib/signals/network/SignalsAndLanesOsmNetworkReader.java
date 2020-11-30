@@ -83,13 +83,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int INTERGREENTIME = 5;
 	private final static int MIN_GREENTIME = 10;
 	private final static double SIGNAL_MERGE_DISTANCE = 30; //changed from 40m sb 25.03.2020
-	private final static double SIGNAL_LANES_CAPACITY = 2000.0;
+    private final double MERGE_DISTANCE_JUNCTIONS = 30;
+
+    private final static double SIGNAL_LANES_CAPACITY = 2000.0;
 	private final static double THROUGHLINK_ANGLE_TOLERANCE = 0.1666667;
 	private final static double DEGREE_TOLERANCE_ROUNDABOUTS = 1.;
 	private final static int PEDESTRIAN_CROSSING_TIME = 20;
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
-
 
     private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
@@ -97,7 +98,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static String TO_LINK_REFERENCE = "toLinkReference";
 	private final static String NON_CRIT_LANES = "non_critical_lane";
 	private final static String CRIT_LANES = "critical_lane";
-	//TODO I added this one: sbraun24102019
 	private final static String IS_ORIG_LANE = "isOrigLane";
 
 	private final String OSM_TURN_INFO = "osmTurnInfo";
@@ -777,15 +777,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	//TODO what does this do??
-	// sbraun 20200130 I feel he is just adding Nodes to the list junction Node without checking if these are junctions at all. They are just closer to first node than 30m
+
 	private void findCloseJunctionNodesWithSignals(OsmNode firstNode, OsmNode node, List<OsmNode> junctionNodes,
 			List<OsmNode> checkedNodes, double distance, boolean getAll) {
 		//Loop over all ways of given node
 		for (OsmWay way : node.ways.values()) {
 			String oneway = way.tags.get(TAG_ONEWAY);
 			//if (oneway != null) { // && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))   //sbraun20200204 check why this was commented out??
-			if (oneway != null && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))) { //
+			if ((oneway != null) && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))) { //
 				//Again loop over all nodes of way
 				for (int i = way.nodes.indexOf(node.id) + 1; i < way.nodes.size(); i++) {
 					OsmNode otherNode = nodes.get(way.nodes.get(i));
@@ -884,10 +883,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						String oneway = way.tags.get(TAG_ONEWAY);
 						//sbraun 05032020 alles was kein Onewaytag hat wird übersprungen -> änder das -> evtl. die ganz Logik rausnehmen
 						//-> Fixed Error in Junction System 1420523170 in Benchmark Network
-						if (oneway != null && !oneway.equals("no")||oneway==null)
+						if (oneway == null || !oneway.equals("no"))
 							continue;						//changed to continue
 						for (int i = 0; i < way.nodes.size(); i++) {
-							if (otherSuit == true)
+							if (otherSuit)
 								continue;					//changed to continue
 							otherNode = nodes.get(way.nodes.get(i));
 
@@ -1025,9 +1024,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (!checkedNodes.contains(node) && node.used && signalizedOsmNodes.contains(node.id)
 					&& node.ways.size() > 1) {
 				List<OsmNode> junctionNodes = new ArrayList<>();
-				//TODO this 30m seems very arbitrary
-				double distance = 30;
-				findCloseJunctionNodesWithSignals(node, node, junctionNodes, checkedNodes, distance, false);
+
+				findCloseJunctionNodesWithSignals(node, node, junctionNodes, checkedNodes, MERGE_DISTANCE_JUNCTIONS, false);
 
 				if (junctionNodes.size() == 4) {
 					double repX = 0;
@@ -1382,7 +1380,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						signalizedOsmNodes.add(junctionNode.id);
 
 						//TODO sbraun20200128: This could have been checked further up, would be much clearer -> dont have code above double in this method
-					} else if ((oneway != null && oneway.equals("-1")) || oneway == null || oneway.equals("no") ){
+					} else if (((oneway != null) && oneway.equals("-1")) || (oneway == null) || oneway.equals("no")){
 						// "else" = no nearby junction found in positive direction. try reverse direction:
 						// "if" = reverse oneway or no oneway (check opposite direction)
 						OsmNode prevNode = this.nodes.get(way.nodes.get(i - 1));
@@ -2540,7 +2538,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 
-	//TODO ist mapping beim Nodemergen der Junction in findingMoreNodeJunctions dann nötig
 	public boolean isNodeAtJunction(OsmNode node) {
 		if (node.endPoint && node.ways.size() > 2)
 			return true;
@@ -2690,7 +2687,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			this.calculateTheta();
 		}
 
-		//sbraun second constructor since we changed coordinates //08042020 from and to node was mistakenly wrong order
+		//08042020 sbraun second constructor since we changed coordinates
 		public LinkVector(Link link, Coord oldFromNode, Coord oldToNode){
 			this.link = link;
 			this.x = oldToNode.getX() - oldFromNode.getX();
@@ -2759,7 +2756,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		private double east;
 
 		public BoundingBox(double south, double west, double north, double east) {
-			//TODO Check if BB is valid
 			this.south = south;
 			this.west = west;
 			this.north = north;
