@@ -90,12 +90,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
 
-	//Define what a small Roundabout is (used in method findingSmallRoundabouts()) - sbraun
-	private final double roundaboutRadius = 20;
-
-
-
-
 
     private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
@@ -151,7 +145,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
  		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_10_09";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_10_30";
 // 		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/cottbus2020_09_18";
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
