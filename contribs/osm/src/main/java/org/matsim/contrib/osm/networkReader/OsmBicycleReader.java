@@ -134,8 +134,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
 	public static class Builder extends AbstractBuilder<OsmBicycleReader> {
 
-		@Override
-		OsmBicycleReader createInstance() {
+		public Builder() {
 			addOverridingLinkProperties(OsmTags.TRACK, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.CYCLEWAY, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.SERVICE, new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false));
@@ -143,7 +142,10 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 			addOverridingLinkProperties(OsmTags.PEDESTRIAN, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.PATH, new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false));
 			addOverridingLinkProperties(OsmTags.STEPS, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false));
+		}
 
+		@Override
+		OsmBicycleReader createInstance() {
 			OsmNetworkParser parser = new OsmNetworkParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
 			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated);
 		}
