@@ -6,11 +6,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -29,6 +29,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 	public static void main( String[] args ){
 
 		Config config = ConfigUtils.createConfig() ;
+		config.controler().setLastIteration(2);
 
 		// use the default subtour mode choice for subpop1:
 		{
@@ -67,7 +68,7 @@ public final class RunDifferentStrategiesWithDifferentSubpopsExample{
 						PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<>() ) ;
 						SubtourModeChoiceConfigGroup modeChoiceConfig = new SubtourModeChoiceConfigGroup() ;
 						modeChoiceConfig.setModes( new String[] {TransportMode.car, TransportMode.bike} );
-						builder.addStrategyModule(new SubtourModeChoice(tripRouterProvider, globalConfigGroup, modeChoiceConfig) );
+						builder.addStrategyModule(new SubtourModeChoice(globalConfigGroup, modeChoiceConfig, new PermissibleModesCalculatorImpl(config)) );
 						builder.addStrategyModule(new ReRoute(facilities, tripRouterProvider, globalConfigGroup) );
 						return builder.build() ;
 					}
