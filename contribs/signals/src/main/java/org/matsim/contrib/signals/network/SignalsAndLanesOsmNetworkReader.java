@@ -145,7 +145,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
  		String inputOSM = "../shared-svn/studies/tthunig/osmData/150526berlin-latest.osm";
 //		String inputOSM = "../shared-svn/studies/tthunig/osmData/15042020cottbus-latest.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_10_30";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/berlin2020_11_30";
 // 		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/cottbus2020_09_18";
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -508,7 +508,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		super.createMatsimData();
 
 		for (Id<Link> linkId : loopLinks){
-			Link a = network.getLinks().get(linkId);
 			network.removeLink(linkId);
 		}
 
@@ -623,20 +622,20 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					Tuple<LinkVector, LinkVector> firstPair = getInLinkPair(inLinks);
 					LinkVector first = null;
 					LinkVector second = null;
-					for (int i = 0; i < inLinks.size(); i++) {
-						if (first == null) {
-							if (!inLinks.get(i).equals(firstPair.getFirst())
-									&& !inLinks.get(i).equals(firstPair.getSecond())) {
-								first = inLinks.get(i);
-							}
-						} else {
-							if (!inLinks.get(i).equals(firstPair.getFirst())
-									&& !inLinks.get(i).equals(firstPair.getSecond())) {
-								second = inLinks.get(i);
-							}
-						}
+                    for (LinkVector inLink : inLinks) {
+                        if (first == null) {
+                            if (!inLink.equals(firstPair.getFirst())
+                                    && !inLink.equals(firstPair.getSecond())) {
+                                first = inLink;
+                            }
+                        } else {
+                            if (!inLink.equals(firstPair.getFirst())
+                                    && !inLink.equals(firstPair.getSecond())) {
+                                second = inLink;
+                            }
+                        }
 
-					}
+                    }
 					Tuple<LinkVector, LinkVector> secondPair = new Tuple<LinkVector, LinkVector>(first, second);
 					createPlansForFourWayJunction(node, signalSystem, firstPair, secondPair);
 					setInLinksCapacities(node);
@@ -937,7 +936,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 													if (isNodeAtJunction(candidate)){
 														tempNode = candidate;
 													}
-													if (potentialCandidate.longValue()==otherNode.id) break;
+													if (potentialCandidate ==otherNode.id) break;
 												}
 
 												//sbraun 05032020 wenn kleine Mittelwege keine Onewways sind ist die Reihenfolge manchmal anders rum
@@ -967,7 +966,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								}
 
 								String otherOneway = origWay.tags.get(TAG_ONEWAY);
-								if (otherOneway != null && !otherOneway.equals("no")||otherOneway==null) {
+								if (otherOneway == null || !otherOneway.equals("no")) {
 									otherSuit = true;
 									break;
 								}
@@ -1199,12 +1198,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (OsmWay way : this.ways.values()) {
 			for (int i = 1; i < way.nodes.size() - 1; i++) {
 				OsmNode signalNode = this.nodes.get(way.nodes.get(i));
-				OsmNode endPoint = null;
-				String oneway = way.tags.get(TAG_ONEWAY);
+				OsmNode endPoint;
+				String oneWay = way.tags.get(TAG_ONEWAY);
 
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 
-					if ((oneway != null && !oneway.equals("-1") && !oneway.equals("no")) || oneway == null) {
+					if ((oneWay != null && !oneWay.equals("-1") && !oneWay.equals("no")) || oneWay == null) {
 						endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
                         if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
 								&& NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
@@ -1212,8 +1211,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							signalizedOsmNodes.remove(signalNode.id);
 					}
 					//sbraun20200128: Oneway Street reversed - need to keep that
-					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")
-							&& !oneway.equals("no")) || oneway == null) {
+					if ((oneWay != null && !oneWay.equals("yes") && !oneWay.equals("true") && !oneWay.equals("1")
+							&& !oneWay.equals("no")) || oneWay == null) {
 						endPoint = this.nodes.get(way.nodes.get(0));
                         if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
 								&& NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
@@ -1609,11 +1608,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		LanesToLinkAssignment l2l = lanes.getLanesToLinkAssignments().get(firstLink.getId());
 		LanesToLinkAssignment otherl2l = lanes.getLanesToLinkAssignments().get(secondLink.getId());
 		List<Lane> firstLanes = new ArrayList<Lane>();
-		List<Lane> secondLanes = new ArrayList<Lane>();
+		List<Lane> secondLanes = new ArrayList<>();
 		if (l2l != null) {
 			for (Lane lane : l2l.getLanes().values()) {
-				if (!lane.getId().toString().endsWith("ol"))
-					firstLanes.add(lane);
+				if (!lane.getId().toString().endsWith("ol")) {
+                    firstLanes.add(lane);
+                }
 			}
 		}
 		if (otherl2l != null) {
