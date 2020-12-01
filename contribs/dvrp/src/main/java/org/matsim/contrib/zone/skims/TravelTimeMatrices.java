@@ -57,7 +57,7 @@ public final class TravelTimeMatrices {
 			Node toNode = centralNodes.get(toZone);
 			int nodeIndex = toNode.getId().index();
 			OptionalTime currOptionalTime = lcpTree.getTime(nodeIndex);
-			double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time"));
+			double currTime = currOptionalTime.orElseThrow(() -> new RuntimeException("Undefined Time. Reason could be that the dvrp network is not fully connected. Please check and/or clean."));
 			double tt = currTime - departureTime;
 			travelTimeMatrix.set(fromZone, toZone, tt);
 		}
