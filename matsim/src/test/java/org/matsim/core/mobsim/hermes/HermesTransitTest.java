@@ -525,6 +525,74 @@ public class HermesTransitTest {
 		Assert.assertEquals("wrong link in first event.", f.link2.getId(), collector.events.get(0).getLinkId());
 		// there should be no more events after that, as at 30:00:00 the simulation should stop
 	}
+	/**
+	 * Makes sure Hermes correctly handles strange transit routes with some links before the first stop is served.
+	 */
+	@Test
+	public void testLinksAtRouteStart() {
+		Fixture f = new Fixture();
+		f.config.transit().setUseTransit(true);
+		f.config.hermes().setDeterministicPt(true);
+
+		Vehicles ptVehicles = f.scenario.getTransitVehicles();
+
+		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehicles.addVehicleType(ptVehType1);
+
+		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehicles.addVehicle(ptVeh1);
+
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();
+
+		TransitStopFacility stop1 = sf.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(1000, 10), false);
+		TransitStopFacility stop2 = sf.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(2900, 29), false);
+		TransitStopFacility stop3 = sf.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord(3000, 30), false);
+
+		stop1.setLinkId(f.link3.getId());
+		stop2.setLinkId(f.link3.getId());
+		stop3.setLinkId(f.linkX.getId());
+
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		TransitLine line1 = sf.createTransitLine(Id.create(1, TransitLine.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId(), f.link3.getId()), f.linkX.getId());
+		List<TransitRouteStop> stops = List.of(
+				new TransitRouteStopImpl.Builder().stop(stop1).departureOffset(0).build(),
+				new TransitRouteStopImpl.Builder().stop(stop3).arrivalOffset(600).build()
+		);
+		TransitRoute route1 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+		Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 7*3600);
+		dep1.setVehicleId(ptVeh1.getId());
+		route1.addDeparture(dep1);
+		line1.addRoute(route1);
+
+		schedule.addTransitLine(line1);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		EventsCollector allEventsCollector = new EventsCollector();
+		events.addHandler(allEventsCollector);
+		LinkEnterEventCollector collector = new LinkEnterEventCollector();
+		events.addHandler(collector);
+
+		/* run sim */
+		Hermes sim = createHermes(f, events);
+		sim.run();
+
+		/* finish */
+
+		for (Event event : allEventsCollector.getEvents()) {
+			System.out.println(event.toString());
+		}
+
+		// Not having an Exception here is already good :-)
+		Assert.assertEquals("wrong number of link enter events.", 3, collector.events.size());
+//		Assert.assertEquals("wrong link in first event.", f.link2.getId(), collector.events.get(0).getLinkId());
+//		Assert.assertEquals("wrong link in 2nd event.", f.link3.getId(), collector.events.get(1).getLinkId());
+	}
 
 	/**
 	 * Initializes some commonly used data in the tests.
