@@ -6,6 +6,7 @@ import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfi
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.ApproximationLevel;
 import static org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import static org.matsim.core.controler.OutputDirectoryHierarchy.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -228,62 +229,70 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	enum RunType { shortRun, medRun, longRun }
 
-	@Test public void testTypicalDurationUsage() {
+	@Test public void testDurationTypicalPerformanceUsage() {
 		//Config
 		Config config = ConfigUtils.createConfig();
-		config.controler().setLastIteration(1);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams( "home" ).setTypicalDuration( 12.*3600. ) );
-		config.planCalcScore().addActivityParams( new PlanCalcScoreConfigGroup.ActivityParams( "shop" ).setTypicalDuration( 2.*3600. ) );
-		config.strategy().addStrategySettings( new StrategyConfigGroup.StrategySettings( ).setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 1.0 ).setDisableAfter( 10 ) );
-		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
-		dccg.setEpsilonScaleFactors("0.0" );
-		dccg.setAlgorithm( bestResponse );
-		dccg.setFlexibleTypes( "shop" );
-		dccg.setTravelTimeApproximationLevel( FrozenTastesConfigGroup.ApproximationLevel.localRouting );
-		dccg.setRandomSeed( 2 );
-		dccg.setDestinationSamplePercent( 100. );
+		{
+			config.controler().setLastIteration(1);
+			config.controler().setOutputDirectory(utils.getOutputDirectory());
+			config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("home").setTypicalDuration(12. * 3600.));
+			config.planCalcScore().addActivityParams(new PlanCalcScoreConfigGroup.ActivityParams("shop").setTypicalDuration(2. * 3600.));
+			config.strategy().addStrategySettings(new StrategyConfigGroup.StrategySettings().setStrategyName(FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY).setWeight(1.0).setDisableAfter(10));
+			FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class);
+			dccg.setEpsilonScaleFactors("0.0");
+			dccg.setAlgorithm(bestResponse);
+			dccg.setFlexibleTypes("shop");
+			dccg.setTravelTimeApproximationLevel(FrozenTastesConfigGroup.ApproximationLevel.localRouting);
+			dccg.setRandomSeed(2);
+			dccg.setDestinationSamplePercent(100.);
+		}
 		//scenario
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		//network
-		Network network = scenario.getNetwork();
-		NetworkFactory nf = scenario.getNetwork().getFactory();
-		Node homeNode = nf.createNode(Id.createNodeId(1), new Coord(0, 0));
-		Node shopNode = nf.createNode(Id.createNodeId(2), new Coord(1, 0));
-		Node facilityNode = nf.createNode(Id.createNodeId(3), new Coord(-1, 0));
-		network.addNode(homeNode);
-		network.addNode(shopNode);
-		network.addNode(facilityNode);
-		addLink(scenario, nf, homeNode, shopNode, "1");
-		addLink(scenario, nf, shopNode, homeNode, "2");
-		addLink(scenario, nf, homeNode, facilityNode, "3");
-		addLink(scenario, nf, facilityNode, homeNode, "4");
+		{
+			Network network = scenario.getNetwork();
+			NetworkFactory nf = scenario.getNetwork().getFactory();
+			Node homeNode = nf.createNode(Id.createNodeId(1), new Coord(0, 0));
+			Node shopNode = nf.createNode(Id.createNodeId(2), new Coord(1, 0));
+			Node facilityNode = nf.createNode(Id.createNodeId(3), new Coord(-1, 0));
+			network.addNode(homeNode);
+			network.addNode(shopNode);
+			network.addNode(facilityNode);
+			addLink(scenario, nf, homeNode, shopNode, "1");
+			addLink(scenario, nf, shopNode, homeNode, "2");
+			addLink(scenario, nf, homeNode, facilityNode, "3");
+			addLink(scenario, nf, facilityNode, homeNode, "4");
+		}
 		//population
-		PopulationFactory pf = scenario.getPopulation().getFactory();
-		Person person = pf.createPerson(Id.createPersonId(1));
-		scenario.getPopulation().addPerson(person);
-		Plan plan = pf.createPlan();
-		person.addPlan(plan);
-		Activity home = pf.createActivityFromCoord("home", new Coord(0,0));
-		home.setEndTime(7. * 3600.);
-		plan.addActivity(home);
-		Leg leg = pf.createLeg("car");
-		plan.addLeg(leg);
-		Activity shop = pf.createActivityFromCoord("shop", new Coord(1,0));
-		shop.setEndTime(10. * 3600);
-		plan.addActivity(shop);
-		plan.addLeg(leg);
-		Activity home2 = pf.createActivityFromCoord("home", new Coord(0,0));
-		plan.addActivity( home2 );
+		{
+			PopulationFactory pf = scenario.getPopulation().getFactory();
+			Person person = pf.createPerson(Id.createPersonId(1));
+			scenario.getPopulation().addPerson(person);
+			Plan plan = pf.createPlan();
+			person.addPlan(plan);
+			Activity home = pf.createActivityFromCoord("home", new Coord(0, 0));
+			home.setEndTime(7. * 3600.);
+			plan.addActivity(home);
+			Leg leg = pf.createLeg("car");
+			plan.addLeg(leg);
+			Activity shop = pf.createActivityFromCoord("shop", new Coord(1, 0));
+			shop.setEndTime(10. * 3600);
+			plan.addActivity(shop);
+			plan.addLeg(leg);
+			Activity home2 = pf.createActivityFromCoord("home", new Coord(0, 0));
+			plan.addActivity(home2);
+		}
 		//facilities
-		ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
-		ActivityFacility af = ff.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(1, 0));
-		ActivityOption option = ff.createActivityOption("shop");
-		af.addActivityOption(option);
-		scenario.getActivityFacilities().addActivityFacility(af);
+		{
+			ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
+			ActivityFacility af = ff.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(1, 0));
+			ActivityOption option = ff.createActivityOption("shop");
+			af.addActivityOption(option);
+			scenario.getActivityFacilities().addActivityFacility(af);
+		}
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		FrozenTastes.configure( controler );
 
 		controler.run();
