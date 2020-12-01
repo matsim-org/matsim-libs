@@ -646,10 +646,14 @@ public class ScenarioImporter {
 			if (hasStop) {
 				flatevents.add(new LinkLeaveEvent(0, v.getId(), link));
 			} else {
-				deterministicPtEvents.get(timerunning).add(new LinkEnterEvent(timerunning, v.getId(), link));
+				if (timerunning < deterministicPtEvents.size()) {
+					deterministicPtEvents.get(timerunning).add(new LinkEnterEvent(timerunning, v.getId(), link));
+				}
 				double length = scenario.getNetwork().getLinks().get(link).getLength();
 				timerunning += length / (atEndOfRoute ? averageSpeedBetweenStops.get(stopidx - 2) : averageSpeedBetweenStops.get(stopidx - 1));
-				deterministicPtEvents.get(timerunning - 2).add(new LinkLeaveEvent(timerunning - 2, v.getId(), link));
+				if (timerunning < deterministicPtEvents.size()) {
+					deterministicPtEvents.get(timerunning - 2).add(new LinkLeaveEvent(timerunning - 2, v.getId(), link));
+				}
 			}
 			timerunning++;
 		}
