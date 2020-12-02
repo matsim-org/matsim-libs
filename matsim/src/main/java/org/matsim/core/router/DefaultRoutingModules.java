@@ -93,7 +93,7 @@ public final class DefaultRoutingModules {
 	 *
 	 * @param invertedNetwork if not null, routing will be on the inverted network, in which case routeAlgo needs to be an {@link InvertedLeastPathCalculator}
 	 */
-	public static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
+	static RoutingModule createAccessEgressNetworkRouter( String mode, final LeastCostPathCalculator routeAlgo, Scenario scenario,
 																 Network filteredNetwork, @Nullable Network invertedNetwork,
 																 RoutingModule accessToNetworkRouter, RoutingModule egressFromNetworkRouter) {
 		return new NetworkRoutingInclAccessEgressModule(
