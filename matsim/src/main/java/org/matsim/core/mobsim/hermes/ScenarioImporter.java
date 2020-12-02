@@ -660,7 +660,9 @@ public class ScenarioImporter {
 				}
 				timerunning += length / avgSpeed;
 				if (timerunning < deterministicPtEvents.size()) {
-					deterministicPtEvents.get(timerunning - 2).add(new LinkLeaveEvent(timerunning - 2, v.getId(), link));
+					var linkLeaveTime = timerunning - 2;
+					if (linkLeaveTime < 0) linkLeaveTime = 0;
+					deterministicPtEvents.get(linkLeaveTime).add(new LinkLeaveEvent(linkLeaveTime, v.getId(), link));
 				}
 			}
 			timerunning++;
