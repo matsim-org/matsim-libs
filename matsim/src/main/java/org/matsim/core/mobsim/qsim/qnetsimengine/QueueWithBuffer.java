@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -134,7 +136,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Double.NEGATIVE_INFINITY ;
-	private QVehicle bufferLastRemovedVehicle = null;
 
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
@@ -145,9 +146,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double storageCapacity;
 	private double usedStorageCapacity;
 	/**
-	 * Holds all vehicles that are ready to cross the outgoing intersection
+	 * Holds all vehicles that are ready to cross the outgoing intersection and their capacity consumption. <br>
+	 * We store the capacity consumption as it is needed twice: <br>
+	 * (1) entry to the buffer (this is where it is computed and then stored) <br>
+	 * (2) update of the remaining flow capacity (where we account for all vehicles that are still in the buffer since previous time steps) - see {@link #subtractConsumptionOfVehiclesThatAreAlreadyInTheBuffer()} <br>
 	 */
-	private final Queue<QVehicle> buffer = new LinkedList<>() ;
+	private final Queue<Pair<QVehicle,Double>> buffer = new LinkedList<>() ;
 	/**
 	 * null if the link is not signalized
 	 */
@@ -167,13 +171,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double effectiveNumberOfLanes = Double.NaN ;
 
 	/**
-	 * Points to the latest vehicle that left the queue.
+	 * Points to the latest vehicle that entered the buffer and the entry time.
 	 */
-	private QVehicle prevVehicle = null;
+	private Pair<QVehicle,Double> lastBufferEntry = null;
+
 	/**
-	 * The time when {@link #prevVehicle} left the queue.
+	 * Points to the latest vehicle that entered the queue and the entry time.
 	 */
-	private double prevTime;
+	private Pair<QVehicle,Double> lastQueueEntry = null;
+
 
 	private final VisData visData = new VisDataImpl() ;
 	private final NetsimEngineContext context;
@@ -217,9 +223,14 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// kai/mz/amit, mar'12
 
 		double now = context.getSimTimer().getTimeOfDay() ;
-        this.flowcap_accumulate.addValue(-getFlowCapacityConsumptionInEquivalents(veh, prevVehicle, now - prevTime), now);
 
-		buffer.add(veh);
+		double flowEfficiency = (lastBufferEntry == null) ?
+				getFlowCapacityConsumptionInEquivalents(veh, null, null) : getFlowCapacityConsumptionInEquivalents(veh, lastBufferEntry.getKey(), now - lastBufferEntry.getValue());
+        this.flowcap_accumulate.addValue(-flowEfficiency, now);
+
+		buffer.add(new ImmutablePair<>(veh,flowEfficiency));
+		lastBufferEntry = new ImmutablePair<>(veh,now);
+
 		if (buffer.size() == 1) {
 			bufferLastMovedTime = now;
 			// (if there is one vehicle in the buffer now, there were zero vehicles in the buffer before.  in consequence,
@@ -233,8 +244,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			// also in the original QLane code.  kai, sep'13
 		}
 
-		prevTime = now;
-		prevVehicle = veh;
 	}
 
     /**
@@ -316,7 +325,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private void updateFastFlowAccumulation(){
 		double now = context.getSimTimer().getTimeOfDay() ;
 
-		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		double remainingFlowCapThisTimeStep = subtractConsumptionOfVehiclesThatAreAlreadyInTheBuffer();
 		
 		if( this.flowcap_accumulate.getTimeStep() < now
 				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
@@ -332,7 +341,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void updateSlowFlowAccumulation(){
-		double remainingFlowCapThisTimeStep = subtractSizeOfVehiclesThatAreAlreadyInTheBuffer();
+		double remainingFlowCapThisTimeStep = subtractConsumptionOfVehiclesThatAreAlreadyInTheBuffer();
 		
 		if (this.thisTimeStepGreen
 				&& this.flowcap_accumulate.getValue() < remainingFlowCapThisTimeStep){
@@ -342,13 +351,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 	}
 
-	private double subtractSizeOfVehiclesThatAreAlreadyInTheBuffer() {
+	private double subtractConsumptionOfVehiclesThatAreAlreadyInTheBuffer() {
 		double remainingFlowCapThisTimeStep = flowCapacityPerTimeStep;
-		QVehicle prev = bufferLastRemovedVehicle;
-		for (QVehicle veh : buffer) {
+		for (Pair<QVehicle,Double> vehEfficiencyPair : buffer) {
 			// Subtract size of vehicles that are already in the buffer (from previous time steps)
-			remainingFlowCapThisTimeStep -= getFlowCapacityConsumptionInEquivalents(veh, prev, null);
-			prev = veh;
+			remainingFlowCapThisTimeStep -= vehEfficiencyPair.getValue();
 		}
 		return remainingFlowCapThisTimeStep;
 	}
@@ -564,11 +571,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
                 break;
             case kinematicWaves:
                 this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
-                this.accumulatedInflowCap -= getFlowCapacityConsumptionInEquivalents(veh, prevVehicle, now - prevTime); //prevTime is the time the last vehicle was added to buffer! we would rather want prevTimeAddedToQueue here..
+				double flowEfficiency = (lastQueueEntry == null) ?
+						getFlowCapacityConsumptionInEquivalents(veh, null, null) : getFlowCapacityConsumptionInEquivalents(veh, lastQueueEntry.getKey(), now - lastQueueEntry.getValue());
+                this.accumulatedInflowCap -= flowEfficiency;
                 break;
             default:
                 throw new RuntimeException("The traffic dynamics " + context.qsimConfig.getTrafficDynamics() + " is not implemented yet.");
 		}
+
+		lastQueueEntry = new ImmutablePair<>(veh, now);
 	}
 
 	private void removeVehicleFromQueue(final QVehicle veh2Remove) {
@@ -699,9 +710,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			if (veh.getId().equals(vehicleId))
 				return veh;
 		}
-		for (QVehicle veh : this.buffer) {
-			if (veh.getId().equals(vehicleId))
-				return veh;
+		for (Pair<QVehicle,Double> vehEfficiencyPair : this.buffer) {
+			if (vehEfficiencyPair.getKey().getId().equals(vehicleId))
+				return vehEfficiencyPair.getKey();
 		}
 		return null;
 	}
@@ -712,7 +723,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		 * It will be more complicated for passingQueue. amit feb'16
 		 */
 		Collection<MobsimVehicle> vehicles = new ArrayList<>();
-		vehicles.addAll(buffer);
+		for (Pair<QVehicle, Double> pair : buffer) {
+			vehicles.add(pair.getKey());
+		}
 		vehicles.addAll(vehQueue);
 		return vehicles ;
 	}
@@ -721,7 +734,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	public final QVehicle popFirstVehicle() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
-		this.bufferLastRemovedVehicle = veh;
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getId(), this.getId() ));
@@ -732,7 +744,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private final QVehicle removeFirstVehicle(){
 		double now = context.getSimTimer().getTimeOfDay() ;
-		QVehicle veh = buffer.poll();
+		QVehicle veh = buffer.poll().getKey();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ) {
 			flowcap_accumulate.setTimeStep(now - context.qsimConfig.getTimeStepSize());
@@ -793,7 +805,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		vehQueue.clear();
 
-		for (QVehicle veh : buffer) {
+		for (Pair<QVehicle,Double> bufferEntry : buffer) {
+			QVehicle veh = bufferEntry.getKey();
 			context.getEventsManager().processEvent( new VehicleAbortsEvent(now, veh.getId(), veh.getCurrentLink().getId()));
 			context.getEventsManager().processEvent( new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 
@@ -829,7 +842,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		if (this.buffer.isEmpty()) {
 			return this.vehQueue.peek();
 		}
-		return this.buffer.peek() ;
+		return this.buffer.peek().getKey() ;
 	}
 
 	@Override
