@@ -1,7 +1,5 @@
 package org.matsim.core.mobsim.hermes;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +8,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -20,6 +22,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
@@ -55,11 +58,11 @@ import java.util.List;
 /**
  * Various unit tests checking various pt-related things in HERMES.
  *
+ * Most of the tests here cover issues described in <a href="https://github.com/matsim-org/matsim-libs/issues/1248">#1248</a>.
+ *
  * @author mrieser / Simunto
  */
 public class HermesTransitTest {
-
-	private final static Logger log = LogManager.getLogger(HermesTransitTest.class);
 
 	protected static Hermes createHermes(MutableScenario scenario, EventsManager events) {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
@@ -525,6 +528,7 @@ public class HermesTransitTest {
 		Assert.assertEquals("wrong link in first event.", f.link2.getId(), collector.events.get(0).getLinkId());
 		// there should be no more events after that, as at 30:00:00 the simulation should stop
 	}
+
 	/**
 	 * Makes sure Hermes correctly handles strange transit routes with some links before the first stop is served.
 	 */
@@ -595,6 +599,375 @@ public class HermesTransitTest {
 	}
 
 	/**
+	 * In some cases, the time information of linkEnter/linkLeave events was wrong.
+	 */
+	@Test
+	public void testDeterministicCorrectTiming() {
+		Fixture f = new Fixture();
+		f.config.transit().setUseTransit(true);
+		f.config.hermes().setDeterministicPt(true);
+
+		Vehicles ptVehicles = f.scenario.getTransitVehicles();
+
+		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehicles.addVehicleType(ptVehType1);
+
+		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehicles.addVehicle(ptVeh1);
+
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();
+
+		TransitStopFacility stop1 = sf.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(1000, 10), false);
+		TransitStopFacility stop2 = sf.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(2900, 29), false);
+		TransitStopFacility stop3 = sf.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord(3000, 30), false);
+
+		stop1.setLinkId(f.link1.getId());
+		stop2.setLinkId(f.link3.getId());
+		stop3.setLinkId(f.link3.getId());
+
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		TransitLine line1 = sf.createTransitLine(Id.create(1, TransitLine.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId()), f.link3.getId());
+		List<TransitRouteStop> stops = List.of(
+				new TransitRouteStopImpl.Builder().stop(stop1).departureOffset(0).build(),
+				new TransitRouteStopImpl.Builder().stop(stop2).departureOffset(300).build(),
+				new TransitRouteStopImpl.Builder().stop(stop3).arrivalOffset(600).build()
+		);
+		TransitRoute route1 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+		Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 1000);
+		dep1.setVehicleId(ptVeh1.getId());
+		route1.addDeparture(dep1);
+		line1.addRoute(route1);
+
+		schedule.addTransitLine(line1);
+
+		// add a single person with leg from link1 to link3
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+		a1.setEndTime(900);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		leg.setRoute(new DefaultTransitPassengerRoute(f.link1.getId(), f.link3.getId(), stop1.getId(), stop3.getId(), line1.getId(), route1.getId()));
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		EventsCollector allEventsCollector = new EventsCollector();
+		events.addHandler(allEventsCollector);
+
+		/* run sim */
+		Hermes sim = createHermes(f, events);
+		sim.run();
+
+		/* finish */
+
+		List<TransitDriverStartsEvent> transitDriverStartsEvents = new ArrayList<>();
+		List<VehicleArrivesAtFacilityEvent> arrivesAtFacilityEvents = new ArrayList<>();
+		List<VehicleDepartsAtFacilityEvent> departsAtFacilityEvents = new ArrayList<>();
+		List<LinkEnterEvent> linkEnterEvents = new ArrayList<>();
+		List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
+
+		for (Event event : allEventsCollector.getEvents()) {
+			System.out.println(event.toString());
+
+			if (event instanceof TransitDriverStartsEvent) transitDriverStartsEvents.add((TransitDriverStartsEvent) event);
+			if (event instanceof VehicleArrivesAtFacilityEvent) arrivesAtFacilityEvents.add((VehicleArrivesAtFacilityEvent) event);
+			if (event instanceof VehicleDepartsAtFacilityEvent) departsAtFacilityEvents.add((VehicleDepartsAtFacilityEvent) event);
+			if (event instanceof LinkEnterEvent) linkEnterEvents.add((LinkEnterEvent) event);
+			if (event instanceof LinkLeaveEvent) linkLeaveEvents.add((LinkLeaveEvent) event);
+		}
+
+		Assert.assertEquals("wrong number of transit-driver-starts events.", 1, transitDriverStartsEvents.size());
+		Assert.assertEquals("wrong number of link enter events.", 2, linkEnterEvents.size());
+		Assert.assertEquals("wrong number of link leave events.", 2, linkLeaveEvents.size());
+		Assert.assertEquals("wrong number of VehicleArrivesAtFacilityEvents.", 3, arrivesAtFacilityEvents.size());
+		Assert.assertEquals("wrong number of VehicleDepartsAtFacilityEvents.", 3, departsAtFacilityEvents.size());
+
+		Assert.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
+
+		Assert.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop1.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop1.getId(), departsAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1251.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1251.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
+
+		Assert.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), departsAtFacilityEvents.get(1).getFacilityId());
+
+		Assert.assertEquals(1598.0, arrivesAtFacilityEvents.get(2).getTime(), 1e-8);
+		Assert.assertEquals(stop3.getId(), arrivesAtFacilityEvents.get(2).getFacilityId());
+
+		Assert.assertEquals(1600.0, departsAtFacilityEvents.get(2).getTime(), 1e-8);
+		Assert.assertEquals(stop3.getId(), departsAtFacilityEvents.get(2).getFacilityId());
+	}
+
+	/**
+	 * Tests that event times are correct when a transit route starts with some links before arriving at the first stop.
+	 */
+	@Test
+	public void testDeterministicCorrectTiming_initialLinks() {
+		Fixture f = new Fixture();
+		f.config.transit().setUseTransit(true);
+		f.config.hermes().setDeterministicPt(true);
+
+		Vehicles ptVehicles = f.scenario.getTransitVehicles();
+
+		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehicles.addVehicleType(ptVehType1);
+
+		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehicles.addVehicle(ptVeh1);
+
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();
+
+		TransitStopFacility stop1 = sf.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(1000, 10), false);
+		TransitStopFacility stop2 = sf.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(2900, 29), false);
+		TransitStopFacility stop3 = sf.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord(3000, 30), false);
+
+		stop1.setLinkId(f.link1.getId());
+		stop2.setLinkId(f.link2.getId());
+		stop3.setLinkId(f.link3.getId());
+
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		TransitLine line1 = sf.createTransitLine(Id.create(1, TransitLine.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId()), f.link3.getId());
+		List<TransitRouteStop> stops = List.of(
+				new TransitRouteStopImpl.Builder().stop(stop2).departureOffset(60).build(),
+				new TransitRouteStopImpl.Builder().stop(stop3).arrivalOffset(600).build()
+		);
+		TransitRoute route1 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+		Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 1000);
+		dep1.setVehicleId(ptVeh1.getId());
+		route1.addDeparture(dep1);
+		line1.addRoute(route1);
+
+		schedule.addTransitLine(line1);
+
+		// add a single person
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+		a1.setEndTime(900);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		leg.setRoute(new DefaultTransitPassengerRoute(f.link1.getId(), f.link3.getId(), stop2.getId(), stop3.getId(), line1.getId(), route1.getId()));
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		EventsCollector allEventsCollector = new EventsCollector();
+		events.addHandler(allEventsCollector);
+
+		/* run sim */
+		Hermes sim = createHermes(f, events);
+		sim.run();
+
+		/* finish */
+
+		List<TransitDriverStartsEvent> transitDriverStartsEvents = new ArrayList<>();
+		List<VehicleArrivesAtFacilityEvent> arrivesAtFacilityEvents = new ArrayList<>();
+		List<VehicleDepartsAtFacilityEvent> departsAtFacilityEvents = new ArrayList<>();
+		List<LinkEnterEvent> linkEnterEvents = new ArrayList<>();
+		List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
+
+		for (Event event : allEventsCollector.getEvents()) {
+			System.out.println(event.toString());
+
+			if (event instanceof TransitDriverStartsEvent) transitDriverStartsEvents.add((TransitDriverStartsEvent) event);
+			if (event instanceof VehicleArrivesAtFacilityEvent) arrivesAtFacilityEvents.add((VehicleArrivesAtFacilityEvent) event);
+			if (event instanceof VehicleDepartsAtFacilityEvent) departsAtFacilityEvents.add((VehicleDepartsAtFacilityEvent) event);
+			if (event instanceof LinkEnterEvent) linkEnterEvents.add((LinkEnterEvent) event);
+			if (event instanceof LinkLeaveEvent) linkLeaveEvents.add((LinkLeaveEvent) event);
+		}
+
+		Assert.assertEquals("wrong number of transit-driver-starts events.", 1, transitDriverStartsEvents.size());
+		Assert.assertEquals("wrong number of link enter events.", 2, linkEnterEvents.size());
+		Assert.assertEquals("wrong number of link leave events.", 2, linkLeaveEvents.size());
+		Assert.assertEquals("wrong number of VehicleArrivesAtFacilityEvents.", 2, arrivesAtFacilityEvents.size());
+		Assert.assertEquals("wrong number of VehicleDepartsAtFacilityEvents.", 2, departsAtFacilityEvents.size());
+
+		Assert.assertEquals(1000.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
+
+		Assert.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1058.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1060.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), departsAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1061.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1061.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1598.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop3.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
+
+		Assert.assertEquals(1600.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop3.getId(), departsAtFacilityEvents.get(1).getFacilityId());
+	}
+
+	/**
+	 * Tests that everything is correct when a transit route ends with some links after arriving at the last stop.
+	 */
+	@Test
+	public void testTrailingLinksInRoute() {
+		Fixture f = new Fixture();
+		f.config.transit().setUseTransit(true);
+		f.config.hermes().setDeterministicPt(true);
+
+		Vehicles ptVehicles = f.scenario.getTransitVehicles();
+
+		VehicleType ptVehType1 = ptVehicles.getFactory().createVehicleType(Id.create("bus", VehicleType.class));
+		ptVehicles.addVehicleType(ptVehType1);
+
+		Vehicle ptVeh1 = ptVehicles.getFactory().createVehicle(Id.create("veh1", Vehicle.class), ptVehType1);
+		ptVehicles.addVehicle(ptVeh1);
+
+		TransitSchedule schedule = f.scenario.getTransitSchedule();
+		TransitScheduleFactory sf = schedule.getFactory();
+
+		TransitStopFacility stop1 = sf.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(1000, 10), false);
+		TransitStopFacility stop2 = sf.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(2900, 29), false);
+		TransitStopFacility stop3 = sf.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord(3000, 30), false);
+
+		stop1.setLinkId(f.link1.getId());
+		stop2.setLinkId(f.link2.getId());
+		stop3.setLinkId(f.link3.getId());
+
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		TransitLine line1 = sf.createTransitLine(Id.create(1, TransitLine.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), List.of(f.link2.getId()), f.link3.getId());
+		List<TransitRouteStop> stops = List.of(
+				new TransitRouteStopImpl.Builder().stop(stop1).departureOffset(0).build(),
+				new TransitRouteStopImpl.Builder().stop(stop2).arrivalOffset(300).build()
+		);
+		TransitRoute route1 = sf.createTransitRoute(Id.create(0, TransitRoute.class), netRoute, stops, "bus");
+		Departure dep1 = sf.createDeparture(Id.create("dep1", Departure.class), 1000);
+		dep1.setVehicleId(ptVeh1.getId());
+		route1.addDeparture(dep1);
+		line1.addRoute(route1);
+
+		schedule.addTransitLine(line1);
+
+		// add a single person
+		Person person = PopulationUtils.getFactory().createPerson(Id.create(0, Person.class));
+		Plan plan = PersonUtils.createAndAddPlan(person, true);
+		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
+		a1.setEndTime(900);
+		Leg leg = PopulationUtils.createAndAddLeg(plan, TransportMode.pt);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
+		leg.setRoute(new DefaultTransitPassengerRoute(f.link1.getId(), f.link2.getId(), stop1.getId(), stop2.getId(), line1.getId(), route1.getId()));
+		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
+		f.plans.addPerson(person);
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		EventsCollector allEventsCollector = new EventsCollector();
+		events.addHandler(allEventsCollector);
+
+		/* run sim */
+		Hermes sim = createHermes(f, events);
+		sim.run();
+
+		/* finish */
+
+		List<TransitDriverStartsEvent> transitDriverStartsEvents = new ArrayList<>();
+		List<VehicleArrivesAtFacilityEvent> arrivesAtFacilityEvents = new ArrayList<>();
+		List<VehicleDepartsAtFacilityEvent> departsAtFacilityEvents = new ArrayList<>();
+		List<LinkEnterEvent> linkEnterEvents = new ArrayList<>();
+		List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<>();
+		List<PersonLeavesVehicleEvent> personLeavesVehicleEvents = new ArrayList<>();
+
+		for (Event event : allEventsCollector.getEvents()) {
+			System.out.println(event.toString());
+
+			if (event instanceof TransitDriverStartsEvent) transitDriverStartsEvents.add((TransitDriverStartsEvent) event);
+			if (event instanceof VehicleArrivesAtFacilityEvent) arrivesAtFacilityEvents.add((VehicleArrivesAtFacilityEvent) event);
+			if (event instanceof VehicleDepartsAtFacilityEvent) departsAtFacilityEvents.add((VehicleDepartsAtFacilityEvent) event);
+			if (event instanceof LinkEnterEvent) linkEnterEvents.add((LinkEnterEvent) event);
+			if (event instanceof LinkLeaveEvent) linkLeaveEvents.add((LinkLeaveEvent) event);
+			if (event instanceof PersonLeavesVehicleEvent) personLeavesVehicleEvents.add((PersonLeavesVehicleEvent) event);
+		}
+
+		Assert.assertEquals("wrong number of transit-driver-starts events.", 1, transitDriverStartsEvents.size());
+		Assert.assertEquals("wrong number of link enter events.", 2, linkEnterEvents.size());
+		Assert.assertEquals("wrong number of link leave events.", 2, linkLeaveEvents.size());
+		Assert.assertEquals("wrong number of VehicleArrivesAtFacilityEvents.", 2, arrivesAtFacilityEvents.size());
+		Assert.assertEquals("wrong number of VehicleDepartsAtFacilityEvents.", 2, departsAtFacilityEvents.size());
+		Assert.assertEquals("wrong number of PersonLeavesVehicleEvents.", 2, personLeavesVehicleEvents.size());
+
+		Assert.assertEquals(997.0, transitDriverStartsEvents.get(0).getTime(), 1e-8);
+		Id<Person> transitDriverId = transitDriverStartsEvents.get(0).getDriverId();
+
+		Assert.assertEquals(998.0, arrivesAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop1.getId(), arrivesAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1000.0, departsAtFacilityEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(stop1.getId(), departsAtFacilityEvents.get(0).getFacilityId());
+
+		Assert.assertEquals(1001.0, linkLeaveEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link1.getId(), linkLeaveEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1001.0, linkEnterEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkEnterEvents.get(0).getLinkId());
+
+		Assert.assertEquals(1298.0, arrivesAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), arrivesAtFacilityEvents.get(1).getFacilityId());
+
+		Assert.assertEquals(1299.0, personLeavesVehicleEvents.get(0).getTime(), 1e-8);
+		Assert.assertEquals(person.getId(), personLeavesVehicleEvents.get(0).getPersonId());
+
+		Assert.assertEquals(1300.0, departsAtFacilityEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(stop2.getId(), departsAtFacilityEvents.get(1).getFacilityId());
+
+		Assert.assertEquals(1301.0, linkLeaveEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link2.getId(), linkLeaveEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1301.0, linkEnterEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(f.link3.getId(), linkEnterEvents.get(1).getLinkId());
+
+		Assert.assertEquals(1312.0, personLeavesVehicleEvents.get(1).getTime(), 1e-8);
+		Assert.assertEquals(transitDriverId, personLeavesVehicleEvents.get(1).getPersonId());
+
+	}
+
+	/**
 	 * Initializes some commonly used data in the tests.
 	 *
 	 * @author mrieser
@@ -627,9 +1000,9 @@ public class HermesTransitTest {
 			this.node2 = NetworkUtils.createAndAddNode(this.network, Id.create("2", Node.class), new Coord(100, 0));
 			this.node3 = NetworkUtils.createAndAddNode(this.network, Id.create("3", Node.class), new Coord(1100, 0));
 			this.node4 = NetworkUtils.createAndAddNode(this.network, Id.create("4", Node.class), new Coord(1200, 0));
-			this.link1 = NetworkUtils.createAndAddLink(this.network, Id.create("1", Link.class), this.node1, this.node2, 100, 100, 60000, 9 );
+			this.link1 = NetworkUtils.createAndAddLink(this.network, Id.create("1", Link.class), this.node1, this.node2, 100, 10, 60000, 9 );
 			this.link2 = NetworkUtils.createAndAddLink(this.network, Id.create("2", Link.class), this.node2, this.node3, 1000, 100, 6000, 2 );
-			this.link3 = NetworkUtils.createAndAddLink(this.network, Id.create("3", Link.class), this.node3, this.node4, 100, 100, 60000, 9 );
+			this.link3 = NetworkUtils.createAndAddLink(this.network, Id.create("3", Link.class), this.node3, this.node4, 100, 10, 60000, 9 );
 			this.linkX = NetworkUtils.createAndAddLink(this.network, Id.create("X", Link.class), this.node4, this.node1, 2000, 100, 2000, 1 );
 
 			/* build plans */
