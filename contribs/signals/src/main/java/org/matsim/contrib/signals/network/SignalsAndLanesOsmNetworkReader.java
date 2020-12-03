@@ -168,10 +168,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
+		//TODO add tests for each combination
 
-		reader.setMergeOnewaySignalSystems(false);       //TODO check was passiert
+		reader.setMergeOnewaySignalSystems(false);
 		reader.setAllowUTurnAtLeftLaneOnly(false);
-		reader.setMakePedestrianSignals(true);         //TODO check was passiert
+		reader.setMakePedestrianSignals(true);
 
 
 		//fuer Cottbus
@@ -456,7 +457,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	protected void simplifyOsmData() {
 		super.simplifyOsmData();
 		
-		// TODO move this into the general osm network reader (with a flag)
+		// TODO TZ: move this into the general osm network reader (with a flag)
 		// (afterwards, make nodes private again)
 
 		// Trying to simplify four-node- and two-node-junctions to one-node-junctions
@@ -513,7 +514,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 		// lanes were already created (via setOrModifyLinkAttributes()) but without toLinks. add toLinks now:
-
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
@@ -673,7 +673,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 	//sbraun 30092020 Attempt to speed up this method:
     // 1. Try to parse over Long objects instead of OsmNodes in inner Loops
-    // 2. Create Set with only OSMNodes in Boundingbox (to reduce size of each set)//TODO Was passiert an den Rändern der BoundingBox
+    // 2. Create Set with only OSMNodes in Boundingbox (to reduce size of each set)
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 	    //Find all nodes within BoundingBox
         Set<Long> nodesInBB = new HashSet<>();
@@ -1009,7 +1009,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 	}
-	//TODO add bounding box check here
+
+
 	private void findingFourNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
 			if (!checkedNodes.contains(node) && node.used && signalizedOsmNodes.contains(node.id)
@@ -1816,7 +1817,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
  					try {
 						if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
 							for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
-//							if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { //TODO---> makes more sense???
 								if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
 									break mergeCheck; // the lanes have not the same to-links
 								}
@@ -1844,7 +1844,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	 * placeholder-variables. The far right Lane is on top of the Stack.
 	 * nschirrmacher on 170613
 	 */
-
 	private void createLaneStack(String turnLanes, Stack<Stack<Integer>> turnLaneStack, double nofLanes, Id<Link> id) {
 
 		String[] allTheLanes = turnLanes.split("\\|");
@@ -2205,11 +2204,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						lane.addToLinkId(tempLinks.get(0).getLink().getId());
 						writeOutLinkInfo(lane, tempLinks.get(0).getLink().getId(), "sharp_right");
 					}
-//					    lane.getAttributes().putAttribute(OSM_TURN_INFO,"sharp_right");
 				} else {
-					//TODO hier lieber geradeaus sbraun29052020 check ob tempDir==null aber abgedeckt oben
 					lane.addToLinkId(toLinks.get(0).getLink().getId());
-                    //lane.getAttributes().putAttribute(OSM_TURN_INFO, "right");
 				}
 				lane.setAlignment(-2);
 			}
@@ -2241,7 +2237,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 					if (tempDir == 1) { // lane direction: "left"
 						for (LinkVector lvec : tempLinks) {
-                            // TODO does this make sense? it means:
                             // add link as to-link, if it is not the reverse link OR the link has only one lane OR u-turn is allowed at any lane
                             if (!lvec.equals(reverseLink) || singleLaneOfTheLink || !this.allowUTurnAtLeftLaneOnly) {
                                 lane.addToLinkId(lvec.getLink().getId());
@@ -2589,8 +2584,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				this.currentRelation = new OsmRelation(Long.parseLong(atts.getValue("id")));
 			} else if ("tag".equals(name)) {
 				if (this.currentNode != null) {
-					// TODO just save tags here (as for ways) and evaluate in endTags??
-					String key = atts.getValue("k"); 
+					String key = atts.getValue("k");
 					String value = atts.getValue("v");
 					if ("highway".equals(key) && "traffic_signals".equals(value)) {
 						signalizedOsmNodes.add(currentNode.id);
