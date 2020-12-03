@@ -49,7 +49,8 @@ public final class Matrix {
 
 	Matrix(Set<Zone> zones) {
 		size = zones.size();
-		checkArgument(size <= MAX_ZONE_COUNT, "Too many zones. Try using bigger cell sizes (when using grid zones)");
+		checkArgument(size <= MAX_ZONE_COUNT, "Too many zones for computing the DVRP travel time matrix."
+				+ " Try using bigger cell sizes (when using grid zones)");
 
 		//to make sure we do not refer to zones added later
 		Arrays.fill(zoneIndex2localIndex, -1);
