@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
@@ -103,7 +104,27 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		return distanceFromFNode;
 	}
 
-	
+	@Override
+	public AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceToFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 
-	
+		var distanceFromFNode = calculateFreespeedDistanceToFromNode(freespeedTraveltime, remainingTravelTime, length);
+
+
+	}
+
+	private double calculateFreespeedDistanceToFromNode(double freespeedTraveltime, double remainingTravelTime, double curvedLength) {
+
+		if (freespeedTraveltime == 0) {
+			return 0;
+		}
+
+		var result = (1.0 - (remainingTravelTime / freespeedTraveltime)) * curvedLength;
+		return Math.min(result, 0.0);
+	}
+
+	private double calculateCongestedDinstanceToFromNode(double)
+
+
+
+
 }

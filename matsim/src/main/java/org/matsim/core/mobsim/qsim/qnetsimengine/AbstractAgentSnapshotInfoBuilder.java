@@ -158,7 +158,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		// The reason for this, in return, is that positionVehiclesAlongLine(...) is a service method for queue models only.  kai, apr'16
 		
 		MobsimDriverAgent driverAgent = veh.getDriver();
-		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), startCoord, endCoord, 
+
+		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), veh.getId(), veh.getCurrentLink().getId(), startCoord, endCoord,
 				distanceFromFromNode, lane, lengthOfCurve);
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
@@ -189,7 +190,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
-			Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed, 
+			Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
 			int numberOfLanesAsInt, Queue<Hole> holes)
 	{
 		double spacingOfOnePCE = this.calculateVehicleSpacing( curvedLength, storageCapacity, vehs );
@@ -305,7 +306,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	{
 		Integer lane = 20 ;
 		double speedValue = 1. ;
-		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), upstreamCoord, downstreamCoord, 
+		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class),
+				veh.getId(), null, upstreamCoord, downstreamCoord,
 				distanceFromFromNode, lane, curvedLength);
 		pos.setColorValueBetweenZeroAndOne(speedValue);
 		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
@@ -322,7 +324,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		}
 		for (PassengerAgent passenger : passengers) {
 			int lanePos = laneInt - 2*cnt ;
-			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), startCoord, endCoord, 
+			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(),
+					passenger.getVehicle().getId(), passenger.getCurrentLinkId(), startCoord, endCoord,
 					distanceOnLink, lanePos, lengthOfCurve);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
@@ -340,4 +343,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
 			double now, double freespeedTraveltime, double remainingTravelTime);
+
+	public abstract AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceFromNode,
+																		 double now, double freespeedTraveltime, double remainingTravelTime);
 }

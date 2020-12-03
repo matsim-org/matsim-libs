@@ -34,7 +34,8 @@ public class PositionEventsTest {
 		config.qsim().setSnapshotPeriod(10);
 		config.controler().setWriteSnapshotsInterval(0);
 		config.controler().setLastIteration(0);
-		config.controler().setOutputDirectory("C:\\Users\\Janek\\Desktop\\test-output");
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setOutputDirectory("C:\\Users\\Janekdererste\\Desktop\\test-output");
 
 		var scenario = ScenarioUtils.loadScenario(config);
 

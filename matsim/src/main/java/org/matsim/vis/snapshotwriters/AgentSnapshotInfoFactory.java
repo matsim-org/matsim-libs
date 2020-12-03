@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * translation of physical position (e.g. odometer distance on link, lane) into visualization position
@@ -77,10 +78,12 @@ public class AgentSnapshotInfoFactory {
 	 *  creator based on Coord
 	 * @param curveLength lengths are usually different (usually longer) than the euclidean distances between the startCoord and endCoord
 	 */
-	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Id<Vehicle> vehicleId, Id<Link> linkId, Coord startCoord, Coord endCoord, double distanceOnLink,
 			Integer lane, double curveLength) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
+		info.setVehicleId(vehicleId);
+		info.setLinkId(linkId);
 		double lanePosition = this.linkWidthCalculator.calculateLanePosition(lane);
 		Gbl.assertNotNull( startCoord );
 		Gbl.assertNotNull( endCoord );
@@ -152,12 +155,14 @@ public class AgentSnapshotInfoFactory {
 	 private static class PositionInfo implements AgentSnapshotInfo {
 
 		private Id<Person> agentId = null;
+		private Id<Link> linkId = null;
+		private Id<Vehicle> vehicleId = null;
 		private double easting = Double.NaN;
 		private double northing = Double.NaN;
 		private double azimuth = Double.NaN;
 		private double colorValue = 0;
 		private AgentState agentState = null;
-		private Id<Link> linkId = null;
+		private DrivingState drivingState = null;
 		private int user = 0;
 
 		/* package-private */ PositionInfo() { }
@@ -169,6 +174,18 @@ public class AgentSnapshotInfoFactory {
 		public final void setId( Id<Person> tmp ) {
 			this.agentId = tmp ;
 		}
+
+		@Override
+		public final Id<Link> getLinkId() {
+			return this.linkId;
+		}
+		public final void setLinkId( Id<Link> tmp ) {
+			this.linkId = tmp ;
+		}
+
+		@Override
+		public final Id<Vehicle> getVehicleId() {return vehicleId;}
+		public final void setVehicleId(Id<Vehicle> vehicleId) {this.vehicleId = vehicleId;}
 
 		@Override
 		public final double getEasting() {
@@ -212,12 +229,9 @@ public class AgentSnapshotInfoFactory {
 			this.agentState = state ;
 		}
 
-		public final Id<Link> getLinkId() {
-			return this.linkId;
-		}
-		public final void setLinkId( Id<Link> tmp ) {
-			this.linkId = tmp ;
-		}
+		@Override
+		public final DrivingState getDrivingState() { return this.drivingState; 		}
+		public final void setDrivingState(DrivingState drivingState) { this.drivingState = drivingState; }
 
 		@Override
 		public int getUserDefined() {
@@ -234,7 +248,5 @@ public class AgentSnapshotInfoFactory {
 			+ " easting: " + this.easting
 			+ " northing: " + this.northing ;
 		}
-
 	}
-
 }
