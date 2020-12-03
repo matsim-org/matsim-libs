@@ -485,33 +485,33 @@ public class ScoreStatsControlerListenerTest {
 		StartupEvent eventStart = new StartupEvent(null);
 		scoreStatsControlerListener.notifyStartup(eventStart);
 		
-		IterationEndsEvent event0 = new IterationEndsEvent(null, 0);
+		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		scoreStatsControlerListener.notifyIterationEnds(event0);
 		
 		readAndValidateValues(0, population);
 		
 		population.getPersons().remove(Id.create("2", Person.class));
 		
-		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
+		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
 		scoreStatsControlerListener.notifyIterationEnds(event1);
 		
 		readAndValidateValues(1, population);
 		
 		population.getPersons().remove(Id.create("3", Person.class));
 		
-		IterationEndsEvent event2 = new IterationEndsEvent(null, 2);
+		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
 		scoreStatsControlerListener.notifyIterationEnds(event2);
 		
 		readAndValidateValues(2, population);
 		
 		population.getPersons().remove(Id.create("4", Person.class));
 		
-		IterationEndsEvent event3 = new IterationEndsEvent(null, 3);
+		IterationEndsEvent event3 = new IterationEndsEvent(null, 3, true);
 		scoreStatsControlerListener.notifyIterationEnds(event3);
 		
 		readAndValidateValues(3, population);
 		
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false);
+		ShutdownEvent eventShutdown = new ShutdownEvent(null, false, 3);
 		scoreStatsControlerListener.notifyShutdown(eventShutdown);
 
 	}

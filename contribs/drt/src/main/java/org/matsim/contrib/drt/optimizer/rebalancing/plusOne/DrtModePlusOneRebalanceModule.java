@@ -45,22 +45,21 @@ public class DrtModePlusOneRebalanceModule extends AbstractDvrpModeModule {
 	public void install() {
 		log.info("Plus one rebalancing strategy is now being installed!");
 		RebalancingParams generalParams = drtCfg.getRebalancingParams().orElseThrow();
-		PlusOneRebalancingStrategyParams specificParams = (PlusOneRebalancingStrategyParams) generalParams
-				.getRebalancingStrategyParams();
+		PlusOneRebalancingStrategyParams specificParams = (PlusOneRebalancingStrategyParams)generalParams.getRebalancingStrategyParams();
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
 				bindModal(PlusOneRebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new PlusOneRebalancingStrategy(getMode(), getter.getModal(Network.class),
-								getter.getModal(LinkBasedRelocationCalculator.class))))
-						.asEagerSingleton();
+								getter.getModal(LinkBasedRelocationCalculator.class)))).asEagerSingleton();
 
 				// binding zone free relocation calculator
 				switch (specificParams.getZoneFreeRelocationCalculatorType()) {
 					case FastHeuristic:
 						bindModal(LinkBasedRelocationCalculator.class).toProvider(
-								modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()));
+								modalProvider(getter -> new FastHeuristicLinkBasedRelocationCalculator()))
+								.asEagerSingleton();
 						break;
 
 					default:
