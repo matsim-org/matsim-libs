@@ -1813,21 +1813,16 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				mergeCheck: 
 				for (int indexLane2 = indexLane1+1; indexLane2 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane2++) {
 					Lane lane2 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane2, Lane.class));
-					//TODO check if this is sensible. I added the if ToLinkList==null to make it work ---sbraun 20191024
- 					try {
-						if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
-							for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
-								if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
-									break mergeCheck; // the lanes have not the same to-links
-								}
+
+					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
+						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
+							if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
+								break mergeCheck; // the lanes have not the same to-links
 							}
-							// lane2 has the same outgoing links as lane1. save it as to be merged
-							lanesToBeRemoved.add(lane2.getId());
-							lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 						}
-					} catch (Exception e) {
- 						LOG.warn("Error when trying to merge lanes on "+link.getId().toString());
-						e.printStackTrace();
+						// lane2 has the same outgoing links as lane1. save it as to be merged
+						lanesToBeRemoved.add(lane2.getId());
+						lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 					}
 				}
 			}
