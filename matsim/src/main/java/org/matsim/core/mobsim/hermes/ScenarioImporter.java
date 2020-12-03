@@ -679,13 +679,13 @@ public class ScenarioImporter {
 				}
 
 				c.flatevents.add(new VehicleArrivesAtFacilityEvent(0, c.vehId, stopId, arrivalTime));
-				c.flatplan.add(Agent.prepareStopArrivalEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex, c.stopidx));
+				c.flatplan.add(Agent.prepareStopArrivalEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex));
 
 				// no event associated to stop delay
-				c.flatplan.add(Agent.prepareStopDelayEntry((int) departureTime, c.routeNo, stopIdIndex, c.stopidx));
+				c.flatplan.add(Agent.prepareStopDelayEntry((int) departureTime, c.routeNo, stopIdIndex));
 
 				c.flatevents.add(new VehicleDepartsAtFacilityEvent(0, c.vehId, stopId, departureTime));
-				c.flatplan.add(Agent.prepareStopDepartureEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex, c.stopidx));
+				c.flatplan.add(Agent.prepareStopDepartureEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex));
 
 				c.time = (int) departureTime;
 				c.stopidx++;
@@ -782,7 +782,7 @@ public class ScenarioImporter {
 		List<TransitRouteStop> trs = tr.getStops();
 		TransitRouteStop next = trs.get(0);
 		int stopidx = 0;
-		Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
+		Vehicle v = this.scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
 		int endid = nr.getEndLinkId().index();
@@ -810,11 +810,11 @@ public class ScenarioImporter {
 			while (checkForStop) {
 				if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
 					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx], stopidx));
+					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx]));
 					// no event associated to stop delay
-					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stop_ids[stopidx], stopidx));
+					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stop_ids[stopidx]));
 					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx], stopidx));
+					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx]));
 
 					stopidx += 1;
 
@@ -841,11 +841,11 @@ public class ScenarioImporter {
 				TransitStopFacility nextStopFacility = next.getStopFacility();
 				if (nextStopFacility.getLinkId().equals(link)) {
 					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid, stopidx));
+					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
 					// no event associated to stop delay
-					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid, stopidx));
+					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
 					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid, stopidx));
+					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid));
 
 					stopidx += 1;
 					if (stopidx < trs.size()) {
@@ -870,11 +870,11 @@ public class ScenarioImporter {
 			if (nextStopFacility.getLinkId().equals(nr.getEndLinkId())) {
 				int stopid = stop_ids[stopidx];
 				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
-				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid, stopidx));
+				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
 				// no event associated to stop delay
-				flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid, stopidx));
+				flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
 				flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
-				flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid, stopidx));
+				flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid));
 				stopidx += 1;
 				if (stopidx < trs.size()) {
 					next = trs.get(stopidx);
