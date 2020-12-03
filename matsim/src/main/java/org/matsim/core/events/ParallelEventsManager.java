@@ -79,7 +79,7 @@ public final class ParallelEventsManager implements EventsManager {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
 		this.numOfThreads = numOfThreads;
-		this.eventsHandlers = new ArrayList<EventHandler>();
+		this.eventsHandlers = new ArrayList<>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
 		this.eventsQueueSize = eventsQueueSize;
 		this.eventQueue = new ArrayBlockingQueue<>(eventsQueueSize);
@@ -138,7 +138,7 @@ public final class ParallelEventsManager implements EventsManager {
 			distributor.interrupt();
 			distributor.join();
 		} catch (InterruptedException e) {
-			throw new RuntimeException("Exception while waiting on join..." + e.getMessage());
+			throw new RuntimeException("Exception while waiting on join...", e);
 		}
 
 	}
@@ -147,11 +147,19 @@ public final class ParallelEventsManager implements EventsManager {
 	public void processEvent(final Event event) {
 		EventArray array = new EventArray(1);
 		array.add(event);
-		this.eventQueue.add(array);
+		try {
+			this.eventQueue.put(array);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Exception while adding event.", e);
+		}
 	}
 
 	public void processEvents(final EventArray events) {
-		this.eventQueue.add(events);
+		try {
+			this.eventQueue.put(events);
+		} catch (InterruptedException e) {
+			throw new RuntimeException("Exception while adding event.", e);
+		}
 	}
 
 	@Override

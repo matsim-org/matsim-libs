@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -28,51 +28,53 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Memory-optimized map, backed by a simple array, for storing a <b>small</b> number of entries.
+ * Memory-optimized map, backed by two simple arrays, for storing a <b>small</b> number of entries with integer keys.
  * Many operations (like {@link #get(Object)}) have a runtime of <code>O(n)</code>, so this map implementation
  * should only be used to store a small number of elements in it. But for small number of elements,
  * this implementation performs very well, especially because of its very low memory overhead.
  *
- * Internally, this implementation uses a single array which stores boths keys and values in sequential order
- * (data[i * 2] contains the keys, data[i * 2 + 1] contains the values).
- *
  * @author mrieser / Simunto GmbH
  */
-public class ArrayMap<K, V> implements Map<K, V> {
+public class IntArrayMap<V> implements Map<Integer, V> {
 
-	private final static Object[] EMPTY = new Object[0];
+	private int[] keys;
+	private Object[] values;
+	private int length = 0;
 
-	@SuppressWarnings("unchecked")
-	private Object[] data = EMPTY;
-
-	public ArrayMap() {
+	public IntArrayMap() {
+		this(8);
 	}
 
-	public ArrayMap(Map<K, V> map) {
-		this.data = new Object[map.size() * 2];
-		int i = 0;
-		for (Map.Entry<K, V> e : map.entrySet()) {
-			this.data[i] = e.getKey();
-			this.data[i + 1] = e.getValue();
-			i += 2;
-		}
+	public IntArrayMap(int capacity) {
+		this.keys = new int[capacity];
+		this.values = new Object[capacity];
 	}
 
 	@Override
 	public int size() {
-		return this.data.length / 2;
+		return this.length;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return this.data.length == 0;
+		return this.length == 0;
 	}
 
+	/**
+	 * @deprecated use {@link #containsKey(int)}
+	 */
+	@Deprecated
 	@Override
 	public boolean containsKey(Object key) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
+		if (key instanceof Integer) {
+			return containsKey(((Integer) key).intValue());
+		}
+		return false;
+	}
+
+	public boolean containsKey(int key) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
 				return true;
 			}
 		}
@@ -81,8 +83,8 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object value) {
-		for (int i = 1, n = this.data.length; i < n; i += 2) {
-			Object v = this.data[i];
+		for (int i = 0, n = this.length; i < n; i++) {
+			Object v = this.values[i];
 			if (Objects.equals(v, value)) {
 				return true;
 			}
@@ -90,54 +92,103 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * @deprecated use {@link #get(int)}
+	 */
+	@Deprecated
 	@Override
 	public V get(Object key) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
-				return (V) this.data[i + 1];
-			}
-		}
-		return null;
-	}
-
-	public V put(K key, V value) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
-				V oldValue = (V) this.data[i + 1];
-				this.data[i + 1] = value;
-				return oldValue;
-			}
-		}
-		int oldLength = this.data.length;
-		this.data = Arrays.copyOf(this.data, oldLength + 2);
-		this.data[oldLength] = key;
-		this.data[oldLength + 1] = value;
-		return null;
-	}
-
-	@Override
-	public V replace(K key, V value) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
-				V oldValue = (V) this.data[i + 1];
-				this.data[i + 1] = value;
-				return oldValue;
-			}
+		if (key instanceof Integer) {
+			return this.get(((Integer) key).intValue());
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
+	public V get(int key) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
+				return (V) this.values[i];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated use {@link #put(int, V)}
+	 */
+	@Deprecated
+	@Override
+	public V put(Integer key, V value) {
+		return this.put(key.intValue(), value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public V put(int key, V value) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
+				V oldValue = (V) this.values[i];
+				this.values[i] = value;
+				return oldValue;
+			}
+		}
+		ensureCapacity(this.length + 1);
+
+		this.keys[this.length] = key;
+		this.values[this.length] = value;
+		this.length++;
+		return null;
+	}
+
+	private void ensureCapacity(int capacity) {
+		if (this.keys.length < capacity) {
+			int newLength = (this.keys.length + 1) * 2;
+			while (newLength < capacity) {
+				newLength = (newLength + 1) * 2;
+			}
+			this.keys = Arrays.copyOf(this.keys, newLength);
+			this.values = Arrays.copyOf(this.values, newLength);
+		}
+	}
+
+	/**
+	 * @deprecated use {@link #replace(int, Object)}
+	 */
+	@Deprecated
+	@Override
+	public V replace(Integer key, V value) {
+		return replace(key.intValue(), value);
+	}
+
+	@SuppressWarnings("unchecked")
+	public V replace(int key, V value) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
+				V oldValue = (V) this.values[i];
+				this.values[i] = value;
+				return oldValue;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated use {@link #remove(int)}
+	 */
+	@Deprecated
 	@Override
 	public V remove(final Object key) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
-				V oldValue = (V) this.data[i + 1];
+		if (key instanceof Integer) {
+			return remove(((Integer) key).intValue());
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public V remove(int key) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
+				V oldValue = (V) this.values[i];
 				removeIndex(i);
 				return oldValue;
 			}
@@ -145,12 +196,23 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		return null;
 	}
 
+	/**
+	 * @deprecated use {@link #remove(int, Object)}
+	 */
+	@Deprecated
 	@Override
 	public boolean remove(Object key, Object value) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
-				V v = (V) this.data[i + 1];
+		if (key instanceof Integer) {
+			return remove(((Integer) key).intValue(), value);
+		}
+		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean remove(int key, Object value) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
+				V v = (V) this.values[i];
 				if (Objects.equals(v, value)) {
 					removeIndex(i);
 					return true;
@@ -160,10 +222,9 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		return false;
 	}
 
-	public boolean removeKey(final Object key) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object k = this.data[i];
-			if (Objects.equals(k, key)) {
+	public boolean removeKey(int key) {
+		for (int i = 0, n = this.length; i < n; i++) {
+			if (this.keys[i] == key) {
 				removeIndex(i);
 				return true;
 			}
@@ -172,8 +233,8 @@ public class ArrayMap<K, V> implements Map<K, V> {
 	}
 
 	public boolean removeValue(final Object value) {
-		for (int i = 0, n = this.data.length; i < n; i += 2) {
-			Object v = this.data[i + 1];
+		for (int i = 0, n = this.length; i < n; i++) {
+			Object v = this.values[i];
 			if (Objects.equals(v, value)) {
 				removeIndex(i);
 				return true;
@@ -183,55 +244,54 @@ public class ArrayMap<K, V> implements Map<K, V> {
 	}
 
 	private void removeIndex(int i) {
-		Object[] tmp = new Object[this.data.length - 2];
-		if (i > 0) {
-			System.arraycopy(this.data, 0, tmp, 0, i);
-		}
-		if (i + 2 < this.data.length) {
-			System.arraycopy(this.data, i + 2, tmp, i, this.data.length - 2 - i);
-		}
-		this.data = tmp;
+		int lastIndex = this.length - 1;
+		this.keys[i] = this.keys[lastIndex];
+		this.values[i] = this.values[lastIndex];
+		this.keys[lastIndex] = 0;
+		this.values[lastIndex] = null;
+		this.length--;
 	}
 
 	@Override
-	public void putAll(final Map<? extends K, ? extends V> m) {
+	public void putAll(final Map<? extends Integer, ? extends V> m) {
 		m.forEach(this::put);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
-		this.data = EMPTY;
+		Arrays.fill(this.keys, 0);
+		Arrays.fill(this.values, null);
+		this.length = 0;
 	}
 
 	@Override
-	public Set<K> keySet() {
+	public Set<Integer> keySet() {
 		return new KeySetView<>(this);
 	}
 
 	@Override
 	public Collection<V> values() {
-		return new ValuesView(this);
+		return new ValuesView<>(this);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Set<java.util.Map.Entry<K, V>> entrySet() {
-		return new EntrySetView(this);
+	public Set<Map.Entry<Integer, V>> entrySet() {
+		return new EntrySetView<>(this);
 	}
 
-	private static class Entry<K, V> implements Map.Entry<K, V> {
+	private static class Entry<V> implements Map.Entry<Integer, V> {
 
-		private final K k;
+		private final int k;
 		private final V v;
 
-		public Entry(K k, V v) {
+		public Entry(int k, V v) {
 			this.k = k;
 			this.v = v;
 		}
 
 		@Override
-		public K getKey() {
+		public Integer getKey() {
 			return this.k;
 		}
 
@@ -249,7 +309,7 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		public boolean equals(Object o) {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
-			Entry<?, ?> entry = (Entry<?, ?>) o;
+			Entry<?> entry = (Entry<?>) o;
 			return Objects.equals(this.k, entry.k) &&
 					Objects.equals(this.v, entry.v);
 		}
@@ -260,11 +320,11 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private static class KeySetView<K, V> implements Set<K> {
+	private static class KeySetView<V> implements Set<Integer> {
 
-		private final ArrayMap<K, V> map;
+		private final IntArrayMap<V> map;
 
-		KeySetView(ArrayMap<K, V> map) {
+		KeySetView(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
@@ -280,54 +340,60 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 		@Override
 		public boolean contains(Object o) {
-			return this.map.containsKey(o);
-		}
-
-		@Override
-		public Iterator<K> iterator() {
-			return new KeyIterator<K, V>(this.map);
-		}
-
-		@Override
-		public Object[] toArray() {
-			Object[] data = this.map.data;
-			Object[] result = new Object[data.length / 2];
-			for (int i = 0; i < result.length; i++) {
-				result[i] = data[i * 2];
+			if (o instanceof Integer) {
+				return this.map.containsKey(((Integer) o).intValue());
 			}
-			return result;
+			return false;
+		}
+
+		@Override
+		public Iterator<Integer> iterator() {
+			return new KeyIterator<>(this.map);
+		}
+
+		@Override
+		public Integer[] toArray() {
+			Integer[] array = new Integer[this.map.length];
+			for (int i = 0; i < this.map.length; i++) {
+				array[i] = this.map.keys[i];
+			}
+			return array;
 		}
 
 		@Override
 		public <T> T[] toArray(T[] a) {
-			Object[] data = this.map.data;
-			int resultLength = data.length / 2;
+			int resultLength = this.map.length;
 			Object[] result = a;
 			if (result == null) {
 				result = new Object[resultLength];
 			} else if (result.length != resultLength) {
 				result = Arrays.copyOf(a, resultLength);
 			}
-			for (int i = 0; i < result.length; i++) {
-				result[i] = data[i * 2];
-			}
+			System.arraycopy(this.map.values, 0, result, 0, result.length);
 			return (T[]) result;
 		}
 
 		@Override
-		public boolean add(K k) {
+		public boolean add(Integer k) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean remove(Object o) {
-			return this.map.removeKey(o);
+			if (o instanceof Integer) {
+				return this.map.removeKey(((Integer)o).intValue());
+			}
+			return false;
 		}
 
 		@Override
 		public boolean containsAll(Collection<?> c) {
 			for (Object o : c) {
-				if (!this.map.containsKey(o)) {
+				if (o instanceof Integer) {
+					if (!this.map.containsKey(((Integer) o).intValue())) {
+						return false;
+					}
+				} else {
 					return false;
 				}
 			}
@@ -335,16 +401,15 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends K> c) {
+		public boolean addAll(Collection<? extends Integer> c) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean retainAll(Collection<?> c) {
 			boolean modified = false;
-			Object[] data = this.map.data;
-			for (int i = 0, n = data.length; i < n; i += 2) {
-				Object key = data[i];
+			for (int i = 0, n = this.map.length; i < n; i++) {
+				int key = this.map.keys[i];
 				if (!c.contains(key)) {
 					this.map.remove(key);
 					modified = true;
@@ -357,8 +422,10 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		public boolean removeAll(Collection<?> c) {
 			boolean modified = false;
 			for (Object o : c) {
-				if (this.map.removeKey(o)) {
-					modified = true;
+				if (o instanceof Integer) {
+					if (this.map.removeKey(((Integer) o).intValue())) {
+						modified = true;
+					}
 				}
 			}
 			return modified;
@@ -370,24 +437,24 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private static class KeyIterator<K, V> implements Iterator<K> {
-		private final ArrayMap<K, V> map;
+	private static class KeyIterator<V> implements Iterator<Integer> {
+		private final IntArrayMap<V> map;
 		private int nextIndex;
 
-		KeyIterator(ArrayMap<K, V> map) {
+		KeyIterator(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return this.map.data.length > this.nextIndex;
+			return this.map.length > this.nextIndex;
 		}
 
 		@Override
-		public K next() {
+		public Integer next() {
 			if (hasNext()) {
-				K key = (K) this.map.data[this.nextIndex];
-				this.nextIndex += 2;
+				int key = this.map.keys[this.nextIndex];
+				this.nextIndex++;
 				return key;
 			}
 			throw new NoSuchElementException();
@@ -395,16 +462,16 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 		@Override
 		public void remove() {
-			this.nextIndex -= 2;
+			this.nextIndex--;
 			this.map.removeIndex(this.nextIndex);
 		}
 	}
 
-	private static class ValuesView<K, V> implements Collection<V> {
+	private static class ValuesView<V> implements Collection<V> {
 
-		private final ArrayMap<K, V> map;
+		private final IntArrayMap<V> map;
 
-		public ValuesView(ArrayMap<K, V> map) {
+		public ValuesView(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
@@ -430,27 +497,26 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 		@Override
 		public Object[] toArray() {
-			Object[] data = this.map.data;
-			Object[] result = new Object[data.length / 2];
-			for (int i = 0; i < result.length; i++) {
-				result[i] = data[i * 2 + 1];
+			Object[] data = this.map.values;
+			Object[] result = new Object[this.map.length];
+			if (result.length >= 0) {
+				System.arraycopy(data, 0, result, 0, result.length);
 			}
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T[] toArray(T[] a) {
-			Object[] data = this.map.data;
-			int resultLength = data.length / 2;
+			Object[] data = this.map.values;
+			int resultLength = this.map.length;
 			Object[] result = a;
 			if (result == null) {
 				result = new Object[resultLength];
 			} else if (result.length != resultLength) {
 				result = Arrays.copyOf(a, resultLength);
 			}
-			for (int i = 0; i < result.length; i++) {
-				result[i] = data[i * 2 + 1];
-			}
+			System.arraycopy(data, 0, result, 0, result.length);
 			return (T[]) result;
 		}
 
@@ -493,8 +559,8 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		@Override
 		public boolean retainAll(Collection<?> c) {
 			boolean modified = false;
-			Object[] data = this.map.data;
-			for (int i = 0, n = data.length; i < n; i += 2) {
+			Object[] data = this.map.values;
+			for (int i = 0, n = this.map.length; i < n; i++) {
 				Object value = data[i + 1];
 				if (!c.contains(value)) {
 					this.map.removeValue(value);
@@ -510,25 +576,26 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private static class ValueIterator<K, V> implements Iterator<V> {
+	private static class ValueIterator<V> implements Iterator<V> {
 
-		private final ArrayMap<K, V> map;
+		private final IntArrayMap<V> map;
 		private int nextIndex;
 
-		ValueIterator(ArrayMap<K, V> map) {
+		ValueIterator(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return this.map.data.length > this.nextIndex;
+			return this.map.length > this.nextIndex;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public V next() {
 			if (hasNext()) {
-				V value = (V) this.map.data[this.nextIndex + 1];
-				this.nextIndex += 2;
+				V value = (V) this.map.values[this.nextIndex];
+				this.nextIndex++;
 				return value;
 			}
 			throw new NoSuchElementException();
@@ -536,16 +603,16 @@ public class ArrayMap<K, V> implements Map<K, V> {
 
 		@Override
 		public void remove() {
-			this.nextIndex -= 2;
+			this.nextIndex--;
 			this.map.removeIndex(this.nextIndex);
 		}
 	}
 
-	private static class EntrySetView<K, V> implements Set<java.util.Map.Entry<K, V>> {
+	private static class EntrySetView<V> implements Set<Map.Entry<Integer, V>> {
 
-		private final ArrayMap<K, V> map;
+		private final IntArrayMap<V> map;
 
-		EntrySetView(ArrayMap<K, V> map) {
+		EntrySetView(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
@@ -559,34 +626,34 @@ public class ArrayMap<K, V> implements Map<K, V> {
 			return this.map.isEmpty();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean contains(Object o) {
 			if (o instanceof Entry) {
-				Entry e = (Entry) o;
+				Entry<V> e = (Entry<V>) o;
 				return Objects.equals(e.v, this.map.get(e.k));
 			}
 			return false;
 		}
 
 		@Override
-		public Iterator<Map.Entry<K, V>> iterator() {
+		public Iterator<Map.Entry<Integer, V>> iterator() {
 			return new EntryIterator<>(this.map);
 		}
 
 		@Override
 		public Object[] toArray() {
-			Object[] data = this.map.data;
-			Object[] result = new Object[data.length / 2];
+			Object[] result = new Object[this.map.length];
 			for (int i = 0; i < result.length; i++) {
-				result[i] = new Entry<>(data[i * 2], data[i * 2 + 1]);
+				result[i] = new Entry<>(this.map.keys[i], this.map.values[i]);
 			}
 			return result;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T[] toArray(T[] a) {
-			Object[] data = this.map.data;
-			int resultLength = data.length / 2;
+			int resultLength = this.map.length;
 			Object[] result = a;
 			if (result == null) {
 				result = new Object[resultLength];
@@ -594,20 +661,21 @@ public class ArrayMap<K, V> implements Map<K, V> {
 				result = Arrays.copyOf(a, resultLength);
 			}
 			for (int i = 0; i < result.length; i++) {
-				result[i] = new Entry<>(data[i * 2], data[i * 2 + 1]);
+				result[i] = new Entry<>(this.map.keys[i], this.map.values[i]);
 			}
 			return (T[]) result;
 		}
 
 		@Override
-		public boolean add(Map.Entry<K, V> kvEntry) {
+		public boolean add(Map.Entry<Integer, V> kvEntry) {
 			throw new UnsupportedOperationException();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean remove(Object o) {
 			if (o instanceof Entry) {
-				Entry e = (Entry) o;
+				Entry<V> e = (Entry<V>) o;
 				return this.map.remove(e.k, e.v);
 			}
 			return false;
@@ -624,17 +692,16 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 
 		@Override
-		public boolean addAll(Collection<? extends Map.Entry<K, V>> c) {
+		public boolean addAll(Collection<? extends Map.Entry<Integer, V>> c) {
 			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public boolean retainAll(Collection<?> c) {
 			boolean modified = false;
-			Object[] data = this.map.data;
-			for (int i = 0, n = data.length; i < n; i += 2) {
-				Object key = data[i];
-				Object value = data[i + 1];
+			for (int i = 0, n = this.map.length; i < n; i++) {
+				int key = this.map.keys[i];
+				Object value = this.map.values[i];
 				if (!c.contains(new Entry<>(key, value))) {
 					this.map.remove(key, value);
 					modified = true;
@@ -643,12 +710,13 @@ public class ArrayMap<K, V> implements Map<K, V> {
 			return modified;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public boolean removeAll(Collection<?> c) {
 			boolean modified = false;
 			for (Object o : c) {
 				if (o instanceof Entry) {
-					Entry e = (Entry) o;
+					Entry<V> e = (Entry<V>) o;
 					if (this.map.remove(e.k, e.v)) {
 						modified = true;
 					}
@@ -663,29 +731,27 @@ public class ArrayMap<K, V> implements Map<K, V> {
 		}
 	}
 
-	private static class EntryIterator<K, V> implements Iterator<java.util.Map.Entry<K, V>> {
-
-		private final ArrayMap<K, V> map;
+	private static class EntryIterator<V> implements Iterator<Map.Entry<Integer, V>> {
+		private final IntArrayMap<V> map;
 		private int nextIndex;
 
-		EntryIterator(ArrayMap<K, V> map) {
+		EntryIterator(IntArrayMap<V> map) {
 			this.map = map;
 		}
 
 		@Override
 		public boolean hasNext() {
-			return this.map.data.length > this.nextIndex;
+			return this.map.length > this.nextIndex;
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
-		public java.util.Map.Entry<K, V> next() {
-			K key = (K) this.map.data[this.nextIndex];
-			V value = (V) this.map.data[this.nextIndex + 1];
-			this.nextIndex += 2;
+		public Map.Entry<Integer, V> next() {
+			int key = this.map.keys[this.nextIndex];
+			V value = (V) this.map.values[this.nextIndex];
+			this.nextIndex++;
 			return new Entry<>(key, value);
 		}
-
 	}
-
 
 }
