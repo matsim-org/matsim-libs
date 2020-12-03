@@ -23,10 +23,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
- * This is currently only a substitute to the full Controler. 
+ * This is currently only a substitute to the full Controler.
+ *
+ * This class is deprecated. Use {@link org.matsim.core.controler.Controler} instead
  *
  * @author mrieser
  */
+@Deprecated(forRemoval = true)
 public class Controler {
 
 	private final org.matsim.core.controler.Controler controler;
