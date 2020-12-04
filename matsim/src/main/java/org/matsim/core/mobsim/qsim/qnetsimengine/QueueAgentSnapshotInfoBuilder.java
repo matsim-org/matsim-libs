@@ -56,12 +56,10 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		}
 
 
-		double vehLen = Math.min( 
+		return Math.min(
 				curvedLength / overallStorageCapacity , // number of ``cells''
-				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles 
+				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles
 				);
-		
-		return vehLen;
 	}
 	
 
@@ -104,12 +102,11 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		return distanceFromFNode;
 	}
 
-	@Override
 	public AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceToFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 
 		var distanceFromFNode = calculateFreespeedDistanceToFromNode(freespeedTraveltime, remainingTravelTime, length);
 
-
+		return AgentSnapshotInfo.DrivingState.CONGESTED;
 	}
 
 	private double calculateFreespeedDistanceToFromNode(double freespeedTraveltime, double remainingTravelTime, double curvedLength) {
@@ -122,9 +119,5 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		return Math.min(result, 0.0);
 	}
 
-	private double calculateCongestedDinstanceToFromNode(double)
-
-
-
-
+	private double calculateCongestedDinstanceToFromNode(double value) {return 0;}
 }

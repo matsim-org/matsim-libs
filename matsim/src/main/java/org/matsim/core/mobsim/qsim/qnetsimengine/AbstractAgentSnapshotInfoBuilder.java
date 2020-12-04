@@ -343,7 +343,4 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
 			double now, double freespeedTraveltime, double remainingTravelTime);
-
-	public abstract AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceFromNode,
-																		 double now, double freespeedTraveltime, double remainingTravelTime);
 }
