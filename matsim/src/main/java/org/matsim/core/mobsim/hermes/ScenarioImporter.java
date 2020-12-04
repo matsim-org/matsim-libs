@@ -777,24 +777,60 @@ public class ScenarioImporter {
 		flatevents.add(new PersonArrivalEvent(0, driverid, nr.getEndLinkId(), legmode));
 	}
 
+	private void generateNondeterministicVehicleOnLink(TransitRouteContext c, Id<Link> linkId, boolean generateLinkEnterEvent, boolean generateLinkLeaveEvent, int velocity, int pcuCategory) {
+		if (generateLinkEnterEvent) {
+			c.flatevents.add(new LinkEnterEvent(0, c.vehId, linkId));
+			c.flatplan.add(Agent.prepareLinkEntry(c.flatevents.size() - 1, linkId.index(), velocity, pcuCategory));
+		}
+
+		while (true) {
+			if (c.stopidx >= c.trs.size()) {
+				break;
+			}
+			TransitRouteStop routeStop = c.trs.get(c.stopidx);
+			boolean stopOnLink = routeStop.getStopFacility().getLinkId().equals(linkId);
+			if (stopOnLink) {
+				Id<TransitStopFacility> stopId = routeStop.getStopFacility().getId();
+				int stopIdIndex = stopId.index();
+				double arrivalTime = arrivalOffsetHelper(c.depart, routeStop);
+				double departureTime = departureOffsetHelper(c.depart, routeStop);
+
+				c.flatevents.add(new VehicleArrivesAtFacilityEvent(0, c.vehId, stopId, arrivalTime));
+				c.flatplan.add(Agent.prepareStopArrivalEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex));
+				c.agent.setServeStop(stopIdIndex);
+
+				// no event associated to stop delay
+				c.flatplan.add(Agent.prepareStopDelayEntry((int) departureTime, c.routeNo, stopIdIndex));
+
+				c.flatevents.add(new VehicleDepartsAtFacilityEvent(0, c.vehId, stopId, departureTime));
+				c.flatplan.add(Agent.prepareStopDepartureEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex));
+
+				c.stopidx++;
+			} else {
+				break;
+			}
+		}
+
+		if (generateLinkLeaveEvent) {
+			c.flatevents.add(new LinkLeaveEvent(0, c.vehId, linkId));
+		}
+	}
+
 	private void generateVehicleTrip(
 			Agent agent,
 			TransitLine tl,
 			TransitRoute tr,
 			Departure depart) {
+
+		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
+		TransitRouteContext context = new TransitRouteContext(agent, tl, tr, routeNo, depart, this.scenario.getNetwork());
 		PlanArray flatplan = agent.plan;
 		EventArray flatevents = agent.events;
-		List<TransitRouteStop> trs = tr.getStops();
-		TransitRouteStop next = trs.get(0);
-		int stopidx = 0;
 		Vehicle v = this.scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
-		int endid = nr.getEndLinkId().index();
 		int pcuCategory = 0;
 		//the PCU category for transit vehicles is never read from plan entry but remains constant over the day
-		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
-		int[] stop_ids = this.route_stops_by_route_no[routeNo];
 		int velocity = (int) Math.min(Math.round(v.getType().getMaximumVelocity()), HermesConfigGroup.MAX_VEHICLE_VELOCITY);
 
 		Id<Person> driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
@@ -809,92 +845,14 @@ public class ScenarioImporter {
 		flatevents.add(new PersonEntersVehicleEvent(0, driverid, v.getId()));
 		flatevents.add(new VehicleEntersTrafficEvent(0, driverid, nr.getStartLinkId(), v.getId(), legmode, 1));
 
-		// Adding first link and possibly the first stop.
-		{
-			boolean checkForStop = true;
-			while (checkForStop) {
-				if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
-					int stopId = stop_ids[stopidx];
-					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopId));
-					agent.setServeStop(stopId);
-					// no event associated to stop delay
-					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopId));
-					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopId));
+		generateNondeterministicVehicleOnLink(context, nr.getStartLinkId(), false, true, velocity, pcuCategory);
 
-					stopidx += 1;
-
-					// We don't add a flatplan event here on purpose.
-					next = trs.get(stopidx);
-				} else {
-					checkForStop = false;
-				}
-			}
-			flatevents.add(new LinkLeaveEvent(0, v.getId(), nr.getStartLinkId()));
-		}
-
-		// For each link (excluding the first and the last)
 		for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
-			int linkid = link.index();
-			int stopid = stop_ids[stopidx];
-			flatevents.add(new LinkEnterEvent(0, v.getId(), link));
-			flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, velocity, pcuCategory));
-
-			boolean checkForStop = next != null;
-
-			while (checkForStop) {
-				// Adding link and possibly a stop.
-				TransitStopFacility nextStopFacility = next.getStopFacility();
-				if (nextStopFacility.getLinkId().equals(link)) {
-					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
-					agent.setServeStop(stopid);
-					// no event associated to stop delay
-					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
-					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid));
-
-					stopidx += 1;
-					if (stopidx < trs.size()) {
-						next = trs.get(stopidx);
-					} else {
-						next = null;
-						checkForStop = false;
-					}
-				} else {
-					checkForStop = false;
-				}
-			}
-			flatevents.add(new LinkLeaveEvent(0, v.getId(), link));
+			generateNondeterministicVehicleOnLink(context, link, true, true, velocity, pcuCategory);
 		}
 
-		// Adding last link and possibly the last stop.
-		flatevents.add(new LinkEnterEvent(0, v.getId(), nr.getEndLinkId()));
-		flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, endid, velocity, pcuCategory));
-		boolean checkForStop = next != null;
-		while (checkForStop) {
-			TransitStopFacility nextStopFacility = next.getStopFacility();
-			if (nextStopFacility.getLinkId().equals(nr.getEndLinkId())) {
-				int stopid = stop_ids[stopidx];
-				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
-				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
-				agent.setServeStop(stopid);
-				// no event associated to stop delay
-				flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
-				flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
-				flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopid));
-				stopidx += 1;
-				if (stopidx < trs.size()) {
-					next = trs.get(stopidx);
-				} else {
-					next = null;
-					checkForStop = false;
-				}
-			} else {
-				checkForStop = false;
-			}
-		}
+		generateNondeterministicVehicleOnLink(context, nr.getEndLinkId(), true, false, velocity, pcuCategory);
+
 		flatevents.add(new VehicleLeavesTrafficEvent(0, driverid, nr.getEndLinkId(), v.getId(), legmode, 1));
 		flatevents.add(new PersonLeavesVehicleEvent(0, driverid, v.getId()));
 		flatevents.add(new PersonArrivalEvent(0, driverid, nr.getEndLinkId(), legmode));
