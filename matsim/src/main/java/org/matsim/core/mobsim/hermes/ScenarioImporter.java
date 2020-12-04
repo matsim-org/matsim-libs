@@ -550,6 +550,7 @@ public class ScenarioImporter {
 	}
 
 	private static class TransitRouteContext {
+		final Agent agent;
 		final PlanArray flatplan;
 		final EventArray flatevents;
 		final TransitLine tl;
@@ -562,9 +563,10 @@ public class ScenarioImporter {
 		int stopidx = 0;
 		int time;
 
-		public TransitRouteContext(PlanArray flatplan, EventArray flatevents, TransitLine tl, TransitRoute tr, int routeNo, Departure depart, Network network) {
-			this.flatplan = flatplan;
-			this.flatevents = flatevents;
+		public TransitRouteContext(Agent agent, TransitLine tl, TransitRoute tr, int routeNo, Departure depart, Network network) {
+			this.agent = agent;
+			this.flatplan = agent.plan;
+			this.flatevents = agent.events;
 			this.tl = tl;
 			this.tr = tr;
 			this.routeNo = routeNo;
@@ -680,6 +682,7 @@ public class ScenarioImporter {
 
 				c.flatevents.add(new VehicleArrivesAtFacilityEvent(0, c.vehId, stopId, arrivalTime));
 				c.flatplan.add(Agent.prepareStopArrivalEntry(c.flatevents.size() - 1, c.routeNo, stopIdIndex));
+				c.agent.setServeStop(stopIdIndex);
 
 				// no event associated to stop delay
 				c.flatplan.add(Agent.prepareStopDelayEntry((int) departureTime, c.routeNo, stopIdIndex));
@@ -728,8 +731,7 @@ public class ScenarioImporter {
 	}
 
 	private void generateDeterministicVehicleTrip(
-			PlanArray flatplan,
-			EventArray flatevents,
+			Agent agent,
 			TransitLine tl,
 			TransitRoute tr,
 			Departure depart) {
@@ -737,7 +739,9 @@ public class ScenarioImporter {
 		Vehicle v = this.scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
 		int routeNo = this.route_numbers.get(tl.getId()).get(tr.getId());
 
-		TransitRouteContext context = new TransitRouteContext(flatplan, flatevents, tl, tr, routeNo, depart, this.scenario.getNetwork());
+		TransitRouteContext context = new TransitRouteContext(agent, tl, tr, routeNo, depart, this.scenario.getNetwork());
+		PlanArray flatplan = agent.plan;
+		EventArray flatevents = agent.events;
 
 		VehicleType vt = v.getType();
 		NetworkRoute nr = tr.getRoute();
@@ -774,11 +778,12 @@ public class ScenarioImporter {
 	}
 
 	private void generateVehicleTrip(
-			PlanArray flatplan,
-			EventArray flatevents,
+			Agent agent,
 			TransitLine tl,
 			TransitRoute tr,
 			Departure depart) {
+		PlanArray flatplan = agent.plan;
+		EventArray flatevents = agent.events;
 		List<TransitRouteStop> trs = tr.getStops();
 		TransitRouteStop next = trs.get(0);
 		int stopidx = 0;
@@ -809,12 +814,14 @@ public class ScenarioImporter {
 			boolean checkForStop = true;
 			while (checkForStop) {
 				if (next.getStopFacility().getLinkId().equals(nr.getStartLinkId())) {
+					int stopId = stop_ids[stopidx];
 					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), arrivalOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx]));
+					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopId));
+					agent.setServeStop(stopId);
 					// no event associated to stop delay
-					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stop_ids[stopidx]));
+					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopId));
 					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), next.getStopFacility().getId(), departureOffsetHelper(depart, next)));
-					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stop_ids[stopidx]));
+					flatplan.add(Agent.prepareStopDepartureEntry(flatevents.size() - 1, routeNo, stopId));
 
 					stopidx += 1;
 
@@ -842,6 +849,7 @@ public class ScenarioImporter {
 				if (nextStopFacility.getLinkId().equals(link)) {
 					flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
 					flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
+					agent.setServeStop(stopid);
 					// no event associated to stop delay
 					flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
 					flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
@@ -871,6 +879,7 @@ public class ScenarioImporter {
 				int stopid = stop_ids[stopidx];
 				flatevents.add(new VehicleArrivesAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), arrivalOffsetHelper(depart, next)));
 				flatplan.add(Agent.prepareStopArrivalEntry(flatevents.size() - 1, routeNo, stopid));
+				agent.setServeStop(stopid);
 				// no event associated to stop delay
 				flatplan.add(Agent.prepareStopDelayEntry((int) departureOffsetHelper(depart, next), routeNo, stopid));
 				flatevents.add(new VehicleDepartsAtFacilityEvent(0, v.getId(), nextStopFacility.getId(), departureOffsetHelper(depart, next)));
@@ -898,17 +907,16 @@ public class ScenarioImporter {
 				for (Departure depart : tr.getDepartures().values()) {
 					Vehicle v = vehicles.get(depart.getVehicleId());
 					int hermes_id = hermes_id(v.getId().index(), true);
-					PlanArray plan = hermes_agents[hermes_id].plan();
-					EventArray events = hermes_agents[hermes_id].events();
+					Agent agent = hermes_agents[hermes_id];
 					float storageCapacityPCUE = deterministicPt ? 0.1f : (float) v.getType().getPcuEquivalents();
 					float flowCapacityPCUE = deterministicPt ? 0.1f : (float) (v.getType().getPcuEquivalents() / v.getType().getFlowEfficiencyFactor());
-					//for pt vehicles, storage and flow capacities are never updated
+					// for pt vehicles, storage and flow capacities are never updated
 					hermes_agents[hermes_id].setStorageCapacityPCUE(storageCapacityPCUE);
 					hermes_agents[hermes_id].setFlowCapacityPCUE(flowCapacityPCUE);
 					if (deterministicPt) {
-						generateDeterministicVehicleTrip(plan, events, tl, tr, depart);
+						generateDeterministicVehicleTrip(agent, tl, tr, depart);
 					} else {
-						generateVehicleTrip(plan, events, tl, tr, depart);
+						generateVehicleTrip(agent, tl, tr, depart);
 					}
 				}
 			}

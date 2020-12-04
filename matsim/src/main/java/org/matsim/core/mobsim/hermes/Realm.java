@@ -228,17 +228,21 @@ public class Realm {
             for (Agent in : waiting_agents) {
                 try {
                     int egressStop = in.getNextStopPlanEntry();
-                    if (!agent.access(egressStop, in)) {
-                        break;
+                    if (agent.willServeStop(egressStop)) {
+                        if (agent.access(egressStop, in)) {
+                            removed.add(in);
+                            // consume wait in stop, activate access
+                            advanceAgentandSetEventTime(in);
+                            // set driver in agent's event
+                            setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
+                        } else {
+                            // agent could not enter, likely the vehicle is full
+                            break;
+                        }
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                removed.add(in);
-                // consume wait in stop, activate access
-                advanceAgentandSetEventTime(in);
-                // set driver in agent's event
-                setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
             }
             waiting_agents.removeAll(removed);
         }
