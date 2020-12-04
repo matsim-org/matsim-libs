@@ -19,8 +19,9 @@
 
 package org.matsim.core.mobsim.hermes;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.EventArray;
-import org.matsim.core.utils.collections.IntArrayMap;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +119,7 @@ public class Agent {
     private float flowCapacityPCUE = -1;
 
     // Map of passengers per destination stop on this vehicle.
-    private IntArrayMap<ArrayList<Agent>> passengersByStop;
+    private UpcomingStops passengersByStop;
 
     private final static List<Agent> NO_PASSENGERS = Collections.emptyList();
 
@@ -130,7 +131,7 @@ public class Agent {
         if (capacity == 0) {
             this.passengersByStop = null;
         } else {
-            this.passengersByStop = new IntArrayMap<>(20);
+            this.passengersByStop = new UpcomingStops();
         }
     }
 
@@ -206,7 +207,7 @@ public class Agent {
     }
 
     public List<Agent> egress(int stopid) {
-        ArrayList<Agent> ret = passengersByStop.remove(stopid);
+        List<Agent> ret = passengersByStop.remove(stopid);
         if (ret == null) {
             return NO_PASSENGERS;
         }
@@ -214,11 +215,19 @@ public class Agent {
         return ret;
     }
 
+    public void setServeStop(int stopId) {
+        this.passengersByStop.addStop(stopId);
+    }
+
+    public boolean willServeStop(int stopId) {
+        return passengersByStop.hasUpcoming(stopId);
+    }
+
     public boolean access(int stopid, Agent agent) {
         if (passengersInside == capacity) {
             return false;
         } else {
-            passengersByStop.computeIfAbsent(stopid, k -> new ArrayList<>()).add(agent);
+            passengersByStop.add(stopid, agent);
             passengersInside++;
             return true;
         }
@@ -379,6 +388,63 @@ public class Agent {
                 return String.format("unknown plan type %d", type);
         }
 
+    }
+
+    private static class UpcomingStops {
+        int[] stopIds = new int[10];
+        List<Agent>[] passengers = new ArrayList[10];
+        int size = 0;
+        int currentStopIdx = -1;
+
+        public void clear() {
+            Arrays.fill(this.stopIds, -1);
+            Arrays.fill(this.passengers, null);
+            this.size = 0;
+            this.currentStopIdx = -1;
+        }
+
+        public void addStop(int stopId) {
+            if (this.size == this.stopIds.length) {
+                this.stopIds = Arrays.copyOf(this.stopIds, this.stopIds.length * 2);
+            }
+            this.stopIds[this.size] = stopId;
+
+            if (this.size == this.passengers.length) {
+                this.passengers = Arrays.copyOf(this.passengers, this.passengers.length * 2);
+            }
+            this.passengers[this.size] = new ArrayList<>();
+
+            this.size++;
+        }
+
+        public void add(int stopId, Agent agent) {
+            for (int i = this.currentStopIdx + 1; i < this.size; i++) {
+                if (this.stopIds[i] == stopId) {
+                    this.passengers[i].add(agent);
+                    return;
+                }
+            }
+            throw new RuntimeException("Could not find upcoming stop " + Id.get(stopId, TransitStopFacility.class) + " along this route.");
+        }
+
+        public boolean hasUpcoming(int stopId) {
+            for (int i = this.currentStopIdx + 1; i < this.size; i++) {
+                if (this.stopIds[i] == stopId) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public List<Agent> remove(int stopId) {
+            for (int i = this.currentStopIdx + 1; i < this.size; i++) {
+                if (this.stopIds[i] == stopId) {
+                    this.currentStopIdx = i;
+                    return this.passengers[this.currentStopIdx];
+                }
+            }
+            throw new RuntimeException("Could not find upcoming stop " + Id.get(stopId, TransitStopFacility.class) + " along this route.");
+        }
     }
 
 }
