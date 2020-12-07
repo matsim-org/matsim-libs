@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -43,10 +44,6 @@ public class AgentSnapshotInfoFactory {
 		this.linkWidthCalculator = widthCalculator;
 	}
 
-	/**
-	 * @param elevation  
-	 */
-	@SuppressWarnings("static-method")
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, double easting, double northing, double elevation, double azimuth) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
@@ -69,6 +66,7 @@ public class AgentSnapshotInfoFactory {
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Link link, double distanceOnLink, int lane) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
+		info.setLinkId(link.getId());
 		double lanePosition = this.linkWidthCalculator.calculateLanePosition(lane);
 		calculateAndSetPosition(info, link.getFromNode().getCoord(), link.getToNode().getCoord(), distanceOnLink, link.getLength(), lanePosition );
 		return info;
@@ -79,7 +77,8 @@ public class AgentSnapshotInfoFactory {
 	 * @param curveLength lengths are usually different (usually longer) than the euclidean distances between the startCoord and endCoord
 	 */
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Id<Vehicle> vehicleId, Id<Link> linkId, Coord startCoord, Coord endCoord, double distanceOnLink,
-			Integer lane, double curveLength) {
+			int lane, double curveLength) {
+
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
 		info.setVehicleId(vehicleId);
@@ -96,12 +95,12 @@ public class AgentSnapshotInfoFactory {
 	 * 
 	 * @param lanePosition may be null
 	 */
-	private final static void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double odometerOnLink, 
-			double lengthOfCurve, double lanePosition){
+	private static void calculateAndSetPosition(PositionInfo info, Coord startCoord, Coord endCoord, double odometerOnLink,
+												double lengthOfCurve, double lanePosition){
 
 		double dx = -startCoord.getX() + endCoord.getX();
 		double dy = -startCoord.getY() + endCoord.getY();
-		double theta = 0.0;
+		double theta;
 		if (dx > 0) {
 			theta = Math.atan(dy/dx);
 		} else if (dx < 0) {
@@ -143,6 +142,140 @@ public class AgentSnapshotInfoFactory {
 		info.setAzimuth( theta / TWO_PI * 360. ) ;
 	}
 
+	public PositionInfoBuilder getAgentSnapshotInfoBuilder() {
+
+		return new PositionInfoBuilder(this.linkWidthCalculator);
+	}
+
+	public static class PositionInfoBuilder {
+
+		private final SnapshotLinkWidthCalculator linkWidthCalculator;
+
+		private Id<Person> agentId = null;
+		private Id<Link> linkId = null;
+		private Id<Vehicle> vehicleId = null;
+		private Coord fromCoord;
+		private Coord toCoord;
+		private double linkLength;
+		private int lane;
+		private double distanceOnLink;
+		private AgentSnapshotInfo.AgentState agentState = null;
+		private AgentSnapshotInfo.DrivingState drivingState = null;
+		private double colorValue;
+		private int user;
+
+		PositionInfoBuilder(SnapshotLinkWidthCalculator linkWidthCalculator) {
+			this.linkWidthCalculator = linkWidthCalculator;
+		}
+
+		public PositionInfoBuilder setPersonId(Id<Person> personId) {
+			this.agentId = personId;
+			return this;
+		}
+
+		public PositionInfoBuilder setLinkId(Id<Link> linkId) {
+			this.linkId = linkId;
+			return this;
+		}
+
+		public PositionInfoBuilder setVehicleId(Id<Vehicle> vehicleId) {
+			this.vehicleId = vehicleId;
+			return this;
+		}
+
+		public PositionInfoBuilder setAgentState(AgentSnapshotInfo.AgentState agentState) {
+			this.agentState = agentState;
+			return this;
+		}
+
+		public PositionInfoBuilder setDrivingState(AgentSnapshotInfo.DrivingState drivingState) {
+			this.drivingState = drivingState;
+			return this;
+		}
+
+		public PositionInfoBuilder setFromCoord(Coord fromCoord) {
+			this.fromCoord = fromCoord;
+			return this;
+		}
+
+		public PositionInfoBuilder setToCoord(Coord toCoord) {
+			this.toCoord = toCoord;
+			return this;
+		}
+
+		public PositionInfoBuilder setLinkLength(double linkLength) {
+			this.linkLength = linkLength;
+			return this;
+		}
+
+		public PositionInfoBuilder setLane(int lane) {
+			this.lane = lane;
+			return this;
+		}
+
+		public PositionInfoBuilder setDistanceOnLink(double distanceOnLink) {
+			this.distanceOnLink = distanceOnLink;
+			return this;
+		}
+
+		public PositionInfoBuilder setColorValue(double colorValue) {
+			this.colorValue = colorValue;
+			return this;
+		}
+
+		public PositionInfoBuilder setUser(int user) {
+			this.user = user;
+			return this;
+		}
+
+		public AgentSnapshotInfo build() {
+
+			var theta = calculateTheta(this.fromCoord, this.toCoord);
+			var euclideanLength = CoordUtils.calcEuclideanDistance(this.fromCoord, this.toCoord);
+			var correction = calculateCorrection(euclideanLength, this.linkLength);
+			var lanePosition = linkWidthCalculator.calculateLanePosition(lane);
+			var easting = fromCoord.getX()
+					+ (Math.cos(theta) * distanceOnLink * correction)
+					+ (Math.sin(theta) * lane);
+			var northing = fromCoord.getY()
+					+ Math.sin(theta) * distanceOnLink  * correction
+					- Math.cos(theta) * lanePosition;
+			var azimuth = theta / TWO_PI * 360.;
+
+			return new PositionInfo(
+					this.agentId, this.linkId, this.vehicleId,
+					easting, northing, azimuth,
+					colorValue, agentState, drivingState, user);
+		}
+
+		private double calculateTheta(Coord startCoord, Coord endCoord) {
+
+			double dx = -startCoord.getX() + endCoord.getX();
+			double dy = -startCoord.getY() + endCoord.getY();
+			double theta;
+			if (dx > 0) {
+				theta = Math.atan(dy/dx);
+			} else if (dx < 0) {
+				theta = Math.PI + Math.atan(dy/dx);
+			} else { // i.e. DX==0
+				if (dy > 0) {
+					theta = PI_HALF;
+				} else if ( dy < 0 ) {
+					theta = -PI_HALF;
+				} else { // i.e. DX==0 && DY==0
+					theta = 0.833*Math.PI ; // some default direction towards north north east
+				}
+			}
+			if (theta < 0.0) theta += TWO_PI;
+
+			return theta;
+		}
+
+		private double calculateCorrection(double euclideanLength, double curvedLength) {
+			return curvedLength != 0 ? euclideanLength / curvedLength : 0;
+		}
+	}
+
 	/**
 	 * A helper class to store information about agents (id, position, speed), mainly used to create
 	 * {@link SnapshotWriter snapshots}.  It also provides a way to convert graph coordinates (linkId, offset) into
@@ -165,13 +298,31 @@ public class AgentSnapshotInfoFactory {
 		private DrivingState drivingState = null;
 		private int user = 0;
 
+		private PositionInfo(Id<Person> agentId, Id<Link> linkId, Id<Vehicle> vehicleId, double easting, double northing, double azimuth, double colorValue, AgentState agentState, DrivingState drivingState, int user) {
+			this.agentId = agentId;
+			this.linkId = linkId;
+			this.vehicleId = vehicleId;
+			this.easting = easting;
+			this.northing = northing;
+			this.azimuth = azimuth;
+			this.colorValue = colorValue;
+			this.agentState = agentState;
+			this.drivingState = drivingState;
+			this.user = user;
+		}
+
 		/* package-private */ PositionInfo() { }
+
+
 
 		@Override
 		public final Id<Person> getId() {
 			return this.agentId;
 		}
 		public final void setId( Id<Person> tmp ) {
+			if (tmp.equals(Id.createPersonId(6))) {
+				var stop = "here";
+			}
 			this.agentId = tmp ;
 		}
 

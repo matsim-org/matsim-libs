@@ -37,8 +37,14 @@ class PositionEvent extends Event implements BasicLocation, HasPersonId {
 
         @Override
         public Map<String, String> getAttributes() {
-                var attr = super.getAttributes();
-                attr.put("state", position.getAgentState().toString());
-                return attr;
+                try {
+                        var attr = super.getAttributes();
+                        attr.put("state", position.getAgentState().toString());
+                        attr.put("linkId", position.getLinkId().toString());
+                        attr.put("vehicleId", position.getVehicleId().toString());
+                        return attr;
+                } catch(Exception e) {
+                        throw new RuntimeException("oh no!");
+                }
         }
 }

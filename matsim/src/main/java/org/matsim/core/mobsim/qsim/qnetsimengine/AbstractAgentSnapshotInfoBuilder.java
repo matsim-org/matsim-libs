@@ -20,8 +20,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
@@ -29,7 +27,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -60,7 +57,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	AbstractAgentSnapshotInfoBuilder( Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator ){
 		this.snapshotInfoFactory = new AgentSnapshotInfoFactory( linkWidthCalculator );
@@ -74,28 +71,43 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
-			boolean first = true;
-			for (Identifiable passenger : peopleInVehicle) {
+			var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
+			boolean isFirst = true;
+			for (var passenger : peopleInVehicle) {
 				cnt2++ ;
-				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 
-						0.9*link.getLength(), cnt2); // for the time being, same position as facilities
-				if (passenger.getId().toString().startsWith("pt")) {
-					passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-				} else if (first) {
-					passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-				} else {
-					passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
-				}
-				final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
-				if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-					passengerPosition.setAgentState( AgentState.MARKER );
-				}
+				var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+						.setPersonId(passenger.getId())
+						.setVehicleId(veh.getId())
+						.setLinkId(link.getId())
+						.setFromCoord(link.getFromNode().getCoord())
+						.setToCoord(link.getToNode().getCoord())
+						.setDistanceOnLink(link.getLength() * 0.9)
+						.setLane(cnt2)
+						.setLinkLength(link.getLength())
+						.setAgentState(getAgentStateForWaitingList(passenger.getId(), isFirst))
+						.build();
 				positions.add(passengerPosition);
-				first = false;
+				isFirst = false;
 			}
 		}
 		return cnt2 ;
+	}
+
+	private AgentState getAgentStateForWaitingList(Id<Person> id, boolean isFirst) {
+
+		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
+		var marker = getMarkerFromAttributes(id);
+		if (marker != null) return AgentState.MARKER;
+
+		// these are the regular agent states
+		if (id.toString().startsWith("pt")) return AgentState.TRANSIT_DRIVER;
+		if (isFirst) return AgentState.PERSON_DRIVING_CAR;
+		return AgentState.PERSON_OTHER_MODE;
+	}
+
+	private Object getMarkerFromAttributes(Id<Person> id) {
+		var person = scenario.getPopulation().getPersons().get(id);
+		return person != null ? person.getAttributes().getAttribute(AgentSnapshotInfo.marker) : null;
 	}
 
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
@@ -118,17 +130,16 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	/**
 	 * Put the transit vehicles from the transit stop list in positions.
-	 * @param transitVehicleStopQueue 
 	 */
 	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, 
 			Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
-				List<Identifiable<?>> peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
+				var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
-				for ( ListIterator<Identifiable<?>> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
-					Identifiable passenger = it.previous();
+				for ( var it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+					var passenger = it.previous();
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
@@ -153,7 +164,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final void positionAgentGivenDistanceFromFNode(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, QVehicle veh, double distanceFromFromNode, 
-			Integer lane,	double speedValueBetweenZeroAndOne){
+			int lane,	double speedValueBetweenZeroAndOne){
 		// I think that the main reason why this exists as public method is that AssignmentEmulatingQLane wants to use it directly.
 		// The reason for this, in return, is that positionVehiclesAlongLine(...) is a service method for queue models only.  kai, apr'16
 		
@@ -161,6 +172,11 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), veh.getId(), veh.getCurrentLink().getId(), startCoord, endCoord,
 				distanceFromFromNode, lane, lengthOfCurve);
+
+		if (pos.getLinkId() == null || pos.getVehicleId() == null) {
+			throw new RuntimeException("break here");
+		}
+
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
 			pos.setAgentState(AgentState.TRANSIT_DRIVER);
@@ -189,7 +205,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private static int wrnCnt = 0 ;
 
 	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
-			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
+			double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
 			Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, double freeSpeed,
 			int numberOfLanesAsInt, Queue<Hole> holes)
 	{
@@ -266,7 +282,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					now, freespeedTraveltime, remainingTravelTime);
 			// (starts off relatively large (rightmost vehicle))
 			
-			Integer lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
+			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
 			Gbl.assertNotNull( upstreamCoord ) ;
 			Gbl.assertNotNull( downstreamCoord ) ;
@@ -304,7 +320,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
 			double curvedLength, Coord upstreamCoord, Coord downstreamCoord)
 	{
-		Integer lane = 20 ;
+		int lane = 20 ;
 		double speedValue = 1. ;
 		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class),
 				veh.getId(), null, upstreamCoord, downstreamCoord,
