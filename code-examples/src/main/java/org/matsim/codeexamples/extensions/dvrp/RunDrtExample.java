@@ -12,12 +12,17 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 class RunDrtExample{
@@ -31,16 +36,24 @@ class RunDrtExample{
 
 	private static final Logger log = Logger.getLogger( RunDrtExample.class ) ;
 
+	private static final String DRT_A = "drt_A";
+	private static final String DRT_B = "drt_B";
+	private static final String DRT_C = "drt_C";
+
 	public static void main( String[] args ){
 
-		String configFile ;
+		Config config;
+		String configFile;
 		if ( args!=null && args.length>=1 ) {
-			configFile = args[0] ;
+			config = ConfigUtils.loadConfig( args );
 		} else {
 			configFile = "scenarios/multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
+			config = ConfigUtils.loadConfig( configFile );
+			config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
+			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 		}
 		
-		Config config = ConfigUtils.loadConfig( configFile );
+		config.controler().setLastIteration( 1 );
 
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
@@ -52,7 +65,7 @@ class RunDrtExample{
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode("drt_A");
+			drtConfig.setMode( DRT_A );
 			drtConfig.setStopDuration(60.);
 			drtConfig.setMaxWaitTime(900.);
 			drtConfig.setMaxTravelTimeAlpha(1.3);
@@ -63,9 +76,8 @@ class RunDrtExample{
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
-
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode("drt_B");
+			drtConfig.setMode( DRT_B );
 			drtConfig.setStopDuration(60.);
 			drtConfig.setMaxWaitTime(900.);
 			drtConfig.setMaxTravelTimeAlpha(1.3);
@@ -76,9 +88,8 @@ class RunDrtExample{
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
-
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode("drt_C");
+			drtConfig.setMode( DRT_C );
 			drtConfig.setStopDuration(60.);
 			drtConfig.setMaxWaitTime(900.);
 			drtConfig.setMaxTravelTimeAlpha(1.3);
@@ -93,49 +104,22 @@ class RunDrtExample{
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
 
-		config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
-		config.controler().setLastIteration( 1 );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		// configure mode choice so that travellers start using drt:
+		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultStrategy.SubtourModeChoice ).setWeight( 0.1 ) );
+		config.subtourModeChoice().setModes( new String [] {TransportMode.car, DRT_A, DRT_B, DRT_C} );
 
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(  );
-			stratSets.setStrategyName( DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice );
-			stratSets.setWeight( 0.1 );
-			config.strategy().addStrategySettings( stratSets );
-			//
-			config.subtourModeChoice().setModes( new String [] {TransportMode.car, "drt_A", "drt_B", "drt_C"} );
-		}
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(  );
-			stratSets.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
-			stratSets.setWeight( 1. );
-			config.strategy().addStrategySettings( stratSets );
-		}
+		// have a "normal" plans choice strategy:
+		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1. ) );
 
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_A") ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_B" ) ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_C" ) ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_A_walk" ) ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_B_walk" ) ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams( "drt_C_walk" ) ;
-			config.planCalcScore().addModeParams( modeParams );
-		}
+		// add params so that scoring works:
+		config.planCalcScore().addModeParams( new ModeParams( DRT_A ) );
+		config.planCalcScore().addModeParams( new ModeParams( DRT_B ) );
+		config.planCalcScore().addModeParams( new ModeParams( DRT_C ) );
+
+//		config.planCalcScore().addModeParams( new ModeParams( "drt_A_walk" ) );
+//		config.planCalcScore().addModeParams( new ModeParams( "drt_B_walk" ) );
+//		config.planCalcScore().addModeParams( new ModeParams( "drt_C_walk" ) );
+		// now seems to work without these.  kai, dec'20
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 
@@ -146,7 +130,7 @@ class RunDrtExample{
 		controler.addOverridingModule( new DvrpModule() ) ;
 		controler.addOverridingModule( new MultiModeDrtModule( ) ) ;
 
-		controler.configureQSimComponents( DvrpQSimComponents.activateModes( "drt_A" , "drt_B", "drt_C") ) ;
+		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
 
 		controler.run() ;
 	}
