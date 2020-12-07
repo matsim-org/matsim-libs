@@ -30,27 +30,26 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * translation of physical position (e.g. odometer distance on link, lane) into visualization position
- * 
- * @author nagel
  *
+ * @author nagel
  */
 public class AgentSnapshotInfoFactory {
 
 	private static final double TWO_PI = 2.0 * Math.PI;
 	private static final double PI_HALF = Math.PI / 2.0;
-	private SnapshotLinkWidthCalculator linkWidthCalculator;
+	private final SnapshotLinkWidthCalculator linkWidthCalculator;
 
 	public AgentSnapshotInfoFactory(SnapshotLinkWidthCalculator widthCalculator) {
 		this.linkWidthCalculator = widthCalculator;
 	}
 
 	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, double easting, double northing, double elevation, double azimuth) {
-		PositionInfo info = new PositionInfo() ;
-		info.setId( agentId ) ;
-		info.setEasting( easting ) ;
-		info.setNorthing( northing ) ;
-		info.setAzimuth( azimuth ) ;
-		return info ;
+		PositionInfo info = new PositionInfo();
+		info.setId(agentId);
+		info.setEasting(easting);
+		info.setNorthing(northing);
+		info.setAzimuth(azimuth);
+		return info;
 	}
 
 	
@@ -320,9 +319,6 @@ public class AgentSnapshotInfoFactory {
 			return this.agentId;
 		}
 		public final void setId( Id<Person> tmp ) {
-			if (tmp.equals(Id.createPersonId(6))) {
-				var stop = "here";
-			}
 			this.agentId = tmp ;
 		}
 

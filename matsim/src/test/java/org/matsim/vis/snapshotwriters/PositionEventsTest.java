@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -27,15 +28,16 @@ public class PositionEventsTest {
 	@Test
 	public void test1() throws URISyntaxException, MalformedURLException {
 
-		var twoRoutesScenario = ExamplesUtils.getTestScenarioURL("two-routes");
+		var twoRoutesScenario = ExamplesUtils.getTestScenarioURL("pt-tutorial");
 
-		var config = ConfigUtils.loadConfig(twoRoutesScenario.toURI().resolve("config.xml").toURL());
+		var config = ConfigUtils.loadConfig(twoRoutesScenario.toURI().resolve("0.config.xml").toURL());
 		//config.controler().setSnapshotFormat(List.of(ControlerConfigGroup.SnapshotFormat.positionevents));
 		config.qsim().setSnapshotPeriod(10);
 		config.controler().setWriteSnapshotsInterval(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setOutputDirectory("C:\\Users\\Janekdererste\\Desktop\\test-output");
+		config.plans().setHandlingOfPlansWithoutRoutingMode(PlansConfigGroup.HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 
 		var scenario = ScenarioUtils.loadScenario(config);
 

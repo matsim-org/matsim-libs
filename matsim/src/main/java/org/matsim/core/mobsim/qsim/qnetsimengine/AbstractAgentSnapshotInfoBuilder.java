@@ -19,33 +19,28 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Queue;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.Hole;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Queue;
+import java.util.TreeMap;
 
 
 /**
@@ -59,9 +54,14 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private final Scenario scenario;
 
-	AbstractAgentSnapshotInfoBuilder( Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator ){
-		this.snapshotInfoFactory = new AgentSnapshotInfoFactory( linkWidthCalculator );
-		this.scenario = sc ;
+	AbstractAgentSnapshotInfoBuilder(Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator) {
+		this.snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		this.scenario = sc;
+	}
+
+	private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) {
+		double remainingTravelTime = hole.getEarliestLinkExitTime() - now;
+		return remainingTravelTime / freespeedTraveltime * curvedLength;
 	}
 
 	/**
@@ -69,10 +69,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * constructor for handling this situation.
 	 */
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
-			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
+													 final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
 			var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
-			boolean isFirst = true;
 			for (var passenger : peopleInVehicle) {
 				cnt2++ ;
 				var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
@@ -84,24 +83,30 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 						.setDistanceOnLink(link.getLength() * 0.9)
 						.setLane(cnt2)
 						.setLinkLength(link.getLength())
-						.setAgentState(getAgentStateForWaitingList(passenger.getId(), isFirst))
+						.setAgentState(getAgentState(passenger))
 						.build();
 				positions.add(passengerPosition);
-				isFirst = false;
 			}
 		}
-		return cnt2 ;
+		return cnt2;
 	}
 
-	private AgentState getAgentStateForWaitingList(Id<Person> id, boolean isFirst) {
+	private AgentState getAgentState(Identifiable<Person> identifiable) {
 
 		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
-		var marker = getMarkerFromAttributes(id);
+		var marker = getMarkerFromAttributes(identifiable.getId());
 		if (marker != null) return AgentState.MARKER;
 
 		// these are the regular agent states
-		if (id.toString().startsWith("pt")) return AgentState.TRANSIT_DRIVER;
-		if (isFirst) return AgentState.PERSON_DRIVING_CAR;
+		if (identifiable instanceof TransitDriverAgent) return AgentState.TRANSIT_DRIVER;
+		if (identifiable instanceof MobsimDriverAgent && ((MobsimDriverAgent) identifiable).getMode().equals(TransportMode.car))
+			return AgentState.PERSON_DRIVING_CAR;
+
+		// old tests keep them here, since I'm unsure whether the other ones work
+		//if (identifiable.getId().toString().startsWith("pt")) return AgentState.TRANSIT_DRIVER;
+		//if (isFirst) return AgentState.PERSON_DRIVING_CAR;
+
+		// we don't know. Set other mode
 		return AgentState.PERSON_OTHER_MODE;
 	}
 
@@ -110,10 +115,33 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return person != null ? person.getAttributes().getAttribute(AgentSnapshotInfo.marker) : null;
 	}
 
+	private AgentState getAgentStateForActivity(Id<Person> id) {
+
+		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
+		var marker = getMarkerFromAttributes(id);
+		if (marker != null) return AgentState.MARKER;
+
+		return AgentState.PERSON_AT_ACTIVITY;
+	}
+
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
-			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
-		for (MobsimAgent pa : agentsInActivities) {
-			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
+												Collection<MobsimAgent> agentsInActivities, int cnt2) {
+		for (MobsimAgent agent : agentsInActivities) {
+
+			var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+					.setPersonId(agent.getId())
+					.setLinkId(link.getId())
+					.setFromCoord(link.getFromNode().getCoord())
+					.setToCoord(link.getToNode().getCoord())
+					.setDistanceOnLink(link.getLength() * 0.9)
+					.setLinkLength(link.getLength())
+					.setLane(cnt2)
+					.setAgentState(getAgentStateForActivity(agent.getId()))
+					.build();
+			positions.add(position);
+
+
+			/*AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
 			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
 			final Person person = scenario.getPopulation().getPersons().get( pa.getId() );
 			if ( person != null ) {
@@ -123,6 +151,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			}
 
 			positions.add(agInfo) ;
+
+			 */
 			cnt2++ ;
 		}
 		return cnt2;
@@ -131,11 +161,26 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	/**
 	 * Put the transit vehicles from the transit stop list in positions.
 	 */
-	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, 
-			Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
+	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link,
+													 Queue<QVehicle> transitVehicleStopQueue, int cnt2) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
 				var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
+				for (Identifiable<Person> identifiable : peopleInVehicle) {
+
+					var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+							.setPersonId(identifiable.getId())
+							.setVehicleId(veh.getId())
+							.setLinkId(link.getId())
+							.setLinkLength(link.getLength())
+							.setDistanceOnLink(link.getLength() * 0.9)
+							.setLane(cnt2)
+							.setAgentState(getAgentState(identifiable))
+							.build();
+					positions.add(passengerPosition);
+				}
+
+				/*
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
 				for ( var it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
@@ -156,21 +201,55 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				}
 				cnt2 += peopleInVehicle.size() ; // setting it correctly for the next output
 
+				 */
+				cnt2 += peopleInVehicle.size();
 			}
 
 		}
-		return cnt2 ;
+		return cnt2;
 	}
 
+	private static int wrnCnt = 0;
+
 	public final void positionAgentGivenDistanceFromFNode(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
-			double lengthOfCurve, QVehicle veh, double distanceFromFromNode, 
-			int lane,	double speedValueBetweenZeroAndOne){
+														  double lengthOfCurve, QVehicle veh, double distanceFromFromNode,
+														  int lane, double speedValueBetweenZeroAndOne) {
 		// I think that the main reason why this exists as public method is that AssignmentEmulatingQLane wants to use it directly.
 		// The reason for this, in return, is that positionVehiclesAlongLine(...) is a service method for queue models only.  kai, apr'16
-		
+
 		MobsimDriverAgent driverAgent = veh.getDriver();
 
-		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), veh.getId(), veh.getCurrentLink().getId(), startCoord, endCoord,
+		var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+				.setPersonId(driverAgent.getId())
+				.setVehicleId(veh.getId())
+				.setLinkId(veh.getCurrentLink().getId())
+				.setFromCoord(startCoord)
+				.setToCoord(endCoord)
+				.setDistanceOnLink(distanceFromFromNode)
+				.setLane(lane)
+				.setLinkLength(lengthOfCurve)
+				.setAgentState(getAgentState(driverAgent))
+				.setColorValue(speedValueBetweenZeroAndOne)
+				.build();
+
+		if (position.getAgentState().equals(AgentState.PERSON_OTHER_MODE) && veh.getVehicle().getType().getNetworkMode().equals(TransportMode.car)) {
+			throw new RuntimeException("missed a car driver");
+		}
+		if (position.getAgentState().equals(AgentState.PERSON_DRIVING_CAR)) {
+			var stop = "here";
+		}
+		if (position.getAgentState().equals(AgentState.TRANSIT_DRIVER)) {
+			var stop = "here also";
+		}
+
+
+		positions.add(position);
+
+
+
+
+
+	/*	AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), veh.getId(), veh.getCurrentLink().getId(), startCoord, endCoord,
 				distanceFromFromNode, lane, lengthOfCurve);
 
 		if (pos.getLinkId() == null || pos.getVehicleId() == null) {
@@ -195,14 +274,14 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			pos.setAgentState( AgentState.MARKER );
 		}
 
-		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
-				endCoord, lengthOfCurve, lane+5, speedValueBetweenZeroAndOne);
+	 */
+
+		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord,
+				endCoord, lengthOfCurve, lane + 5, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
 
-		positions.add(pos);
+		//positions.add(pos);
 	}
-	
-	private static int wrnCnt = 0 ;
 
 	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<? extends MobsimVehicle> vehs, double curvedLength, double storageCapacity,
@@ -214,7 +293,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		double ttimeOfHoles = curvedLength / (QueueWithBuffer.HOLE_SPEED_KM_H*1000./3600.);
 
 		TreeMap<Double,Hole> consumableHoles = new TreeMap<>() ;
-		
+
 		// holes or kinematicWaves, if applicable:
 
 		switch (scenario.getConfig().qsim().getSnapshotStyle()) {
@@ -229,22 +308,22 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					double distanceOfHoleFromFromNode = Double.NaN ;
 					double sum = 0 ;
 					for (Hole hole : holes) {
-						sum += hole.getSizeInEquivalents() ;
-						distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance( ttimeOfHoles, hole, now, curvedLength);
-						if ( Double.isNaN( firstHolePosition ) ) {
-							firstHolePosition = distanceOfHoleFromFromNode ;
-							sum = 0 ; // don't include first vehicle
+						sum += hole.getSizeInEquivalents();
+						distanceOfHoleFromFromNode = computeHolePositionAndReturnDistance(ttimeOfHoles, hole, now, curvedLength);
+						if (Double.isNaN(firstHolePosition)) {
+							firstHolePosition = distanceOfHoleFromFromNode;
+							sum = 0; // don't include first vehicle
 						}
 
-						if ( Math.round(distanceOfHoleFromFromNode) == Math.round(curvedLength) ) {
-							// since hole is already created even if vehicle is in buffer, thus excluding such holes in vehicle position updating
-							// probably, don't create hole in visualizer also. amit May 2016
-						} else {
-							consumableHoles.put( distanceOfHoleFromFromNode, hole ) ;
-						}
+						if (Math.round(distanceOfHoleFromFromNode) != Math.round(curvedLength)) {
+							consumableHoles.put(distanceOfHoleFromFromNode, hole);
+						} // else {
+						// since hole is already created even if vehicle is in buffer, thus excluding such holes in vehicle position updating
+						// probably, don't create hole in visualizer also. amit May 2016
+						//}
 
-						if ( QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles==scenario.getConfig().qsim().getSnapshotStyle() ) {
-							addHolePosition( positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord ) ;
+						if (QSimConfigGroup.SnapshotStyle.withHolesAndShowHoles == scenario.getConfig().qsim().getSnapshotStyle()) {
+							addHolePosition(positions, distanceOfHoleFromFromNode, hole, curvedLength, upstreamCoord, downstreamCoord);
 						}
 					}
 					final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
@@ -256,8 +335,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 							log.warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
 							log.warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
 						}
-						if ( wrnCnt==10 ) {
-							log.warn( Gbl.FUTURE_SUPPRESSED ) ; 
+						if (wrnCnt == 10) {
+							log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 						}
 					}
 				}
@@ -271,21 +350,21 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		double distanceFromFromNode = Double.NaN;
 
-		for ( MobsimVehicle mveh : vehs ) {
-			final QVehicle veh = (QVehicle) mveh ;
+		for ( MobsimVehicle mveh : vehs) {
+			final QVehicle veh = (QVehicle) mveh;
 
-			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			final double remainingTravelTime = veh.getEarliestLinkExitTime() - now;
 			// (starts off relatively small (rightmost vehicle))
-			
-			final double vehicleSpacing = mveh.getSizeInEquivalents()*spacingOfOnePCE;
-			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, vehicleSpacing , distanceFromFromNode, 
+
+			final double vehicleSpacing = mveh.getSizeInEquivalents() * spacingOfOnePCE;
+			distanceFromFromNode = this.calculateOdometerDistanceFromFromNode(curvedLength, vehicleSpacing, distanceFromFromNode,
 					now, freespeedTraveltime, remainingTravelTime);
 			// (starts off relatively large (rightmost vehicle))
-			
-			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt );
+
+			int lane = VisUtils.guessLane(veh, numberOfLanesAsInt);
 			double speedValue = VisUtils.calcSpeedValueBetweenZeroAndOne(veh, inverseFlowCapPerTS, now, freeSpeed);
-			Gbl.assertNotNull( upstreamCoord ) ;
-			Gbl.assertNotNull( downstreamCoord ) ;
+			Gbl.assertNotNull(upstreamCoord);
+			Gbl.assertNotNull(downstreamCoord);
 			this.positionAgentGivenDistanceFromFNode(positions, upstreamCoord, downstreamCoord, curvedLength, veh, distanceFromFromNode, lane, speedValue);
 
 			switch (this.scenario.getConfig().qsim().getTrafficDynamics()) {
@@ -301,20 +380,12 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				default: throw new RuntimeException("The traffic dynmics "+this.scenario.getConfig().qsim().getTrafficDynamics()+" is not implemented yet.");
 			}
 		}
-		
+
 		/* Can't explain the above in easy words.  Essentially, when vehicles leave the link at max rate, there still must be some space between
 		 * the holes that this generates.  That space is added up until a full vehicle fits into it.  There must be some better way of
 		 * explaining this, but I don't know it right now.  kai, apr'16
 		 */
 		return positions;
-	}
-
-
-	 private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) 
-	{
-		double remainingTravelTime = hole.getEarliestLinkExitTime() - now ;
-		double distanceFromFromNode = remainingTravelTime/freespeedTraveltime * curvedLength ;
-		return distanceFromFromNode;
 	}
 		
 	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
@@ -329,18 +400,32 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		positions.add(pos);
 	}
-	
+
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
-			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
-			double lengthOfCurve, Integer lane, double speedValueBetweenZeroAndOne) {
+								  Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
+								  double lengthOfCurve, int lane, double speedValueBetweenZeroAndOne) {
+
 		int cnt = passengers.size();
-		int laneInt = 2*(cnt+1);
-		if (lane != null){
-			laneInt += lane;
-		}
+		int laneInt = 2 * (cnt + 1) + lane;
+
 		for (PassengerAgent passenger : passengers) {
-			int lanePos = laneInt - 2*cnt ;
-			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(),
+			int lanePos = laneInt - 2 * cnt;
+			var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+					.setPersonId(passenger.getId())
+					.setVehicleId(passenger.getVehicle().getId())
+					.setLinkId(passenger.getCurrentLinkId())
+					.setFromCoord(startCoord)
+					.setToCoord(endCoord)
+					.setDistanceOnLink(distanceOnLink)
+					.setLane(lanePos)
+					.setLinkLength(lengthOfCurve)
+					.setColorValue(speedValueBetweenZeroAndOne)
+					.setAgentState(getAgentState(passenger))
+					.build();
+
+
+
+			/*AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(),
 					passenger.getVehicle().getId(), passenger.getCurrentLinkId(), startCoord, endCoord,
 					distanceOnLink, lanePos, lengthOfCurve);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
@@ -349,6 +434,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
 				passengerPosition.setAgentState( AgentState.MARKER );
 			}
+
+			 */
 
 			positions.add(passengerPosition);
 			cnt-- ;
