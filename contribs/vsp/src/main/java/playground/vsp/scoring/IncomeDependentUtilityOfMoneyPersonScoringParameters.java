@@ -34,6 +34,7 @@ import org.matsim.pt.config.TransitConfigGroup;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.OptionalDouble;
 
 /**
  * @author tschlenther
@@ -74,14 +75,20 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 		log.info("read income attribute '" + PERSONAL_INCOME_ATTRIBUTE_NAME + "' of all agents and compute global average.\n" +
 				"Make sure to set this attribute only to appropriate agents (i.e. true 'persons' and not freight agents) \n" +
 				"Income values <= 0 are ignored. Agents that have negative or 0 income will use the marginalUtilityOfMOney in their subpopulation's scoring params..");
-		double averageIncome =  population.getPersons().values().stream()
+		OptionalDouble averageIncome =  population.getPersons().values().stream()
 				.filter(person -> person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null) //consider only agents that have a specific income provided
-				.mapToDouble(person ->	(double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME))
+				.mapToDouble(person -> (double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME))
 				.filter(dd -> dd > 0)
-				.average()
-				.getAsDouble();
-		log.info("global average income is " + averageIncome);
-		return averageIncome;
+				.average();
+
+		if(! averageIncome.isPresent()){
+			throw new RuntimeException("you are using " + this.getClass() + " but there is not a single income attribute in the population! " +
+					"If you are not aiming for person-specific marginalUtilityOfMOney, better use other PersonScoringParams, e.g. SUbpopulationPersonScoringParams, which have higher performance." +
+					"Otherwise, please provide income attributes in the population...");
+		} else {
+			log.info("global average income is " + averageIncome);
+			return averageIncome.getAsDouble();
+		}
 	}
 
 	@Override
