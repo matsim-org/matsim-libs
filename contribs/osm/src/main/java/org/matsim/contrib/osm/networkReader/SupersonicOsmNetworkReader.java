@@ -40,6 +40,7 @@ public class SupersonicOsmNetworkReader {
 
     private final Predicate<Long> preserveNodeWithId;
     private final AfterLinkCreated afterLinkCreated;
+    private final boolean adjustFreeSpeed;
     private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
     final OsmNetworkParser parser;
 
@@ -48,11 +49,13 @@ public class SupersonicOsmNetworkReader {
     SupersonicOsmNetworkReader(OsmNetworkParser parser,
                                Predicate<Long> preserveNodeWithId,
                                BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-                               AfterLinkCreated afterLinkCreated) {
+                               AfterLinkCreated afterLinkCreated,
+                               boolean adjustFreeSpeed) {
+        this.parser = parser;
+        this.preserveNodeWithId = preserveNodeWithId;
         this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
         this.afterLinkCreated = afterLinkCreated;
-        this.preserveNodeWithId = preserveNodeWithId;
-        this.parser = parser;
+        this.adjustFreeSpeed = adjustFreeSpeed;
     }
 
     public Network read(String inputFile) {
@@ -235,7 +238,8 @@ public class SupersonicOsmNetworkReader {
 
     private double getFreespeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
         if (tags.containsKey(OsmTags.MAXSPEED)) {
-            return LinkProperties.calculateSpeedIfSpeedTag(parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties));
+            double maxSpeed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
+            return adjustFreeSpeed ? LinkProperties.calculateSpeedIfSpeedTag(maxSpeed) : maxSpeed;
         } else {
             return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
         }
@@ -309,9 +313,9 @@ public class SupersonicOsmNetworkReader {
         Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
         BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
         Predicate<Long> preserveNodeWithId = id -> false;
-        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
-        };
+        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> { };
         CoordinateTransformation coordinateTransformation;
+        boolean adjustFreeSpeed = true;
 
         /**
          * Replace all Link-Properties at once. Link properties describe how an osm-highway-tag is translated into a
@@ -392,6 +396,15 @@ public class SupersonicOsmNetworkReader {
         }
 
         /**
+         * This sets whether the free speed will be adjusted for urban links.
+         * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
+         */
+        public AbstractBuilder<T> setAdjustFreeSpeed(boolean adjustFreeSpeed) {
+            this.adjustFreeSpeed = adjustFreeSpeed;
+            return this;
+        }
+
+        /**
          * Coordinate transformation to transform spherical-osm-coordinates into euclidean-coordinates suited for matsim
          * simulations
          *
@@ -428,7 +441,7 @@ public class SupersonicOsmNetworkReader {
             return new SupersonicOsmNetworkReader(
                     parser, preserveNodeWithId,
                     includeLinkAtCoordWithHierarchy,
-                    afterLinkCreated
+                    afterLinkCreated, adjustFreeSpeed
             );
         }
     }
