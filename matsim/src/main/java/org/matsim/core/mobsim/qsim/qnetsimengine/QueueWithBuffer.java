@@ -224,11 +224,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		double now = context.getSimTimer().getTimeOfDay() ;
 
-		double flowEfficiency = (lastBufferEntry == null) ?
+		double flowConsumption = (lastBufferEntry == null) ?
 				getFlowCapacityConsumptionInEquivalents(veh, null, null) : getFlowCapacityConsumptionInEquivalents(veh, lastBufferEntry.getKey(), now - lastBufferEntry.getValue());
-        this.flowcap_accumulate.addValue(-flowEfficiency, now);
+        this.flowcap_accumulate.addValue(-flowConsumption, now);
 
-		buffer.add(new ImmutablePair<>(veh,flowEfficiency));
+		buffer.add(new ImmutablePair<>(veh,flowConsumption));
 		lastBufferEntry = new ImmutablePair<>(veh,now);
 
 		if (buffer.size() == 1) {
@@ -571,9 +571,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
                 break;
             case kinematicWaves:
                 this.remainingHolesStorageCapacity -= veh.getSizeInEquivalents();
-				double flowEfficiency = (lastQueueEntry == null) ?
+				double flowConsumption = (lastQueueEntry == null) ?
 						getFlowCapacityConsumptionInEquivalents(veh, null, null) : getFlowCapacityConsumptionInEquivalents(veh, lastQueueEntry.getKey(), now - lastQueueEntry.getValue());
-                this.accumulatedInflowCap -= flowEfficiency;
+                this.accumulatedInflowCap -= flowConsumption;
                 break;
             default:
                 throw new RuntimeException("The traffic dynamics " + context.qsimConfig.getTrafficDynamics() + " is not implemented yet.");
