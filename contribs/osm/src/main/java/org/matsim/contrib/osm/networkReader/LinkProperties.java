@@ -19,6 +19,14 @@ public class LinkProperties {
 	public static final int LEVEL_RESIDENTIAL = 7;
 	public static final int LEVEL_LIVING_STREET = 8;
 
+	/**
+	 * Assume for links with max speed lower than 51km/h to be in urban areas.
+	 * The free speed is reduced by this factor to account for traffic lights, ROW, etc.
+	 *
+	 * @see #calculateSpeedIfSpeedTag(double) 
+	 */
+	public static final double DEFAULT_FREESPEED_FACTOR = 0.9;
+
 	final int hierachyLevel;
 	final double lanesPerDirection;
 	final double freespeed;
@@ -139,7 +147,7 @@ public class LinkProperties {
      * Calculate free speed of a link based on heuristic if it is an urban link.
      */
 	public static double calculateSpeedIfSpeedTag(double maxSpeed) {
-        double urbanSpeedFactor = maxSpeed < 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
+        double urbanSpeedFactor = maxSpeed < 51 / 3.6 ? DEFAULT_FREESPEED_FACTOR : 1.0;
         return maxSpeed * urbanSpeedFactor;
     }
 
