@@ -50,7 +50,7 @@ public class LinkPropertiesTest {
     public void calculateSpeedIfSpeedTag_withUrbanFactor() {
 
         var maxSpeed = 50 / 3.6;
-        assertEquals(maxSpeed / 2, LinkProperties.calculateSpeedIfSpeedTag(maxSpeed), Double.MIN_VALUE);
+        assertEquals(maxSpeed * 0.9, LinkProperties.calculateSpeedIfSpeedTag(maxSpeed), Double.MIN_VALUE);
     }
 
     @Test
