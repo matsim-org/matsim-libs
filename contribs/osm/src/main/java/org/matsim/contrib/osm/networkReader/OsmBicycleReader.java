@@ -23,14 +23,13 @@ import java.util.function.Predicate;
  */
 public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 
-	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 	private static final double BIKE_PCU = 0.25;
-	private static Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
+	private static final Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
 			OsmTags.TRUNK, OsmTags.TRUNK_LINK));
-	private static Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
+	private static final Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
 			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS));
 
-	private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
+	private final SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
 	public OsmBicycleReader(OsmNetworkParser parser,
 							Predicate<Long> preserveNodeWithId,
@@ -49,9 +48,6 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		setSmoothness(link, tags);
 		setCycleWay(link, tags);
 		setRestrictions(link, tags);
-
-		// do infrastructure factor
-		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
 		outfacingCallback.accept(link, tags, direction);
 	}

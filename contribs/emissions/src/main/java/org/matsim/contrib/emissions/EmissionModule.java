@@ -375,6 +375,7 @@ public final class EmissionModule {
 			else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
 			else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
 			else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
+			else if(string.endsWith("St+Go2")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO_HEAVY;
 			else {
 				logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in hbefa input file.");
 				throw new RuntimeException();
