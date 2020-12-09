@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -58,6 +59,19 @@ public class SupersonicOsmNetworkReader {
         this.adjustFreeSpeed = adjustFreeSpeed;
     }
 
+    /**
+     * Creates a function to adjust the freespeed for urban links.
+     * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
+     */
+    public static AfterLinkCreated adjustFreespeed(final double factor) {
+        return (link, osmTags, direction) -> {
+            if (osmTags.containsKey(OsmTags.MAXSPEED)) {
+                if (link.getFreespeed() < 51 / 3.6)
+                    link.setFreespeed(link.getFreespeed() * factor);
+            }
+        };
+    }
+
     public Network read(String inputFile) {
         return read(Paths.get(inputFile));
     }
@@ -67,10 +81,10 @@ public class SupersonicOsmNetworkReader {
         parser.parse(inputFile);
         this.network = NetworkUtils.createNetwork();
 
-        log.info("starting convertion \uD83D\uDE80");
+        log.info("starting conversion \uD83D\uDE80");
         convert(parser.getWays(), parser.getNodes());
 
-        log.info("finished convertion");
+        log.info("finished conversion");
         return network;
     }
 
@@ -306,6 +320,19 @@ public class SupersonicOsmNetworkReader {
     public interface AfterLinkCreated {
 
         void accept(Link link, Map<String, String> osmTags, Direction direction);
+
+        /**
+         * Executes function {@code after}, after this function has been executed.
+         * @see java.util.function.Consumer#andThen(Consumer)
+         */
+        default AfterLinkCreated andThen(AfterLinkCreated after) {
+            Objects.requireNonNull(after);
+            return (link, osmTags, direction) -> {
+                accept(link, osmTags, direction);
+                after.accept(link, osmTags, direction);
+            };
+        }
+
     }
 
     public static abstract class AbstractBuilder<T> {
@@ -397,6 +424,7 @@ public class SupersonicOsmNetworkReader {
 
         /**
          * This sets whether the free speed will be adjusted for urban links.
+         *
          * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
          */
         public AbstractBuilder<T> setAdjustFreeSpeed(boolean adjustFreeSpeed) {
