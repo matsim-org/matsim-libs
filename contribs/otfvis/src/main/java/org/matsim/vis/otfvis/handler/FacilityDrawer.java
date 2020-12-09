@@ -20,24 +20,14 @@
 
 package org.matsim.vis.otfvis.handler;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.jogamp.opengl.GL2;
-
 import com.jogamp.opengl.util.awt.TextRenderer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.AgentTracker;
-import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -50,8 +40,13 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 public class FacilityDrawer {
 	private static final Logger log = Logger.getLogger(FacilityDrawer.class);
@@ -72,25 +67,35 @@ public class FacilityDrawer {
 		}
 
 		@Override
-		public void writeConstData(ByteBuffer out) throws IOException {
+		public void writeConstData(ByteBuffer out) {
 			out.putInt(this.schedule.getFacilities().size());
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				ByteBufferUtils.putString(out, facility.getId().toString());
 				if (facility.getLinkId() != null) {
 					// yyyy would most probably make sense to have something that generates coordinates for facilities
-					Link link = this.network.getLinks().get( facility.getLinkId() ) ;
-					if ( link==null ) {
-						log.warn( " link not found; linkId: " + facility.getLinkId() ) ;
-						ByteBufferUtils.putString(out,"");
+					Link link = this.network.getLinks().get(facility.getLinkId());
+					if (link == null) {
+						log.warn(" link not found; linkId: " + facility.getLinkId());
+						ByteBufferUtils.putString(out, "");
 						Point2D.Double point = OTFServerQuadTree.transform(facility.getCoord());
 						out.putDouble(point.getX());
 						out.putDouble(point.getY());
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
-						AgentSnapshotInfo ps = agentSnapshotInfoFactory.createAgentSnapshotInfo(Id.create(facility.getId(), Person.class), link, 0.9*link.getLength(), 0) ;
+						var ps = agentSnapshotInfoFactory.getAgentSnapshotInfoBuilder()
+								.setPersonId(Id.createPersonId(facility.getId()))
+								.setLinkId(link.getId())
+								.setFromCoord(link.getFromNode().getCoord())
+								.setToCoord(link.getToNode().getCoord())
+								.setLinkLength(link.getLength())
+								.setDistanceOnLink(0.9 * link.getLength())
+								.setLane(0)
+								.build();
+
+						//AgentSnapshotInfo ps = agentSnapshotInfoFactory.createAgentSnapshotInfo(Id.create(facility.getId(), Person.class), link, 0.9*link.getLength(), 0) ;
 						Point2D.Double point = OTFServerQuadTree.transform(new Coord(ps.getEasting(), ps.getNorthing()));
-						out.putDouble(point.getX()) ;
-						out.putDouble(point.getY()) ;
+						out.putDouble(point.getX());
+						out.putDouble(point.getY());
 					}
 				} else {
 					ByteBufferUtils.putString(out,"");
@@ -103,7 +108,7 @@ public class FacilityDrawer {
 		}
 
 		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
+		public void writeDynData(ByteBuffer out) {
 			for (TransitStopFacility facility : this.schedule.getFacilities().values()) {
 				out.putInt(this.agentTracker.getAgentsAtFacility(facility.getId()).size());
 			}
@@ -113,7 +118,7 @@ public class FacilityDrawer {
 
 	public static class Reader extends OTFDataReader {
 
-		private DataDrawer drawer = new DataDrawer();
+		private final DataDrawer drawer = new DataDrawer();
 
 		@Override
 		public void invalidate(SceneGraph graph) {
@@ -121,7 +126,7 @@ public class FacilityDrawer {
 		}
 
 		@Override
-		public void readConstData(ByteBuffer in) throws IOException {
+		public void readConstData(ByteBuffer in) {
 			int numberOfEntries = in.getInt();
 			for (int i = 0; i < numberOfEntries; i++) {
 				VisBusStop stop = new VisBusStop();
@@ -132,14 +137,12 @@ public class FacilityDrawer {
 				}
 				stop.x = in.getDouble();
 				stop.y = in.getDouble();
-				if (this.drawer != null) {
-					this.drawer.stops.add(stop);
-				}
+				this.drawer.stops.add(stop);
 			}
 		}
 
 		@Override
-		public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		public void readDynData(ByteBuffer in, SceneGraph graph) {
 			for (VisBusStop stop : this.drawer.stops) {
 				stop.setnOfPeople(in.getInt());
 			}

@@ -12,11 +12,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -89,20 +92,25 @@ public class QueueAgentSnapshotInfoBuilderTest {
         return result;
     }
 
-    private static Collection<QVehicle> createTransitVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
+    private static Queue<QVehicle> createTransitVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
 
         VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.pt, VehicleType.class));
         type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
+        type.getCapacity().setSeats(10);
         var exitTime = exitTimeOfFirstVehicle;
 
-        List<QVehicle> result = new ArrayList<>();
+        Queue<QVehicle> result = new LinkedList<>();
 
         for (int i = 0; i < size; i++) {
 
             var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
             vehicle.setEarliestLinkExitTime(exitTime);
-            vehicle.setDriver(new TestDriverAgent(Id.createPersonId(1)));
+            vehicle.setDriver(new TestTransitDriverAgent(Id.createPersonId(1)));
             vehicle.setCurrentLink(link);
+
+            for (int b = 0; b < type.getCapacity().getSeats(); b++) {
+                vehicle.addPassenger(new TestPassengerAgent(Id.createPersonId(1)));
+            }
 
             result.add(vehicle);
             exitTime += 5;
@@ -260,7 +268,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
         // the positions should be at (0.9 * linkLength, -18.75 - 3.75 * waitingListIndex)
         // all should drive a car
         // agentId, vehicleId, linkId should all be 1
-        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -18.75, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -15, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         outCollection.forEach(position -> assertEquals(Id.createVehicleId(1), position.getVehicleId()));
     }
 
@@ -270,22 +278,19 @@ public class QueueAgentSnapshotInfoBuilderTest {
         var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
         var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
+        var waitingList = createTransitVehicles(setUp.link, 1, 100);
 
         // act
-        var newCount = builder.positionVehiclesFromTransitStop(outCollection, setUp.link, setUp.waitingList, setUp.counter);
+        var newCount = builder.positionVehiclesFromTransitStop(outCollection, setUp.link, waitingList, setUp.counter);
 
         // this is the driver
         var firstPosition = outCollection.remove(0);
         assertEquals(AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, firstPosition.getAgentState());
+        assertEquals(setUp.linkLength * 0.9, firstPosition.getEasting(), 0.00001);
+        assertEquals(-15, firstPosition.getNorthing(), 0.00001);
 
 
-        assertStackedPositions(outCollection, setUp.linkLength, -18.75, AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE);
-
-    }
-
-    @Test
-    public void positionPassengers() {
-
+        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -18.75, AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE);
     }
 
     private static class SimpleTestSetUp {
@@ -428,6 +433,40 @@ public class QueueAgentSnapshotInfoBuilderTest {
         @Override
         public Facility getDestinationFacility() {
             return null;
+        }
+    }
+
+    private static class TestTransitDriverAgent extends TestDriverAgent implements TransitDriverAgent {
+
+        private TestTransitDriverAgent(Id<Person> personId) {
+            super(personId);
+        }
+
+        @Override
+        public TransitStopFacility getNextTransitStop() {
+            return null;
+        }
+
+        @Override
+        public double handleTransitStop(TransitStopFacility stop, double now) {
+            return 0;
+        }
+
+        @Override
+        public String getMode() {
+            return TransportMode.pt;
+        }
+    }
+
+    private static class TestPassengerAgent extends TestDriverAgent implements PassengerAgent {
+
+        private TestPassengerAgent(Id<Person> personId) {
+            super(personId);
+        }
+
+        @Override
+        public String getMode() {
+            return TransportMode.pt;
         }
     }
 }

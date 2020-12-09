@@ -46,10 +46,10 @@ import java.util.TreeMap;
 /**
  * @author dgrether
  * @author knagel
- *
  */
 abstract class AbstractAgentSnapshotInfoBuilder {
 	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
+	private static int wrnCnt = 0;
 
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private final Scenario scenario;
@@ -70,25 +70,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 */
 	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 													 final Link link, int cnt2, final Queue<QVehicle> waitingList) {
-		for (QVehicle veh : waitingList) {
-			var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
-			for (var passenger : peopleInVehicle) {
-				cnt2++ ;
-				var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
-						.setPersonId(passenger.getId())
-						.setVehicleId(veh.getId())
-						.setLinkId(link.getId())
-						.setFromCoord(link.getFromNode().getCoord())
-						.setToCoord(link.getToNode().getCoord())
-						.setDistanceOnLink(link.getLength() * 0.9)
-						.setLane(cnt2)
-						.setLinkLength(link.getLength())
-						.setAgentState(getAgentState(passenger))
-						.build();
-				positions.add(passengerPosition);
-			}
-		}
-		return cnt2;
+		return positionStack(positions, waitingList, cnt2);
 	}
 
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
@@ -106,20 +88,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					.setAgentState(getAgentStateForActivity(agent.getId()))
 					.build();
 			positions.add(position);
-
-
-			/*AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
-			agInfo.setAgentState( AgentState.PERSON_AT_ACTIVITY ) ;
-			final Person person = scenario.getPopulation().getPersons().get( pa.getId() );
-			if ( person != null ) {
-				if ( person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ){
-					agInfo.setAgentState( AgentState.MARKER );
-				}
-			}
-
-			positions.add(agInfo) ;
-
-			 */
 			cnt2++ ;
 		}
 		return cnt2;
@@ -130,55 +98,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 */
 	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link,
 													 Queue<QVehicle> transitVehicleStopQueue, int cnt2) {
-		if (transitVehicleStopQueue.size() > 0) {
-			for (QVehicle veh : transitVehicleStopQueue) {
-				var peopleInVehicle = VisUtils.getPeopleInVehicle(veh);
-				for (Identifiable<Person> identifiable : peopleInVehicle) {
-
-					var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
-							.setPersonId(identifiable.getId())
-							.setVehicleId(veh.getId())
-							.setLinkId(link.getId())
-							.setLinkLength(link.getLength())
-							.setDistanceOnLink(link.getLength() * 0.9)
-							.setFromCoord(link.getFromNode().getCoord())
-							.setToCoord(link.getToNode().getCoord())
-							.setLane(cnt2)
-							.setAgentState(getAgentState(identifiable))
-							.build();
-					positions.add(passengerPosition);
-				}
-
-				/*
-				boolean last = false ;
-				cnt2 += peopleInVehicle.size() ;
-				for ( var it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
-					var passenger = it.previous();
-					if ( !it.hasPrevious() ) {
-						last = true ;
-					}
-					AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
-					if ( passenger.getId().toString().startsWith("pt")) {
-						passengerPosition.setAgentState(AgentState.TRANSIT_DRIVER);
-					} else if (last) {
-						passengerPosition.setAgentState(AgentState.PERSON_DRIVING_CAR);
-					} else {
-						passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE);
-					}
-					positions.add(passengerPosition);
-					cnt2-- ;
-				}
-				cnt2 += peopleInVehicle.size() ; // setting it correctly for the next output
-
-				 */
-				cnt2 += peopleInVehicle.size();
-			}
-
-		}
-		return cnt2;
+		return positionStack(positions, transitVehicleStopQueue, cnt2);
 	}
-
-	private static int wrnCnt = 0;
 
 	public final void positionAgentGivenDistanceFromFNode(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
 														  double lengthOfCurve, QVehicle veh, double distanceFromFromNode,
@@ -201,55 +122,11 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 				.setColorValue(speedValueBetweenZeroAndOne)
 				.build();
 
-		if (position.getAgentState().equals(AgentState.PERSON_OTHER_MODE) && veh.getVehicle().getType().getNetworkMode().equals(TransportMode.car)) {
-			throw new RuntimeException("missed a car driver");
-		}
-		if (position.getAgentState().equals(AgentState.PERSON_DRIVING_CAR)) {
-			var stop = "here";
-		}
-		if (position.getAgentState().equals(AgentState.TRANSIT_DRIVER)) {
-			var stop = "here also";
-		}
-
-
-		positions.add(position);
-
-
-
-
-
-	/*	AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(driverAgent.getId(), veh.getId(), veh.getCurrentLink().getId(), startCoord, endCoord,
-				distanceFromFromNode, lane, lengthOfCurve);
-
-		if (pos.getLinkId() == null || pos.getVehicleId() == null) {
-			throw new RuntimeException("break here");
-		}
-
-		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
-		if (driverAgent instanceof TransitDriverAgent){
-			pos.setAgentState(AgentState.TRANSIT_DRIVER);
-		} else if ( driverAgent.getMode().equals(TransportMode.car)) {
-			pos.setAgentState(AgentState.PERSON_DRIVING_CAR);
-		} else {
-			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
-		}
-		if ( driverAgent instanceof HasPerson ){
-			if( PopulationUtils.getPersonAttribute( ((HasPerson) driverAgent).getPerson(), AgentSnapshotInfo.marker ) != null ){
-				pos.setAgentState( AgentState.MARKER );
-			}
-		}
-		final Person person = scenario.getPopulation().getPersons().get( driverAgent.getId() );
-		if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-			pos.setAgentState( AgentState.MARKER );
-		}
-
-	 */
-
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord,
 				endCoord, lengthOfCurve, lane + 5, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
 
-		//positions.add(pos);
+		positions.add(position);
 	}
 
 	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
@@ -357,9 +234,39 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return positions;
 	}
 
-	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
-								  Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
-								  double lengthOfCurve, int lane, double speedValueBetweenZeroAndOne) {
+
+	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
+
+	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode,
+																 double now, double freespeedTraveltime, double remainingTravelTime);
+
+	private int positionStack(final Collection<AgentSnapshotInfo> positions, final Collection<QVehicle> vehicles, final int startCount) {
+
+		var counter = startCount;
+		for (var vehicle : vehicles) {
+			var link = vehicle.getCurrentLink();
+			for (var passenger : VisUtils.getPeopleInVehicle(vehicle)) {
+				var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+						.setPersonId(passenger.getId())
+						.setVehicleId(vehicle.getId())
+						.setLinkId(link.getId())
+						.setFromCoord(link.getFromNode().getCoord())
+						.setToCoord(link.getToNode().getCoord())
+						.setDistanceOnLink(link.getLength() * 0.9)
+						.setLane(counter)
+						.setLinkLength(link.getLength())
+						.setAgentState(getAgentState(passenger))
+						.build();
+				positions.add(position);
+				counter++;
+			}
+		}
+		return counter;
+	}
+
+	private void positionPassengers(Collection<AgentSnapshotInfo> positions,
+									Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
+									double lengthOfCurve, int lane, double speedValueBetweenZeroAndOne) {
 
 		int cnt = passengers.size();
 		int laneInt = 2 * (cnt + 1) + lane;
@@ -379,40 +286,28 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					.setAgentState(getAgentState(passenger))
 					.build();
 
-
-
-			/*AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(),
-					passenger.getVehicle().getId(), passenger.getCurrentLinkId(), startCoord, endCoord,
-					distanceOnLink, lanePos, lengthOfCurve);
-			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
-			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
-			final Person person = scenario.getPopulation().getPersons().get( passenger.getId() );
-			if ( person != null && person.getAttributes().getAttribute( AgentSnapshotInfo.marker ) != null ) {
-				passengerPosition.setAgentState( AgentState.MARKER );
-			}
-
-			 */
-
 			positions.add(passengerPosition);
 			cnt--;
 		}
 	}
 
-	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
-
-	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode,
-																 double now, double freespeedTraveltime, double remainingTravelTime);
-
 	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh,
 								 double curvedLength, Coord upstreamCoord, Coord downstreamCoord) {
 		int lane = 20;
 		double speedValue = 1.;
-		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class),
-				veh.getId(), null, upstreamCoord, downstreamCoord,
-				distanceFromFromNode, lane, curvedLength);
-		pos.setColorValueBetweenZeroAndOne(speedValue);
-		pos.setAgentState(AgentState.PERSON_OTHER_MODE);
-		positions.add(pos);
+
+		var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+				.setPersonId(Id.createPersonId("hole"))
+				.setVehicleId(Id.createVehicleId(veh.getId()))
+				.setFromCoord(upstreamCoord)
+				.setToCoord(downstreamCoord)
+				.setDistanceOnLink(distanceFromFromNode)
+				.setLane(lane)
+				.setLinkLength(curvedLength)
+				.setColorValue(speedValue)
+				.setAgentState(AgentState.PERSON_OTHER_MODE)
+				.build();
+		positions.add(position);
 	}
 
 	private AgentState getAgentState(Identifiable<Person> identifiable) {
