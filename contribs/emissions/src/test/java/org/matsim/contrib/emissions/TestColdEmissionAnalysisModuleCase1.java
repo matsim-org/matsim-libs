@@ -111,8 +111,7 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		ArrayList<Object> testCase1 = new ArrayList<Object>();
 		// first case: complete data
 		// corresponding entry in average table
-		Collections.addAll(testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept,
-				averagePetrolFactor);
+		Collections.addAll(testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor);
 		logger.info("Running testcase:" + testCase1.toString());
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);

@@ -127,7 +127,8 @@ public class TestColdEmissionAnalysisModule {
 		 * or input that should be assigned to average/default cases
 		 */
 
-		setUp();
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
+		//setUp();
 
 		List<ArrayList> testCases = new ArrayList<>();
 
@@ -189,8 +190,7 @@ public class TestColdEmissionAnalysisModule {
 			//coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions( linkId, vehicle, startTime, parkingDuration, tableAccDistance );
 			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicleId,linkId, startTime, parkingDuration, tableAccDistance);
 
-			String message = "The expected emissions for " + tc.toString() + " are " +
-							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+			String message = "The expected emissions for " + tc.toString() + " are " + numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 		}
 	}
@@ -397,8 +397,7 @@ public class TestColdEmissionAnalysisModule {
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );

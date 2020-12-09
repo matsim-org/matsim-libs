@@ -135,10 +135,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
 		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-
 		testCases.add( testCase4 );
-
-
 
 		logger.info("Running testcase: " + testCases.indexOf( 0 ) + " " + testCases.toString());
 		HandlerToTestEmissionAnalysisModules.reset();

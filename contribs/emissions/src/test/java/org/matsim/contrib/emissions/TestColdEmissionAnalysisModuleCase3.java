@@ -107,32 +107,26 @@ public class TestColdEmissionAnalysisModuleCase3 {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 		List<ArrayList> testCases = new ArrayList<>();
-
 		ArrayList<Object> testCase3 = new ArrayList<>();
 		// third case: complete data
 		// corresponding entries in average and detailed table; should use the detailed entry; thus
 		// error when using the average entry.
 		Collections.addAll( testCase3, passengercar, diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
-
-
 		testCases.add( testCase3 );
 
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
-			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
-			
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-			logger.info("VehicleId: " + vehicle.getId().toString());
-			logger.info("VehicleTypeId: " + vehicle.getType().getId());
-			
-			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-			String message = "The expected emissions for " + tc.toString() + " are " +
-							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		}
+		logger.info("Running testcase: " + testCases.indexOf( testCase3 ) + " " + testCase3.toString());
+		HandlerToTestEmissionAnalysisModules.reset();
+		Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( testCase3 ), Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( testCase3 ), Vehicle.class );
+		Id<VehicleType> vehicleTypeId = Id.create( testCase3.get( 0 ) + ";" + testCase3.get( 1 ) + ";" + testCase3.get( 2 ) + ";" + testCase3.get( 3 ), VehicleType.class );
+
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
+		logger.info("VehicleId: " + vehicle.getId().toString());
+		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		String message = "The expected emissions for " + testCase3.toString() + " are " + numberOfColdEmissions * (Double) testCase3.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase3.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+
 		
 	}
 
