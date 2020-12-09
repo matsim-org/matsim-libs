@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 
-public final class Hermes implements Mobsim {
+final class Hermes implements Mobsim {
 
 	final private static Logger log = Logger.getLogger(Hermes.class);
 	private Realm realm;

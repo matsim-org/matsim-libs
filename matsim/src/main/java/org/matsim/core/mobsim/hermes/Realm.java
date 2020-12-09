@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 
-public class Realm {
+class Realm {
 	private final ScenarioImporter si;
     // Global array of links.
     // Note: the id of the link is its index in the array.
