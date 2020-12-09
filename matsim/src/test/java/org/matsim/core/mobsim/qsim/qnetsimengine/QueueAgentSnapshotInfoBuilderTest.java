@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
@@ -25,7 +26,6 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class QueueAgentSnapshotInfoBuilderTest {
 
@@ -85,6 +85,17 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
             result.add(vehicle);
             exitTime += 5;
+        }
+        return result;
+    }
+
+    private static Collection<TestDriverAgent> createAgents(int size) {
+
+        List<TestDriverAgent> result = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+
+            var driver = new TestDriverAgent(Id.createPersonId(1));
+            result.add(driver);
         }
         return result;
     }
@@ -176,10 +187,39 @@ public class QueueAgentSnapshotInfoBuilderTest {
         assertEquals(1.0, vehicle5.getColorValueBetweenZeroAndOne(), 0.0001);
     }
 
+    private static void assertStackedPositions(Collection<AgentSnapshotInfo> positions, double expectedEasting, double expectedFirstNothing, AgentSnapshotInfo.AgentState expectedState) {
+
+        // the positions should be at (expectedEasting, -18.75 - 3.75 * waitingListIndex)
+        // all should drive a car
+        // agentId, vehicleId, linkId should all be 1 if they come out of 'createVehicles' or 'createAgents'
+        var expectedNorthing = expectedFirstNothing;
+        for (AgentSnapshotInfo info : positions) {
+
+            assertEquals(expectedEasting, info.getEasting(), 0.000001);
+            assertEquals(expectedNorthing, info.getNorthing(), 0.00001);
+            assertEquals(expectedState, info.getAgentState());
+            assertEquals(Id.createPersonId(1), info.getId());
+            assertEquals(Id.createLinkId(1), info.getLinkId());
+
+            expectedNorthing -= 3.75;
+        }
+    }
+
     @Test
     public void positionAgentsInActivities() {
 
-        fail("Not yet implemented");
+        var setUp = new SimpleTestSetUp();
+        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
+        var waitingList = createAgents(20);
+
+        // act
+        var newCount = builder.positionAgentsInActivities(outCollection, setUp.link, waitingList, setUp.counter);
+
+        // assert
+        assertEquals(setUp.counter + waitingList.size(), newCount);
+        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -15, AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY);
+
     }
 
     @Test
@@ -194,22 +234,13 @@ public class QueueAgentSnapshotInfoBuilderTest {
 
         // assert
         assertEquals(setUp.waitingList.size(), outCollection.size());
+        assertEquals(setUp.counter + setUp.waitingList.size(), newCount);
 
         // the positions should be at (0.9 * linkLength, -18.75 - 3.75 * waitingListIndex)
         // all should drive a car
         // agentId, vehicleId, linkId should all be 1
-        var expectedNorthing = -18.75;
-        for (AgentSnapshotInfo info : outCollection) {
-
-            assertEquals(setUp.linkLength * 0.9, info.getEasting(), 0.000001);
-            assertEquals(expectedNorthing, info.getNorthing(), 0.00001);
-            assertEquals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, info.getAgentState());
-            assertEquals(Id.createPersonId(1), info.getId());
-            assertEquals(Id.createLinkId(1), info.getLinkId());
-            assertEquals(Id.createVehicleId(1), info.getVehicleId());
-
-            expectedNorthing -= 3.75;
-        }
+        assertStackedPositions(outCollection, setUp.linkLength * 0.9, -18.75, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
+        outCollection.forEach(position -> assertEquals(Id.createVehicleId(1), position.getVehicleId()));
     }
 
     private static class SimpleTestSetUp {
@@ -245,7 +276,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
     /**
      * Mock up for MobsimDriverAgent
      */
-    private static class TestDriverAgent implements MobsimDriverAgent {
+    private static class TestDriverAgent implements MobsimDriverAgent, MobsimAgent {
 
         private final Id<Person> personId;
 

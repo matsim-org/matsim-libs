@@ -91,10 +91,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return cnt2;
 	}
 
-
-
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
-												Collection<MobsimAgent> agentsInActivities, int cnt2) {
+												Collection<? extends MobsimAgent> agentsInActivities, int cnt2) {
 		for (MobsimAgent agent : agentsInActivities) {
 
 			var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
