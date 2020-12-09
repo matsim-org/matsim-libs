@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Agent {
+class Agent {
 
 	public static class PlanArray {
 		long[] array;
