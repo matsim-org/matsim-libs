@@ -89,6 +89,27 @@ public class QueueAgentSnapshotInfoBuilderTest {
         return result;
     }
 
+    private static Collection<QVehicle> createTransitVehicles(Link link, int size, double exitTimeOfFirstVehicle) {
+
+        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.pt, VehicleType.class));
+        type.setMaximumVelocity(link.getFreespeed() + 10); // faster than link's freespeed
+        var exitTime = exitTimeOfFirstVehicle;
+
+        List<QVehicle> result = new ArrayList<>();
+
+        for (int i = 0; i < size; i++) {
+
+            var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
+            vehicle.setEarliestLinkExitTime(exitTime);
+            vehicle.setDriver(new TestDriverAgent(Id.createPersonId(1)));
+            vehicle.setCurrentLink(link);
+
+            result.add(vehicle);
+            exitTime += 5;
+        }
+        return result;
+    }
+
     private static Collection<TestDriverAgent> createAgents(int size) {
 
         List<TestDriverAgent> result = new ArrayList<>();
@@ -241,6 +262,30 @@ public class QueueAgentSnapshotInfoBuilderTest {
         // agentId, vehicleId, linkId should all be 1
         assertStackedPositions(outCollection, setUp.linkLength * 0.9, -18.75, AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
         outCollection.forEach(position -> assertEquals(Id.createVehicleId(1), position.getVehicleId()));
+    }
+
+    @Test
+    public void positionVehiclesFromTransitStop() {
+
+        var setUp = new SimpleTestSetUp();
+        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
+
+        // act
+        var newCount = builder.positionVehiclesFromTransitStop(outCollection, setUp.link, setUp.waitingList, setUp.counter);
+
+        // this is the driver
+        var firstPosition = outCollection.remove(0);
+        assertEquals(AgentSnapshotInfo.AgentState.TRANSIT_DRIVER, firstPosition.getAgentState());
+
+
+        assertStackedPositions(outCollection, setUp.linkLength, -18.75, AgentSnapshotInfo.AgentState.PERSON_OTHER_MODE);
+
+    }
+
+    @Test
+    public void positionPassengers() {
+
     }
 
     private static class SimpleTestSetUp {

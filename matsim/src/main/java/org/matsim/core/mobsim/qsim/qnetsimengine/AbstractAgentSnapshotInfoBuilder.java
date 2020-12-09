@@ -141,6 +141,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 							.setLinkId(link.getId())
 							.setLinkLength(link.getLength())
 							.setDistanceOnLink(link.getLength() * 0.9)
+							.setFromCoord(link.getFromNode().getCoord())
+							.setToCoord(link.getToNode().getCoord())
 							.setLane(cnt2)
 							.setAgentState(getAgentState(identifiable))
 							.build();
