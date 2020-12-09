@@ -3,19 +3,17 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -26,72 +24,43 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class QueueAgentSnapshotInfoBuilderTest {
 
     @Test
     public void positionVehiclesAlongLine_singleVehicleFreeFlow() {
 
-        final var config = ConfigUtils.createConfig();
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        final var scenario = ScenarioUtils.createScenario(config);
-        final var freespeed = 10.0;
-        final var linkLength = 100.0;
-        final var linkCapacity = 10;
-        final var linkEnterTime = 0.0;
-        final var now = 1.0;
-        final var fromCoord = new Coord(0,0);
-        final var toCoord = new Coord(linkLength, 0);
-
-        // the test object
-        var builder = new QueueAgentSnapshotInfoBuilder(scenario, new SnapshotLinkWidthCalculator());
-
-        // the list to be filled
-        Collection<AgentSnapshotInfo> outCollection = new ArrayList<>();
-
-        // create a vehicles on the link
-        VehicleType type = VehicleUtils.createVehicleType(Id.create(TransportMode.car, VehicleType.class ) );
-        type.setMaximumVelocity(freespeed + 10); // faster than link's freespeed
-        var vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
-        vehicle.setEarliestLinkExitTime(linkEnterTime + linkLength / freespeed);
-        vehicle.setDriver(new TestDriverAgent(Id.createPersonId(1)));
-        vehicle.setCurrentLink(NetworkUtils.createLink(
-                Id.createLinkId(1),
-                NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
-                NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createNetwork(),
-                linkLength,
-                freespeed,
-                linkCapacity,
-                1
-        ));
-        Collection<MobsimVehicle> vehicles = List.of(vehicle);
-
-        // holes which we are not interested in at the moment
-        Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
+        var setUp = new SimpleTestSetUp();
+        List<AgentSnapshotInfo> outCollection = new ArrayList<>();
+        var now = 1.0;
+        var vehicles = createVehicles(setUp.link, 1, setUp.linkEnterTime + setUp.linkLength / setUp.freespeed);
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
 
         // act
         builder.positionVehiclesAlongLine(
                 outCollection,
                 now,
                 vehicles,
-                linkLength,
-                linkCapacity,
-                fromCoord,
-                toCoord,
-                1/100.0, // this would mean the flow capacity is 100
-                freespeed,
+                setUp.linkLength,
+                setUp.linkCapacity,
+                setUp.fromCoord,
+                setUp.toCoord,
+                1 / setUp.linkCapacity, // this would mean the flow capacity is 100
+                setUp.freespeed,
                 1,
-                holes
-                );
+                new LinkedList<>()
+        );
 
         // assert
         assertEquals(1, outCollection.size());
         AgentSnapshotInfo firstEntry = outCollection.iterator().next();
 
-        assertEquals(linkLength / freespeed * now, firstEntry.getEasting(), 0.00001);
+        assertEquals(setUp.linkLength / setUp.freespeed * now, firstEntry.getEasting(), 0.00001);
         assertEquals(-18.75, firstEntry.getNorthing(), 0.00001); // the calculator assumes an offset to the right of the driving direction ...
+
+        var vehicle = vehicles.iterator().next();
         assertEquals(vehicle.getDriver().getId(), firstEntry.getId());
         assertEquals(vehicle.getCurrentLink().getId(), firstEntry.getLinkId());
         assertEquals(vehicle.getId(), firstEntry.getVehicleId());
@@ -123,60 +92,34 @@ public class QueueAgentSnapshotInfoBuilderTest {
     @Test
     public void positionVehiclesAlongLine_congestedAboveCapacityLimit() {
 
-        final var config = ConfigUtils.createConfig();
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        final var scenario = ScenarioUtils.createScenario(config);
-        final var freespeed = 10.0;
-        final var linkLength = 100.0;
-        final var linkCapacity = 10;
-        final var now = 100;
-        final var fromCoord = new Coord(0,0);
-        final var toCoord = new Coord(linkLength, 0);
-
-        // the test object
-        var builder = new QueueAgentSnapshotInfoBuilder(scenario, new SnapshotLinkWidthCalculator());
-
-        // the list to be filled
+        var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-
-        var link = NetworkUtils.createLink(
-                Id.createLinkId(1),
-                NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
-                NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createNetwork(),
-                linkLength,
-                freespeed,
-                linkCapacity,
-                1
-        );
-
-        var vehicles = createVehicles(link, 20, 0);
-
-        // holes which we are not interested in at the moment
-        Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
+        var vehicles = createVehicles(setUp.link, 20, 0);
+        var now = 100.0;
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
 
         // act
         builder.positionVehiclesAlongLine(
                 outCollection,
                 now,
                 vehicles,
-                linkLength,
-                linkCapacity,
-                fromCoord,
-                toCoord,
-                1/100.0, // this would mean the flow capacity is 100
-                freespeed,
+                setUp.linkLength,
+                setUp.linkCapacity,
+                setUp.fromCoord,
+                setUp.toCoord,
+                1 / setUp.linkCapacity, // this would mean the flow capacity is 100
+                setUp.freespeed,
                 1,
-                holes
+                new LinkedList<>()
         );
 
         // assert
-        assertEquals(20, outCollection.size());
+        assertEquals(vehicles.size(), outCollection.size());
 
         // we have put more cars onto the link than it can actually fit. The calculator should squeeze all vehicles onto the link now
         //outCollection.sort(Comparator.comparingDouble(AgentSnapshotInfo::getEasting));
-        var expectedEasting = linkLength;
-        var offsetBetweenVehicles = linkLength / outCollection.size();
+        var expectedEasting = setUp.linkLength;
+        var offsetBetweenVehicles = setUp.linkLength / outCollection.size();
 
         for (AgentSnapshotInfo info : outCollection) {
             assertEquals(expectedEasting, info.getEasting(), 0.0001);
@@ -187,52 +130,25 @@ public class QueueAgentSnapshotInfoBuilderTest {
     @Test
     public void positionVehiclesAlongLine_queueAtEnd() {
 
-        final var config = ConfigUtils.createConfig();
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        final var scenario = ScenarioUtils.createScenario(config);
-        final var freespeed = 10.0;
-        final var linkLength = 100.0;
-        final var linkCapacity = 10;
-        final var linkEnterTime = 0.0;
-        final var now = 10.0;
-        final var fromCoord = new Coord(0,0);
-        final var toCoord = new Coord(linkLength, 0);
-
-        // the test object
-        var builder = new QueueAgentSnapshotInfoBuilder(scenario, new SnapshotLinkWidthCalculator());
-
-        // the list to be filled
+        var setUp = new SimpleTestSetUp();
+        // use other vehicle list than in simple set up
+        var vehicles = createVehicles(setUp.link, 5, 0);
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-
-        var link = NetworkUtils.createLink(
-                Id.createLinkId(1),
-                NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
-                NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createNetwork(),
-                linkLength,
-                freespeed,
-                linkCapacity,
-                1
-        );
-
-        var vehicles = createVehicles(link, 5, 0);
-
-        // holes which we are not interested in at the moment
-        Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
 
         // act
         builder.positionVehiclesAlongLine(
                 outCollection,
-                now,
+                setUp.now,
                 vehicles,
-                linkLength,
-                linkCapacity,
-                fromCoord,
-                toCoord,
-                1/100.0, // this would mean the flow capacity is 100
-                freespeed,
+                setUp.linkLength,
+                setUp.linkCapacity,
+                setUp.fromCoord,
+                setUp.toCoord,
+                1 / setUp.linkCapacity,
+                setUp.freespeed,
                 1,
-                holes
+                new LinkedList<>()
         );
 
         // assert
@@ -269,39 +185,15 @@ public class QueueAgentSnapshotInfoBuilderTest {
     @Test
     public void positionVehiclesFromWaitingList() {
 
-        final var config = ConfigUtils.createConfig();
-        config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
-        final var scenario = ScenarioUtils.createScenario(config);
-        final var freespeed = 10.0;
-        final var linkLength = 100.0;
-        final var linkCapacity = 10;
-        final var linkEnterTime = 0.0;
-        final var now = 10.0;
-        final var counter = 0;
-        final var fromCoord = new Coord(0,0);
-        final var toCoord = new Coord(linkLength, 0);
-
-        // the test object
-        var builder = new QueueAgentSnapshotInfoBuilder(scenario, new SnapshotLinkWidthCalculator());
-
+        var setUp = new SimpleTestSetUp();
         List<AgentSnapshotInfo> outCollection = new ArrayList<>();
-        var link = NetworkUtils.createLink(
-                Id.createLinkId(1),
-                NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
-                NetworkUtils.createNode(Id.createNodeId(2), toCoord),
-                NetworkUtils.createNetwork(),
-                linkLength,
-                freespeed,
-                linkCapacity,
-                1
-        );
-        Queue<QVehicle> waitingList = new LinkedList<>(createVehicles(link, 10, 10));
+        var builder = new QueueAgentSnapshotInfoBuilder(setUp.scenario, new SnapshotLinkWidthCalculator());
 
         // act
-        var newCount = builder.positionVehiclesFromWaitingList(outCollection, link, counter, waitingList);
+        var newCount = builder.positionVehiclesFromWaitingList(outCollection, setUp.link, setUp.counter, setUp.waitingList);
 
         // assert
-        assertEquals(10, outCollection.size());
+        assertEquals(setUp.waitingList.size(), outCollection.size());
 
         // the positions should be at (0.9 * linkLength, -18.75 - 3.75 * waitingListIndex)
         // all should drive a car
@@ -309,7 +201,7 @@ public class QueueAgentSnapshotInfoBuilderTest {
         var expectedNorthing = -18.75;
         for (AgentSnapshotInfo info : outCollection) {
 
-            assertEquals(linkLength * 0.9, info.getEasting(), 0.000001);
+            assertEquals(setUp.linkLength * 0.9, info.getEasting(), 0.000001);
             assertEquals(expectedNorthing, info.getNorthing(), 0.00001);
             assertEquals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR, info.getAgentState());
             assertEquals(Id.createPersonId(1), info.getId());
@@ -320,6 +212,39 @@ public class QueueAgentSnapshotInfoBuilderTest {
         }
     }
 
+    private static class SimpleTestSetUp {
+
+        final Config config = ConfigUtils.createConfig();
+        final Scenario scenario = ScenarioUtils.createScenario(config);
+        final double freespeed = 10.0;
+        final double linkLength = 100.0;
+        final double linkCapacity = 10;
+        final double linkEnterTime = 0.0;
+        final double now = 10.0;
+        final int counter = 0;
+        final Coord fromCoord = new Coord(0, 0);
+        final Coord toCoord = new Coord(linkLength, 0);
+        Link link = NetworkUtils.createLink(
+                Id.createLinkId(1),
+                NetworkUtils.createNode(Id.createNodeId(1), fromCoord),
+                NetworkUtils.createNode(Id.createNodeId(2), toCoord),
+                NetworkUtils.createNetwork(),
+                linkLength,
+                freespeed,
+                linkCapacity,
+                1
+        );
+
+        Queue<QVehicle> waitingList = new LinkedList<>(createVehicles(link, 10, 10));
+
+        SimpleTestSetUp() {
+            config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+        }
+    }
+
+    /**
+     * Mock up for MobsimDriverAgent
+     */
     private static class TestDriverAgent implements MobsimDriverAgent {
 
         private final Id<Person> personId;
@@ -429,5 +354,4 @@ public class QueueAgentSnapshotInfoBuilderTest {
             return null;
         }
     }
-
 }

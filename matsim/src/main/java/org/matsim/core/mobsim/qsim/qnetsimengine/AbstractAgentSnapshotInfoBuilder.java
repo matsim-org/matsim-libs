@@ -91,38 +91,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return cnt2;
 	}
 
-	private AgentState getAgentState(Identifiable<Person> identifiable) {
 
-		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
-		var marker = getMarkerFromAttributes(identifiable.getId());
-		if (marker != null) return AgentState.MARKER;
-
-		// these are the regular agent states
-		if (identifiable instanceof TransitDriverAgent) return AgentState.TRANSIT_DRIVER;
-		if (identifiable instanceof MobsimDriverAgent && ((MobsimDriverAgent) identifiable).getMode().equals(TransportMode.car))
-			return AgentState.PERSON_DRIVING_CAR;
-
-		// old tests keep them here, since I'm unsure whether the other ones work
-		//if (identifiable.getId().toString().startsWith("pt")) return AgentState.TRANSIT_DRIVER;
-		//if (isFirst) return AgentState.PERSON_DRIVING_CAR;
-
-		// we don't know. Set other mode
-		return AgentState.PERSON_OTHER_MODE;
-	}
-
-	private Object getMarkerFromAttributes(Id<Person> id) {
-		var person = scenario.getPopulation().getPersons().get(id);
-		return person != null ? person.getAttributes().getAttribute(AgentSnapshotInfo.marker) : null;
-	}
-
-	private AgentState getAgentStateForActivity(Id<Person> id) {
-
-		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
-		var marker = getMarkerFromAttributes(id);
-		if (marker != null) return AgentState.MARKER;
-
-		return AgentState.PERSON_AT_ACTIVITY;
-	}
 
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 												Collection<MobsimAgent> agentsInActivities, int cnt2) {
@@ -387,19 +356,6 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		 */
 		return positions;
 	}
-		
-	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh, 
-			double curvedLength, Coord upstreamCoord, Coord downstreamCoord)
-	{
-		int lane = 20 ;
-		double speedValue = 1. ;
-		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class),
-				veh.getId(), null, upstreamCoord, downstreamCoord,
-				distanceFromFromNode, lane, curvedLength);
-		pos.setColorValueBetweenZeroAndOne(speedValue);
-		pos.setAgentState(AgentState.PERSON_OTHER_MODE );
-		positions.add(pos);
-	}
 
 	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
 								  Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
@@ -438,12 +394,57 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			 */
 
 			positions.add(passengerPosition);
-			cnt-- ;
+			cnt--;
 		}
 	}
 
 	public abstract double calculateVehicleSpacing(double linkLength, double overallStorageCapacity, Collection<? extends VisVehicle> vehs);
 
-	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode, 
-			double now, double freespeedTraveltime, double remainingTravelTime);
+	public abstract double calculateOdometerDistanceFromFromNode(double length, double spacing, double lastDistanceFromFromNode,
+																 double now, double freespeedTraveltime, double remainingTravelTime);
+
+	private void addHolePosition(final Collection<AgentSnapshotInfo> positions, double distanceFromFromNode, Hole veh,
+								 double curvedLength, Coord upstreamCoord, Coord downstreamCoord) {
+		int lane = 20;
+		double speedValue = 1.;
+		AgentSnapshotInfo pos = this.snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class),
+				veh.getId(), null, upstreamCoord, downstreamCoord,
+				distanceFromFromNode, lane, curvedLength);
+		pos.setColorValueBetweenZeroAndOne(speedValue);
+		pos.setAgentState(AgentState.PERSON_OTHER_MODE);
+		positions.add(pos);
+	}
+
+	private AgentState getAgentState(Identifiable<Person> identifiable) {
+
+		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
+		var marker = getMarkerFromAttributes(identifiable.getId());
+		if (marker != null) return AgentState.MARKER;
+
+		// these are the regular agent states
+		if (identifiable instanceof TransitDriverAgent) return AgentState.TRANSIT_DRIVER;
+		if (identifiable instanceof MobsimDriverAgent && ((MobsimDriverAgent) identifiable).getMode().equals(TransportMode.car))
+			return AgentState.PERSON_DRIVING_CAR;
+
+		// old tests keep them here, since I'm unsure whether the other ones work
+		//if (identifiable.getId().toString().startsWith("pt")) return AgentState.TRANSIT_DRIVER;
+		//if (isFirst) return AgentState.PERSON_DRIVING_CAR;
+
+		// we don't know. Set other mode
+		return AgentState.PERSON_OTHER_MODE;
+	}
+
+	private Object getMarkerFromAttributes(Id<Person> id) {
+		var person = scenario.getPopulation().getPersons().get(id);
+		return person != null ? person.getAttributes().getAttribute(AgentSnapshotInfo.marker) : null;
+	}
+
+	private AgentState getAgentStateForActivity(Id<Person> id) {
+
+		// I don't know whether I have gotten this right, but I think this is tested in every case in every method
+		var marker = getMarkerFromAttributes(id);
+		if (marker != null) return AgentState.MARKER;
+
+		return AgentState.PERSON_AT_ACTIVITY;
+	}
 }
