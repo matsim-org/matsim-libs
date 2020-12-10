@@ -15,12 +15,11 @@ public interface FlowEfficiencyCalculator {
     /**
      * Calculate the amount of flow capacity consumed by a vehicle.
      *
-     * @param qVehicle         the vehicle that consumes efficiency
+     * @param qVehicle         the vehicle that consumes efficiency.
      * @param previousQVehicle the vehicle previously traveling on this link before {@code qVehicle}, may be null
-     * @param previousTimeDiff time gap to the previous vehicle traveling on this link. Can be null if two vehicles are in the buffer
-     *                         simultaneously or if there was no previous vehicle.
-     * @param link             the link the qVehicle is currently on
-     * @param laneId           id of the lane the vehicle is traveling on
+     * @param timeGapToPreviousVeh time gap to the previous vehicle traveling on this {@code link}. May be null if {@code qVehicle} is the first to travel on {@code link}.
+     * @param link             the link the {@code qVehicle} is currently on.
+     * @param laneId           id of the lane the {@code qVehicle} is traveling on
      */
-    double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, @Nullable Double previousTimeDiff, Link link, Id<Lane> laneId);
+    double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, @Nullable Double timeGapToPreviousVeh, Link link, Id<Lane> laneId);
 }

@@ -112,7 +112,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 
 		@Override
-        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double previousTimeDiff, Link link, Id<Lane> laneId) {
+        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
 			return factor;
 		}
 	}
