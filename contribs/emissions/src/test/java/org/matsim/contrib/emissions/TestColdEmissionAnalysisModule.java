@@ -256,65 +256,6 @@ public class TestColdEmissionAnalysisModule {
 		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 		
 	}
-
-
-
-	@Test
-	public void rescaleColdEmissionsTest() {
-
-		// can not use the setUp method here because the efficiency factor is not null
-		// (yy I don't know what this means.  kai, jul'18)
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
-		fillAveragesTable( avgHbefaColdTable );
-		fillDetailedTable( detailedHbefaColdTable );
-
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-		Double rescaleFactor = -.001;
-
-
-		// @ KMT isnt this now done threw the lookup behaviour
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-
-		// was set to onlyTryDetailedElseAbort but why is this some kind of default??
-		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-
-		//ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
-		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
-		HandlerToTestEmissionAnalysisModules.reset();
-
-		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
-		Id<Vehicle> vehicleIdForAvgTable = Id.create( "vehicle avg", Vehicle.class );
-		//Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
-
-		Id<VehicleType> vehicleInfoForAvgCase = Id.create( passengercar + ";" + petrol_technology +";"+ none_sizeClass +";" + none_emConcept +";" + averagePetrolFactor, VehicleType.class );
-
-
-		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleIdForAvgTable, VehicleUtils.getFactory().createVehicleType( vehicleInfoForAvgCase ) );
-
-
-		//ceam.throwColdEmissionEvent(idForAvgTable, vehicle, startTime, parkingDuration, tableAccDistance);
-		ceam.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(),vehicleIdForAvgTable, idForAvgTable, startTime, parkingDuration,tableAccDistance);
-		//ceam.throwColdEmissionEvent(vehicleIdForAvgTable,idForAvgTable,startTime,);
-
-		// @KMT this method no longer exist
-		//ceam.calculateColdEmissionsAndThrowEvent( idForAvgTable, vehicle, startTime, parkingDuration, tableAccDistance );
-		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
-						     + ( numberOfColdEmissions * averagePetrolFactor ) + " * " + rescaleFactor + " = " +
-						     ( numberOfColdEmissions * averagePetrolFactor * rescaleFactor ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		// @KMT how can the sum be negative?? The rescaleFactor is which seems odd to me
-		Assert.assertEquals( message, rescaleFactor * numberOfColdEmissions * averagePetrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-
-	}
-	
-	// rescale is no longer available. I had no idea what this was good for.  kai, jan'20
 	
 	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
