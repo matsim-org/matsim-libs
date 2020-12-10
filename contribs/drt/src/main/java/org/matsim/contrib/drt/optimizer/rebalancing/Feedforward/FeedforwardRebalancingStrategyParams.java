@@ -20,8 +20,8 @@ package org.matsim.contrib.drt.optimizer.rebalancing.Feedforward;
 
 import java.util.Map;
 
-import javax.annotation.Nonnegative;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -47,25 +47,27 @@ public final class FeedforwardRebalancingStrategyParams extends ReflectiveConfig
 			+ "the time it takes the vehicles to travel can be compensated to some extent. Expect a non-negative integer value. Default value is 0";
 
 	public static final String FEEDBACK_SWITCH = "feedbackSwitch";
-	static final String FEEDBACK_SWITCH_EXP = "Turn on or off the feedback part in the strategy. Feedback part will mainain a minimum number of vehicles"
-			+ " in each zone. Default value is false";
+	static final String FEEDBACK_SWITCH_EXP =
+			"Turn on or off the feedback part in the strategy. Feedback part will mainain a minimum number of vehicles"
+					+ " in each zone. Default value is false";
 
 	public static final String MIN_NUM_VEHICLES_PER_ZONE = "minNumVehiclesPerZone";
-	static final String MIN_NUM_VEHICLES_PER_ZONE_EXP = "The minimum number of vehicles a zone should keep. This value will only be used when feed back "
-			+ " switch is true! Expect a non-negative value. Default value is 1";
+	static final String MIN_NUM_VEHICLES_PER_ZONE_EXP =
+			"The minimum number of vehicles a zone should keep. This value will only be used when feed back "
+					+ " switch is true! Expect a non-negative value. Default value is 1";
 
 	@Positive
 	private int timeBinSize = 900; // [s]
 
-	@Positive
+	@PositiveOrZero
 	private double feedforwardSignalStrength = 1;
 
-	@Nonnegative
+	@PositiveOrZero
 	private int feedforwardSignalLead = 0;
 
 	private boolean feedbackSwitch = false;
 
-	@Nonnegative
+	@PositiveOrZero
 	private int minNumVehiclesPerZone = 1;
 
 	public FeedforwardRebalancingStrategyParams() {
