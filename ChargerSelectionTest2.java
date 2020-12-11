@@ -94,7 +94,7 @@ public class ChargerSelectionTest2 {
 		work.setEndTime(10 * 3600);
 		plan.addActivity(work);
 
-		plan.addLeg(factory.createLeg(TransportMode.car));
+		plan.addLeg(factory.createLeg(TransportMode.bike));
 
 		Activity leisure = factory.createActivityFromLinkId("leisure", Id.createLinkId("90"));
 		leisure.setEndTime(11 * 3600);
