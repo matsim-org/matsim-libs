@@ -134,6 +134,7 @@ class RunDrtExample{
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		ScenarioUtils.loadScenario( scenario );
+		// yyyy in long run, try to get rid of the route factory thing
 
 		Controler controler = new Controler( scenario ) ;
 
@@ -141,6 +142,7 @@ class RunDrtExample{
 		controler.addOverridingModule( new MultiModeDrtModule( ) ) ;
 
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
+		// yyyy in long run, try to get rid of the above line
 
 //		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
 //		otfVisConfigGroup.setLinkWidth( 5 );
