@@ -9,9 +9,10 @@ import org.matsim.core.api.internal.HasPersonId;
 
 import java.util.Map;
 
-class PositionEvent extends Event implements BasicLocation, HasPersonId {
+public class PositionEvent extends Event implements BasicLocation, HasPersonId {
         private final AgentSnapshotInfo position;
-        PositionEvent( double now, AgentSnapshotInfo position ){
+
+        public PositionEvent(double now, AgentSnapshotInfo position) {
                 super(now);
                 this.position = position;
         }
