@@ -90,7 +90,7 @@ public class PositionInfoTest extends MatsimTestCase {
 				.setFromCoord(link1.getFromNode().getCoord())
 				.setToCoord(link1.getToNode().getCoord())
 				.setLinkLength(link1.getLength())
-				.setDistanceOnLink(250)
+				.setDistanceOnLink(500)
 				.setLane(0)
 				.build();
 

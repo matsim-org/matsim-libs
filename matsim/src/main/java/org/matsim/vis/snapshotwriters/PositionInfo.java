@@ -249,7 +249,7 @@ public class PositionInfo implements AgentSnapshotInfo {
             var lanePosition = linkWidthCalculator.calculateLanePosition(lane);
             var easting = fromCoord.getX()
                     + (Math.cos(theta) * distanceOnLink * correction)
-                    + (Math.sin(theta) * lane);
+                    + (Math.sin(theta) * lanePosition);
             var northing = fromCoord.getY()
                     + Math.sin(theta) * distanceOnLink * correction
                     - Math.cos(theta) * lanePosition;
