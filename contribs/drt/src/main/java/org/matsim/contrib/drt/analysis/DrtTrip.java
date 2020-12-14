@@ -57,9 +57,9 @@ final class DrtTrip {
 		this.person = submittedEvent.getPersonId();
 		this.vehicle = pickedUpEvent.getVehicleId();
 		this.fromLinkId = submittedEvent.getFromLinkId();
-		this.fromCoord = linkProvider.apply(fromLinkId).getCoord();
+		this.fromCoord = linkProvider.apply(fromLinkId).getToNode().getCoord();
 		this.toLink = submittedEvent.getToLinkId();
-		this.toCoord = linkProvider.apply(toLink).getCoord();
+		this.toCoord = linkProvider.apply(toLink).getToNode().getCoord();
 		this.waitTime = pickedUpEvent.getTime() - submittedEvent.getTime();
 		this.unsharedDistanceEstimate_m = submittedEvent.getUnsharedRideDistance();
 		this.unsharedTimeEstimate_m = submittedEvent.getUnsharedRideTime();

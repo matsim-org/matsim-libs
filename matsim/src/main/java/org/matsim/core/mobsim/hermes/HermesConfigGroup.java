@@ -27,14 +27,12 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class HermesConfigGroup extends ReflectiveConfigGroup {
+public final class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final String NAME = "hermes";
     private static final String END_TIME = "endTime";
 
     // Maximum number of links (limited to 24 bits in the plan)
     public static final int MAX_LINK_ID = 16777216;
-    // Maximum number of stops in a link (limited to 8 bits in the plan)
-    public static final int MAX_STOP_IDX = 255;
     // Maximum number of stops (limited to 20bits in the plan)
     public static final int MAX_STOP_ROUTE_ID = 65536;
     // Maximum vehicle velocity (limited to 8 bits in the plan)
