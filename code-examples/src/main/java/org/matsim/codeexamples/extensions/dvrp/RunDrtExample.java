@@ -27,6 +27,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 class RunDrtExample{
 	// todo:
@@ -76,8 +77,7 @@ class RunDrtExample{
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			DrtInsertionSearchParams drtInsertionSearchParams = new ExtensiveInsertionSearchParams();
-			drtConfig.addParameterSet(drtInsertionSearchParams);
+			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
@@ -90,8 +90,7 @@ class RunDrtExample{
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			DrtInsertionSearchParams drtInsertionSearchParams = new ExtensiveInsertionSearchParams();
-			drtConfig.addParameterSet(drtInsertionSearchParams);
+			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 		{
@@ -104,14 +103,16 @@ class RunDrtExample{
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
-			DrtInsertionSearchParams drtInsertionSearchParams = new ExtensiveInsertionSearchParams();
-			drtConfig.addParameterSet(drtInsertionSearchParams);
+			drtConfig.addParameterSet( new ExtensiveInsertionSearchParams() );
 			multiModeDrtCfg.addParameterSet(drtConfig);
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
+
+		// clear strategy settings from config file:
+		config.strategy().clearStrategySettings();
 
 		// configure mode choice so that travellers start using drt:
 		config.strategy().addStrategySettings( new StrategySettings(  ).setStrategyName( DefaultStrategy.SubtourModeChoice ).setWeight( 0.1 ) );
@@ -130,9 +131,9 @@ class RunDrtExample{
 //		config.planCalcScore().addModeParams( new ModeParams( "drt_C_walk" ) );
 		// now seems to work without these.  kai, dec'20
 
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-
+		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
+		ScenarioUtils.loadScenario( scenario );
 
 		Controler controler = new Controler( scenario ) ;
 
@@ -141,7 +142,10 @@ class RunDrtExample{
 
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
 
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
+//		otfVisConfigGroup.setLinkWidth( 5 );
+//		otfVisConfigGroup.setDrawNonMovingItems( true );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}
