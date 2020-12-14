@@ -33,7 +33,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.Hole;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
@@ -51,12 +51,14 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 	private static int wrnCnt = 0;
 
-	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private final Scenario scenario;
+	private final PositionInfo.LinkBasedBuilder builder;
 
 	AbstractAgentSnapshotInfoBuilder(Scenario sc, SnapshotLinkWidthCalculator linkWidthCalculator) {
-		this.snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 		this.scenario = sc;
+
+		// use same builder for all positions to avoid uncessary objects being created.
+		this.builder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
 	}
 
 	private static double computeHolePositionAndReturnDistance(double freespeedTraveltime, Hole hole, double now, double curvedLength) {
@@ -75,9 +77,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 												Collection<? extends MobsimAgent> agentsInActivities, int cnt2) {
+		builder.setVehicleId(null); // we don't have a vehicle in this case.
 		for (MobsimAgent agent : agentsInActivities) {
 
-			var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+			var position = builder
 					.setPersonId(agent.getId())
 					.setLinkId(link.getId())
 					.setFromCoord(link.getFromNode().getCoord())
@@ -109,7 +112,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		MobsimDriverAgent driverAgent = veh.getDriver();
 
-		var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+		var position = builder
 				.setPersonId(driverAgent.getId())
 				.setVehicleId(veh.getId())
 				.setLinkId(veh.getCurrentLink().getId())
@@ -246,7 +249,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		for (var vehicle : vehicles) {
 			var link = vehicle.getCurrentLink();
 			for (var passenger : VisUtils.getPeopleInVehicle(vehicle)) {
-				var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+				var position = builder
 						.setPersonId(passenger.getId())
 						.setVehicleId(vehicle.getId())
 						.setLinkId(link.getId())
@@ -273,7 +276,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		for (PassengerAgent passenger : passengers) {
 			int lanePos = laneInt - 2 * cnt;
-			var passengerPosition = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+			var passengerPosition = builder
 					.setPersonId(passenger.getId())
 					.setVehicleId(passenger.getVehicle().getId())
 					.setLinkId(passenger.getCurrentLinkId())
@@ -296,9 +299,10 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		int lane = 20;
 		double speedValue = 1.;
 
-		var position = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+		var position = builder
 				.setPersonId(Id.createPersonId("hole"))
 				.setVehicleId(Id.createVehicleId(veh.getId()))
+				.setLinkId(null)
 				.setFromCoord(upstreamCoord)
 				.setToCoord(downstreamCoord)
 				.setDistanceOnLink(distanceFromFromNode)

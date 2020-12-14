@@ -40,7 +40,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawableReceiver;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -56,14 +56,14 @@ public class FacilityDrawer {
 		private static final long serialVersionUID = 1L;
 		private final transient TransitSchedule schedule;
 		private final transient AgentTracker agentTracker;
-		private final transient Network network ;
-		private final transient AgentSnapshotInfoFactory agentSnapshotInfoFactory;
+		private final transient Network network;
+		private final transient PositionInfo.LinkBasedBuilder builder;
 
-		public Writer(final Network network, final TransitSchedule schedule, final AgentTracker agentTracker, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
-			this.network = network ;
+		public Writer(final Network network, final TransitSchedule schedule, final AgentTracker agentTracker, PositionInfo.LinkBasedBuilder positionInfoBuilder) {
+			this.network = network;
 			this.schedule = schedule;
 			this.agentTracker = agentTracker;
-			this.agentSnapshotInfoFactory = agentSnapshotInfoFactory;
+			this.builder = positionInfoBuilder;
 		}
 
 		@Override
@@ -82,7 +82,7 @@ public class FacilityDrawer {
 						out.putDouble(point.getY());
 					} else {
 						ByteBufferUtils.putString(out, facility.getLinkId().toString());
-						var ps = agentSnapshotInfoFactory.getAgentSnapshotInfoBuilder()
+						var ps = builder
 								.setPersonId(Id.createPersonId(facility.getId()))
 								.setLinkId(link.getId())
 								.setFromCoord(link.getFromNode().getCoord())
@@ -92,7 +92,6 @@ public class FacilityDrawer {
 								.setLane(0)
 								.build();
 
-						//AgentSnapshotInfo ps = agentSnapshotInfoFactory.createAgentSnapshotInfo(Id.create(facility.getId(), Person.class), link, 0.9*link.getLength(), 0) ;
 						Point2D.Double point = OTFServerQuadTree.transform(new Coord(ps.getEasting(), ps.getNorthing()));
 						out.putDouble(point.getX());
 						out.putDouble(point.getY());

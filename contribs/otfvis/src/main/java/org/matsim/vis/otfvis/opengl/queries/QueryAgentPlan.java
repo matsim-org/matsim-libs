@@ -52,7 +52,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
 import org.matsim.vis.otfvis.opengl.gl.GLUtils;
 import org.matsim.vis.otfvis.opengl.gl.InfoText;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import javax.swing.*;
@@ -203,7 +203,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 
 	private static final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private static final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	private static final PositionInfo.LinkBasedBuilder builder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
 
 	public static class Result implements OTFQueryResult {
 
@@ -231,7 +231,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 //						final Id<Link> linkId = act.getLinkId();
 						Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity(act, scenario);
 						Link link = net.getLinks().get(linkId);
-						var pi = snapshotInfoFactory.getAgentSnapshotInfoBuilder()
+						var pi = builder
 								.setPersonId(agentId)
 								.setLinkId(link.getId())
 								.setFromCoord(link.getFromNode().getCoord())

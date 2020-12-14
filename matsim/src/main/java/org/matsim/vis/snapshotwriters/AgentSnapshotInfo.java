@@ -51,12 +51,9 @@ public interface AgentSnapshotInfo {
 	double getAzimuth();
 
 	double getColorValueBetweenZeroAndOne();
-	void setColorValueBetweenZeroAndOne( double tmp ) ;
 
 	AgentState getAgentState();
-	void setAgentState( AgentState state ) ;
 
 	int getUserDefined() ;
-	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
 
 }

@@ -48,7 +48,8 @@ public class PositionInfoTest extends MatsimTestCase {
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 
-		var posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).getAgentSnapshotInfoBuilder()
+		var posInfo = new PositionInfo.LinkBasedBuilder()
+				.setLinkWidthCalculator(linkWidthCalculator)
 				.setPersonId(Id.createPersonId(1))
 				.setLinkId(link1.getId())
 				.setFromCoord(link1.getFromNode().getCoord())
@@ -82,7 +83,8 @@ public class PositionInfoTest extends MatsimTestCase {
 
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		var posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).getAgentSnapshotInfoBuilder()
+		var posInfo = new PositionInfo.LinkBasedBuilder()
+				.setLinkWidthCalculator(linkWidthCalculator)
 				.setPersonId(Id.createPersonId(1))
 				.setLinkId(link1.getId())
 				.setFromCoord(link1.getFromNode().getCoord())
