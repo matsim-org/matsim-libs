@@ -47,14 +47,14 @@ public class DrtZonalSystemTest {
 	public void test_cellSize100() {
 		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 100));
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("5");
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("10");
 	}
 
 	@Test
 	public void test_cellSize700() {
 		DrtZonalSystem drtZonalSystem = createFromPreparedGeometries(createNetwork(),
 				DrtGridUtils.createGridFromNetwork(createNetwork(), 700));
-		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("1");
+		assertThat(drtZonalSystem.getZoneForLinkId(Id.createLinkId("ab")).getId()).isEqualTo("2");
 	}
 
 	@Test
