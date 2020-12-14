@@ -11,6 +11,7 @@ import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -139,6 +140,8 @@ class RunDrtExample{
 		controler.addOverridingModule( new MultiModeDrtModule( ) ) ;
 
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
+
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}
