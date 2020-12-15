@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package playground.vsp.analysis.modules.emissionsAnalyzer;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.emissions.Pollutant;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.contrib.emissions.Pollutant;
 
 
 /**
@@ -44,11 +44,11 @@ public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHand
 	public void handleEvent(WarmEmissionEvent event) {
 		// TODO person id statt vehicleid??? woher?
 		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
-		Map<Pollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
+		Map<Pollutant, Double> warmEmissionsOfEvent = event.getEmissions();
 
-		if(warmEmissionsTotal.get(personId) != null){
-			Map<Pollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(personId );
-			for( Entry<Pollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+		if (warmEmissionsTotal.get(personId) != null) {
+			Map<Pollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(personId);
+			for (Entry<Pollutant, Double> entry : warmEmissionsOfEvent.entrySet()) {
 				Pollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
 

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.vsp.airPollution.flatEmissions;
 
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -33,7 +31,8 @@ import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.MatsimServices;
-import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
+
+import java.util.Set;
 
 
 /**
@@ -69,7 +68,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 				calculateWarmEmissionCostsAndThrowEvent(event);
 			}
 			// pricing applies not for the current link
-			else ;
+
 		}
 	}
 
@@ -85,19 +84,19 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 				calculateColdEmissionCostsAndThrowEvent(event);
 			}
 			// pricing applies not for the current link
-			else ;
+
 		}
 	}
 
 	private void calculateColdEmissionCostsAndThrowEvent(ColdEmissionEvent event) {
 		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
-		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
-		double amount2Pay = - coldEmissionCosts;
-		
+		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getEmissions());
+		double amount2Pay = -coldEmissionCosts;
+
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "coldEmissionCost", null);
 		eventsManager.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 	}
@@ -105,12 +104,12 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
 		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
-		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
-		double amount2Pay = - warmEmissionCosts;
-		
+		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getEmissions());
+		double amount2Pay = -warmEmissionCosts;
+
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay, "warmEmissionCost", null);
 		eventsManager.processEvent(moneyEvent);
-		
+
 		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 	}

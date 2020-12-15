@@ -3,11 +3,11 @@ package org.matsim.contrib.emissions.analysis;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.time.TimeBinMap;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.contrib.emissions.Pollutant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,17 +40,17 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-        Map<Pollutant,Double> map = new HashMap<>() ;
-        for( Map.Entry<Pollutant, Double> entry : event.getWarmEmissions().entrySet() ){
-            map.put( entry.getKey(), entry.getValue() ) ;
+        Map<Pollutant, Double> map = new HashMap<>();
+        for (Map.Entry<Pollutant, Double> entry : event.getEmissions().entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
         }
-        handleEmissionEvent(event.getTime(), event.getLinkId(), map );
+        handleEmissionEvent(event.getTime(), event.getLinkId(), map);
     }
 
     @Override
     public void handleEvent(ColdEmissionEvent event) {
 
-        handleEmissionEvent(event.getTime(), event.getLinkId(), event.getColdEmissions());
+        handleEmissionEvent(event.getTime(), event.getLinkId(), event.getEmissions());
     }
 
     private void handleEmissionEvent(double time, Id<Link> linkId, Map<Pollutant, Double> emissions) {
