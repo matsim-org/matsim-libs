@@ -28,12 +28,17 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public final class EventsUtils {
 
-    public static EventsManager createEventsManager() {
+	public static EventsManager createEventsManager() {
+		// getDefaultEventsManagerClass has to be re-factored too if the type of the returned events manager changes
 		return new ParallelEventsManager(false);
-    }
+	}
+
+	public static Class<? extends EventsManager> getDefaultEventsManagerClass() {
+		return ParallelEventsManager.class;
+	}
 
 	public static EventsManager createEventsManager(Config config) {
-		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );
+		final EventsManager events = Injector.createInjector(config, new EventsManagerModule()).getInstance(EventsManager.class);
 //		events.initProcessing();
 		return events;
 	}

@@ -20,6 +20,7 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -86,60 +87,61 @@ public final class EmissionModule {
 		URL detailedWarmEmissionFactorsFile = null;
 		URL detailedColdEmissionFactorsFile = null;
 
-		switch( this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() ){
+		checkConsistency(this.emissionConfigGroup);
+
+		switch (this.emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {
 			case directlyTryAverageTable:
-				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " cold emissions file.") ;
-				}
-				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " warm emissions file.") ;
-				}
-				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
-				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
 				break;
 			case tryDetailedThenTechnologyAverageThenAverageTable:
-				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " cold emissions file.") ;
-				}
-				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " warm emissions file.") ;
-				}
-				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
-				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
+				averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
+				averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
 				// fall-through
 			case onlyTryDetailedElseAbort:
 				// fall-through
 			case tryDetailedThenTechnologyAverageElseAbort:
-				//Check if value was loaded
-				if ( this.emissionConfigGroup.getDetailedColdEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedColdEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " cold emissions file.") ;
-				}
-				if ( this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile().equals( "" ) ) {
-					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-										    " warm emissions file.") ;
-				}
 				detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
 				detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
 				break;
 			default:
-				throw new IllegalStateException( "Unexpected value: " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() );
+				throw new IllegalStateException("Unexpected value: " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior());
 		}
 
 		//TODO: create roadtype mapping here from config
-		createLookupTables( averageFleetWarmEmissionFactorsFile, averageFleetColdEmissionFactorsFile, detailedWarmEmissionFactorsFile, detailedColdEmissionFactorsFile );
+		createLookupTables(averageFleetWarmEmissionFactorsFile, averageFleetColdEmissionFactorsFile, detailedWarmEmissionFactorsFile, detailedColdEmissionFactorsFile);
 
 		createEmissionHandler();
 
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
 	}
-	
-	private void createLookupTables( URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
-					 URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile ) {
+
+	private void checkConsistency(EmissionsConfigGroup configGroup) {
+
+		if (configGroup.getDetailedVsAverageLookupBehavior().equals(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)) {
+			//Check if value was loaded
+			if (StringUtils.isBlank(configGroup.getDetailedColdEmissionFactorsFile())) {
+				throw new RuntimeException("You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+						" cold emissions file.");
+			}
+			if (StringUtils.isBlank(configGroup.getDetailedWarmEmissionFactorsFile())) {
+				throw new RuntimeException("You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+						" warm emissions file.");
+			}
+		} else {
+			if (StringUtils.isBlank(configGroup.getAverageColdEmissionFactorsFile())) {
+				throw new RuntimeException("You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+						" cold emissions file.");
+			}
+			if (StringUtils.isBlank(configGroup.getAverageWarmEmissionFactorsFile())) {
+				throw new RuntimeException("You have requested " + this.emissionConfigGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
+						" warm emissions file.");
+			}
+		}
+	}
+
+	private void createLookupTables(URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
+									URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile) {
 		logger.info("entering createLookupTables");
 
 		switch (emissionConfigGroup.getDetailedVsAverageLookupBehavior()) {

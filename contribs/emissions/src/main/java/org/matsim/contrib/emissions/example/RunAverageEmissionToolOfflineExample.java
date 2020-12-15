@@ -32,36 +32,35 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.MatsimVehicleWriter;
-import org.matsim.vehicles.VehicleUtils;
 
 
 /**
- *
- * Use the config file as created by the 
+ * Use the config file as created by the
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
  * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
  *
  * @author benjamin, julia
  */
-public final class RunAverageEmissionToolOfflineExample{
+public final class RunAverageEmissionToolOfflineExample {
 
-	private final static String runDirectory = "./test/output/";
-	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
+	private final static String runDirectory = "test/output/";
+	private static final String configFile = "C:\\Users\\Janekdererste\\Projects\\matsim\\contribs\\emissions\\scenarios\\sampleScenario\\testv2_Vehv1\\config_average.xml";
 
-	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
+	private static final String eventsFile = "C:\\Users\\Janekdererste\\Projects\\matsim\\contribs\\emissions\\scenarios\\sampleScenario\\5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
 
-	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
+	private static final String emissionEventOutputFileName = "C:\\Users\\Janekdererste\\Projects\\matsim\\contribs\\emissions\\scenarios\\sampleScenario\\5.events.xml.gz";
 	private Config config;
 
 	// =======================================================================================================		
 
-	public static void main (String[] args){
+	public static void main(String[] args) {
 		RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
 		emissionToolOfflineExampleV2.run();
 	}
 
 	public Config prepareConfig() {
+
 		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
 		return config;
 	}
@@ -72,27 +71,28 @@ public final class RunAverageEmissionToolOfflineExample{
 	}
 
 	public void run() {
-		if ( config==null ) {
-			this.prepareConfig() ;
+		if (config == null) {
+			this.prepareConfig();
 		}
+		config.controler().setOutputDirectory("C:\\Users\\Janekdererste\\Desktop\\emissions-test");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		AbstractModule module = new AbstractModule(){
+		AbstractModule module = new AbstractModule() {
 			@Override
-			public void install(){
-				bind( Scenario.class ).toInstance( scenario );
-				bind( EventsManager.class ).toInstance( eventsManager );
-				bind( EmissionModule.class ) ;
+			public void install() {
+				bind(Scenario.class).toInstance(scenario);
+				bind(EventsManager.class).toInstance(eventsManager);
+				bind(EmissionModule.class);
 			}
-		};;
+		};
 
-		com.google.inject.Injector injector = Injector.createInjector(config, module );
+		com.google.inject.Injector injector = Injector.createInjector(config, module);
 
 		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
 		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
-		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventOutputFileName );
+		EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFileName);
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
@@ -100,7 +100,7 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		emissionEventWriter.closeFile();
 
-		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( outputDirectory + "vehicles.xml.gz" );
+		new MatsimVehicleWriter(scenario.getVehicles()).writeFile(outputDirectory + "vehicles.xml.gz");
 
 	}
 }
