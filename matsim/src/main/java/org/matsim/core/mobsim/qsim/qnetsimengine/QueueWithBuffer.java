@@ -950,6 +950,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 						qLink.getNumberOfLanesAsInt(now) ,
 						holes
 						);
+
 			}
 			return positions ;
 		}
