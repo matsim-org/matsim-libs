@@ -144,12 +144,17 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
+		double satisfactionRate600 = getSatisfactionRate(waitStats, 600);
+		double satisfactionRate900 = getSatisfactionRate(waitStats, 900);
+		
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
 				format.format(waitStats.getMean()) + "",//
 				format.format(waitStats.getMax()) + "",//
 				format.format(waitStats.getPercentile(95)) + "",//
 				format.format(waitStats.getPercentile(75)) + "",//
 				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(satisfactionRate600) + "",//
+				format.format(satisfactionRate900) + "",//
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
@@ -472,4 +477,17 @@ public class DrtTripsAnalyser {
 
 		return result.toString();
 	}
+	
+	public static double getSatisfactionRate(DescriptiveStatistics stats, int timeCriteria) {
+		double[] sortedWaitingTime = stats.getSortedValues();
+		for (int i = 0; i < sortedWaitingTime.length; i++) {
+			if (sortedWaitingTime[i] > timeCriteria) {
+				double numOfRequestsInZone = sortedWaitingTime.length;
+				double output = i / numOfRequestsInZone;
+				return output;
+			}
+		}
+		return 1;
+	}
+	
 }
