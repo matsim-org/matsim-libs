@@ -62,6 +62,13 @@
 			<groupId>ch.sbb</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
 			<version>12.13</version>
+			<!-- Exclude circular dependency with different version -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.matsim</groupId>
+					<artifactId>matsim</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
