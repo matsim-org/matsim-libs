@@ -96,7 +96,6 @@
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
-			<version>21.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
