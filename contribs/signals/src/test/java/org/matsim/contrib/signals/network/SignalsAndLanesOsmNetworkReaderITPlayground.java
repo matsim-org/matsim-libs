@@ -25,11 +25,22 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.population.algorithms.TestsUtil;
 import org.matsim.testcases.MatsimTestUtils;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
+import de.topobyte.osm4j.core.model.impl.Tag;
+
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class SignalsAndLanesOsmNetworkReaderIT {
+
+
+
+
+
+
+
+
+public class SignalsAndLanesOsmNetworkReaderITPlayground {
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
 

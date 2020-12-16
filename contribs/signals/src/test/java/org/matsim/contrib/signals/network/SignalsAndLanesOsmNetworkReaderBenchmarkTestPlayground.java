@@ -25,8 +25,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
+import org.matsim.lanes.data.LanesToLinkAssignment;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.misc.CRCChecksum;
+
+
 
 import java.util.*;
 import java.util.stream.LongStream;
@@ -41,9 +46,10 @@ before cleaning up and transfer to Janeks new OSM Reader Version
 
 
 @RunWith(Parameterized.class)
-public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
+public class SignalsAndLanesOsmNetworkReaderBenchmarkTestPlayground {
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
+
 
 
     String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
@@ -73,14 +79,73 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
     public boolean input5;
 
 
+    @Test
+    public void  testOutLinkLaneConsistency(){
+        //TODO pull prepare context stuff out of tests
+        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+                TransformationFactory.WGS84_UTM33N);
+        // create a config
+        Config config = ConfigUtils.createConfig();
+        SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config,
+                SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
+        signalSystemsConfigGroup.setUseSignalSystems(true);
+        config.qsim().setUseLanes(true);
+        // create a scenario
+        Scenario scenario = ScenarioUtils.createScenario(config);
+        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
+        // pick network, lanes and signals data from the scenario
+        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
+        Lanes lanes = scenario.getLanes();
+        Network network = scenario.getNetwork();
+        SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
+        //TODO Parameterize - but than we have 2^5= 32 combinations
+        signalReader.setMergeOnewaySignalSystems(input2);
+        signalReader.setAllowUTurnAtLeftLaneOnly(input4);
+        signalReader.setMakePedestrianSignals(input5);
+        signalReader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
+        // (south,west,north,east)
 
+
+        signalReader.parse(inputOSM);
+        new NetworkCleaner().run(network);
+        new LanesAndSignalsCleaner().run(scenario);
+
+        Set<Id<Link>> inconsistencLinks = new HashSet<Id<Link>>();
+        for (Link link : network.getLinks().values()){
+            Set<Id<Link>> cosistentOutLinks = new HashSet<Id<Link>>();
+            Set<Id<Link>> outlinks = link.getToNode().getOutLinks().keySet();
+
+
+            if (lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
+                LanesToLinkAssignment lanesToLinkAssignment = lanes.getLanesToLinkAssignments().get(link.getId());
+                for (Lane lane : lanesToLinkAssignment.getLanes().values()) {
+                    if (lane.getToLinkIds()!=null) {
+                        for (Id<Link> outlink : lane.getToLinkIds()) {
+                            cosistentOutLinks.add(outlink);
+                        }
+                    }
+                }
+                for (Id<Link> badLink : outlinks){
+                    if (!cosistentOutLinks.contains(badLink)){
+                        inconsistencLinks.add(badLink);
+                        System.out.println("Lanes of Link" + badLink.toString() + " are not leading to all outLinks");
+                    }
+                }
+
+
+            }
+        }
+
+        Assert.assertEquals("Links with Lanes which are not leading to all OutLinks", 0, inconsistencLinks.size());
+
+    }
 
 
 
 
     @Test
     public void testLinkLaneStructure() {
-
+                //System.out.println(testUtils.getInputDirectory().);
         CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
                 TransformationFactory.WGS84_UTM33N);
         // create a config
@@ -111,8 +176,6 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         //TODO Parameterize - but than we have 2^5= 32 combinations
 
         signalReader.setMergeOnewaySignalSystems(input2);
-
-        signalReader.setUseRadiusReduction(input3);
 
         signalReader.setAllowUTurnAtLeftLaneOnly(input4);
 
@@ -194,6 +257,11 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         }
 
 
+
+// compare signal event files
+//        long checksum_it0 = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it.0/signalEvents2Via.csv");
+//        long checksum_itLast = CRCChecksum.getCRCFromFile(testUtils.getOutputDirectory() + "ITERS/it."+lastIt+"/signalEvents2Via.csv");
+//        Assert.assertEquals("Signal events are different", checksum_it0, checksum_itLast);
 
 
 //        boolean allNodesInWorkingVersionAreInBase = true;
