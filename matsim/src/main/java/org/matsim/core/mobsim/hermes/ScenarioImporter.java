@@ -77,7 +77,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ScenarioImporter {
+class ScenarioImporter {
 
 	final private static Logger log = Logger.getLogger(Hermes.class);
 

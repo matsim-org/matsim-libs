@@ -20,19 +20,11 @@
 
 package org.matsim.vis.otfvis.handler;
 
-import java.awt.geom.Point2D;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.util.texture.TextureCoords;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -44,9 +36,15 @@ import org.matsim.vis.otfvis.data.OTFWriterFactory;
 import org.matsim.vis.otfvis.interfaces.OTFDataReader;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
+
+import java.awt.geom.Point2D;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -58,22 +56,62 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 	public static boolean showParked = false;
 
 	private final Point2D.Float[] quad = new Point2D.Float[4];
-	private float coloridx = 0;
 	private char[] id;
 	private int nrLanes;
 
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-	private final AgentSnapshotInfoFactory snapshotFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+	private final PositionInfo.DirectBuilder linkBasedBuilder = new PositionInfo.DirectBuilder();
 
-	public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len){
+	public static Point2D.Float calcOrtho(double startx, double starty, double endx, double endy, double len) {
 		double dx = endy - starty;
-		double dy = endx -startx;
-		double sqr1 = Math.sqrt(dx*dx +dy*dy);
+		double dy = endx - startx;
+		double sqr1 = Math.sqrt(dx * dx + dy * dy);
 
-		dx = dx*len/sqr1;
-		dy = -dy*len/sqr1;
+		dx = dx * len / sqr1;
+		dy = -dy * len / sqr1;
 
-		return new Point2D.Float((float)dx,(float)dy);
+		return new Point2D.Float((float) dx, (float) dy);
+	}
+
+	private void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
+		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
+
+		String id = ByteBufferUtils.getString(in);
+		float x = in.getFloat();
+		float y = in.getFloat();
+		int userdefined = in.getInt();
+		float colorValue = in.getFloat();
+		int state = in.getInt();
+
+		var agInfo = linkBasedBuilder
+				.setPersonId(Id.createPersonId(id))
+				.setEasting(x)
+				.setNorthing(y)
+				.setColorValue(colorValue)
+				.setUserDefined(userdefined)
+				.setAgentState(AgentState.values()[state])
+				.build();
+
+		sceneGraph.getAgentPointLayer().addAgent(agInfo);
+	}
+
+	@Override
+	public void readConstData(ByteBuffer in) {
+		String id = ByteBufferUtils.getString(in);
+		this.quad[0] = new Point2D.Float(in.getFloat(), in.getFloat());
+		this.quad[1] = new Point2D.Float(in.getFloat(), in.getFloat());
+		this.nrLanes = in.getInt();
+		this.id = id.toCharArray();
+	}
+
+	@Override
+	public void readDynData(ByteBuffer in, SceneGraph graph) {
+		in.getFloat(); // this value is not used, but the buffer's position has to be moved over the color value stored in this float
+
+		int count = in.getInt();
+		for (int i = 0; i < count; i++) {
+			readAgent(in, graph);
+		}
 	}
 
 	static public class Writer extends OTFDataWriter<VisLink> implements OTFWriterFactory<VisLink> {
@@ -81,45 +119,45 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		private static final long serialVersionUID = -7916541567386865404L;
 
 
-		/** 
+		/**
 		 * Hui, warum ist das denn statisch? Damit nicht fuer jeden Writer und damit fuer jeden Link eine eigene
 		 * Collection angelegt wird, die ohnehin fuer jeden Link geleert und wieder gefuellt wird, nehme ich an.
 		 * Das ist ein bisschen gefaehrlich, weil man ja denken koennte, dass so ein linkspezifischer Writer eventuell
 		 * threadsafe und damit parallelisierbar sein koennte.
-		 * 
+		 * <p>
 		 * michaz feb 2011
 		 */
-		private static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+		private static final transient Collection<AgentSnapshotInfo> positions = new ArrayList<>();
 
 		@Override
-		public void writeConstData(ByteBuffer out) throws IOException {
+		public void writeConstData(ByteBuffer out) {
 			String id = this.src.getLink().getId().toString();
 			ByteBufferUtils.putString(out, id);
 			//subtract minEasting/Northing somehow!
 			Point2D.Double.Double linkStart = OTFServerQuadTree.transform(this.src.getLink().getFromNode().getCoord());
 			Point2D.Double.Double linkEnd = OTFServerQuadTree.transform(this.src.getLink().getToNode().getCoord());
 
-			out.putFloat((float) linkStart.x); 
+			out.putFloat((float) linkStart.x);
 			out.putFloat((float) linkStart.y);
-			out.putFloat((float) linkEnd.x); 
+			out.putFloat((float) linkEnd.x);
 			out.putFloat((float) linkEnd.y);
-				if ( OTFVisConfigGroup.NUMBER_OF_LANES.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo()) ) {
-					out.putInt(NetworkUtils.getNumberOfLanesAsInt(this.src.getLink()));
-				} else if ( OTFVisConfigGroup.CAPACITY.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo()) ) {
-					out.putInt( 1 + (int)(2.*this.src.getLink().getCapacity()/3600.) ) ;
-					// yyyyyy 3600. is a magic number (the default of the capacity period attribute in Network) but I cannot get to the network (where "capacityPeriod" resides).  
-					// Please do better if you know better.  kai, jun'11
-				} else {
-					throw new RuntimeException("I do not understand.  Aborting ..." ) ;
-				}
+			if (OTFVisConfigGroup.NUMBER_OF_LANES.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo())) {
+				out.putInt(NetworkUtils.getNumberOfLanesAsInt(this.src.getLink()));
+			} else if (OTFVisConfigGroup.CAPACITY.equals(OTFClientControl.getInstance().getOTFVisConfig().getLinkWidthIsProportionalTo())) {
+				out.putInt(1 + (int) (2. * this.src.getLink().getCapacity() / 3600.));
+				// yyyyyy 3600. is a magic number (the default of the capacity period attribute in Network) but I cannot get to the network (where "capacityPeriod" resides).
+				// Please do better if you know better.  kai, jun'11
+			} else {
+				throw new RuntimeException("I do not understand.  Aborting ...");
+			}
 		}
 
 		@Override
-		public void writeDynData(ByteBuffer out) throws IOException {
-			out.putFloat((float)0.) ; 
+		public void writeDynData(ByteBuffer out) {
+			out.putFloat((float) 0.);
 
 			positions.clear();
-			this.src.getVisData().addAgentSnapshotInfo( positions);
+			this.src.getVisData().addAgentSnapshotInfo(positions);
 
 			if (showParked) {
 				out.putInt(positions.size());
@@ -156,42 +194,6 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		@Override
 		public OTFDataWriter<VisLink> getWriter() {
 			return new Writer();
-		}
-	}
-
-	private void readAgent(ByteBuffer in, SceneGraph sceneGraph) {
-		// yyyy there is a very similar method in OTFAgentsListHandler.  with a more robust format, they should be united.  kai, apr'10
-
-		String id = ByteBufferUtils.getString(in);
-		float x = in.getFloat();
-		float y = in.getFloat();
-		int userdefined = in.getInt();
-		float colorValue = in.getFloat();
-		int state = in.getInt();
-
-		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(Id.create(id, Person.class), x, y, 0., 0.);
-		agInfo.setColorValueBetweenZeroAndOne(colorValue);
-		agInfo.setUserDefined(userdefined);
-		agInfo.setAgentState(AgentState.values()[state]);
-		sceneGraph.getAgentPointLayer().addAgent(agInfo);
-	}
-
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		String id = ByteBufferUtils.getString(in);
-		this.quad[0] = new Point2D.Float(in.getFloat(), in.getFloat());
-		this.quad[1] = new Point2D.Float(in.getFloat(), in.getFloat());
-		this.nrLanes = in.getInt();
-		this.id = id.toCharArray();
-	}
-
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		this.coloridx = in.getFloat();
-
-		int count = in.getInt();
-		for (int i = 0; i < count; i++) {
-			readAgent(in, graph);
 		}
 	}
 

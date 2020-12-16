@@ -27,7 +27,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class HermesConfigGroup extends ReflectiveConfigGroup {
+public final class HermesConfigGroup extends ReflectiveConfigGroup {
     public static final String NAME = "hermes";
     private static final String END_TIME = "endTime";
 
