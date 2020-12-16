@@ -24,7 +24,7 @@ public class SupersonicOsmNetworkReaderIT {
 
 		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)
-				.setAdjustFreeSpeed(true)
+				.setFreeSpeedFactor(LinkProperties.DEFAULT_FREESPEED_FACTOR)
 				.build()
 				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
 
@@ -38,7 +38,7 @@ public class SupersonicOsmNetworkReaderIT {
 		// Alternative expression with functional API that should do the same
 		Network alternative = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)
-				.setAdjustFreeSpeed(false)
+				.setFreeSpeedFactor(1.0)
 				.setAfterLinkCreated(SupersonicOsmNetworkReader.adjustFreespeed(LinkProperties.DEFAULT_FREESPEED_FACTOR))
 				.build()
 				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));

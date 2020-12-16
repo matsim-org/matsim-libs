@@ -56,7 +56,7 @@ public class LinkPropertiesTest {
     @Test
     public void getLaneCapacity_withIncrease() {
 
-        var linkLength = 50;
+        var linkLength = 40;
         var properties = new LinkProperties(LinkProperties.LEVEL_PRIMARY, 1, 50 / 3.6, 1000, false);
 
         assertEquals(properties.laneCapacity * 2, LinkProperties.getLaneCapacity(linkLength, properties), Double.MIN_VALUE);
