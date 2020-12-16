@@ -557,6 +557,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
         Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
         Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
+        Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
     }
 
 
