@@ -280,7 +280,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 
-        //sbraun 19092020 add cleaning logic
+        //sbraun 19092020 add cleaning logic, might go to networkCleaner
         LOG.info("Check if all OutLinks of junction with lanes are connected to the network");
         Map<Id<Node>,Set<Id<Link>>> junctionNodes = new HashMap<>();
         //Fill Map with junction nodes and all ToLinks from Lanes
