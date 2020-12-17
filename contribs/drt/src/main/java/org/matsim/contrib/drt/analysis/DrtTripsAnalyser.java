@@ -144,8 +144,8 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
-		double satisfactionRate600 = getSatisfactionRate(waitStats, 600);
-		double satisfactionRate900 = getSatisfactionRate(waitStats, 900);
+		double percentageWaitTimeBelow600 = getPercentageWaitTimeBelow(600, waitStats);
+		double percentageWaitTimeBelow900 = getPercentageWaitTimeBelow(900, waitStats);
 		
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
 				format.format(waitStats.getMean()) + "",//
@@ -153,8 +153,8 @@ public class DrtTripsAnalyser {
 				format.format(waitStats.getPercentile(95)) + "",//
 				format.format(waitStats.getPercentile(75)) + "",//
 				format.format(waitStats.getPercentile(50)) + "",//
-				format.format(satisfactionRate600) + "",//
-				format.format(satisfactionRate900) + "",//
+				format.format(percentageWaitTimeBelow600) + "",//
+				format.format(percentageWaitTimeBelow900) + "",//
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
@@ -478,7 +478,7 @@ public class DrtTripsAnalyser {
 		return result.toString();
 	}
 	
-	public static double getSatisfactionRate(DescriptiveStatistics stats, int timeCriteria) {
+	public static double getPercentageWaitTimeBelow(int timeCriteria, DescriptiveStatistics stats) {
 		double[] waitingTimes = stats.getValues();
 		
 		if (waitingTimes.length == 0) {
