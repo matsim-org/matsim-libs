@@ -479,15 +479,20 @@ public class DrtTripsAnalyser {
 	}
 	
 	public static double getSatisfactionRate(DescriptiveStatistics stats, int timeCriteria) {
-		double[] sortedWaitingTime = stats.getSortedValues();
-		for (int i = 0; i < sortedWaitingTime.length; i++) {
-			if (sortedWaitingTime[i] > timeCriteria) {
-				double numOfRequestsInZone = sortedWaitingTime.length;
-				double output = i / numOfRequestsInZone;
-				return output;
+		double[] waitingTimes = stats.getValues();
+		
+		if (waitingTimes.length == 0) {
+			return 1; // When there is no request in zone, we assume "everyone" is satisfied
+		}
+		
+		int count = 0;
+		for (int i = 0; i < waitingTimes.length; i++) {
+			if (waitingTimes[i] - timeCriteria < 0) {
+				count += 1;
 			}
 		}
-		return 1;
+		
+		return count / waitingTimes.length;
 	}
 	
 }
