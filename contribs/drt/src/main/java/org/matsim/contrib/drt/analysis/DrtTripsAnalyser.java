@@ -485,7 +485,7 @@ public class DrtTripsAnalyser {
 			return 1; // When there is no request in zone, we assume "everyone" is satisfied
 		}
 		
-		int count = 0;
+		double count = 0;
 		for (int i = 0; i < waitingTimes.length; i++) {
 			if (waitingTimes[i] - timeCriteria < 0) {
 				count += 1;
