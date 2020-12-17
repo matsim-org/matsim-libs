@@ -204,24 +204,27 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		heavyStopGoKmCounter = 0.0;
 	}
 
-	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> warmEmissions ){
+	void throwWarmEmissionEvent(double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> warmEmissions) {
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
+
 	@Override
-	public Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions( Vehicle vehicle, Link link, double travelTime ){
-		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
+	public Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime) {
+		return checkVehicleInfoAndCalculateWarmEmissions(vehicle.getType(), vehicle.getId(), link, travelTime);
 	}
 
-	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions( VehicleType vehicleType, Id<Vehicle> vehicleId,
-																						  Link link, double travelTime ) {
+	private static int cnt = 10;
+
+	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
+																						 Link link, double travelTime) {
 		{
-			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription(vehicleType, this.ecg);
 			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
-			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+			Gbl.assertNotNull(hbefaVehicleTypeDescription);
 		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
-		Gbl.assertNotNull( vehicleInformationTuple );
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType);
+		Gbl.assertNotNull(vehicleInformationTuple);
 
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
@@ -232,30 +235,28 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
 		Map<Pollutant, Double> warmEmissions
-				= calculateWarmEmissions( vehicleId, travelTime, EmissionUtils.getHbefaRoadType( link ), freeVelocity, link.getLength(), vehicleInformationTuple );
+				= calculateWarmEmissions(vehicleId, travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
 
 		return warmEmissions;
 	}
 
+	Map<Pollutant, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
+												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
-	private static int cnt =10;
-	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
-														   double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
-
-		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>( Pollutant.class );
+		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>(Pollutant.class);
 
 		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
-		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
-			for ( Pollutant warmPollutant : warmPollutants) {
-				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
+		if (vehicleInformationTuple.getFirst() == HbefaVehicleCategory.NON_HBEFA_VEHICLE) {
+			for (Pollutant warmPollutant : warmPollutants) {
+				warmEmissionsOfEvent.put(warmPollutant, 0.0);
 				// yyyyyy todo replace by something more meaningful. kai, jan'20
 			}
-			if ( cnt >0 ) {
-				logger.warn( "Just encountered non hbefa vehicle; currently, this code is setting the emissions of such vehicles to zero.  " +
-						"Might be necessary to find a better solution for this.  kai, jan'20" );
+			if (cnt > 0) {
+				logger.warn("Just encountered non hbefa vehicle; currently, this code is setting the emissions of such vehicles to zero.  " +
+						"Might be necessary to find a better solution for this.  kai, jan'20");
 				cnt--;
-				if ( cnt ==0 ) {
-					logger.warn( Gbl.FUTURE_SUPPRESSED );
+				if (cnt == 0) {
+					logger.warn(Gbl.FUTURE_SUPPRESSED);
 				}
 			}
 			return warmEmissionsOfEvent;
