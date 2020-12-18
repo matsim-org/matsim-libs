@@ -101,8 +101,21 @@ public class SumoNetworkHandler extends DefaultHandler {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
+        // lanes length may get incorrect
+        // this uses the maximum length for merged edges
+        for (Map.Entry<String, Edge> e : other.edges.entrySet()) {
+            if (edges.containsKey(e.getKey())) {
+                for (int i = 0; i < Math.min(e.getValue().lanes.size(), edges.get(e.getKey()).lanes.size()); i++) {
+                    Lane l = e.getValue().lanes.remove(i);
+                    Lane o = edges.get(e.getKey()).lanes.get(i);
+                    e.getValue().lanes.add(i, l.withLength(Double.max(l.length, o.length)));
+                }
+            }
+        }
+
         edges.keySet().removeAll(other.edges.keySet());
         lanes.keySet().removeAll(other.lanes.keySet());
+
         junctions.keySet().removeAll(notDeadEnd);
 
         // Re-project to new ct
@@ -296,6 +309,12 @@ public class SumoNetworkHandler extends DefaultHandler {
             }
         }
 
+        /**
+         * Calculate edge length as max of lanes.
+         */
+        public double getLength() {
+            return lanes.stream().mapToDouble( l -> l.length).max().orElseThrow();
+        }
 
         @Override
         public String toString() {
@@ -337,6 +356,10 @@ public class SumoNetworkHandler extends DefaultHandler {
             this.index = index;
             this.length = length;
             this.speed = speed;
+        }
+
+        Lane withLength(double newLength) {
+            return new Lane(id, index, newLength, speed);
         }
     }
 
