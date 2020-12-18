@@ -1,8 +1,5 @@
 package org.matsim.contrib.emissions;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -12,24 +9,20 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import javax.inject.Inject;
-import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class PositionEmissionsModule extends AbstractModule {
 
@@ -69,39 +62,24 @@ public class PositionEmissionsModule extends AbstractModule {
         }
     }
 
+    private static void checkConsistency(Config config) {
+
+        if (config.qsim().getSnapshotPeriod() > 1) {
+            throw new RuntimeException("only snapshot periods of 1s are supported.");
+        }
+        if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
+            throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
+        }
+    }
+
     @Override
     public void install() {
 
-        checkConsistency(emissionsConfigGroup);
-
-        var averageWarmEmissions =
-                new AverageWarmEmissionsLoader().load(emissionsConfigGroup.getAverageWarmEmissionFactorsFileURL(config.getContext()));
-
-        var detailedWarmEmissions =
-                new DetailedWarmEmissionsLoader().load(emissionsConfigGroup.getDetailedWarmEmissionFactorsFileURL(config.getContext()));
-
-      /*  var averageColdEmissions =
-                new AverageColdEmissionsLoader().load(emissionsConfigGroup.getAverageColdEmissionFactorsFileURL(config.getContext()));
-
-       */
-
-        Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> roadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedWarmEmissions);
-        // hard code this for now, but use something other later
-        var pollutants = Set.of(Pollutant.NO2, Pollutant.NOx, Pollutant.CO2_TOTAL, Pollutant.PM); // pm2.5 doesn't seem to be supported
-
-        var eventsManager = EventsUtils.createEventsManager(); // TODO this is a nasty hack
-        var analyser = new WarmEmissionAnalysisModule(
-                averageWarmEmissions, detailedWarmEmissions, roadTrafficSpeeds, pollutants, eventsManager, emissionsConfigGroup);
-
-        // var calculator = new EmissionCalculator(emissionsConfigGroup, averageWarmEmissions, detailedWarmEmissions, analyser);
-
-        bind(WarmEmissionAnalysisModule.class).toInstance(analyser);
+        checkConsistency(config);
         bind(EmissionCalculator.class);
+        bind(EmissionModule.class);
         addEventHandlerBinding().to(Handler.class);
-
-
         log.info("Installed Handler and WarmEmissionAnalysis Module.");
-
     }
 
     static class EmissionCalculator {
@@ -109,54 +87,13 @@ public class PositionEmissionsModule extends AbstractModule {
         @Inject
         private EmissionsConfigGroup emissionsConfigGroup;
         @Inject
-        private WarmEmissionAnalysisModule warmEmissionAnalysisModule;
-
-       /* public EmissionCalculator(EmissionsConfigGroup emissionsConfigGroup, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
-            this.emissionsConfigGroup = emissionsConfigGroup;
-            this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
-        }
-
-        */
+        private EmissionModule emissionModule;
 
         Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time, double speed) {
 
             var vehicleAttributes = getVehicleAttributes(vehicle);
             var roadType = EmissionUtils.getHbefaRoadType(link);
-
-
-
-            /*Map<Pollutant, Double> result = new EnumMap<>(Pollutant.class);
-
-            var key = new HbefaWarmEmissionFactorKey();
-            key.setHbefaVehicleCategory(vehicleAttributes.getFirst());
-            key.setHbefaRoadCategory(EmissionUtils.getHbefaRoadType(link));
-
-
-
-            // the original code has handling for detailed warm emissions here.
-
-            for (var pollutant : Pollutant.values()) {
-
-                key.setHbefaComponent(pollutant);
-                if (speed >= 0.5)
-                    key.setHbefaTrafficSituation(HbefaTrafficSituation.FREEFLOW);
-                else
-                    key.setHbefaTrafficSituation(HbefaTrafficSituation.STOPANDGO);
-
-                // next:
-                // 1. look up emission value for pollutant. This will be in g/km
-                // 2. multiply g/km with distance since last emission event. Originally, since emissions were calculated
-                //    when agents left links this would be the length of the link. Now, we have to provide the distance to
-                //        a. The last emission event
-                //        b. The beginning of the link
-
-                var emissionPerKilometer = 0.0; // here should be a look up
-                var emissionValue = distance * emissionPerKilometer / 1000;
-
-                result.put(pollutant, emissionValue);
-
-            }*/
-            return warmEmissionAnalysisModule.calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
+            return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
         }
 
         private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
@@ -287,217 +224,6 @@ public class PositionEmissionsModule extends AbstractModule {
         @Override
         public String getEventType() {
             return "emissionPositionEvent";
-        }
-    }
-
-    static class AverageWarmEmissionsLoader extends HbefaTableLoader {
-
-        @Override
-        protected void setSpecificThings(HbefaWarmEmissionFactorKey key, HbefaWarmEmissionFactor value, CSVRecord record) {
-
-            key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-            value.setSpeed(Double.parseDouble(record.get("V_weighted")));
-            value.setWarmEmissionFactor(Double.parseDouble(record.get("EFA_weighted")));
-        }
-    }
-
-    static class DetailedWarmEmissionsLoader extends HbefaTableLoader {
-
-        @Override
-        protected void setSpecificThings(HbefaWarmEmissionFactorKey key, HbefaWarmEmissionFactor value, CSVRecord record) {
-
-            var vehicleAttributes = new HbefaVehicleAttributes();
-            vehicleAttributes.setHbefaTechnology(record.get("Technology"));
-            vehicleAttributes.setHbefaSizeClass(record.get("SizeClasse"));
-            vehicleAttributes.setHbefaEmConcept("EmConcept");
-
-            value.setSpeed(Double.parseDouble(record.get("V")));
-            value.setWarmEmissionFactor(Double.parseDouble(record.get("EFA")));
-        }
-    }
-
-    static class AverageColdEmissionsLoader extends HbefaTableLoader {
-
-        @Override
-        protected void setSpecificThings(HbefaWarmEmissionFactorKey key, HbefaWarmEmissionFactor value, CSVRecord record) {
-
-        }
-    }
-
-    static abstract class HbefaTableLoader {
-
-        private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
-
-            if (string.endsWith("Freeflow")) return HbefaTrafficSituation.FREEFLOW;
-            else if (string.endsWith("Heavy")) return HbefaTrafficSituation.HEAVY;
-            else if (string.endsWith("Satur.")) return HbefaTrafficSituation.SATURATED;
-            else if (string.endsWith("St+Go")) return HbefaTrafficSituation.STOPANDGO;
-            else if (string.endsWith("St+Go2")) return HbefaTrafficSituation.STOPANDGO_HEAVY;
-            else {
-                log.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in hbefa input file.");
-                throw new RuntimeException();
-            }
-        }
-
-        Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> load(URL file) {
-
-            Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
-
-            try (var reader = IOUtils.getBufferedReader(file);
-                 var parser = CSVParser.parse(reader, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
-
-                for (var record : parser) {
-                    var key = new HbefaWarmEmissionFactorKey();
-
-                    var vehicleCategory = EmissionUtils.mapString2HbefaVehicleCategory(record.get("VehCat"));
-                    var pollutant = EmissionUtils.getPollutant(record.get("Component"));
-                    var trafficSit = record.get("TrafficSit");
-                    var roadCategory = trafficSit.substring(0, trafficSit.lastIndexOf('/'));
-                    var trafficSituation = mapString2HbefaTrafficSituation(trafficSit);
-
-                    key.setHbefaVehicleCategory(vehicleCategory);
-                    key.setHbefaComponent(pollutant);
-                    key.setHbefaRoadCategory(roadCategory);
-                    key.setHbefaTrafficSituation(trafficSituation);
-
-
-                    var value = new HbefaWarmEmissionFactor();
-
-                    setSpecificThings(key, value, record);
-                    avgWarmTable.put(key, value);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return avgWarmTable;
-        }
-
-        protected abstract void setSpecificThings(HbefaWarmEmissionFactorKey key, HbefaWarmEmissionFactor value, CSVRecord record);
-    }
-
-    static class HbefaColdFactorKey extends HbefaFactorKey {
-
-        private final int parkingTime;
-        private final int distance;
-
-        public HbefaColdFactorKey(HbefaVehicleCategory vehicleCategory, HbefaVehicleAttributes vehicleAttributes, Pollutant component, int parkingTime, int distance) {
-            super(vehicleCategory, vehicleAttributes, component);
-            this.parkingTime = parkingTime;
-            this.distance = distance;
-        }
-
-        public int getParkingTime() {
-            return parkingTime;
-        }
-
-        public int getDistance() {
-            return distance;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-
-            HbefaColdFactorKey that = (HbefaColdFactorKey) o;
-
-            if (parkingTime != that.parkingTime) return false;
-            return distance == that.distance;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = super.hashCode();
-            result = 31 * result + parkingTime;
-            result = 31 * result + distance;
-            return result;
-        }
-    }
-
-    static class HbefaWarmFactorKey extends HbefaFactorKey {
-
-        private final HbefaTrafficSituation trafficSituation;
-        private final String roadCategory;
-
-        public HbefaWarmFactorKey(HbefaVehicleCategory vehicleCategory, HbefaVehicleAttributes vehicleAttributes, Pollutant component, HbefaTrafficSituation trafficSituation, String roadCategory) {
-            super(vehicleCategory, vehicleAttributes, component);
-            this.trafficSituation = trafficSituation;
-            this.roadCategory = roadCategory;
-        }
-
-        public HbefaTrafficSituation getTrafficSituation() {
-            return trafficSituation;
-        }
-
-        public String getRoadCategory() {
-            return roadCategory;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            if (!super.equals(o)) return false;
-
-            HbefaWarmFactorKey that = (HbefaWarmFactorKey) o;
-
-            if (trafficSituation != that.trafficSituation) return false;
-            return roadCategory.equals(that.roadCategory);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = super.hashCode();
-            result = 31 * result + trafficSituation.hashCode();
-            result = 31 * result + roadCategory.hashCode();
-            return result;
-        }
-    }
-
-    static abstract class HbefaFactorKey {
-
-        private final HbefaVehicleCategory vehicleCategory;
-        private final HbefaVehicleAttributes vehicleAttributes;
-
-        private final Pollutant component;
-
-        public HbefaFactorKey(HbefaVehicleCategory vehicleCategory, HbefaVehicleAttributes vehicleAttributes, Pollutant component) {
-            this.vehicleCategory = vehicleCategory;
-            this.vehicleAttributes = vehicleAttributes;
-            this.component = component;
-        }
-
-        public HbefaVehicleCategory getVehicleCategory() {
-            return vehicleCategory;
-        }
-
-        public HbefaVehicleAttributes getVehicleAttributes() {
-            return vehicleAttributes;
-        }
-
-        public Pollutant getComponent() {
-            return component;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof HbefaFactorKey)) return false;
-
-            HbefaFactorKey that = (HbefaFactorKey) o;
-
-            if (vehicleCategory != that.vehicleCategory) return false;
-            if (!vehicleAttributes.equals(that.vehicleAttributes)) return false;
-            return component == that.component;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = vehicleCategory.hashCode();
-            result = 31 * result + vehicleAttributes.hashCode();
-            result = 31 * result + component.hashCode();
-            return result;
         }
     }
 }

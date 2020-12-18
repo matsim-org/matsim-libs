@@ -23,10 +23,6 @@ package org.matsim.contrib.emissions;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.emissions.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.HbefaWarmEmissionFactorKey;
 
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.FC;
@@ -72,33 +68,33 @@ public class TestHbefaWarmEmissionFactorKey{
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
+
 		// generate a warm emission factor key equal to 'normal' 
 		HbefaWarmEmissionFactorKey compare = new HbefaWarmEmissionFactorKey();
-		compare.setHbefaComponent(FC);
-		compare.setHbefaRoadCategory(hbefaRoadCategory);
-		compare.setHbefaTrafficSituation(hbefaTrafficSituation);
-		compare.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		compare.setHbefaVehicleCategory(hbefaVehicleCategory);
+		compare.setComponent(FC);
+		compare.setRoadCategory(hbefaRoadCategory);
+		compare.setTrafficSituation(hbefaTrafficSituation);
+		compare.setVehicleAttributes(hbefaVehicleAttributes);
+		compare.setVehicleCategory(hbefaVehicleCategory);
 
 		String message = "these two objects should be the same but are not: " + normal.toString() + " and " + compare.toString();
 		Assert.assertTrue(message, normal.equals(compare));
 		Assert.assertTrue(message, compare.equals(normal));
-		
+
 		//two unequal but complete objects
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
-		different.setHbefaComponent(CO);
-		different.setHbefaRoadCategory("another road category");
-		different.setHbefaTrafficSituation(HbefaTrafficSituation.SATURATED);
+		different.setComponent(CO);
+		different.setRoadCategory("another road category");
+		different.setTrafficSituation(HbefaTrafficSituation.SATURATED);
 		HbefaVehicleAttributes attrForDifferent = new HbefaVehicleAttributes();
 		attrForDifferent.setHbefaEmConcept("em concept2");
 		attrForDifferent.setHbefaSizeClass("size class2");
 		attrForDifferent.setHbefaTechnology("technology 2");
-		different.setHbefaVehicleAttributes(attrForDifferent);
-		different.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-		
+		different.setVehicleAttributes(attrForDifferent);
+		different.setVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+
 		message = "these two objects should not be the same: " + normal.toString() + " and " + different.toString();
-		
+
 		Assert.assertFalse(message, different.equals(normal));
 		Assert.assertFalse(message, normal.equals(different));
 	}
@@ -118,13 +114,13 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		// empty VehicleCategory
 		HbefaWarmEmissionFactorKey noVehCat = new HbefaWarmEmissionFactorKey();
-		noVehCat.setHbefaComponent(warmPollutant);
-		noVehCat.setHbefaRoadCategory(hbefaRoadCategory);
-		noVehCat.setHbefaTrafficSituation(hbefaTrafficSituation);
-		noVehCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+		noVehCat.setComponent(warmPollutant);
+		noVehCat.setRoadCategory(hbefaRoadCategory);
+		noVehCat.setTrafficSituation(hbefaTrafficSituation);
+		noVehCat.setVehicleAttributes(hbefaVehicleAttributes);
 
-		log.warn( "normal=" + normal );
-		log.warn( "noVehCat=" + noVehCat );
+		log.warn("normal=" + normal);
+		log.warn("noVehCat=" + noVehCat);
 
 		equalErr = false;
 		try {
@@ -151,10 +147,10 @@ public class TestHbefaWarmEmissionFactorKey{
 
 		// empty warm pollutant
 		HbefaWarmEmissionFactorKey noPollutant = new HbefaWarmEmissionFactorKey();
-		noPollutant.setHbefaRoadCategory(hbefaRoadCategory);
-		noPollutant.setHbefaTrafficSituation(hbefaTrafficSituation);
-		noPollutant.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		noPollutant.setHbefaVehicleCategory(hbefaVehicleCategory);
+		noPollutant.setRoadCategory(hbefaRoadCategory);
+		noPollutant.setTrafficSituation(hbefaTrafficSituation);
+		noPollutant.setVehicleAttributes(hbefaVehicleAttributes);
+		noPollutant.setVehicleCategory(hbefaVehicleCategory);
 
 		equalErr = false;
 		try {
@@ -164,7 +160,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		}
 
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: "
-						 + normal.toString() + " and " + noPollutant.toString();
+				+ normal.toString() + " and " + noPollutant.toString();
 		String message2 = "this key should not be comparable since no pollutant is set";
 		Assert.assertTrue(message2, equalErr);
 		Assert.assertFalse(message, normal.equals(noPollutant));
@@ -176,20 +172,19 @@ public class TestHbefaWarmEmissionFactorKey{
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
+
 		//empty road category
 		HbefaWarmEmissionFactorKey noRoadCat = new HbefaWarmEmissionFactorKey();
-		noRoadCat.setHbefaComponent(warmPollutant);
-		noRoadCat.setHbefaTrafficSituation(hbefaTrafficSituation);
-		noRoadCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		noRoadCat.setHbefaVehicleCategory(hbefaVehicleCategory);
-		
+		noRoadCat.setComponent(warmPollutant);
+		noRoadCat.setTrafficSituation(hbefaTrafficSituation);
+		noRoadCat.setVehicleAttributes(hbefaVehicleAttributes);
+		noRoadCat.setVehicleCategory(hbefaVehicleCategory);
+
 		equalErr = false;
-		try{
+		try {
 			noRoadCat.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr= true;
+		} catch (NullPointerException e) {
+			equalErr = true;
 		}
 
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noRoadCat.toString();
@@ -203,21 +198,20 @@ public class TestHbefaWarmEmissionFactorKey{
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal'
 		// and set some parameters
 		setUp();
-		setToNormal(normal);	
-		
+		setToNormal(normal);
+
 		//empty traffic situation
 		HbefaWarmEmissionFactorKey noTrafficSit = new HbefaWarmEmissionFactorKey();
-		noTrafficSit.setHbefaComponent(warmPollutant);
-		noTrafficSit.setHbefaRoadCategory(hbefaRoadCategory);
-		noTrafficSit.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		noTrafficSit.setHbefaVehicleCategory(hbefaVehicleCategory);
-		
+		noTrafficSit.setComponent(warmPollutant);
+		noTrafficSit.setRoadCategory(hbefaRoadCategory);
+		noTrafficSit.setVehicleAttributes(hbefaVehicleAttributes);
+		noTrafficSit.setVehicleCategory(hbefaVehicleCategory);
+
 		equalErr = false;
-		try{
+		try {
 			noTrafficSit.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr= true;
+		} catch (NullPointerException e) {
+			equalErr = true;
 		}
 
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noTrafficSit.toString();
@@ -250,58 +244,57 @@ public class TestHbefaWarmEmissionFactorKey{
 	
 	@Test
 	public final void testEqualsForIncompleteKeys_vehicleAttributes(){
-		
+
 		// if no vehicle attributes are set manually they are set to 'average' by default
 		// thus, the equals method should not throw nullpointer exceptions but return false or respectively true
-		
+
 		// generate a complete HbefaWarmEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
+
 		//empty vehicle attributes
 		HbefaWarmEmissionFactorKey noVehAtt = new HbefaWarmEmissionFactorKey();
-		noVehAtt.setHbefaComponent(warmPollutant);
-		noVehAtt.setHbefaRoadCategory(hbefaRoadCategory);
-		noVehAtt.setHbefaTrafficSituation(hbefaTrafficSituation);
-		noVehAtt.setHbefaVehicleCategory(hbefaVehicleCategory);
-		
+		noVehAtt.setComponent(warmPollutant);
+		noVehAtt.setRoadCategory(hbefaRoadCategory);
+		noVehAtt.setTrafficSituation(hbefaTrafficSituation);
+		noVehAtt.setVehicleCategory(hbefaVehicleCategory);
+
 		equalErr = false;
-		try{
+		try {
 			noVehAtt.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr= true;
+		} catch (NullPointerException e) {
+			equalErr = true;
 		}
 
 		String message = "these two HbefaWarmEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		Assert.assertFalse(message, noVehAtt.equals(normal));
-		Assert.assertFalse(equalErr); 
+		Assert.assertFalse(equalErr);
 		// veh attributes are allowed to be not initiated
 		// therefore this should not throw a nullpointer but return false
 		Assert.assertFalse(message, normal.equals(noVehAtt));
-		
+
 		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
 		//then noVehAtt is equal to normal
 		HbefaVehicleAttributes hbefaVehicleAttributesAverage = new HbefaVehicleAttributes();
 		hbefaVehicleAttributesAverage.setHbefaEmConcept("average");
 		hbefaVehicleAttributesAverage.setHbefaSizeClass("average");
 		hbefaVehicleAttributesAverage.setHbefaTechnology("average");
-		normal.setHbefaVehicleAttributes(hbefaVehicleAttributesAverage);
-		
-		message ="these two HbefaWarmEmissionFactorKeys should be the same: " + normal.toString() + " and " + noVehAtt.toString();
+		normal.setVehicleAttributes(hbefaVehicleAttributesAverage);
+
+		message = "these two HbefaWarmEmissionFactorKeys should be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		Assert.assertTrue(message, normal.equals(noVehAtt));
 		Assert.assertTrue(message, noVehAtt.equals(normal));
-		
+
 
 	}
 	
 	private void setToNormal(HbefaWarmEmissionFactorKey normal) {
-		normal.setHbefaComponent(warmPollutant);
-		normal.setHbefaRoadCategory(hbefaRoadCategory);
-		normal.setHbefaTrafficSituation(hbefaTrafficSituation);
-		normal.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		normal.setHbefaVehicleCategory(hbefaVehicleCategory);
+		normal.setComponent(warmPollutant);
+		normal.setRoadCategory(hbefaRoadCategory);
+		normal.setTrafficSituation(hbefaTrafficSituation);
+		normal.setVehicleAttributes(hbefaVehicleAttributes);
+		normal.setVehicleCategory(hbefaVehicleCategory);
 	}
 	
 	

@@ -95,7 +95,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	// fifth case: cold emission factor not set
 //	private static final String nullcase_emConcept = "nullCase";
 	// this testcase does not exist any more.  kai, jul'18
-	
+
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -103,17 +103,17 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double heavyGoodsFaktor = -1.; //should not be used since HGV is not in HBEFA 3 or 4.1. KMT May 2020
-	
-	private boolean excep = false;
-	
+
+	private final boolean excep = false;
+
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-		
+
 		/*
 		 * six test cases with complete input data
 		 * or input that should be assigned to average/default cases
 		 */
-		
+
 		setUp();
 		
 		List<ArrayList> testCases = new ArrayList<>();
@@ -227,12 +227,12 @@ public class TestColdEmissionAnalysisModuleCase6 {
 								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime( tableParkingDuration );
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime(tableParkingDuration);
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	

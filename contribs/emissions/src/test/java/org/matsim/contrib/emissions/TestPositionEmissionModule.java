@@ -23,7 +23,7 @@ public class TestPositionEmissionModule {
                 EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable); //This is the previous behaviour
         var config = ConfigUtils.loadConfig(configFile, emissionConfig);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.qsim().setSnapshotPeriod(10);
+        config.qsim().setSnapshotPeriod(1);
         config.controler().setWriteSnapshotsInterval(1);
         config.controler().setSnapshotFormat(Set.of(ControlerConfigGroup.SnapshotFormat.positionevents));
 
