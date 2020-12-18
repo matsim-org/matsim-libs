@@ -144,12 +144,17 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
+		double percentageWaitTimeBelow600 = getPercentageWaitTimeBelow(600, waitStats);
+		double percentageWaitTimeBelow900 = getPercentageWaitTimeBelow(900, waitStats);
+		
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
 				format.format(waitStats.getMean()) + "",//
 				format.format(waitStats.getMax()) + "",//
 				format.format(waitStats.getPercentile(95)) + "",//
 				format.format(waitStats.getPercentile(75)) + "",//
 				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(percentageWaitTimeBelow600) + "",//
+				format.format(percentageWaitTimeBelow900) + "",//
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
@@ -472,4 +477,22 @@ public class DrtTripsAnalyser {
 
 		return result.toString();
 	}
+	
+	public static double getPercentageWaitTimeBelow(int timeCriteria, DescriptiveStatistics stats) {
+		double[] waitingTimes = stats.getValues();
+		
+		if (waitingTimes.length == 0) {
+			return 1; // When there is no request in zone, we assume "everyone" is satisfied
+		}
+		
+		double count = 0;
+		for (int i = 0; i < waitingTimes.length; i++) {
+			if (waitingTimes[i] - timeCriteria < 0) {
+				count += 1;
+			}
+		}
+		
+		return count / waitingTimes.length;
+	}
+	
 }
