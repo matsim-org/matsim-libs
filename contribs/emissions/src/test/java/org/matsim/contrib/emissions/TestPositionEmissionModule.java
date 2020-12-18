@@ -30,6 +30,7 @@ public class TestPositionEmissionModule {
         var scenario = ScenarioUtils.loadScenario(config);
 
         var controler = new Controler(scenario);
+
         controler.addOverridingModule(new PositionEmissionsModule());
         controler.run();
     }

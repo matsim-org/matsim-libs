@@ -6,13 +6,9 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -21,6 +17,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
@@ -30,7 +27,6 @@ import org.matsim.vis.snapshotwriters.PositionEvent;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URL;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -89,18 +85,18 @@ public class PositionEmissionsModule extends AbstractModule {
 
        */
 
-        Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> roadTrafficSpeeds = new HashMap<>(); // load this as well
-
+        Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> roadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedWarmEmissions);
         // hard code this for now, but use something other later
-        var pollutants = Set.of(Pollutant.NO2, Pollutant.NOx, Pollutant.CO2_TOTAL, Pollutant.PM, Pollutant.PM2_5);
+        var pollutants = Set.of(Pollutant.NO2, Pollutant.NOx, Pollutant.CO2_TOTAL, Pollutant.PM); // pm2.5 doesn't seem to be supported
 
         var eventsManager = EventsUtils.createEventsManager(); // TODO this is a nasty hack
         var analyser = new WarmEmissionAnalysisModule(
                 averageWarmEmissions, detailedWarmEmissions, roadTrafficSpeeds, pollutants, eventsManager, emissionsConfigGroup);
 
-        var calculator = new EmissionCalculator(emissionsConfigGroup, averageWarmEmissions, detailedWarmEmissions);
+        // var calculator = new EmissionCalculator(emissionsConfigGroup, averageWarmEmissions, detailedWarmEmissions, analyser);
 
-        bind(EmissionCalculator.class).toInstance(calculator);
+        bind(WarmEmissionAnalysisModule.class).toInstance(analyser);
+        bind(EmissionCalculator.class);
         addEventHandlerBinding().to(Handler.class);
 
 
@@ -110,23 +106,32 @@ public class PositionEmissionsModule extends AbstractModule {
 
     static class EmissionCalculator {
 
-        private final EmissionsConfigGroup emissionsConfigGroup;
-        private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-        private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+        @Inject
+        private EmissionsConfigGroup emissionsConfigGroup;
+        @Inject
+        private WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 
-        public EmissionCalculator(EmissionsConfigGroup emissionsConfigGroup, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+       /* public EmissionCalculator(EmissionsConfigGroup emissionsConfigGroup, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable, Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, WarmEmissionAnalysisModule warmEmissionAnalysisModule) {
             this.emissionsConfigGroup = emissionsConfigGroup;
-            this.avgHbefaWarmTable = avgHbefaWarmTable;
-            this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+            this.warmEmissionAnalysisModule = warmEmissionAnalysisModule;
         }
 
-        Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double speed) {
+        */
 
-            Map<Pollutant, Double> result = new EnumMap<>(Pollutant.class);
+        Map<Pollutant, Double> calculateWarmEmissions(Vehicle vehicle, Link link, double distance, double time, double speed) {
+
             var vehicleAttributes = getVehicleAttributes(vehicle);
+            var roadType = EmissionUtils.getHbefaRoadType(link);
+
+
+
+            /*Map<Pollutant, Double> result = new EnumMap<>(Pollutant.class);
+
             var key = new HbefaWarmEmissionFactorKey();
             key.setHbefaVehicleCategory(vehicleAttributes.getFirst());
             key.setHbefaRoadCategory(EmissionUtils.getHbefaRoadType(link));
+
+
 
             // the original code has handling for detailed warm emissions here.
 
@@ -150,8 +155,8 @@ public class PositionEmissionsModule extends AbstractModule {
 
                 result.put(pollutant, emissionValue);
 
-            }
-            return result;
+            }*/
+            return warmEmissionAnalysisModule.calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
         }
 
         private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
@@ -169,6 +174,8 @@ public class PositionEmissionsModule extends AbstractModule {
     static class Handler implements BasicEventHandler {
 
         private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
+        private final Map<Id<Vehicle>, LinkEnterEvent> vehiclesOnLinks = new HashMap<>();
+        private final Map<Id<Vehicle>, PositionEvent> previousPositions = new HashMap<>();
 
         @Inject
         private EmissionCalculator emissionCalculator;
@@ -190,18 +197,29 @@ public class PositionEmissionsModule extends AbstractModule {
                 case LinkEnterEvent.EVENT_TYPE:
                     handleLinkEnterEvent((LinkEnterEvent) event);
                     break;
+                case LinkLeaveEvent.EVENT_TYPE:
+                    handleLinkLeaveEvent((LinkLeaveEvent) event);
+                    break;
                 case PositionEvent.EVENT_TYPE:
                     handlePositionEvent((PositionEvent) event);
                     break;
                 case VehicleEntersTrafficEvent.EVENT_TYPE:
                     handleVehicleEntersTraffic((VehicleEntersTrafficEvent) event);
+                    break;
+                case VehicleLeavesTrafficEvent.EVENT_TYPE:
+                    handleVehicleLeavesTraffic((VehicleLeavesTrafficEvent) event);
+                    break;
                 default:
                     // we're not interested in anything else
             }
         }
 
         private void handleLinkEnterEvent(LinkEnterEvent event) {
+            vehiclesOnLinks.put(event.getVehicleId(), event);
+        }
 
+        private void handleLinkLeaveEvent(LinkLeaveEvent event) {
+            vehiclesOnLinks.remove(event.getVehicleId());
         }
 
         private void handleVehicleEntersTraffic(VehicleEntersTrafficEvent event) {
@@ -210,6 +228,7 @@ public class PositionEmissionsModule extends AbstractModule {
 
         private void handleVehicleLeavesTraffic(VehicleLeavesTrafficEvent event) {
             vehiclesInTraffic.remove(event.getVehicleId());
+            previousPositions.remove(event.getVehicleId());
         }
 
         private void handlePositionEvent(PositionEvent event) {
@@ -217,39 +236,51 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getState().equals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR))
                 return; // only calculate emissions for cars
 
-            var vehicle = vehicles.getVehicles().get(event.getVehicleId());
-            var link = network.getLinks().get(event.getLinkId());
-            var travelTime = event.getTime() - vehiclesInTraffic.get(event.getVehicleId()).getTime();
+            var previousPosition = previousPositions.get(event.getVehicleId());
+            previousPositions.put(event.getVehicleId(), event);
 
-            //var emissions = analysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, link, travelTime);
-            var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, 0, event.speed());
+            // we start calculating warm emissions once we have the second position
+            if (previousPosition != null) {
 
-            log.info("calculated emissions: " + emissions);
+                var travelledDistance = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
 
-            // maybe refactor emission position event, so that it takes position event and emission map
-            var emissionEvent = new WarmEmissionEvent(event.getTime(), event.getLinkId(), event.getVehicleId(), emissions);
-            eventsManager.processEvent(new EmissionPositionEvent(event, emissionEvent));
+                // do matsim cars come to a halt in a traffic jam, or do they move very slowly????
+                if (travelledDistance > 0) {
+                    var vehicle = vehicles.getVehicles().get(event.getVehicleId());
+                    var link = network.getLinks().get(event.getLinkId());
+                    var travelTime = event.getTime() - previousPosition.getTime();
+
+                    // don't go faster than light (freespeed)
+                    if (travelledDistance / travelTime <= link.getFreespeed()) {
+                        //var emissions = analysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, link, travelTime);
+                        var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, travelledDistance, travelTime, event.speed());
+
+                        log.info("calculated emissions: " + emissions);
+                        eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+                    }
+                }
+            }
         }
     }
 
     static class EmissionPositionEvent extends Event {
 
         private final PositionEvent position;
-        private final WarmEmissionEvent emission;
+        private final Map<Pollutant, Double> emissions;
 
-        public EmissionPositionEvent(PositionEvent positionEvent, WarmEmissionEvent emissionEvent) {
-            super(positionEvent.getTime());
+        public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions) {
+            super(positionEvent.getTime() + 1);
             this.position = positionEvent;
-            this.emission = emissionEvent;
+            this.emissions = emissions;
         }
 
         @Override
         public Map<String, String> getAttributes() {
             var attr = super.getAttributes();
-            // there are multiple duplicated keys in both events which should also have the same values
-            // the map should sort this out.
             attr.putAll(position.getAttributes());
-            attr.putAll(emission.getAttributes());
+            for (var pollutant : emissions.entrySet()) {
+                attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
+            }
             return attr;
         }
 

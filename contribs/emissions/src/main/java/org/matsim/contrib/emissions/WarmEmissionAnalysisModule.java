@@ -226,7 +226,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType);
 		Gbl.assertNotNull(vehicleInformationTuple);
 
-		if (vehicleInformationTuple.getFirst() == null){
+		if (vehicleInformationTuple.getFirst() == null) {
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " +
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
@@ -234,13 +234,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		Map<Pollutant, Double> warmEmissions
-				= calculateWarmEmissions(vehicleId, travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
-
-		return warmEmissions;
+		return calculateWarmEmissions(travelTime, EmissionUtils.getHbefaRoadType(link), freeVelocity, link.getLength(), vehicleInformationTuple);
 	}
 
-	Map<Pollutant, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
+	Map<Pollutant, Double> calculateWarmEmissions(double travelTime_sec, String roadType, double freeVelocity_ms,
 												  double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<Pollutant, Double> warmEmissionsOfEvent = new EnumMap<>(Pollutant.class);
