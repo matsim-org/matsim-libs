@@ -22,8 +22,6 @@
 
 package org.matsim.contrib.signals.otfvis;
 
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
@@ -43,8 +41,10 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
+import org.matsim.vis.snapshotwriters.PositionInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
+
+import javax.inject.Inject;
 
 public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 
@@ -73,23 +73,23 @@ public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 
 //			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getAgentSnapshotInfoFactory();
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		linkWidthCalculator.setLinkWidthForVis( config.qsim().getLinkWidthForVis() );
-		if (! Double.isNaN(network.getEffectiveLaneWidth())){
-			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
+		linkWidthCalculator.setLinkWidthForVis(config.qsim().getLinkWidthForVis());
+		if (!Double.isNaN(network.getEffectiveLaneWidth())) {
+			linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
-		AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
+		var snapshotInfoBuilder = new PositionInfo.LinkBasedBuilder().setLinkWidthCalculator(linkWidthCalculator);
 
-		for( AgentTracker agentTracker : qSim.getAgentTrackers() ) {
-			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
+		for (AgentTracker agentTracker : qSim.getAgentTrackers()) {
+			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoBuilder);
 			server.addAdditionalElement(facilityWriter);
 		}
 
-		if ( (config.qsim().isUseLanes() || config.network().getLaneDefinitionsFile()!=null ) 
+		if ((config.qsim().isUseLanes() || config.network().getLaneDefinitionsFile() != null)
 				&& (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (Lanes) scenario.getScenarioElement(Lanes.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
-		} else if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+		} else if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUP_NAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);
@@ -97,7 +97,7 @@ public final class OTFVisWithSignalsLiveModule extends AbstractModule {
 			Lanes laneDefs = scenario.getLanes();
 			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
 			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
-			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData , signalTracker);
+			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData, signalTracker);
 			server.addAdditionalElement(otfSignalWriter);
 		}
 		server.pause();

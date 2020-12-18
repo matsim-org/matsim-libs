@@ -44,7 +44,7 @@ public class MobsimScopeEventHandlingTest {
 	@Test
 	public void test_notifyAfterMobsim_oneHandler() {
 		eventHandling.addMobsimScopeHandler(handler);
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99));
+		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
 		verify(eventsManager, times(1)).removeHandler(argThat(arg -> arg == handler));
 		verify(handler, times(1)).cleanupAfterMobsim(intThat(arg -> arg == 99));
@@ -53,13 +53,13 @@ public class MobsimScopeEventHandlingTest {
 	@Test
 	public void test_notifyAfterMobsim_noHandlersAfterRemoval() {
 		eventHandling.addMobsimScopeHandler(handler);
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99));
+		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 99, false));
 
 		verify(eventsManager, times(1)).removeHandler(any());
 		verify(handler, times(1)).cleanupAfterMobsim(anyInt());
 
 		//no handlers in this iteration, so no new calls to removeHandler() and cleanupAfterMobsim()
-		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 100));
+		eventHandling.notifyAfterMobsim(new AfterMobsimEvent(null, 100, false));
 
 		verify(eventsManager, times(1)).removeHandler(any());
 		verify(handler, times(1)).cleanupAfterMobsim(anyInt());

@@ -64,8 +64,6 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 	private final LeastCostPathCalculator toDropoffPathSearch;
 	private final LeastCostPathCalculator fromDropoffPathSearch;
 
-	private final double stopDuration;
-
 	private final ExecutorService executorService;
 
 	public SingleInsertionDetourPathCalculator(Network network,
@@ -77,7 +75,6 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		fromPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		toDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
-		stopDuration = drtCfg.getStopDuration();
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
@@ -90,8 +87,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		Insertion insertion = filteredInsertions.get(0);
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
-		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
+		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
 
 		// TODO use times from InsertionWithDetourData<Double> as approximate departure times for Dijkstra (will require
 		//  passing it as an argument, instead of Insertion)
@@ -107,13 +103,12 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousLink == null ?
 				Futures.immediateFuture(ImmutableMap.of()) :
 				executorService.submit(() -> Map.of(insertion.dropoff.previousLink,
-						calcPathData(toDropoffPathSearch, insertion.dropoff.previousLink, dropoff,
-								earliestDropoffTime)));
+						calcPathData(toDropoffPathSearch, insertion.dropoff.previousLink, dropoff, latestDropoffTime)));
 
 		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextLink == null ?
 				Futures.immediateFuture(ImmutableMap.of()) :
 				executorService.submit(() -> Map.of(insertion.dropoff.nextLink,
-						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextLink, earliestDropoffTime)));
+						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextLink, latestDropoffTime)));
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
