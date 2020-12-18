@@ -42,9 +42,11 @@ public class ChargerSelectionTest {
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
 		evConfigGroup.setTimeProfiles(true);
 		evConfigGroup.setChargersFile("C:/Users/admin/Desktop/chargers.xml");
-		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
-				evConfigGroup);
-		//config.network().setInputFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/input/1%network.xml");
+//		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
+//		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
+//				evConfigGroup);
+		Config config = ConfigUtils.loadConfig("test/input/chessboard/chessboard-config.xml", evConfigGroup);
+//		config.network().setInputFile("1pctNetwork.xml");
 
 		//prepare config
 		RunUrbanEVExample.prepareConfig(config);
