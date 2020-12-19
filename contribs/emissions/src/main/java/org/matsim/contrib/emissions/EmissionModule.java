@@ -20,20 +20,14 @@
 package org.matsim.contrib.emissions;
 
 import com.google.inject.Inject;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.utils.io.IOUtils;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -147,15 +141,15 @@ public final class EmissionModule {
 		logger.info("entering createLookupTables");
 
 		if (shouldCreateAverageTables()) {
-			this.avgHbefaColdTable = new HbefaAvarageColdTableLoader().load(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.avgHbefaColdTable = HbefaTables.loadAverageCold(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
-			this.avgHbefaWarmTable = new HbefaAverageWarmTableLoader().load(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.avgHbefaWarmTable = HbefaTables.loadAverageWarm(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}
 		if (shouldCreateDetailedTables()) {
-			this.detailedHbefaColdTable = new HbefaDetailedColdTableLoader().load(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.detailedHbefaColdTable = HbefaTables.loadDetailedCold(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
-			this.detailedHbefaWarmTable = new HbefaDetailedWarmTableLoader().load(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			this.detailedHbefaWarmTable = HbefaTables.loadDetailedWarm(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
 			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}
 
@@ -231,155 +225,5 @@ public final class EmissionModule {
 			default:
 				throw new RuntimeException(this.emissionConfigGroup.getHbefaRoadTypeSource() + " is not implemented.");
 		}
-
-	}
-
-	static class HbefaDetailedWarmTableLoader extends HbefaAverageWarmTableLoader {
-
-		@Override
-		protected HbefaWarmEmissionFactorKey createKey(CSVRecord record) {
-
-			var key = super.createKey(record);
-			super.setCommonDetailedParametersOnKey(key, record);
-			return key;
-		}
-
-		@Override
-		protected HbefaWarmEmissionFactor createValue(CSVRecord record) {
-			return new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V")));
-		}
-	}
-
-	static class HbefaAverageWarmTableLoader extends HbefaTableLoader<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> {
-
-		private static HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
-
-			if (string.endsWith("Freeflow")) return HbefaTrafficSituation.FREEFLOW;
-			else if (string.endsWith("Heavy")) return HbefaTrafficSituation.HEAVY;
-			else if (string.endsWith("Satur.")) return HbefaTrafficSituation.SATURATED;
-			else if (string.endsWith("St+Go")) return HbefaTrafficSituation.STOPANDGO;
-			else if (string.endsWith("St+Go2")) return HbefaTrafficSituation.STOPANDGO_HEAVY;
-			else {
-				logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in hbefa input file.");
-				throw new RuntimeException();
-			}
-		}
-
-		@Override
-		protected HbefaWarmEmissionFactorKey createKey(CSVRecord record) {
-
-			var key = new HbefaWarmEmissionFactorKey();
-			setCommonParametersOnKey(key, record);
-			var trafficSit = record.get("TrafficSit");
-			key.setRoadCategory(trafficSit.substring(0, trafficSit.lastIndexOf('/')));
-			key.setTrafficSituation(mapString2HbefaTrafficSituation(trafficSit));
-			key.setVehicleAttributes(new HbefaVehicleAttributes());
-			return key;
-		}
-
-		@Override
-		protected HbefaWarmEmissionFactor createValue(CSVRecord record) {
-
-			var factor = Double.parseDouble(record.get("EFA_weighted"));
-			var speed = Double.parseDouble(record.get("V_weighted"));
-			return new HbefaWarmEmissionFactor(factor, speed);
-		}
-	}
-
-	static class HbefaAvarageColdTableLoader extends HbefaTableLoader<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> {
-
-		@Override
-		protected HbefaColdEmissionFactorKey createKey(CSVRecord record) {
-
-			var key = new HbefaColdEmissionFactorKey();
-			setCommonParametersOnKey(key, record);
-			key.setParkingTime(mapAmbientCondPattern2ParkingTime(record.get("AmbientCondPattern")));
-			key.setDistance(mapAmbientCondPattern2Distance(record.get("AmbientCondPattern")));
-			key.setVehicleAttributes(new HbefaVehicleAttributes());
-
-			return key;
-		}
-
-		@Override
-		protected HbefaColdEmissionFactor createValue(CSVRecord record) {
-			try {
-				return new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted")));
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		private int mapAmbientCondPattern2Distance(String string) {
-			String distanceString = string.split(",")[2];
-			String upperbound = distanceString.split("-")[1];
-			return Integer.parseInt(upperbound.split("k")[0]);
-		}
-
-		private int mapAmbientCondPattern2ParkingTime(String string) {
-
-				String parkingTimeString = string.split(",")[1];
-				if (parkingTimeString.equals(">12h")) {
-					return 13;
-				} else {
-					String upperbound = parkingTimeString.split("-")[1];
-					return Integer.parseInt(upperbound.split("h")[0]);
-				}
-		}
-	}
-
-	static class HbefaDetailedColdTableLoader extends HbefaAvarageColdTableLoader {
-
-		@Override
-		protected HbefaColdEmissionFactorKey createKey(CSVRecord record) {
-
-			var key = super.createKey(record);
-			setCommonDetailedParametersOnKey(key, record);
-			return key;
-		}
-
-		@Override
-		protected HbefaColdEmissionFactor createValue(CSVRecord record) {
-			return new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA")));
-		}
-	}
-
-	abstract static class HbefaTableLoader<K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> {
-
-
-		Map<K, V> load(URL file) {
-
-			Map<K, V> result = new HashMap<>();
-
-			try (var reader = IOUtils.getBufferedReader(file);
-				 var parser = CSVParser.parse(reader, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
-
-				for (var record : parser) {
-
-					var key = createKey(record);
-					var value = createValue(record);
-					result.put(key, value);
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			return result;
-		}
-
-		protected void setCommonParametersOnKey(K key, CSVRecord record) {
-
-			key.setComponent(EmissionUtils.getPollutant(record.get("Component")));
-			key.setVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(record.get("VehCat")));
-		}
-
-		// this violates some principle but I don't care
-		protected void setCommonDetailedParametersOnKey(K key, CSVRecord record) {
-			key.getVehicleAttributes().setHbefaTechnology(record.get("Technology"));
-			key.getVehicleAttributes().setHbefaEmConcept(record.get("EmConcept"));
-			key.getVehicleAttributes().setHbefaSizeClass(record.get("SizeClasse"));
-		}
-
-		protected abstract K createKey(CSVRecord record);
-
-		protected abstract V createValue(CSVRecord record);
 	}
 }
