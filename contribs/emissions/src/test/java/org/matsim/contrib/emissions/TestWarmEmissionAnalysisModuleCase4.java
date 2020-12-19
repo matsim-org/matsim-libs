@@ -22,6 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -105,18 +106,19 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {
 		List <Object[]> list = new ArrayList<>();
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction} ) ;
-		list.add( new Object [] {EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed} ) ;
+		list.add(new Object[]{EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction});
+		list.add(new Object[]{EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed});
 		return list;
 	}
 
-	public TestWarmEmissionAnalysisModuleCase4( EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod ) {
+	public TestWarmEmissionAnalysisModuleCase4(EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
 
 	@Test
-	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4(){
+	@Ignore
+	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent4() {
 
 		//-- set up tables, event handler, parameters, module
 		var emissionModule = setUp();
@@ -151,6 +153,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 
 	@Test
+	@Ignore
 	public void testCounters2() {
 		var emissionModule = setUp();
 
