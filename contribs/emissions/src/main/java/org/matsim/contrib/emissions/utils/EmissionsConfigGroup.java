@@ -332,12 +332,12 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	 * @noinspection JavadocReference
 	 */
 	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
-	public void setDetailedVsAverageLookupBehavior(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
+	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
 		this.hbefaTableConsistencyCheckingLevel = hbefaTableConsistencyCheckingLevel;
 	}
 
 	@StringGetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
-	public HbefaTableConsistencyCheckingLevel gethbefaTableConsistencyCheckingLevel() {
+	public HbefaTableConsistencyCheckingLevel getHbefaTableConsistencyCheckingLevel() {
 		return this.hbefaTableConsistencyCheckingLevel;
 	}
 

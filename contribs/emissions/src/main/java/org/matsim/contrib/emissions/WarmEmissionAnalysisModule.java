@@ -98,7 +98,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		this.eventsManager = eventsManager;
 
 		if ( detailedHbefaWarmTable!=null ) {
-			switch (ecg.gethbefaTableConsistencyCheckingLevel()) {
+			switch (ecg.getHbefaTableConsistencyCheckingLevel()) {
 				case allCombinations:
 					// The following tests if the detailed table is consistent, i.e. if there exist all combinations of entries.  There used to be some test
 					// cases where this was deliberately not the case, implying that this was assumed as plausible also for studies.  This is now forbidding it.
@@ -180,7 +180,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				case none:
 					break;
 				default:
-					throw new IllegalStateException("Unexpected value: " + ecg.gethbefaTableConsistencyCheckingLevel());
+					throw new IllegalStateException("Unexpected value: " + ecg.getHbefaTableConsistencyCheckingLevel());
 			}
 		}
 	}
