@@ -1,9 +1,9 @@
 package org.matsim.contrib.emissions;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -29,38 +29,7 @@ public class PositionEmissionsModule extends AbstractModule {
     private static final Logger log = Logger.getLogger(PositionEmissionsModule.class);
 
     @Inject
-    private EmissionsConfigGroup emissionsConfigGroup;
-
-    @Inject
     private Config config;
-
- /*   @Inject
-    private EventsManager eventsManager;
-*/
-
-    private static void checkConsistency(EmissionsConfigGroup configGroup) {
-
-        if (configGroup.getDetailedVsAverageLookupBehavior().equals(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort)) {
-            //Check if value was loaded
-            if (StringUtils.isBlank(configGroup.getDetailedColdEmissionFactorsFile())) {
-                throw new RuntimeException("You have requested " + configGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-                        " cold emissions file.");
-            }
-            if (StringUtils.isBlank(configGroup.getDetailedWarmEmissionFactorsFile())) {
-                throw new RuntimeException("You have requested " + configGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-                        " warm emissions file.");
-            }
-        } else {
-            if (StringUtils.isBlank(configGroup.getAverageColdEmissionFactorsFile())) {
-                throw new RuntimeException("You have requested " + configGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-                        " cold emissions file.");
-            }
-            if (StringUtils.isBlank(configGroup.getAverageWarmEmissionFactorsFile())) {
-                throw new RuntimeException("You have requested " + configGroup.getDetailedVsAverageLookupBehavior() + " but are not providing a corresponding" +
-                        " warm emissions file.");
-            }
-        }
-    }
 
     private static void checkConsistency(Config config) {
 
@@ -110,8 +79,6 @@ public class PositionEmissionsModule extends AbstractModule {
 
     static class Handler implements BasicEventHandler {
 
-        private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
-        private final Map<Id<Vehicle>, LinkEnterEvent> vehiclesOnLinks = new HashMap<>();
         private final Map<Id<Vehicle>, PositionEvent> previousPositions = new HashMap<>();
 
         @Inject
@@ -131,17 +98,9 @@ public class PositionEmissionsModule extends AbstractModule {
 
             var type = event.getEventType();
             switch (type) {
-                case LinkEnterEvent.EVENT_TYPE:
-                    handleLinkEnterEvent((LinkEnterEvent) event);
-                    break;
-                case LinkLeaveEvent.EVENT_TYPE:
-                    handleLinkLeaveEvent((LinkLeaveEvent) event);
-                    break;
+
                 case PositionEvent.EVENT_TYPE:
                     handlePositionEvent((PositionEvent) event);
-                    break;
-                case VehicleEntersTrafficEvent.EVENT_TYPE:
-                    handleVehicleEntersTraffic((VehicleEntersTrafficEvent) event);
                     break;
                 case VehicleLeavesTrafficEvent.EVENT_TYPE:
                     handleVehicleLeavesTraffic((VehicleLeavesTrafficEvent) event);
@@ -151,20 +110,7 @@ public class PositionEmissionsModule extends AbstractModule {
             }
         }
 
-        private void handleLinkEnterEvent(LinkEnterEvent event) {
-            vehiclesOnLinks.put(event.getVehicleId(), event);
-        }
-
-        private void handleLinkLeaveEvent(LinkLeaveEvent event) {
-            vehiclesOnLinks.remove(event.getVehicleId());
-        }
-
-        private void handleVehicleEntersTraffic(VehicleEntersTrafficEvent event) {
-            vehiclesInTraffic.put(event.getVehicleId(), event);
-        }
-
         private void handleVehicleLeavesTraffic(VehicleLeavesTrafficEvent event) {
-            vehiclesInTraffic.remove(event.getVehicleId());
             previousPositions.remove(event.getVehicleId());
         }
 
