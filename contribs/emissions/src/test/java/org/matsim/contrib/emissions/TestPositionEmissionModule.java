@@ -1,5 +1,6 @@
 package org.matsim.contrib.emissions;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -15,6 +16,7 @@ public class TestPositionEmissionModule {
     private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 
     @Test
+    @Ignore
     public void simpleTest() {
 
         var emissionConfig = new EmissionsConfigGroup();

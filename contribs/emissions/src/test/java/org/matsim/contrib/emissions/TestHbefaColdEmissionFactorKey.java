@@ -23,6 +23,7 @@ package org.matsim.contrib.emissions;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertFalse;
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.FC;
 
@@ -100,8 +101,8 @@ public class TestHbefaColdEmissionFactorKey {
 
 		message = "these two objects should not be the same: " + normal.toString() + " and " + different.toString();
 
-		Assert.assertFalse(message, normal.equals(different));
-		Assert.assertFalse(message, different.equals(normal));
+		assertFalse(message, normal.equals(different));
+		assertFalse(message, different.equals(normal));
 	}
 	
 	// the following tests each compare a incomplete key to a complete key
@@ -127,17 +128,9 @@ public class TestHbefaColdEmissionFactorKey {
 		noVehCat.setParkingTime(parkingTime);
 		noVehCat.setVehicleAttributes(hbefaVehicleAttributes);
 
-		equalErr = false;
-		try {
-			noVehCat.equals(normal);
-		} catch (NullPointerException e) {
-			equalErr = true;
-		}
-		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehCat.toString();
-		message2 = "this key should not be comparable since no vehicle category is set";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noVehCat));
-		
+		var result = noVehCat.equals(normal);
+
+		assertFalse(result);
 	}
 
 	@Test
@@ -155,16 +148,9 @@ public class TestHbefaColdEmissionFactorKey {
 		noColdPollutant.setVehicleCategory(hbefaVehCategory);
 		noColdPollutant.setVehicleAttributes(hbefaVehicleAttributes);
 
-		equalErr = false;
-		try {
-			noColdPollutant.equals(normal);
-		} catch (NullPointerException e) {
-			equalErr = true;
-		}
-		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noColdPollutant.toString();
-		message2 = "this key should not be comparable since no cold pollutant is set";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noColdPollutant));
+		var result = noColdPollutant.equals(normal);
+
+		assertFalse(result);
 	}
 	
 	@Test
@@ -190,8 +176,8 @@ public class TestHbefaColdEmissionFactorKey {
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
 		message2 = "this key should be comparable even though no parking time is set";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noParkingTime));
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noParkingTime));
 	}
 	
 	@Test
@@ -217,31 +203,23 @@ public class TestHbefaColdEmissionFactorKey {
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
 		message2 = "this key should be comparable even though no distance is set";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noDistance));
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noDistance));
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_emptyKey(){
+	public final void testEqualsForIncompleteKeys_emptyKey() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
-		//empty HbefaColdEmissionFactorKey
-				HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
-				equalErr = false;
-				try{
-					emptyKey.equals(normal);
-				}
-				catch(NullPointerException e){
-					equalErr = true;
-				}
-				message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
-				message2 = "this key should not be comparable since nothing is set";
-				Assert.assertTrue(message2, equalErr);
-				Assert.assertFalse(message, normal.equals(emptyKey)); 
+
+		HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
+
+		var result = emptyKey.equals(normal);
+
+		assertFalse(result);
 	}
 	
 	@Test
@@ -270,13 +248,13 @@ public class TestHbefaColdEmissionFactorKey {
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
 		try {
 			noVehAtt.equals(normal);
-			Assert.assertFalse(noVehAtt.equals(normal));
+			assertFalse(noVehAtt.equals(normal));
 		} catch (NullPointerException e) {
 			equalErr = true;
 		}
-		message2 ="vehicle attributes should be 'average' by default and therefore comparable";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noVehAtt));
+		message2 = "vehicle attributes should be 'average' by default and therefore comparable";
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noVehAtt));
 
 
 		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
@@ -295,10 +273,10 @@ public class TestHbefaColdEmissionFactorKey {
 			equalErr = true;
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
-		Assert.assertFalse(message2, equalErr);
+		assertFalse(message2, equalErr);
 		Assert.assertTrue(message, normal.equals(noVehAtt));
-		
-		
+
+
 	}
 
 

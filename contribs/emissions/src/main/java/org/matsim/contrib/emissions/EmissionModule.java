@@ -75,14 +75,8 @@ public final class EmissionModule {
 		this.eventsManager = emissionConfigGroup.isWritingEmissionsEvents() ? eventsManager : EventsUtils.createEventsManager();
 
 		checkConfigConsistency();
-
 		//TODO: create roadtype mapping here from config
-		createLookupTables(
-				emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()),
-				emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()),
-				emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()),
-				emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
-
+		createLookupTables();
 		createEmissionHandlers();
 
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
@@ -149,17 +143,20 @@ public final class EmissionModule {
 		}
 	}
 
-	private void createLookupTables(URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
-									URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile) {
+	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 
 		if (shouldCreateAverageTables()) {
-			this.avgHbefaColdTable = new HbefaAvarageColdTableLoader().load(averageFleetColdEmissionFactorsFile);
-			this.avgHbefaWarmTable = new HbefaAverageWarmTableLoader().load(averageFleetWarmEmissionFactorsFile);
+			this.avgHbefaColdTable = new HbefaAvarageColdTableLoader().load(emissionConfigGroup.getAverageColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			addPollutantsToMap(coldPollutants, avgHbefaColdTable.keySet());
+			this.avgHbefaWarmTable = new HbefaAverageWarmTableLoader().load(emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			addPollutantsToMap(warmPollutants, avgHbefaWarmTable.keySet());
 		}
 		if (shouldCreateDetailedTables()) {
-			this.detailedHbefaColdTable = new HbefaDetailedColdTableLoader().load(detailedColdEmissionFactorsFile);
-			this.detailedHbefaWarmTable = new HbefaDetailedWarmTableLoader().load(detailedWarmEmissionFactorsFile);
+			this.detailedHbefaColdTable = new HbefaDetailedColdTableLoader().load(emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			addPollutantsToMap(coldPollutants, detailedHbefaColdTable.keySet());
+			this.detailedHbefaWarmTable = new HbefaDetailedWarmTableLoader().load(emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(scenario.getConfig().getContext()));
+			addPollutantsToMap(warmPollutants, detailedHbefaWarmTable.keySet());
 		}
 
 		logger.info("leaving createLookupTables");
@@ -171,6 +168,12 @@ public final class EmissionModule {
 			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
 		} else {
 			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");        //Is table mandatory? -> If yes throw exception
+		}
+	}
+
+	private void addPollutantsToMap(Set<Pollutant> addTo, Set<? extends HbefaEmissionFactorKey> keys) {
+		for (HbefaEmissionFactorKey key : keys) {
+			addTo.add(key.getComponent());
 		}
 	}
 
@@ -240,6 +243,11 @@ public final class EmissionModule {
 			super.setCommonDetailedParametersOnKey(key, record);
 			return key;
 		}
+
+		@Override
+		protected HbefaWarmEmissionFactor createValue(CSVRecord record) {
+			return new HbefaWarmEmissionFactor(Double.parseDouble(record.get("EFA")), Double.parseDouble(record.get("V")));
+		}
 	}
 
 	static class HbefaAverageWarmTableLoader extends HbefaTableLoader<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> {
@@ -288,38 +296,34 @@ public final class EmissionModule {
 			key.setParkingTime(mapAmbientCondPattern2ParkingTime(record.get("AmbientCondPattern")));
 			key.setDistance(mapAmbientCondPattern2Distance(record.get("AmbientCondPattern")));
 			key.setVehicleAttributes(new HbefaVehicleAttributes());
+
 			return key;
 		}
 
 		@Override
 		protected HbefaColdEmissionFactor createValue(CSVRecord record) {
-			return new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted")));
+			try {
+				return new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA_weighted")));
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		private int mapAmbientCondPattern2Distance(String string) {
-			int distance;
 			String distanceString = string.split(",")[2];
 			String upperbound = distanceString.split("-")[1];
-			distance = Integer.parseInt(upperbound.split("k")[0]);
-			return distance;
+			return Integer.parseInt(upperbound.split("k")[0]);
 		}
 
 		private int mapAmbientCondPattern2ParkingTime(String string) {
-			try {
-				int parkingTime;
+
 				String parkingTimeString = string.split(",")[1];
 				if (parkingTimeString.equals(">12h")) {
-					parkingTime = 13;
+					return 13;
 				} else {
 					String upperbound = parkingTimeString.split("-")[1];
-					parkingTime = Integer.parseInt(upperbound.split("h")[0]);
+					return Integer.parseInt(upperbound.split("h")[0]);
 				}
-				return parkingTime;
-			} catch (Exception e) {
-				logger.info("");
-			}
-			return 1;
-
 		}
 	}
 
@@ -331,6 +335,11 @@ public final class EmissionModule {
 			var key = super.createKey(record);
 			setCommonDetailedParametersOnKey(key, record);
 			return key;
+		}
+
+		@Override
+		protected HbefaColdEmissionFactor createValue(CSVRecord record) {
+			return new HbefaColdEmissionFactor(Double.parseDouble(record.get("EFA")));
 		}
 	}
 
@@ -347,7 +356,6 @@ public final class EmissionModule {
 					var key = createKey(record);
 					var value = createValue(record);
 					result.put(key, value);
-
 				}
 			} catch (IOException e) {
 				throw new RuntimeException(e);

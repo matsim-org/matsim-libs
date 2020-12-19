@@ -1,5 +1,7 @@
 package org.matsim.contrib.emissions;
 
+import java.util.Objects;
+
 abstract class HbefaEmissionFactorKey {
 
 	private HbefaVehicleCategory vehicleCategory;
@@ -48,8 +50,8 @@ abstract class HbefaEmissionFactorKey {
 		var that = (HbefaEmissionFactorKey) o;
 
 		if (vehicleCategory != that.getVehicleCategory()) return false;
-		if (!vehicleAttributes.equals(that.getVehicleAttributes())) return false;
-		return component == that.getComponent();
+		if (!Objects.equals(vehicleAttributes, that.vehicleAttributes)) return false;
+		return Objects.equals(component, that.component);
 	}
 
 	@Override
