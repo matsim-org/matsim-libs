@@ -345,9 +345,11 @@ public final class EmissionModule {
 
 	abstract static class HbefaTableLoader<K extends HbefaEmissionFactorKey, V extends HbefaEmissionFactor> {
 
-		Map<K, V> result = new HashMap<>();
 
 		Map<K, V> load(URL file) {
+
+			Map<K, V> result = new HashMap<>();
+
 			try (var reader = IOUtils.getBufferedReader(file);
 				 var parser = CSVParser.parse(reader, CSVFormat.newFormat(';').withFirstRecordAsHeader())) {
 
