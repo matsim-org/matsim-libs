@@ -106,7 +106,7 @@ public class DrtTripsAnalyser {
 			}
 			for (Entry<Id<Link>, int[]> e : boardings.entrySet()) {
 				bw.newLine();
-				Coord coord = network.getLinks().get(e.getKey()).getCoord();
+				Coord coord = network.getLinks().get(e.getKey()).getToNode().getCoord();
 				bw.write(e.getKey().toString() + delimiter + coord.getX() + delimiter + coord.getY());
 				for (int i = 0; i < e.getValue().length; i++) {
 					bw.write(delimiter + e.getValue()[i]);
