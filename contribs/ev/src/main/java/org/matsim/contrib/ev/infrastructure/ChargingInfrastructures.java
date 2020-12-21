@@ -20,11 +20,14 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -34,6 +37,8 @@ import com.google.common.collect.ImmutableMap;
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingInfrastructures {
+	static final Logger log = Logger.getLogger(ChargingInfrastructures.class);
+
 	public static ChargingInfrastructure createChargingInfrastructure(
 			ChargingInfrastructureSpecification infrastructureSpecification, Function<Id<Link>, Link> linkProvider,
 			ChargingLogic.Factory chargingLogicFactory) {
@@ -48,8 +53,7 @@ public class ChargingInfrastructures {
 	public static ImmutableListMultimap<Id<Link>, Charger> getChargersAtLinks(ChargingInfrastructure infrastructure) {
 		return infrastructure.getChargers()
 				.values()
-				.stream()
-				.collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
+				.stream().collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
 	}
 
 	public static ChargingInfrastructure filterChargers(ChargingInfrastructure infrastructure,
@@ -59,6 +63,27 @@ public class ChargingInfrastructures {
 				.stream()
 				.filter(filter)
 				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> c));
+		return () -> filteredChargers;
+	}
+
+	public static ChargingInfrastructure createModalNetworkChargers(ChargingInfrastructure infrastructure,
+			Network network, String mode) {
+		var reachableLinks = network.getLinks();
+		var filteredChargers = infrastructure.getChargers().values().stream().map(c -> {
+			var link = reachableLinks.get(c.getLink().getId());
+			return link == null ? null : new ChargerImpl(c.getSpecification(), link, c.getLogic());
+		}).filter(Objects::nonNull).collect(ImmutableMap.toImmutableMap(Charger::getId, c -> (Charger)c));
+
+		int chargerCount = infrastructure.getChargers().size();
+		int unreachableChargerCount = chargerCount - filteredChargers.size();
+		if (unreachableChargerCount > 0) {
+			log.warn(unreachableChargerCount
+					+ "out of "
+					+ chargerCount
+					+ "chargers (depots) are not reachable for mode: "
+					+ mode);
+		}
+
 		return () -> filteredChargers;
 	}
 }

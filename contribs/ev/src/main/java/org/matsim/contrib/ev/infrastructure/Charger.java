@@ -26,6 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public interface Charger extends BasicLocation, Identifiable<Charger> {
+	ChargerSpecification getSpecification();
+
 	ChargingLogic getLogic();
 
 	Link getLink();

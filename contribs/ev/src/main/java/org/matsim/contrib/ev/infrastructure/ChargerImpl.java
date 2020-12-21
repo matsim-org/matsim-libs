@@ -43,6 +43,11 @@ public class ChargerImpl implements Charger {
 	}
 
 	@Override
+	public ChargerSpecification getSpecification() {
+		return specification;
+	}
+
+	@Override
 	public ChargingLogic getLogic() {
 		return logic;
 	}

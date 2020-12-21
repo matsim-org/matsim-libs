@@ -37,7 +37,6 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
@@ -75,7 +74,6 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new EvDvrpIntegrationModule());
 
 		for (TaxiConfigGroup taxiCfg : multiModeTaxiConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(taxiCfg.getMode()));

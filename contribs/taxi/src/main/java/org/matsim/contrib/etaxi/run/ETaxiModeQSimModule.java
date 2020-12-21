@@ -99,11 +99,9 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			}
 		});
 
-		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(getter -> {
-			var reachableLinks = getter.getModal(Network.class).getLinks();
-			return ChargingInfrastructures.filterChargers(getter.get(ChargingInfrastructure.class),
-					c -> reachableLinks.containsKey(c.getLink().getId()));
-		})).asEagerSingleton();
+		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
+				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
+						getter.getModal(Network.class), getMode()))).asEagerSingleton();
 
 		bindModal(ETaxiScheduler.class).toProvider(new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 			@Inject

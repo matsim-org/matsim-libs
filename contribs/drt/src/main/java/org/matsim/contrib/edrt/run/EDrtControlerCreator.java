@@ -32,7 +32,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -56,7 +55,6 @@ public class EDrtControlerCreator {
 		controler.addOverridingModule(new MultiModeEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new EvDvrpIntegrationModule());
 
 		for (DrtConfigGroup drtCfg : multiModeDrtConfig.getModalElements()) {
 			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(drtCfg.getMode()));

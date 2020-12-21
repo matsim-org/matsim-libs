@@ -55,7 +55,7 @@ import org.matsim.contrib.edrt.schedule.EDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -90,23 +90,25 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
+		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
+				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
+						getter.getModal(Network.class), getMode()))).asEagerSingleton();
+
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge
-		bindModal(DepotFinder.class).toProvider(modalProvider(
-				getter -> new NearestChargerAsDepot(getter.get(ChargingInfrastructureSpecification.class),
-						getter.getModal(Network.class), getMode()))).asEagerSingleton();
+		bindModal(DepotFinder.class).toProvider(
+				modalProvider(getter -> new NearestChargerAsDepot(getter.getModal(ChargingInfrastructure.class))))
+				.asEagerSingleton();
 
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
 					@Inject
 					private MobsimTimer timer;
 
-					@Inject
-					private ChargingInfrastructure chargingInfrastructure;
-
 					@Override
 					public EmptyVehicleChargingScheduler get() {
-						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
+						var taskFactory = getModalInstance(DrtTaskFactory.class);
+						var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
 						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
 					}
 				}).asEagerSingleton();
