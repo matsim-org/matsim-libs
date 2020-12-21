@@ -21,6 +21,7 @@
 package org.matsim.contrib.ev.infrastructure;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -36,11 +37,11 @@ public class ChargingInfrastructures {
 	public static ChargingInfrastructure createChargingInfrastructure(
 			ChargingInfrastructureSpecification infrastructureSpecification, Function<Id<Link>, Link> linkProvider,
 			ChargingLogic.Factory chargingLogicFactory) {
-		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
+		var chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
 				.stream()
 				.map(s -> ChargerImpl.create(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory))
-				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> c));
 		return () -> chargers;
 	}
 
@@ -49,5 +50,15 @@ public class ChargingInfrastructures {
 				.values()
 				.stream()
 				.collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
+	}
+
+	public static ChargingInfrastructure filterChargers(ChargingInfrastructure infrastructure,
+			Predicate<Charger> filter) {
+		var filteredChargers = infrastructure.getChargers()
+				.values()
+				.stream()
+				.filter(filter)
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> c));
+		return () -> filteredChargers;
 	}
 }
