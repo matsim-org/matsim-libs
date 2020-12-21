@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -23,11 +25,15 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.consistency.LanesAndSignalsCleaner;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -43,13 +49,37 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-
+@RunWith(Parameterized.class)
 public class SignalsAndLanesOsmNetworkReaderTest {
     private static final Logger log = Logger.getLogger(SignalsAndLanesOsmNetworkReaderTest.class);
 
 
     @Rule
     public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        Object[][] data = new Object[][]{{true, true, true},
+                {true, true, false},
+                {true, false, true},
+                {false, true, true},
+                {true, false, false},
+                {false, true, false},
+                {false, false, true},
+                {false, false, false},};
+        return Arrays.asList(data);
+    }
+
+    @Parameterized.Parameter
+    public boolean setMergeOnewaySignalSystems;
+    @Parameterized.Parameter(1)
+    public boolean setAllowUTurnAtLeftLaneOnly;
+    @Parameterized.Parameter(2)
+    public boolean setMakePedestrianSignals;
+
+
+
+
 
     private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
@@ -140,7 +170,7 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
 //    @SuppressWarnings("ConstantConditions")
     @Test
-    public void singleJunctionWithMerging(){
+    public void singleJunction(){
         OsmData osmData = constructSignalisedJunction();
         Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
         writeOsmData(osmData.getNodes(),osmData.getWays(),file);
@@ -165,73 +195,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
         // Set some variables
-        signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setAllowUTurnAtLeftLaneOnly(true);
-        signalReader.setMakePedestrianSignals(false);
-
-        signalReader.parse(file.toAbsolutePath().toString());
-
-        Assert.assertEquals("Assert number of nodes", 5, network.getNodes().size());
-        Assert.assertEquals("Assert number of links", 8, network.getLinks().size());
-        Assert.assertEquals("Assert number of Systems", 1, signalsData.getSignalSystemsData().getSignalSystemData().size());
-
-        Coord junctionCoord = new Coord(osmData.nodes.get(1).getLatitude(), osmData.nodes.get(1).getLongitude());
-
-        for (Id<Link> link : scenario.getLanes().getLanesToLinkAssignments().keySet()){
-            //Note one InLink of Junction node has no SignalData as this link was simplified
-            //by the internal call the networksimplifier before constructing signal plans
-            boolean shouldHave4Lanes = network.getLinks().get(link).getToNode().getId().toString().equals("13") &&
-                    (network.getLinks().get(link).getFromNode().getId().toString().equals("11")
-                            || network.getLinks().get(link).getFromNode().getId().toString().equals("21"));
-
-            if (shouldHave4Lanes){
-                //Note: 3 lanes and one original lane
-                Assert.assertEquals("Number of Lanes on InLink of SignalisedJunction incorrect",
-                        4, scenario.getLanes().getLanesToLinkAssignments().get(link).getLanes().size());
-            } else {
-                Assert.assertEquals("Number of Lanes on InLink of SignalisedJunction incorrect",
-                        2, scenario.getLanes().getLanesToLinkAssignments().get(link).getLanes().size());
-            }
-
-        }
-
-        Id<SignalSystem> systemId = signalsData.getSignalSystemsData().getSignalSystemData().keySet().iterator().next();
-        int groups = signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().get(systemId).size();
-        Assert.assertEquals("Assert number of Signalgroups", 4, groups);
-
-        int signals = signalsData.getSignalSystemsData().getSignalSystemData().get(systemId).getSignalData().size();
-        Assert.assertEquals("Assert number of Signals", 8, signals);
-    }
-
-    @Test
-    public void singleJunctionNoMerging(){
-        OsmData osmData = constructSignalisedJunction();
-        Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "singleJunction.xml");
-        writeOsmData(osmData.getNodes(),osmData.getWays(),file);
-
-        //-------------------------------------------------------------
-        // Reader Stuff
-        Config config = ConfigUtils.createConfig();
-        SignalSystemsConfigGroup signalSystemsConfigGroup = ConfigUtils.addOrGetModule(config,
-                SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-        signalSystemsConfigGroup.setUseSignalSystems(true);
-        config.qsim().setUseLanes(true);
-
-        CoordinateTransformation ct = new IdentityTransformation();
-
-        // create a scenario
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
-        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-        Lanes lanes = scenario.getLanes();
-        Network network = scenario.getNetwork();
-
-        SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
-
-        // Set some variables
-        signalReader.setMergeOnewaySignalSystems(false);
-        signalReader.setAllowUTurnAtLeftLaneOnly(true);
-        signalReader.setMakePedestrianSignals(false);
+        signalReader.setMergeOnewaySignalSystems(setMergeOnewaySignalSystems);
+        signalReader.setAllowUTurnAtLeftLaneOnly(setAllowUTurnAtLeftLaneOnly);
+        signalReader.setMakePedestrianSignals(setMakePedestrianSignals);
 
         signalReader.parse(file.toAbsolutePath().toString());
 
@@ -293,9 +259,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
         // Set some variables
-        signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setAllowUTurnAtLeftLaneOnly(true);
-        signalReader.setMakePedestrianSignals(false);
+        signalReader.setMergeOnewaySignalSystems(setMergeOnewaySignalSystems);
+        signalReader.setAllowUTurnAtLeftLaneOnly(setAllowUTurnAtLeftLaneOnly);
+        signalReader.setMakePedestrianSignals(setMakePedestrianSignals);
 
         signalReader.setBoundingBox(0, 0, 400,400);
 
@@ -359,9 +325,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
         // Set some variables
-        signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setAllowUTurnAtLeftLaneOnly(true);
-        signalReader.setMakePedestrianSignals(false);
+        signalReader.setMergeOnewaySignalSystems(setMergeOnewaySignalSystems);
+        signalReader.setAllowUTurnAtLeftLaneOnly(setAllowUTurnAtLeftLaneOnly);
+        signalReader.setMakePedestrianSignals(setMakePedestrianSignals);
 
         signalReader.setBoundingBox(0, 0, 1,1);
 
@@ -394,8 +360,9 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
     @Test
     public void berlinSnippet(){
-        Path inputfile = Paths.get(matsimTestUtils.getInputDirectory()).getParent().getParent();
-        inputfile = Paths.get(inputfile.toString(),"berlinSnippet.osm");
+        Path inputfile = Paths.get(matsimTestUtils.getClassInputDirectory());
+        inputfile = Paths.get(inputfile.toString(),"berlinSnippet.osm.gz");
+
         Path outputDir = Paths.get(matsimTestUtils.getOutputDirectory(), "berlinSnippet_");
 
         //-------------------------------------------------------------
@@ -419,11 +386,11 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
         // Set some variables
-        signalReader.setMergeOnewaySignalSystems(true);
-        signalReader.setAllowUTurnAtLeftLaneOnly(true);
-        signalReader.setMakePedestrianSignals(false);
+        signalReader.setMergeOnewaySignalSystems(setMergeOnewaySignalSystems);
+        signalReader.setAllowUTurnAtLeftLaneOnly(setAllowUTurnAtLeftLaneOnly);
+        signalReader.setMakePedestrianSignals(setMakePedestrianSignals);
 
-        signalReader.parse(inputfile.toAbsolutePath().toString());
+        signalReader.parse(inputfile.toString());
 
         //Some of this should go to the network/lane cleaner
         //-----------------------------------------------------------------------
@@ -553,11 +520,94 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 //        signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
 //        signalsWriter.writeSignalsData(scenario);
 
+        //Try-Mini Example to ensure basic usability
+        scenario.getConfig().plans().setInputFile(inputfile+"plans_berlinSnippet.xml");
+        Controler controler = new Controler( scenario );
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controler().setLastIteration(1);
+        controler.run();
 
-        Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
-        Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
-        Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
-        Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        int noSignalGroups = 0;
+        int noSignals = 0;
+        for (SignalSystemData data: signalsData.getSignalSystemsData().getSignalSystemData().values()){
+            noSignalGroups += signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().get(data.getId()).keySet().size();
+            noSignals += data.getSignalData().keySet().size();
+        }
+
+
+        if (setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 246, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 246, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 245, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (!setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 213, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 322, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 658, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 57, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 125, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 245, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (!setMakePedestrianSignals && setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 213, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (!setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 212, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+        if (!setMakePedestrianSignals && !setAllowUTurnAtLeftLaneOnly && !setMergeOnewaySignalSystems){
+            Assert.assertEquals("Assert number of nodes", 296, network.getNodes().size());
+            Assert.assertEquals("Assert number of links", 623, network.getLinks().size());
+            Assert.assertEquals("Assert number of Systems", 38, signalsData.getSignalSystemsData().getSignalSystemData().size());
+            Assert.assertEquals("Assert number of total SignalGroups", 106, noSignalGroups);
+            Assert.assertEquals("Assert number of total Signals", 212, noSignals);
+            Assert.assertEquals("Assert no of links with lanes",117,scenario.getLanes().getLanesToLinkAssignments().size());
+        }
+
+
     }
 
 
