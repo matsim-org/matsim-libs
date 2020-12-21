@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -54,8 +55,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.collect.Maps;
-
 /**
  * Main assumptions:
  * <ul>
@@ -81,7 +80,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 	private final Fleet fleet;
 	private final MobsimTimer timer;
 
-	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging;
+	private final Map<Id<DvrpVehicle>, DvrpVehicle> scheduledForCharging = new HashMap<>();
 
 	public AssignmentETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			MobsimTimer timer, Network network, TravelTime travelTime, TravelDisutility travelDisutility,
@@ -106,11 +105,7 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		}
 
 		eAssignmentProblem = new VehicleAssignmentProblem<>(network, travelTime, travelDisutility);
-
 		eAssignmentCostProvider = new ETaxiToPlugAssignmentCostProvider(params);
-
-		int plugsCount = chargingInfrastructure.getChargers().size() * 2;// TODO
-		scheduledForCharging = Maps.newHashMapWithExpectedSize(plugsCount * 2);
 	}
 
 	private final boolean chargingTaskRemovalEnabled = true;
