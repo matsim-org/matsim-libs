@@ -40,8 +40,8 @@ public class ChargingInfrastructures {
 		var chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
 				.stream()
-				.map(s -> ChargerImpl.create(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory))
-				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> c));
+				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory.create(s)))
+				.collect(ImmutableMap.toImmutableMap(Charger::getId, c -> (Charger)c));
 		return () -> chargers;
 	}
 
