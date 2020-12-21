@@ -66,6 +66,10 @@ import com.google.common.collect.ImmutableSet;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunETaxiBenchmark {
+	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
+	private static final double MAX_RELATIVE_SOC = 0.8; // charge up to 80% SOC
+	private static final double TEMPERATURE = 20; // oC
+
 	public static void run(URL configUrl, int runs) {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
@@ -88,14 +92,13 @@ public class RunETaxiBenchmark {
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new DvrpBenchmarkModule());
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(new String[] { mode })));
 
-		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
 		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
@@ -105,14 +108,17 @@ public class RunETaxiBenchmark {
 			}
 		});
 
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 2.0));
-				bind(TemperatureService.class).toInstance(linkId -> 20);
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 

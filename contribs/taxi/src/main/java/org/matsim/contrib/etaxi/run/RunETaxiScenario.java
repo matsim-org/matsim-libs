@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import static java.util.stream.Collectors.toList;
+
 import java.net.URL;
 import java.util.List;
 
@@ -51,6 +53,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
+	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
+	private static final double MAX_RELATIVE_SOC = 0.8; // charge up to 80% SOC
+	private static final double TEMPERATURE = 20; // oC
+
 	public static void run(URL configUrl, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configUrl,
 				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
@@ -61,7 +67,7 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
+		MultiModeTaxiConfigGroup multiModeTaxiConfig = MultiModeTaxiConfigGroup.get(config);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -70,7 +76,10 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
-		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
+
+		for (TaxiConfigGroup taxiCfg : multiModeTaxiConfig.getModalElements()) {
+			controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(taxiCfg.getMode()));
+		}
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
@@ -79,17 +88,17 @@ public class RunETaxiScenario {
 			}
 		});
 
-		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(new String[] { mode })));
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT),
+				multiModeTaxiConfig.modes().collect(toList())));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1.5));
-				bind(TemperatureService.class).toInstance(linkId -> 20);
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
