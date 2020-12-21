@@ -20,10 +20,12 @@
 package org.matsim.contrib.etaxi.run;
 
 import java.net.URL;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -77,7 +79,8 @@ public class RunETaxiScenario {
 			}
 		});
 
-		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(mode));
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(new String[] { mode })));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

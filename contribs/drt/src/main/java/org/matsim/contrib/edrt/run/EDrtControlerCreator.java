@@ -18,11 +18,14 @@
 
 package org.matsim.contrib.edrt.run;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
@@ -59,7 +62,8 @@ public class EDrtControlerCreator {
 			}
 		});
 
-		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(drtCfg.getMode()));
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(drtCfg.getMode())));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
