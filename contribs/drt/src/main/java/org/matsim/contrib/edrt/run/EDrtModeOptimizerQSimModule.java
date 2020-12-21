@@ -55,6 +55,7 @@ import org.matsim.contrib.edrt.schedule.EDrtStayTaskEndTimeCalculator;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -91,7 +92,9 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 
 		// XXX if overridden to something else, make sure that the depots are equipped with chargers
 		//  otherwise vehicles will not re-charge
-		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
+		bindModal(DepotFinder.class).toProvider(modalProvider(
+				getter -> new NearestChargerAsDepot(getter.get(ChargingInfrastructureSpecification.class),
+						getter.getModal(Network.class), getMode()))).asEagerSingleton();
 
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<>(drtCfg.getMode()) {
