@@ -112,13 +112,15 @@ public class LanesConsistencyChecker {
 							for (Id<Link> temp : links2Replace) {
 								lane.addToLinkId(temp);
 							}
-							Iterator<Id<Link>> toLinkIdIterator = lane.getToLinkIds().iterator();
-							while (toLinkIdIterator.hasNext()) {
-								Id<Link> toLinkId = toLinkIdIterator.next();
-								if (mergedLinks.keySet().contains(toLinkId)) {
-									toLinkIdIterator.remove();
-									log.info("Replace ToLinks of Lane Id: "+ lane.getId() + " on Link Id: " + l2l.getLinkId() +
-											" - Replace ToLink Id: " + toLinkId.toString()+ " with "+mergedLinks.get(toLinkId).toString());
+							if (removeMalformed) {
+								Iterator<Id<Link>> toLinkIdIterator = lane.getToLinkIds().iterator();
+								while (toLinkIdIterator.hasNext()) {
+									Id<Link> toLinkId = toLinkIdIterator.next();
+									if (mergedLinks.keySet().contains(toLinkId)) {
+										toLinkIdIterator.remove();
+										log.info("Replace ToLinks of Lane Id: " + lane.getId() + " on Link Id: " + l2l.getLinkId() +
+												" - Replace ToLink Id: " + toLinkId.toString() + " with " + mergedLinks.get(toLinkId).toString());
+									}
 								}
 							}
 						}
