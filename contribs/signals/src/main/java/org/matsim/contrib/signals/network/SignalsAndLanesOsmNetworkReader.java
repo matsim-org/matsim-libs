@@ -68,7 +68,7 @@ import org.xml.sax.Attributes;
  * Osm reader that extends the basic OSMNetworkReader and in addition reads in signals and lanes information.
  * This tool is based on the master thesis of Nils Schirrmacher from 2017 at VSP.
  * 
- * @author tthunig, nschirrmacher
+ * @author tthunig, nschirrmacher, sbraun
  */
 public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 

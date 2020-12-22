@@ -51,6 +51,11 @@ import java.util.Iterator;
 
 import java.util.*;
 
+/*
+Some test cases for the OSM-Lane and Signal-Reader
+ @author
+ */
+
 @RunWith(Parameterized.class)
 public class SignalsAndLanesOsmNetworkReaderTest {
     private static final Logger log = Logger.getLogger(SignalsAndLanesOsmNetworkReaderTest.class);
