@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
@@ -128,6 +129,62 @@ public class LanesConsistencyChecker {
 				}
 			}
 		}
+
+
+		//sbraun Dec 2020
+		// Check a junction where the InLinks have lanes
+		// More precisely: check if every Outlink is reachable (and if not delete all lanes at this junction)
+		// Note: This case should happen rarely and
+		// only when turn restrictions are misinterpreted or the OSM-data was not understood
+
+		log.info("Check if all OutLinks of junction with lanes is reachable...");
+		Map<Id<Node>,Set<Id<Link>>> junctionNodes = new HashMap<>();
+		//Fill Map with junction nodes and all ToLinks from Lanes
+		for (Id<Link> link : network.getLinks().keySet()) {
+			if (lanes.getLanesToLinkAssignments().get(link) != null &&
+					lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
+				for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
+					if (lane.getToLinkIds() != null) {
+						Id<Node> jn = network.getLinks().get(link).getToNode().getId();
+						if (!junctionNodes.containsKey(jn)){
+							junctionNodes.put(jn,new HashSet<Id<Link>>());
+						}
+						for (Id<Link> toLink :lane.getToLinkIds()){
+							if (!junctionNodes.get(jn).contains(toLink)) junctionNodes.get(jn).add(toLink);
+						}
+					}
+				}
+			}
+		}
+		Set<Id<Node>> checkedJn = new HashSet<Id<Node>>();
+		for (Id<Node> jn : junctionNodes.keySet()){
+			//At a junction if the size of the set filled above equals the number of outLinks everything is fine
+			if (network.getNodes().get(jn).getOutLinks().keySet().size()== junctionNodes.get(jn).size()){
+				checkedJn.add(jn);
+				continue;
+			}
+			//If there is one inLink of that junction which has no Lanes (i.e connects every Outlink) - the junction is fine
+			for (Id<Link>inLink :network.getNodes().get(jn).getInLinks().keySet()){
+				if (!lanes.getLanesToLinkAssignments().containsKey(inLink)){
+					checkedJn.add(jn);
+					break;
+				}
+			}
+			// Identify the not connected OutLink
+			for (Id<Link>outLink :network.getNodes().get(jn).getOutLinks().keySet()){
+				if (!junctionNodes.get(jn).contains(outLink) && !checkedJn.contains(jn)){
+					log.warn("Link "+outLink.toString()+" is not connected to the network - remove lanes from all inLinks of the corresponding junction:");
+					checkedJn.add(jn);
+					for (Id<Link> inLink: network.getNodes().get(jn).getInLinks().keySet()){
+						log.warn("\t\tRemove Lanes on Link "+inLink.toString());
+						lanes.getLanesToLinkAssignments().remove(inLink);
+					}
+				}
+			}
+		}
+
+
+
 
 
 

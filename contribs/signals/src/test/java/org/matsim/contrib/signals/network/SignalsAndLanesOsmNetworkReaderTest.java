@@ -399,103 +399,6 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         netsimplify.run(network);
 
 
-        //Some of this should go to the network/lane cleaner
-        //-----------------------------------------------------------------------
-
-
-//		/*
-//		If Links are merged, the new name has to be added to lane file (signal nodes are excluded from merging therefore the signal file is already fine)
-//		 */
-//        Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
-//        for (Id<Link> link : network.getLinks().keySet()){
-//            if(link.toString().contains("-")){
-//                List<String> origLinks = Arrays.asList(link.toString().split("-"));
-//                for (String origlink : origLinks){
-//                    mergedLinks.put(Id.createLinkId(origlink),link);
-//                }
-//            }
-//        }
-//        // Update Lanefile
-//        for (Id<Link> link : network.getLinks().keySet()) {
-//            if (lanes.getLanesToLinkAssignments().get(link) != null &&
-//                    lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
-//                for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
-//                    if (lane.getToLinkIds()!=null) {
-//                        Set<Id<Link>> links2Replace = new HashSet<>();
-//                        for (Id<Link> toLink : lane.getToLinkIds()) {
-//                            if (mergedLinks.keySet().contains(toLink)) {
-//                                Id<Link> merged = mergedLinks.get(toLink);
-//
-//                                links2Replace.add(merged);
-//                            }
-//                        }
-//                        if (!links2Replace.isEmpty()) {
-//                            for (Id<Link> temp : links2Replace) {
-//                                lane.addToLinkId(temp);
-//                            }
-//                            Iterator<Id<Link>> toLinkIdIterator = lane.getToLinkIds().iterator();
-//                            while (toLinkIdIterator.hasNext()) {
-//                                Id<Link> toLinkId = toLinkIdIterator.next();
-//                                if (mergedLinks.keySet().contains(toLinkId)) {
-//                                    toLinkIdIterator.remove();
-//                                    log.info("Replace ToLinks of Lane Id: "+ lane.getId() + " on Link Id: " +// l2l.getLinkId() +
-//                                            " - Replace ToLink Id: " + toLinkId.toString()+ " with "+mergedLinks.get(toLinkId).toString());
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
-        //sbraun 19092020 add cleaning logic
-        Map<Id<org.matsim.api.core.v01.network.Node>,Set<Id<Link>>> junctionNodes = new HashMap<>();
-        //Fill Map with junction nodes and all ToLinks from Lanes
-        for (Id<Link> link : network.getLinks().keySet()) {
-            if (lanes.getLanesToLinkAssignments().get(link) != null &&
-                    lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
-                for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
-                    if (lane.getToLinkIds() != null) {
-                        Id<org.matsim.api.core.v01.network.Node> jn = network.getLinks().get(link).getToNode().getId();
-                        if (!junctionNodes.containsKey(jn)){
-                            junctionNodes.put(jn,new HashSet<Id<Link>>());
-                        }
-                        for (Id<Link> toLink :lane.getToLinkIds()){
-                            if (!junctionNodes.get(jn).contains(toLink)) junctionNodes.get(jn).add(toLink);
-                        }
-                    }
-                }
-            }
-        }
-        Set<Id<org.matsim.api.core.v01.network.Node>> checkedJn = new HashSet<Id<org.matsim.api.core.v01.network.Node>>();
-        for (Id<org.matsim.api.core.v01.network.Node> jn : junctionNodes.keySet()){
-            //At a junction if the size of the set filled above equals the number of outLinks everything is fine
-            if (network.getNodes().get(jn).getOutLinks().keySet().size()== junctionNodes.get(jn).size()){
-                checkedJn.add(jn);
-                continue;
-            }
-            //If there is one inLink of that junction which has no Lanes (i.e connects every Outlink) - the junction is fine
-            for (Id<Link>inLink :network.getNodes().get(jn).getInLinks().keySet()){
-                if (!lanes.getLanesToLinkAssignments().containsKey(inLink)){
-                    checkedJn.add(jn);
-                    break;
-                }
-            }
-            // Identify the not connected OutLink
-            for (Id<Link>outLink :network.getNodes().get(jn).getOutLinks().keySet()){
-                if (!junctionNodes.get(jn).contains(outLink) && !checkedJn.contains(jn)){
-                    checkedJn.add(jn);
-                    for (Id<Link> inLink: network.getNodes().get(jn).getInLinks().keySet()){
-                        lanes.getLanesToLinkAssignments().remove(inLink);
-                    }
-                }
-            }
-        }
-
-
-
-
         /*
          * Clean the Network. Cleaning means removing disconnected components, so that
          * afterwards there is a route from every link to every other link. This may not
@@ -503,9 +406,6 @@ public class SignalsAndLanesOsmNetworkReaderTest {
          */
         new NetworkCleaner().run(network);
         new LanesAndSignalsCleaner().run(scenario);
-
-        //----------------------------------------------------end insertion
-
 
 
 //        new NetworkWriter(network).write(outputDir + "network.xml");
