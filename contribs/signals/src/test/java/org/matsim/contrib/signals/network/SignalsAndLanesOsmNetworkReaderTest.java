@@ -47,6 +47,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+
 import java.util.*;
 
 @RunWith(Parameterized.class)
@@ -401,40 +403,50 @@ public class SignalsAndLanesOsmNetworkReaderTest {
         //-----------------------------------------------------------------------
 
 
-		/*
-		If Links are merged, the new name has to be added to lane file (signal nodes are excluded from merging therefore the signal file is already fine)
-		 */
-        Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
-        for (Id<Link> link : network.getLinks().keySet()){
-            if(link.toString().contains("-")){
-                List<String> origLinks = Arrays.asList(link.toString().split("-"));
-                for (String origlink : origLinks){
-                    mergedLinks.put(Id.createLinkId(origlink),link);
-                }
-            }
-        }
-        // Update Lanefile
-        for (Id<Link> link : network.getLinks().keySet()) {
-            if (lanes.getLanesToLinkAssignments().get(link) != null &&
-                    lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
-                for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
-                    if (lane.getToLinkIds()!=null) {
-                        Set<Id<Link>> links2Replace = new HashSet<>();
-                        for (Id<Link> toLink : lane.getToLinkIds()) {
-                            if (mergedLinks.keySet().contains(toLink)) {
-                                Id<Link> merged = mergedLinks.get(toLink);
-                                links2Replace.add(merged);
-                            }
-                        }
-                        if (!links2Replace.isEmpty()) {
-                            for (Id<Link> temp : links2Replace) {
-                                lane.addToLinkId(temp);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//		/*
+//		If Links are merged, the new name has to be added to lane file (signal nodes are excluded from merging therefore the signal file is already fine)
+//		 */
+//        Map<Id<Link>,Id<Link>> mergedLinks = new HashMap();
+//        for (Id<Link> link : network.getLinks().keySet()){
+//            if(link.toString().contains("-")){
+//                List<String> origLinks = Arrays.asList(link.toString().split("-"));
+//                for (String origlink : origLinks){
+//                    mergedLinks.put(Id.createLinkId(origlink),link);
+//                }
+//            }
+//        }
+//        // Update Lanefile
+//        for (Id<Link> link : network.getLinks().keySet()) {
+//            if (lanes.getLanesToLinkAssignments().get(link) != null &&
+//                    lanes.getLanesToLinkAssignments().get(link).getLanes().values() != null) {
+//                for (Lane lane : lanes.getLanesToLinkAssignments().get(link).getLanes().values()) {
+//                    if (lane.getToLinkIds()!=null) {
+//                        Set<Id<Link>> links2Replace = new HashSet<>();
+//                        for (Id<Link> toLink : lane.getToLinkIds()) {
+//                            if (mergedLinks.keySet().contains(toLink)) {
+//                                Id<Link> merged = mergedLinks.get(toLink);
+//
+//                                links2Replace.add(merged);
+//                            }
+//                        }
+//                        if (!links2Replace.isEmpty()) {
+//                            for (Id<Link> temp : links2Replace) {
+//                                lane.addToLinkId(temp);
+//                            }
+//                            Iterator<Id<Link>> toLinkIdIterator = lane.getToLinkIds().iterator();
+//                            while (toLinkIdIterator.hasNext()) {
+//                                Id<Link> toLinkId = toLinkIdIterator.next();
+//                                if (mergedLinks.keySet().contains(toLinkId)) {
+//                                    toLinkIdIterator.remove();
+//                                    log.info("Replace ToLinks of Lane Id: "+ lane.getId() + " on Link Id: " +// l2l.getLinkId() +
+//                                            " - Replace ToLink Id: " + toLinkId.toString()+ " with "+mergedLinks.get(toLinkId).toString());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
 
         //sbraun 19092020 add cleaning logic
