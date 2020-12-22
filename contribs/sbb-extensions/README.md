@@ -7,27 +7,6 @@ the [Swiss Federal Railways](http://www.sbb.ch/) (SBB, Schweizerische Bundesbahn
 - [Deterministic PT Simulation](#detPTSim)
 - [Skim Matrices](#skim-matrices)
 
-To use the extensions along your MATSim code, follow these two steps:
-
- **Step 1**. Add the Bintray repository to your `pom.xml`.
-  ```$xml
-	<repositories>
-		<repository>
-		    <id>SBB</id>
-		    <url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
-		</repository>
-	</repositories>
-  ```
-  **Step 2**. Add the dependency
-   ```$xml
-	<dependency>
-	    <groupId>ch.sbb</groupId>
-	    <artifactId>matsim-sbb-extensions</artifactId>
-	    <version>12.x</version> <!-- replace this with latest available version -->
-	</dependency>
-  ``` 
-
-<a id="swissRailRaptor" />
 
 ## SwissRailRaptor 
 
