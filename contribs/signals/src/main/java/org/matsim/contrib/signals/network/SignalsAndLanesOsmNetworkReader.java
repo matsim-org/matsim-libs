@@ -122,7 +122,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
 	// we change a few Nodes in setOrModifyLinkAttributes -> idea: save old Links as key and the old coordinates of 1. FromNode, 2. ToNode
 	Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap();
-	
+	Set<Long> NodesNotToMerge = new HashSet<>();
+
+
 	private boolean mergeOnewaySignalSystems = false;
 	private boolean allowUTurnAtLeftLaneOnly = false;
 	private boolean makePedestrianSignals = false;
@@ -218,27 +220,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		/*
         Simplify the network except the junctions with signals as this might mess up already created plans
         */
-		Set<Long> signalizedNodes = new HashSet<>();
-		for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()){
-			for (SignalData signaldata:signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()){
-				Node signalNode = network.getLinks().get(signaldata.getLinkId()).getToNode();
 
-
-				for(Link outlink : signalNode.getOutLinks().values()){
-					Long temp3 = new Long(outlink.getToNode().getId().toString());
-					signalizedNodes.add(temp3);
-				}
-				Long temp1 = new Long(signalNode.getId().toString());
-				Long temp2 = new Long(network.getLinks().get(signaldata.getLinkId()).getFromNode().getId().toString());
-				signalizedNodes.add(temp1);
-				signalizedNodes.add(temp2);
-
-			}
-		}
-
-		NetworkSimplifier netsimplify = new NetworkSimplifier();
-		netsimplify.setNodesNotToMerge(signalizedNodes);
-		netsimplify.run(network);
+		NetworkSimplifier netSimplify = new NetworkSimplifier();
+		netSimplify.setNodesNotToMerge(reader.NodesNotToMerge);
+		netSimplify.run(network);
 
 
 		/*
@@ -269,6 +254,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 							}
 						}
+						//TODO delete old links
 						if (!links2Replace.isEmpty()) {
 							for (Id<Link> temp : links2Replace) {
 								lane.addToLinkId(temp);
@@ -673,7 +659,27 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 
+		// Save all signalised (MATSim) nodes and and From nodes of corresponding InLinks.
+		// -> To be excluded from Network Simplifier
+		for (Id<SignalSystem> systemId : this.systems.getSignalSystemData().keySet()){
+			for (SignalData signaldata: this.systems.getSignalSystemData().get(systemId).getSignalData().values()){
+				Node signalNode = network.getLinks().get(signaldata.getLinkId()).getToNode();
+
+
+				for(Link outlink : signalNode.getOutLinks().values()){
+					Long temp3 = new Long(outlink.getToNode().getId().toString());
+					this.NodesNotToMerge.add(temp3);
+				}
+				Long temp1 = new Long(signalNode.getId().toString());
+				Long temp2 = new Long(network.getLinks().get(signaldata.getLinkId()).getFromNode().getId().toString());
+				this.NodesNotToMerge.add(temp1);
+				this.NodesNotToMerge.add(temp2);
+
+			}
+		}
+
 	}
+
 	//sbraun 30092020 Attempt to speed up this method:
     // 1. Try to parse over Long objects instead of OsmNodes in inner Loops
     // 2. Create Set with only OSMNodes in Boundingbox (to reduce size of each set)
@@ -2724,7 +2730,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 
-	//TODO consider moving this out in some utils directory
 	private static final class BoundingBox {
 		private double south;
 		private double west;

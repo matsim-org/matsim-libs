@@ -392,30 +392,14 @@ public class SignalsAndLanesOsmNetworkReaderTest {
 
         signalReader.parse(inputfile.toString());
 
+        NetworkSimplifier netsimplify = new NetworkSimplifier();
+        netsimplify.setNodesNotToMerge(signalReader.NodesNotToMerge);
+        netsimplify.run(network);
+
+
         //Some of this should go to the network/lane cleaner
         //-----------------------------------------------------------------------
 
-        Set<Long> signalizedNodes = new HashSet<>();
-        for (Id<SignalSystem> idsystems : signalsData.getSignalSystemsData().getSignalSystemData().keySet()){
-            for (SignalData signaldata:signalsData.getSignalSystemsData().getSignalSystemData().get(idsystems).getSignalData().values()){
-                org.matsim.api.core.v01.network.Node signalNode = network.getLinks().get(signaldata.getLinkId()).getToNode();
-
-
-                for(Link outlink : signalNode.getOutLinks().values()){
-                    Long temp3 = new Long(outlink.getToNode().getId().toString());
-                    signalizedNodes.add(temp3);
-                }
-                Long temp1 = new Long(signalNode.getId().toString());
-                Long temp2 = new Long(network.getLinks().get(signaldata.getLinkId()).getFromNode().getId().toString());
-                signalizedNodes.add(temp1);
-                signalizedNodes.add(temp2);
-
-            }
-        }
-
-        NetworkSimplifier netsimplify = new NetworkSimplifier();
-        netsimplify.setNodesNotToMerge(signalizedNodes);
-        netsimplify.run(network);
 
 		/*
 		If Links are merged, the new name has to be added to lane file (signal nodes are excluded from merging therefore the signal file is already fine)
