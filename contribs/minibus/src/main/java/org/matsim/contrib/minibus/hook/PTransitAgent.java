@@ -143,8 +143,11 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 				return routeStop.getArrivalOffset().seconds() - lastAccessStopDepartureOffset;
 			}
 		}
-		log.error("Did not find access stop or egress stop is not served after passing the access stop. This should not happen.");
-		throw new RuntimeException("Sequence access stop -> egress stop not found.");
+		log.error("Sequence access stop " + accessStopId.toString() + " -> egress stop " +
+				egressStopId.toString() + " not found in TransitRoute " + transitRoute.getId().toString() +
+				". Did not find access stop or egress stop is not served after passing the access stop. This should not happen.");
+		throw new RuntimeException("Sequence access stop " + accessStopId.toString() + " -> egress stop " +
+				 egressStopId.toString() + " not found in TransitRoute " + transitRoute.getId().toString() + ".");
 	}
 
 	private Leg getCurrentLeg() {
