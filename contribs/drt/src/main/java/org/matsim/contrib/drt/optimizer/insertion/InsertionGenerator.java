@@ -62,12 +62,14 @@ import com.google.common.base.Objects;
 public class InsertionGenerator {
 	public static class InsertionPoint {
 		public final int index;
+		public final boolean pickup;
 		public final Link previousLink;
 		public final Link link;
 		public final Link nextLink;
 
-		public InsertionPoint(int index, Link previousLink, Link link, Link nextLink) {
+		public InsertionPoint(int index, boolean pickup, Link previousLink, Link link, Link nextLink) {
 			this.index = index;
+			this.pickup = pickup;
 			this.previousLink = previousLink;
 			this.link = link;
 			this.nextLink = nextLink;
@@ -80,19 +82,23 @@ public class InsertionGenerator {
 			if (o == null || getClass() != o.getClass())
 				return false;
 			InsertionPoint that = (InsertionPoint)o;
-			return index == that.index && Objects.equal(previousLink, that.previousLink) && Objects.equal(link,
-					that.link) && Objects.equal(nextLink, that.nextLink);
+			return index == that.index
+					&& pickup == that.pickup
+					&& Objects.equal(previousLink, that.previousLink)
+					&& Objects.equal(link, that.link)
+					&& Objects.equal(nextLink, that.nextLink);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(index, previousLink, link, nextLink);
+			return Objects.hashCode(index, pickup, previousLink, link, nextLink);
 		}
 
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
 					.add("index", index)
+					.add("pickup", pickup)
 					.add("previousLink", previousLink)
 					.add("link", link)
 					.add("nextLink", nextLink)
@@ -112,7 +118,7 @@ public class InsertionGenerator {
 			Link pickupNextLink = pickupIdx == dropoffIdx ?
 					request.getToLink() :
 					vehicleEntry.stops.get(pickupIdx).task.getLink();
-			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, request.getFromLink(), pickupNextLink);
+			pickup = new InsertionPoint(pickupIdx, true, pickupPreviousLink, request.getFromLink(), pickupNextLink);
 
 			Link dropoffPreviousLink = pickupIdx == dropoffIdx ?
 					null :
@@ -120,7 +126,7 @@ public class InsertionGenerator {
 			Link dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
 					null :
 					vehicleEntry.stops.get(dropoffIdx).task.getLink();
-			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, request.getToLink(), dropoffNextLink);
+			dropoff = new InsertionPoint(dropoffIdx, false, dropoffPreviousLink, request.getToLink(), dropoffNextLink);
 		}
 
 		@Override
