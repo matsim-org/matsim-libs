@@ -87,7 +87,7 @@ public class TaxiScheduleInquiry implements ScheduleInquiry {
 			case STARTED:
 				Task lastTask = Schedules.getLastTask(schedule);
 
-				switch (getBaseType(lastTask)) {
+				switch (getBaseTypeOrElseThrow(lastTask)) {
 					case STAY:
 						Link link = ((StayTask)lastTask).getLink();
 						double time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO very optimistic!!!
