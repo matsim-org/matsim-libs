@@ -180,6 +180,7 @@ public abstract class MatsimXmlParser extends DefaultHandler implements MatsimRe
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setValidating(this.isValidating);
 			factory.setNamespaceAware(this.isNamespaceAware);
+			factory.setFeature("http://xml.org/sax/features/external-general-entities", false); // prevent XEE attack: https://en.wikipedia.org/wiki/XML_external_entity_attack
 			if (this.isValidating) {
 				// enable optional support for XML Schemas
 				factory.setFeature("http://apache.org/xml/features/validation/schema", true);

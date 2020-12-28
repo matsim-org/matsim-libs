@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Controler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer.fifo;
+package playground.vsp.flowEfficiency;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
+import org.matsim.lanes.Lane;
 
 /**
- * @author michalm
- */
-public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
-
-	public FifoTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
-			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			ScheduleTimingUpdater scheduleTimingUpdater) {
-		super(eventsManager, taxiCfg, fleet, scheduler, scheduleTimingUpdater,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler));
-	}
+ * calculate the situational impact on the flow efficiency of {@code qVehicle}. The result is multiplied with other impacts and
+ * the base vlow efficiency value of the vehicle type. See {@link HierarchicalFlowEfficiencyCalculator}.
+ *
+ * @author tschlenther
+**/
+public interface SituationalFlowEfficiencyImpact extends FlowEfficiencyCalculator {
+	boolean isFinalImpact(QVehicle qVehicle, QVehicle previousQVehicle, Double previousTimeDiff, Link link, Id<Lane> laneId);
 }

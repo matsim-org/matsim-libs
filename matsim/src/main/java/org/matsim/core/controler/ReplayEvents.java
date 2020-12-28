@@ -66,7 +66,7 @@ public final class ReplayEvents {
                     }
                 });
         ReplayEvents instance = injector.getInstance(ReplayEvents.class);
-        instance.playEventsFile(eventsFilename, 1);
+        instance.playEventsFile(eventsFilename, 1, false);
 
         return new Results() {
             @Override
@@ -76,42 +76,42 @@ public final class ReplayEvents {
         };
     }
 
-    public void playEventsFile(String eventsFilename, int iterationNumber) {
+    public void playEventsFile(String eventsFilename, int iterationNumber, boolean isLastIteration) {
         ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerStartupEvent();
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof StartupListener) {
                 ((StartupListener) controlerListener).notifyStartup(new StartupEvent(null));
             }
         }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationStartsEvent(iterationNumber);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationStartsEvent(iterationNumber, isLastIteration);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof IterationStartsListener) {
-                ((IterationStartsListener) controlerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber));
+                ((IterationStartsListener) controlerListener).notifyIterationStarts(new IterationStartsEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerBeforeMobsimEvent(iterationNumber, isLastIteration);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof BeforeMobsimListener) {
-                ((BeforeMobsimListener) controlerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber));
+                ((BeforeMobsimListener) controlerListener).notifyBeforeMobsim(new BeforeMobsimEvent(null, iterationNumber, isLastIteration));
             }
         }
         new MatsimEventsReader(eventsManager).readFile(eventsFilename);
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerAfterMobsimEvent(iterationNumber);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerAfterMobsimEvent(iterationNumber, isLastIteration);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof AfterMobsimListener) {
-                ((AfterMobsimListener) controlerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber));
+                ((AfterMobsimListener) controlerListener).notifyAfterMobsim(new AfterMobsimEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationEndsEvent(iterationNumber);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerIterationEndsEvent(iterationNumber, isLastIteration);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof IterationEndsListener) {
-                ((IterationEndsListener) controlerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber));
+                ((IterationEndsListener) controlerListener).notifyIterationEnds(new IterationEndsEvent(null, iterationNumber, isLastIteration));
             }
         }
-        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerShutdownEvent(false);
+        ((ControlerListenerManagerImpl) controlerListenerManager).fireControlerShutdownEvent(false, iterationNumber);
         for (ControlerListener controlerListener : controlerListenersDeclaredByModules) {
             if (controlerListener instanceof ShutdownListener) {
-                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false));
+                ((ShutdownListener) controlerListener).notifyShutdown(new ShutdownEvent(null, false, iterationNumber));
             }
         }
     }

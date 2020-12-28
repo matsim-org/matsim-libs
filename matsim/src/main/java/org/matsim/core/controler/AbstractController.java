@@ -83,7 +83,7 @@ import org.matsim.utils.MemoryObserver;
 
             @Override
             public void shutdown(boolean unexpected) {
-                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected);
+                controlerListenerManagerImpl.fireControlerShutdownEvent(unexpected, thisIteration == null ? -1 : thisIteration);
             }
         };
         MatsimRuntimeModifications.run(runnable);
@@ -107,18 +107,26 @@ import org.matsim.utils.MemoryObserver;
      * method in the SimplifiedControllerUtils class ... as with all other abstract methods.
      * </ul>
      */
-    protected abstract boolean continueIterations(int iteration);
+	protected abstract boolean mayTerminateAfterIteration(int iteration);
+	protected abstract boolean shouldTerminate(int iteration);
 
     private void doIterations(Config config) throws MatsimRuntimeModifications.UnexpectedShutdownException {
-        for (int iteration = config.controler().getFirstIteration(); continueIterations(iteration); iteration++) {
-            iteration(config, iteration);
-        }
+    	int iteration = config.controler().getFirstIteration();
+    	
+    	// Special case if lastIteration == -1 -> Do not run any Mobsim
+    	boolean doTerminate = config.controler().getLastIteration() < iteration;
+    	
+    	while (!doTerminate) {
+    		boolean isLastIteration = mayTerminateAfterIteration(iteration);
+    		iteration(config, iteration, isLastIteration);
+    		doTerminate = isLastIteration && shouldTerminate(iteration);
+    		iteration++;
+    	}
     }
-    
     
     final String MARKER = "### ";
 
-    private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void iteration(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
         this.getStopwatch().beginIteration(iteration);
 
@@ -130,7 +138,7 @@ import org.matsim.utils.MemoryObserver;
         iterationStep("iterationStartsListeners", new Runnable() {
             @Override
             public void run() {
-                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationStartsEvent(iteration, isLastIteration);
             }
         });
 
@@ -138,18 +146,18 @@ import org.matsim.utils.MemoryObserver;
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerReplanningEvent(iteration, isLastIteration);
                 }
             });
         }
 
-        mobsim(config, iteration);
+        mobsim(config, iteration, isLastIteration);
 
         iterationStep("scoring", new Runnable() {
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires scoring event");
-                controlerListenerManagerImpl.fireControlerScoringEvent(iteration);
+                controlerListenerManagerImpl.fireControlerScoringEvent(iteration, isLastIteration);
             }
         });
 
@@ -157,7 +165,7 @@ import org.matsim.utils.MemoryObserver;
             @Override
             public void run() {
                 log.info(MARKER + "ITERATION " + iteration + " fires iteration end event");
-                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration);
+                controlerListenerManagerImpl.fireControlerIterationEndsEvent(iteration, isLastIteration);
             }
         });
 
@@ -174,7 +182,7 @@ import org.matsim.utils.MemoryObserver;
         log.info(Controler.DIVIDER);
     }
 
-    private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+    private void mobsim(final Config config, final int iteration, boolean isLastIteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         // ControlerListeners may create managed resources in
         // beforeMobsim which need to be cleaned up in afterMobsim.
         // Hence the finally block.
@@ -184,7 +192,7 @@ import org.matsim.utils.MemoryObserver;
             iterationStep("beforeMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
-                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerBeforeMobsimEvent(iteration, isLastIteration);
                 }
             });
             
@@ -224,7 +232,7 @@ import org.matsim.utils.MemoryObserver;
                 @Override
                 public void run() {
                     log.info(MARKER + "ITERATION " + iteration + " fires after mobsim event");
-                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration);
+                    controlerListenerManagerImpl.fireControlerAfterMobsimEvent(iteration, isLastIteration);
                 }
             });
         }

@@ -20,18 +20,28 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public interface AgentSnapshotInfo {
 
-	public static final String marker = "marker";
+	String marker = "marker";
 
 	// !!! WARNING: The enum list can only be extended.  Making it shorter or changing the sequence of existing elements
 	// will break the otfvis binary channel, meaning that *.mvi files generated until then will become weird. kai, jan'10
-	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER, MARKER }
+	enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER, MARKER }
 	// !!! WARNING: See comment above this enum.
 
+	enum DrivingState { NOT_DRIVING, FREE_FLOW, CONGESTED }
+
 	Id<Person> getId() ;
+
+	Id<Vehicle> getVehicleId();
+
+	Id<Link> getLinkId();
+
+	DrivingState getDrivingState();
 
 	double getEasting();
 
@@ -41,12 +51,9 @@ public interface AgentSnapshotInfo {
 	double getAzimuth();
 
 	double getColorValueBetweenZeroAndOne();
-	void setColorValueBetweenZeroAndOne( double tmp ) ;
 
 	AgentState getAgentState();
-	void setAgentState( AgentState state ) ;
 
 	int getUserDefined() ;
-	void setUserDefined( int tmp ) ; // needs to be a primitive type because of the byte buffer. kai, jan'10
 
 }

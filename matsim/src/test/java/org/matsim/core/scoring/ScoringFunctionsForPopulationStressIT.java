@@ -72,7 +72,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				throwingScoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		events.processEvent(new PersonMoneyEvent(3600.0, personId, 3.4, "tollRefund", "motorwayOperator"));
 		scoringFunctionsForPopulation.finishScoringFunctions();
 	}
@@ -223,7 +223,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0, "tollRefund", "motorwayOperator"));
@@ -371,7 +371,7 @@ public class ScoringFunctionsForPopulationStressIT {
 				scenario.getPopulation(),
 				scoringFunctionFactory
 		);
-		controlerListenerManager.fireControlerIterationStartsEvent(0);
+		controlerListenerManager.fireControlerIterationStartsEvent(0, false);
 		int MAX = 10;
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {

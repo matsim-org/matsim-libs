@@ -95,7 +95,7 @@ public final class AccessibilityFromEvents{
 			if ( controlerListener instanceof ShutdownListener ) {
 				MatsimServices controler = null ;
 				boolean unexpected = false ;
-				ShutdownEvent shutdownEvent = new ShutdownEvent( controler, unexpected ) ;
+				ShutdownEvent shutdownEvent = new ShutdownEvent( controler, unexpected, 0 ) ;
 				((ShutdownListener) controlerListener).notifyShutdown( shutdownEvent );
 			}
 		}

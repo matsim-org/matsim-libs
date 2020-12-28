@@ -22,16 +22,16 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
-	private final Charger charger;
+	private final ChargerSpecification charger;
 	private final double maxRelativeSoc;
 
-	public ChargeUpToMaxSocStrategy(Charger charger, double maxRelativeSoc) {
+	public ChargeUpToMaxSocStrategy(ChargerSpecification charger, double maxRelativeSoc) {
 		if (maxRelativeSoc < 0 || maxRelativeSoc > 1) {
 			throw new IllegalArgumentException();
 		}

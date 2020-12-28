@@ -39,6 +39,7 @@ import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.etaxi.util.ETaxiStayTaskEndTimeCalculator;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
@@ -84,21 +85,23 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Inject
 			private EventsManager events;
 
-			@Inject
-			private ChargingInfrastructure chargingInfrastructure;
-
 			@Override
 			public TaxiOptimizer get() {
-				Fleet fleet = getModalInstance(Fleet.class);
-				Network network = getModalInstance(Network.class);
-				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
-				TravelDisutility travelDisutility = getModalInstance(
-						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				ScheduleTimingUpdater scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
+				var fleet = getModalInstance(Fleet.class);
+				var network = getModalInstance(Network.class);
+				var eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
+				var travelDisutility = getModalInstance(TravelDisutilityFactory.class).createTravelDisutility(
+						travelTime);
+				var chargingInfrastructure = getModalInstance(ChargingInfrastructure.class);
+				var scheduleTimingUpdater = getModalInstance(ScheduleTimingUpdater.class);
 				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime, travelDisutility,
 						eTaxiScheduler, scheduleTimingUpdater, chargingInfrastructure).get();
 			}
 		});
+
+		bindModal(ChargingInfrastructure.class).toProvider(modalProvider(
+				getter -> ChargingInfrastructures.createModalNetworkChargers(getter.get(ChargingInfrastructure.class),
+						getter.getModal(Network.class), getMode()))).asEagerSingleton();
 
 		bindModal(ETaxiScheduler.class).toProvider(new ModalProviders.AbstractProvider<>(taxiCfg.getMode()) {
 			@Inject

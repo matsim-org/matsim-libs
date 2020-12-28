@@ -69,21 +69,21 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private static final int HEAVY_INDEX = 1;
 	private static final int SAT_INDEX = 2;
 	private static final int SG_INDEX = 3;
-	private final HbefaTrafficSituation[] trafficSituations = {FREEFLOW, HEAVY, SATURATED, STOPANDGO};
-	private final double[] avgPassengerCarSpeed = {51., 40., 30., 10.};
+	private final HbefaTrafficSituation[] trafficSituations = {FREEFLOW, HEAVY, SATURATED, STOPANDGO, STOPANDGO_HEAVY};
+	private final double[] avgPassengerCarSpeed = {51., 40., 30., 10., 5.};
 
 	// vehicle information for regular test cases
 	// case 1 - data in both tables -> use detailed
 	private static final String petrolTechnology = "PC petrol <1,4L";
 	private static final String petrolSizeClass ="<ECE petrol (4S)";
 	private static final String petrolConcept ="<1,4L";
-	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000};
+	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000, 100000};
 
 	// case 2 - free flow entry in both tables, stop go entry in average table -> use average
 	private static final String pcTechnology = "PC petrol <1,4L <ECE";
 	private static final String pcSizeClass = "petrol (4S)";
 	private static final String pcConcept = "<1,4L";
-	private static final double[] avgPetrolFactor = {20, 200, 2000, 20000};
+	private static final double[] avgPetrolFactor = {20, 200, 2000, 20000, 200000};
 
 	public TestWarmEmissionAnalysisModuleTrafficSituations( EmissionsComputationMethod emissionsComputationMethod ) {
 		this.emissionsComputationMethod = emissionsComputationMethod;

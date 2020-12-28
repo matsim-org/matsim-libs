@@ -38,7 +38,7 @@ public class DrtStopFacilityImpl implements DrtStopFacility {
 	}
 
 	public static DrtStopFacility createFromLink(Link link) {
-		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getCoord());
+		return new DrtStopFacilityImpl(Id.create(link.getId(), DrtStopFacility.class), link.getId(), link.getToNode().getCoord());
 	}
 
 	private final Id<DrtStopFacility> id;

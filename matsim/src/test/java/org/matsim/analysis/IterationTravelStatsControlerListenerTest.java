@@ -100,7 +100,7 @@ public class IterationTravelStatsControlerListenerTest {
 	private void performTest(Scenario scenario, String outputDirectory) {
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false);
+		ShutdownEvent shutdownEvent = new ShutdownEvent(null, false, 0);
 		com.google.inject.Injector injector = Injector.createInjector(config, new AbstractModule() {
 			@Override
 			public void install() {
