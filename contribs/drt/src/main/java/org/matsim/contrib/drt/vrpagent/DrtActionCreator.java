@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.vrpagent;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -57,7 +57,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		switch (getBaseType(task)) {
+		switch (getBaseTypeOrElseThrow(task)) {
 			case DRIVE:
 				return legFactory.create(vehicle);
 

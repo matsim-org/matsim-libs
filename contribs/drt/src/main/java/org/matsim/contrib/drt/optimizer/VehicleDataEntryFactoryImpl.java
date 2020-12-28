@@ -19,7 +19,7 @@
 package org.matsim.contrib.drt.optimizer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +65,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			startTask = schedule.getCurrentTask();
-			switch (getBaseType(startTask)) {
+			switch (getBaseTypeOrElseThrow(startTask)) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)startTask;
 					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
