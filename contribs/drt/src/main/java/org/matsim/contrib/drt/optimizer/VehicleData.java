@@ -23,10 +23,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,7 +40,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.istack.Nullable;
 
 /**
  * @author michalm
@@ -73,14 +75,13 @@ public class VehicleData {
 	}
 
 	public static class Start implements Waypoint {
-		@Nullable // if schedule status is PLANNED
-		public final Task task;
+		public final Optional<Task> task;// empty if schedule status is PLANNED
 		public final Link link;
 		public final double time;
 		public final int occupancy;
 
-		public Start(Task task, Link link, double time, int occupancy) {
-			this.task = task;
+		public Start(@Nullable Task task, Link link, double time, int occupancy) {
+			this.task = Optional.ofNullable(task);
 			this.link = link;
 			this.time = time;
 			this.occupancy = occupancy;
