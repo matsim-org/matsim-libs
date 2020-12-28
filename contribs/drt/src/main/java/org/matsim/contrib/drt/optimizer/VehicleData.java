@@ -65,6 +65,8 @@ public class VehicleData {
 	public interface Waypoint {
 		Link getLink();
 
+		double getArrivalTime();
+
 		double getDepartureTime();
 
 		int getOutgoingOccupancy();
@@ -90,6 +92,11 @@ public class VehicleData {
 		}
 
 		@Override
+		public double getArrivalTime() {
+			throw new UnsupportedOperationException("No arrival time for start waypoint");
+		}
+
+		@Override
 		public double getDepartureTime() {
 			return time;
 		}
@@ -105,16 +112,16 @@ public class VehicleData {
 
 		@Nullable
 		public final Link link;//null if open-end route
-		public final OptionalTime time;//undefined if open-end route
+		public final OptionalTime arrivalTime;//undefined if open-end route
 
 		private End() {
 			link = null;
-			time = OptionalTime.undefined();
+			arrivalTime = OptionalTime.undefined();
 		}
 
-		public End(Link link, double time) {
+		public End(Link link, double arrivalTime) {
 			this.link = link;
-			this.time = OptionalTime.defined(time);
+			this.arrivalTime = OptionalTime.defined(arrivalTime);
 		}
 
 		public boolean isOpenEnd() {
@@ -128,8 +135,13 @@ public class VehicleData {
 		}
 
 		@Override
+		public double getArrivalTime() {
+			return arrivalTime.seconds();
+		}
+
+		@Override
 		public double getDepartureTime() {
-			return time.seconds();
+			throw new UnsupportedOperationException("No departure time for end waypoint");
 		}
 
 		@Override
@@ -161,6 +173,11 @@ public class VehicleData {
 		@Override
 		public Link getLink() {
 			return task.getLink();
+		}
+
+		@Override
+		public double getArrivalTime() {
+			return task.getBeginTime();
 		}
 
 		@Override
