@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.drt.optimizer;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.DoubleStream;
 
@@ -80,28 +81,26 @@ public interface Waypoint {
 	class End implements Waypoint {
 		public static final End OPEN_END = new End();
 
-		@Nullable
-		public final Link link;//null if open-end route
+		public final Optional<Link> link;//null if open-end route
 		public final OptionalTime arrivalTime;//undefined if open-end route
 
 		private End() {
-			link = null;
+			link = Optional.empty();
 			arrivalTime = OptionalTime.undefined();
 		}
 
 		public End(Link link, double arrivalTime) {
-			this.link = link;
+			this.link = Optional.of(link);
 			this.arrivalTime = OptionalTime.defined(arrivalTime);
 		}
 
 		public boolean isOpenEnd() {
-			return link == null;
+			return link.isEmpty();
 		}
 
 		@Override
-		@Nullable
 		public Link getLink() {
-			return link;
+			return link.orElseThrow(() -> new NoSuchElementException("Open-end route -- no end link provided"));
 		}
 
 		@Override
