@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -63,16 +62,14 @@ import com.google.common.base.Objects;
 public class InsertionGenerator {
 	public static class InsertionPoint {
 		public final int index;
-		public final boolean pickup;
 		public final Waypoint previousWaypoint;
-		public final Link link;
+		public final Waypoint newWaypoint;
 		public final Waypoint nextWaypoint;
 
-		public InsertionPoint(int index, boolean pickup, Waypoint previousWaypoint, Link link, Waypoint nextWaypoint) {
+		public InsertionPoint(int index, Waypoint previousWaypoint, Waypoint newWaypoint, Waypoint nextWaypoint) {
 			this.index = index;
-			this.pickup = pickup;
 			this.previousWaypoint = previousWaypoint;
-			this.link = link;
+			this.newWaypoint = newWaypoint;
 			this.nextWaypoint = nextWaypoint;
 		}
 
@@ -80,9 +77,8 @@ public class InsertionGenerator {
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
 					.add("index", index)
-					.add("pickup", pickup)
 					.add("previousWaypoint", previousWaypoint)
-					.add("link", link)
+					.add("newWaypoint", newWaypoint)
 					.add("nextWaypoint", nextWaypoint)
 					.toString();
 		}
@@ -96,19 +92,20 @@ public class InsertionGenerator {
 		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 
+			Waypoint.Pickup pickupWaypoint = new Waypoint.Pickup(request);
+			Waypoint.Dropoff dropoffWaypoint = new Waypoint.Dropoff(request);
+
 			Waypoint pickupPreviousWaypoint = vehicleEntry.getWaypoint(pickupIdx);
 			Waypoint pickupNextLink = pickupIdx == dropoffIdx ?
-					new Waypoint.Dropoff(request) :
-					vehicleEntry.stops.get(pickupIdx);
-			pickup = new InsertionPoint(pickupIdx, true, pickupPreviousWaypoint, request.getFromLink(), pickupNextLink);
+					dropoffWaypoint :
+					vehicleEntry.getWaypoint(pickupIdx + 1);
+			pickup = new InsertionPoint(pickupIdx, pickupPreviousWaypoint, pickupWaypoint, pickupNextLink);
 
 			Waypoint dropoffPreviousLink = pickupIdx == dropoffIdx ?
-					new Waypoint.Pickup(request) :
-					vehicleEntry.stops.get(dropoffIdx - 1);
-			Waypoint dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
-					Waypoint.End.OPEN_END :
-					vehicleEntry.stops.get(dropoffIdx);
-			dropoff = new InsertionPoint(dropoffIdx, false, dropoffPreviousLink, request.getToLink(), dropoffNextLink);
+					pickupWaypoint :
+					vehicleEntry.getWaypoint(dropoffIdx);
+			Waypoint dropoffNextLink = vehicleEntry.getWaypoint(dropoffIdx + 1);
+			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffWaypoint, dropoffNextLink);
 		}
 
 		@Override
