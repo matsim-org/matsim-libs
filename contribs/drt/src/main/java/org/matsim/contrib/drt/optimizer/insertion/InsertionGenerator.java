@@ -77,25 +77,6 @@ public class InsertionGenerator {
 		}
 
 		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
-			InsertionPoint that = (InsertionPoint)o;
-			return index == that.index
-					&& pickup == that.pickup
-					&& Objects.equal(previousLink, that.previousLink)
-					&& Objects.equal(link, that.link)
-					&& Objects.equal(nextLink, that.nextLink);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(index, pickup, previousLink, link, nextLink);
-		}
-
-		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
 					.add("index", index)
