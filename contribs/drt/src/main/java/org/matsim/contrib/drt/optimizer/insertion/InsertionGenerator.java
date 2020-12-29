@@ -37,14 +37,14 @@ import com.google.common.base.Objects;
  * <p>
  * Pickup insertion points are indexed in the following way:
  * <ul>
- * <li>{@code pickupIdx = 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
+ * <li>{@code pickupIdx == 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
  * latter resulting in immediate diversion)</li>
  * <li>{@code 0 < pickupIdx <= stops.size()} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
  * </ul>
  * <p>
  * Dropoff insertion points are indexed in the following way:
  * <ul>
- * <li>{@code dropoffIdx = pickupIdx} - dropoff inserted directly after pickup</li>
+ * <li>{@code dropoffIdx == pickupIdx} - dropoff inserted directly after pickup</li>
  * <li>{@code pickupIdx < dropoffIdx <= stops.size()} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
  * </ul>
  * <p>
@@ -62,12 +62,16 @@ import com.google.common.base.Objects;
 public class InsertionGenerator {
 	public static class InsertionPoint {
 		public final int index;
+		public final boolean pickup;
 		public final Link previousLink;
+		public final Link link;
 		public final Link nextLink;
 
-		public InsertionPoint(int index, Link previousLink, Link nextLink) {
+		public InsertionPoint(int index, boolean pickup, Link previousLink, Link link, Link nextLink) {
 			this.index = index;
+			this.pickup = pickup;
 			this.previousLink = previousLink;
+			this.link = link;
 			this.nextLink = nextLink;
 		}
 
@@ -78,20 +82,25 @@ public class InsertionGenerator {
 			if (o == null || getClass() != o.getClass())
 				return false;
 			InsertionPoint that = (InsertionPoint)o;
-			return index == that.index && Objects.equal(previousLink, that.previousLink) && Objects.equal(nextLink,
-					that.nextLink);
+			return index == that.index
+					&& pickup == that.pickup
+					&& Objects.equal(previousLink, that.previousLink)
+					&& Objects.equal(link, that.link)
+					&& Objects.equal(nextLink, that.nextLink);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hashCode(index, previousLink, nextLink);
+			return Objects.hashCode(index, pickup, previousLink, link, nextLink);
 		}
 
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
 					.add("index", index)
+					.add("pickup", pickup)
 					.add("previousLink", previousLink)
+					.add("link", link)
 					.add("nextLink", nextLink)
 					.toString();
 		}
@@ -109,7 +118,7 @@ public class InsertionGenerator {
 			Link pickupNextLink = pickupIdx == dropoffIdx ?
 					request.getToLink() :
 					vehicleEntry.stops.get(pickupIdx).task.getLink();
-			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, pickupNextLink);
+			pickup = new InsertionPoint(pickupIdx, true, pickupPreviousLink, request.getFromLink(), pickupNextLink);
 
 			Link dropoffPreviousLink = pickupIdx == dropoffIdx ?
 					null :
@@ -117,7 +126,7 @@ public class InsertionGenerator {
 			Link dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
 					null :
 					vehicleEntry.stops.get(dropoffIdx).task.getLink();
-			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffNextLink);
+			dropoff = new InsertionPoint(dropoffIdx, false, dropoffPreviousLink, request.getToLink(), dropoffNextLink);
 		}
 
 		@Override

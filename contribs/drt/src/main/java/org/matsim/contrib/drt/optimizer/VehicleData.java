@@ -23,10 +23,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,7 +40,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.collect.ImmutableList;
-import com.sun.istack.Nullable;
 
 /**
  * @author michalm
@@ -47,7 +49,7 @@ public class VehicleData {
 		public final DvrpVehicle vehicle;
 		public final Start start;
 		public final ImmutableList<Stop> stops;
-		private final End end;//TODO keep it private until it is used in insertion cost calculation etc.
+		public final End end;
 
 		public Entry(DvrpVehicle vehicle, Start start, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
@@ -56,14 +58,15 @@ public class VehicleData {
 			this.end = End.OPEN_END;
 		}
 
-		//TODO allow index == stops.size() ==> return end ???
 		public Waypoint getWaypoint(int index) {
-			return index == 0 ? start : stops.get(index - 1);
+			return index == 0 ? start : (index == stops.size() + 1 ? end : stops.get(index - 1));
 		}
 	}
 
 	public interface Waypoint {
 		Link getLink();
+
+		double getArrivalTime();
 
 		double getDepartureTime();
 
@@ -71,14 +74,13 @@ public class VehicleData {
 	}
 
 	public static class Start implements Waypoint {
-		@Nullable // if schedule status is PLANNED
-		public final Task task;
+		public final Optional<Task> task;// empty if schedule status is PLANNED
 		public final Link link;
 		public final double time;
 		public final int occupancy;
 
-		public Start(Task task, Link link, double time, int occupancy) {
-			this.task = task;
+		public Start(@Nullable Task task, Link link, double time, int occupancy) {
+			this.task = Optional.ofNullable(task);
 			this.link = link;
 			this.time = time;
 			this.occupancy = occupancy;
@@ -87,6 +89,11 @@ public class VehicleData {
 		@Override
 		public Link getLink() {
 			return link;
+		}
+
+		@Override
+		public double getArrivalTime() {
+			throw new UnsupportedOperationException("No arrival time for start waypoint");
 		}
 
 		@Override
@@ -101,20 +108,20 @@ public class VehicleData {
 	}
 
 	public static class End implements Waypoint {
-		public static final End OPEN_END = new End();
+		private static final End OPEN_END = new End();
 
 		@Nullable
 		public final Link link;//null if open-end route
-		public final OptionalTime time;//undefined if open-end route
+		public final OptionalTime arrivalTime;//undefined if open-end route
 
 		private End() {
 			link = null;
-			time = OptionalTime.undefined();
+			arrivalTime = OptionalTime.undefined();
 		}
 
-		public End(Link link, double time) {
+		public End(Link link, double arrivalTime) {
 			this.link = link;
-			this.time = OptionalTime.defined(time);
+			this.arrivalTime = OptionalTime.defined(arrivalTime);
 		}
 
 		public boolean isOpenEnd() {
@@ -128,8 +135,13 @@ public class VehicleData {
 		}
 
 		@Override
+		public double getArrivalTime() {
+			return arrivalTime.seconds();
+		}
+
+		@Override
 		public double getDepartureTime() {
-			return time.seconds();
+			throw new UnsupportedOperationException("No departure time for end waypoint");
 		}
 
 		@Override
@@ -161,6 +173,11 @@ public class VehicleData {
 		@Override
 		public Link getLink() {
 			return task.getLink();
+		}
+
+		@Override
+		public double getArrivalTime() {
+			return task.getBeginTime();
 		}
 
 		@Override
