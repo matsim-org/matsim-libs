@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
@@ -161,7 +162,7 @@ public class InsertionGenerator {
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
-			VehicleData.Stop nextStop = nextStop(vEntry, i);
+			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
@@ -185,7 +186,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 
 			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
-				VehicleData.Stop currentStop = currentStop(vEntry, j);
+				Waypoint.Stop currentStop = currentStop(vEntry, j);
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
@@ -205,11 +206,11 @@ public class InsertionGenerator {
 		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
-	private VehicleData.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx - 1);
 	}
 
-	private VehicleData.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
 	}
 }
