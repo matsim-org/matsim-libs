@@ -184,4 +184,60 @@ public interface Waypoint {
 			return "VehicleData.Stop for: " + task.toString();
 		}
 	}
+
+	class Pickup implements Waypoint {
+		public final DrtRequest request;
+
+		public Pickup(DrtRequest request) {
+			this.request = request;
+		}
+
+		@Override
+		public Link getLink() {
+			return request.getFromLink();
+		}
+
+		@Override
+		public double getArrivalTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public double getDepartureTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	class Dropoff implements Waypoint {
+		public final DrtRequest request;
+
+		public Dropoff(DrtRequest request) {
+			this.request = request;
+		}
+
+		@Override
+		public Link getLink() {
+			return request.getToLink();
+		}
+
+		@Override
+		public double getArrivalTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public double getDepartureTime() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public int getOutgoingOccupancy() {
+			throw new UnsupportedOperationException();
+		}
+	}
 }
