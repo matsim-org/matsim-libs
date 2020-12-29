@@ -27,14 +27,15 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.inject.Named;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
@@ -44,8 +45,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.Maps;
 
 import ch.sbb.matsim.routing.graph.Graph;
 
@@ -96,7 +95,8 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	private Map<Link, PathData> calcPathsToPickup(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc backward dijkstra from pickup to ends of selected stops + starts
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		Collection<Link> toLinks = getDetourLinks(filteredInsertions, insertion -> insertion.pickup.previousLink);
+		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream(),
+				insertion -> insertion.pickup.previousWaypoint.getLink());
 		double maxTravelTime = drtRequest.getLatestStartTime() - earliestPickupTime;
 		return toPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), toLinks, earliestPickupTime, false,
 				maxTravelTime);
@@ -105,34 +105,34 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	private Map<Link, PathData> calcPathsFromPickup(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc forward dijkstra from pickup to beginnings of selected stops + dropoff
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		Collection<Link> toLinks = getDetourLinks(filteredInsertions, insertion -> insertion.pickup.nextLink);
+		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream(),
+				insertion -> insertion.pickup.nextWaypoint.getLink());
 		return fromPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), toLinks, earliestPickupTime, true);
 	}
 
 	private Map<Link, PathData> calcPathsToDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc backward dijkstra from dropoff to ends of selected stops
 		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
-		Collection<Link> toLinks = getDetourLinks(filteredInsertions, insertion -> insertion.dropoff.previousLink);
+		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
+						.filter(insertion -> !(insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup)),
+				insertion -> insertion.dropoff.previousWaypoint.getLink());
 		return toDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, false);
 	}
 
 	private Map<Link, PathData> calcPathsFromDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
 		// calc forward dijkstra from dropoff to beginnings of selected stops
 		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
-		Collection<Link> toLinks = getDetourLinks(filteredInsertions, insertion -> insertion.dropoff.nextLink);
+		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
+						.filter(insertion -> !(insertion.dropoff.nextWaypoint instanceof Waypoint.End)),
+				insertion -> insertion.dropoff.nextWaypoint.getLink());
 		return fromDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, true);
 	}
 
-	private Collection<Link> getDetourLinks(List<Insertion> filteredInsertions,
+	private Collection<Link> getDetourLinks(Stream<Insertion> filteredInsertions,
 			Function<Insertion, Link> detourLinkExtractor) {
-		Map<Id<Link>, Link> pickupDetourStartLinks = Maps.newHashMapWithExpectedSize(filteredInsertions.size());
-		for (Insertion insertion : filteredInsertions) {
-			Link link = detourLinkExtractor.apply(insertion);
-			if (link != null) {
-				pickupDetourStartLinks.putIfAbsent(link.getId(), link);
-			}
-		}
-		return pickupDetourStartLinks.values();
+		IdMap<Link, Link> detourLinks = new IdMap<>(Link.class);
+		filteredInsertions.map(detourLinkExtractor).forEach(link -> detourLinks.putIfAbsent(link.getId(), link));
+		return detourLinks.values();
 	}
 
 	@Override

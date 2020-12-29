@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 
 /**
  * Contains detour data for all potential insertions (i.e. pickup and dropoff indices)
@@ -56,23 +57,14 @@ public class DetourData<D> {
 	}
 
 	public InsertionWithDetourData<D> createInsertionWithDetourData(InsertionGenerator.Insertion insertion) {
-		D toPickup = detourToPickup.apply(insertion.pickup.previousLink);
-		D fromPickup = detourFromPickup.apply(insertion.pickup.nextLink);
-		D toDropoff = insertion.dropoff.previousLink == null ?
+		D toPickup = detourToPickup.apply(insertion.pickup.previousWaypoint.getLink());
+		D fromPickup = detourFromPickup.apply(insertion.pickup.nextWaypoint.getLink());
+		D toDropoff = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
 				null :
-				detourToDropoff.apply(insertion.dropoff.previousLink);
-		D fromDropoff = insertion.dropoff.nextLink == null ? null : detourFromDropoff.apply(insertion.dropoff.nextLink);
-
-		// TODO switch to the new approach
-		//			D fromPickup = i == detourFromPickup.length //
-		//					? detourFromPickup[0] // pickup inserted at the end
-		//					: detourFromPickup[i + 1]; // pickup -> i+1
-		//			D toDropoff = i == j ? detourFromPickup[0] // pickup followed by dropoff
-		//					: detourToDropoff[j]; // j -> dropoff
-		//			D fromDropoff = j == detourFromDropoff.length //
-		//					? detourFromDropoff[0] // dropoff inserted at the end
-		//					: detourFromDropoff[j + 1];
-
+				detourToDropoff.apply(insertion.dropoff.previousWaypoint.getLink());
+		D fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
+				null :
+				detourFromDropoff.apply(insertion.dropoff.nextWaypoint.getLink());
 		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
 	}
 }

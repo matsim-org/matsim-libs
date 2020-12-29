@@ -130,7 +130,7 @@ public class InsertionCostCalculator<D> {
 		boolean ongoingStopTask = pickupIdx == 0 && schedule.getStatus() == ScheduleStatus.STARTED//
 				&& STOP.isBaseTypeOf(schedule.getCurrentTask());
 
-		Link pickupPreviousLink = insertion.getPickup().previousLink;
+		Link pickupPreviousLink = insertion.getPickup().previousWaypoint.getLink();
 		if ((ongoingStopTask && drtRequest.getFromLink() == pickupPreviousLink) //
 				|| (pickupIdx > 0 && drtRequest.getFromLink() == pickupPreviousLink)) {
 			if (pickupIdx != dropoffIdx) {// not: PICKUP->DROPOFF
