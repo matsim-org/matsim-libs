@@ -35,6 +35,7 @@ import javax.inject.Named;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -93,22 +94,26 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		//  passing it as an argument, instead of Insertion)
 
 		Future<Map<Link, PathData>> pathsToPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.previousLink,
-						calcPathData(toPickupPathSearch, insertion.pickup.previousLink, pickup, earliestPickupTime)));
+				() -> Map.of(insertion.pickup.previousWaypoint.getLink(),
+						calcPathData(toPickupPathSearch, insertion.pickup.previousWaypoint.getLink(), pickup,
+								earliestPickupTime)));
 
 		Future<Map<Link, PathData>> pathsFromPickupFuture = executorService.submit(
-				() -> Map.of(insertion.pickup.nextLink,
-						calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextLink, earliestPickupTime)));
+				() -> Map.of(insertion.pickup.nextWaypoint.getLink(),
+						calcPathData(fromPickupPathSearch, pickup, insertion.pickup.nextWaypoint.getLink(),
+								earliestPickupTime)));
 
-		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousLink == null ?
+		Future<Map<Link, PathData>> pathsToDropoffFuture = insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup ?
 				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.previousLink,
-						calcPathData(toDropoffPathSearch, insertion.dropoff.previousLink, dropoff, latestDropoffTime)));
+				executorService.submit(() -> Map.of(insertion.dropoff.previousWaypoint.getLink(),
+						calcPathData(toDropoffPathSearch, insertion.dropoff.previousWaypoint.getLink(), dropoff,
+								latestDropoffTime)));
 
-		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextLink == null ?
+		Future<Map<Link, PathData>> pathsFromDropoffFuture = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
 				Futures.immediateFuture(ImmutableMap.of()) :
-				executorService.submit(() -> Map.of(insertion.dropoff.nextLink,
-						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextLink, latestDropoffTime)));
+				executorService.submit(() -> Map.of(insertion.dropoff.nextWaypoint.getLink(),
+						calcPathData(fromDropoffPathSearch, dropoff, insertion.dropoff.nextWaypoint.getLink(),
+								latestDropoffTime)));
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),

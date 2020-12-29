@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -72,7 +71,6 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 					start = diversionPoint != null ? diversionPoint : //diversion possible
 							new LinkTimePair(driveTask.getPath().getToLink(),
 									driveTask.getEndTime());// too late for diversion
-
 					break;
 
 				case STOP:
@@ -104,14 +102,14 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			}
 		}
 
-		Stop[] stops = new Stop[stopTasks.size()];
+		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
 		int outputOccupancy = 0;
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
+			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outputOccupancy);
 			outputOccupancy -= s.occupancyChange;
 		}
 
-		return new Entry(vehicle, new VehicleData.Start(startTask, start.link, start.time, outputOccupancy),
+		return new Entry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outputOccupancy),
 				ImmutableList.copyOf(stops));
 	}
 

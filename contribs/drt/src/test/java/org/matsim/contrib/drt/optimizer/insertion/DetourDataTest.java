@@ -28,8 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.Start;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -125,11 +124,11 @@ public class DetourDataTest {
 	}
 
 	private Entry entry(Link startLink, Link... stopLinks) {
-		return new Entry(null, new Start(null, startLink, 0, 0),
+		return new Entry(null, new Waypoint.Start(null, startLink, 0, 0),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()));
 	}
 
-	private Stop stop(Link link) {
-		return new Stop(new DrtStopTask(0, 60, link), 0);
+	private Waypoint.Stop stop(Link link) {
+		return new Waypoint.Stop(new DrtStopTask(0, 60, link), 0);
 	}
 }

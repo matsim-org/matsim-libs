@@ -26,7 +26,7 @@ import java.util.function.ToDoubleFunction;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
@@ -130,7 +130,7 @@ public class InsertionCostCalculator<D> {
 		boolean ongoingStopTask = pickupIdx == 0 && schedule.getStatus() == ScheduleStatus.STARTED//
 				&& STOP.isBaseTypeOf(schedule.getCurrentTask());
 
-		Link pickupPreviousLink = insertion.getPickup().previousLink;
+		Link pickupPreviousLink = insertion.getPickup().previousWaypoint.getLink();
 		if ((ongoingStopTask && drtRequest.getFromLink() == pickupPreviousLink) //
 				|| (pickupIdx > 0 && drtRequest.getFromLink() == pickupPreviousLink)) {
 			if (pickupIdx != dropoffIdx) {// not: PICKUP->DROPOFF
@@ -192,7 +192,7 @@ public class InsertionCostCalculator<D> {
 
 		// this is what we cannot violate
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
-			Stop stop = vEntry.stops.get(s);
+			Waypoint.Stop stop = vEntry.stops.get(s);
 			// all stops after pickup but still before dropoff are delayed by pickupDetourTimeLoss
 			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.latestArrivalTime //
 					// (stop.latestArrivalTime is the latest arrival time according to alpha*t_direct + beta
@@ -208,7 +208,7 @@ public class InsertionCostCalculator<D> {
 
 		// this is what we cannot violate
 		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
-			Stop stop = vEntry.stops.get(s);
+			Waypoint.Stop stop = vEntry.stops.get(s);
 			// all stops after dropoff are delayed by totalTimeLoss
 			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime //
 					|| stop.task.getEndTime() + totalTimeLoss > stop.latestDepartureTime) {
