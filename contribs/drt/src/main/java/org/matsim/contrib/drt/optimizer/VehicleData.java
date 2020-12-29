@@ -49,7 +49,7 @@ public class VehicleData {
 		public final DvrpVehicle vehicle;
 		public final Start start;
 		public final ImmutableList<Stop> stops;
-		private final End end;//TODO keep it private until it is used in insertion cost calculation etc.
+		public final End end;
 
 		public Entry(DvrpVehicle vehicle, Start start, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
@@ -58,9 +58,8 @@ public class VehicleData {
 			this.end = End.OPEN_END;
 		}
 
-		//TODO allow index == stops.size() ==> return end ???
 		public Waypoint getWaypoint(int index) {
-			return index == 0 ? start : stops.get(index - 1);
+			return index == 0 ? start : (index == stops.size() + 1 ? end : stops.get(index - 1));
 		}
 	}
 
@@ -109,7 +108,7 @@ public class VehicleData {
 	}
 
 	public static class End implements Waypoint {
-		public static final End OPEN_END = new End();
+		private static final End OPEN_END = new End();
 
 		@Nullable
 		public final Link link;//null if open-end route
