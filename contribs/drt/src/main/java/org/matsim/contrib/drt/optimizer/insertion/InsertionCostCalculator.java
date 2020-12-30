@@ -32,8 +32,6 @@ import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -147,8 +145,8 @@ public class InsertionCostCalculator<D> {
 		if (pickupIdx > 0) {
 			return true;
 		}
-		Schedule schedule = vEntry.vehicle.getSchedule();
-		return schedule.getStatus() == ScheduleStatus.STARTED && STOP.isBaseTypeOf(schedule.getCurrentTask());
+		var startTask = vEntry.start.task;
+		return startTask.isPresent() && STOP.isBaseTypeOf(startTask.get());
 	}
 
 	double calculateDropoffDetourTimeLoss(InsertionWithDetourData<D> insertion) {
