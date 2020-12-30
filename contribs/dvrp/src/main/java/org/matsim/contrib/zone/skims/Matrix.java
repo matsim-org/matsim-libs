@@ -39,19 +39,12 @@ public final class Matrix {
 	//In case 18 hours is not enough, we can reduce the resolution from seconds to tens of seconds
 	private static final int MAX_UNSIGNED_SHORT = Short.MAX_VALUE - Short.MIN_VALUE;
 
-	//up to around 46k+ is possible (limited by the max data array size)
-	private static final int MAX_ZONE_COUNT = 45_000;
-
 	//there are usually not so many Zone objects, so not a problem if zoneIndex2localIndex is sparse
 	private final int[] zoneIndex2localIndex = new int[Id.getNumberOfIds(Zone.class)];
 	private final int size;
-	private final short[] data;
+	private final short[][] data;
 
 	Matrix(Set<Zone> zones) {
-		size = zones.size();
-		checkArgument(size <= MAX_ZONE_COUNT, "Too many zones for computing the DVRP travel time matrix."
-				+ " Try using bigger cell sizes (when using grid zones)");
-
 		//to make sure we do not refer to zones added later
 		Arrays.fill(zoneIndex2localIndex, -1);
 
@@ -61,12 +54,15 @@ public final class Matrix {
 			nextIndex++;
 		}
 
-		data = new short[size * size];
-		Arrays.fill(data, (short)MAX_UNSIGNED_SHORT);//-1
+		size = zones.size();
+		data = new short[size][size];
+		for (var row : data) {
+			Arrays.fill(row, (short)MAX_UNSIGNED_SHORT);//-1
+		}
 	}
 
 	public int get(Zone fromZone, Zone toZone) {
-		short shortValue = data[dataIndex(fromZone, toZone)];
+		short shortValue = data[localIndex(fromZone)][localIndex(toZone)];
 		if (shortValue == -1) {
 			throw new NoSuchElementException("No value set for zones: " + fromZone.getId() + " -> " + toZone.getId());
 		}
@@ -75,14 +71,12 @@ public final class Matrix {
 
 	public void set(Zone fromZone, Zone toZone, double value) {
 		checkArgument(Double.isFinite(value) && value >= 0 && value < MAX_UNSIGNED_SHORT);
-		data[dataIndex(fromZone, toZone)] = (short)value;
+		data[localIndex(fromZone)][localIndex(toZone)] = (short)value;
 	}
 
-	private int dataIndex(Zone fromZone, Zone toZone) {
-		int fromIndex = zoneIndex2localIndex[fromZone.getId().index()];
-		checkArgument(fromIndex >= 0, "Matrix was not created for zone: (%s)", fromZone);
-		int toIndex = zoneIndex2localIndex[toZone.getId().index()];
-		checkArgument(toIndex >= 0, "Matrix was not created for zone: (%s)", toZone);
-		return fromIndex * size + toIndex;
+	private int localIndex(Zone zone) {
+		int index = zoneIndex2localIndex[zone.getId().index()];
+		checkArgument(index >= 0, "Matrix was not created for zone: (%s)", zone);
+		return index;
 	}
 }
