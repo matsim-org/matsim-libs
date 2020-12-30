@@ -1,8 +1,11 @@
 package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -22,6 +25,7 @@ import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import javax.inject.Inject;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class PositionEmissionsModule extends AbstractModule {
@@ -65,6 +69,11 @@ public class PositionEmissionsModule extends AbstractModule {
             return emissionModule.getWarmEmissionAnalysisModule().calculateWarmEmissions(time, roadType, link.getFreespeed(), distance, vehicleAttributes);
         }
 
+        Map<Pollutant, Double> calculateColdEmissions(Vehicle vehicle, Id<Link> linkId, double startEngineTime, double parkingDuration, int distance) {
+            return emissionModule.getColdEmissionAnalysisModule()
+                    .checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startEngineTime, parkingDuration, distance);
+        }
+
         private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> getVehicleAttributes(Vehicle vehicle) {
             // the following block fixes the vehicle types's emission information whenusing an  old vehicle type format
             // the unit test I found uses an old format, so have it here.
@@ -79,7 +88,10 @@ public class PositionEmissionsModule extends AbstractModule {
 
     static class Handler implements BasicEventHandler {
 
-        private final Map<Id<Vehicle>, PositionEvent> previousPositions = new HashMap<>();
+        private final Map<Id<Vehicle>, LinkedList<PositionEvent>> trajectories = new HashMap<>();
+        private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
+        private final Map<Id<Vehicle>, VehicleLeavesTrafficEvent> parkedVehicles = new HashMap<>();
+        private final Map<Id<Vehicle>, Double> parkingDurations = new HashMap<>();
 
         @Inject
         private EmissionCalculator emissionCalculator;
@@ -102,6 +114,9 @@ public class PositionEmissionsModule extends AbstractModule {
                 case PositionEvent.EVENT_TYPE:
                     handlePositionEvent((PositionEvent) event);
                     break;
+                case VehicleEntersTrafficEvent.EVENT_TYPE:
+                    handleVehicleEntersTrafficEvent((VehicleEntersTrafficEvent) event);
+                    break;
                 case VehicleLeavesTrafficEvent.EVENT_TYPE:
                     handleVehicleLeavesTraffic((VehicleLeavesTrafficEvent) event);
                     break;
@@ -110,8 +125,32 @@ public class PositionEmissionsModule extends AbstractModule {
             }
         }
 
+        private void handleVehicleEntersTrafficEvent(VehicleEntersTrafficEvent event) {
+            if (!event.getNetworkMode().equals(TransportMode.car)) return;
+
+            vehiclesInTraffic.put(event.getVehicleId(), event);
+            var parkingDuration = calculateParkingTime(event.getVehicleId(), event.getTime());
+            this.parkingDurations.put(event.getVehicleId(), parkingDuration);
+        }
+
+        /**
+         * Calculates parking time AND removes vehicle from parking vehicles
+         */
+        private double calculateParkingTime(Id<Vehicle> vehicleId, double startTime) {
+
+            if (parkedVehicles.containsKey(vehicleId)) {
+                var stopTime = parkedVehicles.remove(vehicleId).getTime();
+                return startTime - stopTime;
+            }
+            //parking duration is assumed to be at least 12 hours when parking overnight
+            return 43200;
+        }
+
         private void handleVehicleLeavesTraffic(VehicleLeavesTrafficEvent event) {
-            previousPositions.remove(event.getVehicleId());
+            if (!event.getNetworkMode().equals(TransportMode.car)) return;
+
+            trajectories.remove(event.getVehicleId());
+            parkedVehicles.put(event.getVehicleId(), event);
         }
 
         private void handlePositionEvent(PositionEvent event) {
@@ -119,29 +158,74 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getState().equals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR))
                 return; // only calculate emissions for cars
 
-            var previousPosition = previousPositions.get(event.getVehicleId());
-            previousPositions.put(event.getVehicleId(), event);
+            if (!trajectories.containsKey(event.getVehicleId())) {
+                computeFirstColdEmissionEvent(event);
+            } else {
+                computeEmissionEvents(event);
+            }
 
-            // we start calculating warm emissions once we have the second position
-            if (previousPosition != null) {
+            // remember all the positions. It is important to do it here, so that the current event is not yet in the
+            // queue when emissions events are computed
+            // the first few positions seem to be a little weird talk about this with kai
+            trajectories.computeIfAbsent(event.getVehicleId(), key -> new LinkedList<>()).add(event);
+        }
 
-                var travelledDistance = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
+        private void computeFirstColdEmissionEvent(PositionEvent event) {
 
-                // do matsim cars come to a halt in a traffic jam, or do they move very slowly????
-                if (travelledDistance > 0) {
-                    var vehicle = vehicles.getVehicles().get(event.getVehicleId());
-                    var link = network.getLinks().get(event.getLinkId());
-                    var travelTime = event.getTime() - previousPosition.getTime();
+            var vehicle = vehicles.getVehicles().get(event.getVehicleId());
+            var startEngineTime = vehiclesInTraffic.get(vehicle.getId()).getTime();
+            var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
+                    startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
-                    // don't go faster than light (freespeed)
-                    if (travelledDistance / travelTime <= link.getFreespeed()) {
-                        //var emissions = analysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, link, travelTime);
-                        var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, travelledDistance, travelTime, event.speed());
+            eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+        }
 
-                        log.info("calculated emissions: " + emissions);
-                        eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
-                    }
+        private void computeEmissionEvents(PositionEvent event) {
+
+            var previousPosition = trajectories.get(event.getVehicleId()).getLast();
+            var distanceToLastPosition = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
+
+            // do matsim cars come to a halt in a traffic jam, or do they move very slowly????
+            if (distanceToLastPosition > 0) {
+                var vehicle = vehicles.getVehicles().get(event.getVehicleId());
+                computeWarmEmissionEvent(event, vehicle, distanceToLastPosition);
+                computeSecondColdEmissionEvent(event, vehicle);
+            }
+        }
+
+        private void computeSecondColdEmissionEvent(PositionEvent event, Vehicle vehicle) {
+            // check for cold emissions which should be computed once if distance is > 1000m
+            double distance = 0;
+            Coord previousCoord = null;
+            for (var position : trajectories.get(event.getVehicleId())) {
+
+                if (previousCoord != null) {
+                    distance += CoordUtils.calcEuclideanDistance(previousCoord, position.getCoord());
                 }
+                previousCoord = position.getCoord();
+            }
+            assert previousCoord != null;
+            distance += CoordUtils.calcEuclideanDistance(previousCoord, event.getCoord());
+
+            if (distance > 1000) {
+                var startEngineTime = vehiclesInTraffic.get(vehicle.getId()).getTime();
+                var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
+                        startEngineTime, parkingDurations.get(vehicle.getId()), 2);
+                eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+            }
+        }
+
+        private void computeWarmEmissionEvent(PositionEvent event, Vehicle vehicle, double distanceToLastPosition) {
+            var link = network.getLinks().get(event.getLinkId());
+            var travelTime = event.getTime() - trajectories.get(vehicle.getId()).getLast().getTime();
+
+            // don't go faster than light (freespeed)
+            if (distanceToLastPosition / travelTime <= link.getFreespeed()) {
+                //var emissions = analysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, link, travelTime);
+                var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
+
+                log.info("calculated emissions: " + emissions);
+                eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
             }
         }
     }

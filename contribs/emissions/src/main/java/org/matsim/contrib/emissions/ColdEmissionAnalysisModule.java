@@ -220,6 +220,7 @@ final class ColdEmissionAnalysisModule {
 
 		for (Pollutant coldPollutant : coldPollutants) {
 			double generatedEmissions;
+			// this is a really weird logic. Probably a million ways how this could fail
 			if (distance_km == 1) {
 				generatedEmissions = getEmissionsFactor(vehicleInformationTuple, 1, key, coldPollutant).getFactor();
 			} else {
