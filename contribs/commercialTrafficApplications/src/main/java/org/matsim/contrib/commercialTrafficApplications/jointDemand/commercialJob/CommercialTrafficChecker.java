@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 class CommercialTrafficChecker {
@@ -64,13 +66,13 @@ class CommercialTrafficChecker {
                 log.error("index 0 is not supported for commercial job attributes. please start with index 1. See activity " + activity + " of person " + pid);
                 fail = true;
             }
-            String[] jobProperties = ((String) (attributes.get(attribute))).split(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-            if (jobProperties.length != 5) {
+            Collection<String> jobProperties = (Collection) attributes.get(attribute);
+            if (jobProperties.size() != 5) {
                 log.error("Activity " + activity + " of person " + pid + " defines commercialJob attribute " + attribute + " with a wrong number of properties. Length should be 6");
                 fail = true;
             }
-            Double timeWindowStart = Double.valueOf(jobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
-            Double timeWindowEnd = Double.valueOf(jobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+            Double timeWindowStart = Double.valueOf((String) jobProperties.toArray()[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+            Double timeWindowEnd = Double.valueOf((String) jobProperties.toArray()[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
             if (timeWindowEnd < timeWindowStart) {
                 log.error("Person " + pid + " has an error in properties of job attribute " + attribute + " in activity " + activity.getType() + ".TimeWindow: start=" + timeWindowStart + " end=" + timeWindowEnd);
                 fail = true;
