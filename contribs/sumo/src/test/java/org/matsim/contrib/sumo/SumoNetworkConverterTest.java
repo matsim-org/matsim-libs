@@ -57,6 +57,9 @@ public class SumoNetworkConverterTest {
 
         assert l2l.containsKey(Id.createLinkId("-160346478#3")) : "Must contain link id";
 
+        Path geometry = Path.of(output.toString().replace(".xml", "-linkGeometries.csv"));
+
+        assert Files.exists(geometry) : "Geometries must exist";
 
     }
 }

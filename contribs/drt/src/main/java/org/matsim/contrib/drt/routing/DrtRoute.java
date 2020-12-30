@@ -69,7 +69,7 @@ public class DrtRoute extends AbstractRoute {
 
 	@Override
 	public String getRouteDescription() {
-		return maxWaitTime + " " + directRideTime;
+		return maxWaitTime.seconds() + " " + directRideTime.seconds();
 	}
 
 	@Override
