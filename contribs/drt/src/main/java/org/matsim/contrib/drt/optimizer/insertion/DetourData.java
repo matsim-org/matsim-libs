@@ -42,18 +42,20 @@ public class DetourData<D> {
 	private final Function<Link, D> detourFromPickup;
 	private final Function<Link, D> detourToDropoff;
 	private final Function<Link, D> detourFromDropoff;
+	private final D zeroDetour;
 
 	DetourData(Map<Link, D> detourToPickup, Map<Link, D> detourFromPickup, Map<Link, D> detourToDropoff,
-			Map<Link, D> detourFromDropoff) {
-		this(detourToPickup::get, detourFromPickup::get, detourToDropoff::get, detourFromDropoff::get);
+			Map<Link, D> detourFromDropoff, D zeroDetour) {
+		this(detourToPickup::get, detourFromPickup::get, detourToDropoff::get, detourFromDropoff::get, zeroDetour);
 	}
 
 	DetourData(Function<Link, D> detourToPickup, Function<Link, D> detourFromPickup, Function<Link, D> detourToDropoff,
-			Function<Link, D> detourFromDropoff) {
+			Function<Link, D> detourFromDropoff, D zeroDetour) {
 		this.detourToPickup = detourToPickup;
 		this.detourFromPickup = detourFromPickup;
 		this.detourToDropoff = detourToDropoff;
 		this.detourFromDropoff = detourFromDropoff;
+		this.zeroDetour = zeroDetour;
 	}
 
 	public InsertionWithDetourData<D> createInsertionWithDetourData(InsertionGenerator.Insertion insertion) {
@@ -63,7 +65,7 @@ public class DetourData<D> {
 				null :
 				detourToDropoff.apply(insertion.dropoff.previousWaypoint.getLink());
 		D fromDropoff = insertion.dropoff.nextWaypoint instanceof Waypoint.End ?
-				null :
+				zeroDetour :
 				detourFromDropoff.apply(insertion.dropoff.nextWaypoint.getLink());
 		return new InsertionWithDetourData<>(insertion, toPickup, fromPickup, toDropoff, fromDropoff);
 	}

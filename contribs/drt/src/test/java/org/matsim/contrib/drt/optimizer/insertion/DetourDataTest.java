@@ -77,8 +77,9 @@ public class DetourDataTest {
 	private final ImmutableMap<Link, String> pathFromDropoffMap = ImmutableMap.of(stop0Link, dropoff_stop0, stop1Link,
 			dropoff_stop1);
 
+	private static final String ZERO_DETOUR = "zero_detour";
 	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap::get, pathFromPickupMap::get,
-			pathToDropoffMap::get, pathFromDropoffMap::get);
+			pathToDropoffMap::get, pathFromDropoffMap::get, ZERO_DETOUR);
 
 	@Test
 	public void insertion_0_0() {
@@ -92,7 +93,7 @@ public class DetourDataTest {
 
 	@Test
 	public void insertion_0_2() {
-		assertInsertion(0, 2, start_pickup, pickup_stop0, stop1_dropoff, null);
+		assertInsertion(0, 2, start_pickup, pickup_stop0, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
@@ -102,12 +103,12 @@ public class DetourDataTest {
 
 	@Test
 	public void insertion_1_2() {
-		assertInsertion(1, 2, stop0_pickup, pickup_stop1, stop1_dropoff, null);
+		assertInsertion(1, 2, stop0_pickup, pickup_stop1, stop1_dropoff, ZERO_DETOUR);
 	}
 
 	@Test
 	public void insertion_2_2() {
-		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, null);
+		assertInsertion(2, 2, stop1_pickup, pickup_dropoff, null, ZERO_DETOUR);
 	}
 
 	private void assertInsertion(int pickupIdx, int dropoffIdx, String detourToPickup, String detourFromPickup,

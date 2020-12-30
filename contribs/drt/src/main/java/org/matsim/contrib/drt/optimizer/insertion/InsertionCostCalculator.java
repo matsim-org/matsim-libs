@@ -24,7 +24,6 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -33,8 +32,6 @@ import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -105,8 +102,8 @@ public class InsertionCostCalculator<D> {
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
-		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, insertion);
-		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, insertion);
+		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(insertion);
+		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(insertion);
 		// the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by
 		// the stops after the dropoff stop. kai, nov'18
 		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
@@ -120,57 +117,53 @@ public class InsertionCostCalculator<D> {
 		return totalTimeLoss + calcSoftConstraintPenalty(drtRequest, insertion, pickupDetourTimeLoss);
 	}
 
-	double calculatePickupDetourTimeLoss(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
+	double calculatePickupDetourTimeLoss(InsertionWithDetourData<D> insertion) {
 		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickup().index;
-		final int dropoffIdx = insertion.getDropoff().index;
+		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
+		int pickupIdx = pickup.index;
 
-		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
-		Schedule schedule = vEntry.vehicle.getSchedule();
-		boolean ongoingStopTask = pickupIdx == 0 && schedule.getStatus() == ScheduleStatus.STARTED//
-				&& STOP.isBaseTypeOf(schedule.getCurrentTask());
-
-		Link pickupPreviousLink = insertion.getPickup().previousWaypoint.getLink();
-		if ((ongoingStopTask && drtRequest.getFromLink() == pickupPreviousLink) //
-				|| (pickupIdx > 0 && drtRequest.getFromLink() == pickupPreviousLink)) {
-			if (pickupIdx != dropoffIdx) {// not: PICKUP->DROPOFF
-				return 0;// no detour
+		boolean driveToPickup = true;
+		boolean appendPickupToExistingStop = false;
+		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
+			if (appendPickupToExistingStopIfSameLinkAsPrevious(vEntry, pickupIdx)) {
+				if (pickupIdx != insertion.getDropoff().index) {
+					return 0;// no detour, no additional stop duration, no existing drive task replaced
+				}
+				appendPickupToExistingStop = true;//no additional stop duration
 			}
-
-			// PICKUP->DROPOFF
-			// no extra drive to pickup and stop (==> toPickupTT == 0 and stopDuration == 0)
-			double fromPickupTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
-			double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickupIdx);
-			return fromPickupTT - replacedDriveTT;
+			driveToPickup = false;
 		}
 
-		double toPickupTT = detourTime.applyAsDouble(insertion.getDetourToPickup());
+		double toPickupTT = driveToPickup ? detourTime.applyAsDouble(insertion.getDetourToPickup()) : 0;
+		double additionalStopDuration = appendPickupToExistingStop ? 0 : stopDuration;
 		double fromPickupTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
-		double replacedDriveTT = pickupIdx == dropoffIdx // PICKUP->DROPOFF ?
-				? 0 // no drive following the pickup is replaced (only the one following the dropoff)
-				: calculateReplacedDriveDuration(vEntry, pickupIdx);
-		return toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
+		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickupIdx);
+		return toPickupTT + additionalStopDuration + fromPickupTT - replacedDriveTT;
 	}
 
-	double calculateDropoffDetourTimeLoss(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
-		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickup().index;
-		final int dropoffIdx = insertion.getDropoff().index;
+	private boolean appendPickupToExistingStopIfSameLinkAsPrevious(VehicleData.Entry vEntry, int pickupIdx) {
+		if (pickupIdx > 0) {
+			return true;
+		}
+		var startTask = vEntry.start.task;
+		return startTask.isPresent() && STOP.isBaseTypeOf(startTask.get());
+	}
 
-		if (dropoffIdx > 0 && pickupIdx != dropoffIdx && drtRequest.getToLink() == vEntry.stops.get(dropoffIdx - 1).task
-				.getLink()) {
-			return 0; // no detour
+	double calculateDropoffDetourTimeLoss(InsertionWithDetourData<D> insertion) {
+		InsertionGenerator.InsertionPoint dropoff = insertion.getDropoff();
+
+		if (dropoff.index == insertion.getPickup().index) {
+			//toDropoffTT and replacedDriveTT taken into account in pickupDetourTimeLoss
+			return stopDuration + detourTime.applyAsDouble(insertion.getDetourFromDropoff());
 		}
 
-		double toDropoffTT = dropoffIdx == pickupIdx // PICKUP->DROPOFF ?
-				? 0 // PICKUP->DROPOFF taken into account as fromPickupTT
-				: detourTime.applyAsDouble(insertion.getDetourToDropoff());
-		double fromDropoffTT = dropoffIdx == vEntry.stops.size() // DROPOFF->STAY ?
-				? 0 //
-				: detourTime.applyAsDouble(insertion.getDetourFromDropoff());
-		double replacedDriveTT = dropoffIdx == pickupIdx // PICKUP->DROPOFF ?
-				? 0 // replacedDriveTT already taken into account in pickupDetourTimeLoss
-				: calculateReplacedDriveDuration(vEntry, dropoffIdx);
+		if (dropoff.newWaypoint.getLink() == dropoff.previousWaypoint.getLink()) {
+			return 0; // no detour, no additional stop duration
+		}
+
+		double toDropoffTT = detourTime.applyAsDouble(insertion.getDetourToDropoff());
+		double fromDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromDropoff());
+		double replacedDriveTT = calculateReplacedDriveDuration(insertion.getVehicleEntry(), dropoff.index);
 		return toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
 	}
 
