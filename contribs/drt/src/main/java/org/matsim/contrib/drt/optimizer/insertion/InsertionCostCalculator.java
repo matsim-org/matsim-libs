@@ -146,9 +146,7 @@ public class InsertionCostCalculator<D> {
 
 		double toPickupTT = detourTime.applyAsDouble(insertion.getDetourToPickup());
 		double fromPickupTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
-		double replacedDriveTT = pickupIdx == dropoffIdx // PICKUP->DROPOFF ?
-				? 0 // no drive following the pickup is replaced (only the one following the dropoff)
-				: calculateReplacedDriveDuration(vEntry, pickupIdx);
+		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickupIdx);
 		return toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 	}
 
