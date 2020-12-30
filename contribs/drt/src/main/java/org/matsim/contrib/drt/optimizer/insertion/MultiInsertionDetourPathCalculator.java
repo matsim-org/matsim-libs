@@ -107,7 +107,8 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream(),
 				insertion -> insertion.pickup.nextWaypoint.getLink());
-		return fromPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), toLinks, earliestPickupTime, true);
+		return fromPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), toLinks, earliestPickupTime, true,
+				maxTravelTime(drtRequest));
 	}
 
 	private Map<Link, PathData> calcPathsToDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
@@ -116,7 +117,8 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.previousWaypoint instanceof Waypoint.Pickup)),
 				insertion -> insertion.dropoff.previousWaypoint.getLink());
-		return toDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, false);
+		return toDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, false,
+				maxTravelTime(drtRequest));
 	}
 
 	private Map<Link, PathData> calcPathsFromDropoff(DrtRequest drtRequest, List<Insertion> filteredInsertions) {
@@ -125,7 +127,12 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		Collection<Link> toLinks = getDetourLinks(filteredInsertions.stream()
 						.filter(insertion -> !(insertion.dropoff.nextWaypoint instanceof Waypoint.End)),
 				insertion -> insertion.dropoff.nextWaypoint.getLink());
-		return fromDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, true);
+		return fromDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), toLinks, latestDropoffTime, true,
+				maxTravelTime(drtRequest));
+	}
+
+	private double maxTravelTime(DrtRequest request) {
+		return request.getLatestArrivalTime() - request.getEarliestStartTime();
 	}
 
 	private Collection<Link> getDetourLinks(Stream<Insertion> filteredInsertions,
