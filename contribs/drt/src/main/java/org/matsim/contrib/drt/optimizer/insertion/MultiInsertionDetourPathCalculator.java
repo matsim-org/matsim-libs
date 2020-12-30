@@ -86,7 +86,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 
 		try {
 			return new DetourData<>(pathsToPickupFuture.get(), pathsFromPickupFuture.get(), pathsToDropoffFuture.get(),
-					pathsFromDropoffFuture.get());
+					pathsFromDropoffFuture.get(), PathData.EMPTY);
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}

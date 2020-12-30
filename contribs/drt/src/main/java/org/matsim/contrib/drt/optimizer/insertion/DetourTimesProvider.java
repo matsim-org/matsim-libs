@@ -41,6 +41,6 @@ public class DetourTimesProvider {
 		Function<Link, Double> timesToDropoff = link -> detourTimeEstimator.estimateTime(link, drtRequest.getToLink());
 		Function<Link, Double> timesFromDropoff = link -> detourTimeEstimator.estimateTime(drtRequest.getToLink(),
 				link);
-		return new DetourData<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff);
+		return new DetourData<>(timesToPickup, timesFromPickup, timesToDropoff, timesFromDropoff, 0.);
 	}
 }
