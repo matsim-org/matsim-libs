@@ -323,6 +323,15 @@
 			<version>12.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.matsim</groupId>
+			<artifactId>mjanowski</artifactId>
+			<version>12.0-SNAPSHOT</version>
+		</dependency>
+
+
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jcommon</artifactId>

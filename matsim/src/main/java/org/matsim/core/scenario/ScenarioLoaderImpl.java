@@ -19,11 +19,21 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.google.inject.Inject;
+import kernighan_lin.*;
 import org.apache.log4j.Logger;
+import org.graphstream.graph.implementations.SingleGraph;
+import org.graphstream.ui.view.Viewer;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -34,6 +44,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
@@ -48,9 +59,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.MatsimVehicleReader;
 
-
 import java.net.URL;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_DEPRECATION_MESSAGE;
 
@@ -64,7 +77,7 @@ import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_D
  * loaded or created by the user.
  * <p></p>
  * Design thoughts:<ul>
- * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
+ * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar"11
  * </ul>
  *
  * @see org.matsim.core.scenario.MutableScenario
@@ -98,9 +111,17 @@ class ScenarioLoaderImpl {
 		this.config = this.scenario.getConfig();
 	}
 
+	private Vertex nodeToVertex(Node node) {
+		return new Vertex(node.getId().toString());
+	}
+
+	private Vertex createVertexIfAbsent(Map<Id<Node>, Vertex> vertices, Node node) {
+		return vertices.computeIfAbsent(node.getId(), (id) -> nodeToVertex(node));
+	}
+
 	/**
 	 * Loads all mandatory Scenario elements and
-	 * if activated in config's scenario module/group
+	 * if activated in config"s scenario module/group
 	 * optional elements.
 	 * @return the Scenario
 	 */
@@ -108,11 +129,141 @@ class ScenarioLoaderImpl {
 //		String currentDir = new File("tmp").getAbsolutePath();
 //		currentDir = currentDir.substring(0, currentDir.length() - 3);
 //		log.info("loading scenario from base directory: " + currentDir);
-		// the above is not used and thus only causing confusion in the log output.  kai, sep'18
+		// the above is not used and thus only causing confusion in the log output.  kai, sep"18
 
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
+
+		Network network = this.scenario.getNetwork();
+		Population population = this.scenario.getPopulation();
+
+		Map<Id<Link>, ? extends Link> linksMap = network.getLinks();
+
+		List<List<Id<Node>>> routes = population.getPersons()
+				.values()
+				.stream()
+				.map(Person::getPlans)
+				.flatMap(Collection::stream)
+				.map(Plan::getPlanElements)
+				.flatMap(Collection::stream)
+				.filter(p -> p instanceof Leg)
+				.map(p -> (Leg) p)
+				.map(Leg::getRoute)
+				.filter(r -> r instanceof NetworkRoute)
+				.map(r -> (NetworkRoute) r) //todo
+				.map(r -> {
+					ArrayList<Id<Node>> result = new ArrayList<>();
+					Id<Node> fromNodeId = getFromNodeId(linksMap, r.getStartLinkId());
+					result.add(fromNodeId);
+					r.getLinkIds()
+							.stream()
+							.map(lid -> getFromNodeId(linksMap, lid))
+							.forEach(result::add);
+					Id<Node> finalFromNodeId = getFromNodeId(linksMap, r.getEndLinkId());
+					Id<Node> toNodeId = getToNodeId(linksMap, r.getEndLinkId());
+					result.add(finalFromNodeId);
+					result.add(toNodeId);
+					return result;
+				})
+				.collect(Collectors.toList());
+
+		Multiset<Set<Id<Node>>> weights = HashMultiset.create();
+
+		for (List<Id<Node>> route : routes) {
+			for (int i = 0; i < route.size() - 1; i++) {
+				Id<Node> nodeId1 = route.get(i);
+				Id<Node> nodeId2 = route.get(i + 1);
+				if (nodeId1.equals(nodeId2))
+					continue;
+				Set<Id<Node>> key = Set.of(nodeId1, nodeId2);
+				weights.add(key, 1);
+			}
+		}
+
+		Graph mainGraph = new Graph();
+		Map<Id<Node>, Vertex> vertices = new HashMap<>();
+
+		Collection<? extends Link> links = network.getLinks().values();
+		for (Link link : links) {
+			Node fromNode = link.getFromNode();
+			Node toNode = link.getToNode();
+			Vertex fromVertex = createVertexIfAbsent(vertices, fromNode);
+			Vertex toVertex = createVertexIfAbsent(vertices, toNode);
+			mainGraph.addVertex(fromVertex);
+			mainGraph.addVertex(toVertex);
+			Set<Id<Node>> key = Set.of(fromNode.getId(), toNode.getId());
+			int weight = weights.count(key);
+			Edge edge = new Edge(weight);
+			mainGraph.addEdge(edge, fromVertex, toVertex);
+		}
+
+		String dummy = "dummy";
+		if (mainGraph.getVerticesValues().size() % 2 != 0) {
+			mainGraph.addVertex(new Vertex(dummy));
+		}
+
+		int partitionsNumber = 4;
+		double iterationsNumber = Math.log(partitionsNumber) / Math.log(2);
+		List<Graph> graphs = Collections.singletonList(mainGraph);
+		for (int i = 0; i < iterationsNumber; i++) {
+			graphs = graphs.stream()
+					.map(this::partitionGraph)
+					.flatMap(Collection::stream)
+					.collect(Collectors.toCollection(ArrayList::new));
+		}
+
+
+		List<String> colours = Arrays.asList("#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6",
+				"#bfef45", "#fabed4", "#469990", "#dcbeff", "#9A6324", "#fffac8", "#800000", "#aaffc3", "#808000",
+				"#ffd8b1", "#000075", "#a9a9a9", "#000000");
+
+		Map<Integer, String> coloursMap = IntStream.range(0, colours.size())
+				.boxed()
+				.collect(Collectors.toMap(Function.identity(), colours::get));
+
+		SingleGraph displayGraph = new SingleGraph("1");
+		for (int i = 0; i < graphs.size(); i++) {
+			Graph graph = graphs.get(i);
+			for (Vertex vertex : graph.getVerticesValues()) {
+				if (vertex.name.equals(dummy))
+					continue;
+				org.graphstream.graph.Node node = displayGraph.addNode(vertex.name);
+				Id<Node> nodeId = Id.create(vertex.name, Node.class);
+				Coord coord = network.getNodes().get(nodeId).getCoord();
+				node.setAttribute("xy", coord.getX(), coord.getY());
+				String colour = colours.get(i);
+				node.setAttribute("ui.style", String.format("fill-color: %s;", colour));
+			}
+		}
+
+//		for (Map.Entry<String, KernighanLin.VertexGroup> entry : groups.entrySet()) {
+//			for (Vertex vertex : entry.getValue()) {
+//				if (!vertex.name.equals(dummy)) {
+//					if (entry.getKey().equals("A"))
+//						node.setAttribute("ui.style", "fill-color: rgb(255,0,0);");
+//					else
+//						node.setAttribute("ui.style", "fill-color: rgb(0,0,255);");
+//				}
+//			}
+//		}
+
+		for (Map.Entry<Edge, Pair<Vertex>> entry : mainGraph.getEdgesMap().entrySet()) {
+			org.graphstream.graph.Edge edge = displayGraph.addEdge(entry.getKey().toString(), entry.getValue().first.name, entry.getValue().second.name);
+			edge.addAttribute("ui.label", entry.getKey().weight);
+		}
+
+		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		Viewer display = displayGraph.display(false);
+
+		try {
+			Thread.currentThread().join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.exit(0);
+
 		this.loadHouseholds(); // tests internally if the file is there
 		this.loadTransit(); // tests internally if the file is there
 		this.loadTransitVehicles(); // tests internally if the file is there
@@ -123,6 +274,37 @@ class ScenarioLoaderImpl {
 			this.loadLanes();
 		}
 		return this.scenario;
+	}
+
+	private Id<Node> getFromNodeId(Map<Id<Link>, ? extends Link> linksMap, Id<Link> linkId) {
+		return linksMap.get(linkId).getFromNode().getId();
+	}
+
+	private Id<Node> getToNodeId(Map<Id<Link>, ? extends Link> linksMap, Id<Link> linkId) {
+		return linksMap.get(linkId).getToNode().getId();
+	}
+
+	private List<Graph> partitionGraph(Graph graph) {
+		KernighanLin kernighanLin = KernighanLin.process(graph);
+		KernighanLin.VertexGroup groupA = kernighanLin.getGroupA();
+		KernighanLin.VertexGroup groupB = kernighanLin.getGroupB();
+		Graph graphA = vertexGroupToGraph(graph, groupA);
+		Graph graphB = vertexGroupToGraph(graph, groupB);
+		return List.of(graphA, graphB);
+	}
+
+	private Graph vertexGroupToGraph(Graph graph, KernighanLin.VertexGroup vertexGroup) {
+		Graph partitionGraph = new Graph();
+		for (Vertex vertex : vertexGroup) {
+			partitionGraph.addVertex(vertex);
+			graph.getVerticesMap()
+					.get(vertex)
+					.entrySet()
+					.stream()
+					.filter(e -> vertexGroup.contains(e.getKey()))
+					.forEach(e -> partitionGraph.addEdge(e.getValue(), vertex, e.getKey()));
+		}
+		return partitionGraph;
 	}
 
 	/**
@@ -224,7 +406,7 @@ class ScenarioLoaderImpl {
 //			if ( outDir.exists() && outDir.canWrite() ){
 //				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
 //				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
-//				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun'19
+//				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun"19
 //
 //				String outFilename = outputDirectory + "/input_plans_with_person_attributes.xml.gz";
 //				PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
@@ -233,7 +415,7 @@ class ScenarioLoaderImpl {
 //					  "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
 //						    "the persons. " );
 //			}
-			// TD says to rather not have this kind of side effect.  kai, jul'19
+			// TD says to rather not have this kind of side effect.  kai, jul"19
 
 			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
 				throw new RuntimeException(PERSON_ATTRIBUTES_DEPRECATION_MESSAGE) ;
@@ -368,7 +550,7 @@ class ScenarioLoaderImpl {
 			attributes.removeAllAttributes( facility.getId().toString() );
 		}
 		// (some of the above could also become a static helper method in ObjectAttributesUtils, but this here seems the only
-		// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun'19)
+		// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun"19)
 
 		if ( !attributes.toString().equals( "" ) ) {
 			log.warn( message ) ;

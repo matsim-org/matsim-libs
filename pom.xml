@@ -12,5 +12,6 @@
 		<module>benchmark</module>
 		<module>contribs</module>
 		<module>distribution</module>
+		<module>mjanowski</module>
 	</modules>
 </project>
