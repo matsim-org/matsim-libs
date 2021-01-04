@@ -135,12 +135,14 @@ public class InsertionCostCalculator<D> {
 		boolean driveToPickup = true;
 		boolean appendPickupToExistingStop = false;
 		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
-			if (appendPickupToExistingStopIfSameLinkAsPrevious(vEntry, pickupIdx)) {
-				if (pickupIdx != insertion.getDropoff().index) {
-					return 0;// no detour, no additional stop duration, no existing drive task replaced
-				}
-				appendPickupToExistingStop = true;//no additional stop duration
+			//check if possible to append -> no additional stop duration
+			appendPickupToExistingStop = appendPickupToExistingStopIfSameLinkAsPrevious(vEntry, pickupIdx);
+
+			if (pickupIdx != insertion.getDropoff().index) {
+				// no detour, no existing drive task replaced
+				return appendPickupToExistingStop ? 0 : stopDuration;
 			}
+
 			driveToPickup = false;
 		}
 
