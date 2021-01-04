@@ -52,6 +52,8 @@ import org.matsim.core.config.ConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -646,4 +648,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
 		return Optional.ofNullable(drtRequestInsertionRetryParams);
 	}
+
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 */
+	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		testForLocked() ;
+		addParameterSet( pars );
+	}
+
 }
