@@ -173,6 +173,7 @@
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
 		<module>roadpricing</module>
+		<module>sbb-extensions</module>
 		<module>signals</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
