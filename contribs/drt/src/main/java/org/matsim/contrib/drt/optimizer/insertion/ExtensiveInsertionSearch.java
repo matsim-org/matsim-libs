@@ -55,14 +55,15 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		this.forkJoinPool = forkJoinPool;
 
 		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue);
+		var detourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
+		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue,
+				detourTimeEstimator);
 
-		admissibleDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(insertionParams.getAdmissibleBeelineSpeedFactor(),
-						dvrpTravelTimeMatrix));
+		admissibleDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
 
 		bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime, null));
 	}
 
 	@Override
