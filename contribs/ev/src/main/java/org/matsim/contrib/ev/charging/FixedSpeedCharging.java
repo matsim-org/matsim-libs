@@ -19,7 +19,7 @@
 package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author michalm
@@ -37,12 +37,12 @@ public class FixedSpeedCharging implements BatteryCharging {
 	}
 
 	@Override
-	public double calcChargingPower(Charger charger) {
+	public double calcChargingPower(ChargerSpecification charger) {
 		return Math.min(maxPower, charger.getPlugPower());
 	}
 
 	@Override
-	public double calcChargingTime(Charger charger, double energy) {
+	public double calcChargingTime(ChargerSpecification charger, double energy) {
 		return energy / calcChargingPower(charger);
 	}
 }

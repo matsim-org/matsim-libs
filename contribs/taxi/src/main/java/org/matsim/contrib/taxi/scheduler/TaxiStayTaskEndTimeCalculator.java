@@ -19,7 +19,7 @@
 package org.matsim.contrib.taxi.scheduler;
 
 import static org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater.REMOVE_STAY_TASK;
-import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseType;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.getBaseTypeOrElseThrow;
 
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -38,7 +38,7 @@ public class TaxiStayTaskEndTimeCalculator implements ScheduleTimingUpdater.Stay
 
 	@Override
 	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		switch (getBaseType(task)) {
+		switch (getBaseTypeOrElseThrow(task)) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT

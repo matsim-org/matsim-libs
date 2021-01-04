@@ -20,7 +20,10 @@
 
 package org.matsim.contrib.dvrp.run;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Arrays;
+import java.util.List;
 
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
@@ -30,18 +33,28 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
  * @author Michal Maciejewski (michalm)
  */
 public class DvrpQSimComponents {
-	public static QSimComponentsConfigurator activateModes(String... modes) {
+	public static QSimComponentsConfigurator activateModes(List<String> additionalNamedComponents,
+			List<String> dvrpModes) {
 		return components -> {
 			components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
 			components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-			MultiModals.requireAllModesUnique(modes);
-			for (String m : modes) {
+
+			//activate additional named components
+			additionalNamedComponents.forEach(components::addNamedComponent);
+
+			//activate all DvrpMode components
+			MultiModals.requireAllModesUnique(dvrpModes);
+			for (String m : dvrpModes) {
 				components.addComponent(DvrpModes.mode(m));
 			}
 		};
 	}
 
+	public static QSimComponentsConfigurator activateModes(String... modes) {
+		return activateModes(List.of(), List.of(modes));
+	}
+
 	public static QSimComponentsConfigurator activateAllModes(MultiModal<?>... multiModal) {
-		return activateModes(Arrays.stream(multiModal).flatMap(MultiModal::modes).toArray(String[]::new));
+		return activateModes(List.of(), Arrays.stream(multiModal).flatMap(MultiModal::modes).collect(toList()));
 	}
 }

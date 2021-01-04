@@ -73,8 +73,6 @@ public class DrtZonalSystem {
 	 */
 	@Nullable
 	private static String getGeometryIdForLink(Link link, Map<String, PreparedGeometry> geometries) {
-		//TODO use endNode.getCoord() ?
-//		Point linkCoord = MGC.coord2Point(link.getCoord());
 		Point linkCoord = MGC.coord2Point(link.getToNode().getCoord());
 		return geometries.entrySet()
 				.stream()

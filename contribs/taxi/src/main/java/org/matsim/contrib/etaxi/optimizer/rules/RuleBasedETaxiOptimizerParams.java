@@ -69,7 +69,7 @@ public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerPa
 		super.addParameterSet(set);
 	}
 
-	RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
+	public RuleBasedTaxiOptimizerParams getRuleBasedTaxiOptimizerParams() {
 		return ruleBasedTaxiOptimizerParams;
 	}
 
