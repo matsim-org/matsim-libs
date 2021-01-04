@@ -18,10 +18,7 @@
 
 package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -61,6 +58,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import static org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandUtils.*;
 
 /**
  * Generates carriers and tours depending on next iteration's freight demand
@@ -143,17 +142,18 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
             for (Activity activity : customer2ActsWithJobs.get(customer)) {
                 Map<String,Object> commercialJobAttributes = JointDemandUtils.getCommercialJobAttributes(activity);
                 for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
-                    String[] commercialJobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+                    List<String> commercialJobProperties = new ArrayList<>();
+                    commercialJobProperties.addAll((Collection<? extends String>) commercialJobAttributes.get(commercialJobAttributeKey));
 
                     int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
                     Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer,jobIdx);
 
-                    double earliestStart = Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
-                    double latestStart = Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+                    double earliestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_START_IDX));
+                    double latestStart = Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_END_IDX));
 
                     CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
-                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
-                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
+                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX)));
+                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties.get(COMMERCIALJOB_ATTRIBUTE_DURATION_IDX)));
                     serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
 
                     Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
