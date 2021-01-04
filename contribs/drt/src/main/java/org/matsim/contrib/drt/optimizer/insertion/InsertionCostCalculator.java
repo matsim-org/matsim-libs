@@ -24,6 +24,8 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
 import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
 
+import javax.annotation.Nullable;
+
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -70,17 +72,25 @@ public class InsertionCostCalculator<D> {
 	private final PenaltyCalculator penaltyCalculator;
 	private final ToDoubleFunction<D> detourTime;
 
+	// If the detour data uses approximated detour times (e.g. beeline or matrix-based), provide the same estimator for
+	// replaced drives to avoid systematic errors
+	// When null, the replaced drive duration is derived from the schedule
+	@Nullable
+	private final DetourTimeEstimator replacedDriveTimeEstimator;
+
 	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer, PenaltyCalculator penaltyCalculator,
-			ToDoubleFunction<D> detourTime) {
-		this(drtConfig.getStopDuration(), timer::getTimeOfDay, penaltyCalculator, detourTime);
+			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
+		this(drtConfig.getStopDuration(), timer::getTimeOfDay, penaltyCalculator, detourTime,
+				replacedDriveTimeEstimator);
 	}
 
 	public InsertionCostCalculator(double stopDuration, DoubleSupplier timeOfDay, PenaltyCalculator penaltyCalculator,
-			ToDoubleFunction<D> detourTime) {
+			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.stopDuration = stopDuration;
 		this.timeOfDay = timeOfDay;
 		this.penaltyCalculator = penaltyCalculator;
 		this.detourTime = detourTime;
+		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
 	}
 
 	/**
@@ -170,6 +180,12 @@ public class InsertionCostCalculator<D> {
 	private double calculateReplacedDriveDuration(VehicleData.Entry vEntry, int insertionIdx) {
 		if (insertionIdx == vEntry.stops.size()) {
 			return 0;// end of route - bus would wait there
+		}
+
+		if (replacedDriveTimeEstimator != null) {
+			//use the approximated drive times instead of deriving (presumably more accurate) times from the schedule
+			return replacedDriveTimeEstimator.estimateTime(vEntry.getWaypoint(insertionIdx).getLink(),
+					vEntry.getWaypoint(insertionIdx + 1).getLink());
 		}
 
 		double replacedDriveStartTime = getDriveToInsertionStartTime(vEntry, insertionIdx);
