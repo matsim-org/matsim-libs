@@ -64,8 +64,10 @@ public class SupersonicOsmNetworkReader {
     /**
      * Creates a function to adjust the freespeed for urban links.
      * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
+     *
+     * @apiNote Can be used as example, but no public access currently
      */
-    public static AfterLinkCreated adjustFreespeed(final double factor) {
+    static AfterLinkCreated adjustFreespeed(final double factor) {
         return (link, osmTags, direction) -> {
             if (osmTags.containsKey(OsmTags.MAXSPEED)) {
                 if (link.getFreespeed() < 51 / 3.6)
