@@ -21,7 +21,7 @@
 package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -31,5 +31,5 @@ public interface ChargingPower {
 		ChargingPower create(ElectricVehicle electricVehicle);
 	}
 
-	double calcChargingPower(Charger charger);
+	double calcChargingPower(ChargerSpecification charger);
 }

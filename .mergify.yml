@@ -38,6 +38,7 @@ pull_request_rules:
       - status-success=build (contribs/hybridsim)
       - status-success=build (contribs/otfvis)
       - status-success=build (contribs/osm)
+      - status-success=build (contribs/sbb-extensions)
       - "#approved-reviews-by>=0"
       - label=automerge
     #      - status-success=Jenkins@VSP

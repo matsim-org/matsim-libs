@@ -30,7 +30,7 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 import com.google.common.base.Preconditions;
 
@@ -55,7 +55,7 @@ public class FastThenSlowCharging implements BatteryCharging {
 	}
 
 	@Override
-	public double calcChargingTime(Charger charger, double energy) {
+	public double calcChargingTime(ChargerSpecification charger, double energy) {
 		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 
 		Battery b = electricVehicle.getBattery();
@@ -82,7 +82,7 @@ public class FastThenSlowCharging implements BatteryCharging {
 	}
 
 	@Override
-	public double calcChargingPower(Charger charger) {
+	public double calcChargingPower(ChargerSpecification charger) {
 		return calcChargingPower(charger.getPlugPower());
 	}
 }
