@@ -123,20 +123,17 @@ public interface Waypoint {
 		public final DrtStopTask task;
 		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
 		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
-		public final int occupancyChange;// diff in pickups and dropoffs
 		public final int outgoingOccupancy;
 
-		public Stop(DrtStopTask task, int outputOccupancy) {
+		public Stop(DrtStopTask task, int outgoingOccupancy) {
 			this.task = task;
-			this.outgoingOccupancy = outputOccupancy;
+			this.outgoingOccupancy = outgoingOccupancy;
 
 			// essentially the min of the latest possible arrival times at this stop
 			latestArrivalTime = calcLatestArrivalTime();
 
 			// essentially the min of the latest possible pickup times at this stop
 			latestDepartureTime = calcLatestDepartureTime();
-
-			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
 		@Override
@@ -157,6 +154,10 @@ public interface Waypoint {
 		@Override
 		public int getOutgoingOccupancy() {
 			return outgoingOccupancy;
+		}
+
+		public int getOccupancyChange() {
+			return task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
 		private double calcLatestArrivalTime() {
