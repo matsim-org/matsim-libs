@@ -42,7 +42,7 @@ import java.net.URL;
  */
 public class RunFreightExample {
 
-	private static URL scenarioUrl ;
+	private static final URL scenarioUrl ;
 	static{
 		scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 	}
@@ -57,14 +57,12 @@ public class RunFreightExample {
 		// ### scenario stuff: ###
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		//MATSim configurations
-			// yyyy This needs to be done before the jspritRun, because otherwise it throws an Exception regarding the CarrierModule:
-			// "carriers are provided as scenario element AND per the CarrierModule constructor [...]" KMT Nov'20
-		final Controler controler = new Controler( scenario ) ;
-		Freight.configure( controler );
-
 		//Building the Carriers, running jsprit for solving the VRP:
 		jspritRun( scenario );
+
+		//MATSim configuration:
+		final Controler controler = new Controler( scenario ) ;
+		Freight.configure( controler );
 
 		//start of the MATSim-Run:
 		controler.run();
@@ -90,9 +88,9 @@ public class RunFreightExample {
 		
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-	    freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml");
-	    freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
-	    //
+		freightConfigGroup.setCarriersFile( "singleCarrierFiveActivitiesWithoutRoutes.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile( "vehicleTypes.xml");
+		//
 
 		return config;
 	}
