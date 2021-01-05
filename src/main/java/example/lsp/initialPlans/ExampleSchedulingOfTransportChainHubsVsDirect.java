@@ -31,6 +31,10 @@ import java.util.*;
  *
  * This examples bases on the Example ExampleSchedulingOfTransportChain.class
  * -- the collection Part is removed, Chain is now starting at the CollectionHub
+ *
+ * Scheduler = Macht die Pläne für die Fahrzeuge für die nächste MATSim-Iteration. Er plant es für jede Ressource. --> jede Ressource hatfür jede Resoource einen eigenen scehduler:
+ * 1.) Simple: Nimm die mitgegebene Reihenfolge.
+ * 2.)
  */
 /*package-private*/ class ExampleSchedulingOfTransportChainHubsVsDirect {
 
