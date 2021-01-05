@@ -136,6 +136,13 @@ public interface Waypoint {
 			latestDepartureTime = calcLatestDepartureTime();
 		}
 
+		public Stop(DrtStopTask task, double latestArrivalTime, double latestDepartureTime, int outgoingOccupancy) {
+			this.task = task;
+			this.latestArrivalTime = latestArrivalTime;
+			this.latestDepartureTime = latestDepartureTime;
+			this.outgoingOccupancy = outgoingOccupancy;
+		}
+
 		@Override
 		public Link getLink() {
 			return task.getLink();
