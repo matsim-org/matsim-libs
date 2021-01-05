@@ -385,7 +385,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
-	 * @param -- {@value #MAX_WAIT_TIME_EXP}
+	 * @param maxWaitTime -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
