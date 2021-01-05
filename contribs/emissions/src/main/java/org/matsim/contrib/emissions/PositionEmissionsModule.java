@@ -191,6 +191,23 @@ public class PositionEmissionsModule extends AbstractModule {
 
         private void computeSecondColdEmissionEvent(PositionEvent event) {
             // check for cold emissions which should be computed once if distance is > 1000m
+            double distance = calculateTravelledDistance(event);
+
+            if (distance > 1000) {
+                var vehicle = vehicles.getVehicles().get(event.getVehicleId());
+                var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
+                        event.getTime(), parkingDurations.get(vehicle.getId()), 2);
+                var emisPosEv = new EmissionPositionEvent(event, emissions);
+                log.info("Cold emission event with number " + emisPosEv.getNumber());
+                eventsManager.processEvent(emisPosEv);
+
+                // this makes sure that this is only computed once
+                vehiclesWatingForSecondColdEmissionEvent.remove(vehicle.getId());
+            }
+        }
+
+        private double calculateTravelledDistance(PositionEvent event) {
+            // check for cold emissions which should be computed once if distance is > 1000m
             double distance = 0;
             Coord previousCoord = null;
             for (var position : trajectories.get(event.getVehicleId())) {
@@ -202,19 +219,7 @@ public class PositionEmissionsModule extends AbstractModule {
             }
             assert previousCoord != null;
             distance += CoordUtils.calcEuclideanDistance(previousCoord, event.getCoord());
-
-            if (distance > 1000) {
-                var vehicle = vehicles.getVehicles().get(event.getVehicleId());
-                var startEngineTime = vehiclesInTraffic.get(vehicle.getId()).getTime();
-                var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
-                        event.getTime(), parkingDurations.get(vehicle.getId()), 2);
-                var emisPosEv = new EmissionPositionEvent(event, emissions);
-                log.info("Cold emission event with number " + emisPosEv.getNumber());
-                eventsManager.processEvent(emisPosEv);
-
-                // this makes sure that this is only computed once
-                vehiclesWatingForSecondColdEmissionEvent.remove(vehicle.getId());
-            }
+            return distance;
         }
 
         private void computeWarmEmissionEvent(PositionEvent event) {
@@ -249,6 +254,10 @@ public class PositionEmissionsModule extends AbstractModule {
         private final PositionEvent position;
         private final Map<Pollutant, Double> emissions;
         private final int id;
+
+        public Map<Pollutant, Double> getEmissions() {
+            return emissions;
+        }
 
         public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions) {
             super(positionEvent.getTime() + 1);

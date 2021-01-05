@@ -7,18 +7,23 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -30,9 +35,12 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestPositionEmissionModule {
 
@@ -117,8 +125,57 @@ public class TestPositionEmissionModule {
         var controler = new Controler(scenario);
 
         controler.addOverridingModule(new PositionEmissionsModule());
+        var handler = new Handler();
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addEventHandlerBinding().toInstance(handler);
+            }
+        });
 
         controler.run();
+
+        for (var entry : handler.getClassicEmissions().entrySet()) {
+
+            assertEquals(entry.getValue(), handler.getPositionEmissions().get(entry.getKey()), 0.1);
+        }
+    }
+
+    private static class Handler implements BasicEventHandler {
+
+        private final Map<Pollutant, Double> classicEmissions = new HashMap<>();
+        private final Map<Pollutant, Double> positionEmissions = new HashMap<>();
+
+        public Map<Pollutant, Double> getClassicEmissions() {
+            return classicEmissions;
+        }
+
+        public Map<Pollutant, Double> getPositionEmissions() {
+            return positionEmissions;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+
+            switch (event.getEventType()) {
+                case ColdEmissionEvent.EVENT_TYPE:
+                    sumAll(classicEmissions, ((ColdEmissionEvent) event).getColdEmissions());
+                    break;
+                case WarmEmissionEvent.EVENT_TYPE:
+                    sumAll(classicEmissions, ((WarmEmissionEvent) event).getWarmEmissions());
+                    break;
+                case PositionEmissionsModule.EmissionPositionEvent.EVENT_TYPE:
+                    sumAll(positionEmissions, ((PositionEmissionsModule.EmissionPositionEvent) event).getEmissions());
+                    break;
+            }
+        }
+
+        private void sumAll(Map<Pollutant, Double> to, Map<Pollutant, Double> from) {
+
+            for (Map.Entry<Pollutant, Double> pollutantDoubleEntry : from.entrySet()) {
+                to.merge(pollutantDoubleEntry.getKey(), pollutantDoubleEntry.getValue(), Double::sum);
+            }
+        }
     }
 
     private VehicleType createVehicleType() {
