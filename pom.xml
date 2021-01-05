@@ -12,7 +12,7 @@
 
 	<properties>
 <!--		<matsim.version>13.0-SNAPSHOT</matsim.version>-->
-		<matsim.version>13.0-2020w40-SNAPSHOT</matsim.version>
+		<matsim.version>13.0-2021w01-SNAPSHOT</matsim.version>
 	</properties>
 
 	<repositories>
