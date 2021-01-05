@@ -28,7 +28,7 @@ public class Freight{
 		} else{
 			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
 		}
-		final CarrierModule carrierModule = new CarrierModule( carriers );
+		final CarrierModule carrierModule = new CarrierModule( );
 		ao.addOverridingModule( carrierModule ) ;
 
 		ao.addOverridingModule( new AbstractModule(){

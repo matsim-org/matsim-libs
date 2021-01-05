@@ -68,7 +68,7 @@ final class RunPassengerAlongWithCarriers {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
 		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
 
-		CarrierModule carrierController = new CarrierModule(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
 
 		controler.addOverridingModule(carrierController);
 		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
