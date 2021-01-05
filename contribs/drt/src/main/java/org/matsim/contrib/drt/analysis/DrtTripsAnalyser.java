@@ -485,6 +485,6 @@ public class DrtTripsAnalyser {
 		}
 
 		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
-		return count / waitingTimes.length;
+		return count * 100 / waitingTimes.length;
 	}
 }
