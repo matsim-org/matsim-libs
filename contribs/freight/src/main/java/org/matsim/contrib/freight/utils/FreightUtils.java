@@ -58,8 +58,7 @@ public class FreightUtils {
 	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .
 	 * This string constant will eventually become private.
 	 */
-	@Deprecated
-	public static final String CARRIERS = "carriers";
+	private static final String CARRIERS = "carriers";
 	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
 
@@ -190,6 +189,10 @@ public class FreightUtils {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
+		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
+			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
+		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
