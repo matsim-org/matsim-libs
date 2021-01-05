@@ -130,11 +130,11 @@ public interface Waypoint {
 			this.task = task;
 			this.outgoingOccupancy = outputOccupancy;
 
-			latestArrivalTime = calcLatestArrivalTime();
 			// essentially the min of the latest possible arrival times at this stop
+			latestArrivalTime = calcLatestArrivalTime();
 
-			latestDepartureTime = calcLatestDepartureTime();
 			// essentially the min of the latest possible pickup times at this stop
+			latestDepartureTime = calcLatestDepartureTime();
 
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
