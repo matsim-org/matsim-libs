@@ -13,6 +13,7 @@ import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -24,9 +25,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.PositionEvent;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PositionEmissionsModule extends AbstractModule {
 
@@ -43,6 +43,9 @@ public class PositionEmissionsModule extends AbstractModule {
         if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
             throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
         }
+        if (!config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue)) {
+            throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue");
+        }
     }
 
     @Override
@@ -52,7 +55,6 @@ public class PositionEmissionsModule extends AbstractModule {
         bind(EmissionCalculator.class);
         bind(EmissionModule.class);
         addEventHandlerBinding().to(Handler.class);
-        log.info("Installed Handler and WarmEmissionAnalysis Module.");
     }
 
     static class EmissionCalculator {
@@ -92,6 +94,7 @@ public class PositionEmissionsModule extends AbstractModule {
         private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
         private final Map<Id<Vehicle>, VehicleLeavesTrafficEvent> parkedVehicles = new HashMap<>();
         private final Map<Id<Vehicle>, Double> parkingDurations = new HashMap<>();
+        private final Set<Id<Vehicle>> vehiclesWatingForSecondColdEmissionEvent = new HashSet<>();
 
         @Inject
         private EmissionCalculator emissionCalculator;
@@ -129,6 +132,7 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getNetworkMode().equals(TransportMode.car)) return;
 
             vehiclesInTraffic.put(event.getVehicleId(), event);
+            vehiclesWatingForSecondColdEmissionEvent.add(event.getVehicleId());
             var parkingDuration = calculateParkingTime(event.getVehicleId(), event.getTime());
             this.parkingDurations.put(event.getVehicleId(), parkingDuration);
         }
@@ -158,10 +162,13 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getState().equals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR))
                 return; // only calculate emissions for cars
 
-            if (!trajectories.containsKey(event.getVehicleId())) {
-                computeFirstColdEmissionEvent(event);
+            if (trajectories.containsKey(event.getVehicleId())) {
+                computeWarmEmissionEvent(event);
+
+                if (vehiclesWatingForSecondColdEmissionEvent.contains(event.getVehicleId()))
+                    computeSecondColdEmissionEvent(event);
             } else {
-                computeEmissionEvents(event);
+                computeFirstColdEmissionEvent(event);
             }
 
             // remember all the positions. It is important to do it here, so that the current event is not yet in the
@@ -177,23 +184,12 @@ public class PositionEmissionsModule extends AbstractModule {
             var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                     startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
-            eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+            var emisPosEv = new EmissionPositionEvent(event, emissions);
+            log.info("Cold emission event with number " + emisPosEv.getNumber());
+            eventsManager.processEvent(emisPosEv);
         }
 
-        private void computeEmissionEvents(PositionEvent event) {
-
-            var previousPosition = trajectories.get(event.getVehicleId()).getLast();
-            var distanceToLastPosition = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
-
-            // do matsim cars come to a halt in a traffic jam, or do they move very slowly????
-            if (distanceToLastPosition > 0) {
-                var vehicle = vehicles.getVehicles().get(event.getVehicleId());
-                computeWarmEmissionEvent(event, vehicle, distanceToLastPosition);
-                computeSecondColdEmissionEvent(event, vehicle);
-            }
-        }
-
-        private void computeSecondColdEmissionEvent(PositionEvent event, Vehicle vehicle) {
+        private void computeSecondColdEmissionEvent(PositionEvent event) {
             // check for cold emissions which should be computed once if distance is > 1000m
             double distance = 0;
             Coord previousCoord = null;
@@ -208,37 +204,56 @@ public class PositionEmissionsModule extends AbstractModule {
             distance += CoordUtils.calcEuclideanDistance(previousCoord, event.getCoord());
 
             if (distance > 1000) {
+                var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                 var startEngineTime = vehiclesInTraffic.get(vehicle.getId()).getTime();
                 var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
-                        startEngineTime, parkingDurations.get(vehicle.getId()), 2);
-                eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+                        event.getTime(), parkingDurations.get(vehicle.getId()), 2);
+                var emisPosEv = new EmissionPositionEvent(event, emissions);
+                log.info("Cold emission event with number " + emisPosEv.getNumber());
+                eventsManager.processEvent(emisPosEv);
+
+
+                // this makes sure that this is only computed once
+                vehiclesWatingForSecondColdEmissionEvent.remove(vehicle.getId());
             }
         }
 
-        private void computeWarmEmissionEvent(PositionEvent event, Vehicle vehicle, double distanceToLastPosition) {
-            var link = network.getLinks().get(event.getLinkId());
-            var travelTime = event.getTime() - trajectories.get(vehicle.getId()).getLast().getTime();
+        private void computeWarmEmissionEvent(PositionEvent event) {
 
-            // don't go faster than light (freespeed)
-            if (distanceToLastPosition / travelTime <= link.getFreespeed()) {
-                //var emissions = analysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, link, travelTime);
-                var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
+            var previousPosition = trajectories.get(event.getVehicleId()).getLast();
+            var distanceToLastPosition = CoordUtils.calcEuclideanDistance(event.getCoord(), previousPosition.getCoord());
 
-                log.info("calculated emissions: " + emissions);
-                eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+            if (distanceToLastPosition > 0) {
+
+                var link = network.getLinks().get(event.getLinkId());
+                var travelTime = event.getTime() - trajectories.get(event.getVehicleId()).getLast().getTime();
+
+                // don't go faster than light (freespeed)
+                if (distanceToLastPosition / travelTime <= link.getFreespeed()) {
+                    var vehicle = vehicles.getVehicles().get(event.getVehicleId());
+                    var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
+
+                    eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+                }
             }
         }
     }
 
-    static class EmissionPositionEvent extends Event {
+    public static class EmissionPositionEvent extends Event {
+
+        public static final String EVENT_TYPE = "emissionPositionEvent";
+
+        private static final AtomicInteger eventCounter = new AtomicInteger(); // this should be removed at some point
 
         private final PositionEvent position;
         private final Map<Pollutant, Double> emissions;
+        private final int id;
 
         public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions) {
             super(positionEvent.getTime() + 1);
             this.position = positionEvent;
             this.emissions = emissions;
+            id = eventCounter.incrementAndGet();
         }
 
         @Override
@@ -248,12 +263,17 @@ public class PositionEmissionsModule extends AbstractModule {
             for (var pollutant : emissions.entrySet()) {
                 attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
             }
+            attr.put("#", Integer.toString(id));
             return attr;
         }
 
         @Override
         public String getEventType() {
-            return "emissionPositionEvent";
+            return EVENT_TYPE;
+        }
+
+        int getNumber() {
+            return id;
         }
     }
 }

@@ -101,24 +101,23 @@ final class ColdEmissionAnalysisModule {
 			double eventTime, double parkingDuration, int distance_km) {
 
 		{
-			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription(vehicleType, this.ecg);
 			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
-			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+			Gbl.assertNotNull(hbefaVehicleTypeDescription);
 		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
-		Gbl.assertNotNull( vehicleInformationTuple );
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType);
+		Gbl.assertNotNull(vehicleInformationTuple);
 
-		if (vehicleInformationTuple.getFirst() == null){
+		if (vehicleInformationTuple.getFirst() == null) {
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " +
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
-		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicleId, parkingDuration, vehicleInformationTuple, distance_km );
+		// I think this is not intended. the ColdEmissionHandler calls the throw method separately janek jan'21
+		//	throwColdEmissionEvent(vehicleId, coldEmissionEventLinkId, eventTime, coldEmissions);
 
-		throwColdEmissionEvent(vehicleId, coldEmissionEventLinkId, eventTime, coldEmissions);
-
-		return coldEmissions;
+		return calculateColdEmissions(vehicleId, parkingDuration, vehicleInformationTuple, distance_km);
 	}
 
 	/*package-private*/ void throwColdEmissionEvent(Id<Vehicle> vehicleId, Id<Link> coldEmissionEventLinkId, double eventTime, Map<Pollutant, Double> coldEmissions) {
