@@ -212,7 +212,6 @@ public class PositionEmissionsModule extends AbstractModule {
                 log.info("Cold emission event with number " + emisPosEv.getNumber());
                 eventsManager.processEvent(emisPosEv);
 
-
                 // this makes sure that this is only computed once
                 vehiclesWatingForSecondColdEmissionEvent.remove(vehicle.getId());
             }
@@ -226,10 +225,12 @@ public class PositionEmissionsModule extends AbstractModule {
             if (distanceToLastPosition > 0) {
 
                 var link = network.getLinks().get(event.getLinkId());
-                var travelTime = event.getTime() - trajectories.get(event.getVehicleId()).getLast().getTime();
+                var travelTime = event.getTime() - previousPosition.getTime();
+                var speed = distanceToLastPosition / travelTime;
 
                 // don't go faster than light (freespeed)
-                if (distanceToLastPosition / travelTime <= link.getFreespeed()) {
+                // add a rounding error to the compared freespeed. The warm emission module has a tolerance of 1km/h
+                if (speed <= link.getFreespeed() + 0.01) {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
 
@@ -241,7 +242,7 @@ public class PositionEmissionsModule extends AbstractModule {
 
     public static class EmissionPositionEvent extends Event {
 
-        public static final String EVENT_TYPE = "emissionPositionEvent";
+        public static final String EVENT_TYPE = "emissionPosition";
 
         private static final AtomicInteger eventCounter = new AtomicInteger(); // this should be removed at some point
 
@@ -258,8 +259,11 @@ public class PositionEmissionsModule extends AbstractModule {
 
         @Override
         public Map<String, String> getAttributes() {
-            var attr = super.getAttributes();
-            attr.putAll(position.getAttributes());
+
+            // call super second, so that the event type get overridden
+            var attr = position.getAttributes();
+            attr.putAll(super.getAttributes());
+
             for (var pollutant : emissions.entrySet()) {
                 attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
             }

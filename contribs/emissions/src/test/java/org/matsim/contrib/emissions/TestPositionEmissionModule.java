@@ -128,6 +128,7 @@ public class TestPositionEmissionModule {
         VehicleUtils.setHbefaTechnology(engineInformation, "diesel");
         VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3");
         VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
+        vehicleType.setMaximumVelocity(10);
 
         return vehicleType;
     }
@@ -159,6 +160,7 @@ public class TestPositionEmissionModule {
 
         var link = network.getFactory().createLink(Id.createLinkId(id), from, to);
         EmissionUtils.setHbefaRoadType(link, "URB/Local/50");
+        link.setFreespeed(10);
         network.addLink(link);
     }
 
