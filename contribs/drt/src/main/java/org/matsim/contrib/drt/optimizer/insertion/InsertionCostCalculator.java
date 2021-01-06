@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
-
 import java.util.function.DoubleSupplier;
 import java.util.function.ToDoubleFunction;
+
+import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -69,18 +69,23 @@ public class InsertionCostCalculator<D> {
 	private final DoubleSupplier timeOfDay;
 	private final PenaltyCalculator penaltyCalculator;
 	private final ToDoubleFunction<D> detourTime;
+	private final InsertionDetourTimeCalculator<D> insertionDetourTimeCalculator;
 
 	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer, PenaltyCalculator penaltyCalculator,
-			ToDoubleFunction<D> detourTime) {
-		this(drtConfig.getStopDuration(), timer::getTimeOfDay, penaltyCalculator, detourTime);
+			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
+		this(drtConfig.getStopDuration(), timer::getTimeOfDay, penaltyCalculator, detourTime,
+				replacedDriveTimeEstimator);
 	}
 
 	public InsertionCostCalculator(double stopDuration, DoubleSupplier timeOfDay, PenaltyCalculator penaltyCalculator,
-			ToDoubleFunction<D> detourTime) {
+			ToDoubleFunction<D> detourTime, @Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
 		this.stopDuration = stopDuration;
 		this.timeOfDay = timeOfDay;
 		this.penaltyCalculator = penaltyCalculator;
 		this.detourTime = detourTime;
+
+		insertionDetourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, detourTime,
+				replacedDriveTimeEstimator);
 	}
 
 	/**
@@ -102,122 +107,64 @@ public class InsertionCostCalculator<D> {
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
-		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(insertion);
-		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(insertion);
+		double pickupDetourTimeLoss = insertionDetourTimeCalculator.calculatePickupDetourTimeLoss(insertion);
+		double dropoffDetourTimeLoss = insertionDetourTimeCalculator.calculateDropoffDetourTimeLoss(insertion);
 		// the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by
 		// the stops after the dropoff stop. kai, nov'18
 		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
 
 		// this is what we want to minimise
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
-		if (isHardConstraintsViolated(insertion, pickupDetourTimeLoss, totalTimeLoss)) {
+		if (!checkHardConstraints(insertion, pickupDetourTimeLoss, totalTimeLoss)) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
 		return totalTimeLoss + calcSoftConstraintPenalty(drtRequest, insertion, pickupDetourTimeLoss);
 	}
 
-	double calculatePickupDetourTimeLoss(InsertionWithDetourData<D> insertion) {
-		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
-		int pickupIdx = pickup.index;
-
-		boolean driveToPickup = true;
-		boolean appendPickupToExistingStop = false;
-		if (pickup.newWaypoint.getLink() == pickup.previousWaypoint.getLink()) {
-			if (appendPickupToExistingStopIfSameLinkAsPrevious(vEntry, pickupIdx)) {
-				if (pickupIdx != insertion.getDropoff().index) {
-					return 0;// no detour, no additional stop duration, no existing drive task replaced
-				}
-				appendPickupToExistingStop = true;//no additional stop duration
-			}
-			driveToPickup = false;
-		}
-
-		double toPickupTT = driveToPickup ? detourTime.applyAsDouble(insertion.getDetourToPickup()) : 0;
-		double additionalStopDuration = appendPickupToExistingStop ? 0 : stopDuration;
-		double fromPickupTT = detourTime.applyAsDouble(insertion.getDetourFromPickup());
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, pickupIdx);
-		return toPickupTT + additionalStopDuration + fromPickupTT - replacedDriveTT;
-	}
-
-	private boolean appendPickupToExistingStopIfSameLinkAsPrevious(VehicleData.Entry vEntry, int pickupIdx) {
-		if (pickupIdx > 0) {
-			return true;
-		}
-		var startTask = vEntry.start.task;
-		return startTask.isPresent() && STOP.isBaseTypeOf(startTask.get());
-	}
-
-	double calculateDropoffDetourTimeLoss(InsertionWithDetourData<D> insertion) {
-		InsertionGenerator.InsertionPoint dropoff = insertion.getDropoff();
-
-		if (dropoff.index == insertion.getPickup().index) {
-			//toDropoffTT and replacedDriveTT taken into account in pickupDetourTimeLoss
-			return stopDuration + detourTime.applyAsDouble(insertion.getDetourFromDropoff());
-		}
-
-		if (dropoff.newWaypoint.getLink() == dropoff.previousWaypoint.getLink()) {
-			return 0; // no detour, no additional stop duration
-		}
-
-		double toDropoffTT = detourTime.applyAsDouble(insertion.getDetourToDropoff());
-		double fromDropoffTT = detourTime.applyAsDouble(insertion.getDetourFromDropoff());
-		double replacedDriveTT = calculateReplacedDriveDuration(insertion.getVehicleEntry(), dropoff.index);
-		return toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
-	}
-
-	private double calculateReplacedDriveDuration(VehicleData.Entry vEntry, int insertionIdx) {
-		if (insertionIdx == vEntry.stops.size()) {
-			return 0;// end of route - bus would wait there
-		}
-
-		double replacedDriveStartTime = getDriveToInsertionStartTime(vEntry, insertionIdx);
-		double replacedDriveEndTime = vEntry.stops.get(insertionIdx).task.getBeginTime();
-		return replacedDriveEndTime - replacedDriveStartTime;
-	}
-
-	private boolean isHardConstraintsViolated(InsertionWithDetourData<?> insertion, double pickupDetourTimeLoss,
+	private boolean checkHardConstraints(InsertionWithDetourData<?> insertion, double pickupDetourTimeLoss,
 			double totalTimeLoss) {
-		VehicleData.Entry vEntry = insertion.getVehicleEntry();
-		final int pickupIdx = insertion.getPickup().index;
-		final int dropoffIdx = insertion.getDropoff().index;
+		return checkTimeConstraintsForScheduledRequests(insertion.getInsertion(), pickupDetourTimeLoss, totalTimeLoss)
+				&& checkTimeConstraintsForVehicle(insertion.getVehicleEntry(), totalTimeLoss, timeOfDay.getAsDouble());
+	}
 
-		// this is what we cannot violate
+	static boolean checkTimeConstraintsForScheduledRequests(InsertionGenerator.Insertion insertion,
+			double pickupDetourTimeLoss, double totalTimeLoss) {
+		VehicleData.Entry vEntry = insertion.vehicleEntry;
+		final int pickupIdx = insertion.pickup.index;
+		final int dropoffIdx = insertion.dropoff.index;
+
+		// each existing stop has 2 time constraints: latestArrivalTime and latestDepartureTime (see: Waypoint.Stop)
+		// we are looking only at the time constraints of the scheduled requests (the new request is checked separately)
+
+		// all stops after the new (potential) pickup but before the new dropoff are delayed by pickupDetourTimeLoss
+		// check if this delay satisfies the time constraints at these stops
 		for (int s = pickupIdx; s < dropoffIdx; s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
-			// all stops after pickup but still before dropoff are delayed by pickupDetourTimeLoss
-			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.latestArrivalTime //
-					// (stop.latestArrivalTime is the latest arrival time according to alpha*t_direct + beta
-					// So we are checking if we are now larger than that.)
-					|| stop.task.getEndTime() + pickupDetourTimeLoss > stop.latestDepartureTime
-				// (this is the same except for the departure. Relates to the maximum waiting. kai, nov'18)
-			) {
-				return true;
+			if (stop.task.getBeginTime() + pickupDetourTimeLoss > stop.latestArrivalTime
+					|| stop.task.getEndTime() + pickupDetourTimeLoss > stop.latestDepartureTime) {
+				return false;
 			}
 		}
 
-		// ... now the same for everything after the considered dropoff:
-
-		// this is what we cannot violate
+		// all stops after the new (potential) dropoff are delayed by totalTimeLoss
+		// check if this delay satisfies the time constraints at these stops
 		for (int s = dropoffIdx; s < vEntry.stops.size(); s++) {
 			Waypoint.Stop stop = vEntry.stops.get(s);
-			// all stops after dropoff are delayed by totalTimeLoss
-			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime //
+			if (stop.task.getBeginTime() + totalTimeLoss > stop.latestArrivalTime
 					|| stop.task.getEndTime() + totalTimeLoss > stop.latestDepartureTime) {
-				return true;
+				return false;
 			}
 		}
 
-		// vehicle's time window cannot be violated
-		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		double timeSlack = vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(),
-				timeOfDay.getAsDouble());
-		if (timeSlack < totalTimeLoss) {
-			return true;
-		}
+		return true; //all time constraints of all stops are satisfied
+	}
 
-		return false;// all constraints satisfied
+	static boolean checkTimeConstraintsForVehicle(VehicleData.Entry vEntry, double totalTimeLoss, double now) {
+		// check if the vehicle operations end time is satisfied
+		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
+		double timeSlack = vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), now);
+		return timeSlack >= totalTimeLoss;
 	}
 
 	public static class SoftConstraintViolation {
@@ -240,7 +187,7 @@ public class InsertionCostCalculator<D> {
 		final int pickupIdx = insertion.getPickup().index;
 		final int dropoffIdx = insertion.getDropoff().index;
 
-		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, pickupIdx);
+		double driveToPickupStartTime = vEntry.getWaypoint(pickupIdx).getDepartureTime();
 		// (normally the end time of the previous task)
 		double pickupEndTime = driveToPickupStartTime
 				+ detourTime.applyAsDouble(insertion.getDetourToPickup())
@@ -260,9 +207,5 @@ public class InsertionCostCalculator<D> {
 		// max travel time currently calculated with DrtRouteModule.getMaxTravelTime(unsharedRideTime)
 
 		return penaltyCalculator.calcPenalty(maxWaitTimeViolation, maxTravelTimeViolation);
-	}
-
-	private double getDriveToInsertionStartTime(VehicleData.Entry vEntry, int insertionIdx) {
-		return vEntry.getWaypoint(insertionIdx).getDepartureTime();
 	}
 }

@@ -103,13 +103,13 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
-		int outputOccupancy = 0;
+		int outgoingOccupancy = 0;
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outputOccupancy);
-			outputOccupancy -= s.occupancyChange;
+			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
+			outgoingOccupancy -= s.getOccupancyChange();
 		}
 
-		return new Entry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outputOccupancy),
+		return new Entry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
 				ImmutableList.copyOf(stops));
 	}
 
