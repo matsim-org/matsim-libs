@@ -21,8 +21,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -34,6 +32,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 
 /**
@@ -115,8 +115,6 @@ final class ColdEmissionAnalysisModule {
 		}
 
 		Map<Pollutant, Double> coldEmissions = calculateColdEmissions( vehicleId, parkingDuration, vehicleInformationTuple, distance_km );
-
-		throwColdEmissionEvent(vehicleId, coldEmissionEventLinkId, eventTime, coldEmissions);
 
 		return coldEmissions;
 	}
