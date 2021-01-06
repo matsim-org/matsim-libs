@@ -10,6 +10,7 @@ import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversLegScoring;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.VehicleEmploymentScoring;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -68,7 +69,7 @@ final class RunPassengerAlongWithCarriers {
 		CarrierPlanStrategyManagerFactory strategyManagerFactory = new MyCarrierPlanStrategyManagerFactory(types);
 		CarrierScoringFunctionFactory scoringFunctionFactory = createScoringFunctionFactory(scenario.getNetwork());
 
-		CarrierModule carrierController = new CarrierModule(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierModule carrierController = new CarrierModule( strategyManagerFactory, scoringFunctionFactory);
 
 		controler.addOverridingModule(carrierController);
 		prepareFreightOutputDataAndStats(scenario, controler.getEvents(), controler, carriers);
@@ -90,6 +91,7 @@ final class RunPassengerAlongWithCarriers {
 			prepareConfig() ;
 		}
 		scenario = ScenarioUtils.loadScenario( config ) ;
+		FreightUtils.getOrCreateCarriers( scenario );
 		return scenario ;
 	}
 
