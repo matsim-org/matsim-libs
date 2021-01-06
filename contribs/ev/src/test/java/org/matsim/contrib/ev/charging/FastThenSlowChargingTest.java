@@ -30,11 +30,8 @@ import org.matsim.contrib.ev.fleet.ElectricVehicleImpl;
 import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
 import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
 import org.matsim.contrib.ev.infrastructure.Charger;
-import org.matsim.contrib.ev.infrastructure.ChargerImpl;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
 
@@ -72,7 +69,7 @@ public class FastThenSlowChargingTest {
 
 	private void assertCalcChargingPower(double capacity_kWh, double soc_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
-		Charger charger = createCharger(chargerPower_kW);
+		ChargerSpecification charger = createCharger(chargerPower_kW);
 		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
 		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
 				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
@@ -138,22 +135,20 @@ public class FastThenSlowChargingTest {
 
 	private void assertCalcChargingTime(double capacity_kWh, double soc_kWh, double energy_kWh, double chargerPower_kW,
 			double expectedChargingTime_s) {
-		Charger charger = createCharger(chargerPower_kW);
+		ChargerSpecification charger = createCharger(chargerPower_kW);
 		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
 		Assertions.assertThat(((FastThenSlowCharging)electricVehicle.getChargingPower()).calcChargingTime(charger,
 				EvUnits.kWh_to_J(energy_kWh))).isCloseTo(expectedChargingTime_s, Percentage.withPercentage(1e-13));
 	}
 
-	private Charger createCharger(double chargerPower_kW) {
-		ChargerSpecification chargerSpecification = ImmutableChargerSpecification.newBuilder()
+	private ChargerSpecification createCharger(double chargerPower_kW) {
+		return ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))
 				.chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 				.linkId(Id.createLinkId("link_id"))
 				.plugPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
-		return ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
-				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
 	}
 
 	private ElectricVehicle createElectricVehicle(double capacity_kWh, double soc_kWh) {

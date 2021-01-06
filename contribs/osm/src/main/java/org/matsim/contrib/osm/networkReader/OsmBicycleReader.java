@@ -34,8 +34,8 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 	public OsmBicycleReader(OsmNetworkParser parser,
 							Predicate<Long> preserveNodeWithId,
 							BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-							SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated) {
-		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated));
+							AfterLinkCreated afterLinkCreated, double freeSpeedFactor, double adjustCapacityLength) {
+		super(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, (link, tags, direction) -> handleLink(link, tags, direction, afterLinkCreated), freeSpeedFactor, adjustCapacityLength);
 		this.afterLinkCreated = afterLinkCreated;
 	}
 
@@ -143,7 +143,7 @@ public final class OsmBicycleReader extends SupersonicOsmNetworkReader {
 		@Override
 		OsmBicycleReader createInstance() {
 			OsmNetworkParser parser = new OsmNetworkParser(coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
-			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated);
+			return new OsmBicycleReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated, freeSpeedFactor, adjustCapacityLength);
 		}
 	}
 }

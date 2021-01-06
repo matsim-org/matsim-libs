@@ -9,6 +9,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -106,7 +107,7 @@ public class DrtTripsAnalyser {
 			}
 			for (Entry<Id<Link>, int[]> e : boardings.entrySet()) {
 				bw.newLine();
-				Coord coord = network.getLinks().get(e.getKey()).getCoord();
+				Coord coord = network.getLinks().get(e.getKey()).getToNode().getCoord();
 				bw.write(e.getKey().toString() + delimiter + coord.getX() + delimiter + coord.getY());
 				for (int i = 0; i < e.getValue().length; i++) {
 					bw.write(delimiter + e.getValue()[i]);
@@ -144,12 +145,15 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
+
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
 				format.format(waitStats.getMean()) + "",//
 				format.format(waitStats.getMax()) + "",//
 				format.format(waitStats.getPercentile(95)) + "",//
 				format.format(waitStats.getPercentile(75)) + "",//
 				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(getPercentageWaitTimeBelow(600, waitStats)) + "",//
+				format.format(getPercentageWaitTimeBelow(900, waitStats)) + "",//
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
@@ -471,5 +475,16 @@ public class DrtTripsAnalyser {
 		}
 
 		return result.toString();
+	}
+
+	public static double getPercentageWaitTimeBelow(int timeCriteria, DescriptiveStatistics stats) {
+		double[] waitingTimes = stats.getValues();
+
+		if (waitingTimes.length == 0) {
+			return Double.NaN; // to be consistent with DescriptiveStatistics
+		}
+
+		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
+		return count * 100 / waitingTimes.length;
 	}
 }

@@ -1,6 +1,8 @@
 package org.matsim.contrib.sumo;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
@@ -15,6 +17,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.*;
 import org.xml.sax.SAXException;
 import picocli.CommandLine;
@@ -119,7 +122,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
         Network network = NetworkUtils.createNetwork();
         Lanes lanes = LanesUtils.createLanesContainer();
 
-        convert(network, lanes);
+        SumoNetworkHandler handler = convert(network, lanes);
 
         calculateLaneCapacities(network, lanes);
 
@@ -132,6 +135,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
 
         new NetworkWriter(network).write(output.toAbsolutePath().toString());
         new LanesWriter(lanes).write(output.toAbsolutePath().toString().replace(".xml", "-lanes.xml"));
+
+        writeGeometry(handler, output.toAbsolutePath().toString().replace(".xml", "-linkGeometries.csv"));
 
         return 0;
     }
@@ -149,14 +154,42 @@ public class SumoNetworkConverter implements Callable<Integer> {
         }
     }
 
+    /**
+     * Writes link geometries.
+     */
+    public void writeGeometry(SumoNetworkHandler handler, String path) {
+        try (BufferedWriter out = IOUtils.getBufferedWriter(path)) {
+            CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader("LinkId", "Geometry"));
+
+            for (Map.Entry<String, SumoNetworkHandler.Edge> e : handler.getEdges().entrySet()) {
+
+                if (e.getValue().shape.isEmpty())
+                    continue;
+
+                printer.printRecord(
+                        e.getKey(),
+                        e.getValue().shape.stream().map(d -> {
+                            Coord p = handler.createCoord(d);
+                            return String.format(Locale.US,"(%f,%f)", p.getX(), p.getY());
+                        }).collect(Collectors.joining(","))
+                );
+
+
+            }
+
+        } catch (IOException e) {
+            log.error("Could not write link geometries", e);
+        }
+    }
 
     /**
      * Perform the actual conversion on given input data.
      *
      * @param network results will be added into this network.
      * @param lanes   resulting lanes are added into this object.
+     * @return internal handler used for conversion
      */
-    public void convert(Network network, Lanes lanes) throws ParserConfigurationException, SAXException, IOException {
+    public SumoNetworkHandler convert(Network network, Lanes lanes) throws ParserConfigurationException, SAXException, IOException {
 
         log.info("Parsing SUMO network");
 
@@ -201,7 +234,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 modes.add(TransportMode.bike);
 
             link.setAllowedModes(modes);
-            link.setLength(edge.lanes.get(0).length);
+            link.setLength(edge.getLength());
             LanesToLinkAssignment l2l = lf.createLanesToLinkAssignment(link.getId());
 
             for (SumoNetworkHandler.Lane lane : edge.lanes) {
@@ -231,7 +264,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 continue;
             }
 
-            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(type.speed));
+            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(type.speed, LinkProperties.DEFAULT_FREESPEED_FACTOR));
             link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), prop) * link.getNumberOfLanes());
 
             lanes.addLanesToLinkAssignment(l2l);
@@ -289,8 +322,8 @@ public class SumoNetworkConverter implements Callable<Integer> {
             for (Lane lane : l2l.getLanes().values()) {
                 if (lane.getToLinkIds() == null && lane.getToLaneIds() == null) {
                     // chose first reachable link from this lane
-                    Link out = network.getLinks().get(l2l.getLinkId()).getToNode().getOutLinks().values().iterator().next();
-                    lane.addToLinkId(out.getId());
+                    Collection<? extends Link> out = network.getLinks().get(l2l.getLinkId()).getToNode().getOutLinks().values();
+                    out.forEach(l -> lane.addToLinkId(l.getId()));
 
                     log.warn("No target for lane {}, chosen {}", lane.getId(), out);
                 }
@@ -309,6 +342,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
         }
 
         log.info("Removed {} superfluous lanes, total={}", removed, lanes.getLanesToLinkAssignments().size());
+        return sumoHandler;
     }
 
     private void writeInductionLoops(File file, SumoNetworkHandler other) throws IOException {
