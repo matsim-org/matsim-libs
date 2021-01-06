@@ -12,7 +12,7 @@ import lsp.replanning.LSPPlanStrategyManagerFactory;
 	@Override
 	public GenericStrategyManager<LSPPlan, LSP> createStrategyManager(LSP lsp) {
 		GenericStrategyManager<LSPPlan, LSP> strategyManager = new GenericStrategyManager<LSPPlan, LSP>();
-		ShipmentAssigner tomorrowAssigner = new TomorrowAssigner();
+		ShipmentAssigner tomorrowAssigner = new MaybeTodayAssigner();
 		tomorrowAssigner.setLSP(lsp);
 
 		//Warum wird hier an der Stelle im GenericStrategyManager eine spezifische Strategy hinzugefügt? KMT Jun'20

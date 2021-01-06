@@ -5,13 +5,14 @@ import java.util.Random;
 import lsp.LSP;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
+import org.matsim.core.gbl.Gbl;
 
-/*package-private*/ class TomorrowAssigner implements ShipmentAssigner{
+/*package-private*/ class MaybeTodayAssigner implements ShipmentAssigner{
 
 	private LSP lsp;
-	private Random random;
+	private final Random random;
 	
-	public TomorrowAssigner() {
+	public MaybeTodayAssigner() {
 		this.random = new Random(1);
 	}
 	
@@ -19,6 +20,7 @@ import lsp.shipment.LSPShipment;
 	public void assignShipment(LSPShipment shipment) {
 		boolean assignToday = random.nextBoolean();
 		if(assignToday) {
+			Gbl.assertIf( lsp.getSelectedPlan().getSolutions().size()==1 );
 			lsp.getSelectedPlan().getSolutions().iterator().next().assignShipment(shipment);
 		}	
 	}
@@ -29,9 +31,9 @@ import lsp.shipment.LSPShipment;
 		
 	}
 
-	@Override
-	public LSP getLSP() {
-		return lsp;
-	}
+//	@Override
+//	public LSP getLSP() {
+//		return lsp;
+//	}
 
 }

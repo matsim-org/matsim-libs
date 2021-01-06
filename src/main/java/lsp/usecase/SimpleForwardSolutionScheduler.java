@@ -1,6 +1,7 @@
 package lsp.usecase;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lsp.LSP;
 import lsp.LogisticsSolution;
@@ -12,10 +13,10 @@ import lsp.shipment.LSPShipment;
 /*package-private*/ class SimpleForwardSolutionScheduler implements SolutionScheduler {
 
 	private LSP lsp;
-	private ArrayList<LSPResource> resources;
+	private List<LSPResource> resources;
 	private int bufferTime;
 	
-	SimpleForwardSolutionScheduler(ArrayList<LSPResource> resources) {
+	SimpleForwardSolutionScheduler( List<LSPResource> resources ) {
 		this.resources = resources;
 	}
 	

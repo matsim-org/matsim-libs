@@ -10,29 +10,31 @@ import org.matsim.api.core.v01.population.BasicPlan;
 
 	private LSP lsp;
 	private double score;
-	private Collection<LogisticsSolution> solutions;
+	private final Collection<LogisticsSolution> solutions;
 	private ShipmentAssigner assigner;
 	
 	LSPPlanImpl() {
 		this.solutions = new ArrayList<>();
 	}
 	
-	public void addSolution (LogisticsSolution solution) {
+	@Override public LSPPlan addSolution( LogisticsSolution solution ) {
 		this.solutions.add(solution);
 		solution.setLSP(this.lsp);
+		return this;
 	}
 	
-	public Collection<LogisticsSolution> getSolutions() {
+	@Override public Collection<LogisticsSolution> getSolutions() {
 		return solutions;
 	}
 
-	public ShipmentAssigner getAssigner() {
+	@Override public ShipmentAssigner getAssigner() {
 		return assigner;
 	}
 	
-	public void setAssigner(ShipmentAssigner assigner) {
+	@Override public LSPPlan setAssigner( ShipmentAssigner assigner ) {
 		this.assigner = assigner;
 		this.assigner.setLSP(this.lsp);
+		return this;
 	}
 
 	@Override
@@ -45,7 +47,7 @@ import org.matsim.api.core.v01.population.BasicPlan;
 		this.score = score;
 	}
 
-	public void setLSP(LSP lsp) {
+	@Override public LSPPlan setLSP( LSP lsp ) {
 		this.lsp = lsp;
 		if(assigner != null) {
 			this.assigner.setLSP(lsp);
@@ -53,9 +55,10 @@ import org.matsim.api.core.v01.population.BasicPlan;
 		for(LogisticsSolution solution : solutions) {
 			solution.setLSP(lsp);
 		}
+		return this;
 	}
 	
-	public LSP getLsp() {
+	@Override public LSP getLsp() {
 		return lsp;
 	}
 	

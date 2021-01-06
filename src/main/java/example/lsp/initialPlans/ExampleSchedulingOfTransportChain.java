@@ -168,7 +168,7 @@ import lsp.resources.LSPResource;
 		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
 		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 		
-		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> distributionLinkId = Id.createLinkId("(14 2) (14 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
 		distributionCarrierVehicle.setType( distributionType );
@@ -230,13 +230,17 @@ import lsp.resources.LSPResource;
 		Id<LSP> completeLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(completeLSPId);
 		
-		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
+		//The exogenous list of Resources for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder
 		ArrayList<LSPResource> resourcesList = new ArrayList<LSPResource>();
 		resourcesList.add(collectionAdapter);
 		resourcesList.add(firstReloadingPointAdapter);
 		resourcesList.add(mainRunAdapter);
 		resourcesList.add(secondReloadingPointAdapter);
 		resourcesList.add(distributionAdapter);
+
+//		SolutionScheduler forwardSolutionScheduler = LSPUtils.createForwardSolutionScheduler(); //Ist der "nicht einfache" Scheduler. TODO braucht der keine RessourcenLsite oder ähnliches? --> Offenbar ja, weil Null Pointer. argh!
+//		completeLSPBuilder.setSolutionScheduler(forwardSolutionScheduler);
+
 		SolutionScheduler simpleScheduler = UsecaseUtils.createDefaultSimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		

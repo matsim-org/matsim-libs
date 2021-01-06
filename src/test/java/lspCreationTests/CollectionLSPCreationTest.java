@@ -110,7 +110,8 @@ public class CollectionLSPCreationTest {
 		assertTrue(selectedPlan.getAssigner() == assigner);
 		assertTrue(selectedPlan.getSolutions().iterator().next() == collectionSolution);
 		assertTrue(selectedPlan.getSolutions().iterator().next().getLSP() == collectionLSP);
-		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
+//		assertTrue(selectedPlan.getAssigner().getLSP()== collectionLSP);
+		assertTrue(selectedPlan.getLsp()== collectionLSP);
 	}
 
 }

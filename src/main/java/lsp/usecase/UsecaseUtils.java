@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class UsecaseUtils {
 
@@ -23,7 +24,7 @@ public class UsecaseUtils {
 		return new MainRunCarrierScheduler();
 	}
 
-	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler(ArrayList<LSPResource> resources) {
+	public static SimpleForwardSolutionScheduler createDefaultSimpleForwardSolutionScheduler( List<LSPResource> resources ) {
 		return new SimpleForwardSolutionScheduler(resources);
 	}
 
@@ -61,8 +62,8 @@ public class UsecaseUtils {
 			}
 
 
-			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionHandler){
-				this.collectionScheduler = collectionHandler;
+			public CollectionCarrierAdapterBuilder setCollectionScheduler(CollectionCarrierScheduler collectionCarrierScheduler){
+				this.collectionScheduler = collectionCarrierScheduler;
 				return this;
 			}
 
@@ -103,8 +104,8 @@ public class UsecaseUtils {
 			}
 
 
-			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionHandler){
-				this.distributionHandler = distributionHandler;
+			public DistributionCarrierAdapterBuilder setDistributionScheduler(DistributionCarrierScheduler distributionCarrierScheduler){
+				this.distributionHandler = distributionCarrierScheduler;
 				return this;
 			}
 
@@ -241,8 +242,8 @@ public class UsecaseUtils {
 			this.locationLinkId = locationLinkId;
 		}
 
-		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingHandler){
-			this.reloadingScheduler = reloadingHandler;
+		public ReloadingPointBuilder setReloadingScheduler(ReloadingPointScheduler reloadingPointScheduler){
+			this.reloadingScheduler = reloadingPointScheduler;
 			return this;
 		}
 
