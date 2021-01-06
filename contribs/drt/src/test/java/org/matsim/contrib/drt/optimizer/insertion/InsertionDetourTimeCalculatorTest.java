@@ -46,7 +46,7 @@ public class InsertionDetourTimeCalculatorTest {
 	private final DrtRequest drtRequest = DrtRequest.newBuilder().fromLink(fromLink).toLink(toLink).build();
 
 	@Test
-	public void detourTmeLoss_start_pickup_dropoff() {
+	public void detourTimeLoss_start_pickup_dropoff() {
 		Waypoint.Start start = start(null, 0, link("start"));
 		Entry entry = entry(start);
 		var detour = new Detour(100., 15., null, 0.);
@@ -57,7 +57,7 @@ public class InsertionDetourTimeCalculatorTest {
 	}
 
 	@Test
-	public void detourTmeLoss_ongoingStopAsStart_pickup_dropoff() {
+	public void detourTimeLoss_ongoingStopAsStart_pickup_dropoff() {
 		//similar to detourTmeLoss_start_pickup_dropoff(), but the pickup is appended to the ongoing STOP task
 		Waypoint.Start start = start(new DrtStopTask(0, STOP_DURATION, fromLink), STOP_DURATION, fromLink);
 		Entry entry = entry(start);
@@ -133,6 +133,28 @@ public class InsertionDetourTimeCalculatorTest {
 
 		assertPickupDetourTimeLoss(insertion, 0);
 		assertDropoffDetourTimeLoss(insertion, 0);
+	}
+
+	@Test
+	public void replacedDriveTimeEstimator() {
+		Waypoint.Start start = start(null, 0, link("start"));
+		Waypoint.Stop stop0 = stop(10, link("stop0"));
+		Waypoint.Stop stop1 = stop(200, link("stop1"));
+		Entry entry = entry(start, stop0, stop1);
+		var detour = new Detour(10., 30., 100., 150.);
+		var insertion = insertion(entry, 0, 1, detour);
+
+		double replacedDriveTimePickup = 33;
+		var detourTimeCalculatorPickup = new InsertionDetourTimeCalculator<>(STOP_DURATION, Double::doubleValue,
+				(from, to) -> replacedDriveTimePickup);
+		assertThat(detourTimeCalculatorPickup.calculatePickupDetourTimeLoss(insertion)).isEqualTo(
+				detour.toPickup + STOP_DURATION + detour.fromPickup - replacedDriveTimePickup);
+
+		double replacedDriveTimeDropoff = 111;
+		var detourTimeCalculatorDropoff = new InsertionDetourTimeCalculator<>(STOP_DURATION, Double::doubleValue,
+				(from, to) -> replacedDriveTimeDropoff);
+		assertThat(detourTimeCalculatorDropoff.calculateDropoffDetourTimeLoss(insertion)).isEqualTo(
+				detour.toDropoff + STOP_DURATION + detour.fromDropoff - replacedDriveTimeDropoff);
 	}
 
 	private void assertPickupDetourTimeLoss(InsertionWithDetourData<Double> insertion, double expected) {
