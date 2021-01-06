@@ -114,20 +114,20 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if(!event.getNetworkMode().equals("car")){
-			if( nonCarWarn <=1) {
+		if (!event.getNetworkMode().equals("car")) {
+			if (nonCarWarn <= 1) {
 				logger.warn("non-car modes are supported, however, not properly tested yet.");
 				logger.warn(Gbl.ONLYONCE);
 				nonCarWarn++;
 			}
 		}
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
 		this.vehicleEntersTraffic.put(event.getVehicleId(), linkId2Time);
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>(event.getLinkId(), event.getTime());
 		this.linkenter.put(event.getVehicleId(), linkId2Time);
 	}
 
@@ -136,12 +136,12 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
 		double leaveTime = event.getTime();
-		Link link = (Link) this.scenario.getNetwork().getLinks().get(linkId);
+		Link link = this.scenario.getNetwork().getLinks().get(linkId);
 		double linkLength = link.getLength();
 
 		if (linkLength == 0.) {
-			if (zeroLinkLengthWarnCnt == 0 ){
-				logger.warn("Length of the link "+ linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+			if (zeroLinkLengthWarnCnt == 0) {
+				logger.warn("Length of the link " + linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
 				logger.warn(Gbl.ONLYONCE);
 				zeroLinkLengthWarnCnt++;
 			}
@@ -216,9 +216,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 			} else {
 				VehicleType vehicleType = vehicle.getType() ;
-
 				Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime );
-
 				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 			}
 		}

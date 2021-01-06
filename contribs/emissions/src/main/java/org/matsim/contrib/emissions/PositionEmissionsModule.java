@@ -94,7 +94,7 @@ public class PositionEmissionsModule extends AbstractModule {
         private final Map<Id<Vehicle>, VehicleEntersTrafficEvent> vehiclesInTraffic = new HashMap<>();
         private final Map<Id<Vehicle>, VehicleLeavesTrafficEvent> parkedVehicles = new HashMap<>();
         private final Map<Id<Vehicle>, Double> parkingDurations = new HashMap<>();
-        private final Set<Id<Vehicle>> vehiclesWatingForSecondColdEmissionEvent = new HashSet<>();
+        private final Set<Id<Vehicle>> vehiclesWaitingForSecondColdEmissionEvent = new HashSet<>();
 
         @Inject
         private EmissionCalculator emissionCalculator;
@@ -132,7 +132,7 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getNetworkMode().equals(TransportMode.car)) return;
 
             vehiclesInTraffic.put(event.getVehicleId(), event);
-            vehiclesWatingForSecondColdEmissionEvent.add(event.getVehicleId());
+            vehiclesWaitingForSecondColdEmissionEvent.add(event.getVehicleId());
             var parkingDuration = calculateParkingTime(event.getVehicleId(), event.getTime());
             this.parkingDurations.put(event.getVehicleId(), parkingDuration);
         }
@@ -165,7 +165,7 @@ public class PositionEmissionsModule extends AbstractModule {
             if (trajectories.containsKey(event.getVehicleId())) {
                 computeWarmEmissionEvent(event);
 
-                if (vehiclesWatingForSecondColdEmissionEvent.contains(event.getVehicleId()))
+                if (vehiclesWaitingForSecondColdEmissionEvent.contains(event.getVehicleId()))
                     computeSecondColdEmissionEvent(event);
             } else {
                 computeFirstColdEmissionEvent(event);
@@ -184,7 +184,7 @@ public class PositionEmissionsModule extends AbstractModule {
             var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                     startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
-            var emisPosEv = new EmissionPositionEvent(event, emissions);
+            var emisPosEv = new EmissionPositionEvent(event, emissions, "cold");
             log.info("Cold emission event with number " + emisPosEv.getNumber());
             eventsManager.processEvent(emisPosEv);
         }
@@ -197,12 +197,12 @@ public class PositionEmissionsModule extends AbstractModule {
                 var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                 var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                         event.getTime(), parkingDurations.get(vehicle.getId()), 2);
-                var emisPosEv = new EmissionPositionEvent(event, emissions);
+                var emisPosEv = new EmissionPositionEvent(event, emissions, "cold");
                 log.info("Cold emission event with number " + emisPosEv.getNumber());
                 eventsManager.processEvent(emisPosEv);
 
                 // this makes sure that this is only computed once
-                vehiclesWatingForSecondColdEmissionEvent.remove(vehicle.getId());
+                vehiclesWaitingForSecondColdEmissionEvent.remove(vehicle.getId());
             }
         }
 
@@ -238,8 +238,7 @@ public class PositionEmissionsModule extends AbstractModule {
                 if (speed <= link.getFreespeed() + 0.01) {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
-
-                    eventsManager.processEvent(new EmissionPositionEvent(event, emissions));
+                    eventsManager.processEvent(new EmissionPositionEvent(event, emissions, "warm"));
                 }
             }
         }
@@ -253,17 +252,27 @@ public class PositionEmissionsModule extends AbstractModule {
 
         private final PositionEvent position;
         private final Map<Pollutant, Double> emissions;
+        private final String emissionType;
         private final int id;
 
         public Map<Pollutant, Double> getEmissions() {
             return emissions;
         }
 
-        public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions) {
+        public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions, String emissionType) {
             super(positionEvent.getTime() + 1);
             this.position = positionEvent;
             this.emissions = emissions;
+            this.emissionType = emissionType;
             id = eventCounter.incrementAndGet();
+        }
+
+        public Id<Link> getLinkId() {
+            return position.getLinkId();
+        }
+
+        public String getEmissionType() {
+            return emissionType;
         }
 
         @Override
