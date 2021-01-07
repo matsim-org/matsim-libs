@@ -75,6 +75,7 @@ public abstract class ReflectiveConfigGroupWithConfigurableParameterSets extends
 
 	@Override
 	public final void addParameterSet( ConfigGroup set ) {
+		testForLocked() ;
 		Definition<?> definition = definition(set.getName());
 		ConfigGroup existingParams = definition.getter.get();
 		if (existingParams != null) {

@@ -653,7 +653,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
 	 */
 	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
-		testForLocked() ;
 		addParameterSet( pars );
 	}
 

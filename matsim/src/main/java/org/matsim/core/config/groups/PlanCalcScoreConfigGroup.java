@@ -631,22 +631,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			// check, but I don't know a better place where to add this. kai, jan'18
 
 			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
-//				for (String mode : config.plansCalcRoute().getNetworkModes()) {
-//					String interactionActivityType = createStageActivityType( mode );
-//					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
-//					if (set == null) {
-//						 (we do not want to overwrite this if the use has already set it with other params!)
-//						scoringParameterSet.addActivityParams( createStageActivityParams( mode ) );
-//					}
-//				}
+
+				for (String mode : config.plansCalcRoute().getNetworkModes()) {
+					createAndAddInteractionActivity( scoringParameterSet, mode );
+				}
+				// (In principle, the for loop following next should be sufficient, i.e. taking the necessary modes from scoring.
+				// There is, however, a test that checks if all network modes from planCalcRoute have
+				// interaction activities.  So we rather satisfy it than changing the test.  kai, jan'21
+
 				for( String mode : scoringParameterSet.getModes().keySet() ){
-					log.error("mode=" + mode);
-					String interactionActivityType = createStageActivityType( mode );
-					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
-					if (set == null) {
-						// (we do not want to overwrite this if the use has already set it with other params!)
-						scoringParameterSet.addActivityParams( createStageActivityParams( mode ) );
-					}
+					createAndAddInteractionActivity( scoringParameterSet, mode );
 				}
 			}
 //		}
@@ -659,6 +653,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			}
 		}
 
+	}
+	private static void createAndAddInteractionActivity( ScoringParameterSet scoringParameterSet, String mode ){
+		String interactionActivityType = createStageActivityType( mode );
+		ActivityParams set = scoringParameterSet.getActivityParamsPerType().get( interactionActivityType );
+		if( set == null ){
+//						 (we do not want to overwrite this if the use has already set it with other params!)
+			scoringParameterSet.addActivityParams( createStageActivityParams( mode ) );
+		}
 	}
 
 	public boolean isMemorizingExperiencedPlans() {
