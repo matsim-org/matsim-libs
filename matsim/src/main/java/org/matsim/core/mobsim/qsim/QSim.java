@@ -34,7 +34,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.LastEventOfSimStep;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -406,11 +405,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		// this gives after sim step listeners like snapshot generator the opportunity to generate events
 		// for the current time step.
 		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
-		// this triggers finishing of parallel events processing
-		this.events.processEvent(new LastEventOfSimStep(now));
-		// this awaits finishing of parallel events processing
 		this.events.afterSimStep(now);
-
 
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
 		boolean doContinue = (this.agentCounter.isLiving() && (this.stopTime > now));

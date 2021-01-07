@@ -57,12 +57,10 @@ public class SimStepParallelEventsManagerImplTest {
 		events.initProcessing();
 		events.processEvent(new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)));
 		events.processEvent(new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)));
-		events.processEvent(new LastEventOfSimStep(0));
 		events.afterSimStep(0.0);
 		events.processEvent(new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)));
 		events.processEvent(new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)));
 		events.processEvent(new LastEventOfSimStep(1));
-		events.afterSimStep(1.0);
 		events.finishProcessing();
 
 		assertThat(collector.getEvents(),

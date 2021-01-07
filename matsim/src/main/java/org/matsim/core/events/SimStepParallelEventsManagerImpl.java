@@ -227,6 +227,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		try {
 			Gbl.assertNotNull(this.processedEventsChecker);
 			this.processedEventsChecker.setTime(time);
+			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
