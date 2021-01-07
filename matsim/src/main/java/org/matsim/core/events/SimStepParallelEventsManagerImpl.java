@@ -35,7 +35,6 @@ import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -128,15 +127,15 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		for (EventsManager eventsManager : this.eventsManagers) eventsManager.initProcessing();
 
 		Queue<Event>[] eventsQueuesArray = new Queue[this.numOfThreads];
-		List<Queue<Event>> eventsQueues = new ArrayList<Queue<Event>>();
+		List<Queue<Event>> eventsQueues = new ArrayList<>();
 		for (int i = 0; i < numOfThreads; i++) {
 			Queue<Event> eventsQueue = new LinkedBlockingQueue<>();
 			eventsQueues.add(eventsQueue);
 			eventsQueuesArray[i] = eventsQueue;
 		}
-				
+
 		/*
-		 * Add a null entry to the list which will be set as nextEventsQueue in the last ProcessEventsThread. 
+		 * Add a null entry to the list which will be set as nextEventsQueue in the last ProcessEventsThread.
 		 */
 		eventsQueues.add(null);
 		
@@ -226,7 +225,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		}
 		
 		try {
-			Gbl.assertNotNull( this.processedEventsChecker );
+			Gbl.assertNotNull(this.processedEventsChecker);
 			this.processedEventsChecker.setTime(time);
 			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
