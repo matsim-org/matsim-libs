@@ -184,7 +184,7 @@ public class PositionEmissionsModule extends AbstractModule {
             var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                     startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
-            var emisPosEv = new EmissionPositionEvent(event, emissions, "cold");
+            var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
             log.info("Cold emission event with number " + emisPosEv.getNumber());
             eventsManager.processEvent(emisPosEv);
         }
@@ -197,7 +197,7 @@ public class PositionEmissionsModule extends AbstractModule {
                 var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                 var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                         event.getTime(), parkingDurations.get(vehicle.getId()), 2);
-                var emisPosEv = new EmissionPositionEvent(event, emissions, "cold");
+                var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
                 log.info("Cold emission event with number " + emisPosEv.getNumber());
                 eventsManager.processEvent(emisPosEv);
 
@@ -238,13 +238,13 @@ public class PositionEmissionsModule extends AbstractModule {
                 if (speed <= link.getFreespeed() + 0.01) {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
                     var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
-                    eventsManager.processEvent(new EmissionPositionEvent(event, emissions, "warm"));
+                    eventsManager.processEvent(new PositionEmissionEvent(event, emissions, "warm"));
                 }
             }
         }
     }
 
-    public static class EmissionPositionEvent extends Event {
+    public static class PositionEmissionEvent extends Event {
 
         public static final String EVENT_TYPE = "emissionPosition";
 
@@ -259,7 +259,7 @@ public class PositionEmissionsModule extends AbstractModule {
             return emissions;
         }
 
-        public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions, String emissionType) {
+        public PositionEmissionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions, String emissionType) {
             super(positionEvent.getTime());
             this.position = positionEvent;
             this.emissions = emissions;

@@ -106,7 +106,6 @@ public class TestPositionEmissionModule {
 
         config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
 
-
         // create a scenario:
         final MutableScenario scenario = ScenarioUtils.createMutableScenario(config);
         scenario.setNetwork(createSingleLinkNetwork());
@@ -167,8 +166,8 @@ public class TestPositionEmissionModule {
                 case WarmEmissionEvent.EVENT_TYPE:
                     sumAll(classicEmissions, ((WarmEmissionEvent) event).getWarmEmissions());
                     break;
-                case PositionEmissionsModule.EmissionPositionEvent.EVENT_TYPE:
-                    sumAll(positionEmissions, ((PositionEmissionsModule.EmissionPositionEvent) event).getEmissions());
+                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
+                    sumAll(positionEmissions, ((PositionEmissionsModule.PositionEmissionEvent) event).getEmissions());
                     break;
             }
         }
@@ -185,8 +184,8 @@ public class TestPositionEmissionModule {
                     if (warmEmissionEvent.getLinkId().equals(Id.createLinkId("link")))
                         sumAll(classicEmissions, warmEmissionEvent.getWarmEmissions());
                     break;
-                case PositionEmissionsModule.EmissionPositionEvent.EVENT_TYPE:
-                    var positionEvent = (PositionEmissionsModule.EmissionPositionEvent) event;
+                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
+                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
                     if (positionEvent.getLinkId().equals(Id.createLinkId("link")) && positionEvent.getEmissionType().equals("warm"))
                         sumAll(positionEmissions, positionEvent.getEmissions());
                     break;
@@ -204,8 +203,8 @@ public class TestPositionEmissionModule {
                     var coldEmissionEvent = (ColdEmissionEvent) event;
                     sumAll(classicEmissions, coldEmissionEvent.getColdEmissions());
                     break;
-                case PositionEmissionsModule.EmissionPositionEvent.EVENT_TYPE:
-                    var positionEvent = (PositionEmissionsModule.EmissionPositionEvent) event;
+                case PositionEmissionsModule.PositionEmissionEvent.EVENT_TYPE:
+                    var positionEvent = (PositionEmissionsModule.PositionEmissionEvent) event;
                     if (positionEvent.getEmissionType().equals("cold"))
                         sumAll(positionEmissions, positionEvent.getEmissions());
                     break;
