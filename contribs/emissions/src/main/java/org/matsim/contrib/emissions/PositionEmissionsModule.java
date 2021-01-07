@@ -237,7 +237,7 @@ public class PositionEmissionsModule extends AbstractModule {
                 // add a rounding error to the compared freespeed. The warm emission module has a tolerance of 1km/h
                 if (speed <= link.getFreespeed() + 0.01) {
                     var vehicle = vehicles.getVehicles().get(event.getVehicleId());
-                    var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.speed());
+                    var emissions = emissionCalculator.calculateWarmEmissions(vehicle, link, distanceToLastPosition, travelTime, event.getColorValueBetweenZeroAndOne());
                     eventsManager.processEvent(new EmissionPositionEvent(event, emissions, "warm"));
                 }
             }
@@ -260,7 +260,7 @@ public class PositionEmissionsModule extends AbstractModule {
         }
 
         public EmissionPositionEvent(PositionEvent positionEvent, Map<Pollutant, Double> emissions, String emissionType) {
-            super(positionEvent.getTime() + 1);
+            super(positionEvent.getTime());
             this.position = positionEvent;
             this.emissions = emissions;
             this.emissionType = emissionType;

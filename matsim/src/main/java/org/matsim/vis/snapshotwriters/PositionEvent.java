@@ -45,7 +45,7 @@ public class PositionEvent extends Event implements BasicLocation, HasPersonId {
         return position.getVehicleId();
     }
 
-    public double speed() {
+    public double getColorValueBetweenZeroAndOne() {
         return position.getColorValueBetweenZeroAndOne();
     }
 
