@@ -49,27 +49,30 @@ public class SimStepParallelEventsManagerImplTest {
 			}
 
 			@Override
-			public void reset(int iteration) {}
+			public void reset(int iteration) {
+			}
 		});
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		events.initProcessing();
 		events.processEvent(new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)));
 		events.processEvent(new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)));
+		events.processEvent(new LastEventOfSimStep(0));
 		events.afterSimStep(0.0);
 		events.processEvent(new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)));
 		events.processEvent(new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)));
+		events.processEvent(new LastEventOfSimStep(1));
 		events.afterSimStep(1.0);
 		events.finishProcessing();
 
 		assertThat(collector.getEvents(),
-			contains(
-					new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new PersonStuckEvent(0.0, Id.createPersonId(0), Id.createLinkId(0), "car"),
-					new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car")));
+				contains(
+						new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
+						new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
+						new PersonStuckEvent(0.0, Id.createPersonId(0), Id.createLinkId(0), "car"),
+						new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
+						new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
+						new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car")));
 	}
 
 }
