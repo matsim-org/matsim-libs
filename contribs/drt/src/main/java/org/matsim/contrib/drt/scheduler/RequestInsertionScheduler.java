@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -91,7 +91,7 @@ public class RequestInsertionScheduler {
 	private void insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
-		List<Stop> stops = vehicleEntry.stops;
+		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickup().index;
 		int dropoffIdx = insertion.getDropoff().index;
 
@@ -235,7 +235,7 @@ public class RequestInsertionScheduler {
 	private void insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
-		List<Stop> stops = vehicleEntry.stops;
+		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickup().index;
 		int dropoffIdx = insertion.getDropoff().index;
 

@@ -22,6 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -107,6 +108,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	private final boolean excep = false;
 
 	@Test
+	@Ignore
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 
 		setUp();

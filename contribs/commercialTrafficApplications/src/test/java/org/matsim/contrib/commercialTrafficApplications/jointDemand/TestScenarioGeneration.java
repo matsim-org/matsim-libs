@@ -36,6 +36,8 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.List;
+
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
@@ -110,7 +112,7 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", "pizza_italian;1;" + 12 * 3600 + ";" + 13 * 3600 + ";180");
+        work.getAttributes().putAttribute(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", List.of("pizza_italian","1",String.valueOf(12 * 3600), String.valueOf(13 * 3600),"180"));
         plan.addActivity(work);
         plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 

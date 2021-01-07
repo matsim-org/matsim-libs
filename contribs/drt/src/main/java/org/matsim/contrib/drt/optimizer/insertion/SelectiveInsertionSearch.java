@@ -53,16 +53,16 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		this.forkJoinPool = forkJoinPool;
 
 		double restrictiveBeelineSpeedFactor = ((SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams()).getRestrictiveBeelineSpeedFactor();
-
-		restrictiveDetourTimesProvider = new DetourTimesProvider(
-				DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(restrictiveBeelineSpeedFactor,
-						dvrpTravelTimeMatrix));
+		var detourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(restrictiveBeelineSpeedFactor,
+				dvrpTravelTimeMatrix);
+		restrictiveDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
 
 		initialInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue));
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue,
+						detourTimeEstimator));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime));
+				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime, null));
 	}
 
 	@Override

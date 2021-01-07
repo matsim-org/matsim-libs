@@ -22,6 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -107,6 +108,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	private final boolean excep = false;
 
 	@Test
+	@Ignore
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		setUp();
 
@@ -116,16 +118,16 @@ public class TestColdEmissionAnalysisModuleCase2 {
 
 		// second case: complete data
 		// corresponding entry in detailed table
-		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
+		Collections.addAll(testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor);
 
-		testCases.add( testCase2 );
+		testCases.add(testCase2);
 
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
+		for (List<Object> tc : testCases) {
+			logger.info("Running testcase: " + testCases.indexOf(tc) + " " + tc.toString());
 			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+			Id<Link> linkId = Id.create("linkId" + testCases.indexOf(tc), Link.class);
+			Id<Vehicle> vehicleId = Id.create("vehicleId" + testCases.indexOf(tc), Vehicle.class);
+			Id<VehicleType> vehicleTypeId = Id.create(tc.get(0) + ";" + tc.get(1) + ";" + tc.get(2) + ";" + tc.get(3), VehicleType.class);
 			
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 			logger.info("VehicleId: " + vehicle.getId().toString());

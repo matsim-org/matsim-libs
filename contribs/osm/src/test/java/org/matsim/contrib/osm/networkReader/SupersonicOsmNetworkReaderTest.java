@@ -210,7 +210,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
-		assertEquals(50 / 3.6 * 0.5, link.getFreespeed(), 0);
+		assertEquals(50 / 3.6 * LinkProperties.DEFAULT_FREESPEED_FACTOR, link.getFreespeed(), 0);
 	}
 
 	@Test
