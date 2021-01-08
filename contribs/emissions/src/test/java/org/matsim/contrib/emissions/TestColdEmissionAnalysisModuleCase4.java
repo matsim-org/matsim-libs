@@ -101,8 +101,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		
 		/*
-		 * six test cases with complete input data
-		 * or input that should be assigned to average/default cases
+		 * test cases with complete input data or input that should be assigned to average/default cases
 		 */
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 
@@ -112,10 +111,6 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		// -> falling back to average table
 		Collections.addAll( testCase4, "PASSENGER_CAR", "", "", "", averageAverageFactor );
 
-		// sixth case: heavy goods vehicle
-		// -> throw warning -> use detailed or average table for passenger cars
-		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-		testCase4.add( testCase4 );
 
 		logger.info("Running testcase: " + testCase4.indexOf( 0 ) + " " + testCase4.toString());
 		Id<Link> linkId = Id.create( "linkId" + testCase4.indexOf( 0 ), Link.class );

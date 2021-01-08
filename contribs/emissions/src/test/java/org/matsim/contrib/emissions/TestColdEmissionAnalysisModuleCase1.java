@@ -36,7 +36,6 @@ import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
-import static org.matsim.contrib.emissions.Pollutant.*;
 
 /**
  * @author julia

@@ -36,7 +36,6 @@ import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
-import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /**
@@ -92,9 +91,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double fakeFactor = -1.;
-	
-	private boolean excep = false;
-	
+
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 
@@ -105,9 +102,9 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		// error when using the average entry.
 		Collections.addAll( testCase3, "PASSENGER_CAR", diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
 
-		logger.info("Running testcase: " + testCase3.indexOf( testCase3 ) + " " + testCase3.toString());
-		Id<Link> linkId = Id.create( "linkId" + testCase3.indexOf( testCase3 ), Link.class );
-		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase3.indexOf( testCase3 ), Vehicle.class );
+		logger.info("Running testcase: " + testCase3.toString());
+		Id<Link> linkId = Id.create( "linkId" +  testCase3 , Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase3, Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase3.get( 0 ) + ";" + testCase3.get( 1 ) + ";" + testCase3.get( 2 ) + ";" + testCase3.get( 3 ), VehicleType.class );
 
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );

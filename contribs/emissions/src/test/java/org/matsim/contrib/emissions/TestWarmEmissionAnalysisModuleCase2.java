@@ -148,10 +148,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		{
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
-			
-			// test result:
-			switch( this.emissionsComputationMethod ) {
-				case StopAndGoFraction:
 					//KMT Feb'20: Trying to understand the result:
 					// - StopAndGo fraction is computed as 0 --> ONLY freeFlow values needed and looked up
 					// - DETAILED FreeFlow value is available in the table (1.0E-4 g/km);  StopAndGo value is NOT available in the table
@@ -160,29 +156,14 @@ public class TestWarmEmissionAnalysisModuleCase2{
 					// --> Now, after implementing the new fallback behaviour, it is looking up both values (FreeFlow or StopGo) ways independently from each other. Therefore the result comes from the detailed table (1.0E-4 g/km) * * 0.1 km = 1.0E-5 g/km
 					// -----> We need a decision here, if we want allow that inconsistent(?) lookup of FreeFlow and Detailed values with different grade of detail or not.
 					// After discussion with Kai N. we decided to let it as it is for the time being. I will add a log.info in the consistency checker.  KMT Jul'20
-					Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON ); //(*#)
-					break;
 
-				case AverageSpeed:
-					Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
-					break;
-				default:
-					throw new IllegalStateException( "Unexpected value: " + this.emissionsComputationMethod );
-			}
+			//results should be equal here, because in both cases only the freeflow value is relevant (100% freeflow, 0% stop&go).
+			Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON ); //(*#)
 
-			// throw corresponding event:
+			// throw and test corresponding event:
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
-			// test resulting event:
-			switch( emissionsComputationMethod ) {
-				case StopAndGoFraction:
-					Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 (g/km -- see expected values a few lines above(*#) * number of entries in enum Pollutant)
-					break;
-				case AverageSpeed:
-					Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
-					break;
-				default:
-					throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
-			}
+			Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 (g/km -- see expected values a few lines above(*#) * number of entries in enum Pollutant)
+
 			emissionEventManager.reset();
 			warmEmissions.clear();
 		}

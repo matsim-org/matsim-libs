@@ -209,21 +209,16 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 				throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
 		}
 
-		actualSpeed = avgPassengerCarSpeed[SG_INDEX] - 5;
-		travelTime = linkLength/actualSpeed;
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
+		{
+			actualSpeed = avgPassengerCarSpeed[SG_INDEX] - 5;
+			travelTime = linkLength / actualSpeed;
+			warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime * 3.6);
+			Assert.assertEquals(detailedPetrolFactor[SG_INDEX] * (linkLength / 1000.), warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
 
-		switch( emissionsComputationMethod ) {
-			case StopAndGoFraction:
-				Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
-				break;
-			case AverageSpeed:
-				Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
+			//results should be equal here, because in both cases only the s&g value is relevant (0% freeflow, 100% stop&go).
+			Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
+
 		}
 	}
 

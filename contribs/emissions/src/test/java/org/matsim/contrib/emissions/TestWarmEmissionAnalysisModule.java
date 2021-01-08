@@ -21,7 +21,6 @@
 package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -42,8 +41,6 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.Pollutant.*;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed;
-import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.StopAndGoFraction;
 
 /**
  * @author julia
@@ -87,13 +84,11 @@ public class TestWarmEmissionAnalysisModule {
 
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
-	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
-	private boolean excep =false;
+	private boolean excep = false;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
 	private WarmEmissionAnalysisModule emissionsModule;
-	private Map<Pollutant, Double> warmEmissions;
 
 	//average speeds should be the same across all car types, but vary by traffic situation
 	static final Double AVG_PASSENGER_CAR_SPEED_FF_KMH = 20.;
@@ -101,8 +96,6 @@ public class TestWarmEmissionAnalysisModule {
 	// (These must be in kmh, since at some later point they are divided by 3.6.  However, this makes them awfully slow for practical purposes ...  kai, jan'20)
 
 	// emission factors for tables - no duplicates!
-	private static final Double DETAILED_PETROL_FACTOR_FF = .1;
-	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
 	private static final Double DETAILED_SGFF_FACTOR_FF =   .000011;
 	private static final Double DETAILED_SGFF_FACTOR_SG = 	.0000011;
 	private static final Double AVG_PC_FACTOR_FF = 1.;
@@ -120,17 +113,7 @@ public class TestWarmEmissionAnalysisModule {
 	private final String sgffTechnology = "sg ff technology";
 	private final String sgffConcept = "sg ff concept";
 	private final String sgffSizeClass = "sg ff size class";
-	private final Double sgffDetailedFfSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private final Double sgffDetailedsgSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
 
-	//This case is no longer valid -- the one above, or the one below?
-
-	// case 10 - data in detailed table, stop go speed > free flow speed
-	private final String tableTechnology = "petrol (4S)";
-	private final String tableSizeClass= "<1,4L";
-	private final String tableConcept = "PC-P-Euro-0";
-	private final Double tableffSpeed = AVG_PASSENGER_CAR_SPEED_FF_KMH;
-	private final double tablesgSpeed = AVG_PASSENGER_CAR_SPEED_SG_KMH;
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {
@@ -153,7 +136,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		Id<Vehicle> sgffVehicleId = Id.create("vehicle sg equals ff", Vehicle.class);
 		double sgffLinklength = 4000.;
-		Link sgflink = createMockLink("link sgf", sgffLinklength, sgffDetailedFfSpeed / 3.6);
+		Link sgflink = createMockLink("link sgf", sgffLinklength, AVG_PASSENGER_CAR_SPEED_FF_KMH / 3.6);
 		EmissionUtils.setHbefaRoadType(sgflink, sgffRoadCatgory);
 
 		Id<VehicleType> sgffVehicleTypeId = Id.create( PASSENGER_CAR + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept, VehicleType.class );
@@ -163,18 +146,24 @@ public class TestWarmEmissionAnalysisModule {
 		//avg>ff
 		boolean exceptionThrown = false;
 		try{
-			warmEmissions= emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, .5*sgffLinklength/sgffDetailedFfSpeed*3.6 );
+			emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, .5 * sgffLinklength / AVG_PASSENGER_CAR_SPEED_FF_KMH * 3.6);
 		}
 		catch(RuntimeException re){
 			exceptionThrown = true;
 		}
 		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception",exceptionThrown);
-		//avg=ff=sg -> use ff factors
-		warmEmissions= emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength/sgffDetailedFfSpeed*3.6 );
-		Assert.assertEquals( DETAILED_SGFF_FACTOR_FF *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
-		//avg<sg -> use sg factors 
-		warmEmissions= emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, 2*sgffLinklength/sgffDetailedFfSpeed*3.6 );
-		Assert.assertEquals( DETAILED_SGFF_FACTOR_SG *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
+
+
+		{ //avg=ff=sg -> use ff factors
+			Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength / AVG_PASSENGER_CAR_SPEED_FF_KMH * 3.6);
+			Assert.assertEquals(DETAILED_SGFF_FACTOR_FF * sgffLinklength / 1000., warmEmissions.get(NO2), MatsimTestUtils.EPSILON);
+		}
+
+
+		{ //avg<sg -> use sg factors
+			Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, 2*sgffLinklength/ AVG_PASSENGER_CAR_SPEED_FF_KMH *3.6 );
+			Assert.assertEquals( DETAILED_SGFF_FACTOR_SG *sgffLinklength/1000., warmEmissions.get(NO2 ), MatsimTestUtils.EPSILON );
+		}
 	}
 
 	@Test
@@ -264,9 +253,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		//  vehicle information string is 'null'
 		Id<Vehicle> noeVehicleId = Id.create("veh 8", Vehicle.class);
-		Id<VehicleType> noeVehicleTypeId = null;
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
-		Vehicle noeVehicle = vehFac.createVehicle(noeVehicleId, vehFac.createVehicleType(noeVehicleTypeId));
+		Vehicle noeVehicle = vehFac.createVehicle(noeVehicleId, vehFac.createVehicleType(null));
 		double noeLinkLength = 22.;
 		Link noelink = createMockLink("link 8", noeLinkLength, noeFreeSpeed);
 
@@ -291,13 +279,13 @@ public class TestWarmEmissionAnalysisModule {
 		Id<Vehicle> tableVehicleId = Id.create("vehicle 8", Vehicle.class);
 		double tableLinkLength= 30.*1000;
 		Id<VehicleType> tableVehicleTypeId = Id.create(
-				PASSENGER_CAR + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept, VehicleType.class );
+				PASSENGER_CAR + ";" + "petrol (4S)" +";" + "<1,4L" +";"+ "PC-P-Euro-0", VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle tableVehicle = vehFac.createVehicle(tableVehicleId, vehFac.createVehicleType(tableVehicleTypeId));
-		Link tableLink = createMockLink("link table", tableLinkLength, tableffSpeed / 3.6);
+		Link tableLink = createMockLink("link table", tableLinkLength, AVG_PASSENGER_CAR_SPEED_FF_KMH / 3.6);
 
 		// ff < avg < ff+1 - handled like free flow
-		Double travelTime =  tableLinkLength/(tableffSpeed+0.5)*3.6;
+		double travelTime =  tableLinkLength/(AVG_PASSENGER_CAR_SPEED_FF_KMH +0.5)*3.6;
 		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, travelTime );
 		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assert.assertEquals(tableLinkLength/1000., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
@@ -310,7 +298,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// ff < sg < avg - handled like free flow as well - no additional test needed
 		// avg < ff < sg - handled like stop go 
-		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, 2* tableLinkLength/(tableffSpeed)*3.6 );
+		emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, tableLink, 2* tableLinkLength/(AVG_PASSENGER_CAR_SPEED_FF_KMH)*3.6 );
 		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
@@ -364,7 +352,7 @@ public class TestWarmEmissionAnalysisModule {
 
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			detWarmFactor.setWarmEmissionFactor( DETAILED_SGFF_FACTOR_FF );
-			detWarmFactor.setSpeed( sgffDetailedFfSpeed );
+			detWarmFactor.setSpeed(AVG_PASSENGER_CAR_SPEED_FF_KMH);
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -384,7 +372,7 @@ public class TestWarmEmissionAnalysisModule {
 
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			detWarmFactor.setWarmEmissionFactor( DETAILED_SGFF_FACTOR_SG );
-			detWarmFactor.setSpeed( sgffDetailedsgSpeed );
+			detWarmFactor.setSpeed(AVG_PASSENGER_CAR_SPEED_FF_KMH);
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -462,16 +450,13 @@ public class TestWarmEmissionAnalysisModule {
 			hbefaRoadTrafficSpeeds.putIfAbsent( roadVehicleCategoryKey, new HashMap<>() );
 
 
-			// if the value is not set (returnig null) no exeption is thrown
-			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) == null) {
-
-			}
-			// avoid overriding of speeds from average table with speed from detailled table
-			else {
+			// if the value is already set (returning not null) an exception is thrown
+			// avoid overriding of speeds from average table with speed from detailed table
+			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != null) {
 				if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != emissionFactor.getSpeed()){
 					System.out.println(hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()));
 					System.out.println(emissionFactor.getSpeed());
-					throw new RuntimeException("Try to override speeds from average table with speed from detailled table. This may lead to wrong emission calculations. KMT/GR Aug'20");
+					throw new RuntimeException("Try to override speeds from average table with speed from detailed table. This may lead to wrong emission calculations. KMT/GR Aug'20");
 				}
 			}
 
