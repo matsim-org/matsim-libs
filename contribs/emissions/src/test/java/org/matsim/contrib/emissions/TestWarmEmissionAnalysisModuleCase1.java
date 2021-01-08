@@ -85,6 +85,8 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
+	private static final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
@@ -101,6 +103,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 	private static final String PETROL_CONCEPT ="<1,4L";
 	private static final Double PETROL_SPEED_FF = 20.; //km/h
 	private static final Double PETROL_SPEED_SG = 10.; //km/h
+
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {
@@ -122,7 +125,7 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
@@ -149,12 +152,12 @@ public class TestWarmEmissionAnalysisModuleCase1{
 		Map<Pollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions( vehicle, mockLink, linkLength / PETROL_SPEED_FF * 3.6 );
 		Assert.assertEquals(DETAILED_PETROL_FACTOR_FF *linkLength/1000., warmEmissions.get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
 
-		HandlerToTestEmissionAnalysisModules.reset();
+		emissionEventManager.reset();
 
 		warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, mockLink.getId(), vehicleId, warmEmissions );
-		Assert.assertEquals( pollutants.size() * DETAILED_PETROL_FACTOR_FF *linkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+		Assert.assertEquals( pollutants.size() * DETAILED_PETROL_FACTOR_FF *linkLength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
 
-		HandlerToTestEmissionAnalysisModules.reset();
+		emissionEventManager.reset();
 		warmEmissions.clear();
 	}
 	

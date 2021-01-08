@@ -83,11 +83,14 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	private static final Logger log = Logger.getLogger( TestWarmEmissionAnalysisModuleCase4.class );
 
+	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
+
 	private Map<Pollutant, Double> warmEmissions;
 
 	// emission factors for tables - no duplicates!
@@ -137,17 +140,17 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		// sub case avg speed = stop go speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgSgVelocity*3.6 );
 		Assert.assertEquals( AVG_PC_FACTOR_SG *lpgLinkLength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset();
+		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
-		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_SG *lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
+		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_SG *lpgLinkLength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
+		emissionEventManager.reset(); warmEmissions.clear();
 
 		// sub case avg speed = free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgFreeVelocity*3.6 );
 		Assert.assertEquals( AVG_PC_FACTOR_FF *lpgLinkLength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset();
+		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
-		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_FF *lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_FF *lpgLinkLength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
 		warmEmissions.clear();
 
 	}
@@ -221,7 +224,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		}
 		log.warn( "" );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );

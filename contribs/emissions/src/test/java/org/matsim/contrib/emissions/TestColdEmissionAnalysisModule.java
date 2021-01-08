@@ -71,8 +71,6 @@ import org.matsim.vehicles.VehicleUtils;
 public class TestColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModule.class);
 	
-	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-	
 	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
@@ -159,16 +157,18 @@ public class TestColdEmissionAnalysisModule {
 		Id<Vehicle> vehicleId7 = Id.create( "vehicle 11", Vehicle.class );
 		
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId7, VehicleUtils.getFactory().createVehicleType( vehInfo11 ) );
-		
-		HandlerToTestEmissionAnalysisModules.reset();
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId11, startTime, parkingDuration, tableAccDistance);
+
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId11, startTime, parkingDuration, tableAccDistance);
+
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
+
 		String message = "The expected emissions for an emissions event with vehicle information string '" + vehInfo11 + "' are " +
-						     numberOfColdEmissions * averageAverageFactor + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+						     numberOfColdEmissions * averageAverageFactor + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, numberOfColdEmissions * averageAverageFactor, sumOfEmissions, MatsimTestUtils.EPSILON );
 		
 	}
 	
-	private ColdEmissionAnalysisModule setUp() {
+	private static ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		
@@ -181,10 +181,11 @@ public class TestColdEmissionAnalysisModule {
 
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
+		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 		
 	}
-	
+
+
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
 		// create all needed and one unneeded entry for the detailed table
 		{

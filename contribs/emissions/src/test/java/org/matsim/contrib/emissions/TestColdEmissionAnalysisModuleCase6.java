@@ -62,8 +62,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase6.class);
-	
-	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
 	// same values as int for table
@@ -117,7 +116,6 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, detailedPetrolFactor);
 
 		logger.info("Running testcase: " + testCase6 + " " +testCase6.toString());
-		HandlerToTestEmissionAnalysisModules.reset();
 		Id<Link> linkId = Id.create( "linkId" + testCase6, Link.class );
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase6, Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase6.get( 0 ) + ";" + testCase6.get( 1 ) + ";" + testCase6.get( 2 ) + ";" + testCase6.get( 3 ), VehicleType.class );
@@ -125,9 +123,12 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-		String message = "The expected emissions for " + testCase6.toString() + " are " + numberOfColdEmissions * (Double) testCase6.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase6.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
+
+		String message = "The expected emissions for " + testCase6.toString() + " are " + numberOfColdEmissions * (Double) testCase6.get( 4 ) + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase6.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 	}
 	
 	private ColdEmissionAnalysisModule setUp() {
@@ -139,14 +140,9 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+
+		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 	}
 	
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {

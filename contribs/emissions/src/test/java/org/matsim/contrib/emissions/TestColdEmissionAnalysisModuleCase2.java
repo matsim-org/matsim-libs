@@ -107,17 +107,18 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		ArrayList<Object> testCase2 = new ArrayList<>();
 		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
 
-		HandlerToTestEmissionAnalysisModules.reset();
 		Id<Link> linkId = Id.create( "linkId" + testCase2, Link.class );
 		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase2 , Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase2.get( 0 ) + ";" + testCase2.get( 1 ) + ";" + testCase2.get( 2 ) + ";" + testCase2.get( 3 ), VehicleType.class );
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
-			
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-		String message = "The expected emissions for " + testCase2.toString() + " are " + numberOfColdEmissions * (Double) testCase2.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase2.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
+		
+		String message = "The expected emissions for " + testCase2.toString() + " are " + numberOfColdEmissions * (Double) testCase2.get( 4 ) + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase2.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 		}
 		
 
@@ -131,7 +132,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 
 		//This represents the previous behavior, which falls back to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);

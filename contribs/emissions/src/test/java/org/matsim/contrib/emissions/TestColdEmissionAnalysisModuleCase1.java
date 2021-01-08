@@ -65,7 +65,6 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 public class TestColdEmissionAnalysisModuleCase1 {
 
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase1.class);
-	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.0;
@@ -120,13 +119,14 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
 
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		final Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
-		String message = "The expected emissions for " + testCase1.toString() + " are " + numberOfColdEmissions * (Double) testCase1.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+		String message = "The expected emissions for " + testCase1.toString() + " are " + numberOfColdEmissions * (Double) testCase1.get(4) + " but were " + sumOfEmissions;
+		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4), sumOfEmissions, MatsimTestUtils.EPSILON);
 	}
 
-	private ColdEmissionAnalysisModule setUp() {
+	private static ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 
@@ -135,18 +135,13 @@ public class TestColdEmissionAnalysisModuleCase1 {
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ((Boolean) true == null) {
-			ecg.setHbefaVehicleDescriptionSource(
-					EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes);
-		} else if (true) {
-			ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
-		}
+		ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
 		
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
 		// This test seems to refer to an direct lookup in average table 
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
+		return new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
 	}
 
 	private static void fillDetailedTable(

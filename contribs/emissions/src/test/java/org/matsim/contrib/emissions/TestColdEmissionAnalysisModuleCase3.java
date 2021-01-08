@@ -63,8 +63,6 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 public class TestColdEmissionAnalysisModuleCase3 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase3.class);
 	
-	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-	
 	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
@@ -106,26 +104,26 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
-		List<ArrayList> testCases = new ArrayList<>();
 		ArrayList<Object> testCase3 = new ArrayList<>();
 		// third case: complete data
 		// corresponding entries in average and detailed table; should use the detailed entry; thus
 		// error when using the average entry.
 		Collections.addAll( testCase3, passengercar, diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
-		testCases.add( testCase3 );
 
-		logger.info("Running testcase: " + testCases.indexOf( testCase3 ) + " " + testCase3.toString());
-		HandlerToTestEmissionAnalysisModules.reset();
-		Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( testCase3 ), Link.class );
-		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( testCase3 ), Vehicle.class );
+		logger.info("Running testcase: " + testCase3.indexOf( testCase3 ) + " " + testCase3.toString());
+		Id<Link> linkId = Id.create( "linkId" + testCase3.indexOf( testCase3 ), Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase3.indexOf( testCase3 ), Vehicle.class );
 		Id<VehicleType> vehicleTypeId = Id.create( testCase3.get( 0 ) + ";" + testCase3.get( 1 ) + ";" + testCase3.get( 2 ) + ";" + testCase3.get( 3 ), VehicleType.class );
 
 		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-		String message = "The expected emissions for " + testCase3.toString() + " are " + numberOfColdEmissions * (Double) testCase3.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase3.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
+
+		String message = "The expected emissions for " + testCase3.toString() + " are " + numberOfColdEmissions * (Double) testCase3.get( 4 ) + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase3.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 
 		
 	}
@@ -139,17 +137,12 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 //
-		return coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
+		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 		
 	}
 	

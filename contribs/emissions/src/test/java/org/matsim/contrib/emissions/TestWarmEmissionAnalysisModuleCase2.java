@@ -82,11 +82,14 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
+	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
+
 
 	//private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
@@ -172,15 +175,15 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			// test resulting event:
 			switch( emissionsComputationMethod ) {
 				case StopAndGoFraction:
-					Assert.assertEquals( 2.3, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 (g/km -- see expected values a few lines above(*#) * number of entries in enum Pollutant)
+					Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 (g/km -- see expected values a few lines above(*#) * number of entries in enum Pollutant)
 					break;
 				case AverageSpeed:
-					Assert.assertEquals( 2.3, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+					Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
 					break;
 				default:
 					throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
 			}
-			HandlerToTestEmissionAnalysisModules.reset();
+			emissionEventManager.reset();
 			warmEmissions.clear();
 		}
 
@@ -191,10 +194,10 @@ public class TestWarmEmissionAnalysisModuleCase2{
 
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
 			Assert.assertEquals(
-					pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., HandlerToTestEmissionAnalysisModules.getSum(),
+					pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., emissionEventManager.getSum(),
 					MatsimTestUtils.EPSILON );
 
-			HandlerToTestEmissionAnalysisModules.reset();
+			emissionsModule.reset();
 			warmEmissions.clear();
 		}
 	}
@@ -250,7 +253,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 				avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );

@@ -81,12 +81,11 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
+	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
-
-
-	private Map<Pollutant, Double> warmEmissions;
 
 	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
 
@@ -99,6 +98,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	private final String zeroSizeClass = "zero size class";
 	private final Double zeroFreeVelocity = 20.; //km/h
 	private final Double zeroSgVelocity = 0.; //km/h
+
 
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
@@ -136,13 +136,12 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6 );
+		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2 * zeroLinklength / (zeroFreeVelocity + zeroSgVelocity) * 3.6);
 		Assert.assertEquals( DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset();
 
-		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions );
-		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
+		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
+		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
+		warmEmissions.clear();
 
 	}
 
@@ -159,7 +158,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 				avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
