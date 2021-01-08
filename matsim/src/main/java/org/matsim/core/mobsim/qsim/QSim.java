@@ -404,8 +404,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		// trigger the after sim step listeners before finishing the events processing of this sim step.
 		// this gives after sim step listeners like snapshot generator the opportunity to generate events
 		// for the current time step.
-		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
 		this.events.afterSimStep(now);
+		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
+
 
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
 		boolean doContinue = (this.agentCounter.isLiving() && (this.stopTime > now));
