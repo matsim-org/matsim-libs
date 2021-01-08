@@ -22,10 +22,8 @@ package org.matsim.contrib.emissions;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.emissions.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.HbefaVehicleCategory;
 
+import static org.junit.Assert.assertFalse;
 import static org.matsim.contrib.emissions.Pollutant.CO;
 import static org.matsim.contrib.emissions.Pollutant.FC;
 
@@ -72,37 +70,39 @@ public class TestHbefaColdEmissionFactorKey {
 		//normal HbefaColdEmissionFactorKey	- default case
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
 		setToNormal(normal);
-		
+
 		//another HbefaColdEmissionFactorKey, copy of normal
 		HbefaColdEmissionFactorKey compare = new HbefaColdEmissionFactorKey();
-		compare.setHbefaComponent(coldPollutant);
-		compare.setHbefaDistance(distance);
-		compare.setHbefaParkingTime(parkingTime);
+		compare.setComponent(coldPollutant);
+		compare.setDistance(distance);
+		compare.setParkingTime(parkingTime);
 		HbefaVehicleAttributes attForCompare = new HbefaVehicleAttributes();
 		attForCompare.setHbefaEmConcept("concept");
 		attForCompare.setHbefaSizeClass("size class");
 		attForCompare.setHbefaTechnology("technology");
-		compare.setHbefaVehicleAttributes(attForCompare);
-		compare.setHbefaVehicleCategory(hbefaVehCategory);
-		
+		compare.setVehicleAttributes(attForCompare);
+		compare.setVehicleCategory(hbefaVehCategory);
+
 		message = "these two objects should be the same but are not: " + normal.toString() + " and " + compare.toString();
 		Assert.assertTrue(message, normal.equals(compare));
 		Assert.assertTrue(message, compare.equals(normal));
-		
+
 		//different HbefaColdEmissionFactorKey, does not equal 'normal'
 		HbefaColdEmissionFactorKey different = new HbefaColdEmissionFactorKey();
-		different.setHbefaComponent(CO);
-		different.setHbefaDistance(2);
-		different.setHbefaParkingTime(50);
-		HbefaVehicleAttributes attForDifferent= new HbefaVehicleAttributes();
-		attForDifferent.setHbefaEmConcept("concept 2"); attForDifferent.setHbefaSizeClass("size class 2"); attForDifferent.setHbefaTechnology("technology 2");
-		different.setHbefaVehicleAttributes(attForDifferent);
-		different.setHbefaVehicleCategory( HbefaVehicleCategory.HEAVY_GOODS_VEHICLE );
-		
+		different.setComponent(CO);
+		different.setDistance(2);
+		different.setParkingTime(50);
+		HbefaVehicleAttributes attForDifferent = new HbefaVehicleAttributes();
+		attForDifferent.setHbefaEmConcept("concept 2");
+		attForDifferent.setHbefaSizeClass("size class 2");
+		attForDifferent.setHbefaTechnology("technology 2");
+		different.setVehicleAttributes(attForDifferent);
+		different.setVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+
 		message = "these two objects should not be the same: " + normal.toString() + " and " + different.toString();
-		
-		Assert.assertFalse(message, normal.equals(different));
-		Assert.assertFalse(message, different.equals(normal));
+
+		assertFalse(message, normal.equals(different));
+		assertFalse(message, different.equals(normal));
 	}
 	
 	// the following tests each compare a incomplete key to a complete key
@@ -116,62 +116,45 @@ public class TestHbefaColdEmissionFactorKey {
 		setUp();
 		boolean equalErr = false;
 		String message2;
-		
+
 		//normal HbefaColdEmissionFactorKey
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
 		setToNormal(normal);
-		
+
 		//no vehicle category set
 		HbefaColdEmissionFactorKey noVehCat = new HbefaColdEmissionFactorKey();
-		noVehCat.setHbefaComponent(coldPollutant);
-		noVehCat.setHbefaDistance(distance);
-		noVehCat.setHbefaParkingTime(parkingTime);
-		noVehCat.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-			
-		equalErr = false;	
-		try{
-			noVehCat.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr = true;
-		}	
-		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehCat.toString();
-		message2 = "this key should not be comparable since no vehicle category is set";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noVehCat));
-		
+		noVehCat.setComponent(coldPollutant);
+		noVehCat.setDistance(distance);
+		noVehCat.setParkingTime(parkingTime);
+		noVehCat.setVehicleAttributes(hbefaVehicleAttributes);
+
+		var result = noVehCat.equals(normal);
+
+		assertFalse(result);
 	}
 
 	@Test
-	public final void testEqualsForIncompleteKeys_pollutant(){
-		
+	public final void testEqualsForIncompleteKeys_pollutant() {
+
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
+
 		//no pollutant set
 		HbefaColdEmissionFactorKey noColdPollutant = new HbefaColdEmissionFactorKey();
-		noColdPollutant.setHbefaDistance(distance);
-		noColdPollutant.setHbefaParkingTime(parkingTime);
-		noColdPollutant.setHbefaVehicleCategory(hbefaVehCategory);
-		noColdPollutant.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		
-		equalErr = false;	
-		try{	
-			noColdPollutant.equals(normal);
-		}
-		catch(NullPointerException e){
-			equalErr = true;
-		}	
-		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noColdPollutant.toString();
-		message2 = "this key should not be comparable since no cold pollutant is set";
-		Assert.assertTrue(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noColdPollutant));
+		noColdPollutant.setDistance(distance);
+		noColdPollutant.setParkingTime(parkingTime);
+		noColdPollutant.setVehicleCategory(hbefaVehCategory);
+		noColdPollutant.setVehicleAttributes(hbefaVehicleAttributes);
+
+		var result = noColdPollutant.equals(normal);
+
+		assertFalse(result);
 	}
 	
 	@Test
-	public final void testEqualsForIncompleteKeys_parkingTime(){
+	public final void testEqualsForIncompleteKeys_parkingTime() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
@@ -180,73 +163,63 @@ public class TestHbefaColdEmissionFactorKey {
 
 		//no parking time set
 		HbefaColdEmissionFactorKey noParkingTime = new HbefaColdEmissionFactorKey();
-		noParkingTime.setHbefaComponent(coldPollutant);
-		noParkingTime.setHbefaDistance(distance);
-		noParkingTime.setHbefaVehicleCategory(hbefaVehCategory);	
-		noParkingTime.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		
-		equalErr = false;	
-		try{
+		noParkingTime.setComponent(coldPollutant);
+		noParkingTime.setDistance(distance);
+		noParkingTime.setVehicleCategory(hbefaVehCategory);
+		noParkingTime.setVehicleAttributes(hbefaVehicleAttributes);
+
+		equalErr = false;
+		try {
 			noParkingTime.equals(normal);
-		}
-		catch(NullPointerException e){
+		} catch (NullPointerException e) {
 			equalErr = true;
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noParkingTime.toString();
 		message2 = "this key should be comparable even though no parking time is set";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noParkingTime));
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noParkingTime));
 	}
 	
 	@Test
-	public final void testEqualsForIncompleteKeys_distance(){
+	public final void testEqualsForIncompleteKeys_distance() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
+
 		//no distance set
 		HbefaColdEmissionFactorKey noDistance = new HbefaColdEmissionFactorKey();
-		noDistance.setHbefaComponent(coldPollutant);
-		noDistance.setHbefaParkingTime(parkingTime);
-		noDistance.setHbefaVehicleCategory(hbefaVehCategory);
-		noDistance.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		
+		noDistance.setComponent(coldPollutant);
+		noDistance.setParkingTime(parkingTime);
+		noDistance.setVehicleCategory(hbefaVehCategory);
+		noDistance.setVehicleAttributes(hbefaVehicleAttributes);
+
 		equalErr = false;
-		try{	
+		try {
 			noDistance.equals(normal);
-		}
-		catch(NullPointerException e){
+		} catch (NullPointerException e) {
 			equalErr = true;
-		}	
+		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noDistance.toString();
 		message2 = "this key should be comparable even though no distance is set";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noDistance));
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noDistance));
 	}
-	
+
 	@Test
-	public final void testEqualsForIncompleteKeys_emptyKey(){
+	public final void testEqualsForIncompleteKeys_emptyKey() {
 
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
 		setToNormal(normal);
-		
-		//empty HbefaColdEmissionFactorKey
-				HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
-				equalErr = false;
-				try{
-					emptyKey.equals(normal);
-				}
-				catch(NullPointerException e){
-					equalErr = true;
-				}
-				message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + emptyKey.toString();
-				message2 = "this key should not be comparable since nothing is set";
-				Assert.assertTrue(message2, equalErr);
-				Assert.assertFalse(message, normal.equals(emptyKey)); 
+
+		HbefaColdEmissionFactorKey emptyKey = new HbefaColdEmissionFactorKey();
+
+		var result = emptyKey.equals(normal);
+
+		assertFalse(result);
 	}
 	
 	@Test
@@ -258,64 +231,62 @@ public class TestHbefaColdEmissionFactorKey {
 		// generate a complete HbefaColdEmissionFactorKey: 'normal' 
 		// and set some parameters
 		setUp();
-		setToNormal(normal);		
-		
+		setToNormal(normal);
+
 		//normal HbefaColdEmissionFactorKey
 		HbefaColdEmissionFactorKey normal = new HbefaColdEmissionFactorKey();
 		setToNormal(normal);
-		
+
 		//no veh attributes
 		HbefaColdEmissionFactorKey noVehAtt = new HbefaColdEmissionFactorKey();
-		noVehAtt.setHbefaComponent(coldPollutant);
-		noVehAtt.setHbefaDistance(distance);
-		noVehAtt.setHbefaParkingTime(parkingTime);
-		noVehAtt.setHbefaVehicleCategory(hbefaVehCategory);
-		
+		noVehAtt.setComponent(coldPollutant);
+		noVehAtt.setDistance(distance);
+		noVehAtt.setParkingTime(parkingTime);
+		noVehAtt.setVehicleCategory(hbefaVehCategory);
+
 		equalErr = false;
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
-		try{
+		try {
 			noVehAtt.equals(normal);
-			Assert.assertFalse(noVehAtt.equals(normal));
-		}
-		catch(NullPointerException e){
+			assertFalse(noVehAtt.equals(normal));
+		} catch (NullPointerException e) {
 			equalErr = true;
 		}
-		message2 ="vehicle attributes should be 'average' by default and therefore comparable";
-		Assert.assertFalse(message2, equalErr);
-		Assert.assertFalse(message, normal.equals(noVehAtt));
-		
-		
+		message2 = "vehicle attributes should be 'average' by default and therefore comparable";
+		assertFalse(message2, equalErr);
+		assertFalse(message, normal.equals(noVehAtt));
+
+
 		//set the vehicle attributes of the normal hbefacoldemissionfactorkey to 'average'
 		//then noVehAtt is equal to normal
 		HbefaVehicleAttributes hbefaVehicleAttributesAverage = new HbefaVehicleAttributes();
 		hbefaVehicleAttributesAverage.setHbefaEmConcept("average");
 		hbefaVehicleAttributesAverage.setHbefaSizeClass("average");
 		hbefaVehicleAttributesAverage.setHbefaTechnology("average");
-		normal.setHbefaVehicleAttributes(hbefaVehicleAttributesAverage);
-		
+		normal.setVehicleAttributes(hbefaVehicleAttributesAverage);
+
 		equalErr = false;
-		try{
+		try {
 			noVehAtt.equals(normal);
 			Assert.assertTrue(noVehAtt.equals(normal));
-		}
-		catch(NullPointerException e){
+		} catch (NullPointerException e) {
 			equalErr = true;
 		}
 		message = "these two HbefaColdEmissionFactorKeys should not be the same: " + normal.toString() + " and " + noVehAtt.toString();
-		Assert.assertFalse(message2, equalErr);
+		assertFalse(message2, equalErr);
 		Assert.assertTrue(message, normal.equals(noVehAtt));
-		
-		
+
+
 	}
 
 
 	private void setToNormal(HbefaColdEmissionFactorKey normal) {
-		normal.setHbefaComponent(coldPollutant);
-		normal.setHbefaDistance(distance);
-		normal.setHbefaParkingTime(parkingTime);
-		normal.setHbefaVehicleAttributes(hbefaVehicleAttributes);
-		normal.setHbefaVehicleCategory(hbefaVehCategory);
-		
+		normal.setComponent(coldPollutant);
+		normal.setDistance(distance);
+		normal.setParkingTime(parkingTime);
+		normal.setVehicleAttributes(hbefaVehicleAttributes);
+		normal.setVehicleCategory(hbefaVehCategory);
+
 	}
 	
 }
