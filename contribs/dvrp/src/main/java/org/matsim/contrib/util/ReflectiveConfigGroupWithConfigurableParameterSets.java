@@ -65,14 +65,17 @@ public abstract class ReflectiveConfigGroupWithConfigurableParameterSets extends
 		Preconditions.checkState(oldDefinition == null, "Parameter set for type (%s) already defined", type);
 	}
 
-	public final ConfigGroup createParameterSet(String type) {
+	@Override
+	public final ConfigGroup createParameterSet( String type ) {
 		ConfigGroup params = Preconditions.checkNotNull(definition(type).creator.get());
 		Verify.verify(params.getName().equals(type), "The created parameter set has type (%s) instead of (%s)",
 				params.getName(), type);
 		return params;
 	}
 
-	public final void addParameterSet(ConfigGroup set) {
+	@Override
+	public final void addParameterSet( ConfigGroup set ) {
+		testForLocked() ;
 		Definition<?> definition = definition(set.getName());
 		ConfigGroup existingParams = definition.getter.get();
 		if (existingParams != null) {
@@ -85,7 +88,8 @@ public abstract class ReflectiveConfigGroupWithConfigurableParameterSets extends
 		super.addParameterSet(set);
 	}
 
-	public final boolean removeParameterSet(ConfigGroup set) {
+	@Override
+	public final boolean removeParameterSet( ConfigGroup set ) {
 		Definition<?> definition = definition(set.getName());
 		ConfigGroup existingParams = definition.getter.get();
 		if (existingParams == null || !existingParams.equals(set)) {
