@@ -204,11 +204,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					}
 				}
 			} else if (planElement instanceof Activity){
-				if(((Activity) planElement).getType().equals(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
+				if(((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
 					Leg legToCharger = (Leg) modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) - 1);
 					chargingBegin =  legToCharger.getDepartureTime().seconds() + legToCharger.getTravelTime().seconds();
 
-				} else if(((Activity) planElement).getType().equals(UrbanVehicleChargingHandler.PLUGIN_INTERACTION)){
+				} else if(((Activity) planElement).getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)){
 
 					Leg legFromCharger = (Leg) modifiablePlan.getPlanElements().get(modifiablePlan.getPlanElements().indexOf(planElement) + 1);
 					if(chargingBegin == null) throw new IllegalStateException();
@@ -264,9 +264,13 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 
 		Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
+
 		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
-		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
-		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+//		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+//		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+
+		Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
+		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
 		{	//some consistency checks.. //TODO consider to put in a JUnit test..
 			Preconditions.checkNotNull(pluginTripOrigin, "pluginTripOrigin is null. should never happen..");
@@ -311,14 +315,13 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		planPlugoutTrip(modifiablePlan, routingMode, actWhileCharging, plugoutTripDestination, chargingLink, tripRouter, chargerFacility, toFacility, PlanRouter.calcEndOfActivity(actWhileCharging, modifiablePlan, config));
 	}
 
-	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, Facility chargerFacility, Facility toFacility, double now) {
+	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, Facility chargerFacility, Facility fromFacility, double now) {
 		List<? extends PlanElement> routedSegment;
 		//actually destination can not be null based on how we determine the actWhileCharging = origin at the moment...
 		if(destination == null) throw new RuntimeException("should not happen");
 
 		List<PlanElement> trip  = new ArrayList<>();
-		Facility fromFacility = toFacility;
-		toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
+		Facility toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
 
 		//add leg to charger
 		routedSegment = tripRouter.calcRoute(TransportMode.walk,fromFacility, chargerFacility,
@@ -425,6 +428,50 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			ev.getBattery().changeSoc(-consumption);
 			linkEnterTime += travelT;
 		}
+	}
+
+//	the following methods are modified versions of EditPlans.findRealActBefore() and EditPlans.findRealActAfter()
+
+	private Activity findRealOrChargingActBefore(MobsimAgent agent, int index) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+
+		Activity prevAct = null ;
+		for ( int ii=0 ; ii<index ; ii++ ) {
+			if ( planElements.get(ii) instanceof Activity ) {
+				Activity act = (Activity) planElements.get(ii) ;
+				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() )  ||
+						act.getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ||
+						act.getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION)) {
+					prevAct = act ;
+				}
+			}
+		}
+		return prevAct;
+	}
+
+	private  Activity findRealOrChargingActAfter(MobsimAgent agent, int index) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ;
+	}
+
+	private int findIndexOfRealActAfter(MobsimAgent agent, int index) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+
+		int theIndex = -1 ;
+		for ( int ii=planElements.size()-1 ; ii>index; ii-- ) {
+			if ( planElements.get(ii) instanceof Activity ) {
+				Activity act = (Activity) planElements.get(ii) ;
+				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() )   ||
+						act.getType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ||
+						act.getType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION) ) {
+					theIndex = ii ;
+				}
+			}
+		}
+		return theIndex ;
 	}
 
 }
