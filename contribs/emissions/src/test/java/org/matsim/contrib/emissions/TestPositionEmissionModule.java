@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -22,6 +23,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -130,6 +132,7 @@ public class TestPositionEmissionModule {
                 addEventHandlerBinding().toInstance(handler);
                 addEventHandlerBinding().toInstance(mainLinkWarmHandler);
                 addEventHandlerBinding().toInstance(coldHandler);
+                bind(EventsManager.class).to(EventsManagerImpl.class);
             }
         });
 
