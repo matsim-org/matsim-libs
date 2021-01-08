@@ -1,11 +1,16 @@
 package org.matsim.urbanEV;
 
-import gnu.trove.map.hash.THashMap;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -15,20 +20,19 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ChargerSelectionTest3 {
+
+	Logger logger = Logger.getLogger(ChargerSelectionTest3.class);
 
 	@Rule
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -41,10 +45,8 @@ public class ChargerSelectionTest3 {
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
 		evConfigGroup.setTimeProfiles(true);
-		evConfigGroup.setChargersFile("C:/Users/admin/Desktop/chargers.xml");
+		evConfigGroup.setChargersFile("chargers.xml");
 //		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
-//		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
-//				evConfigGroup);
 		Config config = ConfigUtils.loadConfig("test/input/chessboard/chessboard-config.xml", evConfigGroup);
 		config.network().setInputFile("1pctNetwork.xml");
 
@@ -90,7 +92,18 @@ public class ChargerSelectionTest3 {
 
 		///controler with Urban EV module
 		Controler controler = RunUrbanEVExample.prepareControler(scenario);
+
+		UrbanEVTestHandler handler = new UrbanEVTestHandler();
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+//				this.addEventHandlerBinding().toInstance(handler);
+			}
+		});
+
 		controler.run();
+
 	}
 
 	private void overridePopulation3(Scenario scenario) {
@@ -268,6 +281,58 @@ public class ChargerSelectionTest3 {
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2VehicleId);//probably unnecessary
 		}
 	}
+
+	private class UrbanEVTestHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
+
+		private Map<Id<Person>, Double> plugOutCntPerPerson = new HashMap<>();
+		private Map<Id<Person>, Double> plugInCntPerPerson = new HashMap<>();
+
+
+		@Override
+		public void handleEvent(ActivityEndEvent event) {
+			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION) ){
+				this.plugOutCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
+			}
+		}
+
+		@Override
+		public void handleEvent(ActivityStartEvent event) {
+			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ){
+				this.plugInCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
+			}
+		}
+
+		@Override
+		public void reset(int iteration) {
+			if(iteration > 0){
+				System.out.println("ITERATION = " + iteration);
+
+				Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
+				Assert.assertTrue(plugOutCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
+
+				for (Id<Person> personId : plugInCntPerPerson.keySet()) {
+					Assert.assertTrue(plugInCntPerPerson.get(personId) == 1);
+					Assert.assertTrue(plugInCntPerPerson.get(personId) == plugOutCntPerPerson.get(personId));
+				}
+
+//				plugIns.forEach(person -> {
+//					if(Collections.frequency(plugIns, person) != Collections.frequency(plugOuts, person)){
+//						logger.fatal(" in iteration " + (iteration -1)  + ", person " + person + " starts loading " + Collections.frequency(plugIns, person) + " times and ends loading " + Collections.frequency(plugOuts, person) + "times");
+//						throw new RuntimeException(" in iteration " + (iteration -1) + ", person " + person + " starts loading " + Collections.frequency(plugIns, person) + " times and ends loading " + Collections.frequency(plugOuts, person) + "times");
+//					}
+//				});
+
+
+				Assert.assertEquals(4, plugInCntPerPerson.size(), 0);
+				Assert.assertEquals(4, plugOutCntPerPerson.size(), 0);
+				Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size());
+			}
+
+			this.plugInCntPerPerson.clear();
+			this.plugOutCntPerPerson.clear();
+		}
+	}
+
 
 
 }
