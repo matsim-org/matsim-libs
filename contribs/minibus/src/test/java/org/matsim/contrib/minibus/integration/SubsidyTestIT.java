@@ -103,7 +103,7 @@ public class SubsidyTestIT implements TabularFileHandler {
 		new TabularFileParser().parse(tabFileParserConfig, this);
 
 		// Check final iteration
-		Assert.assertEquals("Number of budget (final iteration)", "202320015.6112222400", this.pStatsResults.get(2)[9]);
+		Assert.assertEquals("Number of budget (final iteration)", "202319997.4909444700", this.pStatsResults.get(2)[9]);
 	}
 	
 	@Override

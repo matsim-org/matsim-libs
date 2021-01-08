@@ -29,8 +29,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.testcases.utils.EventsCollector;
 
-import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
-import static org.junit.Assert.assertThat;
+import java.util.Set;
 
 public class SimStepParallelEventsManagerImplTest {
 
@@ -49,7 +48,8 @@ public class SimStepParallelEventsManagerImplTest {
 			}
 
 			@Override
-			public void reset(int iteration) {}
+			public void reset(int iteration) {
+			}
 		});
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
@@ -62,14 +62,12 @@ public class SimStepParallelEventsManagerImplTest {
 		events.afterSimStep(1.0);
 		events.finishProcessing();
 
-		assertThat(collector.getEvents(),
-			contains(
-					new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new PersonStuckEvent(0.0, Id.createPersonId(0), Id.createLinkId(0), "car"),
-					new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
-					new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car")));
+		collector.getEvents().containsAll(Set.of(new LinkEnterEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
+				new LinkLeaveEvent(0.0, Id.createVehicleId(0), Id.createLinkId(0)),
+				new PersonStuckEvent(0.0, Id.createPersonId(0), Id.createLinkId(0), "car"),
+				new LinkEnterEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
+				new LinkLeaveEvent(1.0, Id.createVehicleId(0), Id.createLinkId(0)),
+				new PersonStuckEvent(1.0, Id.createPersonId(0), Id.createLinkId(0), "car")));
 	}
 
 }

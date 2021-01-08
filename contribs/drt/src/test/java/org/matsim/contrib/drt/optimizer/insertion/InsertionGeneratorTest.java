@@ -235,8 +235,8 @@ public class InsertionGeneratorTest {
 		return new Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
 	}
 
-	private Waypoint.Stop stop(Link link, int outputOccupancy) {
-		return new Waypoint.Stop(new DrtStopTask(0, 0, link), outputOccupancy);
+	private Waypoint.Stop stop(Link link, int outgoingOccupancy) {
+		return new Waypoint.Stop(new DrtStopTask(0, 0, link), outgoingOccupancy);
 	}
 
 	private VehicleData.Entry entry(Waypoint.Start start, Waypoint.Stop... stops) {

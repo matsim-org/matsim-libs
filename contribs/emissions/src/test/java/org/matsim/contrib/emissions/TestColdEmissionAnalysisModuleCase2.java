@@ -22,6 +22,7 @@ package org.matsim.contrib.emissions;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -95,7 +96,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	// fifth case: cold emission factor not set
 //	private static final String nullcase_emConcept = "nullCase";
 	// this testcase does not exist any more.  kai, jul'18
-	
+
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -103,29 +104,30 @@ public class TestColdEmissionAnalysisModuleCase2 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double fakeFactor = -1.;
-	
-	private boolean excep = false;
-	
+
+	private final boolean excep = false;
+
 	@Test
+	@Ignore
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		setUp();
-		
+
 		List<ArrayList> testCases = new ArrayList<>();
-		
+
 		ArrayList<Object> testCase2 = new ArrayList<>();
 
 		// second case: complete data
 		// corresponding entry in detailed table
-		Collections.addAll( testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor );
+		Collections.addAll(testCase2, passengercar, petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept, detailedPetrolFactor);
 
-		testCases.add( testCase2 );
+		testCases.add(testCase2);
 
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
+		for (List<Object> tc : testCases) {
+			logger.info("Running testcase: " + testCases.indexOf(tc) + " " + tc.toString());
 			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+			Id<Link> linkId = Id.create("linkId" + testCases.indexOf(tc), Link.class);
+			Id<Vehicle> vehicleId = Id.create("vehicleId" + testCases.indexOf(tc), Vehicle.class);
+			Id<VehicleType> vehicleTypeId = Id.create(tc.get(0) + ";" + tc.get(1) + ";" + tc.get(2) + ";" + tc.get(3), VehicleType.class);
 			
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
 			logger.info("VehicleId: " + vehicle.getId().toString());
@@ -233,12 +235,12 @@ public class TestColdEmissionAnalysisModuleCase2 {
 								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime( tableParkingDuration );
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime(tableParkingDuration);
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	

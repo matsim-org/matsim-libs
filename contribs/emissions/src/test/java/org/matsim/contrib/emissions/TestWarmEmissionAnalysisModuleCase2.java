@@ -37,7 +37,7 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
 
-import static org.matsim.contrib.emissions.Pollutant.*;
+import static org.matsim.contrib.emissions.Pollutant.NMHC;
 import static org.matsim.contrib.emissions.TestWarmEmissionAnalysisModule.fillAverageTable;
 
 /**
@@ -313,22 +313,20 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		// entry for second test case "pc" -- should not be used
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaTechnology( PC_TECHNOLOGY );
-			vehAtt.setHbefaSizeClass( PC_SIZE_CLASS );
-			vehAtt.setHbefaEmConcept( PC_CONCEPT );
+			vehAtt.setHbefaTechnology(PC_TECHNOLOGY);
+			vehAtt.setHbefaSizeClass(PC_SIZE_CLASS);
+			vehAtt.setHbefaEmConcept(PC_CONCEPT);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor( DETAILED_PC_FACTOR_FF );
-			detWarmFactor.setSpeed( PC_FREE_VELOCITY_KMH );
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(DETAILED_PC_FACTOR_FF, PC_FREE_VELOCITY_KMH);
 
-			for( Pollutant wp : pollutants ){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( HBEFA_ROAD_CATEGORY );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(HBEFA_ROAD_CATEGORY);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 		}
 
@@ -336,26 +334,24 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 			String ffOnlyConcept = "PC-D-Euro-3";
-			vehAtt.setHbefaEmConcept( ffOnlyConcept );
+			vehAtt.setHbefaEmConcept(ffOnlyConcept);
 			String ffOnlySizeClass = ">=2L";
-			vehAtt.setHbefaSizeClass( ffOnlySizeClass );
+			vehAtt.setHbefaSizeClass(ffOnlySizeClass);
 			String ffOnlyTechnology = "diesel";
-			vehAtt.setHbefaTechnology( ffOnlyTechnology );
+			vehAtt.setHbefaTechnology(ffOnlyTechnology);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			double detailedFfOnlyFactorFf = .0000001;
-			detWarmFactor.setWarmEmissionFactor( detailedFfOnlyFactorFf );
 			double ffOnlyffSpeed = 120.;
-			detWarmFactor.setSpeed( ffOnlyffSpeed );
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(detailedFfOnlyFactorFf, ffOnlyffSpeed);
 
-			for( Pollutant wp : pollutants ){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( HBEFA_ROAD_CATEGORY );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(HBEFA_ROAD_CATEGORY);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 		}
 
@@ -363,31 +359,27 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 			String sgOnlyConcept = "PC-Alternative Fuel";
-			vehAtt.setHbefaEmConcept( sgOnlyConcept );
+			vehAtt.setHbefaEmConcept(sgOnlyConcept);
 			String sgOnlySizeClass = "not specified";
-			vehAtt.setHbefaSizeClass( sgOnlySizeClass );
+			vehAtt.setHbefaSizeClass(sgOnlySizeClass);
 			String sgOnlyTechnology = "bifuel CNG/petrol";
-			vehAtt.setHbefaTechnology( sgOnlyTechnology );
+			vehAtt.setHbefaTechnology(sgOnlyTechnology);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
 			double detailedSgOnlyFactorSg = .00000001;
-			detWarmFactor.setWarmEmissionFactor( detailedSgOnlyFactorSg );
 			double sgOnlysgSpeed = 50.;
-			detWarmFactor.setSpeed( sgOnlysgSpeed );
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(detailedSgOnlyFactorSg, sgOnlysgSpeed);
 
-			for( Pollutant wp : pollutants ){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( HBEFA_ROAD_CATEGORY );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(HBEFA_ROAD_CATEGORY);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 		}
-
 	}
-
 }
 	
 
