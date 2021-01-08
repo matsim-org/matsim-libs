@@ -99,7 +99,7 @@ public class ChargerSelectionTest3 {
 		scenario.getPopulation().getPersons().clear();
 
 		PopulationFactory factory = scenario.getPopulation().getFactory();
-		Person person = factory.createPerson(Id.createPersonId("Jonas' kleiner GeheimAgent"));
+		Person person = factory.createPerson(Id.createPersonId("Charge during leisure + bike"));
 
 		Plan plan = factory.createPlan();
 
@@ -124,28 +124,26 @@ public class ChargerSelectionTest3 {
 		plan.addActivity(leisure);
 		plan.addLeg(factory.createLeg(TransportMode.bike));
 
-
-
 		Activity leisure2 = factory.createActivityFromLinkId("leisure", Id.createLinkId("89"));
-		leisure2.setEndTime(12.5 * 3600);
+		leisure2.setEndTime(13 * 3600);
 		plan.addActivity(leisure2);
 		plan.addLeg(factory.createLeg(TransportMode.bike));
 
 		Activity leisure3 = factory.createActivityFromLinkId("leisure", Id.createLinkId("90"));
-		leisure3.setEndTime(13 * 3600);
+		leisure3.setEndTime(14 * 3600);
 		plan.addActivity(leisure3);
 		plan.addLeg(factory.createLeg(TransportMode.car));
 
 
 		Activity home2 = factory.createActivityFromLinkId("home", Id.createLinkId("95"));
-		home2.setEndTime(14 * 3600);
+		home2.setEndTime(15 * 3600);
 		plan.addActivity(home2);
 		person.addPlan(plan);
 		person.setSelectedPlan(plan);
 
 		scenario.getPopulation().addPerson(person);
 
-		Person person2 = factory.createPerson(Id.createPersonId("Dummy"));
+		Person person2 = factory.createPerson(Id.createPersonId("Charger Selection + 20 min shopping"));
 
 		Plan plan2 = factory.createPlan();
 
@@ -160,13 +158,100 @@ public class ChargerSelectionTest3 {
 
 		plan2.addLeg(factory.createLeg(TransportMode.car));
 
+		Activity work32 = factory.createActivityFromLinkId("work", Id.createLinkId("60"));
+		work32.setEndTime(12 * 3600);
+		plan2.addActivity(work32);
+
+		plan2.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity shopping = factory.createActivityFromLinkId("shopping", Id.createLinkId("9"));
+		shopping.setStartTime(12 * 3600 +2100);
+		shopping.setEndTime(12 * 3600 + 3300);
+		plan2.addActivity(shopping);
+
+		plan2.addLeg(factory.createLeg(TransportMode.car));
+
+
+
 		Activity home4 = factory.createActivityFromLinkId("home", Id.createLinkId("91"));
-		home4.setEndTime(14 * 3600);
+		home4.setEndTime(15 * 3600);
 		plan2.addActivity(home4);
 		person2.addPlan(plan2);
 		person2.setSelectedPlan(plan2);
 
 		scenario.getPopulation().addPerson(person2);
+
+		Person person3 = factory.createPerson(Id.createPersonId("Charger Selection long distance leg"));
+
+		Plan plan3 = factory.createPlan();
+
+		Activity home5 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
+		home5.setEndTime(8 * 3600);
+		plan3.addActivity(home5);
+		plan3.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity work4 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work4.setEndTime(10 * 3600);
+		plan3.addActivity(work4);
+
+		plan3.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity work42 = factory.createActivityFromLinkId("work", Id.createLinkId("99"));
+		work42.setEndTime(12 * 3600);
+		plan3.addActivity(work42);
+
+		plan3.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity home6 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
+		home6.setEndTime(15 * 3600);
+		plan3.addActivity(home6);
+		person3.addPlan(plan3);
+		person3.setSelectedPlan(plan3);
+
+		scenario.getPopulation().addPerson(person3);
+
+		Person person4 = factory.createPerson(Id.createPersonId("Charger Selection + 15 min shopping"));
+
+		Plan plan4 = factory.createPlan();
+
+		Activity home7 = factory.createActivityFromLinkId("home", Id.createLinkId("3"));
+		home7.setEndTime(8 * 3600);
+		plan4.addActivity(home7);
+		plan4.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity work5 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work5.setEndTime(10 * 3600);
+		plan4.addActivity(work5);
+
+		plan4.addLeg(factory.createLeg(TransportMode.bike));
+
+		Activity shopping2 = factory.createActivityFromLinkId("shopping", Id.createLinkId("87"));
+		shopping.setStartTime(10 * 3600 + 1100);
+		shopping2.setEndTime(10 * 3600 + 2000);
+		plan4.addActivity(shopping2);
+
+		plan4.addLeg(factory.createLeg(TransportMode.bike));
+
+		Activity work6 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work6.setEndTime(12 * 3600);
+		plan4.addActivity(work6);
+
+		plan4.addLeg(factory.createLeg(TransportMode.car));
+
+		Activity work7= factory.createActivityFromLinkId("work", Id.createLinkId("91"));
+		work7.setEndTime(14 * 3600);
+		plan4.addActivity(work7);
+
+		plan4.addLeg(factory.createLeg(TransportMode.car));
+
+
+		Activity home8 = factory.createActivityFromLinkId("home", Id.createLinkId("3"));
+		home8.setEndTime(15 * 3600);
+		plan4.addActivity(home8);
+		person4.addPlan(plan4);
+		person4.setSelectedPlan(plan4);
+
+		scenario.getPopulation().addPerson(person4);
 
 	}
 
