@@ -10,8 +10,8 @@ class HbefaRoadVehicleCategoryKey {
     }
 
     public HbefaRoadVehicleCategoryKey(HbefaWarmEmissionFactorKey key) {
-        this.hbefaVehicleCategory = key.getHbefaVehicleCategory();
-        this.hbefaRoadCategory = key.getHbefaRoadCategory();
+        this.hbefaVehicleCategory = key.getVehicleCategory();
+        this.hbefaRoadCategory = key.getRoadCategory();
     }
 
     public HbefaVehicleCategory getHbefaVehicleCategory() {
