@@ -108,30 +108,22 @@ public class TestColdEmissionAnalysisModuleCase1 {
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
-		ArrayList<Object> testCase1 = new ArrayList<Object>();
+		ArrayList<Object> testCase1 = new ArrayList<>();
 		// first case: complete data
 		// corresponding entry in average table
 		Collections.addAll(testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor);
 		logger.info("Running testcase:" + testCase1.toString());
 		Id<Link> linkId = Id.create("linkId" + testCase1, Link.class);
 		Id<Vehicle> vehicleId = Id.create("vehicleId" + testCase1, Vehicle.class);
-		Id<VehicleType> vehicleTypeId = Id.create(
-				testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3),
-				VehicleType.class);
-		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,
-				VehicleUtils.getFactory().createVehicleType(vehicleTypeId));
+		Id<VehicleType> vehicleTypeId = Id.create(testCase1.get(0) + ";" + testCase1.get(1) + ";" + testCase1.get(2) + ";" + testCase1.get(3), VehicleType.class);
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, VehicleUtils.getFactory().createVehicleType(vehicleTypeId));
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
 
-		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(),
-				linkId, startTime, parkingDuration, tableAccDistance);
+		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
 
-
-		String message = "The expected emissions for " + testCase1.toString() + " are "
-				+ numberOfColdEmissions * (Double) testCase1.get(4) + " but were "
-				+ HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4),
-				HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+		String message = "The expected emissions for " + testCase1.toString() + " are " + numberOfColdEmissions * (Double) testCase1.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals(message, numberOfColdEmissions * (Double) testCase1.get(4), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 	}
 
 	private ColdEmissionAnalysisModule setUp() {

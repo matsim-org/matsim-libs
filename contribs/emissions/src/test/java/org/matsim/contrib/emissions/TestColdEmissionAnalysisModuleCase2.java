@@ -61,8 +61,8 @@ import static org.matsim.contrib.emissions.Pollutant.*;
  */
 
 public class TestColdEmissionAnalysisModuleCase2 {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase2.class);
 
+	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase2.class);
 	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
@@ -116,8 +116,7 @@ public class TestColdEmissionAnalysisModuleCase2 {
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
 			
 		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-		String message = "The expected emissions for " + testCase2.toString() + " are " +
-							     numberOfColdEmissions * (Double) testCase2.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		String message = "The expected emissions for " + testCase2.toString() + " are " + numberOfColdEmissions * (Double) testCase2.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase2.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 		}
 		

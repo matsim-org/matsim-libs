@@ -64,8 +64,6 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase6.class);
 	
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-	
-	private final String passengercar = "PASSENGER_CAR";
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
 	// same values as int for table
@@ -91,10 +89,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final String diesel_technology = "diesel";
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
-	
-	// fifth case: cold emission factor not set
-//	private static final String nullcase_emConcept = "nullCase";
-	// this testcase does not exist any more.  kai, jul'18
+
 	
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
@@ -103,8 +98,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double heavyGoodsFaktor = -1.; //should not be used since HGV is not in HBEFA 3 or 4.1. KMT May 2020
-	
-	private boolean excep = false;
+
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
@@ -113,38 +107,27 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		 * six test cases with complete input data
 		 * or input that should be assigned to average/default cases
 		 */
-		
-		setUp();
-		
-		List<ArrayList> testCases = new ArrayList<>();
 
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule =setUp();
 		ArrayList<Object> testCase6 = new ArrayList<>();
 
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
 		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
 		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, detailedPetrolFactor);
-		
 
-		testCases.add( testCase6 );
-		
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
-			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+		logger.info("Running testcase: " + testCase6 + " " +testCase6.toString());
+		HandlerToTestEmissionAnalysisModules.reset();
+		Id<Link> linkId = Id.create( "linkId" + testCase6, Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase6, Vehicle.class );
+		Id<VehicleType> vehicleTypeId = Id.create( testCase6.get( 0 ) + ";" + testCase6.get( 1 ) + ";" + testCase6.get( 2 ) + ";" + testCase6.get( 3 ), VehicleType.class );
 			
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-			logger.info("VehicleId: " + vehicle.getId().toString());
-			logger.info("VehicleTypeId: " + vehicle.getType().getId());
-			
-			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-			String message = "The expected emissions for " + tc.toString() + " are " +
-							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		}
-		
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
+		logger.info("VehicleId: " + vehicle.getId().toString());
+		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+		coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		String message = "The expected emissions for " + testCase6.toString() + " are " + numberOfColdEmissions * (Double) testCase6.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase6.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
 	}
 	
 	private ColdEmissionAnalysisModule setUp() {
@@ -185,7 +168,6 @@ public class TestColdEmissionAnalysisModuleCase6 {
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
 			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
 			// when the now deprecated execution path goes away.  kai, jul'18)
-
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedPetrolFactor ), PASSENGER_CAR );
 		}
 	}
@@ -218,8 +200,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );

@@ -128,18 +128,17 @@ public class TestColdEmissionAnalysisModule {
 		 */
 
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
-		//setUp();
-
 		List<ArrayList> testCases = new ArrayList<>();
 
 		ArrayList<Object> testCase2 = new ArrayList<>();
-//		ArrayList<Object> testCase1 = new ArrayList<>(), testCase2 = new ArrayList<>();
-		ArrayList<Object> testCase3 = new ArrayList<>(), testCase4 = new ArrayList<>();
-//		ArrayList<Object> testCase6 = new ArrayList<>();
+		ArrayList<Object> testCase1 = new ArrayList<>();
+		ArrayList<Object> testCase3 = new ArrayList<>();
+		ArrayList<Object> testCase4 = new ArrayList<>();
+		ArrayList<Object> testCase6 = new ArrayList<>();
 
 //		// first case: complete data
 //		// corresponding entry in average table
-//		Collections.addAll( testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
+		Collections.addAll( testCase1, passengercar, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
 
 		// second case: complete data
 		// corresponding entry in detailed table
@@ -149,30 +148,20 @@ public class TestColdEmissionAnalysisModule {
 		// corresponding entries in average and detailed table; should use the detailed entry; thus
 		// error when using the average entry.
 		Collections.addAll( testCase3, passengercar, diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept, detailedDieselFactor );
-//
-//		//fourth case is moved out to own test class.
-//		// fourth case: no specifications for technology, size class or em concept
-//		// -> falling back to average table
-//		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
-
-//		// fifth case: cold emission factor not set - handled as 0.0
-//		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-//		// beim erstellen ueberpruefen dann test umschreiben
-//		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-		// this situation does not exist any more.  kai, jul'18
+		
 
 		// sixth case is moved out to own test class.
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
-//		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-//		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
+		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
+		Collections.addAll( testCase6, heavygoodsvehicle, petrol_technology, none_sizeClass, none_emConcept, averagePetrolFactor );
 
-//		testCases.add( testCase1 );
-//		testCases.add( testCase2 );
-//		testCases.add( testCase3 );
-//		testCases.add( testCase4 );
+		testCases.add( testCase1 );
+		testCases.add( testCase2 );
+		testCases.add( testCase3 );
+		testCases.add( testCase4 );
 //		testCases.add( testCase5 );
-//		testCases.add( testCase6 );
+		testCases.add( testCase6 );
 
 		for ( List<Object> tc : testCases ) {
 			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());

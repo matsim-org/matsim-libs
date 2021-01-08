@@ -62,7 +62,7 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class TestColdEmissionAnalysisModuleCase4 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase4.class);
-	
+
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	
 	private final String passengercar = "PASSENGER_CAR";
@@ -103,8 +103,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double fakeFactor = -1.;
-	
-	private boolean excep = false;
+
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
@@ -114,23 +113,14 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		 * or input that should be assigned to average/default cases
 		 */
 		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
-
 		
 		List<ArrayList> testCases = new ArrayList<>();
 		ArrayList<Object> testCase4 = new ArrayList<>();
-
-		
 
 
 		// fourth case: no specifications for technology, size class or em concept
 		// -> falling back to average table
 		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
-
-//		// fifth case: cold emission factor not set - handled as 0.0
-//		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-//		// beim erstellen ueberpruefen dann test umschreiben
-//		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-		// this situation does not exist any more.  kai, jul'18
 
 		// sixth case: heavy goods vehicle
 		// -> throw warning -> use detailed or average table for passenger cars
