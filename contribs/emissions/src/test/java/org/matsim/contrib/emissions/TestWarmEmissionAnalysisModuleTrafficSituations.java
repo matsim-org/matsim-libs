@@ -109,13 +109,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+        ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort); //declare using detailed values
 
@@ -129,14 +123,13 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	@Test
 	public void testFallBackToAverageTable() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		double ffspeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/ffspeed;
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
-		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
+		Link pcLink = createMockLink(linkLength, ffspeed / 3.6);
 
 		//allow fallback to average table
 		weam.getEcg().setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
@@ -161,7 +154,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		double ffspeed = avgPassengerCarSpeed[FF_INDEX];
 
-		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
+		Link pcLink = createMockLink(linkLength, ffspeed / 3.6);
 
 		double actualSpeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/actualSpeed;
@@ -236,11 +229,10 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 
 
-	private static Link createMockLink( String linkId, double linkLength, double ffspeed ) {
-		Id<Link> mockLinkId = Id.createLinkId(linkId);
+	private static Link createMockLink(double linkLength, double ffspeed) {
 		Node mockNode1 = NetworkUtils.createNode(Id.createNodeId(1));
 		Node mockNode2 = NetworkUtils.createNode(Id.createNodeId(2));
-		Link l = NetworkUtils.createLink(mockLinkId, mockNode1, mockNode2, null, linkLength, ffspeed, 1800, 1);
+		Link l = NetworkUtils.createLink(Id.createLinkId("link"), mockNode1, mockNode2, null, linkLength, ffspeed, 1800, 1);
 		EmissionUtils.setHbefaRoadType(l, "URB");
 		return l;
 	}

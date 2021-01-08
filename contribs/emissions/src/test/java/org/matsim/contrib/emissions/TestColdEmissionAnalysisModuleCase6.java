@@ -36,7 +36,6 @@ import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
-import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /**
@@ -63,13 +62,9 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 public class TestColdEmissionAnalysisModuleCase6 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase6.class);
 
-	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
-	// same values as int for table
-	private static final int tableParkingDuration = (int) Math.round( parkingDuration );
 	private static final int tableAccDistance = 1;
-	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
-	private final int numberOfColdEmissions = pollutants.size();
+	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(Pollutant.values()));
 	// strings for test cases
 	
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
@@ -124,11 +119,11 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		logger.info("VehicleId: " + vehicle.getId().toString());
 		logger.info("VehicleTypeId: " + vehicle.getType().getId());
 
-		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
 		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
 
-		String message = "The expected emissions for " + testCase6.toString() + " are " + numberOfColdEmissions * (Double) testCase6.get( 4 ) + " but were " + sumOfEmissions;
-		Assert.assertEquals( message, numberOfColdEmissions * (Double) testCase6.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
+		String message = "The expected emissions for " + testCase6.toString() + " are " + pollutants.size() * (Double) testCase6.get( 4 ) + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, pollutants.size() * (Double) testCase6.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 	}
 	
 	private ColdEmissionAnalysisModule setUp() {
@@ -200,7 +195,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime( tableParkingDuration );
+			detColdKey.setHbefaParkingTime((int) Math.round( parkingDuration ));
 			detColdKey.setHbefaVehicleAttributes( vehAtt );
 			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
 			detColdKey.setHbefaComponent( cp );

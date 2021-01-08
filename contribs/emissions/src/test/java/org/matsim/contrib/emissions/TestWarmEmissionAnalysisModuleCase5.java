@@ -92,7 +92,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	// vehicle information for regular test cases
 
 	// case 5 - data in detailed table, stop go speed zero
-	private final String zeroRoadCatgory = "URB_case6";
+	private final String zeroRoadCategory = "URB_case6";
 	private final String zeroTechnology = "zero technology";
 	private final String zeroConcept = "zero concept";
 	private final String zeroSizeClass = "zero size class";
@@ -129,7 +129,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		double zeroLinklength = 3000.;
 		Link zerolink = TestWarmEmissionAnalysisModule.createMockLink("link zero", zeroLinklength, zeroFreeVelocity / 3.6 );
 		Id<Link> lpgLinkId = zerolink.getId();
-		EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCatgory);
+		EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCategory);
 
 		Id<VehicleType> zeroVehicleTypeId = Id.create(
 				PASSENGER_CAR + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept, VehicleType.class );
@@ -184,7 +184,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
+				detWarmKey.setHbefaRoadCategory(zeroRoadCategory);
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
@@ -199,7 +199,7 @@ public class TestWarmEmissionAnalysisModuleCase5{
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
+				detWarmKey.setHbefaRoadCategory(zeroRoadCategory);
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );

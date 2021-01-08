@@ -20,21 +20,6 @@
 
 package org.matsim.contrib.emissions;
 
-import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
-import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
-import static org.matsim.contrib.emissions.Pollutant.CO;
-import static org.matsim.contrib.emissions.Pollutant.CO2_TOTAL;
-import static org.matsim.contrib.emissions.Pollutant.FC;
-import static org.matsim.contrib.emissions.Pollutant.HC;
-import static org.matsim.contrib.emissions.Pollutant.NMHC;
-import static org.matsim.contrib.emissions.Pollutant.NO2;
-import static org.matsim.contrib.emissions.Pollutant.NOx;
-import static org.matsim.contrib.emissions.Pollutant.PM;
-import static org.matsim.contrib.emissions.Pollutant.SO2;
-
-import java.util.*;
-
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +30,12 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
+
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
+import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /**
@@ -69,9 +60,7 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 public class TestColdEmissionAnalysisModule {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModule.class);
-	
-	private final String passengercar = "PASSENGER_CAR";
+
 	private final Double startTime = 0.0;
 	private static final Double parkingDuration = 1.;
 	// same values as int for table
@@ -152,7 +141,7 @@ public class TestColdEmissionAnalysisModule {
 		
 		// case: no specifications for technology, size, class, em concept
 		// string has no semicolons as separators - use average values
-		Id<VehicleType> vehInfo11 = Id.create( passengercar, VehicleType.class );
+		Id<VehicleType> vehInfo11 = Id.create("PASSENGER_CAR", VehicleType.class );
 		Id<Link> linkId11 = Id.create( "link id 11", Link.class );
 		Id<Vehicle> vehicleId7 = Id.create( "vehicle 11", Vehicle.class );
 		
