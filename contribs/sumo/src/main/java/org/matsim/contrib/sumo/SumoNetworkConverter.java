@@ -264,7 +264,7 @@ public class SumoNetworkConverter implements Callable<Integer> {
                 continue;
             }
 
-            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(type.speed));
+            link.setFreespeed(LinkProperties.calculateSpeedIfSpeedTag(type.speed, LinkProperties.DEFAULT_FREESPEED_FACTOR));
             link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), prop) * link.getNumberOfLanes());
 
             lanes.addLanesToLinkAssignment(l2l);

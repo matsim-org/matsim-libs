@@ -172,44 +172,36 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		//entries for zero case
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaEmConcept( zeroConcept );
-			vehAtt.setHbefaSizeClass( zeroSizeClass );
-			vehAtt.setHbefaTechnology( zeroTechnology );
+			vehAtt.setHbefaEmConcept(zeroConcept);
+			vehAtt.setHbefaSizeClass(zeroSizeClass);
+			vehAtt.setHbefaTechnology(zeroTechnology);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor( DETAILED_ZERO_FACTOR_FF );
-			detWarmFactor.setSpeed( zeroFreeVelocity );
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(DETAILED_ZERO_FACTOR_FF, zeroFreeVelocity);
 
-			for( Pollutant wp : pollutants ){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(zeroRoadCatgory);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 
-			detWarmFactor = new HbefaWarmEmissionFactor();
-			double detailedZeroFactorSg = .00011;
-			detWarmFactor.setWarmEmissionFactor( detailedZeroFactorSg );
-			detWarmFactor.setSpeed( zeroSgVelocity );
+			detWarmFactor = new HbefaWarmEmissionFactor(.00011, zeroSgVelocity);
 
-			for( Pollutant wp : pollutants ){
+
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(zeroRoadCatgory);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 		}
-
 	}
-
-
-
 }
 	
 
