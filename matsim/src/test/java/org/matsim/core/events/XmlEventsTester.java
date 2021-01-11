@@ -57,7 +57,9 @@ public abstract class XmlEventsTester extends TestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
+		events.initProcessing();
 		new MatsimEventsReader(events).readFile(eventsFile);
+		events.finishProcessing();
 
 		assertEquals("there must be 1 event.", 1, collector.getEvents().size());
 		Event readEvent = collector.getEvents().iterator().next();

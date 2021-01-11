@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -36,6 +37,8 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.AccessEgressType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -106,7 +109,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -200,24 +203,39 @@ public class PtAlongALine2Test{
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
-								    .setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
-								    .setAdvanceRequestPlanningHorizon(99999));
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode(TransportMode.drt)
+						.setMaxTravelTimeAlpha(2.0)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true)
+						.setAdvanceRequestPlanningHorizon(99999);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
+
 			}
 			if ( drt2 ) {
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt2" ).setMaxTravelTimeAlpha( 1.3 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt2")
+						.setMaxTravelTimeAlpha(1.3)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
 			}
 			if ( drt3 ) {
-				mm.addParameterSet(
-						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 )
-								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
+				DrtConfigGroup drtConfigGroup = new DrtConfigGroup().setMode("drt3")
+						.setMaxTravelTimeAlpha(1.3)
+						.setMaxTravelTimeBeta(5. * 60.)
+						.setStopDuration(60.)
+						.setMaxWaitTime(Double.MAX_VALUE)
+						.setRejectRequestIfMaxWaitOrTravelTimeViolated(false)
+						.setUseModeFilteredSubnetwork(true);
+				drtConfigGroup.addParameterSet(new ExtensiveInsertionSearchParams());
+				mm.addParameterSet(drtConfigGroup);
 			}
 
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
@@ -480,7 +498,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -619,7 +637,7 @@ public class PtAlongALine2Test{
 
 		// === ROUTER: ===
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+		config.plansCalcRoute().setAccessEgressType(AccessEgressType.accessEgressModeToLink);
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)

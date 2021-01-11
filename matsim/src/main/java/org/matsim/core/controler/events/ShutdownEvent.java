@@ -33,10 +33,12 @@ public final class ShutdownEvent extends ControlerEvent {
 	 * Flag to indicate if the controler was shutdown unexpected
 	 */
 	private final boolean unexpected;
-
-	public ShutdownEvent(final MatsimServices controler, final boolean unexpected) {
+	private final int iteration;
+	
+	public ShutdownEvent(final MatsimServices controler, final boolean unexpected, int iteration) {
 		super(controler);
 		this.unexpected = unexpected;
+		this.iteration = iteration;
 	}
 
 	/**
@@ -45,5 +47,8 @@ public final class ShutdownEvent extends ControlerEvent {
 	public boolean isUnexpected() {
 		return this.unexpected;
 	}
-
+	
+	public int getIteration() {
+		return iteration;
+	}
 }

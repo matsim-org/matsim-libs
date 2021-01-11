@@ -22,12 +22,13 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.function.Function;
 
+import javax.inject.Provider;
+
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponent;
 
 import com.google.inject.Key;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 
@@ -94,19 +95,24 @@ public abstract class AbstractDvrpModeQSimModule extends AbstractQSimModule {
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass, Key<? extends T> key) {
-		bind(componentClass).annotatedWith(getDvrpMode()).to(key).asEagerSingleton();
-		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+		bindModal(componentClass).to(key).asEagerSingleton();
+		addModalQSimComponentBinding().to(modalKey(componentClass));
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass,
-			Provider<T> componentProvider) {
-		bind(componentClass).annotatedWith(getDvrpMode()).toProvider(componentProvider).asEagerSingleton();
-		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+			Provider<? extends T> componentProvider) {
+		bindModal(componentClass).toProvider(componentProvider).asEagerSingleton();
+		addModalQSimComponentBinding().to(modalKey(componentClass));
+	}
+
+	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass,
+			Class<? extends T> implementation) {
+		bindModal(componentClass).to(implementation).asEagerSingleton();
+		addModalQSimComponentBinding().to(modalKey(componentClass));
 	}
 
 	protected final <T extends QSimComponent> void addModalComponent(Class<T> componentClass) {
-		bind(componentClass).annotatedWith(getDvrpMode()).to(componentClass).asEagerSingleton();
-		addQSimComponentBinding(getDvrpMode()).to(Key.get(componentClass, getDvrpMode()));
+		addModalComponent(componentClass, componentClass);
 	}
 
 	protected final <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

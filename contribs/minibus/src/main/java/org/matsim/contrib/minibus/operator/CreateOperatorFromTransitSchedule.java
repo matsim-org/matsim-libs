@@ -119,7 +119,24 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 				} else if (longestRouteR.getStops().size() < route.getStops().size()) {
 					longestRouteR = route;
 				}
-			}			
+			} else {
+				/*
+				 * The two travel directions are not marked by .H or .R so the existing code just picked up no stops but
+				 * carried on anyway to fail later (due to the lack of stops). This is an attempt to avoid such
+				 * exceptions, but it is obviously simplified and therefore creates less precise results.
+				 * It seems time-consuming to programmatically determine what is a forward direction TransitRoute and
+				 * what is a backward direction TransitRoute.
+				 * The idea is to only provide one direction (as we cannot identify the opposite direction or that
+				 * opposite direction might even not exist at all) and hope that the errors caused by that in terms of
+				 * wrong overall travel time, headway and missing backward direction stopsToBeServed will be fixed
+				 * over iterations by the minibus algorithm.
+				 */
+				if (longestRouteH == null) {
+					longestRouteH = route;
+				} else if (longestRouteH.getStops().size() < route.getStops().size()) {
+					longestRouteH = route;
+				}
+			}
 			
 			for (Departure departure : route.getDepartures().values()) {
 				if (startTime > departure.getDepartureTime()) {
@@ -141,11 +158,15 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 		// current planned headway in case number of vehicles is not changed
 		double departureOffset = 0.0;
 		if (longestRouteH != null) {
-			departureOffset += longestRouteH.getStops().get(longestRouteH.getStops().size() - 1).getDepartureOffset().seconds();
+			TransitRouteStop lastStop = longestRouteH.getStops().get(longestRouteH.getStops().size() - 1);
+			double lastStopOffset = lastStop.getDepartureOffset().isDefined() ? lastStop.getDepartureOffset().seconds() : lastStop.getArrivalOffset().seconds();
+			departureOffset += lastStopOffset;
 		}
 		
 		if (longestRouteR != null) {
-			departureOffset += longestRouteR.getStops().get(longestRouteR.getStops().size() - 1).getDepartureOffset().seconds();
+			TransitRouteStop lastStop = longestRouteR.getStops().get(longestRouteR.getStops().size() - 1);
+			double lastStopOffset = lastStop.getDepartureOffset().isDefined() ? lastStop.getDepartureOffset().seconds() : lastStop.getArrivalOffset().seconds();
+			departureOffset += lastStopOffset;
 		}
 		
 		double headway = departureOffset / vehicleIds.size(); 

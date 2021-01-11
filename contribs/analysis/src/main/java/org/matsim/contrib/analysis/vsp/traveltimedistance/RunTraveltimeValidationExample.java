@@ -54,8 +54,7 @@ public class RunTraveltimeValidationExample {
   	<li>A MATSim Events file</li>
   	<li>A MATSim Network file</li>
   	<li>EPSG-Code of your coordinate system</li>
-  	<li>HERE Maps APP ID, see here.com</li>
-  	<li>HERE Maps APP code, see here.com</li>
+  	<li>HERE Maps API Key, to be requested on here.com</li>
 	<li>Output folder location</li>
 	<li>The date to validate travel times for, format: YYYY-MM-DD</li>
 
@@ -69,13 +68,12 @@ public class RunTraveltimeValidationExample {
 		String events = args[1];
 		String network = args [2];
 		String epsg = args[3];
-		String appId = args[4];
-		String appCode = args[5];
+		String apiKey = args[4];
+		String outputfolder = args[5];
+		String date = args[6];
 		Integer tripsToValidate = null;
-		String outputfolder = args[6];
-		String date = args[7];
-		if (args.length>8){
-			tripsToValidate = Integer.parseInt(args[8]);
+		if (args.length>7){
+			tripsToValidate = Integer.parseInt(args[7]);
 		}
 
         Set<Id<Person>> populationIds = new HashSet<>();
@@ -89,10 +87,11 @@ public class RunTraveltimeValidationExample {
             }
         });
         spr.readFile(plans);
+        System.out.println("populationId Size is " + populationIds.size());
 
 
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
-		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, appId, appCode, date, transformation);
+		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, apiKey, date, transformation);
         //Setting this to true will write out the raw JSON files for each calculated route
         validator.setWriteDetailedFiles(false);
 		TravelTimeValidationRunner runner;

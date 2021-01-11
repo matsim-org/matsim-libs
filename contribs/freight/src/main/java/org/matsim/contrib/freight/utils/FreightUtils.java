@@ -42,6 +42,9 @@ import org.matsim.vehicles.VehicleType;
 
 import javax.management.InvalidAttributeValueException;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 /**
  * Utils for the work with the freight contrib
@@ -55,8 +58,7 @@ public class FreightUtils {
 	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .
 	 * This string constant will eventually become private.
 	 */
-	@Deprecated
-	public static final String CARRIERS = "carriers";
+	private static final String CARRIERS = "carriers";
 	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class);
 
@@ -71,9 +73,9 @@ public class FreightUtils {
 	 *
 	 * @param scenario
 	 * @param freightConfigGroup
-	 * @throws InvalidAttributeValueException
+	 * @throws ExecutionException, InterruptedException
 	 */
-	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws InvalidAttributeValueException {
+	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws ExecutionException, InterruptedException {
 
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
 				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
@@ -81,34 +83,61 @@ public class FreightUtils {
 
 		Carriers carriers = FreightUtils.getCarriers(scenario);
 
-		for (Carrier carrier : carriers.getCarriers().values()){
-				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
+		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
+
+		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
+			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getShipments().size());
+		}
+
+		HashMap<Id<Carrier>, Integer> sortedMap = carrierActivityCounterMap.entrySet().stream()
+				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
+		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
+		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+		forkJoinPool.submit(() -> tempList.parallelStream().forEach(carrierId -> {
+			Carrier carrier = carriers.getCarriers().get(carrierId);
+
+			double start = System.currentTimeMillis();
+			int serviceCount = carrier.getServices().size();
+			log.info("Start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
+
+			VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork())
 					.setRoutingCost(netBasedCosts)
 					.build();
+			VehicleRoutingAlgorithm algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightConfigGroup, netBasedCosts, problem);
 
-			VehicleRoutingAlgorithm algorithm;
-
-			algorithm = MatsimJspritFactory.loadOrCreateVehicleRoutingAlgorithm(scenario, freightConfigGroup, netBasedCosts, problem);
-
-			algorithm.getAlgorithmListeners().addListener(new StopWatch(),
-					VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
-			if (jspritIterations > 0) {
+			try {
+				if (jspritIterations > 0) {
 				algorithm.setMaxIterations(jspritIterations);
-			} else {
+				} else {
 				throw new InvalidAttributeValueException(
-						"Carrier has invalid number of jsprit iterations. They must be positive."
-								+ carrier.getId().toString());
+						"Carrier has invalid number of jsprit iterations. They must be positive! Carrier id: "
+								+ carrier.getId().toString());}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+//				e.printStackTrace();
 			}
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 
+			log.info("tour planning for carrier " + carrier.getId() + " took "
+					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
 
+			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);
+			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took "
+					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			carrier.setSelectedPlan(newPlan);
-		}
+		})).get();
+
 	}
 
 	/**
@@ -160,6 +189,10 @@ public class FreightUtils {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
+		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
+			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
+								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
+		}
 		return (Carriers) scenario.getScenarioElement(CARRIERS);
 	}
 
@@ -178,8 +211,7 @@ public class FreightUtils {
 	 * @param scenario
 	 */
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
-		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(),
-				FreightConfigGroup.class);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class);
 
 		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
 		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );

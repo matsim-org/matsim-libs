@@ -25,49 +25,61 @@ package org.matsim.contrib.drt.analysis;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtDriveTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileCalculator;
 import org.matsim.contrib.drt.util.stats.DrtVehicleOccupancyProfileWriter;
-import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.MatsimServices;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public class DrtModeAnalysisModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
+	private final ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes;
 
 	public DrtModeAnalysisModule(DrtConfigGroup drtCfg) {
+		this(drtCfg, ImmutableSet.of(DrtDriveTask.TYPE, DrtStopTask.TYPE));
+	}
+
+	public DrtModeAnalysisModule(DrtConfigGroup drtCfg, ImmutableSet<Task.TaskType> nonPassengerServingTaskTypes) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
+		this.nonPassengerServingTaskTypes = nonPassengerServingTaskTypes;
 	}
 
 	@Override
 	public void install() {
-		bindModal(DrtPassengerAndVehicleStats.class).toProvider(modalProvider(
-				getter -> new DrtPassengerAndVehicleStats(getter.get(Network.class), getter.get(EventsManager.class), drtCfg,
+		bindModal(DrtVehicleDistanceStats.class).toProvider(modalProvider(
+				getter -> new DrtVehicleDistanceStats(getter.get(Network.class), drtCfg,
 						getter.getModal(FleetSpecification.class)))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtVehicleDistanceStats.class));
 
-		bindModal(DrtRequestAnalyzer.class).toProvider(modalProvider(
-				getter -> new DrtRequestAnalyzer(getter.get(EventsManager.class), getter.get(Network.class), drtCfg)))
-				.asEagerSingleton();
+		bindModal(DrtRequestAnalyzer.class).toProvider(
+				modalProvider(getter -> new DrtRequestAnalyzer(drtCfg.getMode()))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtRequestAnalyzer.class));
 
 		addControlerListenerBinding().toProvider(modalProvider(
 				getter -> new DrtAnalysisControlerListener(getter.get(Config.class), drtCfg,
-						getter.getModal(FleetSpecification.class), getter.getModal(DrtPassengerAndVehicleStats.class),
+						getter.getModal(FleetSpecification.class), getter.getModal(DrtVehicleDistanceStats.class),
 						getter.get(MatsimServices.class), getter.get(Network.class),
 						getter.getModal(DrtRequestAnalyzer.class)))).asEagerSingleton();
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
-			@Override
-			protected void configureQSim() {
-				addModalQSimComponentBinding().toProvider(modalProvider(
-						getter -> new DrtVehicleOccupancyProfileWriter(getter.getModal(Fleet.class),
-								getter.get(MatsimServices.class), drtCfg)));
-			}
-		});
+		bindModal(DrtVehicleOccupancyProfileCalculator.class).toProvider(modalProvider(
+				getter -> new DrtVehicleOccupancyProfileCalculator(getMode(), getter.getModal(FleetSpecification.class),
+						300, getter.get(QSimConfigGroup.class), nonPassengerServingTaskTypes))).asEagerSingleton();
+		addEventHandlerBinding().to(modalKey(DrtVehicleOccupancyProfileCalculator.class));
+
+		addControlerListenerBinding().toProvider(modalProvider(
+				getter -> new DrtVehicleOccupancyProfileWriter(getter.get(MatsimServices.class), drtCfg,
+						getter.getModal(DrtVehicleOccupancyProfileCalculator.class))));
+
 	}
 }

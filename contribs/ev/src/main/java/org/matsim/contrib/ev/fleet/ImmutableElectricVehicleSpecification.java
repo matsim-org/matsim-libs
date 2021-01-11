@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 
 /**
@@ -87,6 +88,17 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 	@Override
 	public double getBatteryCapacity() {
 		return batteryCapacity;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("id", id)
+				.add("vehicleType", vehicleType)
+				.add("chargerTypes", chargerTypes)
+				.add("initialSoc", initialSoc)
+				.add("batteryCapacity", batteryCapacity)
+				.toString();
 	}
 
 	public static final class Builder {

@@ -42,7 +42,7 @@ import org.matsim.core.population.routes.NetworkRoute;
  */
 public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 	private DynAgent agent;
-	private Iterator<PlanElement> planElemIter;
+	private final Iterator<PlanElement> planElemIter;
 
 	/**
 	 * @param plan

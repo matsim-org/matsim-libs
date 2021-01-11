@@ -45,7 +45,7 @@ class LegTimesControlerListener implements AfterMobsimListener {
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "tripdurations.txt"));
+			legTimes.writeStats(controlerIO.getIterationFilename(event.getIteration(), "legdurations.txt"));
 			// - print averages in log
 			log.info("[" + event.getIteration() + "] average trip (probably: leg) duration is: " + (int) legTimes.getAverageTripDuration()
 					+ " seconds = " + Time.writeTime(legTimes.getAverageTripDuration(), Time.TIMEFORMAT_HHMMSS));

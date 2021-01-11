@@ -69,7 +69,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 
 	@Override
 	public QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context, qsimConfig ) ;
 		return builder.build( node ) ;
 	}
 

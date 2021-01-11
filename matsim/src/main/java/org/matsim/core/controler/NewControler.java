@@ -125,8 +125,12 @@ class NewControler extends AbstractController implements ControlerI {
 	}
 
 	@Override
-	protected final boolean continueIterations(int it) {
-		return terminationCriterion.continueIterations(it);
+	protected final boolean mayTerminateAfterIteration(int iteration) {
+		return terminationCriterion.mayTerminateAfterIteration(iteration);
 	}
 
+	@Override
+	protected final boolean shouldTerminate(int iteration) {
+		return terminationCriterion.doTerminate(iteration);
+	}
 }

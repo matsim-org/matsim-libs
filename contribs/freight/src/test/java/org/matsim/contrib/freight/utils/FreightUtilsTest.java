@@ -20,6 +20,8 @@ package org.matsim.contrib.freight.utils;
 
 import java.net.URL;
 import java.util.Collection;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -434,8 +436,6 @@ public class FreightUtilsTest {
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
 
-		setJspritIterationsForCarriers(scenario);
-
 		try {
 			FreightUtils.runJsprit(scenario, freightConfig);
 		} catch (Exception e) {
@@ -449,14 +449,21 @@ public class FreightUtilsTest {
 	/**
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
-	@Test(expected = javax.management.InvalidAttributeValueException.class)
-	public void testRunJsprit_NoOfJsprtiIterationsMissing() throws InvalidAttributeValueException {
+	@Test(expected = java.util.concurrent.ExecutionException.class)
+	public void testRunJsprit_NoOfJspritIterationsMissing() throws ExecutionException, InterruptedException {
 		Config config = prepareConfig();
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
+
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		//remove all attributes --> remove the NumberOfJspritIterations attribute to trigger exception
+		Carriers carriers = FreightUtils.getCarriers(scenario);
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			carrier.getAttributes().clear();
+		}
 
 		FreightUtils.runJsprit(scenario, freightConfig);
 	}
@@ -470,8 +477,6 @@ public class FreightUtilsTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-
-		setJspritIterationsForCarriers(scenario);
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
 		try {
@@ -496,10 +501,5 @@ public class FreightUtilsTest {
 		return config;
 	}
 
-	private void setJspritIterationsForCarriers(Scenario scenario) {
-		for (Carrier carrier : FreightUtils.getCarriers(scenario).getCarriers().values()) {
-			CarrierUtils.setJspritIterations(carrier, 1);
-		}
-	}
 
 }

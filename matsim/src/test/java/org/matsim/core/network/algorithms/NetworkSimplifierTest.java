@@ -20,7 +20,13 @@
 
 package org.matsim.core.network.algorithms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Map;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,21 +36,20 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class NetworkSimplifierTest {
 
-	@Test
-	public void testBuildNetwork(){
-		Network network = buildNetwork();
-		assertEquals("Wrong number of nodes.",  6, network.getNodes().size());
-		assertEquals("Wrong number of links.",  5, network.getLinks().size());
+	@Before
+	public void setUp() {
+		Id.resetCaches();
 	}
-	
-	
+
+	@Test
+	public void testBuildNetwork() {
+		Network network = buildNetwork();
+		assertEquals("Wrong number of nodes.", 6, network.getNodes().size());
+		assertEquals("Wrong number of links.", 5, network.getLinks().size());
+	}
+
 	@Test
 	public void testRun() {
 		Network network = buildNetwork();

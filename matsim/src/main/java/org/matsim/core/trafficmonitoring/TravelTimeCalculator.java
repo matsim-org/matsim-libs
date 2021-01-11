@@ -19,11 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -52,7 +48,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import com.google.inject.Inject;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -273,7 +272,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		 * performs a trip with one of those modes. if not, we skip the event. */
 		if (filterAnalyzedModes && vehiclesToIgnore.contains(e.getVehicleId())) return;
 
-		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getVehicleId());
+		LinkEnterEvent oldEvent = this.linkEnterEvents.put(e.getVehicleId(), e);
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id<Link>, Id<Link>> fromToLink = new Tuple<>(oldEvent.getLinkId(), e.getLinkId());
 			TravelTimeData data = getLinkToLinkTravelTimeData(fromToLink );
@@ -283,7 +282,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			data.addTravelTime(timeSlot, e.getTime() - enterTime );
 			data.setNeedsConsolidation( true );
 		}
-		this.linkEnterEvents.put(e.getVehicleId(), e);
 	}
 
 	@Override
@@ -479,12 +477,11 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 					// if the travel time that has been measured so far is less than that minimum travel time, then do something:
 					if (travelTime < minTravelTime) {
-
-						data.setTravelTime(i, minTravelTime );
 						// (set the travel time to the smallest possible travel time that makes sense according to the argument above)
-
+						travelTime = minTravelTime;
+						data.setTravelTime(i, travelTime);
 					}
-					prevTravelTime = data.getTravelTime(i, i * this.timeSlice ) ;
+					prevTravelTime = travelTime;
 				}
 				data.setNeedsConsolidation( false );
 			}

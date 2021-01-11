@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -106,7 +106,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.19</version>
+                    <version>2.19</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -126,6 +126,7 @@
 						<descriptors>
 							<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 						</descriptors>
+						<attach>false</attach>
 					</configuration>
 					<executions>
 						<execution>
@@ -152,6 +153,7 @@
 		<module>commercialTrafficApplications</module>
 		<module>common</module>
 		<module>decongestion</module>
+		<module>discrete_mode_choice</module>
 		<module>drt</module>
 		<module>dvrp</module>
 		<module>ev</module>
@@ -171,8 +173,10 @@
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
 		<module>roadpricing</module>
+		<module>sbb-extensions</module>
 		<module>signals</module>
 		<module>socnetsim</module>
+		<module>sumo</module>
 		<module>taxi</module>
 		<module>vsp</module>
 	</modules>
@@ -202,7 +206,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13</version>
+			<version>4.13.1</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
@@ -215,14 +219,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
@@ -235,7 +239,7 @@
 			<!--<version>0.10.0</version>-->
 			<!--<version>0.11.0-apr17</version>-->
 			<scope>test</scope>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 		<dependency>
@@ -253,16 +257,6 @@
 				<pluginManagement>
 					<plugins>
 						<plugin>
-							<groupId>org.codehaus.mojo</groupId>
-							<artifactId>cobertura-maven-plugin</artifactId>
-							<version>2.7</version>
-							<configuration>
-								<formats>
-									<format>xml</format>
-								</formats>
-							</configuration>
-						</plugin>
-						<plugin>
 							<groupId>org.apache.maven.plugins</groupId>
 							<artifactId>maven-javadoc-plugin</artifactId>
 							<version>3.1.1</version>
@@ -274,6 +268,32 @@
 				</pluginManagement>
 			</build>
 		</profile>
+		<profile>
+			<id>jacoco</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.6</version>
+						<executions>
+							<execution>
+								<id>default-prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>default-report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<properties>
@@ -281,6 +301,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
+		<argLine></argLine>
 	</properties>
 
 </project>

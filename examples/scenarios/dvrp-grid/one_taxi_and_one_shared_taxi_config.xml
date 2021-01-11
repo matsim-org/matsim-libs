@@ -6,6 +6,7 @@
 
 	<module name="multiModeDrt">
 		<parameterset type="drt">
+			<parameterset type="ExtensiveInsertionSearch"/>
 			<param name="stopDuration" value="60"/>
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>

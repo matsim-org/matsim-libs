@@ -38,12 +38,10 @@ public class VrpPaths {
 	 */
 	public static VrpPathWithTravelData calcAndCreatePath(Link fromLink, Link toLink, double departureTime,
 			LeastCostPathCalculator router, TravelTime travelTime) {
-		Path path = null;
-		if (fromLink != toLink) {
-			// calc path for departureTime+1 (we need 1 second to move over the node)
-			path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + 1, null, null);
-		}
-
+		Path path = fromLink == toLink ?
+				null :
+				router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(), departureTime + FIRST_LINK_TT,
+						null, null);
 		return VrpPaths.createPath(fromLink, toLink, departureTime, path, travelTime);
 	}
 
@@ -53,7 +51,7 @@ public class VrpPaths {
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
 			TravelTime travelTime) {
-		return createPath(fromLink, toLink, departureTime, pathData.path, travelTime);
+		return createPath(fromLink, toLink, departureTime, pathData.getPath(), travelTime);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
@@ -107,9 +105,9 @@ public class VrpPaths {
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
 
-	static final double FIRST_LINK_TT = 1;
+	public static final double FIRST_LINK_TT = 1;
 
-	static double getLastLinkTT(Link lastLink, double time) {
+	public static double getLastLinkTT(Link lastLink, double time) {
 		// XXX imprecise if qsimCfg.timeStepSize != 1
 		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time));
 	}

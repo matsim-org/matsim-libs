@@ -20,8 +20,6 @@ package org.matsim.contrib.edrt.optimizer;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
@@ -31,12 +29,11 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.ev.dvrp.ChargingTask;
+import org.matsim.contrib.edrt.schedule.EDrtChargingTask;
 import org.matsim.contrib.ev.dvrp.ETask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
 import org.matsim.contrib.ev.fleet.Battery;
-import org.matsim.core.config.Config;
 
 import com.google.inject.Provider;
 
@@ -48,7 +45,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		public final double socBeforeFinalStay;
 
 		public EVehicleEntry(Entry entry, double socBeforeFinalStay) {
-			super(entry.vehicle, entry.start, entry.startOccupancy, entry.stops);
+			super(entry.vehicle, entry.start, entry.stops);
 			this.socBeforeFinalStay = socBeforeFinalStay;
 		}
 	}
@@ -71,7 +68,8 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		int taskCount = schedule.getTaskCount();
 		if (taskCount > 1) {
 			Task oneBeforeLast = schedule.getTasks().get(taskCount - 2);
-			if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED && oneBeforeLast instanceof ChargingTask) {
+			if (oneBeforeLast.getStatus() != TaskStatus.PERFORMED && oneBeforeLast.getTaskType()
+					.equals(EDrtChargingTask.TYPE)) {
 				return null;
 			}
 		}
@@ -103,18 +101,17 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 	}
 
 	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<EDrtVehicleDataEntryFactory> {
+		private final DrtConfigGroup drtCfg;
 		private final double minimumRelativeSoc;
 
-		@Inject
-		private Config config;
-
-		public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+		public EDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+			this.drtCfg = drtCfg;
 			this.minimumRelativeSoc = minimumRelativeSoc;
 		}
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config), minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
 		}
 	}
 }

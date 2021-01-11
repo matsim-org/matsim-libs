@@ -62,14 +62,14 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
-    private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
+	private static final String WRITE_TRIPS_INTERVAL = "writeTripsInterval";
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
 	private static final String COMPRESSION_TYPE = "compressionType";
 
 	/*package*/ static final String MOBSIM = "mobsim";
-	public enum MobsimType {qsim, JDEQSim}
+	public enum MobsimType {qsim, JDEQSim, hermes}
 
 	private static final String WRITE_SNAPSHOTS_INTERVAL = "writeSnapshotsInterval";
 
@@ -109,14 +109,14 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");
-        map.put(WRITE_TRIPS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations trips CSV are written " +
+		map.put(WRITE_TRIPS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations trips CSV are written " +
                 "to a file. `0' disables trips writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
                 "written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
 		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false. If enabled, the router takes travel times needed for turning moves into account."
 		        + " Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled.");
-        map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
-        map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
+		map.put(FIRST_ITERATION, "Default=0. First Iteration of a simulation.");
+		map.put(LAST_ITERATION, "Default=1000. Last Iteration of a simulation.");
 
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +

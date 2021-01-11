@@ -96,11 +96,15 @@ public final class NoiseOfflineCalculation{
 		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
 		timeTracker.setOutputFilePath(outputFilePath);
 
-		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
-			linkSpeedCalculator.setNoiseContext(noiseContext);
-			events.addHandler(linkSpeedCalculator);
-		}
+		//LinkSpeedCalculation is already injected with the NoiseModule! nk jul '20
+//		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+//			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
+//			linkSpeedCalculator.setNoiseContext(noiseContext);
+//			events.addHandler(linkSpeedCalculator);
+//		}
+
+		final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
+		noiseParams.checkConsistency(noiseContext.getScenario().getConfig());
 
 		EventWriterXML eventWriter = null;
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {

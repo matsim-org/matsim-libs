@@ -25,14 +25,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import com.google.common.collect.ImmutableList;
 
@@ -42,60 +38,19 @@ import com.google.common.collect.ImmutableList;
 public class VehicleData {
 	public static class Entry {
 		public final DvrpVehicle vehicle;
-		public final LinkTimePair start;
-		public final int startOccupancy;
-		public final ImmutableList<Stop> stops;
+		public final Waypoint.Start start;
+		public final ImmutableList<Waypoint.Stop> stops;
+		public final Waypoint.End end;
 
-		public Entry(DvrpVehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
+		public Entry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<Waypoint.Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
-			this.startOccupancy = startOccupancy;
 			this.stops = stops;
-		}
-	}
-
-	public static class Stop {
-		public final DrtStopTask task;
-		public final double latestArrivalTime;// relating to max passenger drive time (for dropoff requests)
-		public final double latestDepartureTime;// relating to passenger max wait time (for pickup requests)
-		public final int occupancyChange;// diff in pickups and dropoffs
-		public final int outgoingOccupancy;
-
-		public Stop(DrtStopTask task, int outputOccupancy) {
-			this.task = task;
-			this.outgoingOccupancy = outputOccupancy;
-
-			latestArrivalTime = calcLatestArrivalTime();
-			// essentially the min of the latest possible arrival times at this stop
-
-			latestDepartureTime = calcLatestDepartureTime();
-			// essentially the min of the latest possible pickup times at this stop
-
-			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
+			this.end = Waypoint.End.OPEN_END;
 		}
 
-		private double calcLatestArrivalTime() {
-			return getMaxTimeConstraint(
-					task.getDropoffRequests().values().stream().mapToDouble(DrtRequest::getLatestArrivalTime),
-					task.getBeginTime());
-		}
-
-		private double calcLatestDepartureTime() {
-			return getMaxTimeConstraint(
-					task.getPickupRequests().values().stream().mapToDouble(DrtRequest::getLatestStartTime),
-					task.getEndTime());
-		}
-
-		private double getMaxTimeConstraint(DoubleStream latestAllowedTimes, double scheduledTime) {
-			//XXX if task is already delayed beyond one or more of latestTimes, use scheduledTime as maxTime constraint
-			//thus we can still add a new request to the already scheduled stops (as no further delays are incurred)
-			//but we cannot add a new stop before the delayed task
-			return Math.max(latestAllowedTimes.min().orElse(Double.MAX_VALUE), scheduledTime);
-		}
-
-		@Override
-		public String toString() {
-			return "VehicleData.Stop for: " + task.toString();
+		public Waypoint getWaypoint(int index) {
+			return index == 0 ? start : (index == stops.size() + 1 ? end : stops.get(index - 1));
 		}
 	}
 

@@ -19,22 +19,29 @@
 
 package org.matsim.contrib.util.timeprofile;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Paint;
 import java.util.List;
 
-import org.jfree.chart.*;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.*;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.xy.*;
+import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYSeries;
+
+import com.google.common.collect.ImmutableMap;
 
 public class TimeProfileCharts {
 	public enum ChartType {
-		Line, StackedArea;
+		Line, StackedArea
 	}
 
-	public static JFreeChart chartProfile(String[] series, List<Double> times, List<Object[]> timeProfile,
-			ChartType type) {
+	public static JFreeChart chartProfile(List<String> series, List<Double> times,
+			List<ImmutableMap<String, Double>> timeProfile, ChartType type) {
 		return chartProfile(createXYDataset(series, times, timeProfile), type);
 	}
 
@@ -42,9 +49,8 @@ public class TimeProfileCharts {
 		JFreeChart chart;
 		switch (type) {
 			case Line:
-				chart = ChartFactory
-						.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset, PlotOrientation.VERTICAL, true,
-								false, false);
+				chart = ChartFactory.createXYLineChart("TimeProfile", "Time [h]", "Values", dataset,
+						PlotOrientation.VERTICAL, true, false, false);
 				break;
 
 			case StackedArea:
@@ -75,23 +81,23 @@ public class TimeProfileCharts {
 		return chart;
 	}
 
-	public static DefaultTableXYDataset createXYDataset(String[] series, List<Double> times,
-			List<Object[]> timeProfile) {
-		XYSeries[] seriesArray = new XYSeries[series.length];
-		for (int s = 0; s < series.length; s++) {
-			seriesArray[s] = new XYSeries(series[s], false, false);
+	public static DefaultTableXYDataset createXYDataset(List<String> series, List<Double> times,
+			List<ImmutableMap<String, Double>> timeProfile) {
+		XYSeries[] seriesArray = new XYSeries[series.size()];
+		for (int s = 0; s < series.size(); s++) {
+			seriesArray[s] = new XYSeries(series.get(s), false, false);
 		}
 
 		for (int t = 0; t < timeProfile.size(); t++) {
-			Object[] timePoint = timeProfile.get(t);
+			ImmutableMap<String, Double> timePoint = timeProfile.get(t);
 			double hour = times.get(t) / 3600;
-			for (int s = 0; s < series.length; s++) {
-				seriesArray[s].add(hour, Double.parseDouble(timePoint[s] + ""));
+			for (int s = 0; s < series.size(); s++) {
+				seriesArray[s].add(hour, timePoint.getOrDefault(series.get(s), 0.));
 			}
 		}
 
 		DefaultTableXYDataset dataset = new DefaultTableXYDataset();
-		for (int s = 0; s < series.length; s++) {
+		for (int s = 0; s < series.size(); s++) {
 			dataset.addSeries(seriesArray[s]);
 		}
 		return dataset;

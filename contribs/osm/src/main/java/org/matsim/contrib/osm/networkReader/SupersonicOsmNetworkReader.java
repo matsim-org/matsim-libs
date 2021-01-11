@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
@@ -26,7 +27,7 @@ import java.util.function.Predicate;
  * Examples on how to use the reader can be found in {@link org.matsim.contrib.osm.examples}
  * <p>
  * For the most common highway tags the {@link LinkProperties} class contains default properties for the
- * corresponding links in the matsim-nework (e.g. speed, number of lanes). Those default properties may be overridden
+ * corresponding links in the matsim-network (e.g. speed, number of lanes). Those default properties may be overridden
  * with custom link properties using the {@link SupersonicOsmNetworkReader.Builder#addOverridingLinkProperties(String, LinkProperties)}
  * method of the Builder.
  */
@@ -40,6 +41,8 @@ public class SupersonicOsmNetworkReader {
 
     private final Predicate<Long> preserveNodeWithId;
     private final AfterLinkCreated afterLinkCreated;
+    private final double freeSpeedFactor;
+    private final double adjustCapacityLength;
     private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
     final OsmNetworkParser parser;
 
@@ -48,11 +51,29 @@ public class SupersonicOsmNetworkReader {
     SupersonicOsmNetworkReader(OsmNetworkParser parser,
                                Predicate<Long> preserveNodeWithId,
                                BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-                               AfterLinkCreated afterLinkCreated) {
+                               AfterLinkCreated afterLinkCreated,
+                               double freeSpeedFactor, double adjustCapacityLength) {
+        this.parser = parser;
+        this.preserveNodeWithId = preserveNodeWithId;
         this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
         this.afterLinkCreated = afterLinkCreated;
-        this.preserveNodeWithId = preserveNodeWithId;
-        this.parser = parser;
+        this.freeSpeedFactor = freeSpeedFactor;
+        this.adjustCapacityLength = adjustCapacityLength;
+    }
+
+    /**
+     * Creates a function to adjust the freespeed for urban links.
+     * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
+     *
+     * @apiNote Can be used as example, but no public access currently
+     */
+    static AfterLinkCreated adjustFreespeed(final double factor) {
+        return (link, osmTags, direction) -> {
+            if (osmTags.containsKey(OsmTags.MAXSPEED)) {
+                if (link.getFreespeed() < 51 / 3.6)
+                    link.setFreespeed(link.getFreespeed() * factor);
+            }
+        };
     }
 
     public Network read(String inputFile) {
@@ -64,10 +85,10 @@ public class SupersonicOsmNetworkReader {
         parser.parse(inputFile);
         this.network = NetworkUtils.createNetwork();
 
-        log.info("starting convertion \uD83D\uDE80");
+        log.info("starting conversion \uD83D\uDE80");
         convert(parser.getWays(), parser.getNodes());
 
-        log.info("finished convertion");
+        log.info("finished conversion");
         return network;
     }
 
@@ -121,7 +142,11 @@ public class SupersonicOsmNetworkReader {
     }
 
     private boolean isCreateSegment(ProcessedOsmNode from, ProcessedOsmNode to, ProcessedOsmWay way) {
-        return (to.isIntersection() || to.getId() == way.getEndNodeId() || preserveNodeWithId.test(to.getId()))
+
+        // if the user wants to have this node, then he should get it no matter what the other conditions are.
+        if (preserveNodeWithId.test(to.getId())) return true;
+
+        return (to.isIntersection() || to.getId() == way.getEndNodeId())
                 && (to.isWayReferenced(way.getId()) || from.isWayReferenced(way.getId()));
     }
 
@@ -132,7 +157,7 @@ public class SupersonicOsmNetworkReader {
     private Collection<WaySegment> handleLoop(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmNode node, ProcessedOsmWay way, int toNodeIndex) {
 
         // we need an extra test whether the loop is within the link filter
-        if (!includeLinkAtCoordWithHierarchy.test(node.getCoord(), way.getLinkProperties().hierachyLevel))
+        if (!includeLinkAtCoordWithHierarchy.test(node.getCoord(), way.getLinkProperties().hierarchyLevel))
             return Collections.emptyList();
 
         List<WaySegment> result = new ArrayList<>();
@@ -196,7 +221,7 @@ public class SupersonicOsmNetworkReader {
         link.setLength(segment.getLength());
         link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
         link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), direction, properties));
-        link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
+        link.setCapacity(LinkProperties.getLaneCapacity(link.getLength(), properties, adjustCapacityLength) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
         afterLinkCreated.accept(link, segment.getTags(), direction);
@@ -231,11 +256,10 @@ public class SupersonicOsmNetworkReader {
 
     private double getFreespeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
         if (tags.containsKey(OsmTags.MAXSPEED)) {
-            double speed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
-            double urbanSpeedFactor = speed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
-            return speed * urbanSpeedFactor;
+            double maxSpeed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
+            return LinkProperties.calculateSpeedIfSpeedTag(maxSpeed, freeSpeedFactor);
         } else {
-            return calculateSpeedIfNoSpeedTag(properties, linkLength);
+            return LinkProperties.calculateSpeedIfNoSpeedTag(linkLength, properties);
         }
     }
 
@@ -250,26 +274,6 @@ public class SupersonicOsmNetworkReader {
             //System.out.println("Could not parse maxspeed tag: " + tag + " ignoring it");
         }
         return properties.freespeed;
-    }
-
-    /*
-     * For links with unknown max speed we assume that links with a length of less than 300m are urban links. For urban
-     * links with a length of 0m the speed is 10km/h. For links with a length of 300m the speed is the default freespeed
-     * property for that highway type. For links with a length between 0 and 300m the speed is interpolated linearly.
-     *
-     * All links longer than 300m the default freesped property is assumed
-     */
-    private double calculateSpeedIfNoSpeedTag(LinkProperties properties, double linkLength) {
-        if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
-                && linkLength < 300) {
-            return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
-        }
-        return properties.freespeed;
-    }
-
-    private double getLaneCapacity(double linkLength, LinkProperties properties) {
-        double capacityFactor = linkLength < 100 ? 2 : 1;
-        return properties.laneCapacity * capacityFactor;
     }
 
     private double getNumberOfLanes(Map<String, String> tags, Direction direction, LinkProperties properties) {
@@ -320,16 +324,30 @@ public class SupersonicOsmNetworkReader {
     public interface AfterLinkCreated {
 
         void accept(Link link, Map<String, String> osmTags, Direction direction);
+
+        /**
+         * Executes function {@code after}, after this function has been executed.
+         * @see java.util.function.Consumer#andThen(Consumer)
+         */
+        default AfterLinkCreated andThen(AfterLinkCreated after) {
+            Objects.requireNonNull(after);
+            return (link, osmTags, direction) -> {
+                accept(link, osmTags, direction);
+                after.accept(link, osmTags, direction);
+            };
+        }
+
     }
 
     public static abstract class AbstractBuilder<T> {
 
-        ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+        Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
         BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
         Predicate<Long> preserveNodeWithId = id -> false;
-        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
-        };
+        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> { };
         CoordinateTransformation coordinateTransformation;
+        double freeSpeedFactor = LinkProperties.DEFAULT_FREESPEED_FACTOR;
+        double adjustCapacityLength = LinkProperties.DEFAULT_ADJUST_CAPACITY_LENGTH;
 
         /**
          * Replace all Link-Properties at once. Link properties describe how an osm-highway-tag is translated into a
@@ -410,6 +428,25 @@ public class SupersonicOsmNetworkReader {
         }
 
         /**
+         * This sets whether the factor, with which speed will be adjusted for urban links.
+         *
+         * @see LinkProperties#DEFAULT_FREESPEED_FACTOR
+         */
+        public AbstractBuilder<T> setFreeSpeedFactor(double freeSpeedFactor) {
+            this.freeSpeedFactor = freeSpeedFactor;
+            return this;
+        }
+
+        /**
+         * Sets the threshold in meter under which the lane capacity will be adjusted.
+         * @see LinkProperties#DEFAULT_ADJUST_CAPACITY_LENGTH
+         */
+        public AbstractBuilder<T> setAdjustCapacityLength(double adjustCapacityLength) {
+            this.adjustCapacityLength = adjustCapacityLength;
+            return this;
+        }
+
+        /**
          * Coordinate transformation to transform spherical-osm-coordinates into euclidean-coordinates suited for matsim
          * simulations
          *
@@ -446,7 +483,7 @@ public class SupersonicOsmNetworkReader {
             return new SupersonicOsmNetworkReader(
                     parser, preserveNodeWithId,
                     includeLinkAtCoordWithHierarchy,
-                    afterLinkCreated
+                    afterLinkCreated, freeSpeedFactor, adjustCapacityLength
             );
         }
     }

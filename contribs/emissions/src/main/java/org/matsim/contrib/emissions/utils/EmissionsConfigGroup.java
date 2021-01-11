@@ -100,6 +100,12 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	private static final String DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR = "detailedVsAverageLookupBehavior";
 	private DetailedVsAverageLookupBehavior detailedVsAverageLookupBehavior = DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort;
 
+	//This is the first quick fix for the issue https://github.com/matsim-org/matsim-libs/issues/1226.
+	// Maybe other (smarter) strategies will be added later. kturner nov'20
+	public enum HbefaTableConsistencyCheckingLevel { allCombinations, consistent, none}
+	private static final String HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL = "hbefaTableConsistencyCheckingLevel";
+	private HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel = HbefaTableConsistencyCheckingLevel.allCombinations;
+
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "file with HBEFA vehicle type specific fleet average warm emission factors";
@@ -128,6 +134,13 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 															   "FALSE (DO NOT USE except for backwards compability): vehicle description is used for the emission specifications. The emission specifications of a vehicle " +
 															   "type should be surrounded by emission specification markers.\n\t\t" +
 															   "do not actively set (or set to null) (default): hbefa vehicle type description comes from attribute in vehicle type." ;
+
+	private static final String HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL_CMT = "Define on which level the entries in the provided hbefa tables are checked for consistency" + "\n\t\t" +
+			HbefaTableConsistencyCheckingLevel.allCombinations.name() + " : check if entries for all combinations of HbefaTrafficSituation, HbefaVehicleCategory, HbefaVehicleAttributes, HbefaComponent. " +
+																"are available in the table. It only checks for paramters that are available in the table (e.g. if there is no HGV in the table, it can also pass. \n\t\t" +
+			HbefaTableConsistencyCheckingLevel.consistent.name() + " : check if the entries for the two HbefaTrafficSituations 'StopAndGo' and 'FreeFlow' (nov 2020, maybe subject to change) are consistently available in the table. \n\t\t" + //TODO
+			HbefaTableConsistencyCheckingLevel.none.name() + " : There is no consistency check. This option is NOT recommended and only for backward capability to inputs from before spring 2020 . \n\t\t" +
+			"Default is " + HbefaTableConsistencyCheckingLevel.allCombinations.name();
 
 	// yyyy the EmissionsSpecificationMarker thing should be replaced by link attributes.  Did not exist when this functionality was written.  kai, oct'18
 
@@ -176,6 +189,8 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 
 //		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);	//is deprecated now. This functionality is integrated in DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR.
 		map.put(DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR, DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT);
+
+		map.put(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL, HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL_CMT);
 
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, EMISSION_FACTORS_WARM_FILE_DETAILED_CMT) ;
 
@@ -295,6 +310,7 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public boolean setUsingDetailedEmissionCalculation( boolean val ) {
 		throw new RuntimeException( message );
 	}
+
 	// ---
 	/**
 	 * @param detailedVsAverageLookupBehavior -- {@value #DETAILED_VS_AVERAGE_LOOKUP_BEHAVIOR_CMT}
@@ -309,6 +325,22 @@ public final class EmissionsConfigGroup extends ReflectiveConfigGroup {
 	public DetailedVsAverageLookupBehavior getDetailedVsAverageLookupBehavior() {
 		return this.detailedVsAverageLookupBehavior;
 	}
+
+	// ---
+	/**
+	 * @param hbefaTableConsistencyCheckingLevel -- {@value #HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL}
+	 * @noinspection JavadocReference
+	 */
+	@StringSetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
+	public void setHbefaTableConsistencyCheckingLevel(HbefaTableConsistencyCheckingLevel hbefaTableConsistencyCheckingLevel) {
+		this.hbefaTableConsistencyCheckingLevel = hbefaTableConsistencyCheckingLevel;
+	}
+
+	@StringGetter(HBEFA_TABLE_CONSISTENCY_CHECKING_LEVEL)
+	public HbefaTableConsistencyCheckingLevel getHbefaTableConsistencyCheckingLevel() {
+		return this.hbefaTableConsistencyCheckingLevel;
+	}
+
 	// ===============
 	/**
 	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}

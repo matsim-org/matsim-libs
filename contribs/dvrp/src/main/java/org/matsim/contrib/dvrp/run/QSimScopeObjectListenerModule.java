@@ -37,6 +37,7 @@ import com.google.inject.Provider;
  *
  * @author Michal Maciejewski (michalm)
  */
+@Deprecated //prefer using events to monitor the state of mobsim from outside (i.e. controller scope)
 public final class QSimScopeObjectListenerModule<T, L extends QSimScopeObjectListener<T> & ControlerListener & MobsimListener>
 		extends AbstractDvrpModeModule {
 	//without requiring listenerClass to implement ControlerListener & MobsimListener

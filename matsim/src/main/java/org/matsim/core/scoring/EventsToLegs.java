@@ -269,7 +269,7 @@ public final class EventsToLegs
 		PendingTransitTravel pendingTransitTravel;
 		PendingVehicleTravel pendingVehicleTravel;
 		if (experiencedRoute.size() > 1) { // different links processed
-			NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute, null);
+			NetworkRoute networkRoute = RouteUtils.createNetworkRoute(experiencedRoute );
 			networkRoute.setTravelTime(travelTime);
 
 			/* use the relative position of vehicle enter/leave traffic events on first/last links
@@ -322,7 +322,7 @@ public final class EventsToLegs
 				route = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
 				route.setDistance(0.0);
 			} else {
-				route = RouteUtils.createNetworkRoute(traveledLinks, null);
+				route = RouteUtils.createNetworkRoute(traveledLinks );
 				double relPosOnDepartureLink = pendingVehicleTravel.relativePositionOnDepartureLink;
 				double relPosOnArrivalLink = vehicleRoute.relativePositionOnLastArrivalLink;
 				route.setDistance(

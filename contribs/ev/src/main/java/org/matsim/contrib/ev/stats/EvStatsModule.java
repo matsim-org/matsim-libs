@@ -50,7 +50,9 @@ public class EvStatsModule extends AbstractModule {
 					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
 							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
 					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
+
 					bind(ChargerPowerCollector.class).asEagerSingleton();
+					addMobsimScopeEventHandlerBinding().to(ChargerPowerCollector.class);
 					// add more time profiles if necessary
 				}
 			}

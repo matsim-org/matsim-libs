@@ -38,9 +38,12 @@ public class RaptorStaticConfig {
     private double beelineWalkDistanceFactor = 1.0;
 
     private double minimalTransferTime = 60;
+    private double transferWalkMargin = 5;
 
     private boolean useModeMappingForPassengers = false;
     private final Map<String, String> passengerModeMappings = new HashMap<>();
+
+    private boolean useCapacityConstraints = false;
 
     private RaptorOptimization optimization = RaptorOptimization.OneToOneRouting;
 
@@ -68,6 +71,14 @@ public class RaptorStaticConfig {
         this.beelineWalkDistanceFactor = beelineWalkDistanceFactor;
     }
 
+    public double getTransferWalkMargin() {
+        return transferWalkMargin;
+    }
+
+    public void setTransferWalkMargin(double transferWalkMargin) {
+        this.transferWalkMargin = transferWalkMargin;
+    }
+
     public double getMinimalTransferTime() {
         return this.minimalTransferTime;
     }
@@ -82,6 +93,14 @@ public class RaptorStaticConfig {
 
     public void setUseModeMappingForPassengers(boolean useModeMappingForPassengers) {
         this.useModeMappingForPassengers = useModeMappingForPassengers;
+    }
+
+    public boolean isUseCapacityConstraints() {
+        return this.useCapacityConstraints;
+    }
+
+    public void setUseCapacityConstraints(boolean useCapacityConstraints) {
+        this.useCapacityConstraints = useCapacityConstraints;
     }
 
     public void addModeMappingForPassengers(String routeMode, String passengerMode) {

@@ -20,6 +20,13 @@
 
 package org.matsim.analysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -35,12 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author mrieser
@@ -148,33 +149,34 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 
 	public void writeStats(final java.io.Writer out) throws UncheckedIOException {
 		try {
-		boolean first = true;
-		for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
-			String key = entry.getKey();
-			int[] counts = entry.getValue();
-			if (first) {
-				first = false;
-				out.write("pattern");
-				for (int i = 0; i < counts.length; i++) {
-					out.write("\t" + (i*SLOT_SIZE/60) + "+");
+			boolean first = true;
+			for (Map.Entry<String, int[]> entry : this.legStats.entrySet()) {
+				String key = entry.getKey();
+				int[] counts = entry.getValue();
+				if (first) {
+					first = false;
+					out.write("pattern");
+					for (int i = 0; i < counts.length; i++) {
+						out.write("\t" + (i * SLOT_SIZE / 60) + "+");
+					}
+					out.write("\n");
+				}
+				out.write(key);
+				for (int count : counts) {
+					out.write("\t" + count);
 				}
 				out.write("\n");
 			}
-			out.write(key);
-            for (int count : counts) {
-                out.write("\t" + count);
-            }
 			out.write("\n");
-		}
-		out.write("\n");
-		if (this.sumTrips == 0) {
-			out.write("average trip duration: no trips!");
-		} else {
-			out.write("average trip duration: "
-					+ (this.sumTripDurations / this.sumTrips) + " seconds = "
-					+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
-		}
-		out.write("\n");
+			if (this.sumTrips == 0) {
+				out.write("average trip duration: no trips!");
+			} else {
+				out.write("average trip duration: "
+						+ (this.sumTripDurations / this.sumTrips)
+						+ " seconds = "
+						+ Time.writeTime(((int)(this.sumTripDurations / this.sumTrips))));
+			}
+			out.write("\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		} finally {

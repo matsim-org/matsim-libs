@@ -19,10 +19,13 @@
 
 package org.matsim.contrib.drt.scheduler;
 
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.DRIVE;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -40,6 +43,8 @@ import com.google.inject.name.Named;
  * @author michalm
  */
 public class EmptyVehicleRelocator {
+	public static final DrtTaskType RELOCATE_VEHICLE_TASK_TYPE = new DrtTaskType("RELOCATE", DRIVE);
+
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
 	private final DrtTaskFactory taskFactory;
@@ -74,7 +79,7 @@ public class EmptyVehicleRelocator {
 		}
 
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath)); // add DRIVE
+		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath, RELOCATE_VEHICLE_TASK_TYPE)); // add RELOCATE
 		// append STAY
 		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
 				vrpPath.getToLink()));

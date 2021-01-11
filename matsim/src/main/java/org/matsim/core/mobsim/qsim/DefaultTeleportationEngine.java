@@ -59,7 +59,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		public int compare(Tuple<Double, MobsimAgent> o1, Tuple<Double, MobsimAgent> o2) {
 			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
 			if (ret == 0) {
-				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+				ret = o2.getSecond()
+						.getId()
+						.compareTo(o1.getSecond()
+								.getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
 			}
 			return ret;
 		}
@@ -68,21 +71,24 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
-	
-	private final boolean withTravelTimeCheck ;
+
+	private final boolean withTravelTimeCheck;
 
 	@Inject
 	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager) {
+		this(scenario, eventsManager, scenario.getConfig().qsim().isUsingTravelTimeCheckInTeleportation());
+	}
+
+	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, boolean withTravelTimeCheck) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
-		
-		withTravelTimeCheck = scenario.getConfig().qsim().isUsingTravelTimeCheckInTeleportation() ;
+		this.withTravelTimeCheck = withTravelTimeCheck;
 	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if ( agent.getExpectedTravelTime().isUndefined() ) {
-			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
+		if (agent.getExpectedTravelTime().isUndefined()) {
+			Logger.getLogger(this.getClass()).info("mode: " + agent.getMode());
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
 					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
 		}
@@ -122,20 +128,19 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		handleTeleportationArrivals();
+		handleTeleportationArrivals(time);
 	}
 
-	private void handleTeleportationArrivals() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-		while (teleportationList.peek() != null) {
+	private void handleTeleportationArrivals(double now) {
+		while (!teleportationList.isEmpty()) {
 			Tuple<Double, MobsimAgent> entry = teleportationList.peek();
 			if (entry.getFirst() <= now) {
 				teleportationList.poll();
 				MobsimAgent personAgent = entry.getSecond();
-				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
-						.getDestinationLinkId());
+				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance, personAgent.getMode()));
+				this.eventsManager.processEvent(
+						new TeleportationArrivalEvent(now, personAgent.getId(), distance, personAgent.getMode()));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);
@@ -147,7 +152,6 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public void onPrepareSim() {
-
 	}
 
 	@Override
@@ -197,5 +201,4 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 			
 		return travelTimeTmp ;
 	}
-
 }

@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public interface BatteryCharging extends ChargingPower {
 	//XXX consider adding if/when needed
-	//double calcEnergyCharge(Charger charger, double chargePeriod);
+	//double calcEnergyCharge(ChargerSpecification charger, double chargePeriod);
 
-	double calcChargingTime(Charger charger, double energy);
+	double calcChargingTime(ChargerSpecification charger, double energy);
 }

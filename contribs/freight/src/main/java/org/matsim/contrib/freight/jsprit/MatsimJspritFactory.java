@@ -239,12 +239,12 @@ public class MatsimJspritFactory {
 
 		VehicleImpl vehicle = vehicleBuilder.build();
 
-		assert carrierVehicle.getEarliestStartTime() == vehicle
-				.getEarliestDeparture() : "carrierVeh must have the same earliestDep as vrpVeh";
-		assert carrierVehicle.getLatestEndTime() == vehicle
-				.getLatestArrival() : "carrierVeh must have the same latestArr as vrpVeh";
-		assert carrierVehicle.getLocation().toString() == vehicle.getStartLocation()
-				.getId() : "locations must be equal";
+		if (carrierVehicle.getEarliestStartTime() != vehicle.getEarliestDeparture())
+			throw new AssertionError("carrierVeh must have the same earliestDep as vrpVeh");
+		if (carrierVehicle.getLatestEndTime() != vehicle.getLatestArrival())
+			throw new AssertionError("carrierVeh must have the same latestArr as vrpVeh");
+		if (carrierVehicle.getLocation().toString() != vehicle.getStartLocation().getId())
+			throw new AssertionError("locations must be equal");
 		return vehicle;
 	}
 
@@ -270,11 +270,12 @@ public class MatsimJspritFactory {
 			FreightUtils.addSkill(carrierVehicle.getType(), skill);
 		}
 
-		assert vehicle.getEarliestDeparture() == carrierVehicle
-				.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
-		assert vehicle.getLatestArrival() == carrierVehicle
-				.getLatestEndTime() : "vehicles must have the same latestEndTime";
-		assert vehicle.getStartLocation().getId() == carrierVehicle.getLocation().toString() : "locs must be the same";
+		if (vehicle.getEarliestDeparture() != carrierVehicle.getEarliestStartTime())
+			throw new AssertionError("vehicles must have the same earliestStartTime");
+		if (vehicle.getLatestArrival() != carrierVehicle.getLatestEndTime())
+			throw new AssertionError("vehicles must have the same latestEndTime");
+		if (vehicle.getStartLocation().getId() != carrierVehicle.getLocation().toString())
+			throw new AssertionError("locs must be the same");
 		return carrierVehicle;
 	}
 
@@ -284,21 +285,22 @@ public class MatsimJspritFactory {
 	 *
 	 * <p>
 	 * No description and engineInformation can be set here. Do it by calling
-	 * setEngineInforation(engineInfo) from the returned object.
+	 * setEngineInformation(engineInfo) from the returned object.
 	 *
-	 * @param type to be transformed
+	 * @param jspritVehType to be transformed
 	 * @return CarrierVehicleType
 	 */
-	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType type) {
-		VehicleType typeBuilder = VehicleUtils.getFactory()
-				.createVehicleType(Id.create(type.getTypeId(), VehicleType.class));
-		typeBuilder.getCapacity().setWeightInTons(type.getCapacityDimensions().get(0));
-		typeBuilder.getCostInformation().setCostsPerMeter(type.getVehicleCostParams().perDistanceUnit);
-		typeBuilder.getCostInformation().setCostsPerSecond(type.getVehicleCostParams().perTransportTimeUnit);
-		VehicleType vehicleType = typeBuilder;
-		vehicleType.getCostInformation().setFixedCost(type.getVehicleCostParams().fix);
-		typeBuilder.setMaximumVelocity(type.getMaxVelocity());
-		return typeBuilder;
+	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritVehType) {
+		VehicleType vehicleType = VehicleUtils.getFactory()
+				.createVehicleType(Id.create(jspritVehType.getTypeId(), VehicleType.class));
+		vehicleType.getCapacity().setWeightInTons(jspritVehType.getCapacityDimensions().get(0));
+		vehicleType.getCostInformation().setCostsPerMeter(jspritVehType.getVehicleCostParams().perDistanceUnit);
+		vehicleType.getCostInformation().setCostsPerSecond(jspritVehType.getVehicleCostParams().perTransportTimeUnit);
+		vehicleType.getCostInformation().setFixedCost(jspritVehType.getVehicleCostParams().fix);
+		VehicleUtils.setCostsPerSecondInService(vehicleType.getCostInformation(), jspritVehType.getVehicleCostParams().perServiceTimeUnit);
+		VehicleUtils.setCostsPerSecondWaiting(vehicleType.getCostInformation(), jspritVehType.getVehicleCostParams().perWaitingTimeUnit);
+		vehicleType.setMaximumVelocity(jspritVehType.getMaxVelocity());
+		return vehicleType;
 	}
 
 	/**
@@ -329,7 +331,20 @@ public class MatsimJspritFactory {
 		}
 		typeBuilder.addCapacityDimension(0, vehicleCapacityInt);
 		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter());
+
 		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		if (VehicleUtils.getCostsPerSecondInService(carrierVehicleType.getCostInformation()) != null) {
+			typeBuilder.setCostPerServiceTime(VehicleUtils.getCostsPerSecondInService(carrierVehicleType.getCostInformation()));
+		} else {
+			log.info("Costs per service time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + carrierVehicleType.getId());
+			typeBuilder.setCostPerServiceTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		}
+		if (VehicleUtils.getCostsPerSecondWaiting(carrierVehicleType.getCostInformation()) != null) {
+			typeBuilder.setCostPerWaitingTime(VehicleUtils.getCostsPerSecondWaiting(carrierVehicleType.getCostInformation()));
+		} else {
+			log.info("Costs per waiting time is not set in VehicleType attributes. Will use the value of costsPerMeter instead. VehicleTypeId: " + carrierVehicleType.getId());
+			typeBuilder.setCostPerWaitingTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		}
 		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();
@@ -343,8 +358,9 @@ public class MatsimJspritFactory {
 	 * @throws IllegalStateException if tourActivity is NOT {@link ServiceActivity}.
 	 */
 	public static ScheduledTour createTour(VehicleRoute route) {
-		assert route.getDepartureTime() == route.getStart()
-				.getEndTime() : "at this point route.getDepartureTime and route.getStart().getEndTime() must be equal";
+		if (route.getDepartureTime() != route.getStart().getEndTime())
+			throw new AssertionError("at this point route.getDepartureTime and route.getStart().getEndTime() must be equal");
+
 		TourActivities tour = route.getTourActivities();
 		CarrierVehicle carrierVehicle = createCarrierVehicle(route.getVehicle());
 		double depTime = route.getStart().getEndTime();
@@ -380,8 +396,10 @@ public class MatsimJspritFactory {
 		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocation().getId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, carrierVehicle, depTime);
-		assert route.getDepartureTime() == sTour
-				.getDeparture() : "departureTime of both route and scheduledTour must be equal";
+    
+		if (route.getDepartureTime() != sTour.getDeparture())
+			throw new AssertionError("departureTime of both route and scheduledTour must be equal");
+
 		return sTour;
 	}
 
@@ -428,7 +446,8 @@ public class MatsimJspritFactory {
 			log.debug("act: " + act);
 		}
 		log.debug("end: " + route.getEnd());
-		assert route.getDepartureTime() == scheduledTour.getDeparture() : "departureTimes of both routes must be equal";
+		if (route.getDepartureTime() != scheduledTour.getDeparture())
+			throw new AssertionError("departureTimes of both routes must be equal");
 		return route;
 	}
 
@@ -482,9 +501,12 @@ public class MatsimJspritFactory {
 			} else
 				log.warn("cannot find linkId " + v.getId());
 			Vehicle veh = createVehicle(v, coordinate);
-			assert veh.getEarliestDeparture() == v
-					.getEarliestStartTime() : "earliestDeparture of both vehicles must be equal";
-			assert veh.getLatestArrival() == v.getLatestEndTime() : "latestArrTime of both vehicles must be equal";
+
+			if (veh.getEarliestDeparture() != v.getEarliestStartTime())
+				throw new AssertionError("earliestDeparture of both vehicles must be equal");
+			if (veh.getLatestArrival() != v.getLatestEndTime())
+				throw new AssertionError("latestArrTime of both vehicles must be equal");
+
 			vrpBuilder.addVehicle(veh);
 		}
 
@@ -734,7 +756,7 @@ public class MatsimJspritFactory {
 
 				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 				constraintManager.addConstraint(
-						new DistanceConstraint(distanceStateId, stateManager,
+						new DistanceConstraint(
 								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 						ConstraintManager.Priority.CRITICAL);
 
@@ -765,7 +787,7 @@ public class MatsimJspritFactory {
 
 				ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 				constraintManager.addConstraint(
-						new DistanceConstraint(distanceStateId, stateManager,
+						new DistanceConstraint(
 								FreightUtils.getCarrierVehicleTypes(scenario), netBasedCosts),
 						ConstraintManager.Priority.CRITICAL);
 				algorithm = Jsprit.Builder.newInstance(problem)

@@ -23,7 +23,7 @@ public class BicycleLinkSpeedCalculatorTest {
 
     private static final BicycleConfigGroup configGroup = new BicycleConfigGroup();
     private static final double maxBicycleSpeed = 15;
-    private static Network unusedNetwork = NetworkUtils.createNetwork();
+    private static final Network unusedNetwork = NetworkUtils.createNetwork();
 
     @BeforeClass
     public static void before() {
@@ -121,12 +121,24 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithReducedSpeed = createLink(0, "paved", "not-a-cycle-way", 0.5);
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed() * 0.5, 1);
 
-		BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithReducedSpeed, vehicle);
 
         assertTrue(comparisonSpeed > gradientSpeed);
+    }
+
+    @Test
+    public void getMaximumVelocityForLink_noSpeedFactor() {
+
+        var link = createLinkWithNoGradientAndNoSpecialSurface();
+        var vehicle = createVehicle(link.getFreespeed() + 1, 1);
+        var calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+
+        var speed = calculator.getMaximumVelocityForLink(link, vehicle);
+
+        assertEquals(link.getFreespeed(), speed, 0.001);
     }
 
     @Test
@@ -136,7 +148,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkWithCobbleStone = createLink(0, "cobblestone", "not-a-cycle-way", 1.0);
 
         Vehicle vehicle = createVehicle(linkForComparison.getFreespeed(), 1);
-		BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
+        BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
 
         double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison, vehicle);
         double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithCobbleStone, vehicle);
@@ -151,10 +163,8 @@ public class BicycleLinkSpeedCalculatorTest {
         double length = 100;
         Node fromNode = NetworkUtils.createAndAddNode(unusedNetwork, Id.createNodeId(UUID.randomUUID().toString()), from);
         Node toNode = NetworkUtils.createAndAddNode(unusedNetwork, Id.createNodeId(UUID.randomUUID().toString()), to);
-        Link link = NetworkUtils.createAndAddLink(unusedNetwork, Id.createLinkId(UUID.randomUUID().toString()),
+        return NetworkUtils.createAndAddLink(unusedNetwork, Id.createLinkId(UUID.randomUUID().toString()),
                 fromNode, toNode, length, 1000, 1000, 1);
-        link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0);
-        return link;
     }
 
     private Link createLink(double elevation, String surfaceType, String wayType, double speedFactor) {

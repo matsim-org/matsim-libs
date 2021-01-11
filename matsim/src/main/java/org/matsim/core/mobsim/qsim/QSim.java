@@ -20,20 +20,7 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
-import javax.inject.Inject;
-
+import com.google.inject.Injector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -54,13 +41,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -76,7 +58,10 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import com.google.inject.Injector;
+import javax.inject.Inject;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -401,32 +386,38 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		// "added" engines
 		for (MobsimEngine mobsimEngine : this.mobsimEngines) {
 			if (analyzeRunTimes) this.startClockTime = System.nanoTime();
-			
+
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
 
 			mobsimEngine.doSimStep(now);
-			
-			if (analyzeRunTimes) this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startClockTime);
+
+			if (analyzeRunTimes)
+				this.mobsimEngineRunTimes.get(mobsimEngine).addAndGet(System.nanoTime() - this.startClockTime);
 		}
 
 		if (analyzeRunTimes) this.startClockTime = System.nanoTime();
-		
+
 		// console printout:
 		this.printSimLog(now);
-		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > now));
+
+		// trigger the after sim step listeners before finishing the events processing of this sim step.
+		// this gives after sim step listeners like snapshot generator the opportunity to generate events
+		// for the current time step.
 		this.events.afterSimStep(now);
 		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
 
+
 		final QSimConfigGroup qsimConfigGroup = this.scenario.getConfig().qsim();
-		if ( qsimConfigGroup.getSimEndtimeInterpretation()==EndtimeInterpretation.onlyUseEndtime ) {
+		boolean doContinue = (this.agentCounter.isLiving() && (this.stopTime > now));
+		if (qsimConfigGroup.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime) {
 			doContinue = now <= qsimConfigGroup.getEndTime().seconds();
 		}
 
 		if (doContinue) {
 			this.simTimer.incrementTime();
 		}
-		
+
 		if (analyzeRunTimes) this.qSimInternalTime += System.nanoTime() - this.startClockTime;
 
 		return doContinue;
@@ -651,8 +642,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.listenerManager.addQueueSimulationListener(listener);
 	}
 
-	@Inject
-	void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+	@Inject void addQueueSimulationListeners(Set<MobsimListener> listeners) {
+		// I think that "injecting a method" means that the method is called at some point, pulling the method arguments out of injection.  In
+		// consequence, it is assumed that a "Set<MobsimListener>" was bound before, and is used here.  I think that the results of
+		// multibinding will be provided in several ways, one of them as this kind of set.  Thus, the working assumption is that the
+		// <MobsimListener> multibinder that is constructed in AbstractModule is retrieved here.  kai, sep'20
+		
 		for (MobsimListener listener : listeners) {
 			this.listenerManager.addQueueSimulationListener(listener);
 		}

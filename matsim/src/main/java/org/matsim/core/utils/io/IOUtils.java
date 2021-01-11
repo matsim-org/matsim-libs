@@ -22,8 +22,8 @@ package org.matsim.core.utils.io;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4FrameInputStream;
+import net.jpountz.lz4.LZ4FrameOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.GeneralSecurityException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,7 +103,7 @@ import java.util.zip.GZIPOutputStream;
  * 
  * <h2>Compression</h2>
  * 
- * Compessed files are automatically assumed if ceraint file types are
+ * Compressed files are automatically assumed if certain file types are
  * encountered. Currently, the following patterns match certain compression
  * algorithms:
  * 
@@ -112,6 +113,11 @@ import java.util.zip.GZIPOutputStream;
  * <li><code>*.bz2</code>: Bzip2 compression</li>
  * <li><code>*.zst</code>: ZStandard compression</li>
  * </ul>
+ *
+ * <h2>Encryption</h2>
+ *
+ * Files ending with {@code .enc} are assumed to be encrypted and will be handled with {@link CipherUtils}.
+ *
  */
 final public class IOUtils {
 	/**
@@ -218,7 +224,9 @@ final public class IOUtils {
 	 * not compression is assumed.
 	 */
 	private static CompressionType getCompression(URL url) {
-		String[] segments = url.getPath().split("\\.");
+
+		// .enc extension is ignored
+		String[] segments = url.getPath().replace(".enc", "").split("\\.");
 		String lastExtension = segments[segments.length - 1];
 		return COMPRESSION_EXTENSIONS.get(lastExtension.toLowerCase(Locale.ROOT));
 	}
@@ -234,6 +242,9 @@ final public class IOUtils {
 		try {
 			InputStream inputStream = url.openStream();
 
+			if (url.getPath().endsWith(".enc"))
+				inputStream = CipherUtils.getDecryptedInput(inputStream);
+
 			CompressionType compression = getCompression(url);
 			if (compression != null) {
 				switch (compression) {
@@ -241,7 +252,7 @@ final public class IOUtils {
 						inputStream = new GZIPInputStream(inputStream);
 						break;
 					case LZ4:
-						inputStream = new LZ4BlockInputStream(inputStream);
+						inputStream = new LZ4FrameInputStream(inputStream);
 						break;
 					case BZIP2:
 						inputStream = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, inputStream);
@@ -253,7 +264,7 @@ final public class IOUtils {
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
-		} catch (IOException | CompressorException e) {
+		} catch (IOException | CompressorException | GeneralSecurityException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -310,7 +321,7 @@ final public class IOUtils {
 						outputStream = new GZIPOutputStream(outputStream);
 						break;
 					case LZ4:
-						outputStream = new LZ4BlockOutputStream(outputStream);
+						outputStream = new LZ4FrameOutputStream(outputStream);
 						break;
 					case BZIP2:
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);

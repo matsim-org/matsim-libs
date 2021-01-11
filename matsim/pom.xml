@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>12.0-SNAPSHOT</version>
+	<version>13.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
@@ -81,9 +81,8 @@
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
-					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>@{argLine} -Xmx1024m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
 					<!-- skips surefire tests without skipping failsafe tests.
 					     Property value seems to magically default to false -->
 					<!--<skipTests>${skip.surefire.tests}</skipTests>-->
@@ -182,6 +181,7 @@
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
 					</descriptors>
+					<attach>false</attach>
 				</configuration>
 				<executions>
 					<execution>
@@ -207,20 +207,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>cobertura-maven-plugin</artifactId>
-					<version>2.7</version>
-					<configuration>
-						<formats>
-							<format>xml</format>
-						</formats>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<reporting>
@@ -261,17 +247,17 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-1.2-api</artifactId>
-			<version>2.13.0</version>
+			<version>2.13.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -302,7 +288,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.13</version>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -320,7 +306,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>13.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -429,7 +415,42 @@
 			<artifactId>jackson-core</artifactId>
 			<version>2.10.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>3.3.3</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>jacoco</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.6</version>
+						<executions>
+							<execution>
+								<id>default-prepare-agent</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>default-report</id>
+								<goals>
+									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -438,5 +459,6 @@
 		<maven.compiler.target>11</maven.compiler.target>
 		<geotools.version>21.5</geotools.version>
 		<guice.version>4.2.2</guice.version>
+		<argLine></argLine>
 	</properties>
 </project>
