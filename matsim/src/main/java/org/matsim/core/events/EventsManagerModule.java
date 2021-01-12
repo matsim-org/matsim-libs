@@ -26,6 +26,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Set;
 
 public final class EventsManagerModule extends AbstractModule {
@@ -37,11 +38,13 @@ public final class EventsManagerModule extends AbstractModule {
 		} else if (getConfig().parallelEventHandling().getNumberOfThreads() != null) {
 			if (getConfig().parallelEventHandling().getSynchronizeOnSimSteps() != null && getConfig().parallelEventHandling().getSynchronizeOnSimSteps()) {
 				bindEventsManager().to(SimStepParallelEventsManagerImpl.class).asEagerSingleton();
+				//bindEventsManager().to(TinkerManager.class).in(Singleton.class);
 			} else {
 				bindEventsManager().to(ParallelEventsManagerImpl.class).asEagerSingleton();
 			}
 		} else {
-			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).asEagerSingleton();
+			//bindEventsManager().to(SimStepParallelEventsManagerImpl.class).asEagerSingleton();
+			bindEventsManager().to(TinkerManager2.class).in(Singleton.class);
 		}
 		bind(EventHandlerRegistrator.class).asEagerSingleton();
 	}

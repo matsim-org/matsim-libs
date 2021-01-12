@@ -7,16 +7,44 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TinkerManagerTest {
 
     private static final Logger log = Logger.getLogger(TinkerManagerTest.class);
 
+    @Test(expected = RuntimeException.class)
+    public void ensureOrder() {
+
+        var manager = new TinkerManager(1);
+        manager.addHandler((BasicEventHandler) event -> { // nothing
+        });
+
+        manager.initProcessing();
+        manager.processEvent(new SomeEvent(2));
+        manager.processEvent(new SomeEvent(1));
+        manager.afterSimStep(2);
+        manager.finishProcessing();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testExceptionsInHandler() {
+
+        var manager = new TinkerManager(1);
+        manager.addHandler((BasicEventHandler) event -> {
+            throw new RuntimeException("Test");
+        });
+
+            manager.initProcessing();
+            manager.processEvent(new SomeEvent(2));
+            manager.afterSimStep(2);
+            manager.finishProcessing();
+    }
+
     @Test
     public void simpleTest() {
 
-        var manager = new TinkerManager();
+        var manager = new TinkerManager2(1);
         manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
         var assertionHandler = new HandlerForAsyncEvents();
         manager.addHandler(assertionHandler);
@@ -28,6 +56,8 @@ public class TinkerManagerTest {
 
         // move on to the next timestep. The main thread should now wait for the
         manager.processEvent(new SomeEvent(2));
+        manager.afterSimStep(2);
+        manager.processEvent(new AfterSimStepEvent(2));
         manager.finishProcessing();
 
         assertTrue(assertionHandler.isCaughtEvent());
@@ -74,7 +104,7 @@ public class TinkerManagerTest {
             if (event.getEventType().equals(AfterSimStepEvent.EVENT_TYPE)) {
                 try {
                     log.info("reaching thread sleep.");
-                    Thread.sleep(1000); // long computation
+                    Thread.sleep(50); // long computation
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

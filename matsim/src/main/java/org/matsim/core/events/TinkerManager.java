@@ -1,75 +1,182 @@
 package org.matsim.core.events;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 
-import java.util.*;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TinkerManager implements EventsManager {
 
     private static final Logger log = Logger.getLogger(TinkerManager.class);
 
-    private final ExecutorService executorService = Executors.newWorkStealingPool();
+    private final ExecutorService executorService;
     private final Phaser phaser = new Phaser();
-    private final Map<EventHandler, EventsManager> managers = new HashMap<>();
-    private final AtomicDouble currentTimestep = new AtomicDouble();
+    private final List<EventsManager> managers = new ArrayList<>();
+    private final int numberOfThreads;
+    private final AtomicBoolean hasThrown = new AtomicBoolean(false);
 
-    private synchronized void awaitProcessingAndSetNewTimestep(double time) {
-        if (time > currentTimestep.get()) {
+    private double currentTimestep;
+    private int handlerCount;
+    private List<ProcessEvents> processEvents;
 
-            // This is the first event for a new timestep. Wait for processing tasks to finish events of the
-            // previous timestep.
-            log.info("New timestep: " + time + " awaiting events processing to finish");
-            phaser.arriveAndAwaitAdvance();
-            log.info("all events processed new timestep: " + time);
+    @Inject
+    public TinkerManager(ParallelEventHandlingConfigGroup config) {
+        this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
+    }
 
-            // then set up the next timestep and keep processing events.
-            currentTimestep.set(time);
+    public TinkerManager(int numberOfThreads) {
+        this.numberOfThreads = numberOfThreads;
+        executorService = Executors.newFixedThreadPool(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++)
+            managers.add(new EventsManagerImpl());
+    }
+
+    private static class ProcessEvents implements Runnable {
+
+        private final LinkedBlockingQueue<Event> queue = new LinkedBlockingQueue<>();
+        private final ProcessEvents nextProcessor;
+        private final EventsManager manager;
+        private final Phaser phaser;
+
+        private Exception caughtException;
+
+        boolean hadException() {
+            return caughtException != null;
         }
+
+        Exception getCaughtException() {
+            return caughtException;
+        }
+
+        void addEvent(Event event) {
+            phaser.register();
+            this.queue.add(event);
+        }
+
+        private ProcessEvents(EventsManager manager, Phaser phaser, ProcessEvents nextProcessor) {
+            this.nextProcessor = nextProcessor;
+            this.manager = manager;
+            this.phaser = phaser;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    var event = queue.take();
+                    if (event.getEventType().equals(TerminateEvent.EVENT_TYPE)) {
+
+                        phaser.arriveAndDeregister();
+                        break;
+                    } else {
+                        notifyNextProcess(event);
+                        tryProcessEvent(event);
+                    }
+                }
+            } catch (InterruptedException e) {
+                caughtException = e;
+            }
+        }
+
+        private void notifyNextProcess(Event event) {
+            if (nextProcessor != null)
+                nextProcessor.addEvent(event);
+        }
+
+        private void tryProcessEvent(Event event) {
+            try {
+                manager.processEvent(event);
+            } catch (Exception e) {
+                caughtException = e;
+            } finally {
+                phaser.arriveAndDeregister();
+            }
+        }
+    }
+
+    private static class TerminateEvent extends Event {
+
+        private static final String EVENT_TYPE = "terminate";
+
+        public TerminateEvent(double time) {
+            super(time);
+        }
+
+        @Override
+        public String getEventType() {
+            return EVENT_TYPE;
+        }
+    }
+
+
+    private synchronized void setCurrentTimestep(double time) {
+
+        // test again whether timestep needs to be updated inside the synchronized block, to make sure the await
+        // is called only once
+        if (time > currentTimestep) {
+            // wait for event handlers to process all events from previous time step
+            // this waits for events being generated after 'afterSimStep' was called but before the first event of the
+            // new time step is thrown.
+            phaser.arriveAndAwaitAdvance();
+            throwExceptionIfAnyThreadCrashed();
+            currentTimestep = time;
+        }
+    }
+
+    private void throwExceptionIfAnyThreadCrashed() {
+        processEvents.stream()
+                .filter(ProcessEvents::hadException)
+                .findAny()
+                .ifPresent(process -> {
+                    hasThrown.set(true);
+                    throw new RuntimeException(process.getCaughtException());
+                });
+    }
+
+    private void shutDownThreadPool() {
+        processEvent(new TerminateEvent(currentTimestep));
+        executorService.shutdown();
     }
 
     @Override
     public void processEvent(Event event) {
 
-        awaitProcessingAndSetNewTimestep(event.getTime());
-
-        log.info("submitting event to managers: " + event.getEventType() + " " + event.getTime());
-        for (EventsManager manager : managers.values()) {
-
-            // register the new task before submitting it to the thread pool
-            phaser.register();
-            executorService.execute(() -> {
-
-                // process event and tell phaser that this task has been processed
-                log.info("processing event: " + event.getEventType() + " " + event.getTime());
-                manager.processEvent(event);
-                log.info("finished processing event: " + event.getEventType() + " " + event.getTime() + " deregistering from phaser");
-                phaser.arriveAndDeregister();
-            });
+        if (event.getTime() < currentTimestep) {
+            throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
         }
+
+        if (event.getTime() > currentTimestep)
+            setCurrentTimestep(event.getTime());
+
+        processEvents.get(processEvents.size() - 1).addEvent(event);
     }
 
     @Override
     public void addHandler(EventHandler handler) {
-        var manager = new EventsManagerImpl();
-        manager.addHandler(handler);
-        managers.put(handler, manager);
+
+        managers.get(handlerCount % numberOfThreads).addHandler(handler);
+        handlerCount++;
     }
 
     @Override
     public void removeHandler(EventHandler handler) {
-        managers.remove(handler);
+        for (var manager : managers)
+            manager.removeHandler(handler);
     }
 
     @Override
     public void resetHandlers(int iteration) {
-        for (var manager : managers.values())
+        for (var manager : managers)
             manager.resetHandlers(iteration);
     }
 
@@ -78,7 +185,15 @@ public class TinkerManager implements EventsManager {
 
         log.info("register main thread at phaser");
         phaser.register();
-        for (var manager : managers.values()) {
+
+        ProcessEvents nextProcessor = null;
+        processEvents = new ArrayList<>();
+
+        for (var manager : managers) {
+            var process = new ProcessEvents(manager, phaser, nextProcessor);
+            nextProcessor = process;
+            executorService.execute(process);
+            processEvents.add(process);
             manager.initProcessing();
         }
     }
@@ -86,13 +201,10 @@ public class TinkerManager implements EventsManager {
     @Override
     public void afterSimStep(double time) {
 
-        // wait for all events being processed after the mobsim has finished
-        // some mobsimaftersimstep listeners rely on all mobsim events being processed.
-        log.info("afterSimStep awaiting all events to be processed");
         phaser.arriveAndAwaitAdvance();
-        log.info("all events are processed. calling afteSimStep for each manager");
+        throwExceptionIfAnyThreadCrashed();
 
-        for (var manager: managers.values()) {
+        for (var manager : managers) {
             manager.afterSimStep(time);
         }
     }
@@ -100,10 +212,16 @@ public class TinkerManager implements EventsManager {
     @Override
     public void finishProcessing() {
 
-        log.info("finish processing. Awaiting all events to be processed");
-        phaser.awaitAdvance(phaser.arriveAndDeregister());
-        log.info("all events are processed. Deregistered main thread from phaser. Calling finish processing on all managers");
-        for (var manager: managers.values()) {
+        log.info("finishProcessing: Before awaiting all event processes");
+        phaser.arriveAndAwaitAdvance();
+        phaser.arriveAndDeregister();
+        log.info("finishProcessing: After waiting for all events processes.");
+
+        shutDownThreadPool();
+        if (!hasThrown.get())
+            throwExceptionIfAnyThreadCrashed();
+
+        for (var manager : managers) {
             manager.finishProcessing();
         }
     }
