@@ -82,23 +82,18 @@ public class TestWarmEmissionAnalysisModuleCase2{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
+	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	static final String HBEFA_ROAD_CATEGORY = "URB";
 	private static final int leaveTime = 0;
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
 
-	private WarmEmissionAnalysisModule emissionsModule;
+
+	//private WarmEmissionAnalysisModule emissionsModule;
 	private Map<Pollutant, Double> warmEmissions;
 
-	// emission factors for tables - no duplicates!
-	private static final Double DETAILED_PETROL_FACTOR_FF = .1;
-	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
-	private static final Double DETAILED_SGFF_FACTOR_FF =   .000011;
-	private static final Double DETAILED_SGFF_FACTOR_SG = 	.0000011;
-	private static final Double AVG_PC_FACTOR_FF = 1.;
 	private static final Double AVG_PC_FACTOR_SG = 10.;
 
 	// vehicle information for regular test cases
@@ -124,45 +119,20 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-//	@Test
-//	public void testWarmEmissionAnalysisParameter(){
-//		setUp();
-//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-//		if ( (Boolean) true ==null ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-//		} else if ( true ) {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-//		} else {
-//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-//		}
-//
-//		WarmEmissionAnalysisModuleParameter weamp
-//				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, hbefaRoadTrafficSpeeds, pollutants, ecg);
-//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-//		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-//	}
-	// that parameter object no longer exists.  kai, jan'20
 
-	//@Test
-	//public void testWarmEmissionAnalysisModule_exceptions(){
-
-	/* out-dated
-	 * the constructor aborts if either the
-	 * warm emission analysis module parameter or
-	 * the events mangager is null
-	 * EmissionEfficiencyFactor = 'null' is allowed and therefore not tested here
+	/*
+	 * this test method creates a mock link and mock vehicle with a complete vehicleTypId --> lookUpBehaviour: tryDetailedThenTechnologyAverageThenAverageTable
+	 * for two speed cases: avg speed = free flow speed & avg speed = stop go speed the NMHC warm emissions and emissions sum are computed using the two emissionsComputationMethods StopAndGoFraction & AverageSpeed
 	 */
 
-
-	@Test(expected = RuntimeException.class)
+	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent2(){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
 		// see (*) below.  kai, jan'20
-
 
 		// create a link:
 		double pclinkLength= 100.;
@@ -178,13 +148,6 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		{
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
-
-//			2020-02-21 19:55:37,509  WARN WarmEmissionAnalysisModule:403 did not find emission factor for efkey=PASSENGER_CAR; PM_non_exhaust; URB; STOPANDGO; PC petrol <1,4L <ECE; petrol (4S); <1,4L
-
-
-			// test result:
-			switch( this.emissionsComputationMethod ) {
-				case StopAndGoFraction:
 					//KMT Feb'20: Trying to understand the result:
 					// - StopAndGo fraction is computed as 0 --> ONLY freeFlow values needed and looked up
 					// - DETAILED FreeFlow value is available in the table (1.0E-4 g/km);  StopAndGo value is NOT available in the table
@@ -192,41 +155,17 @@ public class TestWarmEmissionAnalysisModuleCase2{
 					// --> It seems like it was intended (or only implemented) in a way, that if one of the detailed values is missing (FreeFlow or StopGo) there is a fallback to average. So the result of this would be 1.0 g/km * 0.1 km = 0.1 g/km
 					// --> Now, after implementing the new fallback behaviour, it is looking up both values (FreeFlow or StopGo) ways independently from each other. Therefore the result comes from the detailed table (1.0E-4 g/km) * * 0.1 km = 1.0E-5 g/km
 					// -----> We need a decision here, if we want allow that inconsistent(?) lookup of FreeFlow and Detailed values with different grade of detail or not.
-					Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
-					break;
-				case AverageSpeed:
-					Assert.assertEquals( DETAILED_PC_FACTOR_FF * pclinkLength / 1000., warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
-					break;
-				default:
-					throw new IllegalStateException( "Unexpected value: " + this.emissionsComputationMethod );
-			}
-			// yyyyyy The above are different for the different computation methods, but for the wrong reasons: In the stopGo case, the value is
-			// not properly specified, and so some fall-back occurs, but in the stopGoFraction case, that fallback is also triggered here, while for
-			// the averageSpeed case, that fallback is only triggered in the stopGo case (following below).  Also see comments elsewhere in
-			// this method.  kai, jan'20
+					// After discussion with Kai N. we decided to let it as it is for the time being. I will add a log.info in the consistency checker.  KMT Jul'20
 
-			// thow corresponding event:
+			//results should be equal here, because in both cases only the freeflow value is relevant (100% freeflow, 0% stop&go).
+			Assert.assertEquals( 0.1, warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON ); //(*#)
+
+			// throw and test corresponding event:
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
-			// test resulting event:
-			switch( emissionsComputationMethod ) {
-				case StopAndGoFraction:
-					Assert.assertEquals( 2.3, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 * number of entries in enum Pollutant)
-					break;
-				case AverageSpeed:
-					Assert.assertEquals( pollutants.size() * DETAILED_PC_FACTOR_FF * pclinkLength / 1000., HandlerToTestEmissionAnalysisModules.getSum(),
-							MatsimTestUtils.EPSILON );
-					break;
-				default:
-					throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
-			}
+			Assert.assertEquals( 2.3, emissionEventManager.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 (g/km -- see expected values a few lines above(*#) * number of entries in enum Pollutant)
 
-			HandlerToTestEmissionAnalysisModules.reset();
+			emissionEventManager.reset();
 			warmEmissions.clear();
-
-			// yyyyyy (*) I haven't understood it yet.  My guess is that this is a really confusing test: With the "averageSpeed" computation
-			// method, only the free flow hbefa value is pulled here, so it uses the "detailed" emissions value.  With the "stopGoFraction"
-			// computation method, however, the stopgo hbefa value is _also_ pullsed (!), and thus it (how??) falls back to the average emissions
-			// value.  :-( :-( :-( :-(  kai, jan'20
 		}
 
 		// sub case avg speed = stop go speed
@@ -235,19 +174,21 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			Assert.assertEquals( AVG_PC_FACTOR_SG * pclinkLength / 1000., warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
 
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
-			Assert.assertEquals(
-					pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., HandlerToTestEmissionAnalysisModules.getSum(),
-					MatsimTestUtils.EPSILON );
-
-			HandlerToTestEmissionAnalysisModules.reset();
+			Assert.assertEquals(pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
+			emissionsModule.reset();
 			warmEmissions.clear();
 		}
 	}
 
-	@Test(expected = RuntimeException.class)
+	/*
+	 * this test method creates a vehicle and mock link
+	 * for three cases:  "current speed equals free flow speed" & "current speed equals stop go speed" & "current speed equals stop go speed" the counters are  tested
+	 * average values are used
+	 */
+	@Test
 	public void testCounters3(){
-		setUp();
-		emissionsModule.reset();
+
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
 		Id<Vehicle> pcVehicleId = Id.create("vehicle 2", Vehicle.class);
@@ -277,14 +218,10 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		Assert.assertEquals(pclinkLength/1000, emissionsModule.getStopGoKmCounter(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals(1, emissionsModule.getStopGoOccurences() );
 		Assert.assertEquals(1, emissionsModule.getWarmEmissionEventCounter() );
-		emissionsModule.reset();
 
 	}
 
-
-
-	private void setUp() {
-
+	private WarmEmissionAnalysisModule setUp() {
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
@@ -294,13 +231,13 @@ public class TestWarmEmissionAnalysisModuleCase2{
 				avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
 
@@ -313,13 +250,19 @@ public class TestWarmEmissionAnalysisModuleCase2{
 		// entry for second test case "pc" -- should not be used
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaTechnology(PC_TECHNOLOGY);
-			vehAtt.setHbefaSizeClass(PC_SIZE_CLASS);
-			vehAtt.setHbefaEmConcept(PC_CONCEPT);
+			vehAtt.setHbefaTechnology( PC_TECHNOLOGY );
+			vehAtt.setHbefaSizeClass( PC_SIZE_CLASS );
+			vehAtt.setHbefaEmConcept( PC_CONCEPT );
+			String ffOnlyConceptAlt = "PC-Alternative Fuel";
+			vehAtt.setHbefaEmConcept( ffOnlyConceptAlt );
+			String ffOnlySizeClassAlt = "not specified";
+			vehAtt.setHbefaSizeClass( ffOnlySizeClassAlt );
+			String ffOnlyTechnologyAlt = "bifuel CNG/petrol";
+			vehAtt.setHbefaTechnology( ffOnlyTechnologyAlt );
 
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(DETAILED_PC_FACTOR_FF, PC_FREE_VELOCITY_KMH);
 
-			for (Pollutant wp : pollutants) {
+			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setComponent(wp);
 				detWarmKey.setRoadCategory(HBEFA_ROAD_CATEGORY);
@@ -340,8 +283,15 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			String ffOnlyTechnology = "diesel";
 			vehAtt.setHbefaTechnology(ffOnlyTechnology);
 
+			String ffOnlyConceptAlt = "PC-Alternative Fuel";
+			vehAtt.setHbefaEmConcept( ffOnlyConceptAlt );
+			String ffOnlySizeClassAlt = "not specified";
+			vehAtt.setHbefaSizeClass( ffOnlySizeClassAlt );
+			String ffOnlyTechnologyAlt = "bifuel CNG/petrol";
+			vehAtt.setHbefaTechnology( ffOnlyTechnologyAlt );
+
 			double detailedFfOnlyFactorFf = .0000001;
-			double ffOnlyffSpeed = 120.;
+			double ffOnlyffSpeed = 20.;
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(detailedFfOnlyFactorFf, ffOnlyffSpeed);
 
 			for (Pollutant wp : pollutants) {
@@ -366,7 +316,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			vehAtt.setHbefaTechnology(sgOnlyTechnology);
 
 			double detailedSgOnlyFactorSg = .00000001;
-			double sgOnlysgSpeed = 50.;
+			double sgOnlysgSpeed = 10.;
 			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(detailedSgOnlyFactorSg, sgOnlysgSpeed);
 
 			for (Pollutant wp : pollutants) {
