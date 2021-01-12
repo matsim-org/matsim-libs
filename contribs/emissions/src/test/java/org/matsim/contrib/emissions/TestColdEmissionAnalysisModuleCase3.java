@@ -160,17 +160,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
-//		{
-//			// add passenger car entry "petrol;none;nullCase":
-//			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
-//			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, nullcase_emConcept );
-//
-//			final HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-//			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
-//			// when the now deprecated execution path goes away.  kai, jul'18)
-//
-//			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, detColdFactor, PASSENGER_CAR );
-//		}
+
 	}
 	
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {

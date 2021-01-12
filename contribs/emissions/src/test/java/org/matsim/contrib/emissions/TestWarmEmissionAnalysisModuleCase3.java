@@ -137,7 +137,8 @@ public class TestWarmEmissionAnalysisModuleCase3{
 		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions );
 		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_FF *dieselLinkLength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
-		emissionEventManager.reset(); warmEmissions.clear();
+		emissionEventManager.reset();
+		warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, diesellink,  dieselLinkLength/ TestWarmEmissionAnalysisModule.AVG_PASSENGER_CAR_SPEED_SG_KMH *3.6 );

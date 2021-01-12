@@ -116,7 +116,6 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-
 	
 	/*
 	 * this test method creates a vehicle (lpg properties) and a mock link
@@ -139,11 +138,12 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 		// sub case avg speed = stop go speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgSgVelocity*3.6 );
-		Assert.assertEquals( AVG_PC_FACTOR_SG *lpgLinkLength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals( AVG_PC_FACTOR_SG *lpgLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON );
 		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
 		Assert.assertEquals( pollutants.size() * AVG_PC_FACTOR_SG *lpgLinkLength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
-		emissionEventManager.reset(); warmEmissions.clear();
+		emissionEventManager.reset();
+		warmEmissions.clear();
 
 		// sub case avg speed = free flow speed
 		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgFreeVelocity*3.6 );

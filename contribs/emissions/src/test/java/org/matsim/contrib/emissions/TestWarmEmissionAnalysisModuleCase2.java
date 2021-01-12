@@ -174,10 +174,7 @@ public class TestWarmEmissionAnalysisModuleCase2{
 			Assert.assertEquals( AVG_PC_FACTOR_SG * pclinkLength / 1000., warmEmissions.get( NMHC ), MatsimTestUtils.EPSILON );
 
 			emissionsModule.throwWarmEmissionEvent( leaveTime, pclink.getId(), pcVehicleId, warmEmissions );
-			Assert.assertEquals(
-					pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., emissionEventManager.getSum(),
-					MatsimTestUtils.EPSILON );
-
+			Assert.assertEquals(pollutants.size() * AVG_PC_FACTOR_SG * pclinkLength / 1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
 			emissionsModule.reset();
 			warmEmissions.clear();
 		}

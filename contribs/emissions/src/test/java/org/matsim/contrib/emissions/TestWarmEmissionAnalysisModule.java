@@ -440,22 +440,26 @@ public class TestWarmEmissionAnalysisModule {
 		// go through all entries in detailed warm table:
 		for( Map.Entry<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> entry : detailedHbefaWarmTable.entrySet() ){
 
+			System.out.println("key: "+entry.getKey() +"value: " + entry.getValue());
+
 			HbefaWarmEmissionFactorKey warmEmissionFactorKey = entry.getKey();
 			HbefaWarmEmissionFactor emissionFactor = entry.getValue();
 
 			// extract road vehicle category key (something like "petrol"-"URB/50")
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey( warmEmissionFactorKey );
 
+			System.out.println(roadVehicleCategoryKey);
+
 			// for that road-vehicle category key, add traffic situation and speed value from current emissions factor:
 			hbefaRoadTrafficSpeeds.putIfAbsent( roadVehicleCategoryKey, new HashMap<>() );
+			System.out.println(hbefaRoadTrafficSpeeds);
 
 
 			// if the value is already set (returning not null) an exception is thrown
 			// avoid overriding of speeds from average table with speed from detailed table
 			if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != null) {
 				if (hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()) != emissionFactor.getSpeed()){
-					System.out.println(hbefaRoadTrafficSpeeds.get(roadVehicleCategoryKey).get(warmEmissionFactorKey.getHbefaTrafficSituation()));
-					System.out.println(emissionFactor.getSpeed());
+
 					throw new RuntimeException("Try to override speeds from average table with speed from detailed table. This may lead to wrong emission calculations. KMT/GR Aug'20");
 				}
 			}
