@@ -101,8 +101,8 @@ public class TestWarmEmissionAnalysisModuleCase4{
 	private static final String lpgTechnology = "PC LPG Euro-4";
 	private static final String lpgSizeClass = "LPG";
 	private static final String lpgConcept = "not specified";
-	private static final Double lpgFreeVelocity = 20.; //km/h
-	private static final Double lpgSgVelocity = 10.; //km/h
+	private static final Double SPEED_FF = 20.; //km/h
+	private static final Double SPEED_SG = 10.; //km/h
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
 	public static Collection<Object[]> createCombinations() {
@@ -131,13 +131,13 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		// case 4 - data in average table
 		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
 		double lpgLinkLength = 700.;
-		Link lpglink = TestWarmEmissionAnalysisModule.createMockLink("link 4", lpgLinkLength, lpgFreeVelocity / 3.6 );
+		Link lpglink = TestWarmEmissionAnalysisModule.createMockLink("link 4", lpgLinkLength, SPEED_FF / 3.6 );
 		Id<VehicleType> lpgVehicleTypeId = Id.create( PASSENGER_CAR + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle lpgVehicle = vehFac.createVehicle(lpgVehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 
 		// sub case avg speed = stop go speed
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgSgVelocity*3.6 );
+		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/ SPEED_SG *3.6 );
 		Assert.assertEquals( AVG_PC_FACTOR_SG *lpgLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON );
 		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
@@ -146,7 +146,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		warmEmissions.clear();
 
 		// sub case avg speed = free flow speed
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgFreeVelocity*3.6 );
+		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/ SPEED_FF *3.6 );
 		Assert.assertEquals( AVG_PC_FACTOR_FF *lpgLinkLength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
 		emissionEventManager.reset();
 		emissionsModule.throwWarmEmissionEvent(leaveTime, lpglink.getId(), lpgVehicleId, warmEmissions );
@@ -172,10 +172,10 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 
-		Link lpgLink = TestWarmEmissionAnalysisModule.createMockLink("link zero", lpgLinkLength, lpgFreeVelocity / 3.6 );
+		Link lpgLink = TestWarmEmissionAnalysisModule.createMockLink("link zero", lpgLinkLength, SPEED_FF / 3.6 );
 
 		// sub case: current speed equals free flow speed
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/lpgFreeVelocity*3.6 );
+		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/ SPEED_FF *3.6 );
 		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assert.assertEquals(lpgLinkLength/1000, emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals(1, emissionsModule.getFreeFlowOccurences() );
@@ -186,7 +186,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 		emissionsModule.reset();
 
 		// sub case: current speed equals free flow speed
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/lpgSgVelocity*3.6 );
+		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(vehicle, lpgLink, lpgLinkLength/ SPEED_SG *3.6 );
 		Assert.assertEquals(0, emissionsModule.getFractionOccurences() );
 		Assert.assertEquals(0., emissionsModule.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON );
 		Assert.assertEquals(0, emissionsModule.getFreeFlowOccurences() );
@@ -199,30 +199,13 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	private WarmEmissionAnalysisModule setUp() {
 
+
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
-
 		TestWarmEmissionAnalysisModule.fillAverageTable( avgHbefaWarmTable );
 		fillDetailedTable( detailedHbefaWarmTable );
-
-
-		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable( avgHbefaWarmTable );
-		log.warn( "" );
-		log.warn( "speeds table from average table:" );
-		for( Map.Entry<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> entry : hbefaRoadTrafficSpeeds.entrySet() ){
-			for( Map.Entry<HbefaTrafficSituation, Double> entry2 : entry.getValue().entrySet() ){
-				log.warn( entry.getKey() + "---" + entry2.getKey() + "---" + entry2.getValue());
-			}
-		}
-		log.warn( "" );
-		log.warn( "speeds table from detailed table:" );
+		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
-		for( Map.Entry<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> entry : hbefaRoadTrafficSpeeds.entrySet() ){
-			for( Map.Entry<HbefaTrafficSituation, Double> entry2 : entry.getValue().entrySet() ){
-				log.warn( entry.getKey() + "---" + entry2.getKey() + "---" + entry2.getValue());
-			}
-		}
-		log.warn( "" );
 
 		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
@@ -234,7 +217,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 
 	}
 
-	private void fillDetailedTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+	private void fillDetailedTable(Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
 
 		// generate some consistent table; however, it should not be used:
 
@@ -249,9 +232,13 @@ public class TestWarmEmissionAnalysisModuleCase4{
 			String ffOnlyTechnology = "diesel";
 			vehAtt.setHbefaTechnology( ffOnlyTechnology );
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor( .0000001 );
-			detWarmFactor.setSpeed( 20. );
+			HbefaWarmEmissionFactor detWarmFactorFF = new HbefaWarmEmissionFactor();
+			detWarmFactorFF.setWarmEmissionFactor( .000001 );
+			detWarmFactorFF.setSpeed(SPEED_FF);
+
+			HbefaWarmEmissionFactor detWarmFactorSG = new HbefaWarmEmissionFactor();
+			detWarmFactorSG.setWarmEmissionFactor( .0000001 );
+			detWarmFactorSG.setSpeed(SPEED_SG);
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -260,8 +247,9 @@ public class TestWarmEmissionAnalysisModuleCase4{
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detailedHbefaWarmTable.put( detWarmKey, detWarmFactorFF );
 			}
+
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent( wp );
@@ -269,7 +257,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detailedHbefaWarmTable.put( detWarmKey, detWarmFactorSG );
 			}
 		}
 
@@ -282,9 +270,13 @@ public class TestWarmEmissionAnalysisModuleCase4{
 			String sgOnlyTechnology = "bifuel CNG/petrol";
 			vehAtt.setHbefaTechnology( sgOnlyTechnology );
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor( .00000001 );
-			detWarmFactor.setSpeed( 10. );
+			HbefaWarmEmissionFactor detWarmFactorFF = new HbefaWarmEmissionFactor();
+			detWarmFactorFF.setWarmEmissionFactor( .0000001 );
+			detWarmFactorFF.setSpeed( SPEED_FF );
+
+			HbefaWarmEmissionFactor detWarmFactorSG = new HbefaWarmEmissionFactor();
+			detWarmFactorSG.setWarmEmissionFactor( .00000001 );
+			detWarmFactorSG.setSpeed( SPEED_SG );
 
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -293,7 +285,7 @@ public class TestWarmEmissionAnalysisModuleCase4{
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detailedHbefaWarmTable.put( detWarmKey, detWarmFactorSG );
 			}
 			for( Pollutant wp : pollutants ){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
@@ -302,10 +294,9 @@ public class TestWarmEmissionAnalysisModuleCase4{
 				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
 				detWarmKey.setHbefaVehicleAttributes( vehAtt );
 				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detailedHbefaWarmTable.put( detWarmKey, detWarmFactorFF );
 			}
 		}
-
 	}
 
 }

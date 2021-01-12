@@ -391,9 +391,7 @@ public class TestWarmEmissionAnalysisModule {
 		// entries for first case "petrol" should not be used since there are entries in the detailed table
 		// there should only average vehicle attributes in the avgHebfWarmTable jm oct'18
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-		//vehAtt.setHbefaEmConcept(petrolConcept);
-		//vehAtt.setHbefaSizeClass(petrolSizeClass);
-		//vehAtt.setHbefaTechnology(petrolTechnology);
+
 
 		// free flow:
 		{
@@ -440,19 +438,14 @@ public class TestWarmEmissionAnalysisModule {
 		// go through all entries in detailed warm table:
 		for( Map.Entry<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> entry : detailedHbefaWarmTable.entrySet() ){
 
-			System.out.println("key: "+entry.getKey() +"value: " + entry.getValue());
-
 			HbefaWarmEmissionFactorKey warmEmissionFactorKey = entry.getKey();
 			HbefaWarmEmissionFactor emissionFactor = entry.getValue();
 
 			// extract road vehicle category key (something like "petrol"-"URB/50")
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey( warmEmissionFactorKey );
 
-			System.out.println(roadVehicleCategoryKey);
-
 			// for that road-vehicle category key, add traffic situation and speed value from current emissions factor:
 			hbefaRoadTrafficSpeeds.putIfAbsent( roadVehicleCategoryKey, new HashMap<>() );
-			System.out.println(hbefaRoadTrafficSpeeds);
 
 
 			// if the value is already set (returning not null) an exception is thrown
