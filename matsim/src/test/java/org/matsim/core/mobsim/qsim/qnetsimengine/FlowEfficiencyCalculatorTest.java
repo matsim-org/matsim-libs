@@ -21,8 +21,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Arrays;
-
+import com.google.inject.Provides;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -34,12 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -50,9 +44,9 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.lanes.Lane;
 
-import com.google.inject.Provides;
+import java.util.Arrays;
 
 public class FlowEfficiencyCalculatorTest {
 	@Test
@@ -118,7 +112,7 @@ public class FlowEfficiencyCalculatorTest {
 		}
 
 		@Override
-		public double calculateFlowEfficiency(Vehicle vehicle, Link link) {
+        public double calculateFlowEfficiency(QVehicle qVehicle, QVehicle previousVehicle, Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
 			return factor;
 		}
 	}

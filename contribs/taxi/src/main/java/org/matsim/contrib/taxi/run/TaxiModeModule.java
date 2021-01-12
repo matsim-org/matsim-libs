@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.taxi.fare.TaxiFareHandler;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
 import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -56,6 +57,9 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
+
+		taxiCfg.getTaxiFareParams()
+				.ifPresent(params -> addEventHandlerBinding().toInstance(new TaxiFareHandler(getMode(), params)));
 
 		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
 				.mode(getMode())

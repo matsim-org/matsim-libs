@@ -104,7 +104,7 @@ public class HermesTest {
 	@Before
 	public void prepareTest() {
 		// TODO - fix these two!
-		Id.flush();
+		Id.resetCaches();
 		ScenarioImporter.flush();
 		HermesConfigGroup.SIM_STEPS = 30 * 60 * 60;
 	}

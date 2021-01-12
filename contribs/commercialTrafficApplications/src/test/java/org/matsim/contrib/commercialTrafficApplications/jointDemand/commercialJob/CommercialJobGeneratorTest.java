@@ -41,7 +41,7 @@ public class CommercialJobGeneratorTest {
         File file = new File(utils.getOutputDirectory() +  "/ITERS/it." + iteration + "/");
         file.mkdirs();
         Controler controler = new Controler(scenario);
-        generator.notifyBeforeMobsim(new BeforeMobsimEvent(controler, iteration));
+        generator.notifyBeforeMobsim(new BeforeMobsimEvent(controler, iteration, false));
     }
 
 

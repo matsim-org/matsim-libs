@@ -104,13 +104,13 @@ public class NoiseRLS19IT {
 
         NoiseLink noiseLink = new NoiseLink(link.getId());
 
-        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario);
+        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network));
 
         final double basePkwEmission = emission.calculateBaseVehicleTypeEmission(RLS19VehicleType.pkw, 40);
         Assert.assertEquals("Wrong base pkw emission!", 97.70334139531323, basePkwEmission, MatsimTestUtils.EPSILON);
 
         double singleVehicleEmission =
-                emission.calculateSingleVehicleEmission(RLS19VehicleType.pkw, 40, 0);
+                emission.calculateSingleVehicleEmission(noiseLink, RLS19VehicleType.pkw, 40);
         Assert.assertEquals("Wrong single pkw emission!", 97.70334139531323, singleVehicleEmission, MatsimTestUtils.EPSILON);
 
         final double vehicleTypePart = emission.calculateVehicleTypeNoise(1, 40, singleVehicleEmission);
@@ -165,7 +165,7 @@ public class NoiseRLS19IT {
         noiseContext.getNoiseLinks().put(link.getId(), noiseLink);
         noiseContext.getNoiseLinks().put(link2.getId(), noiseLink2);
 
-        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario);
+        RLS19NoiseEmission emission = new RLS19NoiseEmission(scenario, new RoadSurfaceContext(network));
         for (int i = 0; i < 1800; i++) {
             noiseLink.addEnteringAgent(RLS19VehicleType.pkw);
             noiseLink2.addEnteringAgent(RLS19VehicleType.pkw);

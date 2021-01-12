@@ -20,6 +20,7 @@ jdk: openjdk11
 # https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
 install: true
 
+if: type == push OR (fork == true AND type == pull_request)
 
 # For the following, see
 # https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
@@ -39,11 +40,11 @@ stages:
 # kai, mar'19
 
 # this is the script run in the "test" stage:
-# 'failsafe:verify' triggers travis failures for errors/failures of integration tests. 
+# 'failsafe:verify' triggers travis failures for errors/failures of integration tests.
 script: mvn install --batch-mode --also-make --projects ${MODULE} -DskipTests -Dmaven.javadoc.skip && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn surefire:test failsafe:integration-test failsafe:verify --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end -Dmaven.javadoc.skip -Dsource.skip -Dassembly.skipAssembly=true
 
 # I just added -DskipTests here since I think that we only want to run
-# the IT tests.  kai, sep'18 
+# the IT tests.  kai, sep'18
 
 # -DskipTests skips both normal _and_ integration tests :-(. There is
 # now instead -Dskip.surefire.tests, which is resolved in the matsim
@@ -102,6 +103,7 @@ env:
      - MODULE=contribs/multimodal
      - MODULE=contribs/protobuf
      - MODULE=contribs/socnetsim
+     - MODULE=contribs/sumo
      - MODULE=contribs/pseudosimulation
      - MODULE=contribs/roadpricing
      - MODULE=contribs/analysis
@@ -109,5 +111,6 @@ env:
      - MODULE=contribs/hybridsim
      - MODULE=contribs/otfvis
      - MODULE=contribs/osm
+     - MODULE=contribs/sbb-extensions
   global:
     - MAVEN_OPTS="-Xmx2g"

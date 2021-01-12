@@ -134,7 +134,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 				for (Link stopLocation : stopLocations) {
 
 					StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
-							2, l -> l, s -> network.getLinks().get(s.getLinkId()));
+							2, Link::getCoord, s -> network.getLinks().get(s.getLinkId()).getCoord());
 					List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(stopLocation,
 							chargingInfrastructureSpecification.getChargerSpecifications()
 									.values()

@@ -82,7 +82,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         pHbyModeCalculator.writeOutput();
         pkMbyModeCalculator.writeOutput();
         final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
-        final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
+        final boolean regularWriteEvents = writingTripsAtAll && ((event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0) || event.isLastIteration());
         if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
             new TripsAndLegsCSVWriter(scenario, customTripsWriterExtension, customLegsWriterExtension, mainModeIdentifier).write(experiencedPlansService.getExperiencedPlans()
                     , outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv)

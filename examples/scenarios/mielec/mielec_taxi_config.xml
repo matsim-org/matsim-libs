@@ -16,6 +16,8 @@
 			<param name="detailedStats" value="true"/>
 
 			<parameterset type="RuleBasedTaxiOptimizer"/>
+
+			<parameterset type="taxifare"/>
 		</parameterset>
 	</module>
 

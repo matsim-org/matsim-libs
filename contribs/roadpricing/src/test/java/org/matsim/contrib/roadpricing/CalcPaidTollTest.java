@@ -219,7 +219,7 @@ public class CalcPaidTollTest {
 		@SuppressWarnings("unused")
 		RoadPricingTollCalculator paidToll = new RoadPricingTollCalculator(scenario.getNetwork(), toll, eventsManager);
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), eventsManager);
-		scoring.beginIteration(0);
+		scoring.beginIteration(0, false);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		new QSimBuilder(scenario.getConfig()) //

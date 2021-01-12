@@ -116,8 +116,13 @@ public class ControlerIT {
 		Controler controler = new Controler(config);
 		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
-			public boolean continueIterations(int iteration) {
-				return false;
+			public boolean mayTerminateAfterIteration(int iteration) {
+				return true;
+			}
+
+			@Override
+			public boolean doTerminate(int iteration) {
+				return true;
 			}
 		});
 		controler.run();

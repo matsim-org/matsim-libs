@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,7 +45,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
     private final Random random = MatsimRandom.getLocalInstance();
 
 	@Inject
-	public DefaultRaptorStopFinder(Population population, Config config, RaptorIntermodalAccessEgress intermodalAE, Map<String, Provider<RoutingModule>> routingModuleProviders) {
+	public DefaultRaptorStopFinder(Config config, RaptorIntermodalAccessEgress intermodalAE, Map<String, Provider<RoutingModule>> routingModuleProviders) {
 		this.intermodalAE = intermodalAE;
 
 		SwissRailRaptorConfigGroup srrConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
@@ -59,7 +58,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 		}
 	}
 
-	public DefaultRaptorStopFinder(Population population, RaptorIntermodalAccessEgress intermodalAE, Map<String, RoutingModule> routingModules) {
+	public DefaultRaptorStopFinder(RaptorIntermodalAccessEgress intermodalAE, Map<String, RoutingModule> routingModules) {
 		this.intermodalAE = intermodalAE;
 		this.routingModules = routingModules;
 	}

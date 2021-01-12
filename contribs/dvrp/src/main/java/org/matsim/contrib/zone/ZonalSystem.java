@@ -28,6 +28,4 @@ public interface ZonalSystem {
 	Map<Id<Zone>, Zone> getZones();
 
 	Zone getZone(Node node);
-
-	// Iterable<Zone> getZonesSortedByDistance(Node node);
 }

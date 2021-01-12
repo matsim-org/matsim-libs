@@ -1,6 +1,12 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
+	<module name="dvrp">
+		<parameterset type="travelTimeMatrix">
+			<param name="cellSize" value="100"/>
+		</parameterset>
+	</module>
+
 	<module name="multiModeDrt">
 		<parameterset type="drt">
 			<parameterset type="ExtensiveInsertionSearch"/>

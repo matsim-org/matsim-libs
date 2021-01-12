@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 	<carriers>
 		<carrier id="19">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_19_heavyVehicle" depotLinkId="j(0,1)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -303,6 +306,9 @@
 		</carrier>
 
 		<carrier id="17">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_17_heavyVehicle" depotLinkId="i(9,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -605,6 +611,9 @@
 		</carrier>
 
 		<carrier id="35">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_35_heavyVehicle" depotLinkId="j(0,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -907,6 +916,9 @@
 		</carrier>
 
 		<carrier id="18">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_18_heavyVehicle" depotLinkId="i(9,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -1209,6 +1221,9 @@
 		</carrier>
 
 		<carrier id="36">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_36_heavyVehicle" depotLinkId="j(9,9)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -1511,6 +1526,9 @@
 		</carrier>
 
 		<carrier id="15">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_15_heavyVehicle" depotLinkId="i(8,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -1813,6 +1831,9 @@
 		</carrier>
 
 		<carrier id="33">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_33_heavyVehicle" depotLinkId="j(0,8)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -2115,6 +2136,9 @@
 		</carrier>
 
 		<carrier id="16">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_16_heavyVehicle" depotLinkId="i(8,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -2417,6 +2441,9 @@
 		</carrier>
 
 		<carrier id="34">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_34_heavyVehicle" depotLinkId="j(9,8)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -2719,6 +2746,9 @@
 		</carrier>
 
 		<carrier id="13">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_13_heavyVehicle" depotLinkId="i(7,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -3021,6 +3051,9 @@
 		</carrier>
 
 		<carrier id="14">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_14_heavyVehicle" depotLinkId="i(7,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -3323,6 +3356,9 @@
 		</carrier>
 
 		<carrier id="11">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_11_heavyVehicle" depotLinkId="i(6,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -3625,6 +3661,9 @@
 		</carrier>
 
 		<carrier id="12">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_12_heavyVehicle" depotLinkId="i(6,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -3927,6 +3966,9 @@
 		</carrier>
 
 		<carrier id="21">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_21_heavyVehicle" depotLinkId="j(0,2)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -4229,6 +4271,9 @@
 		</carrier>
 
 		<carrier id="20">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_20_heavyVehicle" depotLinkId="j(9,1)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -4531,6 +4576,9 @@
 		</carrier>
 
 		<carrier id="22">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_22_heavyVehicle" depotLinkId="j(9,2)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -4833,6 +4881,9 @@
 		</carrier>
 
 		<carrier id="23">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_23_heavyVehicle" depotLinkId="j(0,3)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -5135,6 +5186,9 @@
 		</carrier>
 
 		<carrier id="24">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_24_heavyVehicle" depotLinkId="j(9,3)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -5437,6 +5491,9 @@
 		</carrier>
 
 		<carrier id="25">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_25_heavyVehicle" depotLinkId="j(0,4)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -5739,6 +5796,9 @@
 		</carrier>
 
 		<carrier id="26">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_26_heavyVehicle" depotLinkId="j(9,4)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -6041,6 +6101,9 @@
 		</carrier>
 
 		<carrier id="27">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_27_heavyVehicle" depotLinkId="j(0,5)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -6343,6 +6406,9 @@
 		</carrier>
 
 		<carrier id="28">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_28_heavyVehicle" depotLinkId="j(9,5)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -6645,6 +6711,9 @@
 		</carrier>
 
 		<carrier id="29">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_29_heavyVehicle" depotLinkId="j(0,6)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -6947,6 +7016,9 @@
 		</carrier>
 
 		<carrier id="3">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_3_heavyVehicle" depotLinkId="i(2,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -7249,6 +7321,9 @@
 		</carrier>
 
 		<carrier id="2">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_2_heavyVehicle" depotLinkId="i(1,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -7551,6 +7626,9 @@
 		</carrier>
 
 		<carrier id="1">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_1_heavyVehicle" depotLinkId="i(1,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -7853,6 +7931,9 @@
 		</carrier>
 
 		<carrier id="10">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_10_heavyVehicle" depotLinkId="i(5,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -8155,6 +8236,9 @@
 		</carrier>
 
 		<carrier id="7">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_7_heavyVehicle" depotLinkId="i(4,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -8457,6 +8541,9 @@
 		</carrier>
 
 		<carrier id="30">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_30_heavyVehicle" depotLinkId="j(9,6)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -8759,6 +8846,9 @@
 		</carrier>
 
 		<carrier id="6">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_6_heavyVehicle" depotLinkId="i(3,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -9061,6 +9151,9 @@
 		</carrier>
 
 		<carrier id="5">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_5_heavyVehicle" depotLinkId="i(3,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -9363,6 +9456,9 @@
 		</carrier>
 
 		<carrier id="32">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_32_heavyVehicle" depotLinkId="j(9,7)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -9665,6 +9761,9 @@
 		</carrier>
 
 		<carrier id="4">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_4_heavyVehicle" depotLinkId="i(2,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -9967,6 +10066,9 @@
 		</carrier>
 
 		<carrier id="31">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_31_heavyVehicle" depotLinkId="j(0,7)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -10269,6 +10371,9 @@
 		</carrier>
 
 		<carrier id="9">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_9_heavyVehicle" depotLinkId="i(5,9)R" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>
@@ -10571,6 +10676,9 @@
 		</carrier>
 
 		<carrier id="8">
+			<attributes>
+				<attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+			</attributes>
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
 					<vehicle id="carrier_8_heavyVehicle" depotLinkId="i(4,0)" typeId="heavy" earliestStart="06:00:00" latestEnd="16:00:00"/>

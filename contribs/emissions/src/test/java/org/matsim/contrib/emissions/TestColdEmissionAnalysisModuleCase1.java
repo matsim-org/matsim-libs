@@ -58,7 +58,7 @@ import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
  *         method see test methods for details on the particular test cases
  *         <p>
  *         TestColdEmissionsCase1 looks for Passenger_car, petrol the average
- *         
+ *
  */
 
 public class TestColdEmissionAnalysisModuleCase1 {
@@ -131,10 +131,10 @@ public class TestColdEmissionAnalysisModuleCase1 {
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId);
-		
+
 		// This represents the previous behavior, which fallbacks to the average table,
 		// if values are not found in the detailed table, kmt apr'20
-		// This test seems to refer to an direct lookup in average table 
+		// This test seems to refer to an direct lookup in average table
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
 		return new ColdEmissionAnalysisModule(avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager);
 	}
@@ -218,11 +218,11 @@ public class TestColdEmissionAnalysisModuleCase1 {
 			final HbefaVehicleCategory hbefaVehicleCategory) {
 		for (Pollutant cp : pollutants) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance(tableAccDistance);
-			detColdKey.setHbefaParkingTime((int) Math.round(parkingDuration));
-			detColdKey.setHbefaVehicleAttributes(vehAtt);
-			detColdKey.setHbefaVehicleCategory(hbefaVehicleCategory);
-			detColdKey.setHbefaComponent(cp);
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime((int) Math.round(parkingDuration));
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
 			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}

@@ -93,7 +93,7 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-		
+
 		/*
 		 * six test cases with complete input data
 		 * or input that should be assigned to average/default cases
@@ -191,12 +191,12 @@ public class TestColdEmissionAnalysisModuleCase6 {
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime((int) Math.round( parkingDuration ));
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime((int) Math.round( parkingDuration ));
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	

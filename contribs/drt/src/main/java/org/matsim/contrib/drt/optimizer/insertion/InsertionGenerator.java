@@ -22,8 +22,8 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 import com.google.common.base.MoreObjects;
@@ -37,14 +37,14 @@ import com.google.common.base.Objects;
  * <p>
  * Pickup insertion points are indexed in the following way:
  * <ul>
- * <li>{@code pickupIdx = 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
+ * <li>{@code pickupIdx == 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
  * latter resulting in immediate diversion)</li>
  * <li>{@code 0 < pickupIdx <= stops.size()} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
  * </ul>
  * <p>
  * Dropoff insertion points are indexed in the following way:
  * <ul>
- * <li>{@code dropoffIdx = pickupIdx} - dropoff inserted directly after pickup</li>
+ * <li>{@code dropoffIdx == pickupIdx} - dropoff inserted directly after pickup</li>
  * <li>{@code pickupIdx < dropoffIdx <= stops.size()} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
  * </ul>
  * <p>
@@ -62,37 +62,24 @@ import com.google.common.base.Objects;
 public class InsertionGenerator {
 	public static class InsertionPoint {
 		public final int index;
-		public final Link previousLink;
-		public final Link nextLink;
+		public final Waypoint previousWaypoint;
+		public final Waypoint newWaypoint;
+		public final Waypoint nextWaypoint;
 
-		public InsertionPoint(int index, Link previousLink, Link nextLink) {
+		public InsertionPoint(int index, Waypoint previousWaypoint, Waypoint newWaypoint, Waypoint nextWaypoint) {
 			this.index = index;
-			this.previousLink = previousLink;
-			this.nextLink = nextLink;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o)
-				return true;
-			if (o == null || getClass() != o.getClass())
-				return false;
-			InsertionPoint that = (InsertionPoint)o;
-			return index == that.index && Objects.equal(previousLink, that.previousLink) && Objects.equal(nextLink,
-					that.nextLink);
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hashCode(index, previousLink, nextLink);
+			this.previousWaypoint = previousWaypoint;
+			this.newWaypoint = newWaypoint;
+			this.nextWaypoint = nextWaypoint;
 		}
 
 		@Override
 		public String toString() {
 			return MoreObjects.toStringHelper(this)
 					.add("index", index)
-					.add("previousLink", previousLink)
-					.add("nextLink", nextLink)
+					.add("previousWaypoint", previousWaypoint)
+					.add("newWaypoint", newWaypoint)
+					.add("nextWaypoint", nextWaypoint)
 					.toString();
 		}
 	}
@@ -105,19 +92,20 @@ public class InsertionGenerator {
 		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 
-			Link pickupPreviousLink = vehicleEntry.getWaypoint(pickupIdx).getLink();
-			Link pickupNextLink = pickupIdx == dropoffIdx ?
-					request.getToLink() :
-					vehicleEntry.stops.get(pickupIdx).task.getLink();
-			pickup = new InsertionPoint(pickupIdx, pickupPreviousLink, pickupNextLink);
+			Waypoint.Pickup pickupWaypoint = new Waypoint.Pickup(request);
+			Waypoint.Dropoff dropoffWaypoint = new Waypoint.Dropoff(request);
 
-			Link dropoffPreviousLink = pickupIdx == dropoffIdx ?
-					null :
-					vehicleEntry.stops.get(dropoffIdx - 1).task.getLink();
-			Link dropoffNextLink = dropoffIdx == vehicleEntry.stops.size() ?
-					null :
-					vehicleEntry.stops.get(dropoffIdx).task.getLink();
-			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffNextLink);
+			Waypoint pickupPreviousWaypoint = vehicleEntry.getWaypoint(pickupIdx);
+			Waypoint pickupNextLink = pickupIdx == dropoffIdx ?
+					dropoffWaypoint :
+					vehicleEntry.getWaypoint(pickupIdx + 1);
+			pickup = new InsertionPoint(pickupIdx, pickupPreviousWaypoint, pickupWaypoint, pickupNextLink);
+
+			Waypoint dropoffPreviousLink = pickupIdx == dropoffIdx ?
+					pickupWaypoint :
+					vehicleEntry.getWaypoint(dropoffIdx);
+			Waypoint dropoffNextLink = vehicleEntry.getWaypoint(dropoffIdx + 1);
+			dropoff = new InsertionPoint(dropoffIdx, dropoffPreviousLink, dropoffWaypoint, dropoffNextLink);
 		}
 
 		@Override
@@ -152,7 +140,7 @@ public class InsertionGenerator {
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
-			VehicleData.Stop nextStop = nextStop(vEntry, i);
+			Waypoint.Stop nextStop = nextStop(vEntry, i);
 
 			if (occupancy < vEntry.vehicle.getCapacity()) {// only not fully loaded arcs
 				if (drtRequest.getFromLink() != nextStop.task.getLink()) {// next stop at different link
@@ -176,7 +164,7 @@ public class InsertionGenerator {
 			// i -> pickup -> i+1 && j -> dropoff -> j+1
 
 			if (j > i) {// no need to check the capacity constraints if i == j (already validated for `i`)
-				VehicleData.Stop currentStop = currentStop(vEntry, j);
+				Waypoint.Stop currentStop = currentStop(vEntry, j);
 				if (currentStop.outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 					if (drtRequest.getToLink() == currentStop.task.getLink()) {
 						//special case -- we can insert dropoff exactly at node j
@@ -196,11 +184,11 @@ public class InsertionGenerator {
 		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
-	private VehicleData.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx - 1);
 	}
 
-	private VehicleData.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
 	}
 }

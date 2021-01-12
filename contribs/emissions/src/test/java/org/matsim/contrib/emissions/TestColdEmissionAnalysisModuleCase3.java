@@ -83,7 +83,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	private static final String diesel_technology = "diesel";
 	private static final String geq2l_sizeClass = ">=2L";
 	private static final String PC_D_Euro_3_emConcept = "PC-D-Euro-3";
-	
+
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -117,7 +117,7 @@ public class TestColdEmissionAnalysisModuleCase3 {
 		String message = "The expected emissions for " + testCase3.toString() + " are " + pollutants.size() * (Double) testCase3.get( 4 ) + " but were " + sumOfEmissions;
 		Assert.assertEquals( message, pollutants.size() * (Double) testCase3.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 
-		
+
 	}
 
 	private ColdEmissionAnalysisModule setUp() {
@@ -197,12 +197,12 @@ public class TestColdEmissionAnalysisModuleCase3 {
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime((int) Math.round( parkingDuration ));
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime((int) Math.round( parkingDuration ));
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	

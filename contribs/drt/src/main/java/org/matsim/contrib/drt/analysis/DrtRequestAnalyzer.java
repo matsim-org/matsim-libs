@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -62,8 +63,16 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 
 		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
 				PassengerRequestScheduledEvent scheduled) {
-			this.submitted = submitted;
-			this.scheduled = scheduled;
+			this(submitted, scheduled, null, null);
+		}
+
+		public PerformedRequestEventSequence(DrtRequestSubmittedEvent submitted,
+				PassengerRequestScheduledEvent scheduled, PassengerPickedUpEvent pickedUp,
+				PassengerDroppedOffEvent droppedOff) {
+			this.submitted = Objects.requireNonNull(submitted);
+			this.scheduled = Objects.requireNonNull(scheduled);
+			this.pickedUp = pickedUp;
+			this.droppedOff = droppedOff;
 		}
 
 		public DrtRequestSubmittedEvent getSubmitted() {

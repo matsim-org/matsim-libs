@@ -87,7 +87,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	// fifth case: cold emission factor not set
 //	private static final String nullcase_emConcept = "nullCase";
 	// this testcase does not exist any more.  kai, jul'18
-	
+
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -99,7 +99,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-		
+
 		/*
 		 * test cases with complete input data or input that should be assigned to average/default cases
 		 */
@@ -152,33 +152,19 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		{
 			// add passenger car entry "petrol;<=1.4L;PC-P-Euro-1":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept );
-
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedPetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// add passenger car entry "diesel;>=2L;PC-D-Euro-3":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedDieselFactor ), PASSENGER_CAR );
 		}
 		{
 			// add heavy goods vehicle entry "petrol;none;none":
-			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
-//		{
-//			// add passenger car entry "petrol;none;nullCase":
-//			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
-//			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, nullcase_emConcept );
-//
-//			final HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-//			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
-//			// when the now deprecated execution path goes away.  kai, jul'18)
-//
-//			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, detColdFactor, PASSENGER_CAR );
-//		}
+
 	}
 	
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {
@@ -188,26 +174,22 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( "average", "average", "average" ) ;
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor), PASSENGER_CAR );
 		}
 		{
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( averagePetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// duplicate from detailed table, but with different emission factor.
 			// this should not be used but is needed to assure that the detailed table is tried before the average table
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), PASSENGER_CAR );
 		}
 		{
 			// add HGV entry "petrol;none;none".
 			// (pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
 	}
@@ -215,12 +197,12 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime((int) Math.round( parkingDuration ));
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime((int) Math.round( parkingDuration ));
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	
