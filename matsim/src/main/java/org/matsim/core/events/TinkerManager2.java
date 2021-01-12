@@ -10,10 +10,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TinkerManager2 implements EventsManager {
@@ -26,7 +23,7 @@ public class TinkerManager2 implements EventsManager {
     private final int numberOfThreads;
     private final AtomicBoolean hasThrown = new AtomicBoolean(false);
 
-    private double currentTimestep;
+    private double currentTimestep = Double.NEGATIVE_INFINITY;
     private int handlerCount;
     private List<EventsProcessor> eventsProcessors;
 
@@ -56,7 +53,8 @@ public class TinkerManager2 implements EventsManager {
 
         var lastQueue = eventsProcessors.get(eventsProcessors.size() - 1);
         lastQueue.addEvent(event);
-        executorService.execute(lastQueue);
+
+            executorService.execute(lastQueue);
     }
 
     @Override
@@ -73,6 +71,9 @@ public class TinkerManager2 implements EventsManager {
 
     @Override
     public void resetHandlers(int iteration) {
+
+        currentTimestep = Double.NEGATIVE_INFINITY;
+
         for (var manager : managers)
             manager.resetHandlers(iteration);
     }
@@ -113,7 +114,6 @@ public class TinkerManager2 implements EventsManager {
         phaser.arriveAndDeregister();
         log.info("finishProcessing: After waiting for all events processes.");
 
-        executorService.shutdown();
         if (!hasThrown.get())
             throwExceptionIfAnyThreadCrashed();
 
