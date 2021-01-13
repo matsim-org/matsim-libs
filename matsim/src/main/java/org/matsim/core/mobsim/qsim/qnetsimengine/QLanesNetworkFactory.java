@@ -113,10 +113,16 @@ public final class QLanesNetworkFactory implements QNetworkFactory {
 		return this.delegate.createNetsimNode(node);
 	}
 
+	/**
+	 * Set factory to create QLinks that are not lanes.
+	 */
 	public void setDelegate(QNetworkFactory delegate) {
 		this.delegate = delegate;
 	}
 
+	/**
+	 * Flow efficiency calculator to use for lanes.
+	 */
 	public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
 		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 	}
