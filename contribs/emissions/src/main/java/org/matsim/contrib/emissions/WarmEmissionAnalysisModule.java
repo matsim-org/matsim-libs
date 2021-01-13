@@ -340,7 +340,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// update counters:
-		// yy I don't know what this is good for; I would base downstream analysis rather on events.  kai, jan'20
+		// yy I don't now what this is good for; I would base downstream analysis rather on events.  kai, jan'20
 		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
 			incrementCountersFractional( linkLength_m / 1000, fractionStopGo );
 		}
@@ -559,8 +559,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
 	private HbefaTrafficSituation getTrafficSituation(HbefaWarmEmissionFactorKey efkey, double averageSpeed_kmh, double freeFlowSpeed_kmh) {
 		//TODO: should this be generated only once much earlier?
-		HbefaRoadVehicleCategoryKey roadTrafficKey = new HbefaRoadVehicleCategoryKey(efkey);
-		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(roadTrafficKey);
+		HbefaRoadVehicleCategoryKey hbefaRoadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(efkey);
+		Map<HbefaTrafficSituation, Double> trafficSpeeds = this.hbefaRoadTrafficSpeeds.get(hbefaRoadVehicleCategoryKey);
+
+		//TODO: Hier die Berechunung einfügen, die die trafficSpeedTabelle entsprechend aus den Werten erstellt?
+		//Frage Laufzeit: Einmal berechnen ha
 
 		if (trafficSpeeds == null || !trafficSpeeds.containsKey(FREEFLOW)) {
 			throw new RuntimeException("At least the FREEFLOW condition must be specified for all emission factor keys. " +
@@ -633,6 +636,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			}
 		}
 	}
+
+	//------ These (occurrences) seem do be used only for logging statements and tests. KMT/GR Jul'20
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}

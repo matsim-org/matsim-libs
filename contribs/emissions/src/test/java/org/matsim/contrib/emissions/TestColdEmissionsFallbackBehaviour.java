@@ -1,6 +1,6 @@
 /*
  *   *********************************************************************** *
- *   project: org.matsim.*
+          *   project: org.matsim.*
  *   *********************************************************************** *
  *                                                                           *
  *   copyright       : (C) 2020 by the members listed in the COPYING,        *
@@ -83,8 +83,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(), 
 						startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed ;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_Detailed, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -138,8 +137,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(), 
 						startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_Detailed, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -159,8 +157,7 @@ public class TestColdEmissionsFallbackBehaviour {
 						vehicleFallbackToTechnologyAverage.getId(), link.getId(),
 						startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage ;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_TechnologyAverage, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
@@ -196,8 +193,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFull.getType(), vehicleFull.getId(), link.getId(),
 						startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_Detailed ;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_Detailed, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -216,8 +212,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToTechnologyAverage.getType(),
 						vehicleFallbackToTechnologyAverage.getId(), link.getId(), startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_TechnologyAverage ;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_TechnologyAverage, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 	/**
@@ -237,8 +232,7 @@ public class TestColdEmissionsFallbackBehaviour {
 				.checkVehicleInfoAndCalculateWColdEmissions(vehicleFallbackToAverageTable.getType(),
 						vehicleFallbackToAverageTable.getId(), link.getId(), startTime, parkingDuration, distance);
 
-		double expectedValue = emissionsFactorInGrammPerKilometer_AverageTable ;
-		Assert.assertEquals( expectedValue, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
+		Assert.assertEquals(emissionsFactorInGrammPerKilometer_AverageTable, coldEmissions.get(Pollutant.CO2_TOTAL ), MatsimTestUtils.EPSILON );
 	}
 
 

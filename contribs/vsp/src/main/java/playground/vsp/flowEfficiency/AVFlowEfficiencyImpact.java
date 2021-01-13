@@ -23,6 +23,7 @@ package playground.vsp.flowEfficiency;
 import com.google.common.base.Preconditions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.lanes.Lane;
 import org.matsim.vehicles.VehicleType;
@@ -46,6 +47,10 @@ public class AVFlowEfficiencyImpact implements SituationalFlowEfficiencyImpact {
 
 	@Override
 	public double calculateFlowEfficiency(QVehicle qVehicle, @Nullable QVehicle previousQVehicle, @Nullable Double timeGapToPreviousVeh, Link link, Id<Lane> laneId) {
+
+		// currently, we can not call chooseNextLinkId for TransitQVehicles because no link Id caching is performed!
+		if(qVehicle instanceof TransitQVehicle) { return 1;}
+
 		Id<Link> nextLinkId = qVehicle.getDriver().chooseNextLinkId();
 		if(nextLinkId != null && //vehicle is not arriving
 				this.autonomousVehicleTypes.contains(qVehicle.getVehicle().getType())){
