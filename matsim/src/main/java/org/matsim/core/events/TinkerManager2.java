@@ -18,14 +18,15 @@ public class TinkerManager2 implements EventsManager {
     private static final Logger log = Logger.getLogger(TinkerManager2.class);
 
     private final ExecutorService executorService;
-    private final Phaser phaser = new Phaser();
+    private final Phaser phaser = new Phaser(1);
     private final List<EventsManager> managers = new ArrayList<>();
+    private final List<EventsProcessor> eventsProcessors = new ArrayList<>();
     private final int numberOfThreads;
     private final AtomicBoolean hasThrown = new AtomicBoolean(false);
+    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
 
     private double currentTimestep = Double.NEGATIVE_INFINITY;
     private int handlerCount;
-    private List<EventsProcessor> eventsProcessors;
 
     @Inject
     public TinkerManager2(ParallelEventHandlingConfigGroup config) {
@@ -34,27 +35,35 @@ public class TinkerManager2 implements EventsManager {
 
     public TinkerManager2(int numberOfThreads) {
         this.numberOfThreads = numberOfThreads;
-        executorService = Executors.newWorkStealingPool(numberOfThreads);
-        for (int i = 0; i < numberOfThreads; i++)
-            managers.add(new EventsManagerImpl());
+        this.executorService = Executors.newWorkStealingPool(numberOfThreads);
+
+        EventsProcessor nextProcessor = null;
+
+        for (int i = 0; i < numberOfThreads; i++){
+            var manager = new EventsManagerImpl();
+            managers.add(manager);
+            var processor = new EventsProcessor(manager, phaser, nextProcessor, executorService);
+            nextProcessor = processor;
+            eventsProcessors.add(processor);
+        }
     }
 
     @Override
     public void processEvent(Event event) {
 
-        if (event.getTime() < currentTimestep) {
+        // only test for order, if we are initialized. Some code in some contribs emmits unordered events in between iterations
+        if (event.getTime() < currentTimestep && isInitialized.get()) {
             throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
         }
 
-        // make sure all events of the previous time step are processed
         // testing the condition here already, to minimize the number of calls to synchronized method
         if (event.getTime() > currentTimestep)
             setCurrentTimestep(event.getTime());
 
-        var lastQueue = eventsProcessors.get(eventsProcessors.size() - 1);
-        lastQueue.addEvent(event);
-
-            executorService.execute(lastQueue);
+        // taking last processor because of initialization logic
+        var processor = eventsProcessors.get(eventsProcessors.size() - 1);
+        processor.addEvent(event);
+        executorService.execute(processor);
     }
 
     @Override
@@ -71,25 +80,19 @@ public class TinkerManager2 implements EventsManager {
 
     @Override
     public void resetHandlers(int iteration) {
-
-        currentTimestep = Double.NEGATIVE_INFINITY;
-
         for (var manager : managers)
             manager.resetHandlers(iteration);
     }
 
     @Override
     public void initProcessing() {
-        log.info("register main thread at phaser");
-        phaser.register();
 
-        eventsProcessors = new ArrayList<>();
-        EventsProcessor nextQueue = null;
+        // wait for processing of events which were emitted in between iterations
+        awaitProcessingOfEvents();
+        isInitialized.set(true);
+        currentTimestep = Double.NEGATIVE_INFINITY;
 
         for (var manager : managers) {
-            var queue = new EventsProcessor(manager, phaser, nextQueue, executorService);
-            nextQueue = queue;
-            eventsProcessors.add(queue);
             manager.initProcessing();
         }
     }
@@ -97,9 +100,8 @@ public class TinkerManager2 implements EventsManager {
     @Override
     public void afterSimStep(double time) {
 
-        // wait for event handlers to finish processing events generated during time step
-        phaser.arriveAndAwaitAdvance();
-        throwExceptionIfAnyThreadCrashed();
+        // await processing of events emitted during a simulation step
+        awaitProcessingOfEvents();
 
         for (var manager : managers) {
             manager.afterSimStep(time);
@@ -111,8 +113,9 @@ public class TinkerManager2 implements EventsManager {
 
         log.info("finishProcessing: Before awaiting all event processes");
         phaser.arriveAndAwaitAdvance();
-        phaser.arriveAndDeregister();
         log.info("finishProcessing: After waiting for all events processes.");
+
+        isInitialized.set(false);
 
         if (!hasThrown.get())
             throwExceptionIfAnyThreadCrashed();
@@ -124,16 +127,17 @@ public class TinkerManager2 implements EventsManager {
 
     private synchronized void setCurrentTimestep(double time) {
 
-        // test again whether timestep needs to be updated inside the synchronized block, to make sure the await
-        // is called only once
+        // this test must be inside synchronized block to make sure await is only called once
         if (time > currentTimestep) {
-            // wait for event handlers to process all events from previous time step
-            // this waits for events being generated after 'afterSimStep' was called but before the first event of the
-            // new time step is thrown.
-            phaser.arriveAndAwaitAdvance();
-            throwExceptionIfAnyThreadCrashed();
+            // wait for event handlers to process all events from previous time step including events emitted after 'afterSimStep' was called
+            awaitProcessingOfEvents();
             currentTimestep = time;
         }
+    }
+
+    private void awaitProcessingOfEvents() {
+        phaser.arriveAndAwaitAdvance();
+        throwExceptionIfAnyThreadCrashed();
     }
 
     private void throwExceptionIfAnyThreadCrashed() {
@@ -176,6 +180,10 @@ public class TinkerManager2 implements EventsManager {
             eventQueue.add(event);
         }
 
+        /**
+         * This method must be synchronized to make sure the events are passed to the events manager in the order we've
+         * received them.
+         */
         @Override
         public synchronized void run() {
             var event = eventQueue.poll();
