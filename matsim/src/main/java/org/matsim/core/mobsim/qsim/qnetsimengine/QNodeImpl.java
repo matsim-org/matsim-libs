@@ -77,18 +77,12 @@ final class QNodeImpl extends AbstractQNode {
 	private boolean atLeastOneOutgoingLaneIsJammed;
 
 	/**
-	 * Checks if a value is practically zero.
+	 * Checks if capacity is significant positive.
+	 * This allows for a small eps unequal to zero to mitigate rounding errors that can happen
+	 * with non integer capacities.
 	 */
-	private static boolean nearZero(double x) {
-		return abs(x) <= 1E-10;
-	}
-
-	/**
-	 * Fast abs implementation.
-	 * @see for example., math-commons3
-	 */
-	private static double abs(double x) {
-		return Double.longBitsToDouble(9223372036854775807L & Double.doubleToRawLongBits(x));
+	private static boolean capacityLeft(double x) {
+		return x > 1E-10;
 	}
 
 	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, 
@@ -195,7 +189,7 @@ final class QNodeImpl extends AbstractQNode {
 			}
 		}
 		
-		if (nearZero(inLinksCapSum)) {
+		if (!capacityLeft(inLinksCapSum)) {
 			this.setActive(false);
 			return false; // Nothing to do
 		} 
@@ -205,7 +199,7 @@ final class QNodeImpl extends AbstractQNode {
 		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
 		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
 			// randomize based on link capacity: select a link; if next links have enough space all vehicles from the buffer are allowed to pass the node
-			while (!nearZero(inLinksCapSum)) {
+			while (capacityLeft(inLinksCapSum)) {
 				double rndNum = random.nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
@@ -231,7 +225,7 @@ final class QNodeImpl extends AbstractQNode {
 		case moveVehByVehRandomDistribution_dontBlockNode:
 		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
 			// randomize based on link capacity: select the vehicles (one by one) that are allowed to pass the node
-			while (!nearZero(inLinksCapSum)) {
+			while (capacityLeft(inLinksCapSum)) {
 				double rndNum = random.nextDouble() * inLinksCapSum;
 				double selCap = 0.0;
 				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
@@ -262,7 +256,7 @@ final class QNodeImpl extends AbstractQNode {
 		case moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull:
 			// deterministically choose the inLinks vehicle by vehicle based on their capacity and also account for decisions made in previous time steps (i.e. update priorities) to approximate the correct distribution over time.
 			double prioWithWhichTheLastVehWasSent = 0.;
-			while (!nearZero(inLinksCapSum)) {
+			while (capacityLeft(inLinksCapSum)) {
 				// look for the inLink with minimal priority that has vehicles in the buffer (use first one when equal, because links are sorted by ID)
 				double minPrio = Float.MAX_VALUE;
 				int prioInLinkIndex = -1;
