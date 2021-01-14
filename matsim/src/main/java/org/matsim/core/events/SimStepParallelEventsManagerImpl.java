@@ -131,19 +131,18 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	@Override
 	public void resetHandlers(int iteration) {
+		awaitProcessingOfEvents();
 		delegate.resetHandlers(iteration);
-		for (var manager : managers)
-			manager.resetHandlers(iteration);
 	}
 
 	@Override
 	public void initProcessing() {
-		delegate.initProcessing();
 
 		// wait for processing of events which were emitted in between iterations
 		awaitProcessingOfEvents();
 		isInitialized.set(true);
 		currentTimestep = Double.NEGATIVE_INFINITY;
+		delegate.initProcessing();
 
 		for (var manager : managers) {
 			manager.initProcessing();
