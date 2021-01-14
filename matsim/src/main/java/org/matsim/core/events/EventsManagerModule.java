@@ -37,14 +37,12 @@ public final class EventsManagerModule extends AbstractModule {
 			bindEventsManager().to(ParallelEventsManager.class).asEagerSingleton();
 		} else if (getConfig().parallelEventHandling().getNumberOfThreads() != null) {
 			if (getConfig().parallelEventHandling().getSynchronizeOnSimSteps() != null && getConfig().parallelEventHandling().getSynchronizeOnSimSteps()) {
-				//bindEventsManager().to(SimStepParallelEventsManagerImpl.class).asEagerSingleton();
-				bindEventsManager().to(TinkerManager2.class).in(Singleton.class);
+				bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 			} else {
 				bindEventsManager().to(ParallelEventsManagerImpl.class).asEagerSingleton();
 			}
 		} else {
-			//bindEventsManager().to(SimStepParallelEventsManagerImpl.class).asEagerSingleton();
-			bindEventsManager().to(TinkerManager2.class).in(Singleton.class);
+			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 		}
 		bind(EventHandlerRegistrator.class).asEagerSingleton();
 	}
