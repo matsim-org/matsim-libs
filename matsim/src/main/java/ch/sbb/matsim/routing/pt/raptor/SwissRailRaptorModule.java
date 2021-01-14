@@ -59,6 +59,7 @@ public class SwissRailRaptorModule extends AbstractModule {
             
             bind(RaptorIntermodalAccessEgress.class).to(DefaultRaptorIntermodalAccessEgress.class);
             bind(RaptorInVehicleCostCalculator.class).to(DefaultRaptorInVehicleCostCalculator.class);
+            bind(RaptorTransferCostCalculator.class).to(DefaultRaptorTransferCostCalculator.class);
         }
 
     }

@@ -42,7 +42,6 @@ import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -116,12 +115,7 @@ public class SwissRailRaptorInVehicleCostTest {
 				f.scenario.getNetwork(),
 				occupancyData);
 
-		SwissRailRaptor raptor = new SwissRailRaptor(
-				raptorData,
-				new DefaultRaptorParametersForPerson(f.config),
-				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
-				inVehCostCalcualtor);
+		SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, f.config).with(inVehCostCalcualtor).build();
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));

@@ -4,13 +4,7 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -51,6 +45,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
  * and only minimally adapted to make them run with SwissRailRaptor.
@@ -60,9 +61,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class SwissRailRaptorTest {
 
     private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
-			SwissRailRaptorData data = SwissRailRaptorData.create(schedule, null, RaptorUtils.createStaticConfig(config), network, null);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(config), new LeastCostRaptorRouteSelector(), stopFinder, new DefaultRaptorInVehicleCostCalculator());
+        SwissRailRaptorData data = SwissRailRaptorData.create(schedule, null, RaptorUtils.createStaticConfig(config), network, null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, config).build();
         return raptor;
     }
 
@@ -89,7 +89,7 @@ public class SwissRailRaptorTest {
         double distance = 0.0;
         for (Leg leg : legs) {
             System.out.println(leg+" "+leg.getRoute().getDistance());
-			actualTravelTime += leg.getTravelTime().seconds();
+            actualTravelTime += leg.getTravelTime().seconds();
             distance += leg.getRoute().getDistance();
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
