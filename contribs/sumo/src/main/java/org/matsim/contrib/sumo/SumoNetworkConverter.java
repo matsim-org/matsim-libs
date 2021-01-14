@@ -225,6 +225,9 @@ public class SumoNetworkConverter implements Callable<Integer> {
                     createNode(network, sumoHandler, edge.to)
             );
 
+            if (edge.name != null)
+                link.getAttributes().putAttribute("name", edge.name);
+
             link.setNumberOfLanes(edge.lanes.size());
             Set<String> modes = Sets.newHashSet(TransportMode.car, TransportMode.ride);
 
@@ -377,16 +380,15 @@ public class SumoNetworkConverter implements Callable<Integer> {
         if (node != null)
             return node;
 
-        Coord coord;
-        if (sumoHandler.junctions.containsKey(nodeId)) {
-            coord = sumoHandler.createCoord(sumoHandler.junctions.get(nodeId).coord);
-        } else {
+        SumoNetworkHandler.Junction junction = sumoHandler.junctions.get(nodeId);
+        if (junction == null)
             throw new IllegalStateException("Junction not in network:" + nodeId);
-        }
 
+        Coord coord = sumoHandler.createCoord(junction.coord);
         node = network.getFactory().createNode(id, coord);
-        network.addNode(node);
+        node.getAttributes().putAttribute("type", junction.type);
 
+        network.addNode(node);
         return node;
     }
 
