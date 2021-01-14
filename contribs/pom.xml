@@ -173,6 +173,7 @@
 		<module>protobuf</module>
 		<module>pseudosimulation</module>
 		<module>roadpricing</module>
+		<module>sbb-extensions</module>
 		<module>signals</module>
 		<module>socnetsim</module>
 		<module>sumo</module>
@@ -300,6 +301,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>11</maven.compiler.source>
 		<maven.compiler.target>11</maven.compiler.target>
+		<argLine></argLine>
 	</properties>
 
 </project>

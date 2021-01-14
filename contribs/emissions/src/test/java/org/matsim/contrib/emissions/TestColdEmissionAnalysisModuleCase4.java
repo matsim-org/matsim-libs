@@ -36,7 +36,6 @@ import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
-import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /**
@@ -62,17 +61,10 @@ import static org.matsim.contrib.emissions.Pollutant.*;
 
 public class TestColdEmissionAnalysisModuleCase4 {
 	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModuleCase4.class);
-	
-	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
-	
-	private final String passengercar = "PASSENGER_CAR";
-	private final Double startTime = 0.0;
+
 	private static final Double parkingDuration = 1.;
-	// same values as int for table
-	private static final int tableParkingDuration = (int) Math.round( parkingDuration );
 	private static final int tableAccDistance = 1;
-	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
-	private final int numberOfColdEmissions = pollutants.size();
+	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(Pollutant.values()));
 	// strings for test cases
 	
 	// The material below was confused in the way that strings like "petrol" or "diesel" were given for the
@@ -95,7 +87,7 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	// fifth case: cold emission factor not set
 //	private static final String nullcase_emConcept = "nullCase";
 	// this testcase does not exist any more.  kai, jul'18
-	
+
 	// emission factors for tables - no dublicates!
 	private static final Double detailedPetrolFactor = 100.;
 	private static final Double detailedDieselFactor = 10.;
@@ -103,63 +95,41 @@ public class TestColdEmissionAnalysisModuleCase4 {
 	private static final Double averagePetrolFactor = .01;
 
 	private static final double fakeFactor = -1.;
-	
-	private boolean excep = false;
+
 	
 	@Test
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
-		
+
 		/*
-		 * six test cases with complete input data
-		 * or input that should be assigned to average/default cases
+		 * test cases with complete input data or input that should be assigned to average/default cases
 		 */
-		
-		setUp();
-		
-		List<ArrayList> testCases = new ArrayList<>();
+		ColdEmissionAnalysisModule coldEmissionAnalysisModule  = setUp();
 
 		ArrayList<Object> testCase4 = new ArrayList<>();
 
-		
-
-
 		// fourth case: no specifications for technology, size class or em concept
 		// -> falling back to average table
-		Collections.addAll( testCase4, passengercar, "", "", "", averageAverageFactor );
+		Collections.addAll( testCase4, "PASSENGER_CAR", "", "", "", averageAverageFactor );
 
-//		// fifth case: cold emission factor not set - handled as 0.0
-//		// (Interpretation: when the cold emission factor is not set, then it is treated as zero. kai, jul'18)
-//		// beim erstellen ueberpruefen dann test umschreiben
-//		Collections.addAll( testCase5, passengercar, petrol_technology, none_sizeClass, nullcase_emConcept, .0 );
-		// this situation does not exist any more.  kai, jul'18
 
-		// sixth case: heavy goods vehicle
-		// -> throw warning -> use detailed or average table for passenger cars
-		String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
-
-		testCases.add( testCase4 );
-
-		
-		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
-			HandlerToTestEmissionAnalysisModules.reset();
-			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
-			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
-			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
+		logger.info("Running testcase: " + testCase4.indexOf( 0 ) + " " + testCase4.toString());
+		Id<Link> linkId = Id.create( "linkId" + testCase4.indexOf( 0 ), Link.class );
+		Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCase4.indexOf( 0 ), Vehicle.class );
+		Id<VehicleType> vehicleTypeId = Id.create( testCase4.get( 0 ) + ";" + testCase4.get( 1 ) + ";" + testCase4.get( 2 ) + ";" + testCase4.get( 3 ), VehicleType.class );
 			
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-			logger.info("VehicleId: " + vehicle.getId().toString());
-			logger.info("VehicleTypeId: " + vehicle.getType().getId());
-			
-			coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, startTime, parkingDuration, tableAccDistance);
-			String message = "The expected emissions for " + tc.toString() + " are " +
-							     numberOfColdEmissions * (Double) tc.get( 4 ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-			Assert.assertEquals( message, numberOfColdEmissions * (Double) tc.get( 4 ), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		}
+		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
+		logger.info("VehicleId: " + vehicle.getId().toString());
+		logger.info("VehicleTypeId: " + vehicle.getType().getId());
+
+		Map<Pollutant, Double> calculatedPollutants = coldEmissionAnalysisModule.checkVehicleInfoAndCalculateWColdEmissions(vehicle.getType(), vehicle.getId(), linkId, 0.0, parkingDuration, tableAccDistance);
+		double sumOfEmissions = calculatedPollutants.values().stream().mapToDouble(Double::doubleValue).sum();
+
+		String message = "The expected emissions for " + testCase4.toString() + " are " + pollutants.size() * (Double) testCase4.get( 4 ) + " but were " + sumOfEmissions;
+		Assert.assertEquals( message, pollutants.size() * (Double) testCase4.get( 4 ), sumOfEmissions, MatsimTestUtils.EPSILON );
 		
 	}
 	
-	private void setUp() {
+	private ColdEmissionAnalysisModule setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		
@@ -168,18 +138,12 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+
+		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+
 		//This represents the previous behavior, which fallbacks to the average table, if values are not found in the detailed table, kmt apr'20
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable);
-//		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
-		
+		return new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 	}
 	
 	private static void fillDetailedTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable ) {
@@ -188,33 +152,19 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		{
 			// add passenger car entry "petrol;<=1.4L;PC-P-Euro-1":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology2, leq14l_sizeClass, PC_P_Euro_1_emConcept );
-
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedPetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// add passenger car entry "diesel;>=2L;PC-D-Euro-3":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( detailedDieselFactor ), PASSENGER_CAR );
 		}
 		{
 			// add heavy goods vehicle entry "petrol;none;none":
-			//(pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
-//		{
-//			// add passenger car entry "petrol;none;nullCase":
-//			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
-//			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, nullcase_emConcept );
-//
-//			final HbefaColdEmissionFactor detColdFactor = new HbefaColdEmissionFactor();
-//			// (this is for a test of what happens when the setter is not explicitly used.  This should go away
-//			// when the now deprecated execution path goes away.  kai, jul'18)
-//
-//			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, detColdFactor, PASSENGER_CAR );
-//		}
+
 	}
 	
 	private static void fillAveragesTable( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable ) {
@@ -224,40 +174,35 @@ public class TestColdEmissionAnalysisModuleCase4 {
 		{
 			// add passenger car entry "average;average;average":
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( "average", "average", "average" ) ;
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor(averageAverageFactor), PASSENGER_CAR );
 		}
 		{
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( averagePetrolFactor ), PASSENGER_CAR );
 		}
 		{
 			// duplicate from detailed table, but with different emission factor.
 			// this should not be used but is needed to assure that the detailed table is tried before the average table
 			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, geq2l_sizeClass, PC_D_Euro_3_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), PASSENGER_CAR );
 		}
 		{
 			// add HGV entry "petrol;none;none".
 			// (pre-existing comment: HEAVY_GOODS_VEHICLE;PC petrol;petrol;none should not be used --???)
 			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
-			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
 	}
 	
-	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
+	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
 		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
-			detColdKey.setHbefaDistance( tableAccDistance );
-			detColdKey.setHbefaParkingTime( tableParkingDuration );
-			detColdKey.setHbefaVehicleAttributes( vehAtt );
-			detColdKey.setHbefaVehicleCategory( hbefaVehicleCategory );
-			detColdKey.setHbefaComponent( cp );
-			detailedHbefaColdTable.put( detColdKey, detColdFactor );
+			detColdKey.setDistance(tableAccDistance);
+			detColdKey.setParkingTime((int) Math.round( parkingDuration ));
+			detColdKey.setVehicleAttributes(vehAtt);
+			detColdKey.setVehicleCategory(hbefaVehicleCategory);
+			detColdKey.setComponent(cp);
+			detailedHbefaColdTable.put(detColdKey, detColdFactor);
 		}
 	}
 	

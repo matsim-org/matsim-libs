@@ -23,12 +23,12 @@ public class OsmSignalsReader extends SupersonicOsmNetworkReader {
 	OsmSignalsReader(OsmSignalsParser parser,
 					 Predicate<Long> preserveNodeWithId,
 					 BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-					 AfterLinkCreated afterLinkCreated) {
+					 AfterLinkCreated afterLinkCreated, double freeSpeedFactor, double adjustCapacityLength) {
 
 		super(parser,
 				id -> keepCrossing(id, parser),
 				includeLinkAtCoordWithHierarchy,
-				(link, tags, direction) -> doAfterLinkCreated(link, tags, direction, afterLinkCreated));
+				(link, tags, direction) -> doAfterLinkCreated(link, tags, direction, afterLinkCreated), freeSpeedFactor, adjustCapacityLength);
 		signalsParser = parser;
 
 		throw new RuntimeException("The signals reader is not yet implemented. Please don't use it yet.");
@@ -118,7 +118,7 @@ public class OsmSignalsReader extends SupersonicOsmNetworkReader {
 			OsmSignalsParser parser = new OsmSignalsParser(coordinateTransformation,
 					linkProperties, includeLinkAtCoordWithHierarchy, Executors.newWorkStealingPool());
 
-			return new OsmSignalsReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated);
+			return new OsmSignalsReader(parser, preserveNodeWithId, includeLinkAtCoordWithHierarchy, afterLinkCreated, freeSpeedFactor, adjustCapacityLength);
 		}
 	}
 }

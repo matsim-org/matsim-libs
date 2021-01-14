@@ -22,37 +22,25 @@ package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
- *
  */
-class HbefaWarmEmissionFactor {
+class HbefaWarmEmissionFactor extends HbefaEmissionFactor {
 
-	private double speed;
-	private double warmEmissionFactor;
+	private final double speed;
 
-	/*package-private*/ HbefaWarmEmissionFactor(){
+	/*package-private*/ HbefaWarmEmissionFactor(double factor, double speed) {
+		super(factor);
+		this.speed = speed;
 	}
 
 	public double getSpeed() {
 		return speed;
-	}
-	
-	public void setSpeed(double speed) {
-		this.speed = speed;
-	}
-
-	/*package-private*/ double getWarmEmissionFactor() {
-		return this.warmEmissionFactor;
-	}
-
-	/*package-private*/ void setWarmEmissionFactor(double warmEmissionFactor) {
-		this.warmEmissionFactor = warmEmissionFactor;
 	}
 
 	@Override
 	public String toString() {
 		return "HbefaWarmEmissionFactor{" +
 				"speed=" + speed +
-				", warmEmissionFactor=" + warmEmissionFactor +
+				", warmEmissionFactor=" + getFactor() +
 				'}';
 	}
 }

@@ -20,8 +20,6 @@ package org.matsim.contrib.edrt.optimizer;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
@@ -36,7 +34,6 @@ import org.matsim.contrib.ev.dvrp.ETask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
 import org.matsim.contrib.ev.fleet.Battery;
-import org.matsim.core.config.Config;
 
 import com.google.inject.Provider;
 
@@ -104,18 +101,17 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 	}
 
 	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<EDrtVehicleDataEntryFactory> {
+		private final DrtConfigGroup drtCfg;
 		private final double minimumRelativeSoc;
 
-		@Inject
-		private Config config;
-
-		public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
+		public EDrtVehicleDataEntryFactoryProvider(DrtConfigGroup drtCfg, double minimumRelativeSoc) {
+			this.drtCfg = drtCfg;
 			this.minimumRelativeSoc = minimumRelativeSoc;
 		}
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config), minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
 		}
 	}
 }

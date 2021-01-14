@@ -51,6 +51,7 @@ jobs:
           - contribs/hybridsim
           - contribs/otfvis
           - contribs/osm
+          - contribs/sbb-extensions
 
     steps:
       - name: Checkout git repo
