@@ -7,7 +7,7 @@ import java.util.function.Supplier;
  */
 public class DefaultRaptorTransferCostCalculator implements RaptorTransferCostCalculator {
 	@Override
-	public double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int transferCount, double existingTransferCosts) {
+	public double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int transferCount, double existingTransferCosts, double currentTime) {
 		double transferCostBase = raptorParams.getTransferPenaltyFixCostPerTransfer();
 		double transferCostPerHour = raptorParams.getTransferPenaltyPerTravelTimeHour();
 		double transferCostMin = raptorParams.getTransferPenaltyMinimum();

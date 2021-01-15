@@ -7,6 +7,6 @@ import java.util.function.Supplier;
  */
 public interface RaptorTransferCostCalculator {
 
-	double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts);
+	double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double currentTime);
 
 }

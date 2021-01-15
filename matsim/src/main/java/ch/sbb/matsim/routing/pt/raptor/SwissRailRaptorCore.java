@@ -621,7 +621,7 @@ public class SwissRailRaptorCore {
                     int inVehicleTime = arrivalTime - currentAgentBoardingTime;
                     double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
                     double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
-                    double arrivalTransferCost = currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(transferProvider, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost);
+                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(transferProvider, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
                     double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                     double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
                     if (totalArrivalCost <= previousArrivalCost) {
@@ -742,7 +742,7 @@ public class SwissRailRaptorCore {
                 transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
                 double newArrivalTravelCost = arrivalTravelCost - transfer.transferTime * margUtilityTransitWalk;
-                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(transferProvider, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost)) : 0;
+                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(transferProvider, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
                 double newTotalArrivalCost = newArrivalTravelCost + newArrivalTransferCost;
                 double prevLeastArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                 if (newTotalArrivalCost < prevLeastArrivalCost || (!strict && newTotalArrivalCost <= prevLeastArrivalCost)) {
