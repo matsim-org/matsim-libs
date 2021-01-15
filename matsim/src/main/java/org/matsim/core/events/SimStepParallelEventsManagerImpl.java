@@ -100,6 +100,8 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 			throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
 		}
 
+		phaser.register();
+
 		// testing the condition here already, to minimize the number of calls to synchronized method
 		if (event.getTime() > currentTimestep.get())
 			setCurrentTimestep(event.getTime());
@@ -111,6 +113,7 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 			executorService.execute(processor);
 		} else {
 			delegate.processEvent(event);
+			phaser.arriveAndDeregister();
 		}
 	}
 
@@ -159,11 +162,11 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	@Override
 	public synchronized void finishProcessing() {
 
+		isInitialized.set(false);
+
 		log.info("finishProcessing: Before awaiting all event processes");
 		phaser.arriveAndAwaitAdvance();
 		log.info("finishProcessing: After waiting for all events processes.");
-
-		isInitialized.set(false);
 
 		if (!hasThrown.get())
 			throwExceptionIfAnyThreadCrashed();
@@ -238,7 +241,6 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 		}
 
 		void addEvent(Event event) {
-			phaser.register();
 			eventQueue.add(event);
 		}
 
@@ -255,6 +257,7 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 
 		private void notifyNextProcess(Event event) {
 			if (nextProcessor != null) {
+				phaser.register();
 				nextProcessor.addEvent(event);
 				executorService.execute(nextProcessor);
 			}
