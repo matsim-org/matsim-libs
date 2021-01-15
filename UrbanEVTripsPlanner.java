@@ -214,7 +214,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 					if(chargingBegin == null) throw new IllegalStateException();
 					double chargingDuration = legFromCharger.getDepartureTime().seconds() - chargingBegin;
 
-					Network modeNetwork = this.singleModeNetworksCache.getSingleModeNetworksCache().get(legFromCharger.getMode());
 					ChargerSpecification chargerSpecification = chargingInfrastructureSpecification.getChargerSpecifications()
 							.values()
 							.stream()
@@ -222,10 +221,7 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 							.filter(charger -> electricVehicleSpecification.getChargerTypes().contains(charger.getChargerType()))
 							.findAny().orElseThrow();
 
-					//TODO: if the provider for ChargingInfrastructure.class would be bound, we could inject it and use it here and did not have to copy chargers...
-					//same is actually valid for the electric fleet / electric vehicle. but there we DO want a copy...
-					Charger chargerCopy = ChargerImpl.create(chargerSpecification, modeNetwork.getLinks().get(((Activity) planElement).getLinkId()), chargingLogicFactory);
-					pseudoVehicle.getBattery().changeSoc(pseudoVehicle.getChargingPower().calcChargingPower(chargerCopy) * chargingDuration);
+					pseudoVehicle.getBattery().changeSoc(pseudoVehicle.getChargingPower().calcChargingPower(chargerSpecification) * chargingDuration);
 				}
 			} else throw new IllegalArgumentException();
 		}
@@ -262,13 +258,13 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		ChargerSpecification selectedCharger = selectChargerNearToLink(actWhileCharging.getLinkId(), electricVehicleSpecification, modeNetwork);
 		Link chargingLink = modeNetwork.getLinks().get(selectedCharger.getLinkId());
 
-
 		Activity pluginTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(actWhileCharging));
 
-		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
+//		critical leg should always be the plugout leg, shouldn't it? tschlenther jan' '21
+//		Leg plugoutLeg = activityWhileChargingFinder.getNextLegOfRoutingModeAfterActivity(ImmutableList.copyOf(modifiablePlan.getPlanElements()), actWhileCharging, routingMode);
+		Leg plugoutLeg = leg;
 //		Activity plugoutTripOrigin = EditPlans.findRealActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 //		Activity plugoutTripDestination = EditPlans.findRealActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
-
 		Activity plugoutTripOrigin = findRealOrChargingActBefore(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 		Activity plugoutTripDestination = findRealOrChargingActAfter(mobsimagent, modifiablePlan.getPlanElements().indexOf(plugoutLeg));
 
@@ -299,29 +295,21 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			Preconditions.checkState(TripStructureUtils.getRoutingMode((Leg) legToBeReplaced).equals(routingMode), "leg before plugoutTripDestination has the wrong routing mode. should not happen..");
 		}
 
-		//TODO fix bug! this is wrong in cases where we decided not to charge on the precedent link but earlier...
-		//set SOC back to the second last value as we reroute the last leg and the current leg
-//		pseudoVehicle.getBattery().setSoc(secondLastSOC);
-
-		//facilities
-		Facility fromFacility = FacilitiesUtils.toFacility(pluginTripOrigin, scenario.getActivityFacilities());
-		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
-		Facility toFacility = FacilitiesUtils.toFacility(actWhileCharging, scenario.getActivityFacilities());
-
 		TripRouter tripRouter = tripRouterProvider.get();
-
-		planPluginTrip(modifiablePlan, routingMode, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter, fromFacility, chargerFacility, toFacility);
-
-		planPlugoutTrip(modifiablePlan, routingMode, actWhileCharging, plugoutTripDestination, chargingLink, tripRouter, chargerFacility, toFacility, PlanRouter.calcEndOfActivity(actWhileCharging, modifiablePlan, config));
+		planPluginTrip(modifiablePlan, routingMode, pluginTripOrigin, actWhileCharging, chargingLink, tripRouter);
+		planPlugoutTrip(modifiablePlan, routingMode, plugoutTripOrigin, plugoutTripDestination, chargingLink, tripRouter, PlanRouter.calcEndOfActivity(plugoutTripOrigin, modifiablePlan, config));
 	}
 
-	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, Facility chargerFacility, Facility fromFacility, double now) {
+	private void planPlugoutTrip(Plan plan, String routingMode, Activity origin, Activity destination, Link chargingLink, TripRouter tripRouter, double now) {
+		Facility fromFacility = FacilitiesUtils.toFacility(origin, scenario.getActivityFacilities());
+		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
+		Facility toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
+
 		List<? extends PlanElement> routedSegment;
 		//actually destination can not be null based on how we determine the actWhileCharging = origin at the moment...
 		if(destination == null) throw new RuntimeException("should not happen");
 
 		List<PlanElement> trip  = new ArrayList<>();
-		Facility toFacility = FacilitiesUtils.toFacility(destination, scenario.getActivityFacilities());
 
 		//add leg to charger
 		routedSegment = tripRouter.calcRoute(TransportMode.walk,fromFacility, chargerFacility,
@@ -350,7 +338,11 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		destination.setEndTime(PopulationUtils.decideOnActivityEndTime(destination, now, config ).seconds());
 	}
 
-	private void planPluginTrip(Plan plan, String routingMode, Activity actBeforeCharging, Activity actWhileCharging, Link chargingLink, TripRouter tripRouter, Facility fromFacility, Facility chargerFacility, Facility toFacility) {
+	private void planPluginTrip(Plan plan, String routingMode, Activity actBeforeCharging, Activity actWhileCharging, Link chargingLink, TripRouter tripRouter) {
+		Facility fromFacility = FacilitiesUtils.toFacility(actBeforeCharging, scenario.getActivityFacilities());
+		Facility chargerFacility = new LinkWrapperFacility(chargingLink);
+		Facility toFacility = FacilitiesUtils.toFacility(actWhileCharging, scenario.getActivityFacilities());
+
 		List<PlanElement> trip = new ArrayList<>();
 		//add leg to charger
 		List<? extends PlanElement> routedSegment = tripRouter.calcRoute(routingMode,fromFacility, chargerFacility,
