@@ -26,17 +26,16 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
 
 import javax.inject.Inject;
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -61,11 +60,11 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	private final int numberOfThreads;
 	private final AtomicBoolean hasThrown = new AtomicBoolean(false);
 	private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+	private final AtomicDouble currentTimestep = new AtomicDouble(Double.NEGATIVE_INFINITY);
 
 	// this delegate is used to handle events synchronously during un-initialized state
 	private final EventsManager delegate = new EventsManagerImpl();
 
-	private final AtomicDouble currentTimestep = new AtomicDouble(Double.NEGATIVE_INFINITY);
 	private int handlerCount;
 
 	@Inject
@@ -95,16 +94,15 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	@Override
 	public void processEvent(final Event event) {
 
-		// only test for order, if we are initialized. Some code in some contribs emmits unordered events in between iterations
+		// only test for order, if we are initialized. Some code in some contribs emits unordered events in between iterations
 		if (event.getTime() < currentTimestep.get() && isInitialized.get()) {
 			throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
 		}
 
-		phaser.register();
+		setCurrentTimestep(event.getTime());
 
-		// testing the condition here already, to minimize the number of calls to synchronized method
-		if (event.getTime() > currentTimestep.get())
-			setCurrentTimestep(event.getTime());
+		// register event here, to make sure finishProcessing works correctly awaits all submitted events
+		phaser.register();
 
 		if (isInitialized.get()) {
 			// taking last processor because of initialization logic
@@ -162,6 +160,7 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	@Override
 	public synchronized void finishProcessing() {
 
+		// setting isInitialized before waiting for finishing of all events
 		isInitialized.set(false);
 
 		log.info("finishProcessing: Before awaiting all event processes");
@@ -191,7 +190,6 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	private void setCurrentTimestep(double time) {
 
-		// this test must be inside synchronized block to make sure await is only called once
 		while (time > currentTimestep.get()) {
 			var previousTime = currentTimestep.get();
 			// wait for event handlers to process all events from previous time step including events emitted after 'afterSimStep' was called

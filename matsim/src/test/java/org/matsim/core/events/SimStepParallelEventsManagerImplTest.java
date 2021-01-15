@@ -21,7 +21,6 @@
 
  package org.matsim.core.events;
 
-import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -34,13 +33,13 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.testcases.utils.EventsCollector;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class SimStepParallelEventsManagerImplTest {
-
-	private static Logger log = Logger.getLogger(SimStepParallelEventsManagerImplTest.class);
 
 	@Test
 	public void testEventHandlerCanProduceAdditionalEventLateInSimStep() {
@@ -87,8 +86,8 @@ public class SimStepParallelEventsManagerImplTest {
 		});
 
 		manager.initProcessing();
-		manager.processEvent(new SomeEvent(2));
-		manager.processEvent(new SomeEvent(1));
+		manager.processEvent(new GenericEvent(2, "some"));
+		manager.processEvent(new GenericEvent(1, "some"));
 		manager.afterSimStep(2);
 		manager.finishProcessing();
 	}
@@ -102,7 +101,7 @@ public class SimStepParallelEventsManagerImplTest {
 		});
 
 		manager.initProcessing();
-		manager.processEvent(new SomeEvent(2));
+		manager.processEvent(new GenericEvent(2,  "some"));
 		manager.afterSimStep(2);
 		manager.finishProcessing();
 	}
@@ -111,14 +110,14 @@ public class SimStepParallelEventsManagerImplTest {
 	public void testWaitingWhenTimestepIsIncreased() {
 
 		var manager = new SimStepParallelEventsManagerImpl(1);
-		manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
-		var handler = new HandlerForAsyncEvents();
-		manager.addHandler(handler);
+		manager.addHandler(new SlowHandler(manager, "afterSimStep"));
+		var assertionHandler = new CounterHandler(SlowHandler.EVENT_TYPE_THROWN);
+		manager.addHandler(assertionHandler);
 
 		manager.initProcessing();
-		manager.processEvent(new AfterSimStepEvent(2));
-		manager.processEvent(new SomeEvent(3));
-		assertTrue(handler.isCaughtEvent());
+		manager.processEvent(new GenericEvent(2, "afterSimStep"));
+		manager.processEvent(new GenericEvent(3, "some"));
+		assertEquals(1, assertionHandler.counter);
 		manager.finishProcessing();
 	}
 
@@ -126,124 +125,168 @@ public class SimStepParallelEventsManagerImplTest {
 	public void testWaitingWhenTimestepIsIncreasedAsync() {
 
 		var manager = new SimStepParallelEventsManagerImpl(1);
-		manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
+		manager.addHandler(new SlowHandler(manager, "afterSimStep"));
 		EventHandler handler = (BasicEventHandler) event -> {
-			if (event.getEventType().equals(HandlerListeningForAfterSimStepEvents.EventThrownAsync.EVENT_TYPE)) {
-				// trigger update of managers timestep while main thread is awaiting this thread to finish
-				// should result in a deadlock
-				manager.processEvent(new SomeEvent(event.getTime() + 1));
+			if (event.getEventType().equals(SlowHandler.EVENT_TYPE_THROWN)) {
+				// trigger update of manager's timestep while main thread is awaiting this thread to finish
+				manager.processEvent(new GenericEvent(event.getTime() + 1, "some"));
 			}
 		};
 		manager.addHandler(handler);
 
 		manager.initProcessing();
-		manager.processEvent(new AfterSimStepEvent(2));
+		manager.processEvent(new GenericEvent(2, "afterSimStep"));
 
 		// increase timestep from main thread
-		manager.processEvent(new SomeEvent(3));
+		manager.processEvent(new GenericEvent(3, "some"));
 		manager.finishProcessing();
 	}
 
 	@Test
-	public void simpleTest() {
+	public void testWaitingWhenFinishProcessing() {
 
 		var manager = new SimStepParallelEventsManagerImpl(1);
-		manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
-		var assertionHandler = new HandlerForAsyncEvents();
-		manager.addHandler(assertionHandler);
+		manager.addHandler(new SlowHandler(manager, "some-event"));
+		var handlerOfSlowHandlersEvents = new CounterHandler(SlowHandler.EVENT_TYPE_THROWN);
+		var handlerOfSyncEvents = new CounterHandler("synchronous-event");
+		manager.addHandler(handlerOfSlowHandlersEvents);
+		manager.addHandler(handlerOfSyncEvents);
 
 		manager.initProcessing();
-		manager.processEvent(new SomeEvent(1));
-		manager.afterSimStep(1);
-		manager.processEvent(new AfterSimStepEvent(1));
+		manager.processEvent(new GenericEvent(1, "some-event"));
 
-		// move on to the next timestep. The main thread should now wait for the
-		manager.processEvent(new SomeEvent(2));
-		manager.afterSimStep(2);
-		manager.processEvent(new AfterSimStepEvent(2));
+		// the slow handler will issue an event to 'processEvent' while finishing
+		// is awaited. The finish method should also wait for this event
 		manager.finishProcessing();
 
-		assertTrue(assertionHandler.isCaughtEvent());
+		// after finish processing events are directed to a synchronous manager therefore
+		// the following event should be caught without awaiting
+		manager.processEvent(new GenericEvent(1,"synchronous-event"));
+
+		assertEquals(1, handlerOfSlowHandlersEvents.counter);
+		assertEquals(1, handlerOfSyncEvents.counter);
 	}
 
-	private static class SomeEvent extends Event {
+	@Test
+	public void testWaitingWhenTimeIsIncreased() {
 
-		public static final String EVENT_TYPE = "someEvent";
-		public SomeEvent(double time) {
-			super(time);
+		var manager = new SimStepParallelEventsManagerImpl(1);
+		manager.addHandler(new SlowHandler(manager, "some-event"));
+		var counterHandler = new CounterHandler(SlowHandler.EVENT_TYPE_THROWN);
+		manager.addHandler(counterHandler);
+
+		manager.initProcessing();
+		manager.processEvent(new GenericEvent(1, "some-event"));
+		manager.processEvent(new GenericEvent(2, "event-from-next-timestep"));
+
+		assertEquals(1, counterHandler.counter);
+	}
+
+	@Test
+	public void testWaitingWhenAfterSimStep() {
+
+		var manager = new SimStepParallelEventsManagerImpl(1);
+		manager.addHandler(new SlowHandler(manager, "some-event"));
+		var counterHandler = new CounterHandler(SlowHandler.EVENT_TYPE_THROWN);
+		manager.addHandler(counterHandler);
+
+		manager.initProcessing();
+		manager.processEvent(new GenericEvent(1, "some-event"));
+		manager.afterSimStep(1);
+
+		assertEquals(1, counterHandler.counter);
+	}
+
+	@Test
+	public void testOrderOfEventsIsKept() {
+
+		var manager = new SimStepParallelEventsManagerImpl(3);
+		var events = List.of(
+				new GenericEvent(1,"first"),
+				new GenericEvent(1, "second"),
+				new GenericEvent(1, "third"));
+
+		var handler = new BasicEventHandler() {
+
+			private final List<GenericEvent> caughtEvents = new ArrayList<>();
+			@Override
+			public void handleEvent(Event event) {
+				if (event instanceof GenericEvent) {
+					caughtEvents.add((GenericEvent) event);
+				}
+			}
+		};
+		manager.addHandler(handler);
+
+		manager.initProcessing();
+		for (var event : events) {
+			manager.processEvent(event);
 		}
+		manager.finishProcessing();
 
-		@Override
-		public String getEventType() {
-			return EVENT_TYPE;
+		assertEquals(events.size(), handler.caughtEvents.size());
+		for (var i = 0; i < events.size(); i++) {
+			var expected = events.get(i);
+			var actual = handler.caughtEvents.get(i);
+			assertEquals(expected.type, actual.type);
 		}
 	}
 
-	private static class AfterSimStepEvent extends Event {
+	private static class SlowHandler implements BasicEventHandler {
 
-		public static final String EVENT_TYPE = "afterSimStep";
+		static final String EVENT_TYPE_THROWN = "fromSlowHandler";
 
-		public AfterSimStepEvent(double time) {
-			super(time);
-		}
+		final EventsManager manager;
+		final String eventType;
 
-		@Override
-		public String getEventType() {
-			return EVENT_TYPE;
-		}
-	}
-
-	private static class HandlerListeningForAfterSimStepEvents implements BasicEventHandler {
-
-		private final EventsManager manager;
-
-		private HandlerListeningForAfterSimStepEvents(EventsManager manager) {
+		private SlowHandler(EventsManager manager, String eventType) {
 			this.manager = manager;
+			this.eventType = eventType;
 		}
 
 		@Override
 		public void handleEvent(Event event) {
 
-			if (event.getEventType().equals(AfterSimStepEvent.EVENT_TYPE)) {
+			if (event.getEventType().equals(eventType)) {
 				try {
 					Thread.sleep(1000); // long computation
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
-
-				manager.processEvent(new HandlerListeningForAfterSimStepEvents.EventThrownAsync(event.getTime()));
-			}
-		}
-
-		private static class EventThrownAsync extends Event {
-
-			public static final String EVENT_TYPE = "afterSimStepAsync";
-
-			public EventThrownAsync(double time) {
-				super(time);
-			}
-
-			@Override
-			public String getEventType() {
-				return EVENT_TYPE;
+				manager.processEvent(new GenericEvent(event.getTime(), EVENT_TYPE_THROWN));
 			}
 		}
 	}
 
-	private static class HandlerForAsyncEvents implements BasicEventHandler {
+	private static class CounterHandler implements BasicEventHandler {
 
-		private boolean caughtEvent = false;
+		private final String eventType;
+
+		private int counter;
+
+		private CounterHandler(String eventType) {
+			this.eventType = eventType;
+		}
 
 		@Override
 		public void handleEvent(Event event) {
-			if (event.getEventType().equals(HandlerListeningForAfterSimStepEvents.EventThrownAsync.EVENT_TYPE)) {
+			if (event.getEventType().equals(eventType))
+				counter++;
+		}
+	}
 
-				this.caughtEvent = true;
-			}
+	private static class GenericEvent extends Event {
+
+		private final String type;
+
+		private GenericEvent(double time, String type) {
+			super(time);
+			this.type = type;
 		}
 
-		public boolean isCaughtEvent() {
-			return caughtEvent;
+		@Override
+		public String getEventType() {
+			return type;
 		}
 	}
 }
