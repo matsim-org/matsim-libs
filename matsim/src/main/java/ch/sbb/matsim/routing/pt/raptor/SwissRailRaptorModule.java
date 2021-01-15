@@ -8,6 +8,7 @@ import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.pt.router.TransitRouter;
 
 /**
  * @author mrieser / SBB
@@ -23,6 +24,7 @@ public class SwissRailRaptorModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().transit().isUseTransit()) {
+            bind(TransitRouter.class).toProvider(SwissRailRaptorFactory.class);
             bind(SwissRailRaptor.class).toProvider(SwissRailRaptorFactory.class);
 
             for (String mode : getConfig().transit().getTransitModes()) {
