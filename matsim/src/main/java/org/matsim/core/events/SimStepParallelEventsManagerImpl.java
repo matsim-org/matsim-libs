@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -64,7 +65,7 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	// this delegate is used to handle events synchronously during un-initialized state
 	private final EventsManager delegate = new EventsManagerImpl();
 
-	private double currentTimestep = Double.NEGATIVE_INFINITY;
+	private final AtomicDouble currentTimestep = new AtomicDouble(Double.NEGATIVE_INFINITY);
 	private int handlerCount;
 
 	@Inject
@@ -95,12 +96,12 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	public void processEvent(final Event event) {
 
 		// only test for order, if we are initialized. Some code in some contribs emmits unordered events in between iterations
-		if (event.getTime() < currentTimestep && isInitialized.get()) {
+		if (event.getTime() < currentTimestep.get() && isInitialized.get()) {
 			throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
 		}
 
 		// testing the condition here already, to minimize the number of calls to synchronized method
-		if (event.getTime() > currentTimestep)
+		if (event.getTime() > currentTimestep.get())
 			setCurrentTimestep(event.getTime());
 
 		if (isInitialized.get()) {
@@ -130,18 +131,18 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	}
 	
 	@Override
-	public void resetHandlers(int iteration) {
+	public synchronized void resetHandlers(int iteration) {
 		awaitProcessingOfEvents();
 		delegate.resetHandlers(iteration);
 	}
 
 	@Override
-	public void initProcessing() {
+	public synchronized void initProcessing() {
 
 		// wait for processing of events which were emitted in between iterations
 		awaitProcessingOfEvents();
 		isInitialized.set(true);
-		currentTimestep = Double.NEGATIVE_INFINITY;
+		currentTimestep.set(Double.NEGATIVE_INFINITY);
 		delegate.initProcessing();
 
 		for (var manager : managers) {
@@ -185,13 +186,14 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 		}
     }
 
-	private synchronized void setCurrentTimestep(double time) {
+	private void setCurrentTimestep(double time) {
 
 		// this test must be inside synchronized block to make sure await is only called once
-		if (time > currentTimestep) {
+		while (time > currentTimestep.get()) {
+			var previousTime = currentTimestep.get();
 			// wait for event handlers to process all events from previous time step including events emitted after 'afterSimStep' was called
 			awaitProcessingOfEvents();
-			currentTimestep = time;
+			currentTimestep.compareAndSet(previousTime, time);
 		}
 	}
 

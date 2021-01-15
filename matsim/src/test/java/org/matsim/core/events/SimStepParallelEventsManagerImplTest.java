@@ -21,6 +21,7 @@
 
  package org.matsim.core.events;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.testcases.utils.EventsCollector;
 
 import java.util.Set;
@@ -37,6 +39,8 @@ import java.util.Set;
 import static org.junit.Assert.assertTrue;
 
 public class SimStepParallelEventsManagerImplTest {
+
+	private static Logger log = Logger.getLogger(SimStepParallelEventsManagerImplTest.class);
 
 	@Test
 	public void testEventHandlerCanProduceAdditionalEventLateInSimStep() {
@@ -100,6 +104,43 @@ public class SimStepParallelEventsManagerImplTest {
 		manager.initProcessing();
 		manager.processEvent(new SomeEvent(2));
 		manager.afterSimStep(2);
+		manager.finishProcessing();
+	}
+
+	@Test
+	public void testWaitingWhenTimestepIsIncreased() {
+
+		var manager = new SimStepParallelEventsManagerImpl(1);
+		manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
+		var handler = new HandlerForAsyncEvents();
+		manager.addHandler(handler);
+
+		manager.initProcessing();
+		manager.processEvent(new AfterSimStepEvent(2));
+		manager.processEvent(new SomeEvent(3));
+		assertTrue(handler.isCaughtEvent());
+		manager.finishProcessing();
+	}
+
+	@Test
+	public void testWaitingWhenTimestepIsIncreasedAsync() {
+
+		var manager = new SimStepParallelEventsManagerImpl(1);
+		manager.addHandler(new HandlerListeningForAfterSimStepEvents(manager));
+		EventHandler handler = (BasicEventHandler) event -> {
+			if (event.getEventType().equals(HandlerListeningForAfterSimStepEvents.EventThrownAsync.EVENT_TYPE)) {
+				// trigger update of managers timestep while main thread is awaiting this thread to finish
+				// should result in a deadlock
+				manager.processEvent(new SomeEvent(event.getTime() + 1));
+			}
+		};
+		manager.addHandler(handler);
+
+		manager.initProcessing();
+		manager.processEvent(new AfterSimStepEvent(2));
+
+		// increase timestep from main thread
+		manager.processEvent(new SomeEvent(3));
 		manager.finishProcessing();
 	}
 
@@ -169,6 +210,7 @@ public class SimStepParallelEventsManagerImplTest {
 				} catch (InterruptedException e) {
 					throw new RuntimeException(e);
 				}
+
 				manager.processEvent(new HandlerListeningForAfterSimStepEvents.EventThrownAsync(event.getTime()));
 			}
 		}
