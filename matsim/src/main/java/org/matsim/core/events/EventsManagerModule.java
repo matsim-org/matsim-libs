@@ -45,7 +45,7 @@ public final class EventsManagerModule extends AbstractModule {
 		} else {
 			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 		}
-		bind(EventHandlerRegistrator.class).in(Singleton.class);
+		bind(EventHandlerRegistrator.class).asEagerSingleton();
 	}
 
 	public static class EventHandlerRegistrator {
