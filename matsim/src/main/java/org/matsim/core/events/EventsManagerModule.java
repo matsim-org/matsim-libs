@@ -21,6 +21,7 @@
 
  package org.matsim.core.events;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
@@ -33,18 +34,18 @@ public final class EventsManagerModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if (getConfig().parallelEventHandling().getOneThreadPerHandler() != null && getConfig().parallelEventHandling().getOneThreadPerHandler()) {
-			bindEventsManager().to(ParallelEventsManager.class).asEagerSingleton();
+		if (BooleanUtils.isTrue(getConfig().parallelEventHandling().getOneThreadPerHandler())) {
+			bindEventsManager().to(ParallelEventsManager.class).in(Singleton.class);
 		} else if (getConfig().parallelEventHandling().getNumberOfThreads() != null) {
-			if (getConfig().parallelEventHandling().getSynchronizeOnSimSteps() != null && getConfig().parallelEventHandling().getSynchronizeOnSimSteps()) {
+			if (BooleanUtils.isTrue(getConfig().parallelEventHandling().getSynchronizeOnSimSteps())) {
 				bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 			} else {
-				bindEventsManager().to(ParallelEventsManagerImpl.class).asEagerSingleton();
+				bindEventsManager().to(ParallelEventsManagerImpl.class).in(Singleton.class);
 			}
 		} else {
 			bindEventsManager().to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
 		}
-		bind(EventHandlerRegistrator.class).asEagerSingleton();
+		bind(EventHandlerRegistrator.class).in(Singleton.class);
 	}
 
 	public static class EventHandlerRegistrator {
