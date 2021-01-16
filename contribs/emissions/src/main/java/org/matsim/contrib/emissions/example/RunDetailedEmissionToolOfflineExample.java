@@ -27,10 +27,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.ParallelEventsManager;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.MatsimVehicleWriter;
 
 
 /**
@@ -42,14 +44,13 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author benjamin, julia
  */
 public final class RunDetailedEmissionToolOfflineExample{
-	
-	private final static String runDirectory = "./test/output/";
+
 	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 	
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
 
-	private static final String emissionEventOutputFile = runDirectory + "5.emission.events.offline.xml.gz";
+	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
 	private Config config;
 
 	// =======================================================================================================		
@@ -74,7 +75,11 @@ public final class RunDetailedEmissionToolOfflineExample{
 			this.prepareConfig() ;
 		}
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        EventsManager eventsManager = new ParallelEventsManager(false, 1, 65536);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		// If you get an Exception "queue full" with the eventsManager above, please try the "old" single threaded one (below)
+		// There is an issue that the ParallelEventsManager has problems if the number of events is to hugh.
+		// see also https://github.com/matsim-org/matsim-libs/issues/1091
+//		EventsManager eventsManager = new EventsManagerImpl();
 
 		AbstractModule module = new AbstractModule(){
 			@Override
@@ -89,15 +94,17 @@ public final class RunDetailedEmissionToolOfflineExample{
 
         EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
-        EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
+		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventOutputFileName );
         emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
-        eventsManager.initProcessing();
 
+        eventsManager.initProcessing();
         MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
         matsimEventsReader.readFile(eventsFile);
-
         eventsManager.finishProcessing();
+
         emissionEventWriter.closeFile();
 
+		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( outputDirectory + "vehicles.xml.gz" );
     }
 }

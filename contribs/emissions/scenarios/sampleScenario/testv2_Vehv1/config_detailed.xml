@@ -45,6 +45,12 @@
 
 		<!-- if true then detailed emission factor files must be provided! -->
 		<param name="usingDetailedEmissionCalculation" value="true" />
+
+		<!-- Each vehicle in matsim points to a VehicleType.  For the emissions package to work,
+			each VehicleType needs to contain corresponding information.  This switch
+			determines _where_ in VehicleType that information is contained.
+			default: HbefaVehicleDescriptionSource.asEngineInformationAttributes -->
+		<param name="hbefaVehicleDescriptionSource" value="fromVehicleTypeDescription"/>
 	</module>
 
 <!-- ====================================================================== -->

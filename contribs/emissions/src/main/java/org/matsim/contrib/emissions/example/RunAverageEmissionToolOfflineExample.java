@@ -21,12 +21,14 @@ package org.matsim.contrib.emissions.example;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -45,7 +47,6 @@ import org.matsim.vehicles.VehicleUtils;
  */
 public final class RunAverageEmissionToolOfflineExample{
 
-	private final static String runDirectory = "./test/output/";
 	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
 
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
@@ -68,6 +69,8 @@ public final class RunAverageEmissionToolOfflineExample{
 
 	public Config prepareConfig(String configFile) {
 		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+		EmissionsConfigGroup ecg = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+		ecg.setHbefaVehicleDescriptionSource(EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription);
 		return config;
 	}
 
@@ -76,7 +79,12 @@ public final class RunAverageEmissionToolOfflineExample{
 			this.prepareConfig() ;
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		// If you get an Exception "queue full" with the eventsManager above, please try the "old" single threaded one (below)
+		// There is an issue that the ParallelEventsManager has problems if the number of events is to hugh.
+		// see also https://github.com/matsim-org/matsim-libs/issues/1091
+//		EventsManager eventsManager = new EventsManagerImpl();
 
 		AbstractModule module = new AbstractModule(){
 			@Override
@@ -95,8 +103,10 @@ public final class RunAverageEmissionToolOfflineExample{
 		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventOutputFileName );
 		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
+		eventsManager.initProcessing();
 		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
 		matsimEventsReader.readFile(eventsFile);
+		eventsManager.finishProcessing();
 
 		emissionEventWriter.closeFile();
 
