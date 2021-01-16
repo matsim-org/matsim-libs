@@ -97,7 +97,7 @@ public class SumoNetworkHandler extends DefaultHandler {
     void merge(SumoNetworkHandler other, CoordinateTransformation ct) {
 
         Set<String> notDeadEnd = other.junctions.entrySet().stream()
-                .filter((e) -> !"dead_end" .equals(e.getValue().type))
+                .filter((e) -> !"dead_end".equals(e.getValue().type))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
 
@@ -180,7 +180,7 @@ public class SumoNetworkHandler extends DefaultHandler {
             case "edge":
 
                 // Internal edges are not needed
-                if ("internal" .equals(attributes.getValue("function")))
+                if ("internal".equals(attributes.getValue("function")))
                     break;
 
                 String shape = attributes.getValue("shape");
@@ -189,6 +189,7 @@ public class SumoNetworkHandler extends DefaultHandler {
                         attributes.getValue("from"),
                         attributes.getValue("to"),
                         attributes.getValue("type"),
+                        attributes.getValue("name"),
                         shape == null ? new String[0] : shape.split(" ")
                 );
 
@@ -270,7 +271,7 @@ public class SumoNetworkHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if ("edge" .equals(qName) && tmpEdge != null) {
+        if ("edge".equals(qName) && tmpEdge != null) {
             edges.put(tmpEdge.id, tmpEdge);
             tmpEdge = null;
         }
@@ -285,6 +286,9 @@ public class SumoNetworkHandler extends DefaultHandler {
         final String from;
         final String to;
         final String type;
+        @Nullable
+        final String name;
+
         final List<double[]> shape = new ArrayList<>();
 
         final List<Lane> lanes = new ArrayList<>();
@@ -297,11 +301,12 @@ public class SumoNetworkHandler extends DefaultHandler {
         @Nullable
         String origTo;
 
-        public Edge(String id, String from, String to, String type, String[] shape) {
+        public Edge(String id, String from, String to, String type, String name, String[] shape) {
             this.id = id;
             this.from = from;
             this.to = to;
             this.type = type;
+            this.name = name;
 
             for (String coords : shape) {
                 String[] split = coords.split(",");
@@ -313,7 +318,7 @@ public class SumoNetworkHandler extends DefaultHandler {
          * Calculate edge length as max of lanes.
          */
         public double getLength() {
-            return lanes.stream().mapToDouble( l -> l.length).max().orElseThrow();
+            return lanes.stream().mapToDouble(l -> l.length).max().orElseThrow();
         }
 
         @Override

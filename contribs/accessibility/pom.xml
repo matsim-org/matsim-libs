@@ -85,13 +85,11 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
 		</dependency>
 		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
 			<groupId>org.geotools.jdbc</groupId>
 			<artifactId>gt-jdbc-postgis</artifactId>
-			<version>21.5</version>
 		</dependency>
 	</dependencies>
 </project>
