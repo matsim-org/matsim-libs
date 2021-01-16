@@ -69,11 +69,7 @@ class RunDrtExample{
 		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_A );
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(900.);
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setMaxTravelTimeBeta(10. * 60.);
+			drtConfig.setMode( DRT_A ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_A.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
@@ -82,11 +78,7 @@ class RunDrtExample{
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_B );
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(900.);
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setMaxTravelTimeBeta(10. * 60.);
+			drtConfig.setMode( DRT_B ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_B.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
@@ -95,11 +87,7 @@ class RunDrtExample{
 		}
 		{
 			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMode( DRT_C );
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(900.);
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setMaxTravelTimeBeta(10. * 60.);
+			drtConfig.setMode( DRT_C ).setStopDuration(60.).setMaxWaitTime(900.).setMaxTravelTimeAlpha(1.3).setMaxTravelTimeBeta(10. * 60.);
 			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile("one_shared_taxi_vehicles_C.xml");
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
@@ -144,10 +132,10 @@ class RunDrtExample{
 		controler.configureQSimComponents( DvrpQSimComponents.activateModes( DRT_A, DRT_B, DRT_C ) ) ;
 		// yyyy in long run, try to get rid of the above line
 
-//		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
-//		otfVisConfigGroup.setLinkWidth( 5 );
-//		otfVisConfigGroup.setDrawNonMovingItems( true );
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+		OTFVisConfigGroup otfVisConfigGroup = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
+		otfVisConfigGroup.setLinkWidth( 5 );
+		otfVisConfigGroup.setDrawNonMovingItems( true );
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run() ;
 	}
