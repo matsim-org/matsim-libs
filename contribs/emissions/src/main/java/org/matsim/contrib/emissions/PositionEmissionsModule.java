@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -271,9 +272,16 @@ public class PositionEmissionsModule extends AbstractModule {
             return position.getLinkId();
         }
 
+        public Id<Vehicle> getVehicleId() { return position.getVehicleId(); }
+
+        public Id<Person> getPersonId() { return position.getPersonId(); }
+
         public String getEmissionType() {
             return emissionType;
         }
+
+        public Coord getCoord() { return position.getCoord(); }
+
 
         @Override
         public Map<String, String> getAttributes() {
