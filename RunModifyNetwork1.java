@@ -11,11 +11,7 @@ import org.matsim.examples.ExamplesUtils;
 
 import static org.matsim.examples.ExamplesUtils.getTestScenarioURL;
 
-/**
- * @author  jbischoff
- * This provides an example script how to read a MATSim network and modify some values for each link.
- * In this case, we are reducing the capacity of each link by 50%.
- */
+
 
 public class RunModifyNetwork1 {
 
@@ -24,13 +20,13 @@ public class RunModifyNetwork1 {
         // read in the network
         Network network = NetworkUtils.createNetwork();
 
-        new MatsimNetworkReader(network).readFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/output/org/matsim/urbanEV/ChargerSelectionTest/testUrbanEVExample/output_network.xml");
+        new MatsimNetworkReader(network).readFile("C:/Users/admin/IdeaProjects/matsim-berlin/test/input/chessboard/network.xml");
 
         // iterate through all links
         for (Link l : network.getLinks().values()){
             //get current capacity
             double oldLength = l.getLength();
-            double newLength = oldLength * 0.736;
+            double newLength = oldLength * 0.728803851494254;
 
             //set new capacity
             l.setLength(newLength);
