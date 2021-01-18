@@ -44,8 +44,8 @@ public class PositionEmissionsModule extends AbstractModule {
         if (!config.controler().getSnapshotFormat().contains(ControlerConfigGroup.SnapshotFormat.positionevents)) {
             throw new RuntimeException("config.controler.snapshotFormat must be set to 'positionevents'");
         }
-        if (!config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue)) {
-            throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue");
+        if (!(config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.queue) || config.qsim().getSnapshotStyle().equals(QSimConfigGroup.SnapshotStyle.kinematicWaves))) {
+            throw new RuntimeException("I think generating emissions only makes sense if config.qsim.snapshotstyle == queue or == kinematicWaves");
         }
     }
 
@@ -163,6 +163,9 @@ public class PositionEmissionsModule extends AbstractModule {
             if (!event.getState().equals(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR))
                 return; // only calculate emissions for cars
 
+            if (!vehiclesInTraffic.containsKey(event.getVehicleId()))
+                return; // only collect positions if vehicle has entered traffic (if vehicle is wait2link its position is calculated but it hasn't entered traffic yet.
+
             if (trajectories.containsKey(event.getVehicleId())) {
                 computeWarmEmissionEvent(event);
 
@@ -186,7 +189,6 @@ public class PositionEmissionsModule extends AbstractModule {
                     startEngineTime, parkingDurations.get(vehicle.getId()), 1);
 
             var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-            log.info("Cold emission event with number " + emisPosEv.getNumber());
             eventsManager.processEvent(emisPosEv);
         }
 
@@ -199,7 +201,6 @@ public class PositionEmissionsModule extends AbstractModule {
                 var emissions = emissionCalculator.calculateColdEmissions(vehicle, event.getLinkId(),
                         event.getTime(), parkingDurations.get(vehicle.getId()), 2);
                 var emisPosEv = new PositionEmissionEvent(event, emissions, "cold");
-                log.info("Cold emission event with number " + emisPosEv.getNumber());
                 eventsManager.processEvent(emisPosEv);
 
                 // this makes sure that this is only computed once
@@ -247,14 +248,11 @@ public class PositionEmissionsModule extends AbstractModule {
 
     public static class PositionEmissionEvent extends Event {
 
-        public static final String EVENT_TYPE = "emissionPosition";
-
-        private static final AtomicInteger eventCounter = new AtomicInteger(); // this should be removed at some point
+        public static final String EVENT_TYPE = "positionEmission";
 
         private final PositionEvent position;
         private final Map<Pollutant, Double> emissions;
         private final String emissionType;
-        private final int id;
 
         public Map<Pollutant, Double> getEmissions() {
             return emissions;
@@ -265,7 +263,6 @@ public class PositionEmissionsModule extends AbstractModule {
             this.position = positionEvent;
             this.emissions = emissions;
             this.emissionType = emissionType;
-            id = eventCounter.incrementAndGet();
         }
 
         public Id<Link> getLinkId() {
@@ -293,17 +290,12 @@ public class PositionEmissionsModule extends AbstractModule {
             for (var pollutant : emissions.entrySet()) {
                 attr.put(pollutant.getKey().toString(), pollutant.getValue().toString());
             }
-            attr.put("#", Integer.toString(id));
             return attr;
         }
 
         @Override
         public String getEventType() {
             return EVENT_TYPE;
-        }
-
-        int getNumber() {
-            return id;
         }
     }
 }
