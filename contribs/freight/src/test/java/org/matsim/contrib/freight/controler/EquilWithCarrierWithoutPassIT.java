@@ -44,6 +44,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 import static org.matsim.contrib.freight.controler.EquilWithCarrierWithPassIT.addDummyVehicleType;
 
@@ -183,7 +184,10 @@ public class EquilWithCarrierWithoutPassIT {
 		Assert.assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(), 2.0);
 	}
 
-
+	/**
+	 * Compare if the Agent (driver) and the vehicle id are the same in the output compared to an
+	 * existing event file. The check will be done by comparing the Ids from PersonEntersVehicleEvents.
+	 */
 	@Test
 	public void testCarrierAgentAndCarrierVehicleIdInEvents(){
 		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
@@ -211,6 +215,30 @@ public class EquilWithCarrierWithoutPassIT {
 		Assert.assertTrue(inputEventsHandler.getSetOfVehicleIds().containsAll(outputEventsHandler.getSetOfVehicleIds()));
 		Assert.assertTrue(outputEventsHandler.getSetOfVehicleIds().containsAll(inputEventsHandler.getSetOfVehicleIds()));
 
+	}
+
+	/**
+	 * Compare the resulting eventsFile with an already existing one.
+	 * This is not the best test, but better then noting
+	 */
+	@Test
+	public void testCompareEvents(){
+		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		CarrierModule carrierControler = new CarrierModule();
+		controler.addOverridingModule(carrierControler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
+		controler.run();
+
+		String eventsFileReference = testUtils.getClassInputDirectory() + "/output_events.xml.gz";
+		String eventsFileOutput = testUtils.getOutputDirectory() + "/output_events.xml.gz";
+		EventsFileComparator.Result result = EventsFileComparator.compare(eventsFileReference, eventsFileOutput);
+		Assert.assertEquals(EventsFileComparator.Result.FILES_ARE_EQUAL, result);
 	}
 
 	private DriverAndVehicleIdFromEventsHandlerForTest createDriverAndVehicleIdFromEventsHandler(String filename) {
