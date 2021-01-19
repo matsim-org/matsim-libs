@@ -39,7 +39,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -63,12 +62,7 @@ public class SwissRailRaptorCapacitiesTest {
 				f.scenario.getNetwork(),
 				occupancyData);
 
-		SwissRailRaptor raptor = new SwissRailRaptor(
-				raptorData,
-				new DefaultRaptorParametersForPerson(f.config),
-				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
-				new DefaultRaptorInVehicleCostCalculator());
+		SwissRailRaptor raptor = new SwissRailRaptor.Builder(raptorData, f.config).build();
 
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
@@ -105,12 +99,7 @@ public class SwissRailRaptorCapacitiesTest {
 				f.scenario.getNetwork(),
 				occupancyData);
 
-		raptor = new SwissRailRaptor(
-				raptorData,
-				new DefaultRaptorParametersForPerson(f.config),
-				new LeastCostRaptorRouteSelector(),
-				new DefaultRaptorStopFinder(f.config, new DefaultRaptorIntermodalAccessEgress(), Collections.emptyMap()),
-				new DefaultRaptorInVehicleCostCalculator());
+		raptor = new SwissRailRaptor.Builder(raptorData, f.config).build();
 
 		Id<Person> person1 = Id.create(1, Person.class);
 		Id<Person> person2 = Id.create(2, Person.class);
