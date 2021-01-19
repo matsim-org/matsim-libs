@@ -20,6 +20,7 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.events.EventArray;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 
@@ -30,6 +31,15 @@ import org.matsim.core.mobsim.framework.Steppable;
 public interface EventsManager {
 
 	public void processEvent(final Event event);
+
+	/**
+	 * Submit multiple events for processing at once.
+	 */
+	default void processEvents(final EventArray events) {
+		for (int i = 0; i < events.size(); i++) {
+			processEvent(events.get(i));
+		}
+	}
 
 	public void addHandler(final EventHandler handler);
 	

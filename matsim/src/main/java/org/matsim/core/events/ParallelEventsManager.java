@@ -158,6 +158,7 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 	}
 
+	@Override
 	public void processEvents(final EventArray events) {
 		if (!init) throw new IllegalStateException(".initProcessing() has to be called before processing events!");
 
