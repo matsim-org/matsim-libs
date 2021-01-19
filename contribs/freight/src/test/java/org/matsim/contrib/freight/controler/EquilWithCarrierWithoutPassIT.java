@@ -34,11 +34,14 @@ import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -192,7 +195,46 @@ public class EquilWithCarrierWithoutPassIT {
 		Assert.assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(), 2.0);
 	}
 
-	
-	
-	
+
+	@Test
+	public void testCarrierAgentAndCarrierVehicleIdInEvents(){
+		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		CarrierModule carrierControler = new CarrierModule();
+		controler.addOverridingModule(carrierControler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(CarrierPlanStrategyManagerFactory.class).to(StrategyManagerFactoryForTests.class).asEagerSingleton();
+				bind(CarrierScoringFunctionFactory.class).to(TimeScoringFunctionFactoryForTests.class).asEagerSingleton();
+			}
+		});
+		controler.run();
+
+		DriverAndVehicleIdFromEventsHandler inputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getClassInputDirectory() + "/output_events.xml.gz");
+		DriverAndVehicleIdFromEventsHandler outputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getOutputDirectory() + "/output_events.xml.gz");
+
+		//Check for driverIds
+		Assert.assertEquals(inputEventsHandler.getSetOfDriverIds().size(), outputEventsHandler.getSetOfDriverIds().size());
+		Assert.assertTrue(inputEventsHandler.getSetOfDriverIds().containsAll(outputEventsHandler.getSetOfDriverIds()));
+		Assert.assertTrue(outputEventsHandler.getSetOfDriverIds().containsAll(inputEventsHandler.getSetOfDriverIds()));
+
+		//Check for vehicleIds
+		Assert.assertEquals(inputEventsHandler.getSetOfVehicleIds().size(), outputEventsHandler.getSetOfVehicleIds().size());
+		Assert.assertTrue(inputEventsHandler.getSetOfVehicleIds().containsAll(outputEventsHandler.getSetOfVehicleIds()));
+		Assert.assertTrue(outputEventsHandler.getSetOfVehicleIds().containsAll(inputEventsHandler.getSetOfVehicleIds()));
+
+	}
+
+	private DriverAndVehicleIdFromEventsHandler createDriverAndVehicleIdFromEventsHandler(String filename) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		DriverAndVehicleIdFromEventsHandler eventsHandler = new DriverAndVehicleIdFromEventsHandler();
+		eventsManager.addHandler(eventsHandler);
+
+		eventsManager.initProcessing();
+		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+		matsimEventsReader.readFile(filename);
+		eventsManager.finishProcessing();
+		return eventsHandler;
+	}
+
 }
