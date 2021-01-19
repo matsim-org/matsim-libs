@@ -35,7 +35,7 @@ import java.util.TreeSet;
  *  2) Vehicle Ids
  *  found in the PersonEntersVehicleEvents.
  */
-class DriverAndVehicleIdFromEventsHandler implements PersonEntersVehicleEventHandler {
+class DriverAndVehicleIdFromEventsHandlerForTest implements PersonEntersVehicleEventHandler {
 
 	private TreeSet<Id<Person>> setOfDriverIds = new TreeSet<>();
 	private TreeSet<Id<Vehicle>> setOfVehicleIds = new TreeSet<>();

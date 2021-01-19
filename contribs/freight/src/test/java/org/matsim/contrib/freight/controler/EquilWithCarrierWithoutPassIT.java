@@ -198,8 +198,8 @@ public class EquilWithCarrierWithoutPassIT {
 		});
 		controler.run();
 
-		DriverAndVehicleIdFromEventsHandler inputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getClassInputDirectory() + "/output_events.xml.gz");
-		DriverAndVehicleIdFromEventsHandler outputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getOutputDirectory() + "/output_events.xml.gz");
+		DriverAndVehicleIdFromEventsHandlerForTest inputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getClassInputDirectory() + "/output_events.xml.gz");
+		DriverAndVehicleIdFromEventsHandlerForTest outputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getOutputDirectory() + "/output_events.xml.gz");
 
 		//Check for driverIds
 		Assert.assertEquals(inputEventsHandler.getSetOfDriverIds().size(), outputEventsHandler.getSetOfDriverIds().size());
@@ -213,9 +213,9 @@ public class EquilWithCarrierWithoutPassIT {
 
 	}
 
-	private DriverAndVehicleIdFromEventsHandler createDriverAndVehicleIdFromEventsHandler(String filename) {
+	private DriverAndVehicleIdFromEventsHandlerForTest createDriverAndVehicleIdFromEventsHandler(String filename) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		DriverAndVehicleIdFromEventsHandler eventsHandler = new DriverAndVehicleIdFromEventsHandler();
+		DriverAndVehicleIdFromEventsHandlerForTest eventsHandler = new DriverAndVehicleIdFromEventsHandlerForTest();
 		eventsManager.addHandler(eventsHandler);
 
 		eventsManager.initProcessing();
