@@ -124,11 +124,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
-		if ( false ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
-		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
-		}
+		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
 		controler.addOverridingModule( new CarrierModule( ) );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -149,11 +145,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
-		if ( true ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
-		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
-		}
+		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
 		final CarrierModule carrierModule = new CarrierModule( );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
@@ -175,11 +167,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
-		if ( true ){
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
-		} else{
-			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
-		}
+		freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
 		CarrierModule carrierControler = new CarrierModule();
 		controler.addOverridingModule(carrierControler);
 		controler.addOverridingModule(new AbstractModule() {
