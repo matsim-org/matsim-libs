@@ -85,7 +85,7 @@ public class ObjectAttributesConverterTest {
 		var expectedString = "[\"a\",\"b\"]";
 		final var converter = new ObjectAttributesConverter();
 
-		Collection<String> parsed = Arrays.asList("a", "b");
+		Collection<String> parsed = (Collection<String>) converter.convert("java.util.Collection", expectedString);
 		var serialized = converter.convertToString(parsed);
 
 		assertEquals(expectedString, serialized);
