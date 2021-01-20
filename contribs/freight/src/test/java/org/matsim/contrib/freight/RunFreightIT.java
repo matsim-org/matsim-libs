@@ -22,7 +22,11 @@
 package org.matsim.contrib.freight;
 
 import org.junit.*;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,12 +35,12 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.vehicles.Vehicle;
 
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
 
 public class RunFreightIT {
 
@@ -82,7 +86,7 @@ public class RunFreightIT {
 	 */
 	@Test
 	public void testCompareEvents(){
-				final Controler controler = new Controler( scenario ) ;
+		final Controler controler = new Controler( scenario ) ;
 		Freight.configure( controler );
 		controler.run();
 
@@ -98,10 +102,21 @@ public class RunFreightIT {
 	 * Later in the Agent creation it gets unified to have unique agents in unique vehicles.
 	 * Now it should get unified already during the reconverting from jsprit to MATSim.
 	 */
+	//TODO Set to ignore until changes are done. KMT'Jan21
 	@Ignore
 	@Test
 	public void testCarrierToursHasUniqueVehicleIds(){
-		//TODO
+		Carriers carriers = FreightUtils.getCarriers(scenario);
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			ArrayList<Id<Vehicle>> listOfIds = new ArrayList<>();
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				Id<Vehicle> vehicleId = scheduledTour.getVehicle().getId();
+				final String message = "This tour plan already has an vehicle with the same Id. They have to be unique." +
+						"Carrier: " + carrier.getId() + " ; vehicleId: " + vehicleId;
+				Assert.assertFalse(message,	listOfIds.contains(vehicleId));
+				listOfIds.add(vehicleId);
+			}
+		}
 	}
 
 }

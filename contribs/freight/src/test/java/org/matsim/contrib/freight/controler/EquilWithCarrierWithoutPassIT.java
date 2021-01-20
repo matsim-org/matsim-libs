@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
@@ -45,6 +46,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.vehicles.Vehicle;
+
+import java.util.TreeSet;
 
 import static org.matsim.contrib.freight.controler.EquilWithCarrierWithPassIT.addDummyVehicleType;
 
@@ -55,6 +59,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	private FreightConfigGroup freightConfigGroup;
+	private TreeSet<Id<Vehicle>> setOfVehicleIds_output;
 
 	@Before
 	public void setUp() throws Exception{
@@ -206,14 +211,20 @@ public class EquilWithCarrierWithoutPassIT {
 		DriverAndVehicleIdFromEventsHandlerForTest outputEventsHandler = createDriverAndVehicleIdFromEventsHandler(testUtils.getOutputDirectory() + "/output_events.xml.gz");
 
 		//Check for driverIds
-		Assert.assertEquals(inputEventsHandler.getSetOfDriverIds().size(), outputEventsHandler.getSetOfDriverIds().size());
-		Assert.assertTrue(inputEventsHandler.getSetOfDriverIds().containsAll(outputEventsHandler.getSetOfDriverIds()));
-		Assert.assertTrue(outputEventsHandler.getSetOfDriverIds().containsAll(inputEventsHandler.getSetOfDriverIds()));
+		final TreeSet<Id<Person>> setOfDriverIds_input = inputEventsHandler.getSetOfDriverIds();
+		final TreeSet<Id<Person>> setOfDriverIds_output = outputEventsHandler.getSetOfDriverIds();
+		String messageDriver = "Driver Ids are not equal: \n Input: " + setOfDriverIds_input.toString() + "\n Output: " + setOfDriverIds_output.toString();
+		Assert.assertEquals(messageDriver, setOfDriverIds_input.size(), setOfDriverIds_output.size());
+		Assert.assertTrue(messageDriver, setOfDriverIds_input.containsAll(setOfDriverIds_output));
+		Assert.assertTrue(messageDriver, setOfDriverIds_output.containsAll(setOfDriverIds_input));
 
 		//Check for vehicleIds
-		Assert.assertEquals(inputEventsHandler.getSetOfVehicleIds().size(), outputEventsHandler.getSetOfVehicleIds().size());
-		Assert.assertTrue(inputEventsHandler.getSetOfVehicleIds().containsAll(outputEventsHandler.getSetOfVehicleIds()));
-		Assert.assertTrue(outputEventsHandler.getSetOfVehicleIds().containsAll(inputEventsHandler.getSetOfVehicleIds()));
+		final TreeSet<Id<Vehicle>> setOfVehicleIds_input = inputEventsHandler.getSetOfVehicleIds();
+		final TreeSet<Id<Vehicle>> setOfVehicleIds_output = outputEventsHandler.getSetOfVehicleIds();
+		String messageVehicles = "VehicleIds are not equal: \n Input: " + setOfVehicleIds_input.toString() + "\n Output: " + setOfVehicleIds_output.toString();
+		Assert.assertEquals(messageVehicles, setOfVehicleIds_input.size(), setOfVehicleIds_output.size());
+		Assert.assertTrue(messageVehicles, setOfVehicleIds_input.containsAll(setOfVehicleIds_output));
+		Assert.assertTrue(messageVehicles, setOfVehicleIds_output.containsAll(setOfVehicleIds_input));
 
 	}
 
