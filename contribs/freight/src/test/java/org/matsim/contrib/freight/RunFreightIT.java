@@ -56,12 +56,12 @@ public class RunFreightIT {
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.network().setInputFile(IOUtils.extendUrl(scenarioUrl, "grid9x9.xml").getPath());
+		config.network().setInputFile(IOUtils.extendUrl(scenarioUrl, "grid9x9.xml").toString());
 
 		//freight settings
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml").getPath());
-		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl,  "vehicleTypes.xml").getPath());
+		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml").toString());
+		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl,  "vehicleTypes.xml").toString());
 
 		scenario = ScenarioUtils.loadScenario( config );
 
