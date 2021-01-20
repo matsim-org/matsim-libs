@@ -3,6 +3,8 @@ package org.matsim.contrib.freight.usecases.chessboard;
 import java.io.FileWriter;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,6 +29,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
 import com.google.inject.Inject;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Defines example carrier scoring function (factory).
@@ -188,7 +191,15 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
             if(leg.getRoute() instanceof NetworkRoute){
                 NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
                 Id vehicleId = nRoute.getVehicleId();
-                CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+                // TODO: Here it crashes, because it will now look for vehicle in the CarriersCapabilites list, but they are not there, because within the tours they now have other names. KMT'Jan21
+                //CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
+          //### TODO: First (not nice!) try to debug/and fix it. Something like the following seems to work, but it has to go somewhere more centralized KMT'Jan21
+                TreeMap<Id<Vehicle>, CarrierVehicle> carrierVehiclesMap = new TreeMap<>();
+                for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+                    carrierVehiclesMap.put(scheduledTour.getVehicle().getId(), scheduledTour.getVehicle());
+                }
+                CarrierVehicle vehicle = carrierVehiclesMap.get(vehicleId);
+          //####
                 Gbl.assertNotNull(vehicle);
                 if(!employedVehicles.contains(vehicle)){
                     employedVehicles.add(vehicle);

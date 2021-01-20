@@ -85,7 +85,8 @@ public class MatsimTransformerTest {
 		CarrierVehicle matsimVehicle = MatsimJspritFactory.createCarrierVehicle(jspritVehicle);
 		assertNotNull(matsimVehicle);
 		assertEquals("myType", matsimVehicle.getType().getId().toString());
-		assertEquals("myVehicle", matsimVehicle.getId().toString());
+		//TODO: I would expect now the _0 instead of the occuring _1 -> has to look into the MATSimJspritFactory how the suffix is created. Maybe a problem with static. KMT,Jan21
+		assertEquals("myVehicle_0", matsimVehicle.getId().toString());
 		assertEquals(10.0, matsimVehicle.getEarliestStartTime(), 0.01);
 		assertEquals(20.0, matsimVehicle.getLatestEndTime(), 0.01);
 		assertEquals("loc", matsimVehicle.getLocation().toString());

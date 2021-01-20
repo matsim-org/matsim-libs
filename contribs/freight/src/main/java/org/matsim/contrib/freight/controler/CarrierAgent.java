@@ -209,7 +209,7 @@ class CarrierAgent
 
 	private final Collection<Id<Person>> driverIds = new ArrayList<>();
 
-	private int nextId = 0;
+	// private int nextId = 0;
 
 	private final Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
@@ -302,7 +302,7 @@ class CarrierAgent
 	private void clear() {
 		carrierDriverAgents.clear();
 		driverIds.clear();
-		nextId = 0;
+	//	nextId = 0;
 	}
 
 	Collection<Id<Person>> getDriverIds() {
@@ -314,9 +314,10 @@ class CarrierAgent
 	}
 
 	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {
-		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId, Person.class );
+//		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId, Person.class );
+		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId(), Person.class );
 		driverIds.add(id);
-		++nextId;
+		//++nextId;
 		return id;
 	}
 

@@ -75,6 +75,7 @@ import org.matsim.vehicles.VehicleUtils;
 public class MatsimJspritFactory {
 
 	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
+	private static int nextVehId; //Todo: Check if this makes sence. Even in cases with more then one carrier. I Think some resets might be necessary (See MatsimTransformerTest)
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18
@@ -256,7 +257,7 @@ public class MatsimJspritFactory {
 	 * @see CarrierVehicle, Vehicle
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle) {
-		String vehicleId = vehicle.getId();
+		String vehicleId = vehicle.getId() + "_" + nextVehId;
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
 				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
 				Id.create(vehicle.getStartLocation().getId(), Link.class));
@@ -714,10 +715,12 @@ public class MatsimJspritFactory {
 	 * </br>
 	 */
 	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
+		nextVehId = 0;
 		Collection<ScheduledTour> tours = new ArrayList<ScheduledTour>();
 		for (VehicleRoute route : solution.getRoutes()) {
 			ScheduledTour scheduledTour = createTour(route);
 			tours.add(scheduledTour);
+			++nextVehId;
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
 		carrierPlan.setScore(solution.getCost() * (-1));
