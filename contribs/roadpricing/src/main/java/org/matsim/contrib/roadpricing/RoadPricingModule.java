@@ -28,8 +28,7 @@ public final class RoadPricingModule extends AbstractModule {
 	
 	@Override
 	public void install() {
-		LOG.warn(" !!! Creating RoadPricingConfigGroup !!!");
-		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
+		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.class);
 		
 
 		// TODO sort out different ways to set toll schemes; reduce automagic
@@ -51,9 +50,6 @@ public final class RoadPricingModule extends AbstractModule {
 
 		// specific re-routing strategy for area toll:
 		// yyyy TODO could probably combine them somewhat
-//		bind(PlansCalcRouteWithTollOrNot.class); // so that ReRouteAreaToll can use it by injection; yy could replace this by traditional constructor
-//		 call. kai, oct'19
-		// done.  kai, oct'19
 		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 		addTravelDisutilityFactoryBinding( CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()));
 		addRoutingModuleBinding( CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting());

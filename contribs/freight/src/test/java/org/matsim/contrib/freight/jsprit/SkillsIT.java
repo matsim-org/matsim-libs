@@ -104,7 +104,7 @@ public class SkillsIT {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getClassInputDirectory() + "grid-network.xml");
 
-		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
 		{
 			Carrier carrier = CarrierUtils.createCarrier( Id.create("TestCarrier", Carrier.class));
 			{

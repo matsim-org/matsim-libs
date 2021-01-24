@@ -91,7 +91,7 @@ final class RunPassengerAlongWithCarriers {
 			prepareConfig() ;
 		}
 		scenario = ScenarioUtils.loadScenario( config ) ;
-		FreightUtils.getOrCreateCarriers( scenario );
+		FreightUtils.addOrGetCarriers( scenario );
 		return scenario ;
 	}
 
