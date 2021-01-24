@@ -28,9 +28,19 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public final class EventsUtils {
 
+	/**
+	 * Create a events manager instance that guarantees causality of processed events across all handlers.
+	 */
     public static EventsManager createEventsManager() {
-		return new ParallelEventsManager(false);
+		return new EventsManagerImpl();
     }
+
+	/**
+	 * Creates a parallel events manager, with no guarantees for the order of processed events between multiple handlers.
+	 */
+	public static EventsManager createParallelEventsManager() {
+		return new ParallelEventsManager(false);
+	}
 
 	public static EventsManager createEventsManager(Config config) {
 		final EventsManager events = Injector.createInjector( config, new EventsManagerModule() ).getInstance( EventsManager.class );

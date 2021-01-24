@@ -50,6 +50,7 @@ public final class ParallelEventsManager implements EventsManager {
 	private final int numOfThreads;
 	private final ExceptionHandler uncaughtExceptionHandler;
 	private int iteration = 0;
+	private boolean init = false;
 	private final BlockingQueue<EventArray> eventQueue;
 
 	private final int eventsQueueSize;
@@ -127,6 +128,7 @@ public final class ParallelEventsManager implements EventsManager {
 		this.distributor.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 		this.distributor.setName("EventsDistributor");
 		this.distributor.start();
+		this.init = true;
 	}
 
 	private void teardown() {
@@ -145,6 +147,8 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Override
 	public void processEvent(final Event event) {
+		if (!init) throw new IllegalStateException(".initProcessing() has to be called before processing events!");
+
 		EventArray array = new EventArray(1);
 		array.add(event);
 		try {
@@ -154,7 +158,10 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 	}
 
+	@Override
 	public void processEvents(final EventArray events) {
+		if (!init) throw new IllegalStateException(".initProcessing() has to be called before processing events!");
+
 		try {
 			this.eventQueue.put(events);
 		} catch (InterruptedException e) {
@@ -164,6 +171,9 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Override
 	public void addHandler(final EventHandler handler) {
+		if (init)
+			throw new IllegalStateException("Handlers can not be added after .initProcessing() was called!");
+
 		// this will be used the next time we start an iteration
 		this.eventsHandlers.add(handler);
 	}

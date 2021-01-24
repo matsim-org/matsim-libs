@@ -20,22 +20,24 @@
 
 package org.matsim.core.events;
 
-import com.google.common.util.concurrent.AtomicDouble;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
 
 import javax.inject.Inject;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An EventsHandler that handles all occurring Events in separate Threads.
@@ -43,83 +45,67 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * in that Time Step are processed before the simulation can go on.
  * This is necessary e.g. when using Within-day Replanning.
  *
- * This events manager handles submitted events in-between initProcessing and finishProcessing
- * concurrently. After finishProcessing was called, e.g. in-between iterations, events are
- * handled on the calling thread. Many things seem to rely on this logic.
- * 
  * @author cdobler
  */
-public final class SimStepParallelEventsManagerImpl implements EventsManager {
+class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	private final static Logger log = Logger.getLogger(SimStepParallelEventsManagerImpl.class);
 
-	private final ExecutorService executorService;
-	private final Phaser phaser = new Phaser(1);
-	private final List<EventsManager> managers = new ArrayList<>();
-	private final List<ProcessEventsRunnable> eventsProcessors = new ArrayList<>();
-	private final int numberOfThreads;
-	private final AtomicBoolean hasThrown = new AtomicBoolean(false);
-	private final AtomicBoolean isInitialized = new AtomicBoolean(false);
-	private final AtomicDouble currentTimestep = new AtomicDouble(Double.NEGATIVE_INFINITY);
+	private final int numOfThreads;
+	private CyclicBarrier simStepEndBarrier;
+	private CyclicBarrier iterationEndBarrier;
+    private ProcessEventsRunnable[] runnables;
+	private EventsManagerImpl[] eventsManagers;
+	private EventsManagerImpl delegate;
+	private ProcessedEventsChecker processedEventsChecker;
 
-	// this delegate is used to handle events synchronously during un-initialized state
-	private final EventsManager delegate = new EventsManagerImpl();
+	private boolean parallelMode = false;
+	private int handlerCount = 0;
 
-	private int handlerCount;
+	private AtomicLong counter;
+	private AtomicReference<Throwable> hadException = new AtomicReference<>();
 
 	@Inject
 	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
-		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 2);
+		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
 	}
 
     public SimStepParallelEventsManagerImpl() {
-		this(2);
+		this(1);
 	}
-	
+
 	public SimStepParallelEventsManagerImpl(int numOfThreads) {
-		this.numberOfThreads = numOfThreads;
-		this.executorService = Executors.newWorkStealingPool(numberOfThreads);
+		this.numOfThreads = numOfThreads;
+		log.info("number of threads=" + numOfThreads );
+		init();
+	}
 
-		ProcessEventsRunnable nextProcessor = null;
+	private void init() {
+		this.counter = new AtomicLong(0);
 
-		for (int i = 0; i < numberOfThreads; i++){
-			var manager = new EventsManagerImpl();
-			managers.add(manager);
-			var processor = new ProcessEventsRunnable(manager, phaser, nextProcessor, executorService);
-			nextProcessor = processor;
-			eventsProcessors.add(processor);
-		}
+		this.simStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
+		this.iterationEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
+
+		this.delegate = new EventsManagerImpl();
+
+		this.eventsManagers = new EventsManagerImpl[this.numOfThreads];
+		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl();
 	}
 
 	@Override
 	public void processEvent(final Event event) {
+		this.counter.incrementAndGet();
 
-		// only test for order, if we are initialized. Some code in some contribs emits unordered events in between iterations
-		if (event.getTime() < currentTimestep.get() && isInitialized.get()) {
-			throw new RuntimeException("Event with time step: " + event.getTime() + " was submitted. But current timestep was: " + currentTimestep + ". Events must be ordered chronologically");
-		}
-
-		setCurrentTimestep(event.getTime());
-
-		// register event here, to make sure finishProcessing works correctly awaits all submitted events
-		phaser.register();
-
-		if (isInitialized.get()) {
-			// taking last processor because of initialization logic
-			var processor = eventsProcessors.get(eventsProcessors.size() - 1);
-			processor.addEvent(event);
-			executorService.execute(processor);
-		} else {
-			delegate.processEvent(event);
-			phaser.arriveAndDeregister();
-		}
+		if (parallelMode) {
+			runnables[0].processEvent(event);
+		} else delegate.processEvent(event);
 	}
 
 	@Override
 	public void addHandler(final EventHandler handler) {
 		delegate.addHandler(handler);
 
-		managers.get(handlerCount % numberOfThreads).addHandler(handler);
+		eventsManagers[handlerCount % numOfThreads].addHandler(handler);
 		handlerCount++;
 	}
 
@@ -127,30 +113,67 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	public void removeHandler(final EventHandler handler) {
 		delegate.removeHandler(handler);
 
-		for (var manager : managers)
-			manager.removeHandler(handler);
+		for (EventsManager eventsManager : eventsManagers) eventsManager.removeHandler(handler);
 	}
-	
+
 	@Override
-	public synchronized void resetHandlers(int iteration) {
-		awaitProcessingOfEvents();
+	public void resetHandlers(int iteration) {
 		delegate.resetHandlers(iteration);
+		counter.set(0);
 	}
 
 	@Override
-	public synchronized void initProcessing() {
-
-		// wait for processing of events which were emitted in between iterations
-		awaitProcessingOfEvents();
-		isInitialized.set(true);
-		currentTimestep.set(Double.NEGATIVE_INFINITY);
+	public void initProcessing() {
 		delegate.initProcessing();
+		for (EventsManager eventsManager : this.eventsManagers) eventsManager.initProcessing();
 
-		for (var manager : managers) {
-			manager.initProcessing();
+		Queue<Event>[] eventsQueuesArray = new Queue[this.numOfThreads];
+		List<Queue<Event>> eventsQueues = new ArrayList<Queue<Event>>();
+		for (int i = 0; i < numOfThreads; i++) {
+			Queue<Event> eventsQueue = new LinkedBlockingQueue<>();
+			eventsQueues.add(eventsQueue);
+			eventsQueuesArray[i] = eventsQueue;
 		}
+
+		/*
+		 * Add a null entry to the list which will be set as nextEventsQueue in the last ProcessEventsThread.
+		 */
+		eventsQueues.add(null);
+
+		/*
+		 * Create a ProcessedEventsChecker that checks whether all Events of
+		 * a time step have been processed.
+		 */
+		processedEventsChecker = new ProcessedEventsChecker(this, eventsQueuesArray);
+
+		/*
+		 *  Create a Barrier that the threads use to synchronize.
+		 */
+        CyclicBarrier waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
+
+		hadException = new AtomicReference<>();
+        ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier,
+                simStepEndBarrier, iterationEndBarrier);
+
+		runnables = new ProcessEventsRunnable[numOfThreads];
+		for (int i = 0; i < numOfThreads; i++) {
+			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManagers[i], processedEventsChecker,
+                    waitForEmptyQueuesBarrier, simStepEndBarrier, iterationEndBarrier, eventsQueues.get(i), eventsQueues.get(i + 1));
+			runnables[i] = processEventsRunnable;
+			Thread thread = new Thread(processEventsRunnable);
+			thread.setDaemon(true);
+			thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+			thread.setName(ProcessEventsRunnable.class.toString() + i);
+			thread.start();
+		}
+
+		/*
+		 * During the simulation Events are processed in
+		 * the EventsProcessingThreads.
+		 */
+		this.parallelMode = true;
 	}
-		
+
 	/*
 	 * In some chases Events are created after this method has been called.
 	 * To ensure that they are processed in real time, we process them not
@@ -160,115 +183,251 @@ public final class SimStepParallelEventsManagerImpl implements EventsManager {
 	@Override
 	public synchronized void finishProcessing() {
 
-		// setting isInitialized before waiting for finishing of all events
-		isInitialized.set(false);
-
-		log.info("finishProcessing: Before awaiting all event processes");
-		phaser.arriveAndAwaitAdvance();
-		log.info("finishProcessing: After waiting for all events processes.");
-
-		if (!hasThrown.get())
-			throwExceptionIfAnyThreadCrashed();
+		/*
+		 * If an exception occurred, at least one of the events processing threads
+		 * has crashed. As a result, also all other events processing threads have
+		 * been stopped.
+		 * If not, it is waited until all threads have ended processing events.
+		 */
+		Throwable throwable = this.hadException.get();
+		if (throwable == null) {
+			try {
+				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
+				iterationEndBarrier.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				this.hadException.set(e);
+			}
+        }
 
 		delegate.finishProcessing();
-		for (var manager : managers) {
-			manager.finishProcessing();
+		for (EventsManager eventsManager : this.eventsManagers) eventsManager.finishProcessing();
+
+		/*
+		 * After the simulation Events are processed in
+		 * the Main Thread.
+		 */
+		this.parallelMode = false;
+
+		if (throwable != null) {
+			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
 	}
 
 	@Override
 	public void afterSimStep(double time) {
 
-		// await processing of events emitted during a simulation step
-		awaitProcessingOfEvents();
+		/*
+		 * If an exception occurred, at least one of the events processing threads
+		 * has crashed. Therefore the remaining threads would get stuck at the
+		 * CyclicBarrier.
+		 */
+		if (hadException.get() != null) {
+			return;
+		}
 
-		delegate.afterSimStep(time);
-		for (var manager : managers) {
-			manager.afterSimStep(time);
+		try {
+			Gbl.assertNotNull( this.processedEventsChecker );
+			this.processedEventsChecker.setTime(time);
+			this.processEvent(new LastEventOfSimStep(time));
+			simStepEndBarrier.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			throw new RuntimeException(e);
 		}
     }
 
-	private void setCurrentTimestep(double time) {
-
-		while (time > currentTimestep.get()) {
-			var previousTime = currentTimestep.get();
-			// wait for event handlers to process all events from previous time step including events emitted after 'afterSimStep' was called
-			awaitProcessingOfEvents();
-			currentTimestep.compareAndSet(previousTime, time);
-		}
-	}
-
-	private void awaitProcessingOfEvents() {
-		phaser.arriveAndAwaitAdvance();
-		throwExceptionIfAnyThreadCrashed();
-	}
-
-	private void throwExceptionIfAnyThreadCrashed() {
-		eventsProcessors.stream()
-				.filter(ProcessEventsRunnable::hadException)
-				.findAny()
-				.ifPresent(process -> {
-					hasThrown.set(true);
-					throw new RuntimeException(process.getCaughtException());
-				});
-	}
-	
 	private static class ProcessEventsRunnable implements Runnable {
 
-		private final EventsManager manager;
-		private final Phaser phaser;
-		private final ProcessEventsRunnable nextProcessor;
-		private final ExecutorService executorService;
-		private final Queue<Event> eventQueue = new ConcurrentLinkedQueue<>();
+		private final EventsManager eventsManager;
+		private final ProcessedEventsChecker processedEventsChecker;
+		private final CyclicBarrier waitForEmptyQueuesBarrier;
+		private final CyclicBarrier simStepEndBarrier;
+		private final CyclicBarrier iterationEndBarrier;
+		private final Queue<Event> eventsQueue;
+		private final Queue<Event> nextEventsQueue;
+		private double lastEventTime = 0.0;
 
-		private Exception caughtException;
-
-		private ProcessEventsRunnable(EventsManager manager, Phaser phaser, ProcessEventsRunnable nextProcessor, ExecutorService executorService) {
-			this.manager = manager;
-			this.phaser = phaser;
-			this.nextProcessor = nextProcessor;
-			this.executorService = executorService;
+		public ProcessEventsRunnable(EventsManager eventsManager, ProcessedEventsChecker processedEventsChecker,
+				CyclicBarrier waitForEmptyQueuesBarrier,CyclicBarrier simStepEndBarrier,
+				CyclicBarrier iterationEndBarrier, Queue<Event> eventsQueue, Queue<Event> nextEventsQueue) {
+			this.eventsManager = eventsManager;
+			this.processedEventsChecker = processedEventsChecker;
+			this.waitForEmptyQueuesBarrier = waitForEmptyQueuesBarrier;
+			this.simStepEndBarrier = simStepEndBarrier;
+			this.iterationEndBarrier = iterationEndBarrier;
+			this.eventsQueue = eventsQueue;
+			this.nextEventsQueue = nextEventsQueue;
 		}
 
-		private boolean hadException() {
-			return caughtException != null;
-		}
-
-		private Exception getCaughtException() {
-			return caughtException;
-		}
-
-		void addEvent(Event event) {
-			eventQueue.add(event);
-		}
-
-		/**
-		 * This method must be synchronized to make sure the events are passed to the events manager in the order we've
-		 * received them.
-		 */
 		@Override
-		public synchronized void run() {
-			var event = eventQueue.poll();
-			notifyNextProcess(event);
-			tryProcessEvent(event);
-		}
-
-		private void notifyNextProcess(Event event) {
-			if (nextProcessor != null) {
-				phaser.register();
-				nextProcessor.addEvent(event);
-				executorService.execute(nextProcessor);
-			}
-		}
-
-		private void tryProcessEvent(Event event) {
+		public void run() {
 			try {
-				manager.processEvent(event);
-			} catch (Exception e) {
-				caughtException = e;
-			} finally {
-				phaser.arriveAndDeregister();
+				/*
+				 * If the Simulation has ended we may still have some
+				 * Events left to process. So we continue until the
+				 * eventsQueue is empty.
+				 *
+				 * The loop is ended by a break command when a LastEventOfIteration
+				 * event is found.
+				 */
+				lastEventTime = 0.0;
+				while (true) {
+					Event event = ((LinkedBlockingQueue<Event>) eventsQueue).take();
+
+					/*
+					 * Check whether the events are ordered chronologically.
+					 */
+					if (event.getTime() < this.lastEventTime) {
+						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
+								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
+								"as a MobsimAfterSimStepListener?");
+					} else this.lastEventTime = event.getTime();
+
+					if (event instanceof LastEventOfSimStep) {
+						/*
+						 * Send the event to the next events processing thread, if this is not the last thread.
+						 */
+						if (nextEventsQueue != null) {
+							nextEventsQueue.add(event);
+						}
+
+						/*
+						 * At the moment, this thread's queue is empty. However, one of the other threads
+						 * could create additional events for this time step. Therefore we have to wait
+						 * until all threads reach this barrier. Afterwards we can check whether still
+						 * all queues are empty. If this is true, the threads reach the sim step end barrier.
+						 */
+						waitForEmptyQueuesBarrier.await();
+						if (!processedEventsChecker.allEventsProcessed()) continue;
+
+						/*
+						 * All event queues are empty, therefore finish current time step by
+						 * reaching the sim step end barrier.
+						 */
+						simStepEndBarrier.await();
+						continue;
+					}
+					else {
+						/*
+						 * Handing the event over to the next events processing thread.
+						 *
+						 * This could be added to the next EventHandlers queue here or in
+						 * the processEvent(...) method. Doing it here might be a bit faster
+						 * since it is not done in the main thread.
+						 */
+						if (nextEventsQueue != null) {
+							nextEventsQueue.add(event);
+						}
+
+						/*
+						 * If it is the last Event of the iteration, break the while loop
+						 * and end the parallel events processing.
+						 * TODO: Check whether still some events could be left in the queues...
+						 */
+						if (event instanceof LastEventOfIteration) {
+							break;
+						}
+					}
+					eventsManager.processEvent(event);
+				}
+				iterationEndBarrier.await();
+			} catch (InterruptedException | BrokenBarrierException e) {
+				throw new RuntimeException(e);
 			}
+            Gbl.printCurrentThreadCpuTime();
 		}
+
+		public void processEvent(Event event) {
+			this.eventsQueue.add(event);
+		}
+
+	}	// ProcessEventsRunnable
+
+	private static class ProcessedEventsChecker implements Runnable {
+
+		private final EventsManager evenentsManger;
+		private final Queue<Event>[] eventQueues;
+		private boolean allEventsProcessed;
+		private double time;
+
+		public ProcessedEventsChecker(EventsManager evenentsManger, Queue<Event>[] eventQueues) {
+			this.evenentsManger = evenentsManger;
+			this.eventQueues = eventQueues;
+
+			this.allEventsProcessed = true;
+		}
+
+		public void setTime(double time) {
+			this.time = time;
+		}
+
+		public boolean allEventsProcessed() {
+			return this.allEventsProcessed;
+		}
+
+		@Override
+		public void run() {
+			for (Queue<Event> eventsQueue : eventQueues) {
+				/*
+				 * Some EventHandlers might have created additional Events [1] which
+				 * could be located in the list AFTER the LastEventOfSimStep, meaning
+				 * that they would be processed while the simulation is already processing
+				 * the next time step. Therefore we check whether the eventsQueues are really
+				 * empty.
+				 * If at least one of the queues is not empty, this time steps
+				 * events processing has to go on. This is triggered by setting
+				 * allEventsProcessed to false. Additionally a last event of sim
+				 * step event is created. When all events processing threads
+				 * process that event, it is again checked whether there are
+				 * more events left.
+				 *
+				 * [1] ... Such a behavior is NOT part of MATSim's default EventHandlers but it
+				 * still might occur.
+				 */
+				if (eventsQueue.size() > 0) {
+					allEventsProcessed = false;
+					evenentsManger.processEvent(new LastEventOfSimStep(time));
+					return;
+				}
+			}
+
+			// otherwise
+			allEventsProcessed = true;
+		}
+
+	}	// ProcessedEventsChecker
+
+	/**
+	 * @author mrieser
+	 */
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicReference<Throwable> hadException;
+		private final CyclicBarrier simStepEndBarrier;
+		private final CyclicBarrier iterationEndBarrier;
+		private final CyclicBarrier waitForEmptyQueuesBarrier;
+
+		public ExceptionHandler(final AtomicReference<Throwable> hadException, CyclicBarrier waitForEmptyQueuesBarrier,
+				CyclicBarrier simStepEndBarrier, CyclicBarrier iterationEndBarrier) {
+			this.hadException = hadException;
+			this.waitForEmptyQueuesBarrier = waitForEmptyQueuesBarrier;
+			this.simStepEndBarrier = simStepEndBarrier;
+			this.iterationEndBarrier = iterationEndBarrier;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			this.hadException.set(e);
+			log.error("Thread " + t.getName() + " died with exception while handling events.", e);
+
+			/*
+			 * By reseting the barriers, they will throw a BrokenBarrierException
+			 * which again will stop the events processing threads.
+			 */
+			this.simStepEndBarrier.reset();
+			this.iterationEndBarrier.reset();
+			this.waitForEmptyQueuesBarrier.reset();
+		}
+
 	}
+
 }

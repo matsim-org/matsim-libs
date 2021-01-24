@@ -23,7 +23,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -132,7 +132,7 @@ public class TestPositionEmissionModule {
                 addEventHandlerBinding().toInstance(handler);
                 addEventHandlerBinding().toInstance(mainLinkWarmHandler);
                 addEventHandlerBinding().toInstance(coldHandler);
-                bind(EventsManager.class).to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
+                bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
             }
         });
 
