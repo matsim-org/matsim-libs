@@ -141,8 +141,12 @@ public class CarrierVehicle implements Vehicle {
 		return vehicleType;
 	}
 
-	public void setType( VehicleType vehicleType ) {
+	/**
+	 * @deprecated -- set in builder and do not change afterwards.  kai, nov'20
+	 */
+	public CarrierVehicle setType( VehicleType vehicleType ) {
 		this.vehicleType = vehicleType;
+		return this;
 	}
 
 	/**

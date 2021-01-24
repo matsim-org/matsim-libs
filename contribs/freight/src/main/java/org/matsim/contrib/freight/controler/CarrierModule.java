@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
 import java.util.List;
 
-public class CarrierModule extends AbstractModule {
+public final class CarrierModule extends AbstractModule {
 
 	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
 	private CarrierScoringFunctionFactory scoringFunctionFactory;

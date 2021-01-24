@@ -72,19 +72,36 @@ public class FreightUtils {
 	 *
 	 *
 	 * @param scenario
-	 * @param freightConfigGroup
 	 * @throws ExecutionException, InterruptedException
 	 */
-	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws ExecutionException, InterruptedException {
+	public static void runJsprit(Scenario scenario) throws ExecutionException, InterruptedException{
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class );
+		runJsprit( scenario, freightConfigGroup );
+	}
 
+	/**
+	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
+	 * 	- creating NetbasedCosts based on the network
+	 * 	- building and solving the VRP for all carriers using jsprit
+	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 *
+	 *
+	 * @param scenario
+	 * @param freightConfigGroup
+	 * @throws ExecutionException, InterruptedException
+	 * 
+	 * @deprecated -- use {@link #runJsprit(Scenario)}
+	 */
+	public static void runJsprit(Scenario scenario, FreightConfigGroup freightConfigGroup) throws ExecutionException, InterruptedException {
+		
 		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
 				scenario.getNetwork(), FreightUtils.getCarrierVehicleTypes(scenario).getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
-
+		
 		Carriers carriers = FreightUtils.getCarriers(scenario);
-
+		
 		HashMap<Id<Carrier>, Integer> carrierActivityCounterMap = new HashMap<>();
-
+		
 		// Fill carrierActivityCounterMap -> basis for sorting the carriers by number of activities before solving in parallel
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			carrierActivityCounterMap.put(carrier.getId(), carrierActivityCounterMap.getOrDefault(carrier.getId(), 0) + carrier.getServices().size());
@@ -173,7 +190,13 @@ public class FreightUtils {
 		return carriersWithShipments;
 	}
 
-	public static Carriers getOrCreateCarriers(Scenario scenario) {
+	/**
+	 * @deprecated -- please inline.  Reason: move syntax closer to how it is done in {@link ConfigUtils}.
+	 */
+	public static Carriers getOrCreateCarriers(Scenario scenario){
+		return addOrGetCarriers( scenario );
+	}
+	public static Carriers addOrGetCarriers( Scenario scenario ) {
 		// I have separated getOrCreateCarriers and getCarriers, since when the
 		// controler is started, it is better to fail if the carriers are not found.
 		// kai, oct'19
@@ -186,9 +209,8 @@ public class FreightUtils {
 	}
 
 	public static Carriers getCarriers(Scenario scenario) {
-		// I have separated getOrCreateCarriers and getCarriers, since when the
-		// controler is started, it is better to fail if the carriers are not found.
-		// kai, oct'19
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are
+		// not found. kai, oct'19
 		if ( scenario.getScenarioElement( CARRIERS ) == null ) {
 			throw new RuntimeException( "\n\ncannot retrieve carriers from scenario; typical ways to resolve that problem are to call " +
 								    "FreightUtils.getOrCreateCarriers(...) or FreightUtils.loadCarriersAccordingToFreightConfig(...) early enough\n") ;
@@ -213,7 +235,7 @@ public class FreightUtils {
 	public static void loadCarriersAccordingToFreightConfig(Scenario scenario) {
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class);
 
-		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
+		Carriers carriers = addOrGetCarriers( scenario ); // also registers with scenario
 		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
