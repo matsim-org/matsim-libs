@@ -20,36 +20,23 @@
 
 package org.matsim.codeexamples.extensions.roadpricing;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 
+import org.matsim.contrib.roadpricing.run.RunRoadPricingExample;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
-/**
- * Uses roadpricing extension, therefore needs to create config with RoadPricingConfigGroup
- * 
- * @author vsp-gleich
- *
- */
 public class RunRoadpricingExample {
 
-	public static void main(final String[] args) {
-		String configFile ;
-		if ( args!=null && args.length>=1 ) {
-			configFile = args[0] ;
-		} else {
-			configFile = "scenarios/equil-extended/config-with-roadpricing.xml";
-		}
+	/**
+	 * @see RunRoadPricingExample
+	 */
+	public static void main( String [] args ) {
+		RunRoadPricingExample.main( new String []{
+				"scenarios/equil-extended/config-with-roadpricing.xml"
+				, "--config:controler.outputDirectory=" + "output"
+				, "--config:controler.overwriteFiles=" + OverwriteFileSetting.deleteDirectoryIfExists.name()
+				, "--config:controler.lastIteration=5"
+		} );
 
-		Config config = ConfigUtils.loadConfig(configFile, new RoadPricingConfigGroup() );
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		controler.run();
 	}
 
 }

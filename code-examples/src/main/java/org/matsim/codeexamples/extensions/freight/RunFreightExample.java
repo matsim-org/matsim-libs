@@ -57,11 +57,6 @@ public class RunFreightExample {
 		//more general settings
 		config.controler().setOutputDirectory("./output/freight" );
 
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		new OutputDirectoryHierarchy( config );
-		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
-		// (the directory structure is needed for jsprit output, which is before the controler starts.  Maybe there is a better alternative ...)
-
 		config.controler().setLastIteration(0 );		// yyyyyy iterations currently do not work; needs to be fixed.
 
 		//freight settings
@@ -78,16 +73,16 @@ public class RunFreightExample {
 		// how to set the capacity of the "light" vehicle type to "1":
 //		FreightUtils.getCarrierVehicleTypes( scenario ).getVehicleTypes().get( Id.create("light", VehicleType.class ) ).getCapacity().setOther( 1 );
 
-		//### Output before jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( scenario.getConfig().controler().getOutputDirectory() + "/jsprit_unplannedCarriers.xml" ) ;
+		// output before jsprit run (not necessary)
+		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_unplannedCarriers.xml" ) ;
+		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//Solving the VRP (generate carrier's tour plans)
-		FreightUtils.runJsprit( scenario, freightConfigGroup );
-//		FreightUtils.runJsprit( scenario );
-		// yy replace once available
+		FreightUtils.runJsprit( scenario );
 
-		//### Output after jsprit run (not necessary)
-		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( scenario.getConfig().controler().getOutputDirectory() + "/jsprit_plannedCarriers.xml" ) ;
+		// output after jsprit run (not necessary)
+		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;
+		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//MATSim configuration:
 		final Controler controler = new Controler( scenario ) ;
