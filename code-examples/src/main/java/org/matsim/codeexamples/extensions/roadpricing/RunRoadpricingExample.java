@@ -22,8 +22,7 @@ package org.matsim.codeexamples.extensions.roadpricing;
 
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricing;
-import org.matsim.contrib.roadpricing.run.RunRoadPricingExample;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,11 +39,10 @@ public class RunRoadpricingExample {
 			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-roadpricing.xml" );
 			config.controler().setOutputDirectory( "output" );
 			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-			config.controler().setLastIteration( 5 );
+			config.controler().setLastIteration( 100 );
 		} else {
 			config = ConfigUtils.loadConfig( args );
 		}
-
 
 		// load the scenario:
 		Scenario scenario = ScenarioUtils.loadScenario( config );
@@ -53,12 +51,15 @@ public class RunRoadpricingExample {
 		Controler controler = new Controler(scenario);
 
 		// use the road pricing module:
-		RoadPricing.configure( controler );
+		controler.addOverridingModule( new RoadPricingModule() );
+//		RoadPricing.configure( controler );
+		// yyyyyy switch once available in matsim build
 
 		// run the controler:
 		controler.run();
 
 
+		// ignore:
 //		RunRoadPricingExample.main( new String []{
 //				"scenarios/equil-extended/config-with-roadpricing.xml"
 //				, "--config:controler.outputDirectory=" + "output"
