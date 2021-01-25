@@ -36,7 +36,7 @@ public class ScenarioElementAndInjection{
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.addOrGetMutableRoadPricingScheme( scenario );
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme( scenario );
 		RoadPricingUtils.setType( scheme, RoadPricingScheme.TOLL_TYPE_LINK );
 
 		Controler controler = new Controler( scenario ) ;

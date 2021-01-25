@@ -78,7 +78,8 @@ public class RunFreightExample {
 		// (this will go into the standard "output" directory.  note that this may be removed if this is also used as the configured output dir.)
 
 		//Solving the VRP (generate carrier's tour plans)
-		FreightUtils.runJsprit( scenario );
+		FreightUtils.runJsprit( scenario, freightConfigGroup );
+//		FreightUtils.runJsprit( scenario ); // yyyy replace once available
 
 		// output after jsprit run (not necessary)
 		new CarrierPlanXmlWriterV2(FreightUtils.getCarriers( scenario )).write( "output/jsprit_plannedCarriers.xml" ) ;

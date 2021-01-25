@@ -21,21 +21,50 @@
 package org.matsim.codeexamples.extensions.roadpricing;
 
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.roadpricing.RoadPricing;
 import org.matsim.contrib.roadpricing.run.RunRoadPricingExample;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunRoadpricingExample {
 
-	/**
-	 * @see RunRoadPricingExample
-	 */
 	public static void main( String [] args ) {
-		RunRoadPricingExample.main( new String []{
-				"scenarios/equil-extended/config-with-roadpricing.xml"
-				, "--config:controler.outputDirectory=" + "output"
-				, "--config:controler.overwriteFiles=" + OverwriteFileSetting.deleteDirectoryIfExists.name()
-				, "--config:controler.lastIteration=5"
-		} );
+
+		// load the config:
+		Config config ;
+		if ( args==null || args.length==0 || args[0]==null ) {
+			config = ConfigUtils.loadConfig( "scenarios/equil-extended/config-with-roadpricing.xml" );
+			config.controler().setOutputDirectory( "output" );
+			config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+			config.controler().setLastIteration( 5 );
+		} else {
+			config = ConfigUtils.loadConfig( args );
+		}
+
+
+		// load the scenario:
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+
+		// instantiate the controler:
+		Controler controler = new Controler(scenario);
+
+		// use the road pricing module:
+		RoadPricing.configure( controler );
+
+		// run the controler:
+		controler.run();
+
+
+//		RunRoadPricingExample.main( new String []{
+//				"scenarios/equil-extended/config-with-roadpricing.xml"
+//				, "--config:controler.outputDirectory=" + "output"
+//				, "--config:controler.overwriteFiles=" + OverwriteFileSetting.deleteDirectoryIfExists.name()
+//				, "--config:controler.lastIteration=5"
+//		} );
 
 	}
 
