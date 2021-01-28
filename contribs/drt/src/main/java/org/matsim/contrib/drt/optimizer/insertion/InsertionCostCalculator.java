@@ -107,19 +107,18 @@ public class InsertionCostCalculator<D> {
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
-		double pickupDetourTimeLoss = insertionDetourTimeCalculator.calculatePickupDetourTimeLoss(insertion);
-		double dropoffDetourTimeLoss = insertionDetourTimeCalculator.calculateDropoffDetourTimeLoss(insertion);
+		var detourTimeInfo = insertionDetourTimeCalculator.calculateDetourTimeLoss(insertion);
 		// the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by
 		// the stops after the dropoff stop. kai, nov'18
 		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
 
 		// this is what we want to minimise
-		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
-		if (!checkHardConstraints(insertion, pickupDetourTimeLoss, totalTimeLoss)) {
+		double totalTimeLoss = detourTimeInfo.pickupTimeLoss + detourTimeInfo.dropoffTimeLoss;
+		if (!checkHardConstraints(insertion, detourTimeInfo.pickupTimeLoss, totalTimeLoss)) {
 			return INFEASIBLE_SOLUTION_COST;
 		}
 
-		return totalTimeLoss + calcSoftConstraintPenalty(drtRequest, insertion, pickupDetourTimeLoss);
+		return totalTimeLoss + calcSoftConstraintPenalty(drtRequest, insertion, detourTimeInfo.pickupTimeLoss);
 	}
 
 	private boolean checkHardConstraints(InsertionWithDetourData<?> insertion, double pickupDetourTimeLoss,
