@@ -36,7 +36,8 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * Changes the carrier for a single commercial delivery of the day.
+ * Changes the carrier for a single, random commercial job in the given plan. <br>
+ * Can only choose carriers that operate within the same market. The market is (assumed to be) an attribute of the carrier.
  */
 public final class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
 
