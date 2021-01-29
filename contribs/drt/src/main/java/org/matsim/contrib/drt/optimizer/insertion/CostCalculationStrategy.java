@@ -26,6 +26,13 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
  * @author Michal Maciejewski (michalm)
  */
 public interface CostCalculationStrategy {
+	/**
+	 * @param request
+	 * @param insertion
+	 * @param vehicleSlackTime
+	 * @param detourTimeInfo
+	 * @return the cost of insertion, INFEASIBLE_SOLUTION_COST if insertion is not feasible
+	 */
 	double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
 			InsertionCostCalculator.DetourTimeInfo detourTimeInfo);
 
