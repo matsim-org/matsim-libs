@@ -47,7 +47,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public SelectiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator.CostCalculationStrategy costCalculationStrategy,
+			ForkJoinPool forkJoinPool, CostCalculationStrategy costCalculationStrategy,
 			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;

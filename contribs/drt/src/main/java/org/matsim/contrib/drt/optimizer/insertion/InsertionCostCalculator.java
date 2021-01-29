@@ -54,48 +54,6 @@ public class InsertionCostCalculator<D> {
 		}
 	}
 
-	public interface CostCalculationStrategy {
-		double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo);
-	}
-
-	public static class RejectSoftConstraintViolations implements CostCalculationStrategy {
-		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo) {
-			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss - vehicleSlackTime > 0
-					|| detourTimeInfo.departureTime - request.getLatestStartTime() > 0
-					|| detourTimeInfo.arrivalTime - request.getLatestArrivalTime() > 0) {
-				return INFEASIBLE_SOLUTION_COST;
-			}
-
-			return totalTimeLoss;
-		}
-	}
-
-	public static class DiscourageSoftConstraintViolations implements CostCalculationStrategy {
-		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
-		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
-		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
-
-		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo) {
-			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss - vehicleSlackTime > 0) {
-				return INFEASIBLE_SOLUTION_COST;
-			}
-
-			double waitTimeViolation = Math.max(0, detourTimeInfo.departureTime - request.getLatestStartTime());
-			double travelTimeViolation = Math.max(0, detourTimeInfo.arrivalTime - request.getLatestArrivalTime());
-			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
-					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
-					+ totalTimeLoss;
-		}
-	}
-
 	public static final double INFEASIBLE_SOLUTION_COST = Double.POSITIVE_INFINITY;
 
 	private final DoubleSupplier timeOfDay;
