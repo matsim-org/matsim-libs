@@ -21,14 +21,16 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForScheduledRequests;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForVehicle;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DiscourageSoftConstraintViolations.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DiscourageSoftConstraintViolations.MAX_WAIT_TIME_VIOLATION_PENALTY;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -96,15 +98,19 @@ public class InsertionCostCalculatorTest {
 	}
 
 	@Test
-	public void checkTimeConstraintsForVehicle_all_cases() {
-		//just enough of slack time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 400, 0)).isTrue();
+	public void calcVehicleSlackTime_all_cases() {
+		//we are ahead of time
+		assertThat(calcVehicleSlackTime(entry(1000, 600), 0)).isEqualTo(400);
 
-		//not enough of slack time - due to predicted last stay begin time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 401, 0)).isFalse();
+		//at least 150 s of delay, optimistically 250 s of slack
+		assertThat(calcVehicleSlackTime(entry(1000, 600), 750)).isEqualTo(250);
 
-		//note enough of slack time - due to current time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 400, 601)).isFalse();
+		//behind the vehicle end time - due to current time
+		assertThat(calcVehicleSlackTime(entry(1000, 990), 1111)).isEqualTo(-111);
+
+		//behind the vehicle end time - due to predicted last task end time
+		assertThat(calcVehicleSlackTime(entry(1000, 1234), 888)).isEqualTo(-234);
+
 	}
 
 	private VehicleData.Entry entry(double vehicleEndTime, double lastStayTaskBeginTime) {
@@ -140,4 +146,70 @@ public class InsertionCostCalculatorTest {
 	private InsertionGenerator.Insertion insertion(VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
 		return new InsertionGenerator.Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
 	}
+
+	@Test
+	public void RejectSoftConstraintViolations_tooLittleSlackTime() {
+		assertRejectSoftConstraintViolations(9999, 9999, 10, new DetourTimeInfo(0, 0, 5, 5.01),
+				INFEASIBLE_SOLUTION_COST);
+	}
+
+	@Test
+	public void RejectSoftConstraintViolations_tooLongWaitTime() {
+		assertRejectSoftConstraintViolations(10, 9999, 9999, new DetourTimeInfo(11, 22, 0, 0),
+				INFEASIBLE_SOLUTION_COST);
+	}
+
+	@Test
+	public void RejectSoftConstraintViolations_tooLongTravelTime() {
+		assertRejectSoftConstraintViolations(9999, 10, 9999, new DetourTimeInfo(0, 11, 0, 0), INFEASIBLE_SOLUTION_COST);
+	}
+
+	@Test
+	public void RejectSoftConstraintViolations_allConstraintSatisfied() {
+		assertRejectSoftConstraintViolations(9999, 9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+	}
+
+	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
+			double vehicleSlackTime, DetourTimeInfo detourTimeInfo, double expectedCost) {
+		var drtRequest = DrtRequest.newBuilder()
+				.latestStartTime(latestStartTime)
+				.latestArrivalTime(latestArrivalTime)
+				.build();
+		assertThat(new InsertionCostCalculator.RejectSoftConstraintViolations().calcCost(drtRequest, null,
+				vehicleSlackTime, detourTimeInfo)).isEqualTo(expectedCost);
+	}
+
+	@Test
+	public void DiscourageSoftConstraintViolations_tooLittleSlackTime() {
+		assertDiscourageSoftConstraintViolations(9999, 9999, 10, new DetourTimeInfo(0, 0, 5, 5.01),
+				INFEASIBLE_SOLUTION_COST);
+	}
+
+	@Test
+	public void DiscourageSoftConstraintViolations_tooLongWaitTime() {
+		assertDiscourageSoftConstraintViolations(10, 9999, 9999, new DetourTimeInfo(11, 22, 0, 0),
+				MAX_WAIT_TIME_VIOLATION_PENALTY);
+	}
+
+	@Test
+	public void DiscourageSoftConstraintViolations_tooLongTravelTime() {
+		assertDiscourageSoftConstraintViolations(9999, 10, 9999, new DetourTimeInfo(0, 11, 0, 0),
+				MAX_TRAVEL_TIME_VIOLATION_PENALTY);
+	}
+
+	@Test
+	public void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
+		assertDiscourageSoftConstraintViolations(9999, 9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
+	}
+
+	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
+			double vehicleSlackTime, DetourTimeInfo detourTimeInfo, double expectedCost) {
+		var drtRequest = DrtRequest.newBuilder()
+				.latestStartTime(latestStartTime)
+				.latestArrivalTime(latestArrivalTime)
+				.build();
+		assertThat(new InsertionCostCalculator.DiscourageSoftConstraintViolations().calcCost(drtRequest, null,
+				vehicleSlackTime, detourTimeInfo)).isEqualTo(expectedCost);
+	}
+
 }

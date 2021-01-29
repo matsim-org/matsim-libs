@@ -49,7 +49,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public ExtensiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
+			ForkJoinPool forkJoinPool, InsertionCostCalculator.CostCalculationStrategy costCalculationStrategy,
 			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
@@ -57,13 +57,13 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		var detourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
 				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
-		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue,
-				detourTimeEstimator);
+		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy,
+				Double::doubleValue, detourTimeEstimator);
 
 		admissibleDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
 
 		bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime, null));
+				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
 	}
 
 	@Override

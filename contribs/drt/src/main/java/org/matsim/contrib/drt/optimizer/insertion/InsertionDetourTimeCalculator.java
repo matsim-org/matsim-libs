@@ -7,6 +7,7 @@ import java.util.function.ToDoubleFunction;
 import javax.annotation.Nullable;
 
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DetourTimeInfo;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -26,20 +27,6 @@ class InsertionDetourTimeCalculator<D> {
 		this.stopDuration = stopDuration;
 		this.detourTime = detourTime;
 		this.replacedDriveTimeEstimator = replacedDriveTimeEstimator;
-	}
-
-	static class DetourTimeInfo {
-		final double departureTime;
-		final double arrivalTime;
-		final double pickupTimeLoss;
-		final double dropoffTimeLoss;
-
-		DetourTimeInfo(double departureTime, double arrivalTime, double pickupTimeLoss, double dropoffTimeLoss) {
-			this.departureTime = departureTime;
-			this.arrivalTime = arrivalTime;
-			this.pickupTimeLoss = pickupTimeLoss;
-			this.dropoffTimeLoss = dropoffTimeLoss;
-		}
 	}
 
 	DetourTimeInfo calculateDetourTimeInfo(InsertionWithDetourData<D> insertion) {

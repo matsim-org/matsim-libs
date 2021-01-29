@@ -47,7 +47,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public SelectiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator.PenaltyCalculator penaltyCalculator,
+			ForkJoinPool forkJoinPool, InsertionCostCalculator.CostCalculationStrategy costCalculationStrategy,
 			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;
@@ -58,11 +58,11 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		restrictiveDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
 
 		initialInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, Double::doubleValue,
+				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
 						detourTimeEstimator));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, penaltyCalculator, PathData::getTravelTime, null));
+				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
 	}
 
 	@Override
