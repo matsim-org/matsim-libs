@@ -49,7 +49,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
 	public ExtensiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, InsertionCostCalculator.CostCalculationStrategy costCalculationStrategy,
+			ForkJoinPool forkJoinPool, CostCalculationStrategy costCalculationStrategy,
 			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
 		this.detourPathCalculator = detourPathCalculator;
 		this.forkJoinPool = forkJoinPool;

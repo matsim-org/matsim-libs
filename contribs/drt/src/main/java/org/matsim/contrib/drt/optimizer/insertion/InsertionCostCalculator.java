@@ -37,9 +37,13 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class InsertionCostCalculator<D> {
 	public static class DetourTimeInfo {
+		// expected departure time for the new request
 		public final double departureTime;
+		// expected arrival time for the new request
 		public final double arrivalTime;
+		// time delay of each stop placed after the pickup insertion point
 		public final double pickupTimeLoss;
+		// ADDITIONAL time delay of each stop placed after the dropoff insertion point
 		public final double dropoffTimeLoss;
 
 		public DetourTimeInfo(double departureTime, double arrivalTime, double pickupTimeLoss, double dropoffTimeLoss) {
@@ -49,50 +53,10 @@ public class InsertionCostCalculator<D> {
 			this.dropoffTimeLoss = dropoffTimeLoss;
 		}
 
+		// TOTAL time delay of each stop placed after the dropoff insertion point
+		// (this is the amount of extra time the vehicle will operate if this insertion is applied)
 		public double getTotalTimeLoss() {
 			return pickupTimeLoss + dropoffTimeLoss;
-		}
-	}
-
-	public interface CostCalculationStrategy {
-		double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo);
-	}
-
-	public static class RejectSoftConstraintViolations implements CostCalculationStrategy {
-		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo) {
-			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss - vehicleSlackTime > 0
-					|| detourTimeInfo.departureTime - request.getLatestStartTime() > 0
-					|| detourTimeInfo.arrivalTime - request.getLatestArrivalTime() > 0) {
-				return INFEASIBLE_SOLUTION_COST;
-			}
-
-			return totalTimeLoss;
-		}
-	}
-
-	public static class DiscourageSoftConstraintViolations implements CostCalculationStrategy {
-		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
-		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
-		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
-
-		@Override
-		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
-				DetourTimeInfo detourTimeInfo) {
-			double totalTimeLoss = detourTimeInfo.getTotalTimeLoss();
-			if (totalTimeLoss - vehicleSlackTime > 0) {
-				return INFEASIBLE_SOLUTION_COST;
-			}
-
-			double waitTimeViolation = Math.max(0, detourTimeInfo.departureTime - request.getLatestStartTime());
-			double travelTimeViolation = Math.max(0, detourTimeInfo.arrivalTime - request.getLatestArrivalTime());
-			return MAX_WAIT_TIME_VIOLATION_PENALTY * waitTimeViolation
-					+ MAX_TRAVEL_TIME_VIOLATION_PENALTY * travelTimeViolation
-					+ totalTimeLoss;
 		}
 	}
 
@@ -121,29 +85,21 @@ public class InsertionCostCalculator<D> {
 
 	/**
 	 * As the main goal is to minimise bus operation time, this method calculates how much longer the bus will operate
-	 * after insertion. By returning a value equal or higher than INFEASIBLE_SOLUTION_COST, the insertion is considered
-	 * infeasible
+	 * after insertion. By returning INFEASIBLE_SOLUTION_COST, the insertion is considered infeasible
 	 * <p>
-	 * The insertion is invalid if some maxTravel/Wait constraints for the already scheduled requests are not fulfilled
-	 * or the vehicle's time window is violated (hard constraints). This is denoted by returning INFEASIBLE_SOLUTION_COST.
+	 * The insertion is invalid if some maxTravel/Wait constraints for the already scheduled requests are not fulfilled.
+	 * This is denoted by returning INFEASIBLE_SOLUTION_COST.
 	 * <p>
-	 * However, not fulfilling the maxTravel/Time constraints (soft constraints) is penalised using
-	 * PenaltyCalculator. If the penalty is at least as high as INFEASIBLE_SOLUTION_COST, the soft
-	 * constraint becomes effectively a hard one.
 	 *
 	 * @param drtRequest the request
-	 * @param insertion  the insertion to be considered here, with PickupIdx and DropoffIdx the positions
-	 * @return cost of insertion (values higher or equal to INFEASIBLE_SOLUTION_COST represent an infeasible insertion)
+	 * @param insertion  the insertion to be considered here
+	 * @return cost of insertion (INFEASIBLE_SOLUTION_COST represents an infeasible insertion)
 	 */
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
 		var detourTimeInfo = detourTimeCalculator.calculateDetourTimeInfo(insertion);
-		// the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by
-		// the stops after the dropoff stop. kai, nov'18
-		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
 
-		// this is what we want to minimise
 		if (!checkTimeConstraintsForScheduledRequests(insertion.getInsertion(), detourTimeInfo.pickupTimeLoss,
 				detourTimeInfo.getTotalTimeLoss())) {
 			return INFEASIBLE_SOLUTION_COST;

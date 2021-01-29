@@ -21,16 +21,14 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DiscourageSoftConstraintViolations.MAX_TRAVEL_TIME_VIOLATION_PENALTY;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DiscourageSoftConstraintViolations.MAX_WAIT_TIME_VIOLATION_PENALTY;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.calcVehicleSlackTime;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForScheduledRequests;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.Waypoint;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -146,70 +144,4 @@ public class InsertionCostCalculatorTest {
 	private InsertionGenerator.Insertion insertion(VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
 		return new InsertionGenerator.Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
 	}
-
-	@Test
-	public void RejectSoftConstraintViolations_tooLittleSlackTime() {
-		assertRejectSoftConstraintViolations(9999, 9999, 10, new DetourTimeInfo(0, 0, 5, 5.01),
-				INFEASIBLE_SOLUTION_COST);
-	}
-
-	@Test
-	public void RejectSoftConstraintViolations_tooLongWaitTime() {
-		assertRejectSoftConstraintViolations(10, 9999, 9999, new DetourTimeInfo(11, 22, 0, 0),
-				INFEASIBLE_SOLUTION_COST);
-	}
-
-	@Test
-	public void RejectSoftConstraintViolations_tooLongTravelTime() {
-		assertRejectSoftConstraintViolations(9999, 10, 9999, new DetourTimeInfo(0, 11, 0, 0), INFEASIBLE_SOLUTION_COST);
-	}
-
-	@Test
-	public void RejectSoftConstraintViolations_allConstraintSatisfied() {
-		assertRejectSoftConstraintViolations(9999, 9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
-	}
-
-	private void assertRejectSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-			double vehicleSlackTime, DetourTimeInfo detourTimeInfo, double expectedCost) {
-		var drtRequest = DrtRequest.newBuilder()
-				.latestStartTime(latestStartTime)
-				.latestArrivalTime(latestArrivalTime)
-				.build();
-		assertThat(new InsertionCostCalculator.RejectSoftConstraintViolations().calcCost(drtRequest, null,
-				vehicleSlackTime, detourTimeInfo)).isEqualTo(expectedCost);
-	}
-
-	@Test
-	public void DiscourageSoftConstraintViolations_tooLittleSlackTime() {
-		assertDiscourageSoftConstraintViolations(9999, 9999, 10, new DetourTimeInfo(0, 0, 5, 5.01),
-				INFEASIBLE_SOLUTION_COST);
-	}
-
-	@Test
-	public void DiscourageSoftConstraintViolations_tooLongWaitTime() {
-		assertDiscourageSoftConstraintViolations(10, 9999, 9999, new DetourTimeInfo(11, 22, 0, 0),
-				MAX_WAIT_TIME_VIOLATION_PENALTY);
-	}
-
-	@Test
-	public void DiscourageSoftConstraintViolations_tooLongTravelTime() {
-		assertDiscourageSoftConstraintViolations(9999, 10, 9999, new DetourTimeInfo(0, 11, 0, 0),
-				MAX_TRAVEL_TIME_VIOLATION_PENALTY);
-	}
-
-	@Test
-	public void DiscourageSoftConstraintViolations_allConstraintSatisfied() {
-		assertDiscourageSoftConstraintViolations(9999, 9999, 9999, new DetourTimeInfo(11, 22, 33, 44), 33 + 44);
-	}
-
-	private void assertDiscourageSoftConstraintViolations(double latestStartTime, double latestArrivalTime,
-			double vehicleSlackTime, DetourTimeInfo detourTimeInfo, double expectedCost) {
-		var drtRequest = DrtRequest.newBuilder()
-				.latestStartTime(latestStartTime)
-				.latestArrivalTime(latestArrivalTime)
-				.build();
-		assertThat(new InsertionCostCalculator.DiscourageSoftConstraintViolations().calcCost(drtRequest, null,
-				vehicleSlackTime, detourTimeInfo)).isEqualTo(expectedCost);
-	}
-
 }
