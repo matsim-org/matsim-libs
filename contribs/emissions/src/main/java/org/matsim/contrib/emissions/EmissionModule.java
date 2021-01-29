@@ -177,7 +177,7 @@ public final class EmissionModule {
 			case directlyTryAverageTable:
 				return true;
 			default:
-				return true;
+				return false;
 		}
 	}
 
