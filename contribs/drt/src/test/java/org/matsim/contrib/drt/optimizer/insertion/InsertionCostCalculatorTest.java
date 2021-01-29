@@ -21,8 +21,8 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.calcVehicleSlackTime;
 import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForScheduledRequests;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForVehicle;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -96,15 +96,19 @@ public class InsertionCostCalculatorTest {
 	}
 
 	@Test
-	public void checkTimeConstraintsForVehicle_all_cases() {
-		//just enough of slack time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 400, 0)).isTrue();
+	public void calcVehicleSlackTime_all_cases() {
+		//we are ahead of time
+		assertThat(calcVehicleSlackTime(entry(1000, 600), 0)).isEqualTo(400);
 
-		//not enough of slack time - due to predicted last stay begin time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 401, 0)).isFalse();
+		//at least 150 s of delay, optimistically 250 s of slack
+		assertThat(calcVehicleSlackTime(entry(1000, 600), 750)).isEqualTo(250);
 
-		//note enough of slack time - due to current time
-		assertThat(checkTimeConstraintsForVehicle(entry(1000, 600), 400, 601)).isFalse();
+		//behind the vehicle end time - due to current time
+		assertThat(calcVehicleSlackTime(entry(1000, 990), 1111)).isEqualTo(-111);
+
+		//behind the vehicle end time - due to predicted last task end time
+		assertThat(calcVehicleSlackTime(entry(1000, 1234), 888)).isEqualTo(-234);
+
 	}
 
 	private VehicleData.Entry entry(double vehicleEndTime, double lastStayTaskBeginTime) {
