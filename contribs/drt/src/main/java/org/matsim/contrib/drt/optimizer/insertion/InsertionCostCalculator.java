@@ -107,7 +107,7 @@ public class InsertionCostCalculator<D> {
 	public double calculate(DrtRequest drtRequest, InsertionWithDetourData<D> insertion) {
 		//TODO precompute time slacks for each stop to filter out even more infeasible insertions ???????????
 
-		var detourTimeInfo = insertionDetourTimeCalculator.calculateDetourTimeLoss(insertion);
+		var detourTimeInfo = insertionDetourTimeCalculator.calculateDetourTimeInfo(insertion);
 		// the pickupTimeLoss is needed for stops that suffer only that one, while the sum of both will be suffered by
 		// the stops after the dropoff stop. kai, nov'18
 		// The computation is complicated; presumably, it takes care of this.  kai, nov'18
