@@ -77,8 +77,8 @@ public class InsertionCostCalculator<D> {
 	public static class DiscourageSoftConstraintViolations implements CostCalculationStrategy {
 		//XXX try to keep penalties reasonably high to prevent people waiting or travelling for hours
 		//XXX however, at the same time prefer max-wait-time to max-travel-time violations
-		private static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
-		private static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
+		static final double MAX_WAIT_TIME_VIOLATION_PENALTY = 1;// 1 second of penalty per 1 second of late departure
+		static final double MAX_TRAVEL_TIME_VIOLATION_PENALTY = 10;// 10 seconds of penalty per 1 second of late arrival
 
 		@Override
 		public double calcCost(DrtRequest request, InsertionGenerator.Insertion insertion, double vehicleSlackTime,
