@@ -12,7 +12,8 @@ public class RunRoadPricingExampleIT {
 		try {
 			RunRoadPricingExample.main(args);
 		} catch (Exception e) {
-			Assert.fail("Example should run without exceptions.");
+			e.printStackTrace();
+			Assert.fail("Example should run without exceptions. Error message: " + e.getMessage());
 		}
 	}
 }
