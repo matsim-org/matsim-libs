@@ -21,8 +21,9 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.calcVehicleSlackTime;
-import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.checkTimeConstraintsForScheduledRequests;
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -57,8 +58,35 @@ public class InsertionCostCalculatorTest {
 	private final Waypoint.Stop stop1 = stop(300, 340, 400, 430);
 
 	@Test
+	public void testCalculate() throws NoSuchFieldException {
+		VehicleData.Entry entry = entry(500, 450, stop0);
+		var insertion = new InsertionWithDetourData<>(insertion(entry, 0, 1), null, null, null, null);
+
+		//feasible solution
+		assertCalculate(0, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 11, 22), 11 + 22);
+
+		//infeasible solution - time constraints at stop 0
+		assertCalculate(0, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 999, 999),
+				INFEASIBLE_SOLUTION_COST);
+
+		//infeasible solution - too little vehicle time slack
+		assertCalculate(499, insertion, new InsertionCostCalculator.DetourTimeInfo(0, 0, 1, 1),
+				INFEASIBLE_SOLUTION_COST);
+	}
+
+	private <D> void assertCalculate(double now, InsertionWithDetourData<D> insertion,
+			InsertionCostCalculator.DetourTimeInfo detourTimeInfo, double expectedCost) {
+		@SuppressWarnings("unchecked")
+		var detourTimeCalculator = (InsertionDetourTimeCalculator<D>)mock(InsertionDetourTimeCalculator.class);
+		var insertionCostCalculator = new InsertionCostCalculator<>(() -> now,
+				new CostCalculationStrategy.RejectSoftConstraintViolations(), detourTimeCalculator);
+		when(detourTimeCalculator.calculateDetourTimeInfo(insertion)).thenReturn(detourTimeInfo);
+		assertThat(insertionCostCalculator.calculate(drtRequest, insertion)).isEqualTo(expectedCost);
+	}
+
+	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_pickup_stop_dropoff_stop() {
-		VehicleData.Entry entry = entry(start, stop0, stop1);
+		VehicleData.Entry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 0, 1);
 
 		//almost too late
@@ -73,7 +101,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_pickup_dropoff_stop_stop() {
-		VehicleData.Entry entry = entry(start, stop0, stop1);
+		VehicleData.Entry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 0, 0);
 
 		//almost too late
@@ -88,7 +116,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_stop_stop_pickup_dropoff() {
-		VehicleData.Entry entry = entry(start, stop0, stop1);
+		VehicleData.Entry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 2, 2);
 
 		//appended at the end -> never too late
@@ -111,7 +139,7 @@ public class InsertionCostCalculatorTest {
 
 	}
 
-	private VehicleData.Entry entry(double vehicleEndTime, double lastStayTaskBeginTime) {
+	private VehicleData.Entry entry(double vehicleEndTime, double lastStayTaskBeginTime, Waypoint.Stop... stops) {
 		var vehicle = new DvrpVehicleImpl(ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create("a", DvrpVehicle.class))
 				.startLinkId(Id.createLinkId("depot"))
@@ -122,7 +150,7 @@ public class InsertionCostCalculatorTest {
 		vehicle.getSchedule()
 				.addTask(new DrtStayTask(lastStayTaskBeginTime, Math.max(lastStayTaskBeginTime, vehicleEndTime),
 						link("depot")));
-		return new VehicleData.Entry(vehicle, start, ImmutableList.of());
+		return new VehicleData.Entry(vehicle, start, ImmutableList.copyOf(stops));
 	}
 
 	private Link link(String id) {
@@ -137,7 +165,7 @@ public class InsertionCostCalculatorTest {
 		return new Waypoint.Stop(new DrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
 	}
 
-	private VehicleData.Entry entry(Waypoint.Start start, Waypoint.Stop... stops) {
+	private VehicleData.Entry entry(Waypoint.Stop... stops) {
 		return new VehicleData.Entry(null, start, ImmutableList.copyOf(stops));
 	}
 

@@ -32,6 +32,8 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author michalm
  */
@@ -69,18 +71,17 @@ public class InsertionCostCalculator<D> {
 	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer,
 			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
 			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
-		this(drtConfig.getStopDuration(), timer::getTimeOfDay, costCalculationStrategy, detourTime,
-				replacedDriveTimeEstimator);
+		this(timer::getTimeOfDay, costCalculationStrategy,
+				new InsertionDetourTimeCalculator<>(drtConfig.getStopDuration(), detourTime,
+						replacedDriveTimeEstimator));
 	}
 
-	public InsertionCostCalculator(double stopDuration, DoubleSupplier timeOfDay,
-			CostCalculationStrategy costCalculationStrategy, ToDoubleFunction<D> detourTime,
-			@Nullable DetourTimeEstimator replacedDriveTimeEstimator) {
+	@VisibleForTesting
+	InsertionCostCalculator(DoubleSupplier timeOfDay, CostCalculationStrategy costCalculationStrategy,
+			InsertionDetourTimeCalculator<D> detourTimeCalculator) {
 		this.timeOfDay = timeOfDay;
 		this.costCalculationStrategy = costCalculationStrategy;
-
-		detourTimeCalculator = new InsertionDetourTimeCalculator<>(stopDuration, detourTime,
-				replacedDriveTimeEstimator);
+		this.detourTimeCalculator = detourTimeCalculator;
 	}
 
 	/**
