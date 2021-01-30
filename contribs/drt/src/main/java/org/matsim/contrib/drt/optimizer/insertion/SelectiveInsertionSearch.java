@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	// step 1: initial filtering out feasible insertions
-	private final DetourTimesProvider restrictiveDetourTimesProvider;
+	private final DetourTimeEstimator restrictiveDetourTimeEstimator;
 	private final BestInsertionFinder<Double> initialInsertionFinder;
 
 	// step 2: finding best insertion
@@ -53,13 +53,12 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		this.forkJoinPool = forkJoinPool;
 
 		double restrictiveBeelineSpeedFactor = ((SelectiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams()).getRestrictiveBeelineSpeedFactor();
-		var detourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(restrictiveBeelineSpeedFactor,
-				dvrpTravelTimeMatrix);
-		restrictiveDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
+		restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+				restrictiveBeelineSpeedFactor, dvrpTravelTimeMatrix);
 
 		initialInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
-						detourTimeEstimator));
+						restrictiveDetourTimeEstimator));
 
 		bestInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
@@ -69,7 +68,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
-		DetourData<Double> restrictiveTimeData = restrictiveDetourTimesProvider.getDetourData(drtRequest);
+		DetourData<Double> restrictiveTimeData = DetourData.create(restrictiveDetourTimeEstimator, drtRequest);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
 		Optional<Insertion> bestInsertion = forkJoinPool.submit(
