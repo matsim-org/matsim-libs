@@ -79,8 +79,8 @@ public class DetourDataTest {
 			dropoff_stop1);
 
 	private static final String ZERO_DETOUR = "zero_detour";
-	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap::get, pathFromPickupMap::get,
-			pathToDropoffMap::get, pathFromDropoffMap::get, ZERO_DETOUR);
+	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap, pathFromPickupMap, pathToDropoffMap,
+			pathFromDropoffMap, ZERO_DETOUR);
 
 	@Test
 	public void insertion_0_0() {
@@ -143,8 +143,7 @@ public class DetourDataTest {
 				.put(stop0Link, dropoffLink, 56.)
 				.put(dropoffLink, stop1Link, 78.)
 				.build();
-		var detourData = DetourData.create(timeEstimates::get, request)
-				.createInsertionWithDetourData(insertion);
+		var detourData = DetourData.create(timeEstimates::get, request).createInsertionWithDetourData(insertion);
 
 		var expectedDetourData = new InsertionWithDetourData<>(insertion, 12., 34., 56., 78.);
 		assertThat(detourData).isEqualToComparingFieldByField(expectedDetourData);
