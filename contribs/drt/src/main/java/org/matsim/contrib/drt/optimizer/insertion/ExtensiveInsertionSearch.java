@@ -41,7 +41,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	// step 1: initial filtering out feasible insertions
 	private final InsertionCostCalculator<Double> admissibleCostCalculator;
-	private final DetourTimesProvider admissibleDetourTimesProvider;
+	private final DetourTimeEstimator admissibleDetourTimeEstimator;
 
 	// step 2: finding best insertion
 	private final ForkJoinPool forkJoinPool;
@@ -55,12 +55,10 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 		this.forkJoinPool = forkJoinPool;
 
 		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		var detourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+		admissibleDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
 				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
 		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy,
-				Double::doubleValue, detourTimeEstimator);
-
-		admissibleDetourTimesProvider = new DetourTimesProvider(detourTimeEstimator);
+				Double::doubleValue, admissibleDetourTimeEstimator);
 
 		bestInsertionFinder = new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
@@ -70,7 +68,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<Entry> vEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
-		DetourData<Double> admissibleTimeData = admissibleDetourTimesProvider.getDetourData(drtRequest);
+		DetourData<Double> admissibleTimeData = DetourData.create(admissibleDetourTimeEstimator, drtRequest);
 		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
 

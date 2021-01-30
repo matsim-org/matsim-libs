@@ -36,6 +36,7 @@ import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableTable;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -131,5 +132,21 @@ public class DetourDataTest {
 
 	private Waypoint.Stop stop(Link link) {
 		return new Waypoint.Stop(new DrtStopTask(0, 60, link), 0);
+	}
+
+	@Test
+	public void testCreate() {
+		Insertion insertion = new Insertion(request, entry, 0, 1);
+		var timeEstimates = ImmutableTable.<Link, Link, Double>builder()//
+				.put(startLink, pickupLink, 12.)
+				.put(pickupLink, stop0Link, 34.)
+				.put(stop0Link, dropoffLink, 56.)
+				.put(dropoffLink, stop1Link, 78.)
+				.build();
+		var detourData = DetourData.create(timeEstimates::get, request)
+				.createInsertionWithDetourData(insertion);
+
+		var expectedDetourData = new InsertionWithDetourData<>(insertion, 12., 34., 56., 78.);
+		assertThat(detourData).isEqualToComparingFieldByField(expectedDetourData);
 	}
 }
