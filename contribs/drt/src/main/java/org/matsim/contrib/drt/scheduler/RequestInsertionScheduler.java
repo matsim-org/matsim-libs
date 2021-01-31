@@ -56,6 +56,16 @@ import com.google.inject.name.Named;
  * @author michalm
  */
 public class RequestInsertionScheduler {
+	public static class PickupDropoffTaskPair {
+		public final DrtStopTask pickupTask;
+		public final DrtStopTask dropoffTask;
+
+		public PickupDropoffTaskPair(DrtStopTask pickupTask, DrtStopTask dropoffTask) {
+			this.pickupTask = pickupTask;
+			this.dropoffTask = dropoffTask;
+		}
+	}
+
 	private final Fleet fleet;
 	private final double stopDuration;
 	private final MobsimTimer timer;
@@ -83,12 +93,13 @@ public class RequestInsertionScheduler {
 		}
 	}
 
-	public void scheduleRequest(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
-		insertPickup(request, insertion);
-		insertDropoff(request, insertion);
+	public PickupDropoffTaskPair scheduleRequest(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+		var pickupTask = insertPickup(request, insertion);
+		var dropoffTask = insertDropoff(request, insertion, pickupTask);
+		return new PickupDropoffTaskPair(pickupTask, dropoffTask);
 	}
 
-	private void insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
@@ -139,7 +150,6 @@ public class RequestInsertionScheduler {
 			if (stopTask != null && request.getFromLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
-				request.setPickupTask(stopTask);
 				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + stopDuration, request.getEarliestStartTime()));
 
 				/// ADDED
@@ -175,7 +185,7 @@ public class RequestInsertionScheduler {
 					///////
 				}
 
-				return;
+				return stopTask;
 			} else {
 				StayTask stayOrStopTask = stayTask != null ? stayTask : stopTask;
 
@@ -215,7 +225,6 @@ public class RequestInsertionScheduler {
 				Math.max(startTime + stopDuration, request.getEarliestStartTime()), request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);
 		pickupStopTask.addPickupRequest(request);
-		request.setPickupTask(pickupStopTask);
 
 		// add drive from pickup
 		Link toLink = pickupIdx == dropoffIdx ? request.getToLink() // pickup->dropoff
@@ -230,9 +239,11 @@ public class RequestInsertionScheduler {
 		// TODO should be enough to update the timeline only till dropoffIdx...
 		scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2,
 				driveFromPickupTask.getEndTime());
+		return pickupStopTask;
 	}
 
-	private void insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
+	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertion,
+			DrtStopTask pickupTask) {
 		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
@@ -241,15 +252,14 @@ public class RequestInsertionScheduler {
 
 		Task driveToDropoffTask;
 		if (pickupIdx == dropoffIdx) { // no drive to dropoff
-			int pickupTaskIdx = request.getPickupTask().getTaskIdx();
+			int pickupTaskIdx = pickupTask.getTaskIdx();
 			driveToDropoffTask = schedule.getTasks().get(pickupTaskIdx + 1);
 		} else {
 			DrtStopTask stopTask = stops.get(dropoffIdx - 1).task;
 			if (request.getToLink() == stopTask.getLink()) { // no detour; no new stop task
 				// add dropoff request to stop task
 				stopTask.addDropoffRequest(request);
-				request.setDropoffTask(stopTask);
-				return;
+				return stopTask;
 			} else { // add drive task to dropoff location
 
 				// remove drive j->j+1 (if j is not the last stop)
@@ -277,7 +287,6 @@ public class RequestInsertionScheduler {
 				startTime + stopDuration, request.getToLink());
 		schedule.addTask(taskIdx, dropoffStopTask);
 		dropoffStopTask.addDropoffRequest(request);
-		request.setDropoffTask(dropoffStopTask);
 
 		// add drive from dropoff
 		if (dropoffIdx == stops.size()) {// bus stays at dropoff
@@ -304,5 +313,6 @@ public class RequestInsertionScheduler {
 			scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2,
 					driveFromDropoffTask.getEndTime());
 		}
+		return dropoffStopTask;
 	}
 }
