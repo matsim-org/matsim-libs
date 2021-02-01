@@ -31,13 +31,12 @@ import java.util.stream.Collectors;
 
 public class JointDemandUtils {
 
-    //TODO use StringCollection object attribute type instead of custom convention (using semicolon)
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     public static final String CARRIER_MARKET_ATTRIBUTE_NAME = "market";
     static final String FREIGHT_DRIVER_PREFIX = "freight";
 
 //    the pattern is the following
-//    attribute name="commercialJob[NUMBER]" class="java.util.Collection">["TYPE","OPERATOR","CAPACITYDEMAND","EARLIESTSTART","LATESTSTART","DURATION"]</attribute>
+//    attribute name="commercialJob[NUMBER]" class="java.util.Collection">["OPERATOR","CAPACITYDEMAND","EARLIESTSTART","LATESTSTART","DURATION"]</attribute>
     static final int COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX = 0;
     static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 1;
     static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 2;

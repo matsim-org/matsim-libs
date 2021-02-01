@@ -54,7 +54,7 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 		}).toProvider(modalProvider(
 				getter -> new SelectiveInsertionSearch(getter.getModal(DetourPathCalculator.class), drtCfg,
 						getter.get(MobsimTimer.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
+						getter.getModal(CostCalculationStrategy.class),
 						getter.getModal(DvrpTravelTimeMatrix.class))));
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {

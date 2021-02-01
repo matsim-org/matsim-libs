@@ -109,13 +109,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 		} else {
 			InsertionWithDetourData<PathData> insertion = best.get();
-			insertionScheduler.scheduleRequest(req, insertion);
+			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
 			vData.updateEntry(insertion.getVehicleEntry().vehicle);
 			eventsManager.processEvent(
 					new PassengerRequestScheduledEvent(now, drtCfg.getMode(), req.getId(), req.getPassengerId(),
-							insertion.getVehicleEntry().vehicle.getId(), req.getPickupTask().getEndTime(),
-							req.getDropoffTask().getBeginTime()));
+							insertion.getVehicleEntry().vehicle.getId(), pickupDropoffTaskPair.pickupTask.getEndTime(),
+							pickupDropoffTaskPair.dropoffTask.getBeginTime()));
 		}
-
 	}
 }
