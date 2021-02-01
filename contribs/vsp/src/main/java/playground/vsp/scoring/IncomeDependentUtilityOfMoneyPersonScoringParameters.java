@@ -20,6 +20,7 @@ package playground.vsp.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -60,7 +61,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
-	private final Map<Id<Person>, ScoringParameters> params = new HashMap<>();
+	private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
 	private final double globalAvgIncome;
 
 	@Inject
@@ -94,7 +95,8 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
 
-		if (!this.params.containsKey(person.getId())) {
+		ScoringParameters scoringParametersThisPerson = params.get(person.getId());
+		if (scoringParametersThisPerson == null) {
 			final String subpopulation = PopulationUtils.getSubpopulation( person );
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
@@ -126,11 +128,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 				}
 			}
 
+			scoringParametersThisPerson = builder.build();
 			this.params.put(
 					person.getId(),
-					builder.build());
+					scoringParametersThisPerson);
 		}
 
-		return this.params.get(person.getId());
+		return scoringParametersThisPerson;
 	}
 }
