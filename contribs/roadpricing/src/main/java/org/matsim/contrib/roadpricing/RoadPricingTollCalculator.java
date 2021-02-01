@@ -21,6 +21,7 @@
 package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
+import java.util.stream.Collector;
 
 import javax.inject.Inject;
 
@@ -54,19 +55,27 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 	Logger log = Logger.getLogger( RoadPricingTollCalculator.class ) ;
 
-	static class AgentTollInfo {
+
+	/**
+	 * @deprecated -- I think that most of this is no longer needed since we now throw money events immediately when links are left.  kai, jan'21
+	 */
+	private static class AgentTollInfo {
 		public double toll = 0.0;
 		boolean insideCordonArea = true;
 	}
 
-	final RoadPricingScheme scheme;
-	final TreeMap<Id<Person>, AgentTollInfo> agents = new TreeMap<>();
+	private final RoadPricingScheme scheme;
+
+	/**
+	 * @deprecated -- I think that most of this is no longer needed since we now throw money events immediately when links are left.  kai, jan'21
+	 */
+	private final TreeMap<Id<Person>, AgentTollInfo> agents = new TreeMap<>();
+
 	private final Network network;
 
 	private final TollBehaviourI handler;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-    @Inject
 	RoadPricingTollCalculator(final Network network, final RoadPricingScheme scheme, EventsManager events ) {
 		super();
 		events.addHandler(this);
@@ -116,18 +125,18 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		}
 	}
 
-	/**
-	 * Sends {@link PersonMoneyEvent}s for all agents that must pay a toll.
-	 * This method should usually be called at the end before of an iteration.
-	 *
-	 * <strong>Important note: </strong>Do not call this method twice without
-	 * calling {@link #reset(int)} in between. Otherwise modules listening to
-	 * AgentMoneyEvents will hear them twice, i.e. the toll-disutility
-	 * may be added twice to the agents' score!
-	 *
-	 * @param time the current time the generated events are associated with
-	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
-	 */
+//	/**
+//	 * Sends {@link PersonMoneyEvent}s for all agents that must pay a toll.
+//	 * This method should usually be called at the end before of an iteration.
+//	 *
+//	 * <strong>Important note: </strong>Do not call this method twice without
+//	 * calling {@link #reset(int)} in between. Otherwise modules listening to
+//	 * AgentMoneyEvents will hear them twice, i.e. the toll-disutility
+//	 * may be added twice to the agents' score!
+//	 *
+//	 * @param time the current time the generated events are associated with
+//	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
+//	 */
 //	public void sendMoneyEvents(final double time, final EventsManager events) {
 //		// public is currently needed. kai, sep'13
 //
@@ -143,27 +152,25 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	}
 
 
-	/**
-	 * Returns the toll the specified agent has paid in the course of the
-	 * simulation so far.
-	 *
-	 * @param agentId
-	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
-	 */
-	double getAgentToll(final Id<Person> agentId) {
-		AgentTollInfo info = this.agents.get(agentId);
-		if (info == null) {
-			return 0.0;
-		}
-		return info.toll;
-	}
+//	/**
+//	 * Returns the toll the specified agent has paid in the course of the
+//	 * simulation so far.
+//	 *
+//	 * @param agentId
+//	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
+//	 */
+//	double getAgentToll(final Id<Person> agentId) {
+//		AgentTollInfo info = this.agents.get(agentId);
+//		if (info == null) {
+//			return 0.0;
+//		}
+//		return info.toll;
+//	}
 
 	/**
 	 * @return The toll paid by all the agents.
 	 */
-	public double getAllAgentsToll() {
-		// public is currently needed. kai, sep'13
-
+	double getAllAgentsToll() {
 		double tolls = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			tolls += (ai == null) ? 0.0 : ai.toll;
@@ -174,9 +181,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	/**
 	 * @return The Number of all the Drawees.
 	 */
-	public int getDraweesNr() {
-		// public is currently needed. kai, sep'13
-
+	int getDraweesNr() {
 		int dwCnt = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			if ((ai != null) && (ai.toll > 0.0)) {
@@ -190,7 +195,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
-		public void handleEvent(LinkEnterEvent event, Link link );
+		void handleEvent( LinkEnterEvent event, Link link );
 	}
 
 	/**
@@ -199,8 +204,8 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * agent does not have to pay the toll for a link if it starts on the link,
 	 * as it may have paid already when arriving on the link.
 	 */
-	class DistanceTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class DistanceTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
@@ -227,18 +232,17 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 				}
 				info.toll += newToll;
 				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
-
 			}
 		}
 	}
 
 	
-	class LinkTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class LinkTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
-		public LinkTollBehaviour(EventsManager events) {
+		private LinkTollBehaviour(EventsManager events) {
 			this.events = events;
 
 		}
@@ -277,12 +281,12 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * 			 fee.  kai, mar'12
 	 * </ul> 
 	 */
-	class AreaTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class AreaTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
-		public AreaTollBehaviour(EventsManager events) {
+		private AreaTollBehaviour(EventsManager events) {
 			this.events = events;
 		}
 
@@ -314,12 +318,12 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * Handles the calculation of the cordon toll. An agent has only to pay if he
 	 * crosses the cordon from the outside to the inside.
 	 */
-	class CordonTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class CordonTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
-		public CordonTollBehaviour(EventsManager events) {
+		private CordonTollBehaviour(EventsManager events) {
 			this.events = events;
 		}
 
