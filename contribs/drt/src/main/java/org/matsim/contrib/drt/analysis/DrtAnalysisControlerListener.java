@@ -199,7 +199,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			if (!headerWritten) {
 				headerWritten = true;
 				bw.write(line("runId", "iteration", "rides", "wait_average", "wait_max", "wait_p95", "wait_p75",
-						"wait_median", "percentage_WT_below_10", "percentage_WT_below_15", "inVehicleTravelTime_mean", 
+						"wait_median", "percentage_WT_below_10", "percentage_WT_below_15", "inVehicleTravelTime_mean",
 						"distance_m_mean", "directDistance_m_mean", "totalTravelTime_mean", "rejections", "rejectionRate"));
 			}
 			bw.write(runId + ";" + it + ";" + summarizeTrips);
@@ -217,8 +217,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
-						"totalRevenueDistance", "averageDrivenDistance", "averageEmptyDistance",
-						"averageRevenueDistance", "d_r/d_t", "l_det"));
+						"totalPassengerDistance", "averageDrivenDistance", "averageEmptyDistance",
+						"averagePassengerDistance", "d_p/d_t", "l_det"));
 			}
 			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {
