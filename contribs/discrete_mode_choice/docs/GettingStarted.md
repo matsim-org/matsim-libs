@@ -78,7 +78,7 @@ To set up the model that we just used, the configuration would look like that:
    <parameterset type="strategysettings">
       <param name="strategyName" value="DiscreteModeChoice" />
       <!-- further settings, weight, etc ... -->
-   </parmeterset>
+   </parameterset>
 </module>
 ```
 
