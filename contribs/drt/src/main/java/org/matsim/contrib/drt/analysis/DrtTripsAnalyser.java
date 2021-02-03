@@ -368,7 +368,7 @@ public class DrtTripsAnalyser {
 	 */
 	public static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
 			String iterationFilename) {
-		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;passengerDistance_pm";
+		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;passengerDistanceTraveled_pm";
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -385,7 +385,7 @@ public class DrtTripsAnalyser {
 						+ format.format(vehicleState.totalDistance) + ";"//
 						+ format.format(vehicleState.totalOccupiedDistance) + ";"//
 						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + ";"//
-						+ format.format(vehicleState.totalPassengerMeter));
+						+ format.format(vehicleState.totalPassengerTraveledDistance));
 				bw.newLine();
 			}
 			bw.flush();
@@ -410,25 +410,25 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		DescriptiveStatistics passengerMeter = new DescriptiveStatistics();
+		DescriptiveStatistics passengerTraveledDistance = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
 		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			driven.addValue(state.totalDistance);
-			passengerMeter.addValue(state.totalPassengerMeter);
+			passengerTraveledDistance.addValue(state.totalPassengerTraveledDistance);
 			occupied.addValue(state.totalOccupiedDistance);
 			empty.addValue(state.totalDistanceByOccupancy[0]);
 		}
-		double d_p_d_t = passengerMeter.getSum() / driven.getSum();
+		double d_p_d_t = passengerTraveledDistance.getSum() / driven.getSum();
 		return String.join(del, vehicleDistances.size() + "",//
 				format.format(driven.getSum()) + "",//
 				format.format(empty.getSum()) + "",//
 				format.format(empty.getSum() / driven.getSum()) + "",//
-				format.format(passengerMeter.getSum()) + "",//
+				format.format(passengerTraveledDistance.getSum()) + "",//
 				format.format(driven.getMean()) + "",//
 				format.format(empty.getMean()) + "",//
-				format.format(passengerMeter.getMean()) + "",//
+				format.format(passengerTraveledDistance.getMean()) + "",//
 				format.format(d_p_d_t) + "");
 	}
 

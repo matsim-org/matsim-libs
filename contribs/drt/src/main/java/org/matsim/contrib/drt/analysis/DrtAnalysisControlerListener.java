@@ -217,8 +217,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		try (var bw = getAppendingBufferedWriter("drt_vehicle_stats", ".csv")) {
 			if (!vheaderWritten) {
 				bw.write(line("runId", "iteration", "vehicles", "totalDistance", "totalEmptyDistance", "emptyRatio",
-						"totalPassengerDistance", "averageDrivenDistance", "averageEmptyDistance",
-						"averagePassengerDistance", "d_p/d_t", "l_det"));
+						"totalPassengerDistanceTraveled", "averageDrivenDistance", "averageEmptyDistance",
+						"averagePassengerDistanceTraveled", "d_p/d_t", "l_det"));
 			}
 			bw.write(line(runId, it, summarizeVehicles));
 		} catch (IOException e) {
