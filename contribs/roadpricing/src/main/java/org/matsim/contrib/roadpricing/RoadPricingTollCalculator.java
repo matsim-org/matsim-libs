@@ -57,7 +57,8 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 
 	/**
-	 * @deprecated -- I think that most of this is no longer needed since we now throw money events immediately when links are left.  kai, jan'21
+	 * Much of this is no longer needed since we now throw money events immediately when links are left.  It is, however, still
+	 * needed for area toll, and for the specific implementation of cordon toll here. kai, jan'21
 	 */
 	private static class AgentTollInfo {
 		public double toll = 0.0;
@@ -67,7 +68,8 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	private final RoadPricingScheme scheme;
 
 	/**
-	 * @deprecated -- I think that most of this is no longer needed since we now throw money events immediately when links are left.  kai, jan'21
+	 * Much of this is no longer needed since we now throw money events immediately when links are left.  It is, however, still
+	 * needed for area toll, and for the specific implementation of cordon toll here. kai, jan'21
 	 */
 	private final TreeMap<Id<Person>, AgentTollInfo> agents = new TreeMap<>();
 
@@ -212,24 +214,13 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		public DistanceTollBehaviour(EventsManager events) {
 			this.events = events;
 		}
-
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), driverId, event.getVehicleId());
+			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					/* The agent is not yet "registered". */
-					
-					/* Generate a "registration object. */
-					info = new AgentTollInfo();
-					
-					/* Register it. */
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
+				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += newToll;
 				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
 			}
@@ -246,25 +237,12 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			this.events = events;
 
 		}
-
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
-
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					/* The agent is not yet "registered" */
-
-					/* Generate a "registration object" */
-					info = new AgentTollInfo();
-
-					/* Register it. */
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
+				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += cost.amount;
 				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 			}

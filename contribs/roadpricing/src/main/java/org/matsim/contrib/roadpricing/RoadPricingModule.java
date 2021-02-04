@@ -42,15 +42,17 @@ public final class RoadPricingModule extends AbstractModule {
 		// (My personal preference is actually to have it as scenario element ... since then it can be set before controler is even called.  Which
 		// certainly makes more sense for a clean build sequence.  kai, oct'19)
 		bind(RoadPricingInitializer.class).in( Singleton.class );
-		
+
+
+
 		// add the toll to the routing disutility.  also includes "randomizing":
 		addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
 
-		// specific re-routing strategy for area toll:
-		// yyyy TODO could probably combine them somewhat
-		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-		addTravelDisutilityFactoryBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()) );
-		addRoutingModuleBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting() );
+//		// specific re-routing strategy for area toll:
+//		// yyyy TODO could probably combine them somewhat
+//		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+//		addTravelDisutilityFactoryBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()) );
+//		addRoutingModuleBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting() );
 		
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16
