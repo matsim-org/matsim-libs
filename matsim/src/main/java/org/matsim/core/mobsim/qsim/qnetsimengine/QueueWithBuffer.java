@@ -437,7 +437,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		
 		//this assumes that vehicles have the flowEfficiencyFactor of 1.0; the actual flow can be different
-		double tempStorageCapacity = freespeedTravelTime * unscaledFlowCapacity_s;
+		double tempStorageCapacity = Math.max(1.0, freespeedTravelTime * unscaledFlowCapacity_s);
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
