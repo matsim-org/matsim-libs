@@ -309,7 +309,8 @@ public class TollTravelCostCalculatorTest {
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = RoadPricingUtils.addOrGetMutableRoadPricingScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
-		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
+//		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
+		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
 		RoadPricingTestUtils.createPopulation2(scenario);

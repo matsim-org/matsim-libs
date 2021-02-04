@@ -92,10 +92,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			log.warn("area toll does not work if you have different toll amounts on different " +
 					"links.  Make sure you get what you want.  kai, mar'12");
 		} else if (RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
-			this.handler = new CordonTollBehaviour(events);
-			log.info("just instantiated CordonTollBehavior") ;
-			log.warn("cordon toll only charges at transition from untolled to tolled. " +
-					"Make sure this is what you want. kai, mar'12") ;
+			throw new RuntimeException( "use LINK toll behavior to implement cording pricing (just pay on links that traverse the cordon)" );
 		} else if (RoadPricingScheme.TOLL_TYPE_LINK.equals(scheme.getType())) {
 			this.handler = new LinkTollBehaviour(events);
 			log.info("just instantiated LinkTollBehavior") ;
@@ -220,9 +217,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
+
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += newToll;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
 			}
 		}
 	}
@@ -242,9 +240,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
 				info.toll += cost.amount;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 			}
 		}
 	}
@@ -285,72 +284,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 					/* The toll amount comes from the current link, but should 
 					 * be the same for all links. */
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+
 					info.toll = cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 				}
-			}
-		}
-	}
-
-	/**
-	 * Handles the calculation of the cordon toll. An agent has only to pay if he
-	 * crosses the cordon from the outside to the inside.
-	 */
-	private class CordonTollBehaviour implements TollBehaviourI {
-		private final EventsManager events;
-		/**
-		 * @param events The EventsManager to send money events
-		 */
-		private CordonTollBehaviour(EventsManager events) {
-			this.events = events;
-		}
-
-		@Override
-		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
-			if (cost != null) {
-				// this is a link inside the toll area.
-				// [[I guess this assumes that all links inside the cordon are listed in the toll scheme, similar to an area
-				// toll.  Conventionally, one would not do it in this way, but one would just name those links where
-				// the cordon toll is charged.  kai, mar'12]]
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					// (the agent is not yet "registered")
-					// [[yyyy this would refer to any toll, so if we have two cordons, it does not work.  kai, mar'12]]
-
-					// generate a "registration object":
-					info = new AgentTollInfo();
-
-					// register it:
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-
-					// we start in the area, do not toll:
-					info.toll = 0.0;
-
-					// info.insideCordonArea is implicitly initialized with `true'. kai, mar'12
-				} else if (!info.insideCordonArea) {
-					// (info is != null, and insideCordonArea is false)
-					// agent was outside before, now inside the toll area --> agent has to pay
-					info.insideCordonArea = true;
-					info.toll += cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
-				}
-				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
-			} else {
-				// this is a link outside the toll area; just need to memorize that the agent is outside the toll area.
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					// (the agent is not yet "registered")
-
-					// generate a "registration object":
-					info = new AgentTollInfo();
-
-					// register it:
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
-				// memorize that agent is outside toll area:
-				info.insideCordonArea = false;
 			}
 		}
 	}
