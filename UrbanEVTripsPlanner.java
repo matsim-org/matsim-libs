@@ -384,6 +384,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 		if (nearestChargers.isEmpty()){
 			throw new RuntimeException("no charger could be found for vehicle type " + vehicleSpecification.getVehicleType());
 		}
+		if (NetworkUtils.getEuclideanDistance(network.getLinks().get(linkId).getToNode().getCoord(), network.getLinks().get(nearestChargers.get(0).getLinkId()).getToNode().getCoord()) >= 1000){
+			//throw new RuntimeException("There are no chargers within 1000m");
+			log.warn("Charger out of range. Inefficient charging");
+		}
 		return nearestChargers.get(0);
 	}
 
