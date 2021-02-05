@@ -1,5 +1,6 @@
 package org.matsim.urbanEV;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -19,10 +20,12 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
 import org.matsim.testcases.MatsimTestUtils;
@@ -57,6 +60,7 @@ public class ChargerSelectionTest {
 		config.controler().setLastIteration(1);
 
 		config.planCalcScore().addModeParams(new PlanCalcScoreConfigGroup.ModeParams(TransportMode.bike));
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -98,11 +102,14 @@ public class ChargerSelectionTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-//				this.addEventHandlerBinding().toInstance(handler);
+				this.addEventHandlerBinding().toInstance(handler);
 			}
 		});
 
 		controler.run();
+
+
+
 
 	}
 
@@ -112,7 +119,7 @@ public class ChargerSelectionTest {
 		scenario.getPopulation().getPersons().clear();
 
 		PopulationFactory factory = scenario.getPopulation().getFactory();
-		Person person = factory.createPerson(Id.createPersonId("Charge during leisure + bike"));
+		/*Person person = factory.createPerson(Id.createPersonId("Charge during leisure + bike"));
 
 		Plan plan = factory.createPlan();
 
@@ -161,7 +168,8 @@ public class ChargerSelectionTest {
 
 		scenario.getPopulation().addPerson(person);
 
-	/*	Person person2 = factory.createPerson(Id.createPersonId("Charger Selection + 20 min shopping"));
+
+		Person person2 = factory.createPerson(Id.createPersonId("Charger Selection + 20 min shopping"));
 
 		Plan plan2 = factory.createPlan();
 
@@ -269,108 +277,108 @@ public class ChargerSelectionTest {
 		person4.addPlan(plan4);
 		person4.setSelectedPlan(plan4);
 
-		scenario.getPopulation().addPerson(person4);
+		scenario.getPopulation().addPerson(person4);*/
 
 		Person person5 = factory.createPerson(Id.createPersonId("Triple Charger"));
 
 		Plan plan5 = factory.createPlan();
 
 		Activity home51 = factory.createActivityFromLinkId("home", Id.createLinkId("1"));
-		home51.setEndTime(1 * 3600);
+		home51.setMaximumDuration(1*1200);
 		plan5.addActivity(home51);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work51 = factory.createActivityFromLinkId("work", Id.createLinkId("9"));
-		work51.setEndTime(2 * 3600);
+		Activity work51 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work51.setMaximumDuration(1*1200);
 		plan5.addActivity(work51);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work52 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-		work52.setEndTime(3 * 3600);
+		Activity work52 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
+		work52.setMaximumDuration(1*1200);
 		plan5.addActivity(work52);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work53 = factory.createActivityFromLinkId("home", Id.createLinkId("99"));
-		work53.setEndTime(4 * 3600);
+		Activity work53 = factory.createActivityFromLinkId("home", Id.createLinkId("90"));
+		work53.setMaximumDuration(1*1200);
 		plan5.addActivity(work53);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
 		Activity home52 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-		home52.setEndTime(5 * 3600);
+		home52.setMaximumDuration(1*1200);
 		plan5.addActivity(home52);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work54 = factory.createActivityFromLinkId("work", Id.createLinkId("9"));
-		work54.setEndTime(6 * 3600);
+		Activity work54 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work54.setMaximumDuration(1*1200);
 		plan5.addActivity(work54);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work55 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-		work55.setEndTime(7 * 3600);
+		Activity work55 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
+		work55.setMaximumDuration(1*1200);
 		plan5.addActivity(work55);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work56 = factory.createActivityFromLinkId("home", Id.createLinkId("99"));
-		work56.setEndTime(8 * 3600);
+		Activity work56 = factory.createActivityFromLinkId("home", Id.createLinkId("90"));
+		work56.setMaximumDuration(1*1200);
 		plan5.addActivity(work56);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
 		Activity home53 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-		home53.setEndTime(9 * 3600);
+		home53.setMaximumDuration(1*1200);
 		plan5.addActivity(home53);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work57 = factory.createActivityFromLinkId("work", Id.createLinkId("9"));
-		work57.setEndTime(10 * 3600);
+		Activity work57 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work57.setMaximumDuration(1*1200);
 		plan5.addActivity(work57);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work58 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-		work58.setEndTime(11 * 3600);
+		Activity work58 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
+		work58.setMaximumDuration(1*1200);
 		plan5.addActivity(work58);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work59 = factory.createActivityFromLinkId("home", Id.createLinkId("99"));
-		work59.setEndTime(12 * 3600);
+		Activity work59 = factory.createActivityFromLinkId("home", Id.createLinkId("90"));
+		work59.setMaximumDuration(1*1200);
 		plan5.addActivity(work59);
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
 		Activity home54 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-		home54.setEndTime(13 * 3600);
+		home54.setMaximumDuration(1*1200);
 		plan5.addActivity(home54);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work510 = factory.createActivityFromLinkId("work", Id.createLinkId("9"));
-		work510.setEndTime(14 * 3600);
+		Activity work510 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
+		work510.setMaximumDuration(1*1200);
 		plan5.addActivity(work510);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work511 = factory.createActivityFromLinkId("work", Id.createLinkId("90"));
-		work511.setEndTime(15 * 3600);
+		Activity work511 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
+		work511.setMaximumDuration(1*1200);
 		plan5.addActivity(work511);
 
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
-		Activity work512 = factory.createActivityFromLinkId("home", Id.createLinkId("99"));
-		work512.setEndTime(16 * 3600);
+		Activity work512 = factory.createActivityFromLinkId("home", Id.createLinkId("90"));
+		work512.setMaximumDuration(1*1200);
 		plan5.addActivity(work512);
 		plan5.addLeg(factory.createLeg(TransportMode.car));
 
 		Activity home55 = factory.createActivityFromLinkId("work", Id.createLinkId("1"));
-		home55.setEndTime(17 * 3600);
+		home55.setMaximumDuration(1*1200);
 		plan5.addActivity(home55);
 
 
@@ -380,7 +388,7 @@ public class ChargerSelectionTest {
 		person5.setSelectedPlan(plan5);
 
 		scenario.getPopulation().addPerson(person5);
-*/
+
 
 
 	}
@@ -398,19 +406,25 @@ public class ChargerSelectionTest {
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2VehicleId);//probably unnecessary
 		}
 	}
+	private  int getNumberOfActs(Person person){
+		return (int) TripStructureUtils.getActivities(person.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities).size();
+
+	}
 
 	private class UrbanEVTestHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 		private Map<Id<Person>, Double> plugOutCntPerPerson = new HashMap<>();
 		private Map<Id<Person>, Double> plugInCntPerPerson = new HashMap<>();
-		private Map<Id<Person>, Double> BikeCntPerPerson = new HashMap<>();
+		private Map<Id<Person>, List<String>> actPerPerson = new HashMap<>();
 
+		@Inject Scenario scenario;
 
 		@Override
 		public void handleEvent(ActivityEndEvent event) {
 			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION) ){
 				this.plugOutCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
 			}
+
 		}
 
 		@Override
@@ -418,6 +432,17 @@ public class ChargerSelectionTest {
 			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ){
 				this.plugInCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
 
+			}
+			if(!TripStructureUtils.isStageActivityType(event.getActType())){
+				if (actPerPerson.containsKey(event.getPersonId())){
+					List<String> list = actPerPerson.get(event.getPersonId());
+					list.add(event.getActType() + ","+ event.getTime());
+				}
+				else {
+					List<String> list = new ArrayList<>();
+					list.add(event.getActType() + ","+ event.getTime());
+					actPerPerson.put(event.getPersonId(), list);
+				}
 			}
 		}
 
@@ -427,13 +452,16 @@ public class ChargerSelectionTest {
 			if(iteration > 0){
 				System.out.println("ITERATION = " + iteration);
 
-				Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
-				Assert.assertTrue(plugOutCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
+				//Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
+				//Assert.assertTrue(plugOutCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
 
-				for (Id<Person> personId : plugInCntPerPerson.keySet()) {
-					Assert.assertTrue(plugInCntPerPerson.get(personId) == 1);
-					Assert.assertTrue(plugInCntPerPerson.get(personId) == plugOutCntPerPerson.get(personId));
+				//for (Id<Person> personId : plugInCntPerPerson.keySet()) {
+					//Assert.assertTrue(plugInCntPerPerson.get(personId) == 1);
+				//	Assert.assertTrue(plugInCntPerPerson.get(personId) == plugOutCntPerPerson.get(personId));
 
+				//}
+				for (Person person : scenario.getPopulation().getPersons().values()){
+					Assert.assertTrue("Geplante Aktivitäten ist ungleich der tatsächlichen für Person" + person,actPerPerson.get(person.getId()).size() + 1 == getNumberOfActs(person));
 				}
 
 //				plugIns.forEach(person -> {
@@ -444,13 +472,13 @@ public class ChargerSelectionTest {
 //				});
 
 
-				Assert.assertEquals(6, plugInCntPerPerson.size(), 0);
-				Assert.assertEquals(6, plugOutCntPerPerson.size(), 0);
-				Assert.assertEquals(4, BikeCntPerPerson.size(), 0);
-				Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size());
+				//Assert.assertEquals(6, plugInCntPerPerson.size(), 0);
+				//Assert.assertEquals(6, plugOutCntPerPerson.size(), 0);
+
+				//Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size());
 
 			}
-
+			this.actPerPerson.clear();
 			this.plugInCntPerPerson.clear();
 			this.plugOutCntPerPerson.clear();
 		}
