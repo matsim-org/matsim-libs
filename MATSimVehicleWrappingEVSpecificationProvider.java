@@ -64,7 +64,7 @@ class MATSimVehicleWrappingEVSpecificationProvider implements Provider<ElectricF
 
 		//collect EV ids needed this iteration
 		Set<Id<Vehicle>> evIds = new HashSet<>();
-		population.getPersons().values().parallelStream()
+		population.getPersons().values().stream()
 				.map(person -> person.getSelectedPlan())
 				.forEach(plan -> registerEVs(plan));
 	}
