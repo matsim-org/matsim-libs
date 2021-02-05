@@ -11,8 +11,6 @@ import org.matsim.contrib.roadpricing.RoadPricingModuleDefaults.TravelDisutility
 
 import com.google.inject.Singleton;
 
-import static org.matsim.contrib.roadpricing.PlansCalcRouteWithTollOrNot.*;
-
 public final class RoadPricingModule extends AbstractModule {
 	final private static Logger LOG = Logger.getLogger(RoadPricingModule.class);
 	
@@ -30,7 +28,6 @@ public final class RoadPricingModule extends AbstractModule {
 	public void install() {
 		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.class);
 		
-
 		// TODO sort out different ways to set toll schemes; reduce automagic
 		// TODO JWJ: is this still too "automagic"?
 		if ( scheme != null) {
@@ -44,25 +41,21 @@ public final class RoadPricingModule extends AbstractModule {
 		// (My personal preference is actually to have it as scenario element ... since then it can be set before controler is even called.  Which
 		// certainly makes more sense for a clean build sequence.  kai, oct'19)
 		bind(RoadPricingInitializer.class).in( Singleton.class );
-		
-		// add the toll to the routing disutility.  also includes "randomizing":
-		addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).asEagerSingleton();
 
-		// specific re-routing strategy for area toll:
-		// yyyy TODO could probably combine them somewhat
+		// add the toll to the routing disutility.  also includes "randomizing":
+		addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
+
+//		// specific re-routing strategy for area toll:
+//		// yyyy TODO could probably combine them somewhat
 		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-		addTravelDisutilityFactoryBinding( CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()));
-		addRoutingModuleBinding( CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting());
+		addTravelDisutilityFactoryBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig()) );
+		addRoutingModuleBinding( PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL ).toProvider(new RoadPricingNetworkRouting() );
 		
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16
 
 		// this is what makes the mobsim compute tolls and generate money events
-		// TODO yyyy could probably combine the following two:
 		addControlerListenerBinding().to(RoadPricingControlerListener.class);
-		bind(RoadPricingTollCalculator.class).in(Singleton.class);
-
-		// this is for analysis only:
-		bind(CalcAverageTolledTripLength.class).in(Singleton.class);
+		
 	}
 }
