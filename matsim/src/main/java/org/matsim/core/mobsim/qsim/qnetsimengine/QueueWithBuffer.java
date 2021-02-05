@@ -440,6 +440,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		double tempStorageCapacity = Math.max(1.0, freespeedTravelTime * unscaledFlowCapacity_s);
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
+		
+		// Here, we set the lower bound of the flow capacity to 1, that means a link needs 
+		// to accommodate at least 1 vehicle. -Chengqi Lu Feb 2021
 
 		if (storageCapacity < tempStorageCapacity) {
 			if (QueueWithBuffer.spaceCapWarningCount <= 10) {
