@@ -442,7 +442,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 		
 		// Here, we set the lower bound of the flow capacity to 1, that means a link needs 
-		// to accommodate at least 1 vehicle. -Chengqi Lu Feb 2021
+		// to accommodate at least 1 vehicle. The reason for adding this is that if the storage
+		// capacity of a link is below 1, then there will be congestion even if there is only one
+		// vehicle (i.e. the vehicle has to wait at the end of previous link, until the stuck
+		// time has been reached, before it can enter this link).  -Chengqi Lu Feb 2021
 
 		if (storageCapacity < tempStorageCapacity) {
 			if (QueueWithBuffer.spaceCapWarningCount <= 10) {
