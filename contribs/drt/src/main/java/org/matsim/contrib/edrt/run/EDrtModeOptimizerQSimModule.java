@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
+import org.matsim.contrib.drt.scheduler.DefaultRequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
@@ -157,7 +158,7 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(DrtScheduleInquiry.class).to(DrtScheduleInquiry.class).asEagerSingleton();
 
 		bindModal(RequestInsertionScheduler.class).toProvider(modalProvider(
-				getter -> new RequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
+				getter -> new DefaultRequestInsertionScheduler(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class),
 						getter.getNamed(TravelTime.class, DvrpTravelTimeModule.DVRP_ESTIMATED),
 						getter.getModal(ScheduleTimingUpdater.class), getter.getModal(DrtTaskFactory.class))))
