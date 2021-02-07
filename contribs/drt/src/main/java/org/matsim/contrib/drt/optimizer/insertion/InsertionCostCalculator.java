@@ -24,7 +24,7 @@ import java.util.function.ToDoubleFunction;
 
 import javax.annotation.Nullable;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -112,7 +112,7 @@ public class InsertionCostCalculator<D> {
 
 	static boolean checkTimeConstraintsForScheduledRequests(InsertionGenerator.Insertion insertion,
 			double pickupDetourTimeLoss, double totalTimeLoss) {
-		VehicleData.Entry vEntry = insertion.vehicleEntry;
+		VehicleEntry vEntry = insertion.vehicleEntry;
 		final int pickupIdx = insertion.pickup.index;
 		final int dropoffIdx = insertion.dropoff.index;
 
@@ -142,7 +142,7 @@ public class InsertionCostCalculator<D> {
 		return true; //all time constraints of all stops are satisfied
 	}
 
-	static double calcVehicleSlackTime(VehicleData.Entry vEntry, double now) {
+	static double calcVehicleSlackTime(VehicleEntry vEntry, double now) {
 		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
 		return vEntry.vehicle.getServiceEndTime() - Math.max(lastTask.getBeginTime(), now);
 	}

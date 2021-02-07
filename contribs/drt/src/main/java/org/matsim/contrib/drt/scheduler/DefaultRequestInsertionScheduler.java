@@ -25,7 +25,7 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STAY;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -92,7 +92,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 	}
 
 	private DrtStopTask insertPickup(DrtRequest request, InsertionWithDetourData<PathData> insertion) {
-		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
+		VehicleEntry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickup().index;
@@ -236,7 +236,7 @@ public class DefaultRequestInsertionScheduler implements RequestInsertionSchedul
 
 	private DrtStopTask insertDropoff(DrtRequest request, InsertionWithDetourData<PathData> insertion,
 			DrtStopTask pickupTask) {
-		VehicleData.Entry vehicleEntry = insertion.getVehicleEntry();
+		VehicleEntry vehicleEntry = insertion.getVehicleEntry();
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Waypoint.Stop> stops = vehicleEntry.stops;
 		int pickupIdx = insertion.getPickup().index;

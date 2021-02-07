@@ -91,13 +91,13 @@ public class DrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleData.EntryFactory.class),
+						getter.getModal(VehicleEntry.EntryFactory.class),
 						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
 		install(getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
+		bindModal(VehicleEntry.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
 
 		bindModal(CostCalculationStrategy.class).to(
 				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
