@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -66,14 +66,14 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	@Override
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
-			Collection<Entry> vEntries) {
+			Collection<VehicleEntry> vehicleEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> admissibleTimeData = DetourData.create(admissibleDetourTimeEstimator, drtRequest);
 		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
 				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
-		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vEntries.parallelStream()
+		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
 				//generate feasible insertions (wrt occupancy limits)
 				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 				//map insertions to insertions with admissible detour times (i.e. admissible beeline speed factor)

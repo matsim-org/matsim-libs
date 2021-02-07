@@ -20,16 +20,22 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.DoubleSupplier;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
@@ -51,7 +57,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final DoubleSupplier timeOfDay;
 	private final EventsManager eventsManager;
 	private final RequestInsertionScheduler insertionScheduler;
-	private final VehicleData.EntryFactory vehicleDataEntryFactory;
+	private final VehicleEntry.EntryFactory vehicleEntryFactory;
 	private final DrtRequestInsertionRetryQueue insertionRetryQueue;
 
 	private final ForkJoinPool forkJoinPool;
@@ -59,16 +65,16 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			VehicleData.EntryFactory vehicleDataEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
+			VehicleEntry.EntryFactory vehicleEntryFactory, DrtInsertionSearch<PathData> insertionSearch,
 			ForkJoinPool forkJoinPool) {
-		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler,
-				vehicleDataEntryFactory, new DrtRequestInsertionRetryQueue(drtCfg.getDrtRequestInsertionRetryParams().
+		this(drtCfg.getMode(), fleet, mobsimTimer::getTimeOfDay, eventsManager, insertionScheduler, vehicleEntryFactory,
+				new DrtRequestInsertionRetryQueue(drtCfg.getDrtRequestInsertionRetryParams().
 						orElse(new DrtRequestInsertionRetryParams())), forkJoinPool, insertionSearch);
 	}
 
 	@VisibleForTesting
 	DefaultUnplannedRequestInserter(String mode, Fleet fleet, DoubleSupplier timeOfDay, EventsManager eventsManager,
-			RequestInsertionScheduler insertionScheduler, VehicleData.EntryFactory vehicleDataEntryFactory,
+			RequestInsertionScheduler insertionScheduler, VehicleEntry.EntryFactory vehicleEntryFactory,
 			DrtRequestInsertionRetryQueue insertionRetryQueue, ForkJoinPool forkJoinPool,
 			DrtInsertionSearch<PathData> insertionSearch) {
 		this.mode = mode;
@@ -76,7 +82,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.timeOfDay = timeOfDay;
 		this.eventsManager = eventsManager;
 		this.insertionScheduler = insertionScheduler;
-		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
+		this.vehicleEntryFactory = vehicleEntryFactory;
 		this.insertionRetryQueue = insertionRetryQueue;
 		this.forkJoinPool = forkJoinPool;
 		this.insertionSearch = insertionSearch;
@@ -91,21 +97,27 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			return;
 		}
 
-		VehicleData vData = new VehicleData(now, fleet.getVehicles().values().stream(), vehicleDataEntryFactory,
-				forkJoinPool);
+		var vehicleEntries = forkJoinPool.submit(() -> fleet.getVehicles()
+				.values()
+				.parallelStream()
+				.map(v -> vehicleEntryFactory.create(v, now))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e))).join();
 
 		//first retry scheduling old requests
-		requestsToRetry.forEach(req -> scheduleUnplannedRequest(req, vData, now));
+		requestsToRetry.forEach(req -> scheduleUnplannedRequest(req, vehicleEntries, now));
 
 		//then schedule new requests
 		for (var reqIter = unplannedRequests.iterator(); reqIter.hasNext(); ) {
-			scheduleUnplannedRequest(reqIter.next(), vData, now);
+			scheduleUnplannedRequest(reqIter.next(), vehicleEntries, now);
 			reqIter.remove();
 		}
 	}
 
-	private void scheduleUnplannedRequest(DrtRequest req, VehicleData vData, double now) {
-		Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req, vData.getEntries());
+	private void scheduleUnplannedRequest(DrtRequest req, Map<Id<DvrpVehicle>, VehicleEntry> vehicleEntries,
+			double now) {
+		Optional<InsertionWithDetourData<PathData>> best = insertionSearch.findBestInsertion(req,
+				Collections.unmodifiableCollection(vehicleEntries.values()));
 		if (best.isEmpty()) {
 			if (!insertionRetryQueue.tryAddFailedRequest(req, now)) {
 				eventsManager.processEvent(
@@ -120,11 +132,20 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			}
 		} else {
 			InsertionWithDetourData<PathData> insertion = best.get();
+			var vehicle = insertion.getVehicleEntry().vehicle;
 			var pickupDropoffTaskPair = insertionScheduler.scheduleRequest(req, insertion);
-			vData.updateEntry(insertion.getVehicleEntry().vehicle);
-			eventsManager.processEvent(new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(),
-					insertion.getVehicleEntry().vehicle.getId(), pickupDropoffTaskPair.pickupTask.getEndTime(),
-					pickupDropoffTaskPair.dropoffTask.getBeginTime()));
+
+			VehicleEntry newVehicleEntry = vehicleEntryFactory.create(vehicle, now);
+			if (newVehicleEntry != null) {
+				vehicleEntries.put(vehicle.getId(), newVehicleEntry);
+			} else {
+				vehicleEntries.remove(vehicle.getId());
+			}
+
+			eventsManager.processEvent(
+					new PassengerRequestScheduledEvent(now, mode, req.getId(), req.getPassengerId(), vehicle.getId(),
+							pickupDropoffTaskPair.pickupTask.getEndTime(),
+							pickupDropoffTaskPair.dropoffTask.getBeginTime()));
 		}
 	}
 }

@@ -6,7 +6,7 @@ import java.util.function.ToDoubleFunction;
 
 import javax.annotation.Nullable;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.DetourTimeInfo;
 
 /**
@@ -37,7 +37,7 @@ class InsertionDetourTimeCalculator<D> {
 			return calculateDetourTimeInfoForIfPickupToDropoffDetour(insertion);
 		}
 
-		VehicleData.Entry vEntry = insertion.getVehicleEntry();
+		VehicleEntry vEntry = insertion.getVehicleEntry();
 
 		final double departureTime;
 		final double pickupTimeLoss;
@@ -73,7 +73,7 @@ class InsertionDetourTimeCalculator<D> {
 	}
 
 	private DetourTimeInfo calculateDetourTimeInfoForIfPickupToDropoffDetour(InsertionWithDetourData<D> insertion) {
-		VehicleData.Entry vEntry = insertion.getVehicleEntry();
+		VehicleEntry vEntry = insertion.getVehicleEntry();
 		InsertionGenerator.InsertionPoint pickup = insertion.getPickup();
 
 		final double toPickupTT;
@@ -99,7 +99,7 @@ class InsertionDetourTimeCalculator<D> {
 		return new DetourTimeInfo(departureTime, arrivalTime, pickupTimeLoss, dropoffTimeLoss);
 	}
 
-	private double calcAdditionalPickupStopDurationIfSameLinkAsPrevious(VehicleData.Entry vEntry, int pickupIdx) {
+	private double calcAdditionalPickupStopDurationIfSameLinkAsPrevious(VehicleEntry vEntry, int pickupIdx) {
 		if (pickupIdx > 0) {
 			return 0;
 		}
@@ -107,7 +107,7 @@ class InsertionDetourTimeCalculator<D> {
 		return startTask.isPresent() && STOP.isBaseTypeOf(startTask.get()) ? 0 : stopDuration;
 	}
 
-	private double calculateReplacedDriveDuration(VehicleData.Entry vEntry, int insertionIdx) {
+	private double calculateReplacedDriveDuration(VehicleEntry vEntry, int insertionIdx) {
 		if (insertionIdx == vEntry.stops.size()) {
 			return 0;// end of route - bus would wait there
 		}

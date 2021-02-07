@@ -20,8 +20,7 @@ package org.matsim.contrib.edrt.optimizer;
 
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -40,11 +39,11 @@ import com.google.inject.Provider;
 /**
  * @author michalm
  */
-public class EDrtVehicleDataEntryFactory implements EntryFactory {
-	public static class EVehicleEntry extends Entry {
+public class EDrtVehicleDataEntryFactory implements VehicleEntry.EntryFactory {
+	public static class EVehicleEntry extends VehicleEntry {
 		public final double socBeforeFinalStay;
 
-		public EVehicleEntry(Entry entry, double socBeforeFinalStay) {
+		public EVehicleEntry(VehicleEntry entry, double socBeforeFinalStay) {
 			super(entry.vehicle, entry.start, entry.stops);
 			this.socBeforeFinalStay = socBeforeFinalStay;
 		}
@@ -59,7 +58,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 	}
 
 	@Override
-	public Entry create(DvrpVehicle vehicle, double currentTime) {
+	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
 		if (!entryFactory.isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
@@ -96,11 +95,11 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 			return null;// skip undercharged vehicles
 		}
 
-		Entry entry = entryFactory.create(vehicle, currentTime);
+		VehicleEntry entry = entryFactory.create(vehicle, currentTime);
 		return entry == null ? null : new EVehicleEntry(entry, socBeforeNextTask);
 	}
 
-	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<EDrtVehicleDataEntryFactory> {
+	public static class EDrtVehicleDataEntryFactoryProvider implements Provider<VehicleEntry.EntryFactory> {
 		private final DrtConfigGroup drtCfg;
 		private final double minimumRelativeSoc;
 

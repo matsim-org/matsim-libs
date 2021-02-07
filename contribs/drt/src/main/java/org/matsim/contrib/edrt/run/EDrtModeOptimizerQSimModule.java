@@ -25,7 +25,7 @@ import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtModeOptimizerQSimModule;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.CostCalculationStrategy;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
@@ -121,19 +121,18 @@ public class EDrtModeOptimizerQSimModule extends AbstractDvrpModeQSimModule {
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleData.EntryFactory.class),
+						getter.getModal(VehicleEntry.EntryFactory.class),
 						getter.getModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
 						}), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool()))).asEagerSingleton();
 
 		install(DrtModeOptimizerQSimModule.getInsertionSearchQSimModule(drtCfg));
 
-		bindModal(VehicleData.EntryFactory.class).toProvider(
+		bindModal(VehicleEntry.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(CostCalculationStrategy.class).to(
-				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
-						CostCalculationStrategy.RejectSoftConstraintViolations.class :
-						CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+		bindModal(CostCalculationStrategy.class).to(drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
+				CostCalculationStrategy.RejectSoftConstraintViolations.class :
+				CostCalculationStrategy.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 

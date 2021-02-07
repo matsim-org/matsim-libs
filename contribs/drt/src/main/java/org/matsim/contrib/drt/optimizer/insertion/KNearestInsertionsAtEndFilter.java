@@ -20,7 +20,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.util.PartialSort;
 
@@ -46,7 +46,7 @@ class KNearestInsertionsAtEndFilter {
 	 * Designed to be used with parallel streams
 	 */
 	boolean filter(InsertionWithDetourData<Double> insertion) {
-		Entry vEntry = insertion.getVehicleEntry();
+		VehicleEntry vEntry = insertion.getVehicleEntry();
 		int i = insertion.getPickup().index;
 
 		if (i < vEntry.stops.size()) {//not an insertion at the schedule end

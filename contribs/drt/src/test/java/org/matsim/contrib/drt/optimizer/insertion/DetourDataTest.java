@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -64,7 +64,7 @@ public class DetourDataTest {
 	private final String dropoff_stop1 = "dropoff_stop1";
 
 	private final DrtRequest request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
-	private final Entry entry = entry(startLink, stop0Link, stop1Link);
+	private final VehicleEntry entry = entry(startLink, stop0Link, stop1Link);
 
 	private final ImmutableMap<Link, String> pathToPickupMap = ImmutableMap.of(startLink, start_pickup, stop0Link,
 			stop0_pickup, stop1Link, stop1_pickup);
@@ -125,8 +125,8 @@ public class DetourDataTest {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
-	private Entry entry(Link startLink, Link... stopLinks) {
-		return new Entry(null, new Waypoint.Start(null, startLink, 0, 0),
+	private VehicleEntry entry(Link startLink, Link... stopLinks) {
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()));
 	}
 
