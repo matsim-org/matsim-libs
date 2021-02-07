@@ -89,6 +89,12 @@ public class InsertionGenerator {
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
 
+		public Insertion(VehicleData.Entry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff) {
+			this.vehicleEntry = vehicleEntry;
+			this.pickup = pickup;
+			this.dropoff = dropoff;
+		}
+
 		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 

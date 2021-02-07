@@ -52,9 +52,8 @@ public class RunDrtExampleIT {
 				new OTFVisConfigGroup());
 
 		for (var drtCfg : MultiModeDrtConfigGroup.get(config).getModalElements()) {
-			var retryParams = new DrtRequestInsertionRetryParams();
-			retryParams.setMaxRequestAge(7200);//relatively high value to prevent rejections
-			drtCfg.addParameterSet(retryParams);
+			//relatively high max age to prevent rejections
+			drtCfg.addParameterSet(new DrtRequestInsertionRetryParams().setMaxRequestAge(7200));
 		}
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
