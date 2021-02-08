@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -26,7 +28,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -69,22 +70,30 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 			Collection<VehicleEntry> vehicleEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> admissibleTimeData = DetourData.create(admissibleDetourTimeEstimator, drtRequest);
-		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
-				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.
-		List<Insertion> filteredInsertions = forkJoinPool.submit(() -> vehicleEntries.parallelStream()
-				//generate feasible insertions (wrt occupancy limits)
-				.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
-				//map insertions to insertions with admissible detour times (i.e. admissible beeline speed factor)
-				.map(admissibleTimeData::createInsertionWithDetourData)
-				//optimistic pre-filtering wrt admissible cost function
-				.filter(insertion -> admissibleCostCalculator.calculate(drtRequest, insertion)
-						< InsertionCostCalculator.INFEASIBLE_SOLUTION_COST)
+		List<InsertionWithDetourData<Double>> preFilteredInsertions = forkJoinPool.submit(
+				() -> vehicleEntries.parallelStream()
+						//generate feasible insertions (wrt occupancy limits)
+						.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
+						//map insertions to insertions with admissible detour times (i.e. admissible beeline speed factor)
+						.map(admissibleTimeData::createInsertionWithDetourData)
+						//optimistic pre-filtering wrt admissible cost function
+						.filter(insertion -> admissibleCostCalculator.calculate(drtRequest, insertion)
+								< INFEASIBLE_SOLUTION_COST)
+						//collect
+						.collect(Collectors.toList())).join();
+
+		//TODO this may introduce non-determinism of results (add some additional ordering as in BestInsertionFinder)
+		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
+				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
+		var filteredInsertions = preFilteredInsertions.stream()
 				//skip insertions at schedule ends (a subset of most promising "insertionsAtEnd" will be added later)
 				.filter(kNearestInsertionsAtEndFilter::filter)
 				//forget (admissible) detour times
-				.map(InsertionWithDetourData::getInsertion).collect(Collectors.toList())).join();
+				.map(InsertionWithDetourData::getInsertion)
+				//collect
+				.collect(Collectors.toList());
 		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
 
 		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, filteredInsertions);
