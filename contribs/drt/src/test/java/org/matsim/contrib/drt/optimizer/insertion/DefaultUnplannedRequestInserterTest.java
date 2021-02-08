@@ -65,6 +65,21 @@ public class DefaultUnplannedRequestInserterTest {
 	private final ForkJoinPool forkJoinPool = new ForkJoinPool(1);
 
 	@Test
+	public void nothingToSchedule() {
+		var fleet = fleet(vehicle("1"));
+		var unplannedRequests = requests();
+		double now = 15;
+		VehicleEntry.EntryFactory entryFactory = null;//should not be used
+		DrtRequestInsertionRetryQueue retryQueue = new DrtRequestInsertionRetryQueue(
+				new DrtRequestInsertionRetryParams());//retry OFF, empty queue
+		DrtInsertionSearch<PathData> insertionSearch = null;//should not be used
+		RequestInsertionScheduler insertionScheduler = null;//should not be used
+
+		newInserter(fleet, now, entryFactory, retryQueue, insertionSearch,
+				insertionScheduler).scheduleUnplannedRequests(unplannedRequests);
+	}
+
+	@Test
 	public void notScheduled_rejected() {
 		var fleet = fleet();//no vehicles -> impossible to schedule
 		var unplannedRequests = requests(request1);
