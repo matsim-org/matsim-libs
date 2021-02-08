@@ -40,7 +40,7 @@ class KNearestInsertionsAtEndFilter {
 		for (var insertion : insertions) {
 			VehicleEntry vEntry = insertion.getVehicleEntry();
 			var pickup = insertion.getPickup();
-			if (pickup.index < vEntry.stops.size()) {//not an insertion at the schedule end
+			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion.getInsertion());
 			} else {
 				double departureTime = pickup.previousWaypoint.getDepartureTime();

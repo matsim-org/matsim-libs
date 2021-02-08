@@ -47,4 +47,8 @@ public class VehicleEntry {
 	public Waypoint getWaypoint(int index) {
 		return index == 0 ? start : (index == stops.size() + 1 ? end : stops.get(index - 1));
 	}
+
+	public boolean isAfterLastStop(int index) {
+		return index == stops.size();
+	}
 }
