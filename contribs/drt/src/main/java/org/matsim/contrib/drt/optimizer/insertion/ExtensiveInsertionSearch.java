@@ -84,17 +84,9 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 						//collect
 						.collect(Collectors.toList())).join();
 
-		//TODO this may introduce non-determinism of results (add some additional ordering as in BestInsertionFinder)
-		KNearestInsertionsAtEndFilter kNearestInsertionsAtEndFilter = new KNearestInsertionsAtEndFilter(
-				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor());
-		var filteredInsertions = preFilteredInsertions.stream()
-				//skip insertions at schedule ends (a subset of most promising "insertionsAtEnd" will be added later)
-				.filter(kNearestInsertionsAtEndFilter::filter)
-				//forget (admissible) detour times
-				.map(InsertionWithDetourData::getInsertion)
-				//collect
-				.collect(Collectors.toList());
-		filteredInsertions.addAll(kNearestInsertionsAtEndFilter.getNearestInsertionsAtEnd());
+		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(
+				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor(),
+				preFilteredInsertions);
 
 		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, filteredInsertions);
 		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
