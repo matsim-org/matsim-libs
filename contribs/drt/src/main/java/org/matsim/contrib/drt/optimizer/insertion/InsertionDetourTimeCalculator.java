@@ -108,7 +108,7 @@ class InsertionDetourTimeCalculator<D> {
 	}
 
 	private double calculateReplacedDriveDuration(VehicleEntry vEntry, int insertionIdx) {
-		if (insertionIdx == vEntry.stops.size()) {
+		if (vEntry.isAfterLastStop(insertionIdx)) {
 			return 0;// end of route - bus would wait there
 		}
 

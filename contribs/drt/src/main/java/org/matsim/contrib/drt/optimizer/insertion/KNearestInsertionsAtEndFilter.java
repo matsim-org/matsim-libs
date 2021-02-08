@@ -18,10 +18,10 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.util.PartialSort;
 
 /**
@@ -32,43 +32,27 @@ import org.matsim.contrib.util.PartialSort;
  * @author michalm
  */
 class KNearestInsertionsAtEndFilter {
-	// synchronised addition via addInsertionAtEndCandidate(Insertion insertionAtEnd, double timeDistance)
-	private final PartialSort<Insertion> nearestInsertionsAtEnd;
+	static List<InsertionGenerator.Insertion> filterInsertionsAtEnd(int k, double admissibleBeelineSpeedFactor,
+			List<InsertionWithDetourData<Double>> insertions) {
+		var nearestInsertionsAtEnd = new PartialSort<InsertionGenerator.Insertion>(k);
+		var filteredInsertions = new ArrayList<InsertionGenerator.Insertion>(insertions.size());
 
-	private final double admissibleBeelineSpeedFactor;
+		for (var insertion : insertions) {
+			VehicleEntry vEntry = insertion.getVehicleEntry();
+			var pickup = insertion.getPickup();
+			if (!vEntry.isAfterLastStop(pickup.index)) {
+				filteredInsertions.add(insertion.getInsertion());
+			} else {
+				double departureTime = pickup.previousWaypoint.getDepartureTime();
 
-	public KNearestInsertionsAtEndFilter(int k, double admissibleBeelineSpeedFactor) {
-		nearestInsertionsAtEnd = new PartialSort<>(k);
-		this.admissibleBeelineSpeedFactor = admissibleBeelineSpeedFactor;
-	}
-
-	/**
-	 * Designed to be used with parallel streams
-	 */
-	boolean filter(InsertionWithDetourData<Double> insertion) {
-		VehicleEntry vEntry = insertion.getVehicleEntry();
-		int i = insertion.getPickup().index;
-
-		if (i < vEntry.stops.size()) {//not an insertion at the schedule end
-			return true;
+				// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
+				// (timeToPickup is underestimated by this factor)
+				double timeDistance = departureTime + admissibleBeelineSpeedFactor * insertion.getDetourToPickup();
+				nearestInsertionsAtEnd.add(insertion.getInsertion(), timeDistance);
+			}
 		}
 
-		//i == j == stops.size()
-		double departureTime = vEntry.getWaypoint(i).getDepartureTime();
-
-		// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles
-		// (timeToPickup is underestimated by this factor)
-		double timeDistance = departureTime + admissibleBeelineSpeedFactor * insertion.getDetourToPickup();
-		addInsertionAtEndCandidate(insertion.getInsertion(), timeDistance);
-		return false;//skip now; the selected (i.e. K nearest) insertions will be added later
-	}
-
-	public List<Insertion> getNearestInsertionsAtEnd() {
-		return nearestInsertionsAtEnd.kSmallestElements();
-	}
-
-	//synchronized -- allows filtering of parallel streams
-	private synchronized void addInsertionAtEndCandidate(Insertion insertionAtEnd, double timeDistance) {
-		nearestInsertionsAtEnd.add(insertionAtEnd, timeDistance);
+		filteredInsertions.addAll(nearestInsertionsAtEnd.kSmallestElements());
+		return filteredInsertions;
 	}
 }
