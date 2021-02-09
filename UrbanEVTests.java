@@ -29,6 +29,27 @@ import org.matsim.vehicles.Vehicle;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO translate and complete
+
+/** <b>für (jeden) Agenten:</b>		</b>
+		(*) wann wird geladen?	<br>
+		(*) wo wird geladen?	<br>
+		(*) wird geladen?	<br>
+		(*) wie lange wird geladen?	<br>
+		(*) wie oft wird geladen?	<br>
+		? wird auch bei Fahrzeugwechsel (anderer Mode) geladen?	<br>
+		? wird auch 3x geladen?	<br>
+		? gleichzeitiges Laden: werden die Fahrzeuge in der richtigen Reihenfolge ein- und ausgestöpselt? (chargingStart und chargingEndEvents) <br>
+ 	<br>
+	<b>für jedes Fahrzeug</b>	<br>
+		(*) wird am richtigen charger geladen (charger type / leistung)?	<br>
+
+	<b>generell:</b>	<br>
+		Konsistenz zw Plugin and Plugout bzgl <br>
+		((*) Ort = Link <br>
+		(*) Häufigkeit <br>
+		(*) .. <br>
+**/
 public class UrbanEVTests {
 
 	@Rule
@@ -59,16 +80,16 @@ public class UrbanEVTests {
 	public void testAgentsExecuteSameNumberOfActs(){
 
 		boolean fail = false;
-		String personsWithDifferingActCound = "";
+		String personsWithDifferingActCount = "";
 		for (Map.Entry<Id<Person>, List<Activity>> person2Acts : plannedActivitiesPerPerson.entrySet()) {
 
 			List<ActivityStartEvent> executedActs = handler.normalActStarts.get(person2Acts.getKey());
 			if(executedActs.size() != person2Acts.getValue().size() - 1 ){ //first act of the day is not started
 				fail = true;
-				personsWithDifferingActCound += "\n" + person2Acts.getKey() + " plans " + person2Acts.getValue().size() + " activities and executes " + executedActs.size() + " activities";
+				personsWithDifferingActCount += "\n" + person2Acts.getKey() + " plans " + person2Acts.getValue().size() + " activities and executes " + executedActs.size() + " activities";
 			}
 		}
-		Assert.assertFalse("the following persons do not execute the same amount of activities as they plan to:" + personsWithDifferingActCound, fail);
+		Assert.assertFalse("the following persons do not execute the same amount of activities as they plan to:" + personsWithDifferingActCount, fail);
 	}
 
 	@Test
