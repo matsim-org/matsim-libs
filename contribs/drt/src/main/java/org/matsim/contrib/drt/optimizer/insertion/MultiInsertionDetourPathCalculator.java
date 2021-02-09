@@ -46,6 +46,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import ch.sbb.matsim.routing.graph.Graph;
 
 /**
@@ -73,6 +75,16 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 		toDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		fromDropoffPathSearch = OneToManyPathSearch.createSearch(graph, nodeMap, travelTime, travelDisutility, true);
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+	}
+
+	@VisibleForTesting
+	MultiInsertionDetourPathCalculator(OneToManyPathSearch toPickupPathSearch, OneToManyPathSearch fromPickupPathSearch,
+			OneToManyPathSearch toDropoffPathSearch, OneToManyPathSearch fromDropoffPathSearch, int numberOfThreads) {
+		this.toPickupPathSearch = toPickupPathSearch;
+		this.fromPickupPathSearch = fromPickupPathSearch;
+		this.toDropoffPathSearch = toDropoffPathSearch;
+		this.fromDropoffPathSearch = fromDropoffPathSearch;
+		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
 	@Override
