@@ -21,13 +21,17 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 
 import com.google.common.collect.ImmutableList;
 
@@ -44,7 +48,7 @@ public class KNearestInsertionsAtEndFilterTest {
 
 	@Test
 	public void noAtEndInsertions_allReturned() {
-		var vehicleEntry = vehicleEntry(start(0), stop(100));
+		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry, 0, 11);
 		var insertion2 = insertion(vehicleEntry, 0, 22);
 
@@ -55,11 +59,11 @@ public class KNearestInsertionsAtEndFilterTest {
 	@Test
 	public void onlyAtEndInsertions_theEarliestReturned() {
 		// estimated arrival time: 100 + 10 = 110
-		var vehicleEntry1 = vehicleEntry(start(0), stop(100));
+		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry1, 1, 10);
 
 		// estimated arrival time: 50 + 61 = 111
-		var vehicleEntry2 = vehicleEntry(start(50));
+		var vehicleEntry2 = vehicleEntry("v2", start(50));
 		var insertion2 = insertion(vehicleEntry2, 0, 61);
 
 		//insertion1 is better
@@ -68,23 +72,23 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@Test
-	public void onlyAtEndInsertions_equalArrivalTime_theFirstReturned() {
+	public void onlyAtEndInsertions_equalArrivalTime_useVehicleIdAsTieBreaker() {
 		// estimated arrival time: 100 + 10 = 110
-		var vehicleEntry1 = vehicleEntry(start(0), stop(100));
+		var vehicleEntry1 = vehicleEntry("v1", start(0), stop(100));
 		var insertion1 = insertion(vehicleEntry1, 1, 10);
 
 		// estimated arrival time: 50 + 60 = 110
-		var vehicleEntry2 = vehicleEntry(start(50));
+		var vehicleEntry2 = vehicleEntry("v2", start(50));
 		var insertion2 = insertion(vehicleEntry2, 0, 60);
 
 		//take the first
 		assertThat(filterInsertionsAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
-		assertThat(filterInsertionsAtEnd(insertion2, insertion1)).containsExactly(insertion2.getInsertion());
+		assertThat(filterInsertionsAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
 	}
 
 	@Test
 	public void mixedTypeInsertions_bothReturned() {
-		var vehicleEntry = vehicleEntry(start(0), stop(100));
+		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
 		var insertionAfterStart = insertion(vehicleEntry, 0, 11);
 		var insertionAtEnd = insertion(vehicleEntry, 1, 10);
 
@@ -108,8 +112,10 @@ public class KNearestInsertionsAtEndFilterTest {
 		return new Waypoint.Stop(new DrtStopTask(endTime - 10, endTime, null), 0);
 	}
 
-	private VehicleEntry vehicleEntry(Waypoint.Start start, Waypoint.Stop... stops) {
-		return new VehicleEntry(null, start, ImmutableList.copyOf(stops));
+	private VehicleEntry vehicleEntry(String id, Waypoint.Start start, Waypoint.Stop... stops) {
+		var vehicle = mock(DvrpVehicle.class);
+		when(vehicle.getId()).thenReturn(Id.create(id, DvrpVehicle.class));
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops));
 	}
 
 	@SafeVarargs

@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -190,7 +191,8 @@ public class AssignmentETaxiOptimizer extends DefaultTaxiOptimizer {
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
 		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
-				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
+				vehiclesBelowMinSocLevel,
+				Comparator.comparingDouble(v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc()));
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler.getScheduleInquiry(), leastChargedVehicles.stream());
 	}
