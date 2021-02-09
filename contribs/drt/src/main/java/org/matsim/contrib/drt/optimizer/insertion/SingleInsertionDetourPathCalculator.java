@@ -49,6 +49,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.Futures;
@@ -70,13 +71,18 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 	public SingleInsertionDetourPathCalculator(Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
-		LeastCostPathCalculatorFactory pathCalculatorFactory = new FastAStarLandmarksFactory(
-				drtCfg.getNumberOfThreads());
+		this(network, travelTime, travelDisutility, drtCfg.getNumberOfThreads(),
+				new FastAStarLandmarksFactory(drtCfg.getNumberOfThreads()));
+	}
+
+	@VisibleForTesting
+	SingleInsertionDetourPathCalculator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+			int numberOfThreads, LeastCostPathCalculatorFactory pathCalculatorFactory) {
 		toPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromPickupPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		toDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
 		fromDropoffPathSearch = pathCalculatorFactory.createPathCalculator(network, travelDisutility, travelTime);
-		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
+		executorService = Executors.newFixedThreadPool(Math.min(numberOfThreads, MAX_THREADS));
 	}
 
 	@Override
@@ -85,7 +91,7 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		Link dropoff = drtRequest.getToLink();
 
 		Preconditions.checkArgument(filteredInsertions.size() == 1);
-		Insertion insertion = filteredInsertions.get(0);
+		var insertion = filteredInsertions.get(0);
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
 		double latestDropoffTime = drtRequest.getLatestArrivalTime(); // pessimistic
