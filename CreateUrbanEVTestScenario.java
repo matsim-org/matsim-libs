@@ -1,16 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.urbanEV;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -18,45 +30,36 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.run.ev.RunUrbanEVExample;
-import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehiclesFactory;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ChargerSelectionTest3 {
+class CreateUrbanEVTestScenario {
 
-	Logger logger = Logger.getLogger(ChargerSelectionTest3.class);
-
-	@Rule
-	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
-
-	@Test
-	public void testUrbanEVExample3() {
+	static Scenario createTestScenario(){
 		//config. vehicle source = modeVehicleTypeFromData ??
-
 
 		EvConfigGroup evConfigGroup = new EvConfigGroup();
 		evConfigGroup.setVehiclesFile("this is not important because we use standard matsim vehicles");
 		evConfigGroup.setTimeProfiles(true);
-		evConfigGroup.setChargersFile("chargers.xml");
-//		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
+		evConfigGroup.setChargersFile("chessboard-chargers-1-plugs-1.xml");
 		Config config = ConfigUtils.loadConfig("test/input/chessboard/chessboard-config.xml", evConfigGroup);
-		config.network().setInputFile("1pctNetwork.xml");
+//		config.network().setInputFile("1pctNetwork.xml");
 
 		//prepare config
 		RunUrbanEVExample.prepareConfig(config);
-		config.controler().setOutputDirectory(matsimTestUtils.getOutputDirectory());
+		config.controler().setOutputDirectory("test/output/urbanEV");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(1);
-
-		config.planCalcScore().addModeParams(new PlanCalcScoreConfigGroup.ModeParams(TransportMode.bike));
 
 		//set VehicleSource
 		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
@@ -64,6 +67,7 @@ public class ChargerSelectionTest3 {
 		//load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		overridePopulation(scenario);
 
 		//manually insert car vehicle type with attributes (hbefa technology, initial energy etc....)
 		VehiclesFactory vehiclesFactory = scenario.getVehicles().getFactory();
@@ -83,30 +87,15 @@ public class ChargerSelectionTest3 {
 		scenario.getVehicles().addVehicleType(carVehicleType);
 		scenario.getVehicles().addVehicleType(bikeVehicleType);
 
-		overridePopulation3(scenario);
-
 		Map<String, VehicleType> mode2VehicleType = new HashMap<>();
 		mode2VehicleType.put(TransportMode.car, carVehicleType);
 		mode2VehicleType.put(TransportMode.bike, bikeVehicleType);
 		createAndRegisterVehicles(scenario, mode2VehicleType);
 
-		///controler with Urban EV module
-		Controler controler = RunUrbanEVExample.prepareControler(scenario);
-
-		UrbanEVTestHandler handler = new UrbanEVTestHandler();
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-//				this.addEventHandlerBinding().toInstance(handler);
-			}
-		});
-
-		controler.run();
-
+		return scenario;
 	}
 
-	private void overridePopulation3(Scenario scenario) {
+	private static void overridePopulation(Scenario scenario) {
 
 		//delete all persons that are there already
 		scenario.getPopulation().getPersons().clear();
@@ -268,7 +257,7 @@ public class ChargerSelectionTest3 {
 
 	}
 
-	private void createAndRegisterVehicles(Scenario scenario, Map<String, VehicleType> mode2VehicleType){
+	private static void createAndRegisterVehicles(Scenario scenario, Map<String, VehicleType> mode2VehicleType){
 		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			Map<String,Id<Vehicle>> mode2VehicleId = new HashMap<>();
@@ -281,58 +270,5 @@ public class ChargerSelectionTest3 {
 			VehicleUtils.insertVehicleIdsIntoAttributes(person, mode2VehicleId);//probably unnecessary
 		}
 	}
-
-	private class UrbanEVTestHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
-
-		private Map<Id<Person>, Double> plugOutCntPerPerson = new HashMap<>();
-		private Map<Id<Person>, Double> plugInCntPerPerson = new HashMap<>();
-
-
-		@Override
-		public void handleEvent(ActivityEndEvent event) {
-			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGOUT_INTERACTION) ){
-				this.plugOutCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
-			}
-		}
-
-		@Override
-		public void handleEvent(ActivityStartEvent event) {
-			if( event.getActType().contains(UrbanVehicleChargingHandler.PLUGIN_INTERACTION) ){
-				this.plugInCntPerPerson.compute(event.getPersonId(), (person,count) -> count == null ? 1 : count + 1);
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-			if(iteration > 0){
-				System.out.println("ITERATION = " + iteration);
-
-				Assert.assertTrue(plugInCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
-				Assert.assertTrue(plugOutCntPerPerson.containsKey(Id.createPersonId("Charger Selection long distance leg")));
-
-				for (Id<Person> personId : plugInCntPerPerson.keySet()) {
-					Assert.assertTrue(plugInCntPerPerson.get(personId) == 1);
-					Assert.assertTrue(plugInCntPerPerson.get(personId) == plugOutCntPerPerson.get(personId));
-				}
-
-//				plugIns.forEach(person -> {
-//					if(Collections.frequency(plugIns, person) != Collections.frequency(plugOuts, person)){
-//						logger.fatal(" in iteration " + (iteration -1)  + ", person " + person + " starts loading " + Collections.frequency(plugIns, person) + " times and ends loading " + Collections.frequency(plugOuts, person) + "times");
-//						throw new RuntimeException(" in iteration " + (iteration -1) + ", person " + person + " starts loading " + Collections.frequency(plugIns, person) + " times and ends loading " + Collections.frequency(plugOuts, person) + "times");
-//					}
-//				});
-
-
-				Assert.assertEquals(4, plugInCntPerPerson.size(), 0);
-				Assert.assertEquals(4, plugOutCntPerPerson.size(), 0);
-				Assert.assertEquals( plugInCntPerPerson.size(), plugOutCntPerPerson.size());
-			}
-
-			this.plugInCntPerPerson.clear();
-			this.plugOutCntPerPerson.clear();
-		}
-	}
-
-
 
 }
