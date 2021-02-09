@@ -120,6 +120,21 @@ public class SingleInsertionDetourPathCalculatorTest {
 		assertThat(insertionWithDetourData.getDetourFromDropoff().getTravelTime()).isZero();
 	}
 
+	@Test
+	public void calculatePaths_noDetours() {
+		var pickup = insertionPoint(waypoint(pickupLink), waypoint(pickupLink));
+		var dropoff = insertionPoint(waypoint(dropoffLink), waypoint(dropoffLink));
+		var insertion = new Insertion(null, pickup, dropoff);
+
+		var detourData = detourPathCalculator.calculatePaths(request, List.of(insertion));
+		var insertionWithDetourData = detourData.createInsertionWithDetourData(insertion);
+
+		assertThat(insertionWithDetourData.getDetourToPickup().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.getDetourFromPickup().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.getDetourToDropoff().getTravelTime()).isZero();
+		assertThat(insertionWithDetourData.getDetourFromDropoff().getTravelTime()).isZero();
+	}
+
 	private Path mockCalcLeastCostPath(Link fromLink, Link toLink, double startTimeArg, double pathTravelTime) {
 		var fromNode = fromLink.getToNode();
 		var toNode = toLink.getFromNode();
