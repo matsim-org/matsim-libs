@@ -24,8 +24,6 @@ import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseT
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -42,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class VehicleDataEntryFactoryImpl implements EntryFactory {
+public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
@@ -53,7 +51,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 	}
 
-	public Entry create(DvrpVehicle vehicle, double currentTime) {
+	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
 		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
@@ -109,7 +107,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			outgoingOccupancy -= s.getOccupancyChange();
 		}
 
-		return new Entry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
+		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
 				ImmutableList.copyOf(stops));
 	}
 

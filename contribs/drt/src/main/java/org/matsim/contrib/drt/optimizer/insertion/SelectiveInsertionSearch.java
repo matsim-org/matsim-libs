@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -66,7 +66,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	@Override
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
-			Collection<Entry> vEntries) {
+			Collection<VehicleEntry> vehicleEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> restrictiveTimeData = DetourData.create(restrictiveDetourTimeEstimator, drtRequest);
 
@@ -75,7 +75,7 @@ public class SelectiveInsertionSearch implements DrtInsertionSearch<PathData> {
 				// find best insertion given a stream of insertion with time data
 				() -> initialInsertionFinder.findBestInsertion(drtRequest,
 						//for each vehicle entry
-						vEntries.parallelStream()
+						vehicleEntries.parallelStream()
 								//generate feasible insertions (wrt occupancy limits)
 								.flatMap(e -> insertionGenerator.generateInsertions(drtRequest, e).stream())
 								//map them to insertions with admissible detour times

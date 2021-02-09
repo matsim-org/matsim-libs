@@ -18,27 +18,37 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.scheduler;
+package org.matsim.contrib.drt.optimizer;
 
-import org.matsim.contrib.drt.optimizer.insertion.InsertionWithDetourData;
-import org.matsim.contrib.drt.passenger.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public interface RequestInsertionScheduler {
-	class PickupDropoffTaskPair {
-		public final DrtStopTask pickupTask;
-		public final DrtStopTask dropoffTask;
-
-		public PickupDropoffTaskPair(DrtStopTask pickupTask, DrtStopTask dropoffTask) {
-			this.pickupTask = pickupTask;
-			this.dropoffTask = dropoffTask;
-		}
+public class VehicleEntry {
+	public interface EntryFactory {
+		VehicleEntry create(DvrpVehicle vehicle, double currentTime);
 	}
 
-	PickupDropoffTaskPair scheduleRequest(DrtRequest request,
-			InsertionWithDetourData<OneToManyPathSearch.PathData> insertion);
+	public final DvrpVehicle vehicle;
+	public final Waypoint.Start start;
+	public final ImmutableList<Waypoint.Stop> stops;
+	public final Waypoint.End end;
+
+	public VehicleEntry(DvrpVehicle vehicle, Waypoint.Start start, ImmutableList<Waypoint.Stop> stops) {
+		this.vehicle = vehicle;
+		this.start = start;
+		this.stops = stops;
+		this.end = Waypoint.End.OPEN_END;
+	}
+
+	public Waypoint getWaypoint(int index) {
+		return index == 0 ? start : (index == stops.size() + 1 ? end : stops.get(index - 1));
+	}
+
+	public boolean isAfterLastStop(int index) {
+		return index == stops.size();
+	}
 }

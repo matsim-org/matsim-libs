@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -59,7 +59,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void testCalculate() throws NoSuchFieldException {
-		VehicleData.Entry entry = entry(500, 450, stop0);
+		VehicleEntry entry = entry(500, 450, stop0);
 		var insertion = new InsertionWithDetourData<>(insertion(entry, 0, 1), null, null, null, null);
 
 		//feasible solution
@@ -86,7 +86,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_pickup_stop_dropoff_stop() {
-		VehicleData.Entry entry = entry(stop0, stop1);
+		VehicleEntry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 0, 1);
 
 		//almost too late
@@ -101,7 +101,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_pickup_dropoff_stop_stop() {
-		VehicleData.Entry entry = entry(stop0, stop1);
+		VehicleEntry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 0, 0);
 
 		//almost too late
@@ -116,7 +116,7 @@ public class InsertionCostCalculatorTest {
 
 	@Test
 	public void checkTimeConstraintsForScheduledRequests_start_stop_stop_pickup_dropoff() {
-		VehicleData.Entry entry = entry(stop0, stop1);
+		VehicleEntry entry = entry(stop0, stop1);
 		var insertion = insertion(entry, 2, 2);
 
 		//appended at the end -> never too late
@@ -139,7 +139,7 @@ public class InsertionCostCalculatorTest {
 
 	}
 
-	private VehicleData.Entry entry(double vehicleEndTime, double lastStayTaskBeginTime, Waypoint.Stop... stops) {
+	private VehicleEntry entry(double vehicleEndTime, double lastStayTaskBeginTime, Waypoint.Stop... stops) {
 		var vehicle = new DvrpVehicleImpl(ImmutableDvrpVehicleSpecification.newBuilder()
 				.id(Id.create("a", DvrpVehicle.class))
 				.startLinkId(Id.createLinkId("depot"))
@@ -150,7 +150,7 @@ public class InsertionCostCalculatorTest {
 		vehicle.getSchedule()
 				.addTask(new DrtStayTask(lastStayTaskBeginTime, Math.max(lastStayTaskBeginTime, vehicleEndTime),
 						link("depot")));
-		return new VehicleData.Entry(vehicle, start, ImmutableList.copyOf(stops));
+		return new VehicleEntry(vehicle, start, ImmutableList.copyOf(stops));
 	}
 
 	private Link link(String id) {
@@ -165,11 +165,11 @@ public class InsertionCostCalculatorTest {
 		return new Waypoint.Stop(new DrtStopTask(beginTime, endTime, null), latestArrivalTime, latestDepartureTime, 0);
 	}
 
-	private VehicleData.Entry entry(Waypoint.Stop... stops) {
-		return new VehicleData.Entry(null, start, ImmutableList.copyOf(stops));
+	private VehicleEntry entry(Waypoint.Stop... stops) {
+		return new VehicleEntry(null, start, ImmutableList.copyOf(stops));
 	}
 
-	private InsertionGenerator.Insertion insertion(VehicleData.Entry entry, int pickupIdx, int dropoffIdx) {
+	private InsertionGenerator.Insertion insertion(VehicleEntry entry, int pickupIdx, int dropoffIdx) {
 		return new InsertionGenerator.Insertion(drtRequest, entry, pickupIdx, dropoffIdx);
 	}
 }
