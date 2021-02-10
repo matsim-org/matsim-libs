@@ -30,6 +30,8 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author michalm
  */
@@ -44,18 +46,28 @@ public class DefaultDrtInsertionSearch implements DrtInsertionSearch<PathData> {
 
 	public DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
 			CostCalculationStrategy costCalculationStrategy, DrtConfigGroup drtCfg, MobsimTimer timer) {
+		this(insertionProvider, detourPathCalculator, new BestInsertionFinder<>(
+				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null)));
+	}
+
+	@VisibleForTesting
+	DefaultDrtInsertionSearch(InsertionProvider insertionProvider, DetourPathCalculator detourPathCalculator,
+			BestInsertionFinder<PathData> bestInsertionFinder) {
 		this.insertionProvider = insertionProvider;
 		this.detourPathCalculator = detourPathCalculator;
-		this.bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
+		this.bestInsertionFinder = bestInsertionFinder;
 	}
 
 	@Override
 	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
 			Collection<VehicleEntry> vehicleEntries) {
-		var filteredInsertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
-		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, filteredInsertions);
+		var insertions = insertionProvider.getInsertions(drtRequest, vehicleEntries);
+		if (insertions.isEmpty()) {
+			return Optional.empty();
+		}
+
+		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, insertions);
 		return bestInsertionFinder.findBestInsertion(drtRequest,
-				filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
+				insertions.stream().map(pathData::createInsertionWithDetourData));
 	}
 }
