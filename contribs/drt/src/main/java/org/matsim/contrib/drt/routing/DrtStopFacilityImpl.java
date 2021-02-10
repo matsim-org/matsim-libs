@@ -34,7 +34,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author Michal Maciejewski (michalm)
  */
 public class DrtStopFacilityImpl implements DrtStopFacility {
-	public static <F extends Identifiable<?> & Facility & Attributable> DrtStopFacility createFromIdentifiableFacility(F facility) {
+	public static <F extends Identifiable<?> & Facility & Attributable> DrtStopFacility createFromFacility(F facility) {
 		return new DrtStopFacilityImpl(Id.create(facility.getId(), DrtStopFacility.class), facility.getLinkId(),
 				facility.getCoord(), facility.getAttributes());
 	}
