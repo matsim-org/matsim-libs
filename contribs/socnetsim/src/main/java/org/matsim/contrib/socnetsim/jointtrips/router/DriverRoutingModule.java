@@ -31,6 +31,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author thibautd
@@ -54,13 +55,15 @@ public class DriverRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility, 
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes tripAttributes) {
 		List<? extends PlanElement> trip =
 			carRoutingModule.calcRoute(
 					fromFacility,
 					toFacility, 
 					departureTime,
-					person);
+					person,
+					tripAttributes);
 
 		if (trip.size() != 1) {
 			throw new RuntimeException( "unexpected trip size for trip "+trip+" for mode "+mode );

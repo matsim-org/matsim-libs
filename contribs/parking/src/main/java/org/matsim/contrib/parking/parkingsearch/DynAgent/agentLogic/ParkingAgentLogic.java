@@ -53,7 +53,9 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.withinday.utils.EditTrips;
 
 
 /**
@@ -201,7 +203,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Facility fromFacility = new LinkWrapperFacility (network.getLinks().get(agent.getCurrentLinkId()));
 		Facility toFacility = new LinkWrapperFacility (network.getLinks().get(currentPlannedLeg.getRoute().getEndLinkId()));
-		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson());
+		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson(), new Attributes());
 		if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
 			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
 			log.error(message);
@@ -261,7 +263,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
     		Facility fromFacility = new LinkWrapperFacility (network.getLinks().get(agent.getCurrentLinkId()));
             Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now, currentLeg.getMode());
     		Facility toFacility = new LinkWrapperFacility (network.getLinks().get(teleportedParkLink));
-    		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson());
+    		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson(), new Attributes());
     		if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
     			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
     			log.error(message);

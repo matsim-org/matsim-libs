@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * Defines classes responsible for routing for a given
@@ -56,7 +57,8 @@ public interface RoutingModule {
 			Facility fromFacility,
 			Facility toFacility,
 			double departureTime,
-			Person person);
+			Person person,
+			Attributes tripAttributes);
 	// NOTE: It makes some sense to _not_ have the vehicle as an argument here ... since that only makes sense for vehicular modes. kai, feb'19
 
 }

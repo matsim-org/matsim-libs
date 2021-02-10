@@ -29,6 +29,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -110,7 +111,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
     }
 
     @Override
-    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+    public List<Leg> calcRoute( final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person, final Attributes tripAttributes) {
         // find possible start stops
         Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person,
                 fromFacility.getCoord(),

@@ -15,6 +15,7 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +30,7 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 	@Inject private Population population ;
 	@Inject private Network network ;
 
-	@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+	@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person, Attributes tripAttributes ){
 		Leg leg = population.getFactory().createLeg( TransportMode.walk ) ;
 		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
 		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;

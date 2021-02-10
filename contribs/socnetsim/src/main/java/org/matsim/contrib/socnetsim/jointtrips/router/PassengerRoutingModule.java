@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
-
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 
 /**
@@ -51,7 +51,8 @@ public class PassengerRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes tripAttributes) {
 		Leg l = popFactory.createLeg( modeName );
 		l.setDepartureTime( departureTime );
 		Route r = new PassengerRoute( fromFacility.getLinkId() , toFacility.getLinkId() );

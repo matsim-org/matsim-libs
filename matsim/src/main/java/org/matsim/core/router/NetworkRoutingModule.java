@@ -35,6 +35,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -69,7 +70,7 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime,
-			final Person person) {		
+			final Person person, final Attributes tripAttributes) {		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 
 		Gbl.assertNotNull(fromFacility);

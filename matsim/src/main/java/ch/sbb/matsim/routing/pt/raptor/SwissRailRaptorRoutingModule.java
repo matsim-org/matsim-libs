@@ -22,6 +22,7 @@ import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This replicates the functionality of {@link org.matsim.core.router.TransitRouterWrapper},
@@ -52,11 +53,11 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
     }
 
     @Override
-    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-        List<Leg> legs = this.raptor.calcRoute(fromFacility, toFacility, departureTime, person);
+    public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person, Attributes tripAttributes) {
+        List<Leg> legs = this.raptor.calcRoute(fromFacility, toFacility, departureTime, person, tripAttributes);
         return legs != null ?
                 fillWithActivities(legs) :
-                walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+                walkRouter.calcRoute(fromFacility, toFacility, departureTime, person, tripAttributes);
     }
 
     private List<? extends PlanElement> fillWithActivities(List<Leg> legs) {

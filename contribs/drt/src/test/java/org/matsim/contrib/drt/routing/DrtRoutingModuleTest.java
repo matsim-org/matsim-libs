@@ -56,6 +56,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -105,7 +106,7 @@ public class DrtRoutingModuleTest {
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
 		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
-		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
+		List<? extends PlanElement> routedList = dvrpRoutingModule.calcRoute(hf, wf, 8 * 3600, p1, new Attributes());
 
 		Assert.assertEquals(5, routedList.size());
 
@@ -160,7 +161,7 @@ public class DrtRoutingModuleTest {
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
 		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
 
-		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
+		List<? extends PlanElement> routedList2 = dvrpRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2, new Attributes());
 
 		Assert.assertNull(routedList2);
 
@@ -172,7 +173,7 @@ public class DrtRoutingModuleTest {
 		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
 		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
 
-		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
+		List<? extends PlanElement> routedList3 = dvrpRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3, new Attributes());
 
 		Assert.assertNull(routedList3);
 
@@ -184,7 +185,7 @@ public class DrtRoutingModuleTest {
 		Activity w4 = (Activity)p4.getSelectedPlan().getPlanElements().get(2);
 		Facility wf4 = FacilitiesUtils.toFacility(w4, facilities);
 
-		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
+		List<? extends PlanElement> routedList4 = dvrpRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4, new Attributes());
 
 		Assert.assertNull(routedList4);
 
@@ -196,7 +197,7 @@ public class DrtRoutingModuleTest {
 		Activity w5 = (Activity)p5.getSelectedPlan().getPlanElements().get(2);
 		Facility wf5 = FacilitiesUtils.toFacility(w5, facilities);
 
-		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
+		List<? extends PlanElement> routedList5 = dvrpRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5, new Attributes());
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList5);
@@ -209,7 +210,7 @@ public class DrtRoutingModuleTest {
 		Activity w6 = (Activity)p6.getSelectedPlan().getPlanElements().get(2);
 		Facility wf6 = FacilitiesUtils.toFacility(w6, facilities);
 
-		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
+		List<? extends PlanElement> routedList6 = dvrpRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6, new Attributes());
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);

@@ -29,6 +29,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +61,8 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes tripAttributes) {
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 

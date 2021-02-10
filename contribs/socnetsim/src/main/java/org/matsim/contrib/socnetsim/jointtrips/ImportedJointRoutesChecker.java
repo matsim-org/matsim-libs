@@ -31,6 +31,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.FacilitiesUtils;
 
@@ -57,6 +58,8 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 		Iterator<PlanElement> pes = plan.getPlanElements().iterator();
 
 		Activity origin = (Activity) pes.next();
+		Activity nonInteractionOrigin = origin;
+		
 		double now = 0;
 		while (pes.hasNext()) {
 			// FIXME: relies on the assumption of strict alternance leg/act
@@ -71,7 +74,7 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 						  FacilitiesUtils.toFacility( origin, null ),
 						  FacilitiesUtils.toFacility( dest, null ),
 							now,
-							plan.getPerson());
+							plan.getPerson(), nonInteractionOrigin.getAttributes());
 
 				if (trip.size() != 1) {
 					throw new RuntimeException( "unexpected trip length "+trip.size()+" for "+trip+" for mode "+l.getMode());
@@ -84,6 +87,10 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 
 			now = updateTime( now , l );
 			origin = dest;
+			
+			if (!TripStructureUtils.isStageActivityType(origin.getType())) {
+				nonInteractionOrigin = origin;
+			}
 		}
 	}
 

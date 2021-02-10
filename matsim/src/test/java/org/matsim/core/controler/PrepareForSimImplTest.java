@@ -52,6 +52,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.inject.Provider;
 
@@ -776,7 +777,7 @@ public class PrepareForSimImplTest {
 	private class DummyRoutingModule implements RoutingModule {
 		@Override
 		public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-				Person person) {
+				Person person, Attributes attributes) {
 			return Collections.singletonList(PopulationUtils.createLeg("dummyMode"));
 		}
 	}

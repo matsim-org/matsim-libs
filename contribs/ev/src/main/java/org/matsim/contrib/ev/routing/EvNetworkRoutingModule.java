@@ -53,6 +53,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -99,9 +100,9 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(final Facility fromFacility, final Facility toFacility,
-			final double departureTime, final Person person) {
+			final double departureTime, final Person person, final Attributes tripAttributes) {
 
-		List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person);
+		List<? extends PlanElement> basicRoute = delegate.calcRoute(fromFacility, toFacility, departureTime, person, tripAttributes);
 		Id<ElectricVehicle> evId = Id.create(person.getId() + vehicleSuffix, ElectricVehicle.class);
 		if (!electricFleet.getVehicleSpecifications().containsKey(evId)) {
 			return basicRoute;
@@ -147,7 +148,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 						continue;
 					}
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility,
-							lastArrivaltime, person);
+							lastArrivaltime, person, tripAttributes);
 					Leg lastLeg = (Leg)routeSegment.get(0);
 					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
@@ -160,7 +161,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
 				}
-				stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, lastArrivaltime, person));
+				stagedRoute.addAll(delegate.calcRoute(lastFrom, toFacility, lastArrivaltime, person, tripAttributes));
 
 				return stagedRoute;
 

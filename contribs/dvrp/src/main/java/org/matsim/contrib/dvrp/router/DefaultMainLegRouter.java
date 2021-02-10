@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -58,7 +59,7 @@ public class DefaultMainLegRouter implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-			Person person) {
+			Person person, Attributes tripAttributes) {
 		Link accessActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(fromFacility.getLinkId()),
 				"link: %s does not exist in the network of mode: %s", fromFacility.getLinkId(), mode);
 		Link egressActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(toFacility.getLinkId()),

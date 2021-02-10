@@ -52,6 +52,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.routes.DefaultTransitPassengerRoute;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class TransitRouterVariableImpl implements TransitRouter {
 
@@ -110,7 +111,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return new HashMap<>();
 	}
 	    @Override
-	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person) {
+	public List<Leg> calcRoute(final Facility fromFacility, final Facility toFacility, final double departureTime, final Person person, final Attributes attributes) {
 		// find possible start stops
 		Map<Node, InitialNode> wrappedFromNodes = this.locateWrappedNearestTransitNodes(person, fromFacility.getCoord(), departureTime);
 		// find possible end stops

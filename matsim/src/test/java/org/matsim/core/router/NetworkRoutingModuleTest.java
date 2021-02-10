@@ -69,7 +69,7 @@ public class NetworkRoutingModuleTest {
 		            routeAlgo);
 		Facility fromFacility = FacilitiesUtils.toFacility( fromAct, f.s.getActivityFacilities() );
 		Facility toFacility = FacilitiesUtils.toFacility( toAct, f.s.getActivityFacilities() );
-		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person) ;
+		List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 7.0*3600, person, fromAct.getAttributes()) ;
 		Assert.assertEquals(1, result.size() );
 		Leg leg = (Leg)result.get(0) ;
 		Assert.assertEquals(100.0, leg.getTravelTime().seconds(), 1e-8);
@@ -102,7 +102,7 @@ public class NetworkRoutingModuleTest {
 							routeAlgo);
 
 			List<? extends PlanElement> results = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ),
-				  FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person ) ;
+				  FacilitiesUtils.toFacility(toAct, f.s.getActivityFacilities() ), 8.*3600, person, fromAct.getAttributes() ) ;
 			Assert.assertEquals( 1, results.size() );
 			Leg leg = (Leg) results.get(0) ;
 
@@ -131,7 +131,7 @@ public class NetworkRoutingModuleTest {
 							routeAlgo);
 
 			List<? extends PlanElement> result = router.calcRoute( FacilitiesUtils.toFacility(fromAct, f.s.getActivityFacilities() ), FacilitiesUtils.toFacility(toAct,
-				  f.s.getActivityFacilities() ), 7.*3600, person ) ;
+				  f.s.getActivityFacilities() ), 7.*3600, person, fromAct.getAttributes() ) ;
 			
 			Assert.assertEquals( 1, result.size() ) ; 
 			Leg leg = (Leg) result.get(0) ;

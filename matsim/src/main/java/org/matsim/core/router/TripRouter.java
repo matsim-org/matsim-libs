@@ -41,6 +41,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import com.google.common.base.Preconditions;
 
@@ -160,7 +161,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes tripAttributes) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 
@@ -175,10 +177,11 @@ public final class TripRouter implements MatsimExtensionPoint {
 						fromFacility,
 						toFacility,
 						departureTime,
-						person);
+						person,
+						tripAttributes);
 
 			if ( trip == null ) {
-				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person ) ;
+				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person, tripAttributes ) ;
 			}
 			for (Leg leg: TripStructureUtils.getLegs(trip)) {
 				TripStructureUtils.setRoutingMode(leg, mainMode);

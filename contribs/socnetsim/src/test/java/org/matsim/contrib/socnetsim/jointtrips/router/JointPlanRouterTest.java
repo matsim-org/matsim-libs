@@ -48,6 +48,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author thibautd
@@ -182,7 +183,8 @@ public class JointPlanRouterTest {
 								final Facility fromFacility,
 								final Facility toFacility,
 								final double departureTime,
-								final Person person) {
+								final Person person,
+								final Attributes tripAttributes) {
 							NetworkRoute route = RouteUtils.createNetworkRoute(List.of(fromFacility.getLinkId(), toFacility.getLinkId()), null);
 							route.setTravelTime(10);
 							Leg leg =  PopulationUtils.createLeg(TransportMode.car);

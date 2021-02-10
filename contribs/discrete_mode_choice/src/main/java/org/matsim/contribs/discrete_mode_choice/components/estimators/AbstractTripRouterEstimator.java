@@ -15,6 +15,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This is an abstract estimator class that makes it easy to rely on MATSim's
@@ -64,7 +65,7 @@ public abstract class AbstractTripRouterEstimator implements TripEstimator {
 		if (!isPrerouted(mode, trip)) {
 			// II) Perform the routing
 			List<? extends PlanElement> elements = tripRouter.calcRoute(mode, originFacility, destinationFacility,
-					trip.getDepartureTime(), person);
+					trip.getDepartureTime(), person, trip.getOriginActivity().getAttributes());
 
 			// III) Perform utility estimation
 			return estimateTripCandidate(person, mode, trip, previousTrips, elements);

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import javax.inject.Inject;
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public final class MatrixBasedPtRoutingModule implements RoutingModule {
 	}
 	
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person, Attributes tripAttributes) {
 		Leg newLeg = scenario.getPopulation().getFactory().createLeg( TransportMode.pt );
 		Id<Link> startLinkId = fromFacility.getLinkId();
 		Id<Link> endLinkId = toFacility.getLinkId();

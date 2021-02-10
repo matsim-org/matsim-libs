@@ -38,6 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +86,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(10000, 10500), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(50000, 10500), Id.create("to", Link.class));
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -160,7 +161,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(10000, 10500), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(50000, 10500), Id.create("to", Link.class));
 
-        List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.pt, fromFac, toFac, 7*3600, f.dummyPerson);
+        List<? extends PlanElement> planElements = tripRouter.calcRoute(TransportMode.pt, fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
 
         for (PlanElement pe : planElements) {
             System.out.println(pe);
@@ -222,7 +223,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(10000, 10500), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(50000, 10500), Id.create("to", Link.class));
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -277,7 +278,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(10000, 9000), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(11000, 11000), Id.create("to", Link.class));
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
 
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
@@ -328,7 +329,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -345,7 +346,7 @@ public class SwissRailRaptorIntermodalTest {
         stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
         raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
         for (Leg leg1 : legs) {
             System.out.println(leg1);
         }
@@ -415,7 +416,7 @@ public class SwissRailRaptorIntermodalTest {
         Facility fromFac = new FakeFacility(new Coord(10000, 10500), Id.create("from", Link.class));
         Facility toFac = new FakeFacility(new Coord(10500, 10500), Id.create("to", Link.class));
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson, new Attributes());
         
         /* 
          * Going by access/egress mode bike from "fromFac" to stop 3 (which is bikeAccessible) and from there by bike
@@ -468,7 +469,7 @@ public class SwissRailRaptorIntermodalTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -498,7 +499,7 @@ public class SwissRailRaptorIntermodalTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -574,7 +575,7 @@ public class SwissRailRaptorIntermodalTest {
             for (int i = 0; i < 1000; i++) {
                 SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-                List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson);
+                List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f.dummyPerson, new Attributes());
 
                 { // Test 1: Checks whether the amount of legs is correct, whether the legs have the correct modes,
                   // and whether the legs start and end on the correct links
@@ -637,7 +638,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -692,7 +693,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7.5 * 3600 + 900, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7.5 * 3600 + 900, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -727,7 +728,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -777,7 +778,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7.5 * 3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7.5 * 3600, f.dummyPerson, new Attributes());
 
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
@@ -810,7 +811,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).with(stopFinder).build();
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson, new Attributes());
         for (Leg leg : legs) {
             System.out.println(leg);
         }
@@ -845,7 +846,7 @@ public class SwissRailRaptorIntermodalTest {
 
 					@Override
 					public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility,
-							double departureTime, Person person) {
+							double departureTime, Person person, Attributes attributes) {
 						return null;
 					}
         	
@@ -855,7 +856,7 @@ public class SwissRailRaptorIntermodalTest {
         DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor2 = new SwissRailRaptor.Builder(data2, f.scenario.getConfig()).with(stopFinder2).build();
 
-        List<Leg> legs2 = raptor2.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
+        List<Leg> legs2 = raptor2.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson, new Attributes());
         
         Assert.assertNull("The router should not find a route and return null, but did return something else.", legs2);        
     }

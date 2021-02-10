@@ -33,6 +33,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +67,7 @@ class LinkToLinkRoutingModule implements RoutingModule {
 
     @Override
     public List<? extends PlanElement> calcRoute( final Facility fromFacility,
-								  final Facility toFacility, final double departureTime, final Person person) {
+								  final Facility toFacility, final double departureTime, final Person person, final Attributes tripAttributes) {
         Leg newLeg = this.populationFactory.createLeg( this.mode );
 		
 		Gbl.assertNotNull(fromFacility);

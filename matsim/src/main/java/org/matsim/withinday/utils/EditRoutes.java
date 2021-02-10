@@ -46,6 +46,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -149,7 +150,7 @@ public final class EditRoutes {
 	 */
 	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
 	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
-	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter) {
+	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter, Attributes tripAttributes) {
 		// TripRouter variant; everything else uses the PathCalculator
 		
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -159,7 +160,7 @@ public final class EditRoutes {
 		Facility toFacility = new LinkWrapperFacility(toLink);
 
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility,
-				leg.getDepartureTime().seconds(), person);
+				leg.getDepartureTime().seconds(), person, tripAttributes);
 
 		if (planElements.size() != 1) {
 			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +

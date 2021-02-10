@@ -31,6 +31,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
@@ -64,20 +65,20 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 	}
 
 	@Override
-	public List<InitialStop> findStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type) {
+	public List<InitialStop> findStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type, Attributes tripAttributes) {
 		if (type == Direction.ACCESS) {
-			return findAccessStops(facility, person, departureTime, parameters, data);
+			return findAccessStops(facility, person, departureTime, parameters, data, tripAttributes);
 		}
 		if (type == Direction.EGRESS) {
-			return findEgressStops(facility, person, departureTime, parameters, data);
+			return findEgressStops(facility, person, departureTime, parameters, data, tripAttributes);
 		}
 		return Collections.emptyList();
 	}
 
-	private List<InitialStop> findAccessStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findAccessStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, Attributes tripAttributes) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
 		if (srrCfg.isUseIntermodalAccessEgress()) {
-			return findIntermodalStops(facility, person, departureTime, Direction.ACCESS, parameters, data);
+			return findIntermodalStops(facility, person, departureTime, Direction.ACCESS, parameters, data, tripAttributes);
 		} else {
 			double distanceFactor = data.config.getBeelineWalkDistanceFactor();
 			List<TransitStopFacility> stops = findNearbyStops(facility, parameters, data);
@@ -91,10 +92,10 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 		}
 	}
 
-	private List<InitialStop> findEgressStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findEgressStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, Attributes tripAttributes) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
 		if (srrCfg.isUseIntermodalAccessEgress()) {
-			return findIntermodalStops(facility, person, departureTime, Direction.EGRESS, parameters, data);
+			return findIntermodalStops(facility, person, departureTime, Direction.EGRESS, parameters, data, tripAttributes);
 		} else {
 			double distanceFactor = data.config.getBeelineWalkDistanceFactor();
 			List<TransitStopFacility> stops = findNearbyStops(facility, parameters, data);
@@ -108,7 +109,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 		}
 	}
 
-	private List<InitialStop> findIntermodalStops(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data) {
+	private List<InitialStop> findIntermodalStops(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data, Attributes tripAttributes) {
 		SwissRailRaptorConfigGroup srrCfg = parameters.getConfig();
 		double x = facility.getCoord().getX();
 		double y = facility.getCoord().getY();
@@ -116,7 +117,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
         switch (srrCfg.getIntermodalAccessEgressModeSelection()) {
             case CalcLeastCostModePerStop:
                 for (IntermodalAccessEgressParameterSet parameterSet : srrCfg.getIntermodalAccessEgressParameterSets()) {
-                    addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y, initialStops, parameterSet);
+                    addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y, initialStops, parameterSet, tripAttributes);
                 }
                 break;
             case RandomSelectOneModePerRoutingRequestAndDirection:
@@ -124,7 +125,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                 do {
                     int rndSelector = random.nextInt(srrCfg.getIntermodalAccessEgressParameterSets().size());
                     addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y,
-                            initialStops, srrCfg.getIntermodalAccessEgressParameterSets().get(rndSelector));
+                            initialStops, srrCfg.getIntermodalAccessEgressParameterSets().get(rndSelector), tripAttributes);
                     counter++;
                     // try again if no initial stop was found for the parameterset. Avoid infinite loop by limiting number of tries.
                 } while (initialStops.isEmpty() && counter < 2 * srrCfg.getIntermodalAccessEgressParameterSets().size());
@@ -135,7 +136,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
         return initialStops;
     }
 
-    private void addInitialStopsForParamSet(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data, double x, double y, List<InitialStop> initialStops, IntermodalAccessEgressParameterSet paramset) {
+    private void addInitialStopsForParamSet(Facility facility, Person person, double departureTime, Direction direction, RaptorParameters parameters, SwissRailRaptorData data, double x, double y, List<InitialStop> initialStops, IntermodalAccessEgressParameterSet paramset, Attributes tripAttributes) {
         String mode = paramset.getMode();
         String linkIdAttribute = paramset.getLinkIdAttribute();
         String personFilterAttribute = paramset.getPersonFilterAttribute();
@@ -179,12 +180,12 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
                 List<? extends PlanElement> routeParts;
                 if (direction == Direction.ACCESS) {
                     RoutingModule module = this.routingModules.get(mode);
-                    routeParts = module.calcRoute(facility, stopFacility, departureTime, person);
+                    routeParts = module.calcRoute(facility, stopFacility, departureTime, person, tripAttributes);
                 } else { // it's Egress
                     // We don't know the departure time for the egress trip, so just use the original departureTime,
                     // although it is wrong and might result in a wrong traveltime and thus wrong route.
                     RoutingModule module = this.routingModules.get(mode);
-                    routeParts = module.calcRoute(stopFacility, facility, departureTime, person);
+                    routeParts = module.calcRoute(stopFacility, facility, departureTime, person, tripAttributes);
                     if (routeParts == null) {
                         // the router for the access/egress mode could not find a route, skip that access/egress mode
                         continue;

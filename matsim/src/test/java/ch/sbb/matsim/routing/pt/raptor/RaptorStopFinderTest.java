@@ -29,6 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +84,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
             
@@ -111,7 +112,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -155,7 +156,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -212,7 +213,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
             
@@ -246,7 +247,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -297,7 +298,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -352,7 +353,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -400,7 +401,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
             
@@ -429,7 +430,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -473,7 +474,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -530,7 +531,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
 
             Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
             
@@ -565,7 +566,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -617,7 +618,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -673,7 +674,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -734,7 +735,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -779,7 +780,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -824,7 +825,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -878,7 +879,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -930,7 +931,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -978,7 +979,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1024,7 +1025,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1070,7 +1071,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1125,7 +1126,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1178,7 +1179,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1241,7 +1242,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1288,7 +1289,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1346,7 +1347,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1401,7 +1402,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1453,7 +1454,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1501,7 +1502,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f1.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f1.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1560,7 +1561,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1616,7 +1617,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1689,7 +1690,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1755,7 +1756,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }
@@ -1817,7 +1818,7 @@ public class RaptorStopFinderTest {
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f0.scenario.getConfig()).with(stopFinder).build();
 
-            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson);
+            List<Leg> legs = raptor.calcRoute(this.fromFac, this.toFac, 7 * 3600, f0.dummyPerson, new Attributes());
             for (Leg leg : legs) {
                 System.out.println(leg);
             }

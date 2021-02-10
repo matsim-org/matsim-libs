@@ -33,6 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 
@@ -63,7 +64,8 @@ public class TeleportationRoutingModule implements RoutingModule {
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
-			final Person person) {
+			final Person person,
+			final Attributes tripAttributes) {
 		Leg newLeg = this.scenario.getPopulation().getFactory().createLeg( this.mode );
 		newLeg.setDepartureTime( departureTime );
 

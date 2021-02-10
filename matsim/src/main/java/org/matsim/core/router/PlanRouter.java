@@ -33,6 +33,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.List;
@@ -89,6 +90,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
+			final Attributes tripAttributes = oldTrip.getOriginActivity().getAttributes();
+			
 			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
@@ -96,7 +99,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
 						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),
-							plan.getPerson() );
+							plan.getPerson(), tripAttributes );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
 					plan, 

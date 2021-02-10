@@ -34,7 +34,7 @@ public class DeterministicStopStopTimeCalculator implements StopStopTimeCalculat
 		TransitStopFacility originFacility = schedule.getFacilities().get(stopOId);
 		TransitStopFacility destinationFacility = schedule.getFacilities().get(stopDId);
 
-		List<Leg> legs = transitRouter.calcRoute(originFacility, destinationFacility, time, null);
+		List<Leg> legs = transitRouter.calcRoute(originFacility, destinationFacility, time, null, null);
 		return legs.stream().mapToDouble(l -> l.getTravelTime().seconds()).sum();
 	}
 

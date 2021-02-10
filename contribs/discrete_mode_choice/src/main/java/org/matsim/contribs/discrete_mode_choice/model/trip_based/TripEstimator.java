@@ -13,5 +13,6 @@ import org.matsim.contribs.discrete_mode_choice.model.trip_based.candidates.Trip
  * @author sebhoerl
  */
 public interface TripEstimator {
-	TripCandidate estimateTrip(Person person, String mode, DiscreteModeChoiceTrip trip, List<TripCandidate> previousTrips);
+	TripCandidate estimateTrip(Person person, String mode, DiscreteModeChoiceTrip trip,
+			List<TripCandidate> previousTrips);
 }

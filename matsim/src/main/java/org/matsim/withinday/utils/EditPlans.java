@@ -39,6 +39,7 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public final class EditPlans {
 	private static final Logger log = Logger.getLogger( EditPlans.class ) ;
@@ -63,7 +64,7 @@ public final class EditPlans {
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
 		Gbl.assertNotNull( this.pf = mobsim.getScenario().getPopulation().getFactory() ) ;
 	}
-	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
+	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode, Attributes tripAttributes) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
@@ -79,7 +80,7 @@ public final class EditPlans {
 		// (need the terminating activity in order to find the current trip. kai, nov'17)
 		
 		if (!isAtRealActivity(agent)) {
-			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay(),routingMode);
+			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay(), routingMode);
 		}
 		
 		
@@ -228,7 +229,8 @@ public final class EditPlans {
 	 * Convenience method, clarifying that this can be called without giving the mode.
 	 */
 	public void insertActivity(MobsimAgent agent, int index, Activity activity ) {
-		String mode = TripStructureUtils.identifyMainMode( EditTrips.findCurrentTrip(agent ).getTripElements() ) ;
+		Trip currentTrip = EditTrips.findCurrentTrip(agent);
+		String mode = TripStructureUtils.identifyMainMode( currentTrip.getTripElements() ) ;
 		insertActivity( agent, index, activity, mode, mode ) ;
 	}
 

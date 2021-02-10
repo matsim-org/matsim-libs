@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author jbischoff
@@ -67,7 +68,7 @@ public class DvrpRoutingModule implements RoutingModule {
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-			Person person) {
+			Person person, Attributes tripAttributes) {
 		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
@@ -98,7 +99,7 @@ public class DvrpRoutingModule implements RoutingModule {
 		double now = departureTime;
 
 		// access (sub-)trip:
-		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(fromFacility, accessFacility, now, person);
+		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(fromFacility, accessFacility, now, person, tripAttributes);
 		if (!accessTrip.isEmpty()) {
 			trip.addAll(accessTrip);
 			for (PlanElement planElement : accessTrip) {
@@ -111,14 +112,14 @@ public class DvrpRoutingModule implements RoutingModule {
 		}
 
 		// dvrp proper leg:
-		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(accessFacility, egressFacility, now, person);
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(accessFacility, egressFacility, now, person, tripAttributes);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
 		}
 
 		now++;
-		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
+		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person, tripAttributes);
 		if (!egressTrip.isEmpty()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(egressFacility, now));

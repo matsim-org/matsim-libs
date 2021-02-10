@@ -17,6 +17,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,13 +58,13 @@ public class SwissRailRaptor implements TransitRouter {
     }
 
     @Override
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person, Attributes tripAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
         if (parameters.getConfig().isUseRangeQuery()) {
-            return this.performRangeQuery(fromFacility, toFacility, departureTime, person, parameters);
+            return this.performRangeQuery(fromFacility, toFacility, departureTime, person, parameters, tripAttributes);
         }
-        List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters);
-        List<InitialStop> egressStops = findEgressStops(toFacility, person, departureTime, parameters);
+        List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters, tripAttributes);
+        List<InitialStop> egressStops = findEgressStops(toFacility, person, departureTime, parameters, tripAttributes);
 
         RaptorRoute foundRoute = this.raptor.calcLeastCostRoute(departureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, departureTime, person, parameters);
@@ -123,7 +124,7 @@ public class SwissRailRaptor implements TransitRouter {
 		return true;
 	}
 
-    private List<Leg> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters) {
+    private List<Leg> performRangeQuery(Facility fromFacility, Facility toFacility, double desiredDepartureTime, Person person, RaptorParameters parameters, Attributes tripAttributes) {
         SwissRailRaptorConfigGroup srrConfig = parameters.getConfig();
 
         String subpopulation = PopulationUtils.getSubpopulation(person);
@@ -142,17 +143,17 @@ public class SwissRailRaptor implements TransitRouter {
             selector.setBetaDepartureTime(params.getBetaDepartureTime());
         }
 
-        return this.calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector);
+        return this.calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector, tripAttributes);
     }
 
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person) {
-        return calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector);
+    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, Attributes tripAttributes) {
+        return calcRoute(fromFacility, toFacility, earliestDepartureTime, desiredDepartureTime, latestDepartureTime, person, this.defaultRouteSelector, tripAttributes);
     }
 
-    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, RaptorRouteSelector selector) {
+    public List<Leg> calcRoute(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, RaptorRouteSelector selector, Attributes tripAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
-        List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters);
-        List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters);
+        List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters, tripAttributes);
+        List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters, tripAttributes);
 
         List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute foundRoute = selector.selectOne(foundRoutes, desiredDepartureTime);
@@ -185,10 +186,10 @@ public class SwissRailRaptor implements TransitRouter {
         return legs;
     }
 
-    public List<RaptorRoute> calcRoutes(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person) {
+    public List<RaptorRoute> calcRoutes(Facility fromFacility, Facility toFacility, double earliestDepartureTime, double desiredDepartureTime, double latestDepartureTime, Person person, Attributes tripAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
-        List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters);
-        List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters);
+        List<InitialStop> accessStops = findAccessStops(fromFacility, person, desiredDepartureTime, parameters, tripAttributes);
+        List<InitialStop> egressStops = findEgressStops(toFacility, person, desiredDepartureTime, parameters, tripAttributes);
 
         List<RaptorRoute> foundRoutes = this.raptor.calcRoutes(earliestDepartureTime, desiredDepartureTime, latestDepartureTime, fromFacility, toFacility, accessStops, egressStops, parameters, person);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, desiredDepartureTime, person, parameters);
@@ -225,9 +226,9 @@ public class SwissRailRaptor implements TransitRouter {
         return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
     }
 
-    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person) {
+    public Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> calcTree(Facility fromFacility, double departureTime, Person person, Attributes tripAttributes) {
         RaptorParameters parameters = this.parametersForPerson.getRaptorParameters(person);
-        List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters);
+        List<InitialStop> accessStops = findAccessStops(fromFacility, person, departureTime, parameters, tripAttributes);
         return this.calcLeastCostTree(accessStops, departureTime, parameters, person);
     }
 
@@ -239,12 +240,12 @@ public class SwissRailRaptor implements TransitRouter {
         return this.data;
     }
 
-    private List<InitialStop> findAccessStops(Facility facility, Person person, double departureTime, RaptorParameters parameters) {
-        return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.ACCESS);
+    private List<InitialStop> findAccessStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, Attributes tripAttributes) {
+        return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.ACCESS, tripAttributes);
     }
 
-    private List<InitialStop> findEgressStops(Facility facility, Person person, double departureTime, RaptorParameters parameters) {
-        return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.EGRESS);
+    private List<InitialStop> findEgressStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, Attributes tripAttributes) {
+        return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.EGRESS, tripAttributes);
     }
 
     // TODO: replace with call to FallbackRoutingModule ?!

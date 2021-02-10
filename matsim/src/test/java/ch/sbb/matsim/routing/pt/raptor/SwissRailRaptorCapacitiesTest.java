@@ -36,6 +36,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class SwissRailRaptorCapacitiesTest {
 		Facility fromFacility = new FakeFacility(new Coord(900, 900), Id.create("aa", Link.class));
 		Facility toFacility = new FakeFacility(new Coord(7100, 1100), Id.create("cd", Link.class));
 
-		List<Leg> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<Leg> route1 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null, new Attributes());
 		Assert.assertNotNull(route1);
 		System.out.println("uncongested route:");
 		for (Leg leg : route1) {
@@ -170,7 +171,7 @@ public class SwissRailRaptorCapacitiesTest {
 		tracker.handleEvent(new PersonEntersVehicleEvent(Time.parseTime("07:20:25"), person9, vehicle3));
 		tracker.handleEvent(new VehicleDepartsAtFacilityEvent(Time.parseTime("07:20:30"), vehicle3, f.stopAId, 0));
 
-		List<Leg> route2 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null);
+		List<Leg> route2 = raptor.calcRoute(fromFacility, toFacility, Time.parseTime("07:00:00"), null, new Attributes());
 		Assert.assertNotNull(route2);
 		System.out.println("congested route:");
 		for (Leg leg : route2) {

@@ -26,6 +26,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FallbackRoutingModuleTest{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -79,7 +80,7 @@ public class FallbackRoutingModuleTest{
 			@Override public void install(){
 				this.addRoutingModuleBinding( "abcd" ).toInstance( new RoutingModule(){
 					@Override
-					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
+					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person, Attributes tripAttributes ){
 						return null;
 					}
 				} );

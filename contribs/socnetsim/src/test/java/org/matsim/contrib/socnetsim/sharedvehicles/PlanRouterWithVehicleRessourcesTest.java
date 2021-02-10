@@ -46,6 +46,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -109,7 +110,8 @@ public class PlanRouterWithVehicleRessourcesTest {
 							final Facility fromFacility,
 							final Facility toFacility,
 							final double departureTime,
-							final Person p) {
+							final Person p,
+							final Attributes tripAttributes) {
 						final List<PlanElement> legs = new ArrayList<PlanElement>();
 
 						for (int i=0; i < 5; i++) {
