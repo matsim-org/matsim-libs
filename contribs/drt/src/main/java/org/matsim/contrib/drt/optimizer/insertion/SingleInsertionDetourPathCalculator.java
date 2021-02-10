@@ -24,6 +24,7 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Inse
 import static org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -90,7 +91,9 @@ public class SingleInsertionDetourPathCalculator implements DetourPathCalculator
 		Link pickup = drtRequest.getFromLink();
 		Link dropoff = drtRequest.getToLink();
 
-		Preconditions.checkArgument(filteredInsertions.size() == 1);
+		if (filteredInsertions.isEmpty()) {
+			return new DetourData<>(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), PathData.EMPTY);
+		}
 		var insertion = filteredInsertions.get(0);
 
 		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
