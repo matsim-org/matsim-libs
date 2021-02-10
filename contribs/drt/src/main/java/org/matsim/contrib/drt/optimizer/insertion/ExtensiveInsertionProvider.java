@@ -23,51 +23,49 @@ import static org.matsim.contrib.drt.optimizer.insertion.InsertionCostCalculator
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultDrtInsertionSearch.InsertionProvider;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
-	private final ExtensiveInsertionSearchParams insertionParams;
+public class ExtensiveInsertionProvider implements InsertionProvider {
+	public static ExtensiveInsertionProvider create(DrtConfigGroup drtCfg, MobsimTimer timer,
+			CostCalculationStrategy costCalculationStrategy, DvrpTravelTimeMatrix dvrpTravelTimeMatrix,
+			ForkJoinPool forkJoinPool) {
+		var insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
+		var restrictiveDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
+				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
+		return new ExtensiveInsertionProvider(drtCfg, timer, costCalculationStrategy, restrictiveDetourTimeEstimator,
+				forkJoinPool);
+	}
 
-	// step 1: initial filtering out feasible insertions
+	private final ExtensiveInsertionSearchParams insertionParams;
 	private final InsertionCostCalculator<Double> admissibleCostCalculator;
 	private final DetourTimeEstimator admissibleDetourTimeEstimator;
-
-	// step 2: finding best insertion
 	private final ForkJoinPool forkJoinPool;
-	private final DetourPathCalculator detourPathCalculator;
-	private final BestInsertionFinder<PathData> bestInsertionFinder;
 
-	public ExtensiveInsertionSearch(DetourPathCalculator detourPathCalculator, DrtConfigGroup drtCfg, MobsimTimer timer,
-			ForkJoinPool forkJoinPool, CostCalculationStrategy costCalculationStrategy,
-			DvrpTravelTimeMatrix dvrpTravelTimeMatrix) {
-		this.detourPathCalculator = detourPathCalculator;
+	public ExtensiveInsertionProvider(DrtConfigGroup drtCfg, MobsimTimer timer,
+			CostCalculationStrategy costCalculationStrategy, DetourTimeEstimator admissibleDetourTimeEstimator,
+			ForkJoinPool forkJoinPool) {
+		this.insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
 		this.forkJoinPool = forkJoinPool;
 
-		insertionParams = (ExtensiveInsertionSearchParams)drtCfg.getDrtInsertionSearchParams();
-		admissibleDetourTimeEstimator = DetourTimeEstimator.createFreeSpeedZonalTimeEstimator(
-				insertionParams.getAdmissibleBeelineSpeedFactor(), dvrpTravelTimeMatrix);
-		admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy,
+		this.admissibleCostCalculator = new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy,
 				Double::doubleValue, admissibleDetourTimeEstimator);
-
-		bestInsertionFinder = new BestInsertionFinder<>(
-				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, PathData::getTravelTime, null));
+		this.admissibleDetourTimeEstimator = admissibleDetourTimeEstimator;
 	}
 
 	@Override
-	public Optional<InsertionWithDetourData<PathData>> findBestInsertion(DrtRequest drtRequest,
-			Collection<VehicleEntry> vehicleEntries) {
+	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
 		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> admissibleTimeData = DetourData.create(admissibleDetourTimeEstimator, drtRequest);
 
@@ -84,14 +82,7 @@ public class ExtensiveInsertionSearch implements DrtInsertionSearch<PathData> {
 						//collect
 						.collect(Collectors.toList())).join();
 
-		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(
-				insertionParams.getNearestInsertionsAtEndLimit(), insertionParams.getAdmissibleBeelineSpeedFactor(),
-				preFilteredInsertions);
-
-		DetourData<PathData> pathData = detourPathCalculator.calculatePaths(drtRequest, filteredInsertions);
-		//TODO could use a parallel stream within forkJoinPool, however the idea is to have as few filteredInsertions
-		// as possible, and then using a parallel stream does not make sense.
-		return bestInsertionFinder.findBestInsertion(drtRequest,
-				filteredInsertions.stream().map(pathData::createInsertionWithDetourData));
+		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(insertionParams.getNearestInsertionsAtEndLimit(),
+				insertionParams.getAdmissibleBeelineSpeedFactor(), preFilteredInsertions);
 	}
 }
