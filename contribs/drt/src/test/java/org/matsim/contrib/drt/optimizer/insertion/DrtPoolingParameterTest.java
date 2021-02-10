@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -50,6 +51,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * The stopDuration is set to 1s --> potential TODO: reset to default of 60s
  * TODO: write tests for maxTravelTimeAlpha
  */
+@Ignore
 public class DrtPoolingParameterTest {
 
 	private Controler controler;
