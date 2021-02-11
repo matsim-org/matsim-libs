@@ -29,9 +29,9 @@ import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
 /**
@@ -63,21 +63,12 @@ public class ExtensiveInsertionProviderTest {
 	}
 
 	private void getInsertions_twoInsertionsGenerated(int nearestInsertionsAtEndLimit) {
-		var beforePickupLink = mock(Link.class);
-		var pickupLink = mock(Link.class);
-		var afterPickupLink = mock(Link.class);
-		var beforeDropoffLink = mock(Link.class);
-		var dropoffLink = mock(Link.class);
-		var afterDropoffLink = mock(Link.class);
-
-		var request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
+		var request = DrtRequest.newBuilder().build();
 		var vehicleEntry = mock(VehicleEntry.class);
 
 		// mock insertionGenerator
-		var feasibleInsertion = new InsertionGenerator.Insertion(vehicleEntry,
-				insertionPoint(beforePickupLink, afterPickupLink), insertionPoint(beforeDropoffLink, afterDropoffLink));
-		var infeasibleInsertion = new InsertionGenerator.Insertion(vehicleEntry,
-				insertionPoint(beforePickupLink, afterPickupLink), insertionPoint(beforeDropoffLink, afterDropoffLink));
+		var feasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
+		var infeasibleInsertion = new Insertion(vehicleEntry, insertionPoint(), insertionPoint());
 		var insertionGenerator = mock(InsertionGenerator.class);
 		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
 				.thenReturn(List.of(feasibleInsertion, infeasibleInsertion));
@@ -101,11 +92,7 @@ public class ExtensiveInsertionProviderTest {
 				nearestInsertionsAtEndLimit == 0 ? List.of() : List.of(feasibleInsertion));
 	}
 
-	private InsertionGenerator.InsertionPoint insertionPoint(Link previousLink, Link nextLink) {
-		var previousWaypoint = mock(Waypoint.class);
-		when(previousWaypoint.getLink()).thenReturn(previousLink);
-		var nextWaypoint = mock(Waypoint.class);
-		when(nextWaypoint.getLink()).thenReturn(nextLink);
-		return new InsertionGenerator.InsertionPoint(-1, previousWaypoint, null, nextWaypoint);
+	private InsertionGenerator.InsertionPoint insertionPoint() {
+		return new InsertionGenerator.InsertionPoint(-1, mock(Waypoint.class), null, mock(Waypoint.class));
 	}
 }
