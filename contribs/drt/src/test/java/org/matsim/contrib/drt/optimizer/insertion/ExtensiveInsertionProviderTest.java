@@ -34,8 +34,6 @@ import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
-import com.google.common.collect.ImmutableTable;
-
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -51,20 +49,20 @@ public class ExtensiveInsertionProviderTest {
 	}
 
 	@Test
-	public void findBestInsertion_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
+	public void getInsertions_twoAtEndInsertionsGenerated_zeroNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution gets discarded in the second stage (KNearestInsertionsAtEndFilter)
-		findBestInsertion_twoInsertionsGenerated(0);
+		getInsertions_twoInsertionsGenerated(0);
 	}
 
 	@Test
-	public void findBestInsertion_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
+	public void getInsertions_twoAtEndInsertionsGenerated_tenNearestInsertionsAtEndLimit() {
 		//the infeasible solution gets discarded in the first stage
 		//the feasible solution is NOT discarded in the second stage (KNearestInsertionsAtEndFilter)
-		findBestInsertion_twoInsertionsGenerated(10);
+		getInsertions_twoInsertionsGenerated(10);
 	}
 
-	private void findBestInsertion_twoInsertionsGenerated(int nearestInsertionsAtEndLimit) {
+	private void getInsertions_twoInsertionsGenerated(int nearestInsertionsAtEndLimit) {
 		var beforePickupLink = mock(Link.class);
 		var pickupLink = mock(Link.class);
 		var afterPickupLink = mock(Link.class);
@@ -80,18 +78,9 @@ public class ExtensiveInsertionProviderTest {
 				insertionPoint(beforePickupLink, afterPickupLink), insertionPoint(beforeDropoffLink, afterDropoffLink));
 		var infeasibleInsertion = new InsertionGenerator.Insertion(vehicleEntry,
 				insertionPoint(beforePickupLink, afterPickupLink), insertionPoint(beforeDropoffLink, afterDropoffLink));
-		var generatedInsertions = List.of(feasibleInsertion, infeasibleInsertion);
 		var insertionGenerator = mock(InsertionGenerator.class);
-		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry))).thenReturn(generatedInsertions);
-
-		//init admissibleDetourTimeEstimator
-		var ttMatrix = ImmutableTable.<Link, Link, Double>builder()//
-				.put(beforePickupLink, pickupLink, 1.)
-				.put(pickupLink, afterPickupLink, 2.)
-				.put(beforeDropoffLink, dropoffLink, 3.)
-				.put(dropoffLink, afterDropoffLink, 4.)
-				.build();
-		var admissibleDetourTimeEstimator = (DetourTimeEstimator)ttMatrix::get;
+		when(insertionGenerator.generateInsertions(eq(request), eq(vehicleEntry)))//
+				.thenReturn(List.of(feasibleInsertion, infeasibleInsertion));
 
 		//mock admissibleCostCalculator
 		@SuppressWarnings("unchecked")
@@ -99,15 +88,15 @@ public class ExtensiveInsertionProviderTest {
 		when(admissibleCostCalculator.calculate(eq(request),
 				argThat(argument -> argument.getInsertion() == feasibleInsertion))).thenReturn(1.);
 		when(admissibleCostCalculator.calculate(eq(request),
-				argThat(argument -> argument.getInsertion() == infeasibleInsertion))).thenReturn(
-				InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
+				argThat(argument -> argument.getInsertion() == infeasibleInsertion)))//
+				.thenReturn(InsertionCostCalculator.INFEASIBLE_SOLUTION_COST);
 
-		//test insertion search
+		//test insertionProvider
 		var params = new ExtensiveInsertionSearchParams().setNearestInsertionsAtEndLimit(nearestInsertionsAtEndLimit);
 		//pretend all insertions are at end to check KNearestInsertionsAtEndFilter
 		when(vehicleEntry.isAfterLastStop(anyInt())).thenReturn(true);
-		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator,
-				admissibleDetourTimeEstimator, insertionGenerator, rule.forkJoinPool);
+		var insertionProvider = new ExtensiveInsertionProvider(params, admissibleCostCalculator, (from, to) -> 978.,
+				insertionGenerator, rule.forkJoinPool);
 		assertThat(insertionProvider.getInsertions(request, List.of(vehicleEntry))).isEqualTo(
 				nearestInsertionsAtEndLimit == 0 ? List.of() : List.of(feasibleInsertion));
 	}
