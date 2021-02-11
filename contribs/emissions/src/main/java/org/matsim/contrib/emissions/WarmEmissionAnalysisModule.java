@@ -144,6 +144,95 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						}
 					}
 					break;
+				case perVehCat:
+					if (detailedHbefaWarmTable != null) {
+						Set<String> roadCategories = new HashSet<>();
+						Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
+						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
+						Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+						Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+						for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
+							roadCategories.add(emissionFactorKey.getRoadCategory());
+							trafficSituations.add(emissionFactorKey.getTrafficSituation());
+							vehicleCategories.add(emissionFactorKey.getVehicleCategory());
+							vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
+							pollutantsInTable.add(emissionFactorKey.getComponent());
+						}
+						for (String roadCategory : roadCategories) {
+							for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+								for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+									if (vehicleCategory.equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
+										for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+											if (vehicleAttribute.toString().contains("HGV")) {
+												for (Pollutant pollutant : pollutantsInTable) {
+													HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+													key.setRoadCategory(roadCategory);
+													key.setTrafficSituation(trafficSituation);
+													key.setVehicleCategory(vehicleCategory);
+													key.setVehicleAttributes(vehicleAttribute);
+													key.setComponent(pollutant);
+													HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+													if (result == null) {
+														throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+																"  There used to be some " +
+																"fallback, but it was " +
+																"inconsistent and confusing, so " +
+																"we are now just aborting.");
+													}
+												}
+											}
+										}
+									}
+									else if (vehicleCategory.equals(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE)){
+										for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+											if (vehicleAttribute.toString().contains("LCV")) {
+												for (Pollutant pollutant : pollutantsInTable) {
+													HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+													key.setRoadCategory(roadCategory);
+													key.setTrafficSituation(trafficSituation);
+													key.setVehicleCategory(vehicleCategory);
+													key.setVehicleAttributes(vehicleAttribute);
+													key.setComponent(pollutant);
+													HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+													if (result == null) {
+														throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+																"  There used to be some " +
+																"fallback, but it was " +
+																"inconsistent and confusing, so " +
+																"we are now just aborting.");
+													}
+												}
+											}
+										}
+
+									}
+									else if(vehicleCategory.equals(HbefaVehicleCategory.PASSENGER_CAR)){
+										for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+											if (vehicleAttribute.toString().contains("PC")) {
+												for (Pollutant pollutant : pollutantsInTable) {
+													HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
+													key.setRoadCategory(roadCategory);
+													key.setTrafficSituation(trafficSituation);
+													key.setVehicleCategory(vehicleCategory);
+													key.setVehicleAttributes(vehicleAttribute);
+													key.setComponent(pollutant);
+													HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(key);
+													if (result == null) {
+														throw new RuntimeException("emissions factor for key=" + key + " is missing." +
+																"  There used to be some " +
+																"fallback, but it was " +
+																"inconsistent and confusing, so " +
+																"we are now just aborting.");
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					break;
 
 				case consistent:
 					// yy The above consistency check might actually be too restrictive.  The code only needs that both freeflow and stopgo traffic
