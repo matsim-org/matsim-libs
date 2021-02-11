@@ -44,7 +44,7 @@ class KNearestInsertionsAtEndFilter {
 			var pickup = insertion.getPickup();
 			if (!vEntry.isAfterLastStop(pickup.index)) {
 				filteredInsertions.add(insertion.getInsertion());
-			} else {
+			} else if (k > 0) {
 				double departureTime = pickup.previousWaypoint.getDepartureTime();
 
 				// x ADMISSIBLE_BEELINE_SPEED_FACTOR to remove bias towards near but still busy vehicles

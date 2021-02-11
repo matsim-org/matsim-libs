@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
@@ -44,53 +43,48 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.testcases.fakes.FakeLink;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DefaultDrtInsertionSearchTest {
-	private final Link beforePickupLink = link("before_pickup");
-	private final Link afterPickupLink = link("after_pickup");
-
-	private final Link beforeDropoffLink = link("before_dropoff");
-	private final Link afterDropoffLink = link("after_dropoff");
-
-	private final DrtRequest request = DrtRequest.newBuilder().build();
-	private final VehicleEntry vehicleEntry = mock(VehicleEntry.class);
-
-	private final InsertionProvider insertionProvider = mock(InsertionProvider.class);
-	private final DetourPathCalculator detourPathCalculator = mock(DetourPathCalculator.class);
-
 	@Test
 	public void findBestInsertion_noInsertionsProvided() {
-		var insertionSearch = new DefaultDrtInsertionSearch(insertionProvider, null, null, new DrtConfigGroup(),
-				new MobsimTimer());
-		assertThat(insertionSearch.findBestInsertion(request, List.of())).isEmpty();
+		var insertionSearch = new DefaultDrtInsertionSearch(mock(InsertionProvider.class), null, null,
+				new DrtConfigGroup(), new MobsimTimer());
+		assertThat(insertionSearch.findBestInsertion(null, List.of())).isEmpty();
 	}
 
 	@Test
 	public void findBestInsertion_twoInsertionsProvided() {
+		var beforePickupLink = mock(Link.class);
+		var afterPickupLink = mock(Link.class);
+		var beforeDropoffLink = mock(Link.class);
+		var afterDropoffLink = mock(Link.class);
+
+		var request = DrtRequest.newBuilder().build();
+		var vehicleEntry = mock(VehicleEntry.class);
+
 		//mock insertionProvider
-		var selectedInsertion = new Insertion(vehicleEntry,
-				insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink)),
-				insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink)));
-		var discardedInsertion = new Insertion(vehicleEntry,
-				insertionPoint(waypoint(beforePickupLink), waypoint(afterPickupLink)),
-				insertionPoint(waypoint(beforeDropoffLink), waypoint(afterDropoffLink)));
+		var selectedInsertion = new Insertion(vehicleEntry, insertionPoint(beforePickupLink, afterPickupLink),
+				insertionPoint(beforeDropoffLink, afterDropoffLink));
+		var discardedInsertion = new Insertion(vehicleEntry, insertionPoint(beforePickupLink, afterPickupLink),
+				insertionPoint(beforeDropoffLink, afterDropoffLink));
 		var filteredInsertions = List.of(selectedInsertion, discardedInsertion);
+		var insertionProvider = mock(InsertionProvider.class);
 		when(insertionProvider.getInsertions(eq(request), eq(List.of(vehicleEntry)))).thenReturn(filteredInsertions);
 
 		//mock detourPathCalculator
 		var detourData = new DetourData<>(Map.of(beforePickupLink, mock(PathData.class)),
 				Map.of(afterPickupLink, mock(PathData.class)), Map.of(beforeDropoffLink, mock(PathData.class)),
 				Map.of(afterDropoffLink, mock(PathData.class)), PathData.EMPTY);
+		var detourPathCalculator = mock(DetourPathCalculator.class);
 		when(detourPathCalculator.calculatePaths(eq(request), eq(filteredInsertions))).thenReturn(detourData);
 
 		//mock bestInsertionFinder
+		var selectedInsertionWithPathData = detourData.createInsertionWithDetourData(selectedInsertion);
 		@SuppressWarnings("unchecked")
 		var bestInsertionFinder = (BestInsertionFinder<PathData>)mock(BestInsertionFinder.class);
-		var selectedInsertionWithPathData = detourData.createInsertionWithDetourData(selectedInsertion);
 		when(bestInsertionFinder.findBestInsertion(eq(request),
 				argThat(argument -> argument.map(InsertionWithDetourData::getInsertion)
 						.collect(toSet())
@@ -104,17 +98,11 @@ public class DefaultDrtInsertionSearchTest {
 				selectedInsertionWithPathData);
 	}
 
-	private Link link(String id) {
-		return new FakeLink(Id.createLinkId(id));
-	}
-
-	private InsertionPoint insertionPoint(Waypoint beforeWaypoint, Waypoint afterWaypoint) {
-		return new InsertionPoint(-1, beforeWaypoint, null, afterWaypoint);
-	}
-
-	private Waypoint waypoint(Link afterLink) {
-		var waypoint = mock(Waypoint.class);
-		when(waypoint.getLink()).thenReturn(afterLink);
-		return waypoint;
+	private InsertionPoint insertionPoint(Link previousLink, Link nextLink) {
+		var previousWaypoint = mock(Waypoint.class);
+		when(previousWaypoint.getLink()).thenReturn(previousLink);
+		var nextWaypoint = mock(Waypoint.class);
+		when(nextWaypoint.getLink()).thenReturn(nextLink);
+		return new InsertionPoint(-1, previousWaypoint, null, nextWaypoint);
 	}
 }

@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
+
 import com.google.common.base.Preconditions;
 
 /**
@@ -44,32 +46,39 @@ public class PartialSort<T> {
 
 	private final int k;
 	private final Comparator<T> comparator;
+	@Nullable
 	private final PriorityQueue<T> kSmallestElements;// descending order: from k-th to 1-st
 
 	public PartialSort(int k, Comparator<T> comparator) {
-		Preconditions.checkArgument(k > 0, "k must be positive.");
+		Preconditions.checkArgument(k >= 0, "k must not be negative.");
 		this.k = k;
 		this.comparator = comparator;
-		kSmallestElements = new PriorityQueue<>(k, comparator.reversed());
+		kSmallestElements = k == 0 ? null : new PriorityQueue<>(k, comparator.reversed());
 	}
 
 	public void add(T element) {
-		if (kSmallestElements.size() < k) {
-			kSmallestElements.add(element);
-		} else if (comparator.compare(element, kSmallestElements.peek()) < 0) {
-			kSmallestElements.poll();
-			kSmallestElements.add(element);
+		if (kSmallestElements != null) {
+			if (kSmallestElements.size() < k) {
+				kSmallestElements.add(element);
+			} else if (comparator.compare(element, kSmallestElements.peek()) < 0) {
+				kSmallestElements.poll();
+				kSmallestElements.add(element);
+			}
 		}
 	}
 
 	/**
 	 * Gets k smallest elements.
-	 *
+	 * <p>
 	 * SIDE EFFECT: elements are removed from the queue.
 	 *
 	 * @return list containing k smallest elements sorted ascending: from the smallest to the k-th smallest
 	 */
 	public List<T> kSmallestElements() {
+		if (kSmallestElements == null) {
+			return List.of();
+		}
+
 		@SuppressWarnings("unchecked")
 		T[] array = (T[])new Object[kSmallestElements.size()];
 		for (int i = array.length - 1; i >= 0; i--) {
