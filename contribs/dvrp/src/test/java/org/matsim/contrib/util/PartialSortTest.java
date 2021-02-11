@@ -35,6 +35,12 @@ public class PartialSortTest {
 	private final Comparator<Integer> comparator = Integer::compareTo;
 
 	@Test
+	public void k0_noneSelected() {
+		assertThat(kSmallestElements(0, Stream.of(), comparator)).isEmpty();
+		assertThat(kSmallestElements(0, Stream.of(7, 1, 4, 9, 8), comparator)).isEmpty();
+	}
+
+	@Test
 	public void reversedComparator_largestElementsSelected() {
 		assertThat(kSmallestElements(1, Stream.of(7, 1, 4, 9, 8), comparator.reversed())).containsExactly(9);
 		assertThat(kSmallestElements(3, Stream.of(7, 1, 4, 9, 8), comparator.reversed())).containsExactly(9, 8, 7);
