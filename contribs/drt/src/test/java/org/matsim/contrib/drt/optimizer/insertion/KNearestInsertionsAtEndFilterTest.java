@@ -41,8 +41,16 @@ import com.google.common.collect.ImmutableList;
 public class KNearestInsertionsAtEndFilterTest {
 
 	@Test
+	public void k0_atEndInsertionsNotReturned() {
+		var vehicleEntry = vehicleEntry("v1", start(0), stop(100));
+		var insertion = insertion(vehicleEntry, 1, 10);
+		var filteredInsertions = KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(0, 1, List.of(insertion));
+		assertThat(filteredInsertions).isEmpty();
+	}
+
+	@Test
 	public void noInsertions_emptyList() {
-		var filteredInsertions = filterInsertionsAtEnd();
+		var filteredInsertions = filterOneInsertionAtEnd();
 		assertThat(filteredInsertions).isEmpty();
 	}
 
@@ -52,7 +60,7 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion1 = insertion(vehicleEntry, 0, 11);
 		var insertion2 = insertion(vehicleEntry, 0, 22);
 
-		assertThat(filterInsertionsAtEnd(insertion1, insertion2)).containsExactlyInAnyOrder(insertion1.getInsertion(),
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactlyInAnyOrder(insertion1.getInsertion(),
 				insertion2.getInsertion());
 	}
 
@@ -67,8 +75,8 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion2 = insertion(vehicleEntry2, 0, 61);
 
 		//insertion1 is better
-		assertThat(filterInsertionsAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
-		assertThat(filterInsertionsAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
 	}
 
 	@Test
@@ -82,8 +90,8 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertion2 = insertion(vehicleEntry2, 0, 60);
 
 		//take the first
-		assertThat(filterInsertionsAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
-		assertThat(filterInsertionsAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion1, insertion2)).containsExactly(insertion1.getInsertion());
+		assertThat(filterOneInsertionAtEnd(insertion2, insertion1)).containsExactly(insertion1.getInsertion());
 	}
 
 	@Test
@@ -93,7 +101,7 @@ public class KNearestInsertionsAtEndFilterTest {
 		var insertionAtEnd = insertion(vehicleEntry, 1, 10);
 
 		//insertionAtEnd always returned last
-		assertThat(filterInsertionsAtEnd(insertionAfterStart, insertionAtEnd)).containsExactlyInAnyOrder(
+		assertThat(filterOneInsertionAtEnd(insertionAfterStart, insertionAtEnd)).containsExactlyInAnyOrder(
 				insertionAfterStart.getInsertion(), insertionAtEnd.getInsertion());
 	}
 
@@ -119,7 +127,7 @@ public class KNearestInsertionsAtEndFilterTest {
 	}
 
 	@SafeVarargs
-	private List<InsertionGenerator.Insertion> filterInsertionsAtEnd(InsertionWithDetourData<Double>... insertions) {
+	private List<InsertionGenerator.Insertion> filterOneInsertionAtEnd(InsertionWithDetourData<Double>... insertions) {
 		return KNearestInsertionsAtEndFilter.filterInsertionsAtEnd(1, 1, List.of(insertions));
 	}
 }
