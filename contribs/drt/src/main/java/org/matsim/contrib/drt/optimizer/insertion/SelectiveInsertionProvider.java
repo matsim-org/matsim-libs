@@ -34,6 +34,8 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author michalm
  */
@@ -50,21 +52,29 @@ public class SelectiveInsertionProvider implements InsertionProvider {
 
 	private final DetourTimeEstimator restrictiveDetourTimeEstimator;
 	private final BestInsertionFinder<Double> initialInsertionFinder;
+	private final InsertionGenerator insertionGenerator;
 	private final ForkJoinPool forkJoinPool;
 
 	public SelectiveInsertionProvider(DrtConfigGroup drtCfg, MobsimTimer timer,
 			CostCalculationStrategy costCalculationStrategy, DetourTimeEstimator restrictiveDetourTimeEstimator,
 			ForkJoinPool forkJoinPool) {
-		this.restrictiveDetourTimeEstimator = restrictiveDetourTimeEstimator;
-		this.initialInsertionFinder = new BestInsertionFinder<>(
+		this(restrictiveDetourTimeEstimator, new BestInsertionFinder<>(
 				new InsertionCostCalculator<>(drtCfg, timer, costCalculationStrategy, Double::doubleValue,
-						restrictiveDetourTimeEstimator));
+						restrictiveDetourTimeEstimator)), new InsertionGenerator(), forkJoinPool);
+	}
+
+	@VisibleForTesting
+	SelectiveInsertionProvider(DetourTimeEstimator restrictiveDetourTimeEstimator,
+			BestInsertionFinder<Double> initialInsertionFinder, InsertionGenerator insertionGenerator,
+			ForkJoinPool forkJoinPool) {
+		this.restrictiveDetourTimeEstimator = restrictiveDetourTimeEstimator;
+		this.initialInsertionFinder = initialInsertionFinder;
+		this.insertionGenerator = insertionGenerator;
 		this.forkJoinPool = forkJoinPool;
 	}
 
 	@Override
 	public List<Insertion> getInsertions(DrtRequest drtRequest, Collection<VehicleEntry> vehicleEntries) {
-		InsertionGenerator insertionGenerator = new InsertionGenerator();
 		DetourData<Double> restrictiveTimeData = DetourData.create(restrictiveDetourTimeEstimator, drtRequest);
 
 		// Parallel outer stream over vehicle entries. The inner stream (flatmap) is sequential.

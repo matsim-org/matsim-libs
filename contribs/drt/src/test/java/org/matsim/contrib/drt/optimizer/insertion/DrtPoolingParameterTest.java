@@ -51,7 +51,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * The stopDuration is set to 1s --> potential TODO: reset to default of 60s
  * TODO: write tests for maxTravelTimeAlpha
  */
-@Ignore
 public class DrtPoolingParameterTest {
 
 	private Controler controler;
