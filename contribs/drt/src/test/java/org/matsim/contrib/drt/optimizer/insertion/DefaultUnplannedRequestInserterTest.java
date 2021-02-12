@@ -29,9 +29,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -62,7 +62,9 @@ public class DefaultUnplannedRequestInserterTest {
 	private final DrtRequest request1 = request("r1", "from1", "to1");
 
 	private final EventsManager eventsManager = mock(EventsManager.class);
-	private final ForkJoinPool forkJoinPool = new ForkJoinPool(1);
+
+	@Rule
+	public final ForkJoinPoolTestRule rule = new ForkJoinPoolTestRule();
 
 	@Test
 	public void nothingToSchedule() {
@@ -270,7 +272,7 @@ public class DefaultUnplannedRequestInserterTest {
 			VehicleEntry.EntryFactory vehicleEntryFactory, DrtRequestInsertionRetryQueue insertionRetryQueue,
 			DrtInsertionSearch<PathData> insertionSearch, RequestInsertionScheduler insertionScheduler) {
 		return new DefaultUnplannedRequestInserter(mode, fleet, () -> now, eventsManager, insertionScheduler,
-				vehicleEntryFactory, insertionRetryQueue, forkJoinPool, insertionSearch);
+				vehicleEntryFactory, insertionRetryQueue, rule.forkJoinPool, insertionSearch);
 	}
 
 	private Link link(String id) {
