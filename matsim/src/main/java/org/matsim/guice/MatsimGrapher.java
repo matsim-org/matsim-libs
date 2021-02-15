@@ -1,15 +1,16 @@
 package org.matsim.guice;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.grapher.*;
-import org.jgrapht.DirectedGraph;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.alg.ConnectivityInspector;
-import org.jgrapht.graph.DirectedMaskSubgraph;
-import org.jgrapht.graph.ListenableDirectedGraph;
-import org.jgrapht.graph.MaskFunctor;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.MaskSubgraph;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -31,27 +32,34 @@ import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
 
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.grapher.AbstractInjectorGrapher;
+import com.google.inject.grapher.BindingEdge;
+import com.google.inject.grapher.DependencyEdge;
+import com.google.inject.grapher.Edge;
+import com.google.inject.grapher.ImplementationNode;
+import com.google.inject.grapher.InstanceNode;
+import com.google.inject.grapher.InterfaceNode;
+import com.google.inject.grapher.Node;
+import com.google.inject.grapher.NodeId;
 
 public class MatsimGrapher extends AbstractInjectorGrapher {
 
-	private ListenableDirectedGraph<Node, Edge> g;
+	private Graph<Node, Edge> g;
 	private final Map<NodeId, Node> nodes = new HashMap<>();
 	private Writer writer;
 
 	public MatsimGrapher(GrapherParameters options, Writer writer) {
 		super(options);
 		this.writer = writer;
-		g = new ListenableDirectedGraph<>(Edge.class);
+		g = new DefaultDirectedGraph<>(Edge.class);
 	}
 
 	@Override
 	protected void reset() {
-		g = new ListenableDirectedGraph<>(Edge.class);
+		g = new DefaultDirectedGraph<>(Edge.class);
 		nodes.clear();
 	}
 
@@ -87,9 +95,9 @@ public class MatsimGrapher extends AbstractInjectorGrapher {
 	protected void postProcess() {
 		// More or less arbitrarily filter out graph nodes that I think are unhelpful clutter, like config
 		// groups, scenario elements, and things that aren't usually overridden.
-		DirectedGraph<Node, Edge> filteredGraph = filterGraph();
+		Graph<Node, Edge> filteredGraph = filterGraph();
 
-		DirectedGraph<Node, Edge> graphComponentReachableFromControler = findGraphComponentReachableFromControler(filteredGraph);
+		Graph<Node, Edge> graphComponentReachableFromControler = findGraphComponentReachableFromControler(filteredGraph);
 
 		// Render a dot file. Can be converted to a PDF with
 		//     dot -Tpdf modules.dot > modules.pdf
@@ -99,114 +107,98 @@ public class MatsimGrapher extends AbstractInjectorGrapher {
 		graphvizRenderer.render(graphComponentReachableFromControler);
 	}
 
-	private DirectedGraph<Node, Edge> filterGraph() {
-		return new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
-				@Override
-				public boolean isEdgeMasked(Edge edge) {
-					return false;
-				}
-				@Override
-				public boolean isVertexMasked(Node node) {
-					if (ConfigGroup.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (Network.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (Population.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (DumpDataAtEnd.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (OutputDirectoryHierarchy.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (MatsimServices.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (Injector.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (PopulationFactory.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (Scenario.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (Config.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (IterationStopWatch.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (EventsManager.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (ReplanningContext.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (PlansDumping.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (ActivityFacilities.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (EventsHandling.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (TravelTimeCalculator.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (SingleModeNetworksCache.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (ExperiencedPlansService.class.equals(node.getId().getKey().getTypeLiteral().getRawType())) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("ExperiencedPlansServiceImpl")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("ControlerListener")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("EventsToActivities")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("EventsToLegs")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("LeastCostPathCalculatorFactory")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("MainModeIdentifier")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().toString().contains("TerminationCriterion")) {
-						return true;
-					}
-					if (node.getId().getKey().getTypeLiteral().equals(new TypeLiteral<Set<MobsimListener>>(){})) {
-						return true;
-					}
-					return false;
-				}
-			});
+	private Graph<Node, Edge> filterGraph() {
+		return new MaskSubgraph<>(g, node -> {
+			if (ConfigGroup.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (Network.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (Population.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (DumpDataAtEnd.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (OutputDirectoryHierarchy.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (MatsimServices.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (Injector.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (PopulationFactory.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (Scenario.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (Config.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (IterationStopWatch.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (EventsManager.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (ReplanningContext.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (PlansDumping.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (ActivityFacilities.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (EventsHandling.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (TravelTimeCalculator.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (SingleModeNetworksCache.class.isAssignableFrom(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (ExperiencedPlansService.class.equals(node.getId().getKey().getTypeLiteral().getRawType())) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("ExperiencedPlansServiceImpl")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("ControlerListener")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("EventsToActivities")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("EventsToLegs")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("LeastCostPathCalculatorFactory")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("MainModeIdentifier")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().toString().contains("TerminationCriterion")) {
+				return true;
+			}
+			if (node.getId().getKey().getTypeLiteral().equals(new TypeLiteral<Set<MobsimListener>>(){})) {
+				return true;
+			}
+			return false;
+		}, edge -> false);
 	}
 
-	private DirectedGraph<Node, Edge> findGraphComponentReachableFromControler(DirectedGraph<Node, Edge> filteredGraph) {
-		DirectedGraph<Node, Edge> graphComponentReachableFromControler = new ListenableDirectedGraph<>(Edge.class);
+	private Graph<Node, Edge> findGraphComponentReachableFromControler(Graph<Node, Edge> filteredGraph) {
+		Graph<Node, Edge> graphComponentReachableFromControler = new DefaultDirectedGraph<>(Edge.class);
 		ConnectivityInspector<Node, Edge> ci = new ConnectivityInspector<>(filteredGraph);
-		Graphs.addGraph(graphComponentReachableFromControler, new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
-			Node controlerNode = nodes.get(NodeId.newTypeId(Key.get(ControlerI.class)));
-			@Override
-			public boolean isEdgeMasked(Edge edge) {
-				return false;
-			}
-			@Override
-			public boolean isVertexMasked(Node node) {
-				return !ci.connectedSetOf(controlerNode).contains(node);
-			}
-		}));
+		Node controlerNode = nodes.get(NodeId.newTypeId(Key.get(ControlerI.class)));
+		Graphs.addGraph(graphComponentReachableFromControler, new MaskSubgraph<>(g, node -> !ci.connectedSetOf(controlerNode).contains(node), edge -> false));
 		return graphComponentReachableFromControler;
 	}
 }
