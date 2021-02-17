@@ -24,11 +24,22 @@ package org.matsim.contrib.emissions;
  *
  */
 public enum HbefaVehicleCategory {
-        PASSENGER_CAR,
-        LIGHT_COMMERCIAL_VEHICLE,
-        HEAVY_GOODS_VEHICLE,
-        URBAN_BUS,
-        COACH,
-        MOTORCYCLE,
-        NON_HBEFA_VEHICLE
+        PASSENGER_CAR ("PC"),
+        LIGHT_COMMERCIAL_VEHICLE ("LCV"),
+        HEAVY_GOODS_VEHICLE ("HGV"),
+        URBAN_BUS ("UB"),
+        COACH("CO"),
+        MOTORCYCLE ("MC"),
+        NON_HBEFA_VEHICLE("NON");
+
+        private String identifier;
+        HbefaVehicleCategory(final String identifier){
+             this.identifier = identifier;
+        }
+
+        @Override
+        public String toString() {
+                return identifier;
+        }
 }
+

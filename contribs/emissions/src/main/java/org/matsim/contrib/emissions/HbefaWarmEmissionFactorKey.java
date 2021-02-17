@@ -51,6 +51,19 @@ class HbefaWarmEmissionFactorKey extends HbefaEmissionFactorKey {
 	/*package-private*/ void setTrafficSituation(HbefaTrafficSituation trafficSituation) {
 		this.trafficSituation = trafficSituation;
 	}
+	void setAll(String roadCategory,
+				HbefaTrafficSituation trafficSituation,
+				HbefaVehicleCategory vehicleCategory,
+				HbefaVehicleAttributes vehicleAttributes,
+				Pollutant component){
+
+		this.roadCategory = roadCategory;
+		this.trafficSituation = trafficSituation;
+		setVehicleCategory(vehicleCategory);
+		setVehicleAttributes(vehicleAttributes);
+		setComponent(component);
+
+	}
 
 	@Override
 	public boolean equals(Object o) {
