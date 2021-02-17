@@ -18,19 +18,18 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.Charger;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author michalm
  */
 public class ChargingTaskImpl extends StayTask implements ChargingTask {
-	private final ChargingWithQueueingAndAssignmentLogic chargingLogic;
+	private final ChargingWithAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
 	private Double chargingStartedTime;
 	private final double totalEnergy;
@@ -40,7 +39,7 @@ public class ChargingTaskImpl extends StayTask implements ChargingTask {
 		super(taskType, beginTime, endTime, charger.getLink());
 		Preconditions.checkArgument(totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
 
-		this.chargingLogic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
+		this.chargingLogic = (ChargingWithAssignmentLogic)charger.getLogic();
 		this.ev = ev;
 		this.totalEnergy = totalEnergy;
 	}
@@ -51,7 +50,7 @@ public class ChargingTaskImpl extends StayTask implements ChargingTask {
 	}
 
 	@Override
-	public ChargingWithQueueingAndAssignmentLogic getChargingLogic() {
+	public ChargingWithAssignmentLogic getChargingLogic() {
 		return chargingLogic;
 	}
 
