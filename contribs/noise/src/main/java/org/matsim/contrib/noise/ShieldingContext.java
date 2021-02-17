@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.algorithm.RobustLineIntersector;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.geom.prep.PreparedGeometry;
-import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
@@ -26,45 +25,21 @@ final class ShieldingContext {
 
     //STRtree increases performance by ~40% by reducing the amount of potential
     //obstruction candidates. nkuehnel, mar '20
-    private final STRtree noiseBarriers;
     private final static double GROUND_HEIGHT = 0.5;
     private final ShieldingCorrection shieldingCorrection;
 
+    private BarrierContext barrierContext;
+
     @Inject
-    ShieldingContext(Config config, ShieldingCorrection shieldingCorrection) {
+    ShieldingContext(Config config, ShieldingCorrection shieldingCorrection, BarrierContext barrierContext) {
         this.shieldingCorrection = shieldingCorrection;
+        this.barrierContext = barrierContext;
         NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
-
-        this.noiseBarriers = new STRtree();
-        if (noiseParams.isConsiderNoiseBarriers()) {
-            final Collection<FeatureNoiseBarrierImpl> barriers
-                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(),
-                    noiseParams.getNoiseBarriersSourceCRS(), config.global().getCoordinateSystem());
-
-            for (NoiseBarrier barrier : barriers) {
-                try {
-                    this.noiseBarriers.insert(barrier.getGeometry().getGeometry().getEnvelopeInternal(), barrier);
-                } catch (IllegalArgumentException e) {
-                    logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
-                }
-            }
-        }
     }
 
-    ShieldingContext(Collection<FeatureNoiseBarrierImpl> barriers, Config config, ShieldingCorrection shieldingCorrection) {
+    ShieldingContext(ShieldingCorrection shieldingCorrection, BarrierContext barrierContext) {
         this.shieldingCorrection = shieldingCorrection;
-        NoiseConfigGroup noiseParams = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
-
-        this.noiseBarriers = new STRtree();
-        if (noiseParams.isConsiderNoiseBarriers()) {
-            for (NoiseBarrier barrier : barriers) {
-                try {
-                    this.noiseBarriers.insert(barrier.getGeometry().getGeometry().getEnvelopeInternal(), barrier);
-                } catch (IllegalArgumentException e) {
-                    logger.warn("Could not add noise barrier " + barrier.getId() + " to quad tree. Ignoring it.");
-                }
-            }
-        }
+        this.barrierContext = barrierContext;
     }
 
     /**
@@ -161,7 +136,7 @@ final class ShieldingContext {
     private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Point receiver, Point source, LineString directLineOfSight,
                                                                           LineString fromLineOfSight, LineString toLineOfSight) {
         final Collection<NoiseBarrier> candidates =
-                noiseBarriers.query(directLineOfSight.getEnvelopeInternal());
+                barrierContext.query(directLineOfSight.getEnvelopeInternal());
 
         ConcurrentSkipListMap<Double, Coordinate> edgeCandidates = new ConcurrentSkipListMap<>();
         for (NoiseBarrier noiseBarrier : candidates) {
@@ -185,7 +160,7 @@ final class ShieldingContext {
      */
     private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Coordinate receiver, Coordinate source, LineString directLineOfSight) {
         final Collection<NoiseBarrier> candidates =
-                noiseBarriers.query(directLineOfSight.getEnvelopeInternal());
+                barrierContext.query(directLineOfSight.getEnvelopeInternal());
 
         ConcurrentSkipListMap<Double, Coordinate> edgeCandidates = new ConcurrentSkipListMap<>();
         for (NoiseBarrier noiseBarrier : candidates) {
@@ -193,6 +168,8 @@ final class ShieldingContext {
                 //direct implementation intersects() and intersection() here is up to 15x faster than
                 //using intersects() and intersection() directly on the jts geometry. nkuehnel, aug '20
                 final Set<Coordinate> intersections = intersection((Polygon) noiseBarrier.getGeometry().getGeometry(), directLineOfSight.getCoordinates());
+
+
                 for (Coordinate coordinate : intersections) {
                     coordinate.z = noiseBarrier.getHeight();
                     final double distance = receiver.distance(coordinate);
@@ -251,20 +228,20 @@ final class ShieldingContext {
 
         Set<Coordinate> externalIntersections = intersection(polygon.getExteriorRing(), coords);
 
-        Set<Coordinate> internalIntersections = null;
-        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
-            Set<Coordinate> intersects = intersection(polygon.getInteriorRingN(i), coords);
-            if (!intersects.isEmpty()) {
-                if (internalIntersections == null) {
-                    internalIntersections = new HashSet<>();
-                }
-                internalIntersections.addAll(intersects);
-            }
-        }
+//        Set<Coordinate> internalIntersections = null;
+//        for (int i = 0; i < polygon.getNumInteriorRing(); i++) {
+//            Set<Coordinate> intersects = intersection(polygon.getInteriorRingN(i), coords);
+//            if (!intersects.isEmpty()) {
+//                if (internalIntersections == null) {
+//                    internalIntersections = new HashSet<>();
+//                }
+//                internalIntersections.addAll(intersects);
+//            }
+//        }
 
-        if(internalIntersections != null) {
-            externalIntersections.addAll(internalIntersections);
-        }
+//        if(internalIntersections != null) {
+//            externalIntersections.addAll(internalIntersections);
+//        }
 
         return externalIntersections;
     }
@@ -281,9 +258,7 @@ final class ShieldingContext {
                 if (intersections == null) {
                     intersections = new HashSet<>();
                 }
-                for (int j = 0; j < intersector.getIntersectionNum(); j++) {
-                    intersections.add(intersector.getIntersection(j));
-                }
+                intersections.add(intersector.getIntersection(0));
             }
         }
         return intersections == null ? Collections.emptySet() : intersections;
