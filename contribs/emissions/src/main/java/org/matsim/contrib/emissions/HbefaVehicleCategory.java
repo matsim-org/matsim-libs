@@ -27,9 +27,9 @@ public enum HbefaVehicleCategory {
         PASSENGER_CAR ("PC"),
         LIGHT_COMMERCIAL_VEHICLE ("LCV"),
         HEAVY_GOODS_VEHICLE ("HGV"),
-        URBAN_BUS ("UB"),
-        COACH("CO"),
-        MOTORCYCLE ("MC"),
+        URBAN_BUS ("UBus"),
+        COACH("Coach"),
+        MOTORCYCLE ("SMC"),
         NON_HBEFA_VEHICLE("NON");
 
         private String identifier;
