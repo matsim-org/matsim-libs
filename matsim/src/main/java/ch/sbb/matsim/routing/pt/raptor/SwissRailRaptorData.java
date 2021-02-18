@@ -4,17 +4,6 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +25,17 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * @author mrieser / SBB
@@ -470,6 +470,21 @@ public class SwissRailRaptorData {
         return this.stopsQT.getClosest(x, y);
     }
 
+    /**
+     * "Translates" an internally used {@link RTransfer} into a publicly usable {@link Transfer} object.
+     * @param transfer
+     * @param provider if provided, the object will be reused and returned, otherwise a new object will be created.
+     * @return
+     */
+    public CachingTransferProvider getTransferProvider(RTransfer transfer, CachingTransferProvider provider) {
+        CachingTransferProvider transferProvider = provider;
+        if (transferProvider == null) {
+            transferProvider = new CachingTransferProvider();
+        }
+        transferProvider.reset(transfer);
+        return transferProvider;
+    }
+
     static final class RRoute {
         final int indexFirstRouteStop;
         final int countRouteStops;
@@ -513,7 +528,7 @@ public class SwissRailRaptorData {
         }
     }
 
-    static final class RTransfer {
+    public static final class RTransfer {
         final int fromRouteStop;
         final int toRouteStop;
         final int transferTime;
@@ -547,4 +562,27 @@ public class SwissRailRaptorData {
         }
         stopFilterAttribute2Value2StopsQT.get(stopFilterAttribute).put(stopFilterValue, stopsQTFiltered);
 	}
+
+	public class CachingTransferProvider implements Supplier<Transfer> {
+
+	    private RTransfer raptorTransfer = null;
+	    private Transfer transfer = new Transfer();
+
+      public CachingTransferProvider() {
+      }
+
+      void reset(RTransfer raptorTransfer) {
+          this.raptorTransfer = raptorTransfer;
+      }
+
+      @Override
+      public Transfer get() {
+          if (this.transfer.rTransfer != this.raptorTransfer) {
+              RRouteStop fromStop = SwissRailRaptorData.this.routeStops[this.raptorTransfer.fromRouteStop];
+              RRouteStop toStop = SwissRailRaptorData.this.routeStops[this.raptorTransfer.toRouteStop];
+              this.transfer.reset(this.raptorTransfer, fromStop, toStop);
+          }
+          return this.transfer;
+      }
+  }
 }

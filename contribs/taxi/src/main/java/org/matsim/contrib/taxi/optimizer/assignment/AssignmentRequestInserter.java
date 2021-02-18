@@ -23,8 +23,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
-import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
@@ -33,8 +31,6 @@ import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.FastMultiNodeDijkstraFactory;
-import org.matsim.core.router.MultiNodePathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -53,23 +49,19 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 
 	public AssignmentRequestInserter(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, TaxiScheduler scheduler, AssignmentTaxiOptimizerParams params) {
-		this(fleet, timer, travelTime, scheduler, params,
-				(MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(true).createPathCalculator(network,
-						travelDisutility, travelTime),
-				(BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true).createPathCalculator(
-						network, travelDisutility, travelTime),
+		this(fleet, timer, network, travelTime, travelDisutility, scheduler, params,
 				new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime));
 	}
 
-	public AssignmentRequestInserter(Fleet fleet, MobsimTimer timer, TravelTime travelTime, TaxiScheduler scheduler,
-			AssignmentTaxiOptimizerParams params, MultiNodePathCalculator multiNodeRouter,
-			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router) {
+	public AssignmentRequestInserter(Fleet fleet, MobsimTimer timer, Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, TaxiScheduler scheduler, AssignmentTaxiOptimizerParams params,
+			LeastCostPathCalculator router) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.timer = timer;
 		this.params = params;
 
-		assignmentProblem = new VehicleAssignmentProblem<>(travelTime, multiNodeRouter, backwardMultiNodeRouter, router,
+		assignmentProblem = new VehicleAssignmentProblem<>(network, travelTime, travelDisutility, router,
 				params.getNearestRequestsLimit(), params.getNearestVehiclesLimit());
 
 		assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);

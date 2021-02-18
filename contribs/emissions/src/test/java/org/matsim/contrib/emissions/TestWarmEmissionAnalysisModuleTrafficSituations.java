@@ -54,8 +54,7 @@ import static org.matsim.contrib.emissions.Pollutant.NOx;
 @RunWith(Parameterized.class)
 public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, PM, NOx, NO2,PM, SO2));
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ) );
 	private static final String hbefaRoadCategory = "URB";
 	private final EmissionsComputationMethod emissionsComputationMethod;
@@ -69,21 +68,21 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private static final int HEAVY_INDEX = 1;
 	private static final int SAT_INDEX = 2;
 	private static final int SG_INDEX = 3;
-	private final HbefaTrafficSituation[] trafficSituations = {FREEFLOW, HEAVY, SATURATED, STOPANDGO};
-	private final double[] avgPassengerCarSpeed = {51., 40., 30., 10.};
+	private final HbefaTrafficSituation[] trafficSituations = {FREEFLOW, HEAVY, SATURATED, STOPANDGO, STOPANDGO_HEAVY};
+	private final double[] avgPassengerCarSpeed = {51., 40., 30., 10., 5.};
 
 	// vehicle information for regular test cases
 	// case 1 - data in both tables -> use detailed
 	private static final String petrolTechnology = "PC petrol <1,4L";
 	private static final String petrolSizeClass ="<ECE petrol (4S)";
 	private static final String petrolConcept ="<1,4L";
-	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000};
+	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000, 100000};
 
 	// case 2 - free flow entry in both tables, stop go entry in average table -> use average
 	private static final String pcTechnology = "PC petrol <1,4L <ECE";
 	private static final String pcSizeClass = "petrol (4S)";
 	private static final String pcConcept = "<1,4L";
-	private static final double[] avgPetrolFactor = {20, 200, 2000, 20000};
+	private static final double[] avgPetrolFactor = {20, 200, 2000, 20000, 200000};
 
 	public TestWarmEmissionAnalysisModuleTrafficSituations( EmissionsComputationMethod emissionsComputationMethod ) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
@@ -110,13 +109,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+        ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior(EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort); //declare using detailed values
 
@@ -130,19 +123,16 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	@Test
 	public void testFallBackToAverageTable() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		double ffspeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/ffspeed;
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
-		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
+		Link pcLink = createMockLink(linkLength, ffspeed / 3.6);
 
 		//allow fallback to average table
 		weam.getEcg().setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
-
-		// should be ok
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
 		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
@@ -153,6 +143,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	}
 
+	//using the different computation methods, the NOx warm Emissions are calculated for the diffrent trafic Situations (FF;HEAVY;SAT;SG)
 	@Test
 	public void testTrafficSituations() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
@@ -163,10 +154,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		double ffspeed = avgPassengerCarSpeed[FF_INDEX];
 
-		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
-
-		// yy in the following, the stop-and-go-fraction tests are purely regression tests; I never checked if they are correct in the first place.
-		// kai, jan'20
+		Link pcLink = createMockLink(linkLength, ffspeed / 3.6);
 
 		double actualSpeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/actualSpeed;
@@ -179,7 +167,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals( 1360.1219512195123, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy this is not even close to the "averageSpeed" value, which is 200. kai, jan'20
 				break;
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[HEAVY_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
@@ -194,7 +181,6 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals( 3431.219512195123, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy the "averageSpeed" value is 2000.  kai, jan'20
 				break;
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
@@ -214,8 +200,8 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		switch( emissionsComputationMethod ) {
 			case StopAndGoFraction:
 				Assert.assertEquals(11715.609756097561, warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
-				// yy the "averageSpeed" value is 2000.  kai, jan'20
 				break;
+
 			case AverageSpeed:
 				Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 				break;
@@ -223,28 +209,25 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 				throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
 		}
 
-		actualSpeed = avgPassengerCarSpeed[SG_INDEX] - 5;
-		travelTime = linkLength/actualSpeed;
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
-		switch( emissionsComputationMethod ) {
-			case StopAndGoFraction:
-				break;
-			case AverageSpeed:
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + emissionsComputationMethod );
+		{
+			actualSpeed = avgPassengerCarSpeed[SG_INDEX] - 5;
+			travelTime = linkLength / actualSpeed;
+			warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime * 3.6);
+			Assert.assertEquals(detailedPetrolFactor[SG_INDEX] * (linkLength / 1000.), warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
+
+			//results should be equal here, because in both cases only the s&g value is relevant (0% freeflow, 100% stop&go).
+			Assert.assertEquals(20000, warmEmissions.get(NOx), MatsimTestUtils.EPSILON);
+
 		}
 	}
 
 
 
-	private static Link createMockLink( String linkId, double linkLength, double ffspeed ) {
-		Id<Link> mockLinkId = Id.createLinkId(linkId);
+	private static Link createMockLink(double linkLength, double ffspeed) {
 		Node mockNode1 = NetworkUtils.createNode(Id.createNodeId(1));
 		Node mockNode2 = NetworkUtils.createNode(Id.createNodeId(2));
-		Link l = NetworkUtils.createLink(mockLinkId, mockNode1, mockNode2, null, linkLength, ffspeed, 1800, 1);
+		Link l = NetworkUtils.createLink(Id.createLinkId("link"), mockNode1, mockNode2, null, linkLength, ffspeed, 1800, 1);
 		EmissionUtils.setHbefaRoadType(l, "URB");
 		return l;
 	}
@@ -261,17 +244,15 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			vehAtt.setHbefaSizeClass(petrolSizeClass);
 			vehAtt.setHbefaEmConcept(petrolConcept);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor(factor);
-			detWarmFactor.setSpeed(speed);
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(factor, speed);
 
-			for ( Pollutant wp: pollutants){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent(wp);
-				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-				detWarmKey.setHbefaTrafficSituation(trafficSituation);
-				detWarmKey.setHbefaVehicleAttributes(vehAtt);
-				detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(hbefaRoadCategory);
+				detWarmKey.setTrafficSituation(trafficSituation);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 
 			}
@@ -288,17 +269,15 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor(factor);
-			detWarmFactor.setSpeed(speed);
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(factor, speed);
 
-			for ( Pollutant wp: pollutants){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent(wp);
-				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
-				detWarmKey.setHbefaTrafficSituation(trafficSituation);
-				detWarmKey.setHbefaVehicleAttributes(vehAtt);
-				detWarmKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(hbefaRoadCategory);
+				detWarmKey.setTrafficSituation(trafficSituation);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 				avgHbefaWarmTable.put(detWarmKey, detWarmFactor);
 
 			}
@@ -312,7 +291,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	) {
 		detailedHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
-			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
 			hbefaRoadTrafficSpeeds.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());

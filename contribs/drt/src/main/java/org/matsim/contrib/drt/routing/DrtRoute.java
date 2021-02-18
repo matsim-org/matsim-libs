@@ -17,10 +17,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.drt.routing;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
+import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.base.MoreObjects;
 
@@ -37,39 +40,43 @@ import com.google.common.base.MoreObjects;
 public class DrtRoute extends AbstractRoute {
 	public final static String ROUTE_TYPE = TransportMode.drt;
 
-	private double maxWaitTime;
-	private double directRideTime;
+	private OptionalTime maxWaitTime = OptionalTime.undefined();
+	private OptionalTime directRideTime = OptionalTime.undefined();
 
 	public DrtRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 
 	public double getDirectRideTime() {
-		return directRideTime;
+		return directRideTime.seconds();
 	}
 
 	public double getMaxWaitTime() {
-		return maxWaitTime;
+		return maxWaitTime.seconds();
 	}
 
-	public void setUnsharedRideTime(double directRideTime) {
-		this.directRideTime = directRideTime;
+	public void setDirectRideTime(double directRideTime) {
+		this.directRideTime = OptionalTime.defined(directRideTime);
 	}
 
 	public void setMaxWaitTime(double maxWaitTime) {
-		this.maxWaitTime = maxWaitTime;
+		this.maxWaitTime = OptionalTime.defined(maxWaitTime);
+	}
+
+	public double getMaxTravelTime() {
+		return getTravelTime().seconds(); // currently DrtRoute.travelTime is set to the max allowed travel time
 	}
 
 	@Override
 	public String getRouteDescription() {
-		return maxWaitTime + " " + directRideTime;
+		return maxWaitTime.seconds() + " " + directRideTime.seconds();
 	}
 
 	@Override
 	public void setRouteDescription(String routeDescription) {
 		String[] values = routeDescription.split(" ");
-		maxWaitTime = requiresZeroOrPositive(Double.parseDouble(values[0]));
-		directRideTime = requiresZeroOrPositive(Double.parseDouble(values[1]));
+		maxWaitTime = OptionalTime.defined(requiresZeroOrPositive(Double.parseDouble(values[0])));
+		directRideTime = OptionalTime.defined(requiresZeroOrPositive(Double.parseDouble(values[1])));
 	}
 
 	@Override
@@ -83,10 +90,8 @@ public class DrtRoute extends AbstractRoute {
 	}
 
 	private double requiresZeroOrPositive(double value) {
-		if (value >= 0 || value <= Double.MAX_VALUE) {
-			return value;
-		}
-		throw new IllegalArgumentException("Value: " + value + " must be zero or positive");
+		checkArgument(value >= 0 || value <= Double.MAX_VALUE, "Value: (%s) must be zero or positive", value);
+		return value;
 	}
 
 	@Override

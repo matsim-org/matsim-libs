@@ -30,8 +30,9 @@ public enum DrtTaskBaseType {
 	STOP, // stopped to drop off and pick up passengers
 	DRIVE; // driving with/without passengers
 
-	public static DrtTaskBaseType getBaseType(Task task) {
-		return ((DrtTaskType)task.getTaskType()).getBaseType().get();
+	public static DrtTaskBaseType getBaseTypeOrElseThrow(Task task) {
+		return ((DrtTaskType)task.getTaskType()).getBaseType()
+				.orElseThrow(() -> new IllegalArgumentException("Task: " + task + "does not have a base type"));
 	}
 
 	public boolean isBaseTypeOf(Task task) {

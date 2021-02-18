@@ -6,6 +6,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.routing.pt.raptor.OccupancyData.DepartureData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorInVehicleCostCalculator.RouteSegmentIterator;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.CachingTransferProvider;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRoute;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RRouteStop;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData.RTransfer;
@@ -53,11 +54,12 @@ public class SwissRailRaptorCore {
     private final BitSet tmpImprovedStops; // only used to ensure parallel update
     private final boolean useCapacityConstraints;
     private final RaptorInVehicleCostCalculator inVehicleCostCalculator;
+    private final RaptorTransferCostCalculator transferCostCalculator;
     private final RouteSegmentIteratorImpl routeSegmentIterator;
 
     private final static int TIME_UNDEFINED = Integer.MIN_VALUE;
 
-    SwissRailRaptorCore(SwissRailRaptorData data, RaptorInVehicleCostCalculator inVehicleCostCalculator) {
+    SwissRailRaptorCore(SwissRailRaptorData data, RaptorInVehicleCostCalculator inVehicleCostCalculator, RaptorTransferCostCalculator transferCostCalculator) {
         this.data = data;
         this.arrivalPathPerRouteStop = new PathElement[data.countRouteStops];
         this.egressCostsPerRouteStop = new double[data.countRouteStops];
@@ -72,6 +74,7 @@ public class SwissRailRaptorCore {
         this.tmpImprovedStops = new BitSet(this.data.countStops);
         this.useCapacityConstraints = this.data.config.isUseCapacityConstraints();
         this.inVehicleCostCalculator = inVehicleCostCalculator;
+        this.transferCostCalculator = transferCostCalculator;
         this.routeSegmentIterator = new RouteSegmentIteratorImpl(this.data);
     }
 
@@ -157,7 +160,7 @@ public class SwissRailRaptorCore {
                     double waitingCost = waitingTime * -parameters.getMarginalUtilityOfWaitingPt_utl_s();
 
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, nextDepartureTimeAtStop, arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, nextDepartureTimeAtStop, arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
 
                     /* okay, the following is not very nice...
                      * we want to find the least-cost access leg including the waiting time
@@ -185,7 +188,7 @@ public class SwissRailRaptorCore {
                 } else if (isIntermodalAccess) {
                     // there is no more departure, but we start here by intermodal access, so still register to allow transfers to other (non-)intermodal stops.
                     RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
+                    PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
 
                     /* okay, the following is not very nice...
                      * ... see long comment above, it's the same
@@ -346,7 +349,7 @@ public class SwissRailRaptorCore {
                 double arrivalCost = depAtRouteStop.accessStop.accessCost + depAtRouteStop.costOffset;
                 RRouteStop toRouteStop = depAtRouteStop.routeStop;
                 int routeStopIndex = depAtRouteStop.routeStopIndex;
-                PathElement pe = new PathElement(null, toRouteStop, depAtRouteStop.depTime, depAtRouteStop.depTime, arrivalTime, arrivalCost, 0, depAtRouteStop.accessStop.distance, 0, true, depAtRouteStop.accessStop);
+                PathElement pe = new PathElement(null, toRouteStop, depAtRouteStop.depTime, depAtRouteStop.depTime, arrivalTime, arrivalCost, 0, depAtRouteStop.accessStop.distance, 0, true, null, depAtRouteStop.accessStop);
                 this.arrivalPathPerRouteStop[routeStopIndex] = pe;
                 this.leastArrivalCostAtRouteStop[routeStopIndex] = arrivalCost;
                 this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
@@ -477,7 +480,7 @@ public class SwissRailRaptorCore {
                 int arrivalTime = (int) (depTime + stop.accessTime);
                 double arrivalCost = stop.accessCost;
                 RRouteStop toRouteStop = this.data.routeStops[routeStopIndex];
-                PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, stop);
+                PathElement pe = new PathElement(null, toRouteStop, TIME_UNDEFINED, TIME_UNDEFINED, arrivalTime, arrivalCost, 0, stop.distance, 0, true, null, stop);
                 this.arrivalPathPerRouteStop[routeStopIndex] = pe;
                 this.arrivalPathPerStop[toRouteStop.stopFacilityIndex] = pe;
                 this.leastArrivalCostAtRouteStop[routeStopIndex] = arrivalCost;
@@ -566,10 +569,7 @@ public class SwissRailRaptorCore {
         this.improvedStops.clear();
         this.reachedRouteStopIndices.clear();
 
-        double transferCostBase = parameters.getTransferPenaltyFixCostPerTransfer();
-        double transferCostPerHour = parameters.getTransferPenaltyPerTravelTimeHour();
-        double transferCostMin = parameters.getTransferPenaltyMinimum();
-        double transferCostMax = parameters.getTransferPenaltyMaximum();
+        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         double marginalUtilityOfWaitingPt_utl_s = parameters.getMarginalUtilityOfWaitingPt_utl_s();
 
@@ -612,7 +612,7 @@ public class SwissRailRaptorCore {
                 int firstDepartureTime = (boardingPE.firstDepartureTime == TIME_UNDEFINED) ? currentAgentBoardingTime : boardingPE.firstDepartureTime;
 
                 double marginalUtilityOfTravelTime_utl_s = parameters.getMarginalUtilityOfTravelTime_utl_s(boardingPE.toRouteStop.mode);
-
+                transferProvider.reset(boardingPE.transfer);
 
                 for (int toRouteStopIndex = firstRouteStopIndex + 1; toRouteStopIndex < route.indexFirstRouteStop + route.countRouteStops; toRouteStopIndex++) {
                     routeSegmentIterator.reset(currentDepartureIndex, currentAgentBoardingTime, currentBoardingRouteStopIndex, toRouteStopIndex);
@@ -621,12 +621,12 @@ public class SwissRailRaptorCore {
                     int inVehicleTime = arrivalTime - currentAgentBoardingTime;
                     double inVehicleCost = this.inVehicleCostCalculator.getInVehicleCost(inVehicleTime, marginalUtilityOfTravelTime_utl_s, person, currentVehicle, parameters, routeSegmentIterator);
                     double arrivalTravelCost = currentTravelCostWhenBoarding + inVehicleCost;
-                    double arrivalTransferCost = calcTransferCost(transferCostBase, transferCostPerHour, transferCostMin, transferCostMax, arrivalTime - firstDepartureTime) * (boardingPE.transferCount);
+                    double arrivalTransferCost = (boardingPE.firstDepartureTime != TIME_UNDEFINED) ? (currentTransferCostWhenBoarding + this.transferCostCalculator.calcTransferCost(transferProvider, parameters, arrivalTime - firstDepartureTime, boardingPE.transferCount, boardingPE.arrivalTransferCost, boardingPE.arrivalTime)) : 0;
                     double previousArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                     double totalArrivalCost = arrivalTravelCost + arrivalTransferCost;
                     if (totalArrivalCost <= previousArrivalCost) {
                         double distance = toRouteStop.distanceAlongRoute - boardingPE.toRouteStop.distanceAlongRoute;
-                        PathElement pe = new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, null);
+                        PathElement pe = new PathElement(boardingPE, toRouteStop, firstDepartureTime, currentAgentBoardingTime, arrivalTime, arrivalTravelCost, arrivalTransferCost, distance, boardingPE.transferCount, false, null, null);
                         this.arrivalPathPerRouteStop[toRouteStopIndex] = pe;
                         this.leastArrivalCostAtRouteStop[toRouteStopIndex] = totalArrivalCost;
                         if (totalArrivalCost <= this.leastArrivalCostAtStop[toRouteStop.stopFacilityIndex]) {
@@ -717,28 +717,12 @@ public class SwissRailRaptorCore {
         return this.data.occupancyData.getNextAvailableDeparture(this.data, routeStop, time);
     }
 
-    private double calcTransferCost(double costBase, double costPerHour, double costMin, double costMax, double travelTime) {
-        double cost = costBase + costPerHour / 3600 * travelTime;
-        double max = Math.max(costMin, costMax);
-        double min = Math.min(costMin, costMax);
-        if (cost > max) {
-            cost = max;
-        }
-        if (cost < min) {
-            cost = min;
-        }
-        return cost;
-    }
-
     private void handleTransfers(boolean strict, RaptorParameters raptorParams) {
         this.improvedRouteStopIndices.clear();
         this.tmpImprovedStops.clear();
 
-        double transferCostBase = raptorParams.getTransferPenaltyFixCostPerTransfer();
-        double transferCostPerHour = raptorParams.getTransferPenaltyPerTravelTimeHour();
-        double transferCostMin = raptorParams.getTransferPenaltyMinimum();
-        double transferCostMax = raptorParams.getTransferPenaltyMaximum();
         double margUtilityTransitWalk = raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk); // replaced TransportMode.transit_walk with walk
+        CachingTransferProvider transferProvider = this.data.new CachingTransferProvider();
 
         for (int stopIndex = this.improvedStops.nextSetBit(0); stopIndex >= 0; stopIndex = this.improvedStops.nextSetBit(stopIndex + 1)) {
             PathElement fromPE = this.arrivalPathPerStop[stopIndex];
@@ -755,14 +739,15 @@ public class SwissRailRaptorCore {
             for (int transferIndex = firstTransferIndex; transferIndex < lastTransferIndex; transferIndex++) {
                 RTransfer transfer = this.data.transfers[transferIndex];
                 int toRouteStopIndex = transfer.toRouteStop;
+                transferProvider.reset(transfer);
                 int newArrivalTime = arrivalTime + transfer.transferTime;
                 double newArrivalTravelCost = arrivalTravelCost - transfer.transferTime * margUtilityTransitWalk;
-                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? calcTransferCost (transferCostBase, transferCostPerHour, transferCostMin, transferCostMax, newArrivalTime - fromPE.firstDepartureTime) * (fromPE.transferCount + 1) : 0;
+                double newArrivalTransferCost = (fromPE.firstDepartureTime != TIME_UNDEFINED) ? (arrivalTransferCost + this.transferCostCalculator.calcTransferCost(transferProvider, raptorParams, newArrivalTime - fromPE.firstDepartureTime, fromPE.transferCount + 1, arrivalTransferCost, arrivalTime)) : 0;
                 double newTotalArrivalCost = newArrivalTravelCost + newArrivalTransferCost;
                 double prevLeastArrivalCost = this.leastArrivalCostAtRouteStop[toRouteStopIndex];
                 if (newTotalArrivalCost < prevLeastArrivalCost || (!strict && newTotalArrivalCost <= prevLeastArrivalCost)) {
                     RRouteStop toRouteStop = this.data.routeStops[toRouteStopIndex];
-                    PathElement pe = new PathElement(fromPE, toRouteStop, fromPE.firstDepartureTime, TIME_UNDEFINED, newArrivalTime, newArrivalTravelCost, newArrivalTransferCost, transfer.transferDistance, fromPE.transferCount + 1, true, null);
+                    PathElement pe = new PathElement(fromPE, toRouteStop, fromPE.firstDepartureTime, TIME_UNDEFINED, newArrivalTime, newArrivalTravelCost, newArrivalTransferCost, transfer.transferDistance, fromPE.transferCount + 1, true, transfer, null);
                     this.arrivalPathPerRouteStop[toRouteStopIndex] = pe;
                     this.leastArrivalCostAtRouteStop[toRouteStopIndex] = newTotalArrivalCost;
                     this.improvedRouteStopIndices.set(toRouteStopIndex);
@@ -799,7 +784,7 @@ public class SwissRailRaptorCore {
                 double totalCost = arrivalTravelCost + pe.arrivalTransferCost;
                 if ((totalCost < leastCost) || (totalCost == leastCost && pe.transferCount < leastCostPath.transferCount)) {
                     leastCost = totalCost;
-                    leastCostPath = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, egressStop); // this is the egress leg
+                    leastCostPath = new PathElement(pe, null, pe.firstDepartureTime, TIME_UNDEFINED, arrivalTime, arrivalTravelCost, pe.arrivalTransferCost, egressStop.distance, pe.transferCount, true, null, egressStop); // this is the egress leg
                 }
             }
         }
@@ -881,9 +866,10 @@ public class SwissRailRaptorCore {
         final double distance;
         final int transferCount;
         final boolean isTransfer;
+        final RTransfer transfer;
         final InitialStop initialStop;
 
-        PathElement(PathElement comingFrom, RRouteStop toRouteStop, int firstDepartureTime, int boardingTime, int arrivalTime, double arrivalTravelCost, double arrivalTransferCost, double distance, int transferCount, boolean isTransfer, InitialStop initialStop) {
+        PathElement(PathElement comingFrom, RRouteStop toRouteStop, int firstDepartureTime, int boardingTime, int arrivalTime, double arrivalTravelCost, double arrivalTransferCost, double distance, int transferCount, boolean isTransfer, RTransfer transfer, InitialStop initialStop) {
             this.comingFrom = comingFrom;
             this.toRouteStop = toRouteStop;
             this.firstDepartureTime = firstDepartureTime;
@@ -894,6 +880,7 @@ public class SwissRailRaptorCore {
             this.distance = distance;
             this.transferCount = transferCount;
             this.isTransfer = isTransfer;
+            this.transfer = transfer;
             this.initialStop = initialStop;
         }
     }

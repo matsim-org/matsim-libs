@@ -78,7 +78,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+		Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
 		new CarrierPlanXmlReader(carriers).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		addDummyVehicleType( carriers, "default") ;
 

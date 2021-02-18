@@ -23,6 +23,7 @@ package org.matsim.contrib.ev.charging;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -97,7 +98,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	}
 
 	@Override
-	public double calcChargingPower(Charger charger) {
+	public double calcChargingPower(ChargerSpecification charger) {
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;

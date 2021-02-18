@@ -18,11 +18,9 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.hermes;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -32,10 +30,15 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
 import org.matsim.core.events.ParallelEventsManager;
+import org.matsim.core.utils.collections.IntArrayMap;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-public class Realm {
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+
+class Realm {
 	private final ScenarioImporter si;
     // Global array of links.
     // Note: the id of the link is its index in the array.
@@ -46,16 +49,16 @@ public class Realm {
     // Agents on hold until a specific timestamp (in seconds).
     private final ArrayList<ArrayDeque<Agent>> delayedAgentsByWakeupTime;
     // Agents waiting in pt stations. Should be used as follows:
-    // nqsim_stops.get(curr station id).get(line id).get(dst station id) -> queue of agents
-    private final ArrayList<ArrayList<Map<Integer, ArrayDeque<Agent>>>> agent_stops;
-    // stop ids per route id
-    private final ArrayList<ArrayList<Integer>> stops_in_route;
+    // agent_stops.get(curr station id).get(line id) -> queue of agents
+    private final IdMap<TransitStopFacility, IntArrayMap<ArrayDeque<Agent>>> agent_stops;
+    // stop ids for each route: int[] stop_ids = route_stops_by_route_no[route_no]
+    protected int[][] route_stops_by_route_no;
     // line id of a particular route
     private final int[] line_of_route;
     // queue of sorted events by time
     private EventArray sorted_events;
     // MATSim event manager.
-    private final ParallelEventsManager eventsManager;
+    private final EventsManager eventsManager;
     // Current timestamp
     private int secs;
     Logger log = Logger.getLogger(Realm.class);
@@ -67,10 +70,10 @@ public class Realm {
         this.delayedLinksByWakeupTime = new ArrayList<>();
         this.delayedAgentsByWakeupTime = new ArrayList<>();
         this.agent_stops = scenario.agent_stops;
-        this.stops_in_route = scenario.route_stops_by_index;
+        this.route_stops_by_route_no = scenario.route_stops_by_route_no;
         this.line_of_route = scenario.line_of_route;
         this.sorted_events = new EventArray();
-        this.eventsManager = (ParallelEventsManager)eventsManager;
+        this.eventsManager = eventsManager;
 
 	// the last position is to store events that will not happen...
         for (int i = 0; i <= HermesConfigGroup.SIM_STEPS + 1; i++) {
@@ -81,7 +84,7 @@ public class Realm {
 
     public void log(int time, String s) {
         if (HermesConfigGroup.DEBUG_REALMS) {
-            log.debug(String.format("ETHZ [ time = %d ] %s", time, s));
+            log.debug(String.format("Hermes [ time = %d ] %s", time, s));
         }
     }
 
@@ -169,22 +172,17 @@ public class Realm {
 
     protected boolean processAgentWait(Agent agent, long planentry) {
         advanceAgentandSetEventTime(agent);
-        int routeid = Agent.getRoutePlanEntry(planentry);
+        int routeNo = Agent.getRoutePlanEntry(planentry);
         int accessStop = Agent.getStopPlanEntry(planentry);
-        // Note: getNextStop needs to be called after advanveAgent.
-        int egressStop = agent.getNextStopPlanEntry();
-        int lineid = line_of_route[routeid];
+        // Note: getNextStop needs to be called after advanceAgent.
+        int lineid = line_of_route[routeNo];
 
-        ArrayList<Map<Integer, ArrayDeque<Agent>>> list;
-        Map<Integer, ArrayDeque<Agent>> list2;
-        ArrayDeque<Agent> list3;
         try {
-        	list = agent_stops.get(accessStop);
-            list2 = list.get(lineid);
-            list3 = list2.get(egressStop);
-            list3.add(agent);
+          agent_stops.get(accessStop)
+            .get(lineid)
+            .add(agent);
         } catch (NullPointerException npe) {
-        	System.out.println(String.format("ETHZ NPE agent=%d routeid=%d accessStop=%d lineid=%d egressStop=%d", agent.id, routeid, accessStop, egressStop, lineid));
+        	log.error(String.format("Hermes NPE agent=%d routeNo=%d accessStop=%d lineid=%d", agent.id, routeNo, accessStop, lineid), npe);
         }
         return true;
     }
@@ -198,21 +196,15 @@ public class Realm {
     }
 
     protected boolean processAgentStopDelay(Agent agent, long planentry) {
-        int routeid = Agent.getRoutePlanEntry(planentry);
         int stopid = Agent.getStopPlanEntry(planentry);
-        int stopidx = Agent.getStopIndexPlanEntry(planentry);
-        int lineid = line_of_route[routeid];
         int departure = Agent.getDeparture(planentry);
-        ArrayList<Integer> next_stops = stops_in_route.get(routeid);
-        Map<Integer, ArrayDeque<Agent>> agents_next_stops =
-            agent_stops.get(stopid).get(lineid);
 
         // consume stop delay
         add_delayed_agent(agent, Math.max(secs + 1, departure));
         advanceAgent(agent);
 
         // drop agents
-        for (Agent out : agent.egress(stopidx)) {
+        for (Agent out : agent.egress(stopid)) {
             add_delayed_agent(out, secs + 1);
             // consume access, activate egress
             advanceAgentandSetEventTime(out);
@@ -225,34 +217,34 @@ public class Realm {
     }
 
     protected boolean processAgentStopDepart(Agent agent, long planentry) {
-        int routeid = Agent.getRoutePlanEntry(planentry);
+        int routeNo = Agent.getRoutePlanEntry(planentry);
         int stopid = Agent.getStopPlanEntry(planentry);
-        int stopidx = Agent.getStopIndexPlanEntry(planentry);
-        int lineid = line_of_route[routeid];
-        Map<Integer, ArrayDeque<Agent>> agents_next_stops =
-                agent_stops.get(stopid).get(lineid);
-        ArrayList<Integer> next_stops = stops_in_route.get(routeid);
+        int lineid = line_of_route[routeNo];
+        ArrayDeque<Agent> waiting_agents = agent_stops.get(stopid).get(lineid);
 
         // take agents
-        for (int idx = stopidx; idx < next_stops.size(); idx++) {
-            ArrayDeque<Agent> in_agents = agents_next_stops.get(next_stops.get(idx));
-
-            if (in_agents == null) {
-                continue;
-            }
-
+        if (waiting_agents != null) {
             ArrayList<Agent> removed = new ArrayList<>();
-            for (Agent in : in_agents) {
-                if (!agent.access(idx, in)) {
-                    break;
+            for (Agent in : waiting_agents) {
+                try {
+                    int egressStop = in.getNextStopPlanEntry();
+                    if (agent.willServeStop(egressStop)) {
+                        if (agent.access(egressStop, in)) {
+                            removed.add(in);
+                            // consume wait in stop, activate access
+                            advanceAgentandSetEventTime(in);
+                            // set driver in agent's event
+                            setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
+                        } else {
+                            // agent could not enter, likely the vehicle is full
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-                removed.add(in);
-                // consume wait in stop, activate access
-                advanceAgentandSetEventTime(in);
-                // set driver in agent's event
-                setEventVehicle(in, Agent.getPlanEvent(in.currPlan()), agent.id);
             }
-            in_agents.removeAll(removed);
+            waiting_agents.removeAll(removed);
         }
         advanceAgentandSetEventTime(agent);
         // False is returned to force this agent to be processed in the next tick.

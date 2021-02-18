@@ -103,7 +103,7 @@ public class TaxiScheduler {
 
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath, TaxiTaskType taskType) {
 		Task lastTask = Schedules.getLastTask(schedule);
-		switch (getBaseType(lastTask)) {
+		switch (getBaseTypeOrElseThrow(lastTask)) {
 			case EMPTY_DRIVE:
 				divertDrive((TaxiEmptyDriveTask)lastTask, vrpPath);
 				return;
@@ -287,7 +287,7 @@ public class TaxiScheduler {
 
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (getBaseType(currentTask)) {
+		switch (getBaseTypeOrElseThrow(currentTask)) {
 			case PICKUP:
 				return taxiCfg.isDestinationKnown() ? 2 : null;
 
@@ -327,7 +327,7 @@ public class TaxiScheduler {
 	}
 
 	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
-		TaxiTaskBaseType baseType = getBaseType(task);
+		TaxiTaskBaseType baseType = getBaseTypeOrElseThrow(task);
 		if (baseType == PICKUP) {
 			TaxiRequest request = ((TaxiPickupTask)task).getRequest();
 			request.setPickupTask(null);
@@ -352,7 +352,7 @@ public class TaxiScheduler {
 		double tBegin = schedule.getEndTime();
 		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());
 
-		switch (getBaseType(lastTask)) {
+		switch (getBaseTypeOrElseThrow(lastTask)) {
 			case STAY:
 				lastTask.setEndTime(tEnd);
 				return;

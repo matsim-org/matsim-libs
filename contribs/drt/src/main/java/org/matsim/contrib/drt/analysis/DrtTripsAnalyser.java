@@ -9,6 +9,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -106,7 +107,7 @@ public class DrtTripsAnalyser {
 			}
 			for (Entry<Id<Link>, int[]> e : boardings.entrySet()) {
 				bw.newLine();
-				Coord coord = network.getLinks().get(e.getKey()).getCoord();
+				Coord coord = network.getLinks().get(e.getKey()).getToNode().getCoord();
 				bw.write(e.getKey().toString() + delimiter + coord.getX() + delimiter + coord.getY());
 				for (int i = 0; i < e.getValue().length; i++) {
 					bw.write(delimiter + e.getValue()[i]);
@@ -144,12 +145,15 @@ public class DrtTripsAnalyser {
 			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
+
 		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
 				format.format(waitStats.getMean()) + "",//
 				format.format(waitStats.getMax()) + "",//
 				format.format(waitStats.getPercentile(95)) + "",//
 				format.format(waitStats.getPercentile(75)) + "",//
 				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(getPercentageWaitTimeBelow(600, waitStats)) + "",//
+				format.format(getPercentageWaitTimeBelow(900, waitStats)) + "",//
 				format.format(rideStats.getMean()) + "",//
 				format.format(distanceStats.getMean()) + "",//
 				format.format(directDistanceStats.getMean()) + "",//
@@ -364,7 +368,7 @@ public class DrtTripsAnalyser {
 	 */
 	public static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
 			String iterationFilename) {
-		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;revenueDistance_pm";
+		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;passengerDistanceTraveled_pm";
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -381,7 +385,7 @@ public class DrtTripsAnalyser {
 						+ format.format(vehicleState.totalDistance) + ";"//
 						+ format.format(vehicleState.totalOccupiedDistance) + ";"//
 						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + ";"//
-						+ format.format(vehicleState.totalRevenueDistance));
+						+ format.format(vehicleState.totalPassengerTraveledDistance));
 				bw.newLine();
 			}
 			bw.flush();
@@ -406,27 +410,26 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		DescriptiveStatistics revenue = new DescriptiveStatistics();
+		DescriptiveStatistics passengerTraveledDistance = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
 		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
 			driven.addValue(state.totalDistance);
-			revenue.addValue(state.totalRevenueDistance);
+			passengerTraveledDistance.addValue(state.totalPassengerTraveledDistance);
 			occupied.addValue(state.totalOccupiedDistance);
 			empty.addValue(state.totalDistanceByOccupancy[0]);
 		}
-		double d_r_d_t = revenue.getSum() / driven.getSum();
-		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
+		double d_p_d_t = passengerTraveledDistance.getSum() / driven.getSum();
 		return String.join(del, vehicleDistances.size() + "",//
 				format.format(driven.getSum()) + "",//
 				format.format(empty.getSum()) + "",//
 				format.format(empty.getSum() / driven.getSum()) + "",//
-				format.format(revenue.getSum()) + "",//
+				format.format(passengerTraveledDistance.getSum()) + "",//
 				format.format(driven.getMean()) + "",//
 				format.format(empty.getMean()) + "",//
-				format.format(revenue.getMean()) + "",//
-				format.format(d_r_d_t) + "");
+				format.format(passengerTraveledDistance.getMean()) + "",//
+				format.format(d_p_d_t) + "");
 	}
 
 	public static double getTotalDistance(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances) {
@@ -471,5 +474,16 @@ public class DrtTripsAnalyser {
 		}
 
 		return result.toString();
+	}
+
+	public static double getPercentageWaitTimeBelow(int timeCriteria, DescriptiveStatistics stats) {
+		double[] waitingTimes = stats.getValues();
+
+		if (waitingTimes.length == 0) {
+			return Double.NaN; // to be consistent with DescriptiveStatistics
+		}
+
+		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
+		return count * 100 / waitingTimes.length;
 	}
 }

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
@@ -51,6 +52,8 @@ import org.matsim.core.config.ConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -207,6 +210,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private DrtSpeedUpParams drtSpeedUpParams;
 
+	@Nullable
+	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
+
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
 		initSingletonParameterSets();
@@ -229,13 +235,18 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
 
-		//drt fare
+		//drt fare (optional)
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
 				params -> drtFareParams = (DrtFareParams)params);
 
-		//drt speedup
+		//drt speedup (optional)
 		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
 				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
+
+		//request retry handling (optional)
+		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
+				() -> drtRequestInsertionRetryParams,
+				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
 	}
 
 	@Override
@@ -374,7 +385,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
-	 * @param -- {@value #MAX_WAIT_TIME_EXP}
+	 * @param maxWaitTime -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
@@ -633,4 +644,16 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
 		return Optional.ofNullable(drtSpeedUpParams);
 	}
+
+	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
+		return Optional.ofNullable(drtRequestInsertionRetryParams);
+	}
+
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 */
+	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet( pars );
+	}
+
 }

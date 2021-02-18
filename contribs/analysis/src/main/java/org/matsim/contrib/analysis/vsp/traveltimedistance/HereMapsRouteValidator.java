@@ -106,18 +106,20 @@ public class HereMapsRouteValidator implements TravelTimeDistanceValidator {
 
 			JSONObject jsonObject = (JSONObject) jp.parse(in);
 			JSONArray routes = (JSONArray) jsonObject.get("routes");
-			JSONObject route = (JSONObject) routes.get(0);
-			JSONArray sections = (JSONArray) route.get("sections");
-			JSONObject section = (JSONObject) sections.get(0);
-			JSONObject summary = (JSONObject) section.get("summary");
-			travelTime = (long) summary.get("duration");
-			distance = (long) summary.get("length");
+			if (!routes.isEmpty()) {
+				JSONObject route = (JSONObject) routes.get(0);
+				JSONArray sections = (JSONArray) route.get("sections");
+				JSONObject section = (JSONObject) sections.get(0);
+				JSONObject summary = (JSONObject) section.get("summary");
+				travelTime = (long) summary.get("duration");
+				distance = (long) summary.get("length");
 
-			if (writeDetailedFiles) {
-				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-				bw.write(jsonObject.toString());
-				bw.flush();
-				bw.close();
+				if (writeDetailedFiles) {
+					BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+					bw.write(jsonObject.toString());
+					bw.flush();
+					bw.close();
+				}
 			}
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {

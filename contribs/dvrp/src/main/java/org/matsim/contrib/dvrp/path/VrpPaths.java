@@ -51,7 +51,7 @@ public class VrpPaths {
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
 			TravelTime travelTime) {
-		return createPath(fromLink, toLink, departureTime, pathData.path, travelTime);
+		return createPath(fromLink, toLink, departureTime, pathData.getPath(), travelTime);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,

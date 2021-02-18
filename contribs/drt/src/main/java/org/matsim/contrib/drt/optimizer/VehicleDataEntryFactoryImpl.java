@@ -19,14 +19,11 @@
 package org.matsim.contrib.drt.optimizer;
 
 import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.STOP;
-import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseType;
+import static org.matsim.contrib.drt.schedule.DrtTaskBaseType.getBaseTypeOrElseThrow;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
-import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -43,7 +40,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class VehicleDataEntryFactoryImpl implements EntryFactory {
+public class VehicleDataEntryFactoryImpl implements VehicleEntry.EntryFactory {
 	private final double lookAhead;
 
 	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
@@ -54,7 +51,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 	}
 
-	public Entry create(DvrpVehicle vehicle, double currentTime) {
+	public VehicleEntry create(DvrpVehicle vehicle, double currentTime) {
 		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
@@ -65,14 +62,13 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			startTask = schedule.getCurrentTask();
-			switch (getBaseType(startTask)) {
+			switch (getBaseTypeOrElseThrow(startTask)) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)startTask;
 					LinkTimePair diversionPoint = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
 					start = diversionPoint != null ? diversionPoint : //diversion possible
 							new LinkTimePair(driveTask.getPath().getToLink(),
 									driveTask.getEndTime());// too late for diversion
-
 					break;
 
 				case STOP:
@@ -104,14 +100,14 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			}
 		}
 
-		Stop[] stops = new Stop[stopTasks.size()];
-		int outputOccupancy = 0;
+		Waypoint.Stop[] stops = new Waypoint.Stop[stopTasks.size()];
+		int outgoingOccupancy = 0;
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
-			outputOccupancy -= s.occupancyChange;
+			Waypoint.Stop s = stops[i] = new Waypoint.Stop(stopTasks.get(i), outgoingOccupancy);
+			outgoingOccupancy -= s.getOccupancyChange();
 		}
 
-		return new Entry(vehicle, new VehicleData.Start(startTask, start.link, start.time, outputOccupancy),
+		return new VehicleEntry(vehicle, new Waypoint.Start(startTask, start.link, start.time, outgoingOccupancy),
 				ImmutableList.copyOf(stops));
 	}
 

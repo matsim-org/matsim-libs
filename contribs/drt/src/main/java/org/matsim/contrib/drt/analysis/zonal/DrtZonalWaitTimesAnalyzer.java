@@ -24,7 +24,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
@@ -90,29 +96,30 @@ public final class DrtZonalWaitTimesAnalyzer implements IterationEndsListener, S
 				DescriptiveStatistics stats = zoneStats.get(zoneId);
 				bw.newLine();
 				bw.append(zoneId).
-						append(delimiter).
-						append(centerX).
-						append(delimiter).
-						append(centerY).
-						append(format.format(stats.getN())).
-						append(delimiter).
-						append(format.format(stats.getSum())).
-						append(delimiter).
-						append(String.valueOf(stats.getMean())).
-						append(delimiter).
-						append(String.valueOf(stats.getMin())).
-						append(delimiter).
-						append(String.valueOf(stats.getMax())).
-						append(delimiter).
-						append(String.valueOf(stats.getPercentile(95))).
-						append(delimiter).
-						append(String.valueOf(stats.getPercentile(90))).
-						append(delimiter).
-						append(String.valueOf(stats.getPercentile(80))).
-						append(delimiter).
-						append(String.valueOf(stats.getPercentile(75))).
-						append(delimiter).
-						append(String.valueOf(stats.getPercentile(50)));
+				append(delimiter).
+				append(centerX).
+				append(delimiter).
+				append(centerY).
+				append(delimiter).
+				append(format.format(stats.getN())).
+				append(delimiter).
+				append(format.format(stats.getSum())).
+				append(delimiter).
+				append(String.valueOf(stats.getMean())).
+				append(delimiter).
+				append(String.valueOf(stats.getMin())).
+				append(delimiter).
+				append(String.valueOf(stats.getMax())).
+				append(delimiter).
+				append(String.valueOf(stats.getPercentile(95))).
+				append(delimiter).
+				append(String.valueOf(stats.getPercentile(90))).
+				append(delimiter).
+				append(String.valueOf(stats.getPercentile(80))).
+				append(delimiter).
+				append(String.valueOf(stats.getPercentile(75))).
+				append(delimiter).
+				append(String.valueOf(stats.getPercentile(50)));
 			}
 			bw.flush();
 			bw.close();
