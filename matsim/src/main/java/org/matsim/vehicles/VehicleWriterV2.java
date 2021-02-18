@@ -86,6 +86,8 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, v.getId().toString()));
 			atts.add(this.createTuple(VehicleSchemaV2Names.TYPE, v.getType().getId().toString()));
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, true);
+			attributesWriter.writeAttributes("\t\t", this.writer, v.getAttributes(), false);
+			this.writeEndTag(VehicleSchemaV2Names.VEHICLE);
 		}
 	}
 
