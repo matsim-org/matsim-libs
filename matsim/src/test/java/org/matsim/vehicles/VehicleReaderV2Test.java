@@ -66,6 +66,29 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 	}
 
 	@Test
+	public void test_VehicleAttributesReadCorrectly(){
+		assertNotNull(vehicleTypes);
+		/* First vehicle has an attribute. */
+		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
+		assertNotNull(v1.getAttributes());
+		assertNotNull(v1.getAttributes().getAttribute("testAttributeString"));
+		assertEquals("firstVehicle", v1.getAttributes().getAttribute("testAttributeString").toString());
+
+		/* Second vehicle has no attributes. */
+		Vehicle v2 = vehicles.get(Id.createVehicleId("42"));
+		assertNotNull(v2.getAttributes());
+		assertTrue(v2.getAttributes().isEmpty());
+		assertNull(v2.getAttributes().getAttribute("testAttribute"));
+
+		/* Third vehicle again has one attribute. */
+		Vehicle v3 = vehicles.get(Id.createVehicleId(" 42  23"));
+		assertNotNull(v3.getAttributes());
+		assertNotNull(v3.getAttributes().getAttribute("testAttributeDouble"));
+		assertEquals(1.234, v3.getAttributes().getAttribute("testAttributeDouble"));
+	}
+
+
+	@Test
 	public void test_VehicleTypeValuesAreReadCorrectly_normalCar() {
 		VehicleType vehTypeNormalCar = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehTypeNormalCar);
