@@ -18,14 +18,14 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * @author michalm
  */
 public interface ChargingTask extends ETask {
-	ChargingWithQueueingAndAssignmentLogic getChargingLogic();
+	ChargingWithAssignmentLogic getChargingLogic();
 
 	ElectricVehicle getElectricVehicle();
 
