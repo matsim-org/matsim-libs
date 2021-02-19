@@ -167,8 +167,8 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		/* First vehicle has an attribute. */
 		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
 		assertNotNull(v1.getAttributes());
-		assertNotNull(v1.getAttributes().getAttribute("testAttribute"));
-		assertEquals("firstVehicle", v1.getAttributes().getAttribute("testAttribute").toString());
+		assertNotNull(v1.getAttributes().getAttribute("testAttributeString"));
+		assertEquals("firstVehicle", v1.getAttributes().getAttribute("testAttributeString").toString());
 
 		/* Second vehicle has no attributes. */
 		Vehicle v2 = vehicles.get(Id.createVehicleId("42"));
@@ -179,8 +179,8 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		/* Third vehicle again has one attribute. */
 		Vehicle v3 = vehicles.get(Id.createVehicleId(" 42  23"));
 		assertNotNull(v3.getAttributes());
-		assertNotNull(v3.getAttributes().getAttribute("testAttribute"));
-		assertEquals("thirdVehicle", v3.getAttributes().getAttribute("testAttribute").toString());
+		assertNotNull(v3.getAttributes().getAttribute("testAttributeDouble"));
+		assertEquals(1.234, v3.getAttributes().getAttribute("testAttributeDouble"));
 	}
 
 
