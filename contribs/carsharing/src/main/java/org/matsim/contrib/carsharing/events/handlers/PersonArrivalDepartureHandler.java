@@ -136,7 +136,6 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 			if (vehId.startsWith("OW") && !arrivalMode.equals("access_walk_ow")) {
 				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
-				this.carsharingManager.freeParkingSpot(vehId, linkId);
 
 				this.currentDemand.removeVehicle(event.getPersonId(), link,
 						carsharingSupply.getAllVehicles().get(vehId), "oneway");
@@ -153,6 +152,11 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 
 				this.currentDemand.removeVehicle(event.getPersonId(), link,
 						carsharingSupply.getAllVehicles().get(vehId), "twoway");
+			}
+			
+			if (vehId.startsWith("OW") && arrivalMode.equals("access_walk_ow")) {
+				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
+				this.carsharingManager.freeParkingSpot(vehId, linkId);
 			}
 		}
 	}
