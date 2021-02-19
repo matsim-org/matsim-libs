@@ -108,14 +108,15 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currAttributes = this.currentVehType.getCostInformation().getAttributes();
 				break;
 			case VehicleSchemaV2Names.VEHICLE:
+				String idString = atts.getValue( VehicleSchemaV2Names.ID );
 				Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV2Names.TYPE ), VehicleType.class );
 				VehicleType type = this.vehicles.getVehicleTypes().get( typeId );
 				if( type == null ){
 					log.error( "VehicleType " + typeId + " does not exist." );
 				}
-				String idString = atts.getValue( VehicleSchemaV2Names.ID );
 				Id<Vehicle> id = Id.create( idString, Vehicle.class );
 				Vehicle v = this.builder.createVehicle( id, type );
+				currAttributes = v.getAttributes();
 				this.vehicles.addVehicle( v );
 				break;
 			case VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS:

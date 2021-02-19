@@ -2,6 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -104,6 +105,8 @@ public class CarrierVehicle implements Vehicle {
 
 	private VehicleType vehicleType;
 
+	private final Attributes attributes = new Attributes();
+
 	private double earliestStartTime;
 
 	private double latestEndTime;
@@ -140,6 +143,12 @@ public class CarrierVehicle implements Vehicle {
 	public VehicleType getType() {
 		return vehicleType;
 	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
+
 
 	/**
 	 * @deprecated -- set in builder and do not change afterwards.  kai, nov'20
