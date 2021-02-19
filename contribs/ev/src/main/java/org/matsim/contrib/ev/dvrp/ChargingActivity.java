@@ -20,7 +20,7 @@
 package org.matsim.contrib.ev.dvrp;
 
 import org.matsim.contrib.dynagent.DynActivity;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class ChargingActivity implements DynActivity {
@@ -64,7 +64,7 @@ public class ChargingActivity implements DynActivity {
 	}
 
 	private void initialize(double now) {
-		ChargingWithQueueingAndAssignmentLogic logic = chargingTask.getChargingLogic();
+		ChargingWithAssignmentLogic logic = chargingTask.getChargingLogic();
 		ElectricVehicle ev = chargingTask.getElectricVehicle();
 		logic.unassignVehicle(ev);
 		logic.addVehicle(ev, new DvrpChargingListener(this), now);
