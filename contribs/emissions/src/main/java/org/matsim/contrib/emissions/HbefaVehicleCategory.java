@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import java.util.*;
+
 /**
  * @author benjamin
  *
@@ -37,9 +39,46 @@ public enum HbefaVehicleCategory {
              this.identifier = identifier;
         }
 
-        @Override
-        public String toString() {
+
+        public String identifier() {
                 return identifier;
         }
-}
 
+
+
+public List<HbefaWarmEmissionFactorKey> checkingConsistency (Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable    ) {
+        Set<String> roadCategories = new HashSet<>();
+        Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
+        Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
+        Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+        Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+        for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
+                roadCategories.add(emissionFactorKey.getRoadCategory());
+                trafficSituations.add(emissionFactorKey.getTrafficSituation());
+                vehicleCategories.add(emissionFactorKey.getVehicleCategory());
+                vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
+                pollutantsInTable.add(emissionFactorKey.getComponent());
+        }
+        List<HbefaWarmEmissionFactorKey> key = new ArrayList<>();
+        for (HbefaTrafficSituation trafficSituation : trafficSituations) {
+                for (String roadCategory : roadCategories) {
+                        for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+                                if (vehicleAttribute.toString().contains(HbefaVehicleCategory.this.identifier())) {
+                                        for (Pollutant pollutant : pollutantsInTable) {
+                                                HbefaWarmEmissionFactorKey keyelement = new HbefaWarmEmissionFactorKey();
+                                                keyelement.setRoadCategory(roadCategory);
+                                                keyelement.setVehicleAttributes(vehicleAttribute);
+                                                keyelement.setVehicleCategory(this);
+                                                keyelement.setTrafficSituation(trafficSituation);
+                                                keyelement.setComponent(pollutant);
+                                                key.add(keyelement);
+
+                                        }
+                                }
+                        }
+                }
+        }
+        return key;
+
+        }
+}

@@ -73,7 +73,7 @@ public class TestWarmEmissionsTableConsistencyCheck {
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
 		double expectedValue = 0.017551252200000002; // = 200m * 151.7492371 g/km //TODO @Jonas: Look for correct value in Table ;) -- if using "none" as chachink level
-		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.CO), MatsimTestUtils.EPSILON );
+		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
 	}
 
 
@@ -263,10 +263,10 @@ public class TestWarmEmissionsTableConsistencyCheck {
 	private Vehicle generateFullSpecifiedVehicle() {
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("dieselCarFullSpecified", VehicleType.class));
 		EngineInformation engineInformation = vehicleType.getEngineInformation();
-		VehicleUtils.setHbefaVehicleCategory(engineInformation, "PASSENGER_CAR");
+		VehicleUtils.setHbefaVehicleCategory(engineInformation, "HEAVY_GOODS_VEHICLE");
 		VehicleUtils.setHbefaTechnology(engineInformation,"diesel");
-		VehicleUtils.setHbefaEmissionsConcept(engineInformation, "PC-D-Euro-3");
-		VehicleUtils.setHbefaSizeClass(engineInformation, ">1,4L");
+		VehicleUtils.setHbefaEmissionsConcept(engineInformation, "HGV D Euro-I");
+		VehicleUtils.setHbefaSizeClass(engineInformation, "RT >7,5-12t");
 
 		return VehicleUtils.createVehicle(Id.createVehicleId("dieselCarFullSpecified"), vehicleType);
 	}
