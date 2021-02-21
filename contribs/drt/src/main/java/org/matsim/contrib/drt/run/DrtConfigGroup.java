@@ -88,13 +88,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
 	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
 			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
 	static final String MAX_TRAVEL_TIME_BETA_EXP =
 			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Beta should not be smaller than 0.";
 
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
