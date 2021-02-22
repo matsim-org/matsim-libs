@@ -149,23 +149,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						List<HbefaWarmEmissionFactorKey> keylist = new ArrayList<>();
 						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.allOf(HbefaVehicleCategory.class);
 						for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
-							switch (vehicleCategory){
-								case HEAVY_GOODS_VEHICLE:
-									keylist.addAll(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE.checkingConsistency(detailedHbefaWarmTable));
-									break;
-
-								case LIGHT_COMMERCIAL_VEHICLE:
-									keylist.addAll(HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE.checkingConsistency(detailedHbefaWarmTable));
-									break;
-
-								case PASSENGER_CAR:
-									keylist.addAll(HbefaVehicleCategory.PASSENGER_CAR.checkingConsistency(detailedHbefaWarmTable));
-									break;
-
-								case MOTORCYCLE:
-									keylist.addAll(HbefaVehicleCategory.MOTORCYCLE.checkingConsistency(detailedHbefaWarmTable));
-									break;
-							}
+							keylist.addAll(vehicleCategory.getWarmemissionEntries(detailedHbefaWarmTable));
 						}
 						for (HbefaWarmEmissionFactorKey hbefaWarmEmissionFactorKey : keylist) {
 							HbefaWarmEmissionFactor result = detailedHbefaWarmTable.get(hbefaWarmEmissionFactorKey);

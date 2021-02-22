@@ -72,7 +72,7 @@ public class TestWarmEmissionsTableConsistencyCheck {
 		double travelTimeOnLink = 21; //sec. approx freeSpeed of link12 is : (200 m) / (9.72.. m/s) approx 20.57 s
 		Map<Pollutant, Double> warmEmissions = emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(vehicleFull, link, travelTimeOnLink);
 
-		double expectedValue = 0.017551252200000002; // = 200m * 151.7492371 g/km //TODO @Jonas: Look for correct value in Table ;) -- if using "none" as chachink level
+		double expectedValue = 1.7685253144E9; // = 200m * 151.7492371 g/km
 		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
 	}
 

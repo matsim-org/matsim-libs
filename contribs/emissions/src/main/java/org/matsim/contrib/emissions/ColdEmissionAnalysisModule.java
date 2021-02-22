@@ -96,6 +96,32 @@ final class ColdEmissionAnalysisModule {
 
 		Gbl.assertNotNull( eventsManager );
 		this.eventsManager = eventsManager;
+		/*if ( detailedHbefaColdTable!=null ) {
+			switch (ecg.getHbefaTableConsistencyCheckingLevel()) {
+				case perVehCat:
+					if (detailedHbefaColdTable != null) {
+						List<HbefaColdEmissionFactorKey> keylist = new ArrayList<>();
+						Set<HbefaVehicleCategory> vehicleCategories = EnumSet.allOf(HbefaVehicleCategory.class);
+						for (HbefaVehicleCategory vehicleCategory : vehicleCategories) {
+							keylist.addAll(vehicleCategory.getColdEmissionEntries(detailedHbefaColdTable));
+						}
+						for (HbefaColdEmissionFactorKey hbefaColdEmissionFactorKey : keylist) {
+							HbefaColdEmissionFactor result = detailedHbefaColdTable.get(hbefaColdEmissionFactorKey);
+							if (result == null) {
+								throw new RuntimeException("emissions factor for key=" + hbefaColdEmissionFactorKey + " is missing." +
+										"  There used to be some " +
+										"fallback, but it was " +
+										"inconsistent and confusing, so " +
+										"we are now just aborting.");
+							}
+						}
+
+
+					}
+
+			}
+		} */
+
 	}
 
 	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWColdEmissions(

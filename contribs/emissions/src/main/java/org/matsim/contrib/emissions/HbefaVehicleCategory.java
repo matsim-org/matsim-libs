@@ -46,16 +46,14 @@ public enum HbefaVehicleCategory {
 
 
 
-public List<HbefaWarmEmissionFactorKey> checkingConsistency (Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable    ) {
+public List<HbefaWarmEmissionFactorKey> getWarmemissionEntries( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable    ) {
         Set<String> roadCategories = new HashSet<>();
         Set<HbefaTrafficSituation> trafficSituations = EnumSet.noneOf(HbefaTrafficSituation.class);
-        Set<HbefaVehicleCategory> vehicleCategories = EnumSet.noneOf(HbefaVehicleCategory.class);
         Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
         Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
         for (HbefaWarmEmissionFactorKey emissionFactorKey : detailedHbefaWarmTable.keySet()) {
                 roadCategories.add(emissionFactorKey.getRoadCategory());
                 trafficSituations.add(emissionFactorKey.getTrafficSituation());
-                vehicleCategories.add(emissionFactorKey.getVehicleCategory());
                 vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
                 pollutantsInTable.add(emissionFactorKey.getComponent());
         }
@@ -81,4 +79,81 @@ public List<HbefaWarmEmissionFactorKey> checkingConsistency (Map<HbefaWarmEmissi
         return key;
 
         }
+
+        public List<HbefaColdEmissionFactorKey> getColdEmissionEntries( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable    ) {
+                Set<HbefaVehicleAttributes> vehicleAttributes = new HashSet<>();
+                Set<Pollutant> pollutantsInTable = EnumSet.noneOf(Pollutant.class);
+                for (HbefaColdEmissionFactorKey emissionFactorKey : detailedHbefaColdTable.keySet()) {
+                        vehicleAttributes.add(emissionFactorKey.getVehicleAttributes());
+                        pollutantsInTable.add(emissionFactorKey.getComponent());
+                }
+                List<HbefaColdEmissionFactorKey> key = new ArrayList<>();
+                                for (HbefaVehicleAttributes vehicleAttribute : vehicleAttributes) {
+                                        if (vehicleAttribute.toString().contains(HbefaVehicleCategory.this.identifier())) {
+                                                for (Pollutant pollutant : pollutantsInTable) {
+                                                        HbefaColdEmissionFactorKey keyelement = new HbefaColdEmissionFactorKey();
+                                                        keyelement.setVehicleAttributes(vehicleAttribute);
+                                                        keyelement.setVehicleCategory(this);
+                                                        keyelement.setComponent(pollutant);
+                                                        key.add(keyelement);
+
+                                                }
+                                        }
+
+
+                }
+                return key;
 }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
