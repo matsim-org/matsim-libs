@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,6 +34,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -67,14 +70,17 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 		this.network = network;
 
 		alpha = travelTimeEstimationAlpha;
-		if (alpha > 1 || alpha <= 0) {
-			throw new IllegalArgumentException("travelTimeEstimationAlpha must be in (0,1]");
-		}
+		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
 
 		interval = ttCalcConfig.getTraveltimeBinSize();
+		checkArgument(interval > 0, "interval size must be positive");
 		intervalCount = TimeBinUtils.getTimeBinCount(ttCalcConfig.getMaxTime(), interval);
+		checkArgument(intervalCount > 0, "number of intervals must be positive");
 
-		linkTTs = new double[Id.getNumberOfIds(Link.class)][intervalCount];
+		linkTTs = new double[Id.getNumberOfIds(Link.class)][];
+		//allocate arrays only for the links in the network
+		network.getLinks().values().forEach(link -> linkTTs[link.getId().index()] = new double[intervalCount]);
+
 		updateTTs(initialTT, 1.);
 	}
 
@@ -82,9 +88,13 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
 
+		// check if the link belongs to the network
+		var linkTT = Preconditions.checkNotNull(linkTTs[link.getId().index()],
+				"Link (%s) does not belong to network. No travel time data.", link.getId());
+
 		//handle negative times (e.g. in backward shortest path search)
-		int idx = Math.max(0, TimeBinUtils.getTimeBinIndex(time, interval, intervalCount));
-		return linkTTs[link.getId().index()][idx];
+		int timeBin = Math.max(0, TimeBinUtils.getTimeBinIndex(time, interval, intervalCount));
+		return linkTT[timeBin];
 	}
 
 	@Override
