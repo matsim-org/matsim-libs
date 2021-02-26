@@ -25,9 +25,7 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.ev.charging.ChargingEndEvent;
-import org.matsim.contrib.ev.charging.ChargingEndEventHandler;
-import org.matsim.contrib.ev.charging.VehicleChargingHandler;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -55,7 +53,7 @@ import java.util.*;
  */
 public class UrbanVehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
-		ChargingEndEventHandler, MobsimScopeEventHandler {
+		ChargingEndEventHandler, ChargingStartEventHandler, MobsimScopeEventHandler {
 
 	static final String PLUGIN_IDENTIFIER = " plugin";
 	public static final String PLUGIN_INTERACTION = PlanCalcScoreConfigGroup.createStageActivityType(
@@ -143,6 +141,12 @@ public class UrbanVehicleChargingHandler
 	public void handleEvent(ChargingEndEvent event) {
 		vehiclesAtChargers.remove(event.getVehicleId());
 		//Charging has ended before activity ends
+	}
+
+	@Override
+	public void handleEvent(ChargingStartEvent event) {
+		vehiclesAtChargers.put(event.getVehicleId(), event.getChargerId());
+		//Charging has started
 	}
 
 
