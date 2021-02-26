@@ -21,13 +21,19 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
@@ -47,9 +53,11 @@ import com.google.inject.name.Named;
  *
  * @author michalm
  */
-public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
+public class DvrpOfflineTravelTimeEstimator
+		implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener, AfterMobsimListener {
 	private final TravelTime observedTT;
 	private final Network network;
+	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	private final int interval;
 	private final int intervalCount;
@@ -60,14 +68,18 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
 			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
-		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
+			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig, Config config,
+			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha(),
+				dvrpConfig.getInitialTravelTimesUrl(config.getContext()), outputDirectoryHierarchy);
 	}
 
 	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
+			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha, URL initialTravelTimesUrl,
+			OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.observedTT = observedTT;
 		this.network = network;
+		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 
 		alpha = travelTimeEstimationAlpha;
 		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
@@ -77,11 +89,17 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 		intervalCount = TimeBinUtils.getTimeBinCount(ttCalcConfig.getMaxTime(), interval);
 		checkArgument(intervalCount > 0, "number of intervals must be positive");
 
-		linkTTs = new double[Id.getNumberOfIds(Link.class)][];
-		//allocate arrays only for the links in the network
-		network.getLinks().values().forEach(link -> linkTTs[link.getId().index()] = new double[intervalCount]);
-
-		updateTTs(initialTT, 1.);
+		if (initialTravelTimesUrl != null) {
+			linkTTs = DvrpOfflineTravelTimes.loadLinkTravelTimes(interval, intervalCount, initialTravelTimesUrl);
+			//make sure all TTs are loaded
+			network.getLinks().values().forEach(link -> Preconditions.checkNotNull(linkTTs[link.getId().index()]));
+		} else {
+			linkTTs = new double[Id.getNumberOfIds(Link.class)][];
+			//allocate arrays only for the links in the network
+			network.getLinks().values().forEach(link -> linkTTs[link.getId().index()] = new double[intervalCount]);
+			//init linkTTs
+			updateTTs(initialTT, 1.);
+		}
 	}
 
 	@Override
@@ -100,6 +118,12 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
 		updateTTs(observedTT, alpha);
+	}
+
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		DvrpOfflineTravelTimes.saveLinkTravelTimes(interval, intervalCount, linkTTs,
+				outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "dvrp_travel_times.csv.gz"));
 	}
 
 	private void updateTTs(TravelTime travelTime, double alpha) {
