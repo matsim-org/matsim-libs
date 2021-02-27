@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Verify.verify;
 
 import java.io.BufferedReader;
@@ -29,9 +31,9 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -39,34 +41,32 @@ import com.google.common.base.Preconditions;
 class DvrpOfflineTravelTimes {
 	private static final String DELIMITER = ";";
 
-	static void saveLinkTravelTimes(int interval, int intervalCount, double[][] linkTTs, String filename) {
+	static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, String filename) {
 		try (Writer writer = IOUtils.getBufferedWriter(filename)) {
-			saveLinkTravelTimes(interval, intervalCount, linkTTs, writer);
+			saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	static void saveLinkTravelTimes(int interval, int intervalCount, double[][] linkTTs, Writer writer)
+	static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
 			throws IOException {
-		Preconditions.checkArgument(interval > 0);
-		Preconditions.checkArgument(intervalCount > 0);
-
+		int intervalCount = timeDiscretizer.getIntervalCount();
 		//header row
 		writer.append("linkId" + DELIMITER);
 		for (int i = 0; i < intervalCount; i++) {
-			int time = i * interval;
+			int time = i * timeDiscretizer.getTimeInterval();
 			writer.append(time + DELIMITER);
 		}
 		writer.append('\n');
 
 		//regular rows
-		for (int idx = 0; idx < linkTTs.length; idx++) {
-			double[] ttRow = linkTTs[idx];
+		for (int idx = 0; idx < linkTravelTimes.length; idx++) {
+			double[] ttRow = linkTravelTimes[idx];
 
 			// rows in linkTTs that are null are skipped
 			if (ttRow != null) {
-				Preconditions.checkArgument(ttRow.length == intervalCount);
+				checkArgument(ttRow.length == intervalCount);
 
 				writer.append(Id.get(idx, Link.class) + DELIMITER);
 				for (int t = 0; t < intervalCount; t++) {
@@ -77,32 +77,35 @@ class DvrpOfflineTravelTimes {
 		}
 	}
 
-	static double[][] loadLinkTravelTimes(int interval, int intervalCount, URL url) {
+	static TravelTime createTabularTravelTime(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes) {
+		return (link, time, person, vehicle) -> {
+			var linkTT = checkNotNull(linkTravelTimes[link.getId().index()],
+					"Link (%s) does not belong to network. No travel time data.", link.getId());
+			return linkTT[timeDiscretizer.getIdx(time)];
+		};
+	}
+
+	static TravelTime loadTabularTravelTime(TimeDiscretizer timeDiscretizer, URL url) {
 		try (BufferedReader reader = IOUtils.getBufferedReader(url)) {
-			return loadLinkTravelTimes(interval, intervalCount, reader);
+			return createTabularTravelTime(timeDiscretizer, loadLinkTravelTimes(timeDiscretizer, reader));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	static double[][] loadLinkTravelTimes(int interval, int intervalCount, BufferedReader reader) throws IOException {
-		Preconditions.checkArgument(interval > 0);
-		Preconditions.checkArgument(intervalCount > 0);
-
-		double[][] linkTTs = new double[Id.getNumberOfIds(Link.class)][];
+	static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader) throws IOException {
+		double[][] linkTravelTimes = new double[Id.getNumberOfIds(Link.class)][];
 		//header row
 		String[] headerLine = reader.readLine().split(";");
-		verify(intervalCount == headerLine.length - 1);
+		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
 		verify(headerLine[0].equals("linkId"));
-		for (int i = 0; i < intervalCount; i++) {
-			verify(Integer.parseInt(headerLine[i + 1]) == i * interval);
-		}
+		timeDiscretizer.forEach((bin, time) -> verify(Integer.parseInt(headerLine[bin + 1]) == time));
 
 		//regular rows
 		// rows in linkTTs for which we do not have TT data, will remain null
 		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {
 			int linkIndex = Id.createLinkId(cells[0]).index();
-			double[] row = linkTTs[linkIndex] = new double[intervalCount];
+			double[] row = linkTravelTimes[linkIndex] = new double[timeDiscretizer.getIntervalCount()];
 			verify(row.length == cells.length - 1);
 
 			for (int i = 0; i < row.length; i++) {
@@ -110,6 +113,6 @@ class DvrpOfflineTravelTimes {
 			}
 		});
 
-		return linkTTs;
+		return linkTravelTimes;
 	}
 }

@@ -31,6 +31,7 @@ import java.util.Objects;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 
 import one.util.streamex.EntryStream;
 
@@ -46,35 +47,35 @@ public class DvrpOfflineTravelTimesTest {
 		//the matrix may have more than 2 rows (depends on how many link ids are cached)
 		var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
 
-		linkTTs[linkIdA.index()] = new double[] { 0.0, 1.1, 2.2, 3.3 };
-		linkTTs[linkIdB.index()] = new double[] { 5.5, 6.6, 7.7, 8.8 };
+		linkTTs[linkIdA.index()] = new double[] { 0.0, 1.1, 2.2, 3.3, 4.4 };
+		linkTTs[linkIdB.index()] = new double[] { 5.5, 6.6, 7.7, 8.8, 9.9 };
 
 		var stringWriter = new StringWriter();
-		DvrpOfflineTravelTimes.saveLinkTravelTimes(900, 4, linkTTs, stringWriter);
+		DvrpOfflineTravelTimes.saveLinkTravelTimes(new TimeDiscretizer(3600, 900), linkTTs, stringWriter);
 
 		var lines = stringWriter.toString().split("\n");
 		assertThat(lines).hasSize(3);
-		assertThat(lines[0].split(";")).containsExactly("linkId", "0", "900", "1800", "2700");
-		assertThat(lines[1].split(";")).containsExactly("A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "");
-		assertThat(lines[2].split(";")).containsExactly("B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "");
+		assertThat(lines[0].split(";")).containsExactly("linkId", "0", "900", "1800", "2700", "3600");
+		assertThat(lines[1].split(";")).containsExactly("A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
+		assertThat(lines[2].split(";")).containsExactly("B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
 	}
 
 	@Test
 	public void loadLinkTravelTimes() throws IOException {
-		var line0 = String.join(";", "linkId", "0", "900", "1800", "2700");
-		var line1 = String.join(";", "A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "");
-		var line2 = String.join(";", "B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "");
+		var line0 = String.join(";", "linkId", "0", "900", "1800", "2700", "3600");
+		var line1 = String.join(";", "A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
+		var line2 = String.join(";", "B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
 		var lines = String.join("\n", line0, line1, line2);
 
 		var stringReader = new BufferedReader(new StringReader(lines));
-		var linkTTs = DvrpOfflineTravelTimes.loadLinkTravelTimes(900, 4, stringReader);
+		var linkTTs = DvrpOfflineTravelTimes.loadLinkTravelTimes(new TimeDiscretizer(3600, 900), stringReader);
 
 		//the matrix may have more than 2 rows (depends on how many link ids are cached)
 		//all rows are null (except for links A and B)
 		var existingLinkTTs = EntryStream.of(linkTTs).filterValues(Objects::nonNull).toMap();
 
 		assertThat(existingLinkTTs).containsOnlyKeys(linkIdA.index(), linkIdB.index());
-		assertThat(existingLinkTTs.get(linkIdA.index())).containsExactly(0.0, 1.1, 2.2, 3.3);
-		assertThat(existingLinkTTs.get(linkIdB.index())).containsExactly(5.5, 6.6, 7.7, 8.8);
+		assertThat(existingLinkTTs.get(linkIdA.index())).containsExactly(0.0, 1.1, 2.2, 3.3, 4.4);
+		assertThat(existingLinkTTs.get(linkIdB.index())).containsExactly(5.5, 6.6, 7.7, 8.8, 9.9);
 	}
 }

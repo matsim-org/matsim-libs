@@ -19,7 +19,10 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import java.net.URL;
+
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
@@ -40,7 +43,16 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTime.class).asEagerSingleton();
+		URL initialTravelTimesUrl = dvrpCfg.getInitialTravelTimesUrl(getConfig().getContext());
+		if (initialTravelTimesUrl != null) {
+			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toProvider(
+					() -> DvrpOfflineTravelTimes.loadTabularTravelTime(
+							new TimeDiscretizer(getConfig().travelTimeCalculator()), initialTravelTimesUrl))
+					.asEagerSingleton();
+		} else {
+			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTime.class)
+					.asEagerSingleton();
+		}
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(
 				Key.get(TravelTime.class, Names.named(dvrpCfg.getMobsimMode())));
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
