@@ -174,17 +174,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		return this.capacity;
 	}
 
-
-	@Override
-	public double getFlowCapacityPerSec() {
-		return this.getCapacity() / network.getCapacityPeriod();
-	}
-	@Override
-	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
-		return this.getCapacity(time) / network.getCapacityPeriod();
-	}
-	
-	double getCapacityPeriod() {
+	public double getCapacityPeriod() {
 		// since the link has a back pointer to network, we can as well provide this here (????)
 		// TimeVariantLinkImpl needs this ... but why?
 		return network.getCapacityPeriod() ;
