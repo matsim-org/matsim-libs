@@ -19,29 +19,20 @@
 
 package org.matsim.contrib.dvrp.benchmark;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.QSimFreeSpeedTravelTime;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
  * @author michalm
  */
 public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
-	private final TravelTime travelTime;
-
-	public DvrpBenchmarkTravelTimeModule() {
-		this(new FreeSpeedTravelTime());
-	}
-
-	public DvrpBenchmarkTravelTimeModule(final TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
-
 	public void install() {
 		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
 		// for the car mode
-		bindNetworkTravelTime().toInstance(travelTime);
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
+		bind(QSimFreeSpeedTravelTime.class).asEagerSingleton();
+		addTravelTimeBinding(TransportMode.car).to(QSimFreeSpeedTravelTime.class);
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).to(QSimFreeSpeedTravelTime.class);
 	}
 }
