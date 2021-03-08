@@ -546,9 +546,17 @@ public class SwissRailRaptorData {
      * synchronized in order to avoid that multiple quad trees for the very same stop filter attribute/value combination are prepared at the same time 
      */
 	public synchronized void prepareStopFilterQuadTreeIfNotExistent(String stopFilterAttribute, String stopFilterValue) {
+		// if stopFilterAttribute/stopFilterValue combination exists
+		// we do not have to do anything
+		if (stopFilterAttribute2Value2StopsQT.containsKey(stopFilterAttribute)
+			&& stopFilterAttribute2Value2StopsQT.get(stopFilterAttribute).containsKey(stopFilterValue))
+			return;
+		// otherwise we have to add this map
+		// only in case there is no attribute key
 		if (!stopFilterAttribute2Value2StopsQT.containsKey(stopFilterAttribute)) {
 			stopFilterAttribute2Value2StopsQT.put(stopFilterAttribute, new HashMap<>());
 		}
+		
 	    Set<TransitStopFacility> stops = routeStopsPerStopFacility.keySet();
         QuadTree<TransitStopFacility> stopsQTFiltered = new QuadTree<>(stopsQT.getMinEasting(), stopsQT.getMinNorthing(), stopsQT.getMaxEasting(), stopsQT.getMaxNorthing());
         for (TransitStopFacility stopFacility : stops) {
