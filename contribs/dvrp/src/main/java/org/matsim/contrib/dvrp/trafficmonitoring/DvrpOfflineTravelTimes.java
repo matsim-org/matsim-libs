@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,10 +39,11 @@ import org.matsim.core.utils.io.IOUtils;
 /**
  * @author Michal Maciejewski (michalm)
  */
-class DvrpOfflineTravelTimes {
+public class DvrpOfflineTravelTimes {
 	private static final String DELIMITER = ";";
 
-	static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, String filename) {
+	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes,
+			String filename) {
 		try (Writer writer = IOUtils.getBufferedWriter(filename)) {
 			saveLinkTravelTimes(timeDiscretizer, linkTravelTimes, writer);
 		} catch (IOException e) {
@@ -49,7 +51,7 @@ class DvrpOfflineTravelTimes {
 		}
 	}
 
-	static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
+	public static void saveLinkTravelTimes(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes, Writer writer)
 			throws IOException {
 		int intervalCount = timeDiscretizer.getIntervalCount();
 		//header row
@@ -77,7 +79,17 @@ class DvrpOfflineTravelTimes {
 		}
 	}
 
-	static TravelTime createTabularTravelTime(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes) {
+	public static double[][] convertToLinkTravelTimeMatrix(TravelTime travelTime, Collection<? extends Link> links,
+			TimeDiscretizer timeDiscretizer) {
+		var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
+		for (Link link : links) {
+			double[] tt = linkTTs[link.getId().index()] = new double[timeDiscretizer.getIntervalCount()];
+			timeDiscretizer.forEach((bin, time) -> tt[bin] = travelTime.getLinkTravelTime(link, time, null, null));
+		}
+		return linkTTs;
+	}
+
+	public static TravelTime asTravelTime(TimeDiscretizer timeDiscretizer, double[][] linkTravelTimes) {
 		return (link, time, person, vehicle) -> {
 			var linkTT = checkNotNull(linkTravelTimes[link.getId().index()],
 					"Link (%s) does not belong to network. No travel time data.", link.getId());
@@ -85,15 +97,16 @@ class DvrpOfflineTravelTimes {
 		};
 	}
 
-	static TravelTime loadTabularTravelTime(TimeDiscretizer timeDiscretizer, URL url) {
+	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, URL url) {
 		try (BufferedReader reader = IOUtils.getBufferedReader(url)) {
-			return createTabularTravelTime(timeDiscretizer, loadLinkTravelTimes(timeDiscretizer, reader));
+			return loadLinkTravelTimes(timeDiscretizer, reader);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader) throws IOException {
+	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader)
+			throws IOException {
 		double[][] linkTravelTimes = new double[Id.getNumberOfIds(Link.class)][];
 		//header row
 		String[] headerLine = reader.readLine().split(";");

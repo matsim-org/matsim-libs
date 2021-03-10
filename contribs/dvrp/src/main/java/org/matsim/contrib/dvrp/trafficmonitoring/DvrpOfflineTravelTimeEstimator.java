@@ -22,7 +22,6 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -81,14 +80,8 @@ public class DvrpOfflineTravelTimeEstimator
 		alpha = travelTimeEstimationAlpha;
 		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
 
-		linkTravelTimes = new double[Id.getNumberOfIds(Link.class)][];
-		//allocate arrays only for the links in the network
-		network.getLinks()
-				.values()
-				.forEach(
-						link -> linkTravelTimes[link.getId().index()] = new double[timeDiscretizer.getIntervalCount()]);
-		//init linkTTs
-		updateTTs(initialTT, 1.);
+		linkTravelTimes = DvrpOfflineTravelTimes.convertToLinkTravelTimeMatrix(initialTT, network.getLinks().values(),
+				timeDiscretizer);
 	}
 
 	@Override

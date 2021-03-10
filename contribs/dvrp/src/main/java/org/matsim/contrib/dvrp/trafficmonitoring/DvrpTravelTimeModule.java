@@ -43,12 +43,13 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	private DvrpConfigGroup dvrpCfg;
 
 	public void install() {
-		URL initialTravelTimesUrl = dvrpCfg.getInitialTravelTimesUrl(getConfig().getContext());
-		if (initialTravelTimesUrl != null) {
-			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toProvider(
-					() -> DvrpOfflineTravelTimes.loadTabularTravelTime(
-							new TimeDiscretizer(getConfig().travelTimeCalculator()), initialTravelTimesUrl))
-					.asEagerSingleton();
+		if (dvrpCfg.getInitialTravelTimesFile() != null) {
+			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toProvider(() -> {
+				URL url = dvrpCfg.getInitialTravelTimesUrl(getConfig().getContext());
+				var timeDiscretizer = new TimeDiscretizer(getConfig().travelTimeCalculator());
+				var linkTravelTimes = DvrpOfflineTravelTimes.loadLinkTravelTimes(timeDiscretizer, url);
+				return DvrpOfflineTravelTimes.asTravelTime(timeDiscretizer, linkTravelTimes);
+			}).asEagerSingleton();
 		} else {
 			addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).to(QSimFreeSpeedTravelTime.class)
 					.asEagerSingleton();
