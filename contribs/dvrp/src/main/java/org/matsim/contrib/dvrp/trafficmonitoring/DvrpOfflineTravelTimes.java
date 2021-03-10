@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.router.util.TravelTime;
@@ -107,7 +108,9 @@ public class DvrpOfflineTravelTimes {
 
 	public static double[][] loadLinkTravelTimes(TimeDiscretizer timeDiscretizer, BufferedReader reader)
 			throws IOException {
-		double[][] linkTravelTimes = new double[Id.getNumberOfIds(Link.class)][];
+		//start with IdMap and then convert to array (to avoid index out of bounds)
+		IdMap<Link, double[]> linkTravelTimes = new IdMap<>(Link.class);
+
 		//header row
 		String[] headerLine = reader.readLine().split(";");
 		verify(timeDiscretizer.getIntervalCount() == headerLine.length - 1);
@@ -115,17 +118,20 @@ public class DvrpOfflineTravelTimes {
 		timeDiscretizer.forEach((bin, time) -> verify(Integer.parseInt(headerLine[bin + 1]) == time));
 
 		//regular rows
-		// rows in linkTTs for which we do not have TT data, will remain null
 		reader.lines().map(line -> line.split(DELIMITER)).forEach(cells -> {
-			int linkIndex = Id.createLinkId(cells[0]).index();
-			double[] row = linkTravelTimes[linkIndex] = new double[timeDiscretizer.getIntervalCount()];
-			verify(row.length == cells.length - 1);
+			verify(timeDiscretizer.getIntervalCount() == cells.length - 1);
 
+			double[] row = new double[timeDiscretizer.getIntervalCount()];
 			for (int i = 0; i < row.length; i++) {
 				row[i] = Double.parseDouble(cells[i + 1]);
 			}
+			linkTravelTimes.put(Id.createLinkId(cells[0]), row);
 		});
 
-		return linkTravelTimes;
+		// rows in linkTTs for which we do not have TT data, will remain null
+		double[][] linkTravelTimeArray = new double[Id.getNumberOfIds(Link.class)][];
+		linkTravelTimes.forEach((linkId, row) -> linkTravelTimeArray[linkId.index()] = row);
+
+		return linkTravelTimeArray;
 	}
 }
