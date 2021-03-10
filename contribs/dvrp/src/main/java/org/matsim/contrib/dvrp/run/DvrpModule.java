@@ -52,6 +52,16 @@ public final class DvrpModule extends AbstractModule {
 	@Inject
 	private DvrpConfigGroup dvrpConfigGroup;
 
+	private final AbstractModule dvrpTravelTimeEstimationModule;
+
+	public DvrpModule() {
+		this(new DvrpTravelTimeModule());
+	}
+
+	public DvrpModule(AbstractModule dvrpTravelTimeEstimationModule) {
+		this.dvrpTravelTimeEstimationModule = dvrpTravelTimeEstimationModule;
+	}
+
 	@Override
 	public void install() {
 		// Visualisation of schedules for DVRP DynAgents
@@ -60,7 +70,7 @@ public final class DvrpModule extends AbstractModule {
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(VehicleUtils.getDefaultVehicleType());
 
-		install(new DvrpTravelTimeModule());
+		install(dvrpTravelTimeEstimationModule);
 
 		//lazily initialised:
 		// 1. we have only mode-filtered subnetworks
