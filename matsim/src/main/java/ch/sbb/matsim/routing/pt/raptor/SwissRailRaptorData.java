@@ -548,14 +548,10 @@ public class SwissRailRaptorData {
 	public synchronized void prepareStopFilterQuadTreeIfNotExistent(String stopFilterAttribute, String stopFilterValue) {
 		// if stopFilterAttribute/stopFilterValue combination exists
 		// we do not have to do anything
-		if (stopFilterAttribute2Value2StopsQT.containsKey(stopFilterAttribute)
-			&& stopFilterAttribute2Value2StopsQT.get(stopFilterAttribute).containsKey(stopFilterValue))
-			return;
-		// otherwise we have to add this map
-		// only in case there is no attribute key
-		if (!stopFilterAttribute2Value2StopsQT.containsKey(stopFilterAttribute)) {
-			stopFilterAttribute2Value2StopsQT.put(stopFilterAttribute, new HashMap<>());
-		}
+		Map<String, QuadTree<TransitStopFacility>> filteredQTs = 
+		        this.stopFilterAttribute2Value2StopsQT.computeIfAbsent(stopFilterAttribute, key -> new HashMap<>());
+		if (filteredQTs.containsKey(stopFilterValue))
+		    return;
 		
 	    Set<TransitStopFacility> stops = routeStopsPerStopFacility.keySet();
         QuadTree<TransitStopFacility> stopsQTFiltered = new QuadTree<>(stopsQT.getMinEasting(), stopsQT.getMinNorthing(), stopsQT.getMaxEasting(), stopsQT.getMaxNorthing());
@@ -568,7 +564,7 @@ public class SwissRailRaptorData {
 	            stopsQTFiltered.put(x, y, stopFacility);
 			}
         }
-        stopFilterAttribute2Value2StopsQT.get(stopFilterAttribute).put(stopFilterValue, stopsQTFiltered);
+        filteredQTs.put(stopFilterValue, stopsQTFiltered);
 	}
 
 	public class CachingTransferProvider implements Supplier<Transfer> {
