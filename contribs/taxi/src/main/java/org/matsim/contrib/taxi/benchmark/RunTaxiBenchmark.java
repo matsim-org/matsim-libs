@@ -23,8 +23,7 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -36,7 +35,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
@@ -64,16 +62,13 @@ public class RunTaxiBenchmark {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
+		DvrpBenchmarks.adjustConfig(config);
 
-		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		DvrpBenchmarks.initController(controler);
 
 		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
-		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-
-		Controler controler = new Controler(scenario);
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
 		controler.addOverridingModule(new MultiModeTaxiModule());
@@ -85,17 +80,5 @@ public class RunTaxiBenchmark {
 				.build());
 
 		return controler;
-	}
-
-	public static Scenario loadBenchmarkScenario(Config config, int interval, int maxTime) {
-		Scenario scenario = new ScenarioBuilder(config).build();
-
-		if (config.network().isTimeVariantNetwork()) {
-			scenario.getNetwork().getFactory()
-					.setLinkFactory(new FixedIntervalTimeVariantLinkFactory(interval, maxTime));
-		}
-
-		ScenarioUtils.loadScenario(scenario);
-		return scenario;
 	}
 }

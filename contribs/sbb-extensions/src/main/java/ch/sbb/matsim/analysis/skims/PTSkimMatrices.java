@@ -100,6 +100,7 @@ public class PTSkimMatrices {
                 } else {
                     float avgFactor = 1.0f / count;
                     float adaptionTime = pti.adaptionTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
+                    pti.distanceMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.travelTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.accessTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
                     pti.egressTimeMatrix.multiply(fromZoneId, toZoneId, avgFactor);
