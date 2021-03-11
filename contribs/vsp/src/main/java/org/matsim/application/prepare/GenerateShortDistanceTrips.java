@@ -3,9 +3,11 @@ package org.matsim.application.prepare;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -14,14 +16,11 @@ import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.application.analysis.HomeLocationFilter;
-import org.matsim.application.options.CRSOptions;
+import org.matsim.application.options.CrsOptions;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -45,11 +44,11 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
     @CommandLine.Option(names = "--output", description = "Output filename")
     private Path output;
 
-    @CommandLine.Option(names = "--shp", description = "Shape file used for filtering")
-    private Path shapeFile;
+    @CommandLine.Mixin
+    private final ShpOptions shp = new ShpOptions();
 
     @CommandLine.Mixin
-    private final CRSOptions crs = new CRSOptions();
+    private final CrsOptions crs = new CrsOptions();
 
     @CommandLine.Option(names = "--num-trips", description = "Number of trips to generate", required = true)
     private int numOfMissingTrips;
@@ -60,8 +59,9 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
     @CommandLine.Option(names = "--max-duration", description = "Maximum duration in seconds", defaultValue = "3600")
     private double maxDuration;
 
+    private final Random rnd = new Random(4711);
+
     private Population population;
-    private final Random rnd = MatsimRandom.getLocalInstance();
 
     @Override
     public Integer call() throws Exception {
@@ -77,19 +77,23 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
 
         population = scenario.getPopulation();
 
-        List<String> personsInCityBoundary = new ArrayList<>();
-        HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shapeFile, population);
+        Set<Id<Person>> personsInCityBoundary = new HashSet<>();
 
-        for (Person person : population.getPersons().values()) {
-            if (homeLocationFilter.includeAgent(person.getId())) {
-                personsInCityBoundary.add(person.getId().toString());
+        if (shp.getShapeFile() != null) {
+            log.info("Using shape file {}", shp.getShapeFile());
+            HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp.getShapeFile(), population);
+            for (Person person : population.getPersons().values()) {
+                if (homeLocationFilter.includeAgent(person.getId())) {
+                    personsInCityBoundary.add(person.getId());
+                }
             }
-        }
+        } else
+            personsInCityBoundary.addAll(population.getPersons().keySet());
 
-        Predicate<String> condition = personsInCityBoundary::contains;
+        Predicate<Id<Person>> condition = personsInCityBoundary::contains;
 
         long originalTrips = population.getPersons().values().stream()
-                .filter(person -> condition.test(person.getId().toString())).map(HasPlansAndId::getSelectedPlan)
+                .filter(person -> condition.test(person.getId())).map(HasPlansAndId::getSelectedPlan)
                 .map(plan -> TripStructureUtils.getTrips(plan.getPlanElements())).mapToLong(List::size).sum();
         log.info("trip num before augmentation: {}", originalTrips);
 
@@ -101,7 +105,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         PopulationUtils.writePopulation(getPopulation(), output.toString());
 
         long totalTrips = population.getPersons().values().stream()
-                .filter(person -> condition.test(person.getId().toString())).map(HasPlansAndId::getSelectedPlan)
+                .filter(person -> condition.test(person.getId())).map(HasPlansAndId::getSelectedPlan)
                 .map(plan -> TripStructureUtils.getTrips(plan.getPlanElements())).mapToLong(List::size).sum();
 
         log.info("trip num after augmentation: {}", totalTrips);
@@ -109,7 +113,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         return 0;
     }
 
-    public void run(Predicate<String> addingCondition) {
+    public void run(Predicate<Id<Person>> addingCondition) {
 
         int addedTrips = 0;
 
@@ -117,7 +121,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         log.info("probability of adding trips is: {}", probability);
         log.info("adding missing trips..........{}", addedTrips);
         for (Person person : population.getPersons().values()) {
-            if (addingCondition.test(person.getId().toString())) {
+            if (addingCondition.test(person.getId())) {
 
                 Plan plan = person.getSelectedPlan();
                 var activities = TripStructureUtils.getActivities(plan.getPlanElements(),
@@ -215,7 +219,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         return Math.min(originActivity.getEndTime().seconds(), v);
     }
 
-    private double computeAddingProbability(int numOfMissingTrips, Predicate<String> addingCondition) {
+    private double computeAddingProbability(int numOfMissingTrips, Predicate<Id<Person>> addingCondition) {
         int numOfAct = 0;
         int numOfTrips = 0;
         for (Person person : population.getPersons().values()) {
@@ -224,7 +228,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
             person.addPlan(selectedPlan);
             person.setSelectedPlan(selectedPlan);
 
-            if (addingCondition.test(person.getId().toString())) {
+            if (addingCondition.test(person.getId())) {
                 var activities = TripStructureUtils.getActivities(selectedPlan.getPlanElements(),
                         TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
                 var trips = TripStructureUtils.getTrips(selectedPlan);

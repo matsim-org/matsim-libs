@@ -14,12 +14,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.*;
-import org.matsim.application.options.CRSOptions;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import picocli.CommandLine;
 
@@ -52,11 +53,11 @@ public final class CreateNetworkFromSumo implements Callable<Integer> {
 	@CommandLine.Option(names = "--output", description = "Output xml file", required = true)
 	private Path output;
 
-	@CommandLine.Option(names = "--shp", description = "Shape file used for filtering")
-	private Path shapeFile;
+	@CommandLine.Mixin
+	private final ShpOptions shp = new ShpOptions();
 
 	@CommandLine.Mixin
-	private final CRSOptions crs = new CRSOptions();
+	private final CrsOptions crs = new CrsOptions();
 
 	@CommandLine.Option(names = {"--capacities"}, description = "CSV file with lane capacities", required = false)
 	private Path capacities;
@@ -68,7 +69,7 @@ public final class CreateNetworkFromSumo implements Callable<Integer> {
 	@Override
 	public Integer call() throws Exception {
 
-		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shapeFile, crs.getInputCRS(), crs.getTargetCRS());
+		SumoNetworkConverter converter = SumoNetworkConverter.newInstance(input, output, shp.getShapeFile(), crs.getInputCRS(), crs.getTargetCRS());
 
 		Network network = NetworkUtils.createNetwork();
 		Lanes lanes = LanesUtils.createLanesContainer();

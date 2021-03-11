@@ -37,7 +37,7 @@ public class TrajectoryToPlans implements Callable<Integer> {
     @CommandLine.Option(names = "--sample-size", description = "Sample size of the given input data in (0, 1]", required = true)
     private double sampleSize;
 
-    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]", required = false)
+    @CommandLine.Option(names = "--samples", description = "Desired down-sampled sizes in (0, 1]", arity = "1..*", required = false)
     private List<Double> samples;
 
     @CommandLine.Option(names = "--population", description = "Input original population file", required = true)
@@ -80,7 +80,12 @@ public class TrajectoryToPlans implements Callable<Integer> {
 
 
         PopulationUtils.writePopulation(scenario.getPopulation(),
-                output.resolve(String.format("%s-%dct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
+                output.resolve(String.format("%s-%dpct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
+
+        if (samples == null) {
+            log.info("No sub samples requested. Done.");
+            return 0;
+        }
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 
@@ -89,8 +94,10 @@ public class TrajectoryToPlans implements Callable<Integer> {
             // down-sample previous samples
             PopulationUtils.sampleDown(scenario.getPopulation(), sample / sampleSize);
             sampleSize = sample;
+
+            log.info("Creating {} sample", sampleSize);
             PopulationUtils.writePopulation(scenario.getPopulation(),
-                    output.resolve(String.format("%s-%dct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
+                    output.resolve(String.format("%s-%dpct.plans.xml.gz", name, Math.round(sampleSize * 100))).toString());
         }
 
         return 0;

@@ -25,7 +25,6 @@ public class HomeLocationFilter implements AgentFilter {
 
 	private final Set<Id<Person>> personsToRemove = new HashSet<>();
 	private static final String HOME_ACTIVITY_TYPE_PREFIX = "home";
-	private final Geometry analysisArea;
 
 	public HomeLocationFilter(Path analysisAreaShapeFile, Population population) {
 		Collection<SimpleFeature> features = getFeatures(analysisAreaShapeFile.toString());
@@ -33,7 +32,7 @@ public class HomeLocationFilter implements AgentFilter {
 		if (features.size() < 1) {
 			throw new RuntimeException("There is no feature (zone) in the shape file. Aborting...");
 		}
-		analysisArea = (Geometry) features.iterator().next().getDefaultGeometry();
+		Geometry analysisArea = (Geometry) features.iterator().next().getDefaultGeometry();
 		if (features.size() > 1) {
 			for (SimpleFeature simpleFeature : features) {
 				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
