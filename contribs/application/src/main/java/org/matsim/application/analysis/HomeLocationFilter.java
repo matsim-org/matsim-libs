@@ -3,6 +3,7 @@ package org.matsim.application.analysis;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
+import org.matsim.analysis.AgentFilter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -11,7 +12,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.vsp.cadyts.marginals.AgentFilter;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,8 +62,13 @@ public class HomeLocationFilter implements AgentFilter {
 	}
 
 	@Override
-	public boolean includeAgent(Id<Person> id) {
-		return !personsToRemove.contains(id);
+	public boolean considerAgent(Person person) {
+		return !personsToRemove.contains(person.getId());
+	}
+
+	@Override
+	public String toFileName() {
+		return "homeLocation";
 	}
 
 

@@ -59,11 +59,6 @@
 			<artifactId>analysis</artifactId>
 			<version>13.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>sumo</artifactId>
-			<version>13.0-SNAPSHOT</version>
-		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.processing</groupId>-->
 <!--			<artifactId>core</artifactId>-->
@@ -188,25 +183,5 @@
 			<artifactId>graphhopper-reader-osm</artifactId>
 			<version>2.1</version>
 		</dependency>
-
-		<!-- Command line parser -->
-		<dependency>
-			<groupId>info.picocli</groupId>
-			<artifactId>picocli</artifactId>
-			<version>4.6.1</version>
-		</dependency>
-		<dependency>
-			<groupId>it.unimi.dsi</groupId>
-			<artifactId>fastutil</artifactId>
-			<version>8.5.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.18.1</version>
-			<scope>test</scope>
-		</dependency>
-
 	</dependencies>
 </project>

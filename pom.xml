@@ -65,6 +65,10 @@
             <url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
         </repository>
         <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
             <!-- For MATSim snapshots: -->
             <id>ojo-snapshots</id>
             <url>https://oss.jfrog.org/libs-snapshot</url>

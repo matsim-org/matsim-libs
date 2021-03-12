@@ -1,5 +1,7 @@
 package org.matsim.application.prepare;
 
+import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -7,16 +9,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.application.analysis.HomeLocationFilter;
-import org.matsim.application.options.CrsOptions;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -83,7 +82,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
             log.info("Using shape file {}", shp.getShapeFile());
             HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp.getShapeFile(), population);
             for (Person person : population.getPersons().values()) {
-                if (homeLocationFilter.includeAgent(person.getId())) {
+                if (homeLocationFilter.considerAgent(person)) {
                     personsInCityBoundary.add(person.getId());
                 }
             }

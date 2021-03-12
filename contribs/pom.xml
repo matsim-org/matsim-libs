@@ -79,6 +79,7 @@
 		<module>accessibility</module>
 		<module>accidents</module>
 		<module>analysis</module>
+		<module>application</module>
 		<module>av</module>
 		<module>bicycle</module>
 		<module>cadytsIntegration</module>

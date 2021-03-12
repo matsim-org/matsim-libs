@@ -1,5 +1,7 @@
 package org.matsim.application.prepare;
 
+import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import it.unimi.dsi.fastutil.Pair;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
@@ -14,13 +16,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.application.options.ShpOptions;
 import org.matsim.contrib.sumo.SumoNetworkConverter;
 import org.matsim.contrib.sumo.SumoNetworkHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.lanes.*;
-import org.matsim.application.options.CrsOptions;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import picocli.CommandLine;
 
