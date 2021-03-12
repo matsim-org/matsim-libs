@@ -103,7 +103,7 @@ public class RunFreightIT {
 	 * Now it should get unified already during the reconverting from jsprit to MATSim.
 	 */
 	//TODO Set to ignore until changes are done. KMT'Jan21
-	@Ignore
+//	@Ignore
 	@Test
 	public void testCarrierToursHasUniqueVehicleIds(){
 		Carriers carriers = FreightUtils.getCarriers(scenario);
