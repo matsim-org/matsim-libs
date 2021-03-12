@@ -250,7 +250,7 @@ public class MatsimJspritFactory {
 	}
 
 	/**
-	 * Creates {@link CarrierVehicle} from a {basics.route.Vehicle}
+	 * Creates a MATSim {@link CarrierVehicle} from a jsprit {basics.route.Vehicle}
 	 *
 	 * @param vehicle to be transformed to CarrierVehicle
 	 * @return carrierVehicle
