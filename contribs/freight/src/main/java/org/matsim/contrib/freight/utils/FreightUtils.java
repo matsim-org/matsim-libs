@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import javax.management.InvalidAttributeValueException;
 import java.util.*;
@@ -129,6 +130,9 @@ public class FreightUtils {
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution);
+			//TODO: Think about using this at an useful place --> try to have the connection between the vehicle in VRP definiton and the vehicle of the tour
+			// The challenge is, that it should 1.) be connected and 2) be unique within the tour plans
+//			VehicleUtils.getOrCreateAllvehicles(scenario).addVehicle(...);
 
 			log.info("routing plan for carrier " + carrier.getId());
 			NetworkRouter.routePlan(newPlan, netBasedCosts);

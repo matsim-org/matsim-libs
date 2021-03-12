@@ -13,9 +13,7 @@
 package org.matsim.contrib.freight.jsprit;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
@@ -75,7 +73,7 @@ import org.matsim.vehicles.VehicleUtils;
 public class MatsimJspritFactory {
 
 	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
-	private static int nextVehId; //Todo: Check if this makes sence. Even in cases with more then one carrier. I Think some resets might be necessary (See MatsimTransformerTest)
+	private static Map<String, Integer> vehCounterPerVehicle = new HashMap<>();
 
 	// How to deal with a multi-depot VRP? Which depotLink should be used? kmt
 	// jul/18
@@ -257,7 +255,8 @@ public class MatsimJspritFactory {
 	 * @see CarrierVehicle, Vehicle
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle) {
-		String vehicleId = vehicle.getId() + "_" + nextVehId;
+		final String jspritVehicleId = vehicle.getId();
+		String vehicleId = jspritVehicleId + "_" + vehCounterPerVehicle.get(jspritVehicleId);
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(
 				Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
 				Id.create(vehicle.getStartLocation().getId(), Link.class));
@@ -715,12 +714,14 @@ public class MatsimJspritFactory {
 	 * </br>
 	 */
 	public static CarrierPlan createPlan(Carrier carrier, VehicleRoutingProblemSolution solution) {
-		nextVehId = 0;
+		vehCounterPerVehicle.clear();
 		Collection<ScheduledTour> tours = new ArrayList<ScheduledTour>();
 		for (VehicleRoute route : solution.getRoutes()) {
+			final String vehId = route.getVehicle().getId();
+			vehCounterPerVehicle.putIfAbsent(vehId, 0); //intialize it
 			ScheduledTour scheduledTour = createTour(route);
 			tours.add(scheduledTour);
-			++nextVehId;
+			vehCounterPerVehicle.computeIfPresent(vehId, (key, val) -> val + 1); //increase it by one
 		}
 		CarrierPlan carrierPlan = new CarrierPlan(carrier, tours);
 		carrierPlan.setScore(solution.getCost() * (-1));
