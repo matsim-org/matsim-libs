@@ -396,60 +396,59 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// rho(qmax) = vhole * rhojam / (vmax + vhole)
 				// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
 				
-			TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
-			if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY) {
-				// reduce flow capacity (and keep number of lanes as it is)
-				this.maxFlowUsedInQsim = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
-					
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
+				
+				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
+				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
+						
+				if ( maxFlowFromFdiag < flowCapacityPerTimeStep ) {
 					
-				if ( this.maxFlowUsedInQsim < flowCapacityPerTimeStep ) {
-						
-					// write out the modified qsim behavior as link attribute
-					qLink.getLink().getAttributes().putAttribute("maxFlowUsedInQsim", maxFlowUsedInQsim);
-						
 					if (wrnCnt<10) {
 						wrnCnt++ ;
-						log.warn( "max flow from fdiag < requested flow cap; linkId=" + qLink.getId() +
-											  "; req flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
-											  "; max flow from fdiag/h=" + 3600*maxFlowUsedInQsim/context.qsimConfig.getTimeStepSize() ) ;
+						log.warn( "max flow from fdiag < flow cap in network file; linkId=" + qLink.getId() +
+											  "; network file flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
+											  "; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
+						
+						log.warn( "number of lanes from fdiag > number of lanes in network file; linkId=" + qLink.getId() +
+								  "; number of lanes in network file=" + this.effectiveNumberOfLanes +
+								  "; number of lanes from fdiag=" + minimumNumberOfLanesFromFdiag ) ;
 							
 						if ( wrnCnt==10 ) {
 								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 						}
 					}
-						
-				}
 					
-			} else if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES) {
-				// increase number of lanes (and keep flow capacity as it is)
-				this.effectiveNumberOfLanesUsedInQsim = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
+					// now either correct the flow capacity or the number of lanes!
 					
-				if ( this.effectiveNumberOfLanesUsedInQsim < effectiveNumberOfLanes ) {
+					TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
+					
+					if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY) {
+						this.maxFlowUsedInQsim = maxFlowFromFdiag;
 						
-					// write out the modified qsim behavior as link attribute
-					qLink.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
-						
-					if (wrnCnt<10) {
-						wrnCnt++ ;
-						
-						log.warn( "max number of lanes fdiag < requested number of lanes; linkId=" + qLink.getId() +
-									  "; req number of lanes =" + effectiveNumberOfLanes +
-									  "; max number of lanes from fdiag=" + effectiveNumberOfLanesUsedInQsim ) ;
-							
-						if ( wrnCnt==10 ) {
-							log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+						if (wrnCnt<10) {
+							log.warn("The flow capacity will be reduced. See link attribute 'maxFlowUsedInQsim' written into the output network.");
 						}
-					}
-						
-				}
+
+						// write out the modified qsim behavior as link attribute
+						qLink.getLink().getAttributes().putAttribute("maxFlowUsedInQsim", 3600*maxFlowUsedInQsim/context.qsimConfig.getTimeStepSize());
 					
-			} else {
-				throw new RuntimeException("The approach "+trafficDynamicsCorrectionApproach.toString()+" is not implemented yet.");
-			}
-				
-			break;
+					} else if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES) {
+						this.effectiveNumberOfLanesUsedInQsim = minimumNumberOfLanesFromFdiag;
+						
+						if (wrnCnt<10) {
+							log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
+						}
+						
+						// write out the modified qsim behavior as link attribute
+						qLink.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
+					
+					} else {
+						throw new RuntimeException("The approach "+trafficDynamicsCorrectionApproach.toString()+" is not implemented yet.");
+					}
+
+				}
+				break;
 			
 			default: throw new RuntimeException("The traffic dynamics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
