@@ -381,6 +381,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		
+		// start with the base assumption, might be adjusted below depending on the traffic dynamics
+		this.effectiveNumberOfLanesUsedInQsim = this.effectiveNumberOfLanes;
+		this.maxFlowUsedInQsim = this.flowCapacityPerTimeStep;
+		
 		switch (context.qsimConfig.getTrafficDynamics()) {
 			case queue:
 			case withHoles:
@@ -394,8 +398,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				
 			TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
 			if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY) {
+				// reduce flow capacity (and keep number of lanes as it is)
 				this.maxFlowUsedInQsim = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
-				this.effectiveNumberOfLanesUsedInQsim = this.effectiveNumberOfLanes;
 					
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
@@ -419,8 +423,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				}
 					
 			} else if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES) {
+				// increase number of lanes (and keep flow capacity as it is)
 				this.effectiveNumberOfLanesUsedInQsim = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
-				this.maxFlowUsedInQsim = this.flowCapacityPerTimeStep;
 					
 				if ( this.effectiveNumberOfLanesUsedInQsim < effectiveNumberOfLanes ) {
 						
@@ -458,16 +462,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// The following is not adjusted for time-dependence!! kai, apr'16
 		// No, I think that it simply assumes that the lookups are "now". kai, feb'18
 //		double now = context.getSimTimer().getTimeOfDay() ;
-		
-		double lanes = Double.POSITIVE_INFINITY;
-		if (context.qsimConfig.getTrafficDynamics() == TrafficDynamics.kinematicWaves && context.qsimConfig.getTrafficDynamicsCorrectionApproach() == TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES) {
-			lanes = this.effectiveNumberOfLanesUsedInQsim;
-		} else {
-			lanes = this.effectiveNumberOfLanes;
-		}
 			
 		// first guess at storageCapacity:
-		storageCapacity = this.length * lanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
+		storageCapacity = this.length * this.effectiveNumberOfLanesUsedInQsim / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 //		storageCapacity = this.length * this.qLink.getLink().getNumberOfLanes(now) / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
