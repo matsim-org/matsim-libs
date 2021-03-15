@@ -76,6 +76,8 @@ public class TestWarmEmissionsTableConsistencyCheck {
 		Assert.assertEquals( expectedValue, warmEmissions.get(Pollutant.NOx), MatsimTestUtils.EPSILON );
 	}
 
+	
+
 
 	//TODO: @Jonas: Please update for the new purpose of this test.
 
