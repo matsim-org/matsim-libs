@@ -1,7 +1,5 @@
 package org.matsim.application.prepare;
 
-import org.matsim.application.options.CrsOptions;
-import org.matsim.application.options.ShpOptions;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -9,13 +7,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.application.analysis.HomeLocationFilter;
+import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModeMainModeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.application.analysis.HomeLocationFilter;
+import org.matsim.core.utils.geometry.CoordUtils;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * This step should be used when the population is missing short distance trips.
+ *
  * @author zmeng, Chengqi Lu
  */
 @CommandLine.Command(
@@ -43,14 +45,14 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
     @CommandLine.Option(names = "--output", description = "Output filename")
     private Path output;
 
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    private Generate generate;
+
     @CommandLine.Mixin
     private final ShpOptions shp = new ShpOptions();
 
     @CommandLine.Mixin
     private final CrsOptions crs = new CrsOptions();
-
-    @CommandLine.Option(names = "--num-trips", description = "Number of trips to generate", required = true)
-    private int numOfMissingTrips;
 
     @CommandLine.Option(names = "--range", description = "Maximum distance in meter", defaultValue = "1000")
     private double range;
@@ -80,7 +82,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
 
         if (shp.getShapeFile() != null) {
             log.info("Using shape file {}", shp.getShapeFile());
-            HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp.getShapeFile(), population);
+            HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, population);
             for (Person person : population.getPersons().values()) {
                 if (homeLocationFilter.considerAgent(person)) {
                     personsInCityBoundary.add(person.getId());
@@ -91,17 +93,46 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
 
         Predicate<Id<Person>> condition = personsInCityBoundary::contains;
 
-        long originalTrips = population.getPersons().values().stream()
+        List<TripStructureUtils.Trip> originalTrips = population.getPersons().values().stream()
                 .filter(person -> condition.test(person.getId())).map(HasPlansAndId::getSelectedPlan)
-                .map(plan -> TripStructureUtils.getTrips(plan.getPlanElements())).mapToLong(List::size).sum();
-        log.info("trip num before augmentation: {}", originalTrips);
+                .flatMap(person -> TripStructureUtils.getTrips(person.getPlanElements()).stream())
+                .collect(Collectors.toList());
 
-        run(condition);
+        log.info("trip num before augmentation: {}", originalTrips.size());
+
+        int numTrips;
+        if (generate.numOfMissingTrips > 0) {
+            numTrips = generate.numOfMissingTrips;
+        } else {
+
+            if (generate.tripShare <= 0 || generate.tripShare > 1)
+                throw new IllegalArgumentException("Trip share must be in (0, 1)");
+
+            double shortDistance = originalTrips.stream().mapToDouble(
+                    t -> CoordUtils.calcEuclideanDistance(t.getOriginActivity().getCoord(), t.getDestinationActivity().getCoord())
+            ).filter(d -> d <= range).count();
+
+            double actualShare = shortDistance / originalTrips.size();
+
+            log.info("There are {} short distance trips, share is {} and should be {}", shortDistance, actualShare, generate.tripShare);
+
+            // (total + y) * share = short + y
+            // --> y = (short - total * share) / (share - 1)
+
+            numTrips = (int) (Math.round(shortDistance - originalTrips.size() * generate.tripShare) / (generate.tripShare - 1));
+        }
+
+        log.info("Generating {} trips", numTrips);
+
+        if (numTrips <= 0)
+            return 2;
+
+        run(condition, numTrips);
 
         if (output == null)
             output = Path.of(input.toString().replace(".xml", "-with-trips.xml"));
 
-        PopulationUtils.writePopulation(getPopulation(), output.toString());
+        PopulationUtils.writePopulation(population, output.toString());
 
         long totalTrips = population.getPersons().values().stream()
                 .filter(person -> condition.test(person.getId())).map(HasPlansAndId::getSelectedPlan)
@@ -112,7 +143,7 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         return 0;
     }
 
-    public void run(Predicate<Id<Person>> addingCondition) {
+    private void run(Predicate<Id<Person>> addingCondition, int numOfMissingTrips) {
 
         int addedTrips = 0;
 
@@ -254,7 +285,13 @@ public class GenerateShortDistanceTrips implements Callable<Integer> {
         return filterAct;
     }
 
-    public Population getPopulation() {
-        return population;
+    static class Generate {
+
+        @CommandLine.Option(names = "--num-trips", description = "Number of trips to generate", required = true)
+        private int numOfMissingTrips = -1;
+
+        @CommandLine.Option(names = "--trip-share", description = "Generate as many trips needed to match the share", required = true)
+        private double tripShare;
     }
+
 }

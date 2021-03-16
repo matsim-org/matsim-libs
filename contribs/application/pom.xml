@@ -36,8 +36,8 @@
 			<version>12.2</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>gt-epsg-hsql</artifactId>
 					<groupId>org.geotools</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

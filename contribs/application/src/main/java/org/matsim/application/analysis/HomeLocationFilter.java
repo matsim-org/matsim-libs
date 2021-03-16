@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.application.options.ShpOptions;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -26,10 +27,10 @@ public class HomeLocationFilter implements AgentFilter {
 	private final Set<Id<Person>> personsToRemove = new HashSet<>();
 	private static final String HOME_ACTIVITY_TYPE_PREFIX = "home";
 
-	public HomeLocationFilter(Path analysisAreaShapeFile, Population population) {
-		Collection<SimpleFeature> features = getFeatures(analysisAreaShapeFile.toString());
+	public HomeLocationFilter(ShpOptions analysisAreaShapeFile, Population population) {
+		Collection<SimpleFeature> features =analysisAreaShapeFile.readFeatures();
 
-		if (features.size() < 1) {
+		if (features == null || features.size() < 1) {
 			throw new RuntimeException("There is no feature (zone) in the shape file. Aborting...");
 		}
 		Geometry analysisArea = (Geometry) features.iterator().next().getDefaultGeometry();
