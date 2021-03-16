@@ -43,7 +43,7 @@ import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
  * @author tkohl / Senozon
  *
  */
-public class ParkingProxyModule extends AbstractModule {
+public /*deliberately non-final*/ class ParkingProxyModule extends AbstractModule {
 	
 	private final Scenario scenario;
 	
@@ -55,9 +55,7 @@ public class ParkingProxyModule extends AbstractModule {
 	public void install() {
 		ParkingProxyConfigGroup parkingConfig = ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class );
 		
-		InitialLoadGenerator loadGenerator = new InitialLoadGenerator(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor());
-//		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
-		Collection<Tuple<Coord, Integer>> initialLoad = loadGenerator.calculateInitialCarPositions(parkingConfig.getCarsPer1000Persons());
+		Collection<Tuple<Coord, Integer>> initialLoad = calculateInitialLoad(parkingConfig);
 		int qsimEndTime = Time.isUndefinedTime(getConfig().qsim().getEndTime()) ? 30*3600 : (int)getConfig().qsim().getEndTime();
 		MovingEntityCounter carCounter = new MovingEntityCounter(
 				initialLoad, 
@@ -94,6 +92,12 @@ public class ParkingProxyModule extends AbstractModule {
 		default:
 			throw new RuntimeException("Unsupported calculation method " + parkingConfig.getCalculationMethod());	
 		}
+	}
+	
+	protected Collection<Tuple<Coord, Integer>> calculateInitialLoad(ParkingProxyConfigGroup parkingConfig) {
+		InitialLoadGenerator loadGenerator = new InitialLoadGeneratorWithConstantShare(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor(), parkingConfig.getCarsPer1000Persons());
+//		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
+		return loadGenerator.calculateInitialCarPositions();
 	}
 
 }
