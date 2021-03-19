@@ -2,6 +2,7 @@ package org.matsim.application;
 
 import com.google.common.collect.Lists;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
@@ -10,7 +11,6 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.application.commands.ShowGUI;
 import picocli.AutoComplete;
 import picocli.CommandLine;
 
@@ -21,6 +21,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -79,6 +80,15 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
     @CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
     protected int iterations;
+
+    @CommandLine.Option(names = "--runId", description = "Overwrite runId defined by the application")
+    protected String runId;
+
+    @CommandLine.Option(names = "--output", description = "Overwrite output folder defined by the application")
+    protected Path output;
+
+    //@CommandLine.Option(names = {"-c", "--config"}, description = "Overwrite config values (given as configGroup.param=value)")
+    //protected Map<String, String> configValues;
 
     /**
      * Path to the default scenario config, if applicable.
@@ -144,6 +154,12 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
         if (iterations > -1)
             config.controler().setLastIteration(iterations - 1);
+
+        if (output != null)
+            config.controler().setOutputDirectory(output.toString());
+
+        if (runId != null)
+            config.controler().setRunId(runId);
 
         controler.run();
         return 0;
