@@ -54,7 +54,7 @@ public class CreateTransitScheduleFromGtfs implements Callable<Integer> {
     private File output;
 
     @CommandLine.Option(names = "--include-stops", description = "Fully qualified class name to a Predicate<Stop> for filtering certain stops")
-    private Class<Predicate<Stop>> includeStops;
+    private Class<?> includeStops;
 
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
@@ -83,7 +83,7 @@ public class CreateTransitScheduleFromGtfs implements Callable<Integer> {
                     .setDate(date)
                     .setFeed(gtfsFile)
                     //.setIncludeAgency(agency -> agency.equals("rbg-70"))
-                    .setIncludeStop(includeStops != null ? includeStops.getDeclaredConstructor().newInstance() : (stop) -> true)
+                    .setIncludeStop(includeStops != null ? (Predicate<Stop>) includeStops.getDeclaredConstructor().newInstance() : (stop) -> true)
                     .setMergeStops(true)
                     .build();
 

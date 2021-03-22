@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
  * @author rakow
  */
 @CommandLine.Command(
-        name = "trajectoryToPlans",
+        name = "trajectory-to-plans",
         description = "Create population including, down-sampling, and activity split by duration",
         showDefaultValues = true
 )
