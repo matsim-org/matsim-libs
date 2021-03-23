@@ -155,7 +155,7 @@ public class RunDrtExampleIT {
 		double rejectionRate = Double.parseDouble(params.get("rejectionRate"));
 		double totalTravelTimeMean = Double.parseDouble(params.get("totalTravelTime_mean"));
 
-		var percentage = Percentage.withPercentage(20);
+		var percentage = Percentage.withPercentage(1);
 		assertThat(expectedStats.rejectionRate).isCloseTo(rejectionRate, percentage);
 		assertThat(expectedStats.rejections).isCloseTo(rejections, percentage);
 		assertThat(expectedStats.waitAverage).isCloseTo(waitAverage, percentage);
