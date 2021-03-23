@@ -43,7 +43,6 @@ import org.matsim.contrib.dvrp.vrpagent.TaskStartedEvent;
 import org.matsim.contrib.dvrp.vrpagent.TaskStartedEventHandler;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.common.base.Verify;
@@ -81,20 +80,15 @@ public class DrtVehicleOccupancyProfileCalculator
 		this.dvrpMode = dvrpMode;
 		this.passengerServingTaskTypes = passengerServingTaskTypes;
 
-		if (qsimConfig.getSimEndtimeInterpretation() == EndtimeInterpretation.onlyUseEndtime && qsimConfig.getEndTime()
-				.isDefined()) {
-			analysisEndTime = qsimConfig.getEndTime().seconds();
-		} else {
-			analysisEndTime = fleet.getVehicleSpecifications()
-					.values()
-					.stream()
-					.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
-					.max()
-					.orElse(0);
-		}
-
-		int intervalCount = (int)Math.ceil((analysisEndTime + 1) / timeInterval);
-		timeDiscretizer = new TimeDiscretizer(intervalCount * timeInterval, timeInterval, TimeDiscretizer.Type.ACYCLIC);
+		double qsimEndTime = qsimConfig.getEndTime().orElse(0);
+		double maxServiceEndTime = fleet.getVehicleSpecifications()
+				.values()
+				.stream()
+				.mapToDouble(DvrpVehicleSpecification::getServiceEndTime)
+				.max()
+				.orElse(0);
+		analysisEndTime = Math.max(qsimEndTime, maxServiceEndTime);
+		timeDiscretizer = new TimeDiscretizer((int)Math.ceil(analysisEndTime), timeInterval);
 
 		maxCapacity = fleet.getVehicleSpecifications()
 				.values()

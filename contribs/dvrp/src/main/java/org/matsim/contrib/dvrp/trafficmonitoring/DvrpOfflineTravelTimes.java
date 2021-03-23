@@ -73,7 +73,10 @@ public class DvrpOfflineTravelTimes {
 
 				writer.append(Id.get(idx, Link.class) + DELIMITER);
 				for (int t = 0; t < intervalCount; t++) {
-					writer.append(ttRow[t] + DELIMITER);// some precision lost while writing TTs
+					// rounding up to full seconds, otherwise the output files are sometimes huge (even when gzipped)
+					// consider having a switch for enabling/disabling rounding
+					int tt = (int)Math.ceil(ttRow[t]);//rounding up to avoid zeros; also QSim rounds up
+					writer.append(tt + DELIMITER);
 				}
 				writer.append('\n');
 			}
