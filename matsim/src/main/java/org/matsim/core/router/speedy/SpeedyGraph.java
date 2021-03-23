@@ -1,10 +1,11 @@
 package org.matsim.core.router.speedy;
 
-import java.util.Arrays;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+
+import java.util.Arrays;
 
 /**
  * Implements a highly optimized data structure for representing a MATSim network. Optimized to use as little memory as possible, and thus to fit as much memory as possible into CPU caches for high
@@ -52,6 +53,7 @@ public class SpeedyGraph {
     private final int[] nodeData;
     private final int[] linkData;
     private final Link[] links;
+    private final Node[] nodes;
 
     public SpeedyGraph(Network network) {
         this.nodeCount = Id.getNumberOfIds(Node.class);
@@ -60,10 +62,14 @@ public class SpeedyGraph {
         this.nodeData = new int[nodeCount * NODE_SIZE];
         this.linkData = new int[linkCount * LINK_SIZE];
         this.links = new Link[linkCount];
+        this.nodes = new Node[nodeCount];
 
         Arrays.fill(this.nodeData, -1);
         Arrays.fill(this.linkData, -1);
 
+        for (Node node : network.getNodes().values()) {
+            this.nodes[node.getId().index()] = node;
+        }
         for (Link link : network.getLinks().values()) {
             addLink(link);
         }
@@ -126,6 +132,10 @@ public class SpeedyGraph {
 
     Link getLink(int index) {
         return this.links[index];
+    }
+
+    Node getNode(int index) {
+        return this.nodes[index];
     }
 
     public interface LinkIterator {
