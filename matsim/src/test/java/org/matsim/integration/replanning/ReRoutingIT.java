@@ -116,7 +116,18 @@ public class ReRoutingIT {
 		controler.run();
 		this.evaluate();
 	}
-	
+
+	@Test
+	public void testReRoutingSpeedyALT() throws MalformedURLException {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
+
 	private void evaluate() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
