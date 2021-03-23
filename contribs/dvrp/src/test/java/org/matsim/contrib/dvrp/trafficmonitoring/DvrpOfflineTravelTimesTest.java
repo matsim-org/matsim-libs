@@ -56,7 +56,7 @@ public class DvrpOfflineTravelTimesTest {
 		//the matrix may have more than 2 rows (depends on how many link ids are cached)
 		var linkTTs = new double[Id.getNumberOfIds(Link.class)][];
 
-		linkTTs[linkIdA.index()] = new double[] { 0.0, 1.1, 2.2, 3.3, 4.4 };
+		linkTTs[linkIdA.index()] = new double[] { 0.1, 1.1, 2.2, 3.3, 4.4 };
 		linkTTs[linkIdB.index()] = new double[] { 5.5, 6.6, 7.7, 8.8, 9.9 };
 
 		var stringWriter = new StringWriter();
@@ -65,14 +65,14 @@ public class DvrpOfflineTravelTimesTest {
 		var lines = stringWriter.toString().split("\n");
 		assertThat(lines).hasSize(3);
 		assertThat(lines[0].split(";")).containsExactly("linkId", "0", "900", "1800", "2700", "3600");
-		assertThat(lines[1].split(";")).containsExactly("A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
-		assertThat(lines[2].split(";")).containsExactly("B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
+		assertThat(lines[1].split(";")).containsExactly("A", "1", "2", "3", "4", "5");
+		assertThat(lines[2].split(";")).containsExactly("B", "6", "7", "8", "9", "10");
 	}
 
 	@Test
 	public void loadLinkTravelTimes() throws IOException {
 		var line0 = String.join(";", "linkId", "0", "900", "1800", "2700", "3600");
-		var line1 = String.join(";", "A", 0.0 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
+		var line1 = String.join(";", "A", 0.1 + "", 1.1 + "", 2.2 + "", 3.3 + "", 4.4 + "");
 		var line2 = String.join(";", "B", 5.5 + "", 6.6 + "", 7.7 + "", 8.8 + "", 9.9 + "");
 		var lines = String.join("\n", line0, line1, line2);
 
@@ -84,7 +84,7 @@ public class DvrpOfflineTravelTimesTest {
 		var existingLinkTTs = EntryStream.of(linkTTs).filterValues(Objects::nonNull).toMap();
 
 		assertThat(existingLinkTTs).containsOnlyKeys(linkIdA.index(), linkIdB.index());
-		assertThat(existingLinkTTs.get(linkIdA.index())).containsExactly(0.0, 1.1, 2.2, 3.3, 4.4);
+		assertThat(existingLinkTTs.get(linkIdA.index())).containsExactly(0.1, 1.1, 2.2, 3.3, 4.4);
 		assertThat(existingLinkTTs.get(linkIdB.index())).containsExactly(5.5, 6.6, 7.7, 8.8, 9.9);
 	}
 
