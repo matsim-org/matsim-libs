@@ -1,4 +1,4 @@
-package ch.sbb.matsim.routing.graph;
+package org.matsim.core.router.speedy;
 
 import java.util.Arrays;
 import org.matsim.api.core.v01.Id;
@@ -21,7 +21,7 @@ import org.matsim.api.core.v01.network.Node;
  *
  * @author mrieser
  */
-public class Graph {
+public class SpeedyGraph {
 
     /*
      * memory consumption:
@@ -53,7 +53,7 @@ public class Graph {
     private final int[] linkData;
     private final Link[] links;
 
-    public Graph(Network network) {
+    public SpeedyGraph(Network network) {
         this.nodeCount = Id.getNumberOfIds(Node.class);
         this.linkCount = Id.getNumberOfIds(Link.class);
 
@@ -147,11 +147,11 @@ public class Graph {
 
     private static abstract class AbstractLinkIterator implements LinkIterator {
 
-        final Graph graph;
+        final SpeedyGraph graph;
         int nodeIdx = -1;
         int linkIdx = -1;
 
-        AbstractLinkIterator(Graph graph) {
+        AbstractLinkIterator(SpeedyGraph graph) {
             this.graph = graph;
         }
 
@@ -192,7 +192,7 @@ public class Graph {
 
     private static class OutLinkIterator extends AbstractLinkIterator {
 
-        OutLinkIterator(Graph graph) {
+        OutLinkIterator(SpeedyGraph graph) {
             super(graph);
         }
 
@@ -216,7 +216,7 @@ public class Graph {
 
     private static class InLinkIterator extends AbstractLinkIterator {
 
-        InLinkIterator(Graph graph) {
+        InLinkIterator(SpeedyGraph graph) {
             super(graph);
         }
 

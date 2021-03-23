@@ -1,4 +1,4 @@
-package ch.sbb.matsim.routing.graph;
+package org.matsim.core.router.speedy;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -10,7 +10,7 @@ import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Implements a least-cost-path-tree upon a {@link Graph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
+ * Implements a least-cost-path-tree upon a {@link SpeedyGraph} datastructure. Besides using the more efficient Graph datastructure, it also makes use of a custom priority-queue implementation (NodeMinHeap)
  * which operates directly on the least-cost-path-three data for additional performance gains.
  * <p>
  * In some limited tests, this resulted in a speed-up of at least a factor 2.5 compared to MATSim's default LeastCostPathTree.
@@ -20,16 +20,16 @@ import org.matsim.vehicles.Vehicle;
  */
 public class LeastCostPathTree {
 
-    private final Graph graph;
+    private final SpeedyGraph graph;
     private final TravelTime tt;
     private final TravelDisutility td;
     private final double[] data; // 3 entries per node: time, cost, distance
     private final int[] comingFrom;
-    private final Graph.LinkIterator outLI;
-    private final Graph.LinkIterator inLI;
+    private final SpeedyGraph.LinkIterator outLI;
+    private final SpeedyGraph.LinkIterator inLI;
     private final NodeMinHeap pq;
 
-    public LeastCostPathTree(Graph graph, TravelTime tt, TravelDisutility td) {
+    public LeastCostPathTree(SpeedyGraph graph, TravelTime tt, TravelDisutility td) {
         this.graph = graph;
         this.tt = tt;
         this.td = td;
