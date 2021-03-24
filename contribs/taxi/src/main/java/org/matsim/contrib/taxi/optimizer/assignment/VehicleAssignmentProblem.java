@@ -40,7 +40,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 
-import ch.sbb.matsim.routing.graph.Graph;
+import org.matsim.core.router.speedy.SpeedyGraph;
 
 /**
  * @author michalm
@@ -74,7 +74,7 @@ public class VehicleAssignmentProblem<D> {
 
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
-		pathSearch = OneToManyPathSearch.createSearch(new Graph(network), nodeMap, travelTime, travelDisutility, false);
+		pathSearch = OneToManyPathSearch.createSearch(new SpeedyGraph(network), nodeMap, travelTime, travelDisutility, false);
 
 		// TODO this kNN is slow
 		destinationFinder = nearestDestinationLimit < 0 ?

@@ -43,12 +43,11 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.router.speedy.SpeedyGraph;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import ch.sbb.matsim.routing.graph.Graph;
 
 /**
  * @author michalm
@@ -66,7 +65,7 @@ public class MultiInsertionDetourPathCalculator implements DetourPathCalculator,
 	public MultiInsertionDetourPathCalculator(Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg) {
-		Graph graph = new Graph(network);
+		SpeedyGraph graph = new SpeedyGraph(network);
 		IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 		nodeMap.putAll(network.getNodes());
 
