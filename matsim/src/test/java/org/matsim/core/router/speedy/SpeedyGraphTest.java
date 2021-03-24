@@ -18,6 +18,8 @@ public class SpeedyGraphTest {
 
     @Test
     public void testConstruction() {
+        Id.resetCaches();
+
         Fixture f = new Fixture();
         Network network = f.network;
 

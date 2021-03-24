@@ -137,6 +137,10 @@ class SpeedyALTData {
 				break;
 			}
 		}
+		if (firstNode == null) {
+			LOG.warn("Network does not contain any nodes!");
+			return;
+		}
 
 		Future<double[]>[] trees = new Future[this.landmarksCount * 2];
 		ExecutorService executor = Executors.newFixedThreadPool(4);
