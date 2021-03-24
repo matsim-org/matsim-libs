@@ -2,7 +2,6 @@ package org.matsim.core.router.speedy;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -98,7 +97,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		int startDeadend = this.astarData.getNodeDeadend(startNodeIndex);
 		int endDeadend = this.astarData.getNodeDeadend(endNodeIndex);
 
-		double estimation = estimateMinTravelcostToDestination(startNodeIndex, endNodeIndex, endNode);
+		double estimation = estimateMinTravelcostToDestination(startNodeIndex, endNodeIndex);
 
 		this.comingFrom[startNodeIndex] = -1;
 		setData(startNodeIndex, 0, startTime, 0);
@@ -138,14 +137,14 @@ public class SpeedyALT implements LeastCostPathCalculator {
 					// this node was already visited in this route-query
 					double oldCost = getCost(toNode);
 					if (newCost < oldCost) {
-						estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex, endNode);
+						estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
 						this.pq.decreaseKey(toNode, newCost + estimation);
 						setData(toNode, newCost, newTime, currDistance + link.getLength());
 						this.comingFrom[toNode] = nodeIdx;
 						this.usedLink[toNode] = linkIdx;
 					}
 				} else {
-					estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex, endNode);
+					estimation = estimateMinTravelcostToDestination(toNode, endNodeIndex);
 					setData(toNode, newCost, newTime, currDistance + link.getLength());
 					this.pq.insert(toNode, newCost + estimation);
 					this.comingFrom[toNode] = nodeIdx;
@@ -165,7 +164,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		return null;
 	}
 
-	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx, Node destinationNode) {
+	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx) {
 		/* The ALT algorithm uses two lower bounds for each Landmark:
 		 * given: source node S, target node T, landmark L
 		 * then, due to the triangle inequality:
@@ -175,18 +174,9 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		 * as this gives the closest approximation for the minimal travel time required to
 		 * go from S to T.
 		 */
-		Node node = this.graph.getNode(nodeIdx);
-		Coord nodeCoord = node.getCoord();
-		Coord destCoord = destinationNode.getCoord();;
-		/* Normally, the distance needs to be computed using pythagoras formula, which includes a square root.
-		 * As the calculation of a square root is computationally expensive, we only look at a "Manhatten"-distance like value,
-		 * taking only the larger value of the x- or y-difference. We cannot use the actual Manhatten distance, as this could
-		 * be larger than the actual distance which would result in too high expected costs, and thus could result in non-shorted
-		 * paths to be found. */
-		double distance = Math.max(Math.abs(nodeCoord.getX() - destCoord.getX()), Math.abs(nodeCoord.getY() - destCoord.getY()));
-		double best = distance * this.astarData.getMinTravelCostPerLength();
+		double best = 0;
 		for (int i = 0, n = this.astarData.getLandmarksCount(); i < n; i++) {
-			double estimate = estimateMinTravelcostToDestination(nodeIdx, destinationIdx, i);
+			double estimate = estimateMinTravelcostToDestinationForLandmark(nodeIdx, destinationIdx, i);
 			if (estimate > best) {
 				best = estimate;
 			}
@@ -194,7 +184,7 @@ public class SpeedyALT implements LeastCostPathCalculator {
 		return best;
 	}
 
-	private double estimateMinTravelcostToDestination(int nodeIdx, int destinationIdx, int landmarkIdx) {
+	private double estimateMinTravelcostToDestinationForLandmark(int nodeIdx, int destinationIdx, int landmarkIdx) {
 		double sl = this.astarData.getTravelCostToLandmark(nodeIdx, landmarkIdx);
 		double ls = this.astarData.getTravelCostFromLandmark(nodeIdx, landmarkIdx);
 		double tl = this.astarData.getTravelCostToLandmark(destinationIdx, landmarkIdx);
