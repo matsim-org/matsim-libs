@@ -60,7 +60,7 @@ public class LSPAgentSource implements AgentSource {
 
 	private final QSim qsim;
 
-	@Inject LSPAgentSource( CarrierAgentTracker carrierAgentTracker, AgentFactory agentFactory, QSim qsim ) {
+	@Inject LSPAgentSource(CarrierAgentTracker carrierAgentTracker, AgentFactory agentFactory, QSim qsim ) {
 		this.vehicleRoutes = carrierAgentTracker.createPlans();
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;

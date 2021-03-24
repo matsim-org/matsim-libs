@@ -28,10 +28,12 @@
 
 package org.matsim.contrib.freight.controler;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -44,7 +46,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.replanning.GenericStrategyManager;
 
-import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Controls the workflow of the simulation.
@@ -57,51 +59,48 @@ import javax.inject.Inject;
  * @author sschroeder, mzilske
  */
 
-class CarrierControlerListener implements BeforeMobsimListener, AfterMobsimListener, ScoringListener, ReplanningListener {
+class CarrierControlerListener implements Provider<CarrierAgentTracker>, ReplanningListener, ScoringListener, BeforeMobsimListener, AfterMobsimListener {
 	private static final Logger log = Logger.getLogger( CarrierControlerListener.class ) ;
 
-	private final CarrierScoringFunctionFactory carrierScoringFunctionFactory;
-
-	private final CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
+	@Inject
+	private CarrierPlanStrategyManagerFactory carrierPlanStrategyManagerFactory;
 
 	private CarrierAgentTracker carrierAgentTracker;
 
-	@Inject EventsManager eventsManager;
-	@Inject Scenario scenario;
+	@Inject
+	private EventsManager eventsManager;
 
-	/**
-	 * Constructs a controller with a set of carriers, re-planning capabilities and scoring-functions.
-	 */
-	@Inject CarrierControlerListener(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-//		log.warn( "calling ctor; scoringFunctionFactory=" + scoringFunctionFactory.getClass() );
-		this.carrierPlanStrategyManagerFactory = strategyManagerFactory;
-		this.carrierScoringFunctionFactory = scoringFunctionFactory;
-	}
+	@Inject
+	private CarrierScoringFunctionFactory carrierScoringFunctionFactory;
 
-	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		carrierAgentTracker = new CarrierAgentTracker(FreightUtils.getCarriers(scenario), carrierScoringFunctionFactory, eventsManager );
-		eventsManager.addHandler(carrierAgentTracker);
-		// (add and remove per mobsim run)
-	}
-
-	@Override public void notifyAfterMobsim(AfterMobsimEvent event) {
-		eventsManager.removeHandler(carrierAgentTracker);
-	}
-
-	@Override public void notifyScoring(ScoringEvent event) {
-		carrierAgentTracker.scoreSelectedPlans();
-	}
-
-	public CarrierAgentTracker getCarrierAgentTracker() {
-		return carrierAgentTracker;
-	}
+	@Inject
+	private Carriers carriers;
 
 	@Override public void notifyReplanning(final ReplanningEvent event) {
 		if (carrierPlanStrategyManagerFactory == null) {
 			return;
 		}
 		GenericStrategyManager<CarrierPlan, Carrier> strategyManager = carrierPlanStrategyManagerFactory.createStrategyManager();
-		strategyManager.run( FreightUtils.getCarriers( scenario ).getCarriers().values() , null, event.getIteration(), event.getReplanningContext() );
+		strategyManager.run( carriers.getCarriers().values() , null, event.getIteration(), event.getReplanningContext() );
+	}
+
+	@Override public void notifyScoring(ScoringEvent event) {
+		carrierAgentTracker.scoreSelectedPlans();
+	}
+
+	@Override
+	public CarrierAgentTracker get() {
+		return carrierAgentTracker;
+	}
+
+	@Override public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		carrierAgentTracker = new DefaultCarrierAgentTracker(carriers, carrierScoringFunctionFactory, eventsManager );
+		eventsManager.addHandler(carrierAgentTracker);
+		// (add and remove per mobsim run)
+	}
+
+	@Override public void notifyAfterMobsim(AfterMobsimEvent event) {
+		eventsManager.removeHandler(carrierAgentTracker);
 	}
 
 }

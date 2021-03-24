@@ -27,7 +27,6 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
@@ -86,9 +85,9 @@ public final class CarrierModule extends AbstractModule {
 			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
 		}
 
-//		bind(CarrierControlerListener.class).in( Singleton.class );
 		bind(CarrierControlerListener.class).asEagerSingleton();
 		addControlerListenerBinding().to(CarrierControlerListener.class);
+		bind(CarrierAgentTracker.class).toProvider(CarrierControlerListener.class);
 
 		// this switches on certain qsim components:
 		QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
@@ -131,15 +130,6 @@ public final class CarrierModule extends AbstractModule {
 			}
 		} );
 
-	}
-
-	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
-	// The freight QSim needs it (see below [[where?]]).
-	// yyyy this feels rather scary.  kai, oct'19
-	// Since we are exporting it anyways, we could as well also inject it.  kai, sep'20
-	@Provides
-	CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-		return carrierControlerListener.getCarrierAgentTracker();
 	}
 
 	private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
