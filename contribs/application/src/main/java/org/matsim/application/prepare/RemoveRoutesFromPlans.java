@@ -1,13 +1,23 @@
 package org.matsim.application.prepare;
 
-import com.google.common.collect.Lists;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.population.PopulationUtils;
-import picocli.CommandLine;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
+
+import org.matsim.analysis.DefaultAnalysisMainModeIdentifier;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.router.RoutingModeMainModeIdentifier;
+
+import com.google.common.collect.Lists;
+
+import picocli.CommandLine;
 
 /**
  * Removes route information from a plans file.
@@ -43,6 +53,10 @@ public class RemoveRoutesFromPlans implements Callable<Integer> {
 			output = Path.of(plans.toAbsolutePath().toString().replace(".xml", "-no-routes.xml"));
 
 		Files.createDirectories(output.getParent());
+		
+		// Using the analysis main mode identifier instead of the routing mode based one on purpose
+		// to be able to process older population files without any routing modes!
+		TripsToLegsAlgorithm trips2Legs = new TripsToLegsAlgorithm(new DefaultAnalysisMainModeIdentifier());
 
 		for (Person person : population.getPersons().values()) {
 
@@ -55,9 +69,15 @@ public class RemoveRoutesFromPlans implements Callable<Integer> {
 			}
 
 			for (Plan plan : person.getPlans()) {
+				trips2Legs.run(plan);
+
 				for (PlanElement el : plan.getPlanElements()) {
 					if (el instanceof Leg) {
 						((Leg) el).setRoute(null);
+					}
+					if (el instanceof Activity) {
+						((Activity) el).setLinkId(null);
+						((Activity) el).setFacilityId(null);
 					}
 				}
 			}
