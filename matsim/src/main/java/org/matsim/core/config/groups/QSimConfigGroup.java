@@ -65,6 +65,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	}
 	
+	public enum TrafficDynamicsCorrectionApproach { REDUCE_FLOW_CAPACITY, INCREASE_NUMBER_OF_LANES }
+	private TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY;
+
 	public enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime }
 	public enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime }
 
@@ -616,6 +619,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	public void setNodeTransitionLogic(NodeTransition nodeTransitionLogic) {
 		this.nodeTransitionLogic = nodeTransitionLogic;
+	}
+
+	public TrafficDynamicsCorrectionApproach getTrafficDynamicsCorrectionApproach() {
+		return this.trafficDynamicsCorrectionApproach;
+	}
+
+	public void setTrafficDynamicsCorrectionApproach(TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach) {
+		this.trafficDynamicsCorrectionApproach = trafficDynamicsCorrectionApproach;
 	}
 
 ////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
