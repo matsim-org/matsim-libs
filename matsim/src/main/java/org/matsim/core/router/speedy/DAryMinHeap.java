@@ -59,9 +59,15 @@ class DAryMinHeap {
 
 	void decreaseKey(int node, double cost) {
 		int i = this.pos[node];
-		if (i < 0 || this.heap[i] != node) {
-			System.err.println("oops "  + node + "   " + i + "   " + (i < 0 ? "" : this.heap[i]));
-			throw new NoSuchElementException();
+		if (i < 0) {
+			// The element is not yet in the heap, add it.
+			// in the ALT algorithm, it is actually possible that a node gets expanded twice,
+			// and that its weight is decreased after already having been expanded once.
+			insert(node, cost);
+			return;
+		}
+		if (this.heap[i] != node) {
+			throw new NoSuchElementException("The element with index " + i + " could not be found at the proper location in the heap.");
 		}
 		if (this.cost[i] < cost) {
 			throw new IllegalArgumentException("existing cost is already smaller than new cost.");
