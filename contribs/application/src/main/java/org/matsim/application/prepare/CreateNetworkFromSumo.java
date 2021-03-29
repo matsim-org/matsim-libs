@@ -1,5 +1,6 @@
 package org.matsim.application.prepare;
 
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import it.unimi.dsi.fastutil.Pair;
@@ -38,7 +39,7 @@ import java.util.concurrent.Callable;
 		description = "Create MATSim network from a SUMO network",
 		showDefaultValues = true
 )
-public final class CreateNetworkFromSumo implements Callable<Integer> {
+public final class CreateNetworkFromSumo implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(CreateNetworkFromSumo.class);
 

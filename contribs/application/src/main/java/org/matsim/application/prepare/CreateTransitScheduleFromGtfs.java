@@ -4,6 +4,7 @@ import com.conveyal.gtfs.model.Stop;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.gtfs.GtfsConverter;
 import org.matsim.core.config.ConfigUtils;
@@ -36,7 +37,7 @@ import java.util.function.Predicate;
         description = "Create transit schedule and vehicles from GTFS data and merge pt network into existing network",
         showDefaultValues = true
 )
-public class CreateTransitScheduleFromGtfs implements Callable<Integer> {
+public class CreateTransitScheduleFromGtfs implements MATSimAppCommand {
 
     @CommandLine.Parameters(arity = "1..*", paramLabel = "INPUT", description = "Input GTFS zip files")
     private List<Path> gtfsFiles;

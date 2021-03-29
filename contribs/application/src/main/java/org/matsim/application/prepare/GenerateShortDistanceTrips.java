@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.analysis.HomeLocationFilter;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
         description = "Add short-distance walk trips to a population",
         showDefaultValues = true
 )
-public class GenerateShortDistanceTrips implements Callable<Integer> {
+public class GenerateShortDistanceTrips implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(GenerateShortDistanceTrips.class);
 

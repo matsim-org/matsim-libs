@@ -6,6 +6,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.text.similarity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CsvOptions;
 import org.matsim.application.options.ShpOptions;
 import org.opengis.feature.simple.SimpleFeature;
@@ -23,7 +24,7 @@ import java.util.concurrent.Callable;
         description = "Match column from csv with features in shape file and write them as columns.",
         showDefaultValues = true
 )
-public class ShapeFileTextLookup implements Callable<Integer> {
+public class ShapeFileTextLookup implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(ShapeFileTextLookup.class);
 

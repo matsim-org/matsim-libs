@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.matsim.analysis.*;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
@@ -26,7 +27,7 @@ import java.util.concurrent.Callable;
 		name = "summary",
 		description = "Run suite of analysis functionality."
 )
-public class AnalysisSummary implements Callable<Integer> {
+public class AnalysisSummary implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(AnalysisSummary.class);
 

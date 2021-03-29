@@ -1,5 +1,6 @@
 package org.matsim.application.options;
 
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine;
 
@@ -8,7 +9,7 @@ import picocli.CommandLine;
  *
  * @see picocli.CommandLine.Mixin
  */
-public class CrsOptions {
+public final class CrsOptions {
 
     @CommandLine.Option(names = "--input-crs", description = "Input coordinate system of the data", defaultValue = TransformationFactory.WGS84)
     private String inputCRS;
@@ -30,4 +31,12 @@ public class CrsOptions {
     public String getTargetCRS() {
         return targetCRS;
     }
+
+    /**
+     * Create coordinate transformation from the options.
+     */
+    public CoordinateTransformation getTransformation() {
+        return TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS);
+    }
+
 }

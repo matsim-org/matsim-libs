@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * These can be used to build a pipeline with command needed for preparation analysis.
  *
  * @see #run(Class, String...)
- * @see #call(Class, Config, String...)
+ * @see #execute(Class, Config, String...)
  * @see #prepare(Class, Config, String...)
  * @see Prepare
  * @see Analysis
@@ -281,7 +281,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
      * @param config input config, overwrites default given by scenario
      * @return return code, 0 indicates success and no errors
      */
-    public static int call(Class<? extends MATSimApplication> clazz, Config config, String... args) {
+    public static int execute(Class<? extends MATSimApplication> clazz, Config config, String... args) {
         MATSimApplication app;
         try {
             if (config != null)
@@ -319,10 +319,10 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     /**
      * Calls an application class with its default config.
      *
-     * @see #call(Class, Config, String...)
+     * @see #execute(Class, Config, String...)
      */
-    public static int call(Class<? extends MATSimApplication> clazz, String... args) {
-        return call(clazz, null, args);
+    public static int execute(Class<? extends MATSimApplication> clazz, String... args) {
+        return execute(clazz, null, args);
     }
 
 
@@ -477,7 +477,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE})
     public @interface Prepare {
-        Class<?>[] value() default {};
+        Class<? extends MATSimAppCommand>[] value() default {};
     }
 
     /**
@@ -486,7 +486,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.TYPE})
     public @interface Analysis {
-        Class<?>[] value() default {};
+        Class<? extends MATSimAppCommand>[] value() default {};
     }
 
 }

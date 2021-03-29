@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.HereMapsRouteValidator;
 import org.matsim.contrib.analysis.vsp.traveltimedistance.TravelTimeValidationRunner;
@@ -24,7 +25,7 @@ import java.util.concurrent.Callable;
 		name = "travel-time",
 		description = "Run travel time analysis on events file."
 )
-public class TravelTimeAnalysis implements Callable<Integer> {
+public class TravelTimeAnalysis implements MATSimAppCommand {
 
 	private static final Logger log = LogManager.getLogger(TravelTimeAnalysis.class);
 

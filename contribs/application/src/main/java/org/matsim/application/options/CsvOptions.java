@@ -15,7 +15,7 @@ import java.nio.file.Path;
  *
  * @see picocli.CommandLine.Mixin
  */
-public class CsvOptions {
+public final class CsvOptions {
 
     @CommandLine.Option(names = "--csv-format", description = "CSV Format", defaultValue = "Default")
     private CSVFormat.Predefined csvFormat;

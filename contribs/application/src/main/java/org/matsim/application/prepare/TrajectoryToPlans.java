@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.application.MATSimAppCommand;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -27,7 +28,7 @@ import java.util.concurrent.Callable;
         description = "Create population including, down-sampling, and activity split by duration",
         showDefaultValues = true
 )
-public class TrajectoryToPlans implements Callable<Integer> {
+public class TrajectoryToPlans implements MATSimAppCommand {
 
     private static final Logger log = LogManager.getLogger(TrajectoryToPlans.class);
 

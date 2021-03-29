@@ -25,7 +25,7 @@ import picocli.CommandLine;
  * @author rakow
  */
 @CommandLine.Command(
-        name = "removeRoutesFromPlans",
+        name = "remove-routes",
         description = "Remove route information from a plans file.",
         showDefaultValues = true
 )
