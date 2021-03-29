@@ -18,7 +18,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import picocli.CommandLine;
 
 import java.nio.charset.StandardCharsets;
@@ -101,8 +100,8 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
         ShpOptions shp = new ShpOptions(shapeFilePath, "EPSG:5677", StandardCharsets.UTF_8);
 
-
         // Extracting relevant zones and associate them with the all the links inside
+        log.info("Analyzing regions in the Shapefile (this may take some time)...");
         Map<String, List<Id<Link>>> regionLinksMap = new HashMap<>();
 
         ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "NUTS_ID");

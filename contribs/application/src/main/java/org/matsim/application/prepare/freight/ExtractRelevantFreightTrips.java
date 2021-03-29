@@ -14,7 +14,6 @@ import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.FastAStarLandmarksFactory;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.speedy.SpeedyALTFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -111,7 +110,14 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 originalPlans.getPersons().keySet().size());
 
         for (Person person : originalPlans.getPersons().values()) {
+
+            processed += 1;
+            if (processed % 1000 == 0) {
+                log.info("Processing: {} persons have been processed", processed);
+            }
+
             Plan plan = person.getSelectedPlan();
+            String goodType = (String) person.getAttributes().getAttribute("type_of_good");
             // By default, the plan of each freight person consist of only 3 elements:
             // startAct, leg, endAct
             Activity startActivity = (Activity) plan.getPlanElements().get(0);
@@ -198,7 +204,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             // Add new freight person to the output plans
             if (act0.getEndTime().orElse(86400) < 86400) {
                 Person freightPerson = populationFactory
-                        .createPerson(Id.create(Integer.toString(generated), Person.class));
+                        .createPerson(Id.create("freight_" + Integer.toString(generated), Person.class));
+                freightPerson.getAttributes().putAttribute("good_type", goodType);
+                freightPerson.getAttributes().putAttribute("subpopulation","freight");
                 Plan freightPersonPlan = populationFactory.createPlan();
                 freightPersonPlan.addActivity(act0);
                 freightPersonPlan.addLeg(leg);
@@ -206,10 +214,6 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 freightPerson.addPlan(freightPersonPlan);
                 outputPlans.addPerson(freightPerson);
                 generated += 1;
-            }
-            processed += 1;
-            if (processed % 1000 == 0) {
-                log.info("Processing: {} persons have been processed", processed);
             }
         }
 
