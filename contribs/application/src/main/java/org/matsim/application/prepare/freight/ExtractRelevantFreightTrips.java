@@ -54,6 +54,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--output", description = "Output path", required = true)
     private Path outputPath;
 
+    @CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
+    private boolean cutOnBoundary;
+
     public static void main(String[] args) {
         System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
     }
