@@ -149,29 +149,39 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             if (originIsInside && !destinationIsInside) {
                 act0.setCoord(ct.transform(startCoord));
                 act0.setEndTime(departureTime);
-                LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
-                        network.getLinks().get(endLink).getToNode(), 0, null, null);
-                for (Link link : route.links) {
-                    if (linksOnTheBoundary.contains(link.getId())) {
-                        act1.setCoord(ct.transform(link.getCoord()));
-                        break;
+                if (cutOnBoundary) {
+                    LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
+                            network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    for (Link link : route.links) {
+                        if (linksOnTheBoundary.contains(link.getId())) {
+                            act1.setCoord(ct.transform(link.getCoord()));
+                            break;
+                        }
                     }
+                } else {
+                    act1.setCoord(ct.transform(endCoord));
                 }
+
 
             }
             // Case 3: incoming trips
             if (!originIsInside && destinationIsInside) {
-                LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
-                        network.getLinks().get(endLink).getToNode(), 0, null, null);
-                double timeSpent = 0;
-                for (Link link : route.links) {
-                    if (linksOnTheBoundary.contains(link.getId())) {
-                        act0.setCoord(ct.transform(link.getCoord()));
-                        double newEndTime = departureTime + timeSpent;
-                        act0.setEndTime(newEndTime);
-                        break;
+                if (cutOnBoundary) {
+                    LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
+                            network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    double timeSpent = 0;
+                    for (Link link : route.links) {
+                        if (linksOnTheBoundary.contains(link.getId())) {
+                            act0.setCoord(ct.transform(link.getCoord()));
+                            double newEndTime = departureTime + timeSpent;
+                            act0.setEndTime(newEndTime);
+                            break;
+                        }
+                        timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
                     }
-                    timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
+                } else {
+                    act0.setCoord(ct.transform(startCoord));
+                    act0.setEndTime(departureTime);
                 }
                 act1.setCoord(ct.transform(endCoord));
             }
@@ -183,22 +193,33 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 boolean vehicleIsInside = false;
                 LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                         network.getLinks().get(endLink).getToNode(), 0, null, null);
-                for (Link link : route.links) {
-                    if (linksOnTheBoundary.contains(link.getId())) {
-                        if (!vehicleIsInside) {
-                            act0.setCoord(ct.transform(link.getCoord()));
-                            double newEndTime = departureTime + timeSpent;
-                            act0.setEndTime(newEndTime);
-                            vehicleIsInside = true;
-                        } else {
-                            act1.setCoord(ct.transform(link.getCoord()));
+                if (cutOnBoundary) {
+                    for (Link link : route.links) {
+                        if (linksOnTheBoundary.contains(link.getId())) {
+                            if (!vehicleIsInside) {
+                                act0.setCoord(ct.transform(link.getCoord()));
+                                double newEndTime = departureTime + timeSpent;
+                                act0.setEndTime(newEndTime);
+                                vehicleIsInside = true;
+                            } else {
+                                act1.setCoord(ct.transform(link.getCoord()));
+                                tripIsRelevant = true;
+                                break;
+                            }
+                        }
+                        timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
+                    }
+                } else {
+                    for (Link link : route.links) {
+                        if (linksOnTheBoundary.contains(link.getId())) {
+                            act0.setCoord(ct.transform(startCoord));
+                            act0.setEndTime(departureTime);
+                            act1.setCoord(ct.transform(endCoord));
                             tripIsRelevant = true;
                             break;
                         }
                     }
-                    timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
                 }
-
                 if (!tripIsRelevant) {
                     continue;
                 }
@@ -207,9 +228,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
             // Add new freight person to the output plans
             if (act0.getEndTime().orElse(86400) < 86400) {
                 Person freightPerson = populationFactory
-                        .createPerson(Id.create("freight_" + Integer.toString(generated), Person.class));
+                        .createPerson(Id.create("freight_" + generated, Person.class));
                 freightPerson.getAttributes().putAttribute("good_type", goodType);
-                freightPerson.getAttributes().putAttribute("subpopulation","freight");
+                freightPerson.getAttributes().putAttribute("subpopulation", "freight");
                 Plan freightPersonPlan = populationFactory.createPlan();
                 freightPersonPlan.addActivity(act0);
                 freightPersonPlan.addLeg(leg);
