@@ -51,8 +51,11 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--sample", defaultValue = "1", description = "Scaling factor of the freight traffic (0, 1)", required = true)
     private double sample;
 
-    @CommandLine.Option(names = "--truckLoad", defaultValue = "16.0", description = "Average load of truck", required = true)
+    @CommandLine.Option(names = "--truck-load", defaultValue = "7.0", description = "Average load of truck", required = true)
     private double averageTruckLoad;
+
+    @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year", required = true)
+    private int workingDays;
 
     @CommandLine.Option(names = "--output",  description = "Path to output population", required = true)
     private Path output;
@@ -84,7 +87,7 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
             log.error("Required lookup table {} not found", lookupTablePath);
         }
 
-        double adjustedTrucksLoad = averageTruckLoad * (1 / sample) * 260; // 1 year = 260 working days
+        double adjustedTrucksLoad = averageTruckLoad * (1 / sample) * workingDays; // 1 year = x working days
 
         // Load config, scenario and network
         Config config = ConfigUtils.createConfig();
