@@ -84,7 +84,7 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
             log.error("Required lookup table {} not found", lookupTablePath);
         }
 
-        double adjustedTrucksLoad = averageTruckLoad * (1 / sample) * 365; // 1 year = 365 days
+        double adjustedTrucksLoad = averageTruckLoad * (1 / sample) * 260; // 1 year = 260 working days
 
         // Load config, scenario and network
         Config config = ConfigUtils.createConfig();
