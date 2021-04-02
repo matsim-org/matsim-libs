@@ -37,7 +37,7 @@ public class GeotoolsTransformationTest extends MatsimTestCase {
 		double x = 638748.9000000004;
 		double y = 9916839.69;
 		
-		double targetX = 100.24690901110905;
+		double targetX = 100.24690901110904;
 		double targetY = -0.7521976363533539;
 		double delta = 1e-16;
 
