@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -75,6 +76,8 @@ public final class ShpOptions {
     public List<SimpleFeature> readFeatures() {
         if (shp == null)
             throw new IllegalStateException("Shape file path not specified");
+        if (!Files.exists(shp))
+            throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
         try {
             ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
@@ -89,9 +92,6 @@ public final class ShpOptions {
      * Return the union of all geometries in the shape file.
      */
     public Geometry getGeometry() {
-
-        if (shp == null)
-            throw new IllegalStateException("Shape file path not specified");
 
         Collection<SimpleFeature> features = readFeatures();
         if (features.size() < 1) {
@@ -117,6 +117,8 @@ public final class ShpOptions {
 
         if (shp == null)
             throw new IllegalStateException("Shape file path not specified");
+        if (!Files.exists(shp))
+            throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
         CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, shpCrs);
 
