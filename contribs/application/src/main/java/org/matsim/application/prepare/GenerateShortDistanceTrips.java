@@ -81,6 +81,8 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
 
         Set<Id<Person>> personsInCityBoundary = new HashSet<>();
 
+        log.info("Number of persons: {}", population.getPersons().size());
+
         if (shp.getShapeFile() != null) {
             log.info("Using shape file {}", shp.getShapeFile());
             HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, population);
@@ -91,6 +93,8 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
             }
         } else
             personsInCityBoundary.addAll(population.getPersons().keySet());
+
+        log.info("Persons in boundary: {}", personsInCityBoundary.size());
 
         Predicate<Id<Person>> condition = personsInCityBoundary::contains;
 
@@ -173,7 +177,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
 
                             addedTrips += 2;
 
-                            if (addedTrips % 100 == 0) {
+                            if (addedTrips % 1000 == 0) {
                                 log.info("adding missing trips..........{}", addedTrips);
                             }
                             // add activity

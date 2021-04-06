@@ -35,13 +35,21 @@ public class DownSamplePopulation implements MATSimAppCommand {
 
         samples.sort(Comparator.comparingDouble(Double::doubleValue).reversed());
 
+        // original prefix
+        String orig = String.format("%dpct", Math.round(sampleSize * 100));
+
         for (Double sample : samples) {
 
             // down-sample previous samples
             PopulationUtils.sampleDown(population, sample / sampleSize);
             sampleSize = sample;
 
-            String path = input.toString().replace(".xml", String.format("-%dpct.xml", Math.round(sampleSize * 100)));
+            String path;
+            if (input.toString().contains(orig))
+                path = input.toString().replace(orig, String.format("%dpct", Math.round(sampleSize * 100)));
+            else
+                path = input.toString().replace(".xml", String.format("-%dpct.xml", Math.round(sampleSize * 100)));
+
             log.info("Writing {} sample to {}", sampleSize, path);
 
             PopulationUtils.writePopulation(population, path);
