@@ -150,23 +150,30 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 act0.setCoord(ct.transform(startCoord));
                 act0.setEndTime(departureTime);
                 if (cutOnBoundary) {
+                    boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act1.setCoord(ct.transform(link.getCoord()));
+                            isCoordSet = true;
                             break;
                         }
+                    }
+                    if (!isCoordSet) {
+                        int lastOne = route.links.size() - 1;
+                        Coord originalCoord = route.links.get(lastOne).getCoord();
+                        act1.setCoord(ct.transform(originalCoord));
                     }
                 } else {
                     act1.setCoord(ct.transform(endCoord));
                 }
 
-
             }
             // Case 3: incoming trips
             if (!originIsInside && destinationIsInside) {
                 if (cutOnBoundary) {
+                    boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
                     double timeSpent = 0;
@@ -175,9 +182,15 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                             act0.setCoord(ct.transform(link.getCoord()));
                             double newEndTime = departureTime + timeSpent;
                             act0.setEndTime(newEndTime);
+                            isCoordSet = true;
                             break;
                         }
                         timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
+                    }
+                    if (!isCoordSet){
+                        Coord originalCoord = route.links.get(0).getCoord();
+                        act0.setCoord(ct.transform(originalCoord));
+                        act0.setEndTime(departureTime);
                     }
                 } else {
                     act0.setCoord(ct.transform(startCoord));
