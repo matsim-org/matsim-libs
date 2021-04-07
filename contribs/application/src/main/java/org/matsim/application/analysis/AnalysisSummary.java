@@ -37,8 +37,14 @@ public class AnalysisSummary implements MATSimAppCommand {
 	@CommandLine.Option(names = "--run-id", defaultValue = "*", description = "Pattern used to match runId", required = true)
 	private String runId;
 
+	@CommandLine.Option(names = "--sample-size", description = "Sample size in [0,1] used to upscale the results", required = true)
+	private double sampleSize;
+
 	@CommandLine.Option(names = "--run-id-compare", defaultValue = "", description = "Run id to compare with", required = false)
 	private String runIdToCompareWith;
+
+	@CommandLine.Option(names = "--home-act-prefix", defaultValue = "home", description = "Prefix to identify home activities")
+	private String homeActivityPrefix;
 
 	@CommandLine.Mixin
 	private CrsOptions crs = new CrsOptions();
@@ -54,10 +60,7 @@ public class AnalysisSummary implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		final String[] helpLegModes = {TransportMode.walk}; // to be able to analyze old runs
-		final int scalingFactor = 4;
-		final String homeActivityPrefix = "home";
 		final String modesString = TransportMode.car + "," + TransportMode.pt + "," + TransportMode.bike + "," + TransportMode.walk + "," + TransportMode.ride;
-
 
 		Scenario scenario1 = loadScenario(runId, runDirectory.get(0), crs);
 		Scenario scenario0 = null;
@@ -71,24 +74,26 @@ public class AnalysisSummary implements MATSimAppCommand {
 		filter1a.preProcess(scenario1);
 		agentFilters.add(filter1a);
 
-		AgentAnalysisFilter filter1b = new AgentAnalysisFilter("residents-in-area");
-		filter1b.setZoneFile(shp.getShapeFile().toString());
-		filter1b.setRelevantActivityType(homeActivityPrefix);
-		filter1b.preProcess(scenario1);
-		agentFilters.add(filter1b);
-
 		List<TripFilter> tripFilters = new ArrayList<>();
 
-		TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("");
-		tripFilter1a.preProcess(scenario1);
-		tripFilters.add(tripFilter1a);
+		if (shp.getShapeFile() != null) {
+			AgentAnalysisFilter filter1b = new AgentAnalysisFilter("residents-in-area");
+			filter1b.setZoneFile(shp.getShapeFile().toString());
+			filter1b.setRelevantActivityType(homeActivityPrefix);
+			filter1b.preProcess(scenario1);
+			agentFilters.add(filter1b);
 
-		TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("o-and-d-in-area");
-		tripFilter1b.setZoneInformation(shp.getShapeFile().toString(), crs.getInputCRS());
-		tripFilter1b.preProcess(scenario1);
-		tripFilter1b.setBuffer(0.);
-		tripFilter1b.setTripConsiderType(TripAnalysisFilter.TripConsiderType.OriginAndDestination);
-		tripFilters.add(tripFilter1b);
+			TripAnalysisFilter tripFilter1a = new TripAnalysisFilter("");
+			tripFilter1a.preProcess(scenario1);
+			tripFilters.add(tripFilter1a);
+
+			TripAnalysisFilter tripFilter1b = new TripAnalysisFilter("o-and-d-in-area");
+			tripFilter1b.setZoneInformation(shp.getShapeFile().toString(), crs.getInputCRS());
+			tripFilter1b.preProcess(scenario1);
+			tripFilter1b.setBuffer(0.);
+			tripFilter1b.setTripConsiderType(TripAnalysisFilter.TripConsiderType.OriginAndDestination);
+			tripFilters.add(tripFilter1b);
+		}
 
 		final List<VehicleFilter> vehicleFilters = new ArrayList<>();
 
@@ -111,10 +116,13 @@ public class AnalysisSummary implements MATSimAppCommand {
 		analysis.setVehicleFilters(vehicleFilters);
 
 		analysis.setScenarioCRS(crs.getInputCRS());
-		analysis.setScalingFactor(scalingFactor);
+		analysis.setScalingFactor((int) Math.round(1 / sampleSize));
 		analysis.setModes(modes);
 		analysis.setHelpLegModes(helpLegModes);
-		analysis.setZoneInformation(shp.getShapeFile().toString(), crs.getInputCRS(), null);
+
+		if (shp.getShapeFile() != null)
+			analysis.setZoneInformation(shp.getShapeFile().toString(), crs.getInputCRS(), null);
+
 		analysis.setVisualizationScriptInputDirectory(null);
 
 		analysis.run();
