@@ -67,7 +67,7 @@ public class TravelTimeAnalysis implements MATSimAppCommand {
 	public Integer call() throws Exception {
 
 		Scenario scenario = AnalysisSummary.loadScenario(runId, runDirectory, crs);
-		Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*")
+		Path events = AnalysisSummary.glob(runDirectory, runId + ".*events.*", false)
 				.orElseThrow(() -> new IllegalArgumentException("Could not find events file."));
 
 		Set<Id<Person>> populationIds = scenario.getPopulation().getPersons().keySet();

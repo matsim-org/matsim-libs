@@ -8,8 +8,12 @@ import org.matsim.application.prepare.MergePopulations;
 import org.matsim.application.prepare.TrajectoryToPlans;
 import org.matsim.application.prepare.freight.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.freight.GenerateGermanWideFreightTrips;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -30,6 +34,19 @@ public class MATSimApplicationTest {
     }
 
     @Test
+    public void config() {
+
+        Controler controler = MATSimApplication.prepare(TestScenario.class, ConfigUtils.createConfig(),
+                "-c:controler.runId=Test123", "--config:global.numberOfThreads=4");
+
+        Config config = controler.getConfig();
+
+        assertThat(config.controler().getRunId()).isEqualTo("Test123");
+        assertThat(config.global().getNumberOfThreads()).isEqualTo(4);
+
+    }
+
+    @Test
     public void population() {
 
         Path input = Path.of(utils.getClassInputDirectory());
@@ -38,12 +55,12 @@ public class MATSimApplicationTest {
         assertThat(input.resolve("persons.xml")).exists();
 
         MATSimApplication.execute(TestScenario.class, "prepare", "trajectoryToPlans",
-                            "--samples", "0.5", "0.1",
-                            "--sample-size", "1.0",
-                            "--name", "test",
-                            "--population", input.resolve("persons.xml").toString(),
-                            "--attributes", input.resolve("attributes.xml").toString(),
-                            "--output", output.toString()
+                "--samples", "0.5", "0.1",
+                "--sample-size", "1.0",
+                "--name", "test",
+                "--population", input.resolve("persons.xml").toString(),
+                "--attributes", input.resolve("attributes.xml").toString(),
+                "--output", output.toString()
         );
 
         Path plans = output.resolve("test-100pct.plans.xml.gz");
@@ -69,7 +86,7 @@ public class MATSimApplicationTest {
     public void freight() {
 
         Path input = Path.of("..", "..", "..", "..",
-                "shared-svn", "komodnext", "data", "freight" , "original_data").toAbsolutePath().normalize();
+                "shared-svn", "komodnext", "data", "freight", "original_data").toAbsolutePath().normalize();
 
         Assume.assumeTrue(Files.exists(input));
 
@@ -103,6 +120,10 @@ public class MATSimApplicationTest {
             GenerateGermanWideFreightTrips.class, ExtractRelevantFreightTrips.class, MergePopulations.class
     })
     private static final class TestScenario extends MATSimApplication {
+
+        public TestScenario(Config config) {
+            super(config);
+        }
 
         // Public constructor is required to run the class
         public TestScenario() {

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(
 		name = "summary",
@@ -133,7 +132,7 @@ public class AnalysisSummary implements MATSimAppCommand {
 	/**
 	 * Glob pattern from path, if not found tries to go into the parent directory.
 	 */
-	public static Optional<Path> glob(Path path, String pattern) {
+	public static Optional<Path> glob(Path path, String pattern, boolean parent) {
 		PathMatcher m = path.getFileSystem().getPathMatcher("glob:" + pattern);
 		try {
 			Optional<Path> match = Files.list(path).filter(p -> m.matches(p.getFileName())).findFirst();
@@ -150,15 +149,30 @@ public class AnalysisSummary implements MATSimAppCommand {
 	}
 
 	/**
+	 * Helper function to glob for a required file.
+	 *
+	 * @throws IllegalStateException if no file was matched
+	 */
+	public static String globFile(Path path, String runId, String name) {
+
+		String file = glob(path, runId + ".*" + name + ".*", true).orElseThrow(() -> new IllegalStateException("No " + name + "file found.")).toString();
+
+		log.info("Using {} file: {}", name, file);
+
+		return file;
+	}
+
+	/**
 	 * Load scenario from a directory using globed patterns.
-	 * @param runId run id pattern
+	 *
+	 * @param runId        run id pattern
 	 * @param runDirectory path to run directory
-	 * @param crs crs of the scenario
+	 * @param crs          crs of the scenario
 	 */
 	public static Scenario loadScenario(String runId, Path runDirectory, CrsOptions crs) {
 		log.info("Loading scenario...");
 
-		Path populationFile = glob(runDirectory, runId + ".*plans.*").orElseThrow(() -> new IllegalStateException("No plans file found."));
+		Path populationFile = glob(runDirectory, runId + ".*plans.*", true).orElseThrow(() -> new IllegalStateException("No plans file found."));
 		int index = populationFile.getFileName().toString().indexOf(".");
 		if (index == -1)
 			index = 0;
@@ -166,10 +180,10 @@ public class AnalysisSummary implements MATSimAppCommand {
 		String resolvedRunId = populationFile.getFileName().toString().substring(0, index);
 		log.info("Using population {} with run id {}", populationFile, resolvedRunId);
 
-		Path networkFile = glob(runDirectory, runId + ".*network.*").orElseThrow(() -> new IllegalStateException("No network file found."));
+		Path networkFile = glob(runDirectory, runId + ".*network.*", true).orElseThrow(() -> new IllegalStateException("No network file found."));
 		log.info("Using network {}", networkFile);
 
-		String facilitiesFile = glob(runDirectory, runId + ".*facilities.*").map(Path::toString).orElse(null);
+		String facilitiesFile = glob(runDirectory, runId + ".*facilities.*", true).map(Path::toString).orElse(null);
 		log.info("Using facilities {}", facilitiesFile);
 
 		Config config = ConfigUtils.createConfig();

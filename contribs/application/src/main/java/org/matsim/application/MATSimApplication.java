@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * A helper class to define and execute MATSim scenarios, including a pipeline of prepare and analysis scripts.
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * MATSimApplication.run(RunScenario.class, args);
  * </code>
  * <p>
- * There are also other variants of this method
+ * There are also other variants of this method, e.g. to run the scenario within code.
  * <p>
  * This class also automatically registers classes from the {@link Prepare} and {@link Analysis} annotations as subcommands.
  * These can be used to build a pipeline with command needed for preparation analysis.
@@ -51,7 +52,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @CommandLine.Command(
         name = MATSimApplication.DEFAULT_NAME,
-        description = {"", "If no subcommand is specified, this will run the scenario using the CONFIG"},
+        description = {"", "Use the \"run\" command to execute the scenario, or any of the other available commands."},
         headerHeading = MATSimApplication.HEADER,
         parameterListHeading = "%n@|bold,underline Parameters:|@%n",
         optionListHeading = "%n@|bold,underline Options:|@%n",
@@ -63,7 +64,7 @@ import java.util.concurrent.atomic.AtomicReference;
         showDefaultValues = true,
         mixinStandardHelpOptions = true,
         abbreviateSynopsis = true,
-        subcommands = {CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class, ShowGUI.class}
+        subcommands = {ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
 )
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
@@ -75,7 +76,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
             " | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
             " |_|  |_/_/ \\_\\_| |___/_|_|_|_|\n|@";
 
-    @CommandLine.Parameters(arity = "0..1", paramLabel = "CONFIG", description = "Scenario config used for the run.")
+    @CommandLine.Option(names = "--config", description = "Path to config file used for the run.", order = 0)
     protected File scenario;
 
     @CommandLine.Option(names = "--iterations", description = "Overwrite number of iterations (if greater than -1).", defaultValue = "-1")
@@ -87,8 +88,16 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     @CommandLine.Option(names = "--output", description = "Overwrite output folder defined by the application")
     protected Path output;
 
-    //@CommandLine.Option(names = {"-c", "--config"}, description = "Overwrite config values (given as configGroup.param=value)")
-    //protected Map<String, String> configValues;
+    /**
+     * This Map will never contain anything, because these argument is not parsed correctly, but instead will go into remainingArgs field.
+     *
+     * @see #remainingArgs
+     */
+    @CommandLine.Option(names = {"-c:", "--config:"}, arity = "0..*", description = "Overwrite config values (e.g. --config:controler.runId=123)")
+    protected Map<String, String> configValues;
+
+    @CommandLine.Unmatched
+    protected List<String> remainingArgs;
 
     /**
      * Path to the default scenario config, if applicable.
@@ -136,13 +145,18 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
         // load config if not present yet.
         if (config == null) {
-            config = loadConfig(Objects.requireNonNull(scenario, "No default scenario location given").getAbsolutePath());
+            config = loadConfig(Objects.requireNonNull(scenario, "No default scenario location given").getAbsoluteFile().toString());
         } else {
             Config tmp = prepareConfig(config);
             config = tmp != null ? tmp : config;
         }
 
         Objects.requireNonNull(config);
+
+        if (remainingArgs != null) {
+            String[] args = remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
+            ConfigUtils.applyCommandline(config, args);
+        }
 
         final Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -271,6 +285,18 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
 
         CommandLine cli = prepare(app);
 
+        CommandLine.ParseResult parsed = cli.parseArgs(args);
+
+        if (!parsed.hasSubcommand()) {
+            cli.usage(System.out);
+            System.exit(2);
+        }
+
+        List<String> unmatched = unmatched(parsed);
+        if (!unmatched.isEmpty()) {
+            throw new RuntimeException("Unknown arguments: " + unmatched);
+        }
+
         int code = cli.execute(args);
         System.exit(code);
     }
@@ -336,8 +362,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         try {
             app = clazz.getDeclaredConstructor(Config.class).newInstance(config);
         } catch (ReflectiveOperationException e) {
-            System.err.println("Could not instantiate the application class");
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not instantiate the application class", e);
         }
 
         CommandLine cli = prepare(app);
@@ -346,8 +371,19 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         if (parseResult.errors().size() > 0)
             throw new RuntimeException(parseResult.errors().get(0));
 
+        List<String> unmatched = unmatched(parseResult);
+        if (!unmatched.isEmpty()) {
+            throw new RuntimeException("Unknown arguments: " + unmatched);
+        }
+
         Config tmp = app.prepareConfig(config);
         config = tmp != null ? tmp : config;
+
+
+        if (app.remainingArgs != null) {
+            String[] extraArgs = app.remainingArgs.stream().map(s -> s.replace("-c:", "--config:")).toArray(String[]::new);
+            ConfigUtils.applyCommandline(config, extraArgs);
+        }
 
         final Scenario scenario = ScenarioUtils.loadScenario(config);
         app.prepareScenario(scenario);
@@ -356,6 +392,15 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         app.prepareControler(controler);
 
         return controler;
+    }
+
+    /**
+     * Check if unmatched options are correct.
+     */
+    private static List<String> unmatched(CommandLine.ParseResult parseResult) {
+        return parseResult.unmatched().stream().filter(
+                s -> !s.startsWith("-c:") && !s.startsWith("--config:")
+        ).collect(Collectors.toList());
     }
 
     private static CommandLine prepare(MATSimApplication app) {
@@ -370,6 +415,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         List<ConfigGroup> modules = Lists.newArrayList();
         modules.addAll(app.getConfigurableModules());
         modules.addAll(app.getCustomModules());
+
+        // App itself is set as run subcommand
+        cli.addSubcommand("run", app);
+        CommandLine.Model.CommandSpec spec = cli.getSubcommands().get("run").getCommandSpec();
+        spec.usageMessage(new CommandLine.Model.UsageMessageSpec().description("Run the scenario"));
 
         // setupConfig(cli, modules);
         return cli;
