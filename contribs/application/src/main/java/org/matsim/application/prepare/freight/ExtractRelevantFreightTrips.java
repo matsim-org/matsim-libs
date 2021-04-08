@@ -94,11 +94,13 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
         // Reading Shape file
         Geometry relevantArea = shp.getGeometry();
 
+        CoordinateTransformation sct = shp.createTransformation(crs.getInputCRS());
+
         // Identify links on the boundary
         List<Id<Link>> linksOnTheBoundary = new ArrayList<>();
         for (Link link : network.getLinks().values()) {
-            Coord fromCoord = link.getFromNode().getCoord();
-            Coord toCoord = link.getToNode().getCoord();
+            Coord fromCoord = sct.transform(link.getFromNode().getCoord());
+            Coord toCoord = sct.transform(link.getToNode().getCoord());
             if (relevantArea.contains(MGC.coord2Point(fromCoord)) ^ relevantArea.contains(MGC.coord2Point(toCoord))) {
                 linksOnTheBoundary.add(link.getId());
             }
@@ -115,7 +117,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
         for (Person person : originalPlans.getPersons().values()) {
 
             processed += 1;
-            if (processed % 1000 == 0) {
+            if (processed % 10000 == 0) {
                 log.info("Processing: {} persons have been processed", processed);
             }
 

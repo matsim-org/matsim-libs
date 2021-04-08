@@ -1,8 +1,11 @@
 package org.matsim.application.options;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -15,6 +18,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
@@ -33,162 +38,189 @@ import java.util.List;
  */
 public final class ShpOptions {
 
-    @CommandLine.Option(names = "--shp", description = "Optional path to shape file used for filtering", required = false)
-    private Path shp;
+	private static final Logger log = LogManager.getLogger(ShpOptions.class);
 
-    @CommandLine.Option(names = "--shp-crs", description = "Overwrite coordinate system of the shape-file", defaultValue = TransformationFactory.WGS84)
-    private String shpCrs;
+	@CommandLine.Option(names = "--shp", description = "Optional path to shape file used for filtering", required = false)
+	private Path shp;
 
-    @CommandLine.Option(names = "--shp-charset", description = "Overwrite coordinate system of the shape-file", defaultValue = "ISO-8859-1")
-    private Charset shpCharset;
+	@CommandLine.Option(names = "--shp-crs", description = "Overwrite coordinate system of the shape file")
+	private String shpCrs;
 
-    public ShpOptions() {
-    }
+	@CommandLine.Option(names = "--shp-charset", description = "Charset used to read the shape file", defaultValue = "ISO-8859-1")
+	private Charset shpCharset;
 
-    /**
-     * Constructor to use shape options manually.
-     */
-    public ShpOptions(Path shp, String shpCrs, Charset shpCharset) {
-        this.shp = shp;
-        this.shpCrs = shpCrs;
-        this.shpCharset = shpCharset;
-    }
+	public ShpOptions() {
+	}
 
-    /**
-     * Get the provided input crs.
-     */
-    public Path getShapeFile() {
-        return shp;
-    }
+	/**
+	 * Constructor to use shape options manually.
+	 */
+	public ShpOptions(Path shp, String shpCrs, Charset shpCharset) {
+		this.shp = shp;
+		this.shpCrs = shpCrs;
+		this.shpCharset = shpCharset;
+	}
 
-    /**
-     * Get the provided target crs.
-     */
-    public String getShapeCrs() {
-        return shpCrs;
-    }
+	/**
+	 * Get the provided input crs.
+	 */
+	public Path getShapeFile() {
+		return shp;
+	}
 
-    /**
-     * Read features from configured shape file.
-     *
-     * @return null if no shp configured.
-     */
-    public List<SimpleFeature> readFeatures() {
-        if (shp == null)
-            throw new IllegalStateException("Shape file path not specified");
-        if (!Files.exists(shp))
-            throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
+	/**
+	 * Get the provided target crs.
+	 */
+	public String getShapeCrs() {
+		return detectCRS();
+	}
 
-        try {
-            ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
-            ds.setCharset(shpCharset);
-            return ShapeFileReader.getSimpleFeatures(ds);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+	/**
+	 * Read features from configured shape file.
+	 *
+	 * @return null if no shp configured.
+	 */
+	public List<SimpleFeature> readFeatures() {
+		if (shp == null)
+			throw new IllegalStateException("Shape file path not specified");
+		if (!Files.exists(shp))
+			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
-    /**
-     * Return the union of all geometries in the shape file.
-     */
-    public Geometry getGeometry() {
+		try {
+			ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
+			ds.setCharset(shpCharset);
+			return ShapeFileReader.getSimpleFeatures(ds);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
 
-        Collection<SimpleFeature> features = readFeatures();
-        if (features.size() < 1) {
-            throw new IllegalStateException("There is no feature in the shape file. Aborting...");
-        }
-        Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
-        if (features.size() > 1) {
-            for (SimpleFeature simpleFeature : features) {
-                Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
-                geometry.union(subArea);
-            }
-        }
-        return geometry;
-    }
+	/**
+	 * Return the union of all geometries in the shape file.
+	 */
+	public Geometry getGeometry() {
 
-    /**
-     * Creates an index to query features from this shape file.
-     *
-     * @param queryCRS coordinate system of the queries
-     * @param attr     the attribute to query from the shape file
-     */
-    public Index createIndex(String queryCRS, String attr) {
+		Collection<SimpleFeature> features = readFeatures();
+		if (features.size() < 1) {
+			throw new IllegalStateException("There is no feature in the shape file. Aborting...");
+		}
+		Geometry geometry = (Geometry) features.iterator().next().getDefaultGeometry();
+		if (features.size() > 1) {
+			for (SimpleFeature simpleFeature : features) {
+				Geometry subArea = (Geometry) simpleFeature.getDefaultGeometry();
+				geometry.union(subArea);
+			}
+		}
+		return geometry;
+	}
 
-        if (shp == null)
-            throw new IllegalStateException("Shape file path not specified");
-        if (!Files.exists(shp))
-            throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
+	/**
+	 * Creates an index to query features from this shape file.
+	 *
+	 * @param queryCRS coordinate system of the queries
+	 * @param attr     the attribute to query from the shape file
+	 */
+	public Index createIndex(String queryCRS, String attr) {
 
-        CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, shpCrs);
+		if (shp == null)
+			throw new IllegalStateException("Shape file path not specified");
+		if (!Files.exists(shp))
+			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
-        try {
-            return new Index(ct, attr);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
+
+		try {
+			return new Index(ct, attr);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	/**
+	 * Create a coordinate transformation to the shape file crs. Tries to autodetect the crs of the shape file.
+	 */
+	public CoordinateTransformation createTransformation(String fromCRS) {
+		return TransformationFactory.getCoordinateTransformation(fromCRS, detectCRS());
+	}
+
+	private String detectCRS() {
+
+		if (shpCrs == null) {
+			try {
+				ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
+				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();
+				ds.dispose();
+				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
+				log.info("Using detected crs for {}: {}", shp, shpCrs);
+
+			} catch (IOException | FactoryException e) {
+				throw new IllegalStateException("Could not determine crs of the shape file. Try to specify it manually using --shp-crs.", e);
+			}
+		}
+
+		return shpCrs;
+	}
 
 
-    /**
-     * Helper class to provide an index for a shapefile lookup.
-     */
-    public final class Index {
+	/**
+	 * Helper class to provide an index for a shapefile lookup.
+	 */
+	public final class Index {
 
-        private final STRtree index = new STRtree();
-        private final CoordinateTransformation ct;
-        private final String attr;
+		private final STRtree index = new STRtree();
+		private final CoordinateTransformation ct;
+		private final String attr;
 
-        /**
-         * Constructor.
-         *
-         * @param ct   coordinate transform from query to target crs
-         * @param attr attribute for the result of {@link #query(Coord)}
-         */
-        private Index(CoordinateTransformation ct, String attr)
-                throws IOException {
-            ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
-            ds.setCharset(shpCharset);
+		/**
+		 * Constructor.
+		 *
+		 * @param ct   coordinate transform from query to target crs
+		 * @param attr attribute for the result of {@link #query(Coord)}
+		 */
+		private Index(CoordinateTransformation ct, String attr)
+				throws IOException {
+			ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
+			ds.setCharset(shpCharset);
 
-            FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
-            while (it.hasNext()) {
-                SimpleFeature ft = it.next();
-                MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
+			FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
+			while (it.hasNext()) {
+				SimpleFeature ft = it.next();
+				MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
 
-                Envelope env = polygon.getEnvelopeInternal();
-                index.insert(env, ft);
-            }
+				Envelope env = polygon.getEnvelopeInternal();
+				index.insert(env, ft);
+			}
 
-            it.close();
-            ds.dispose();
+			it.close();
+			ds.dispose();
 
-            //log.info("Created index with size: {}, depth: {}", index.size(), index.depth());
+			//log.info("Created index with size: {}, depth: {}", index.size(), index.depth());
 
-            this.ct = ct;
-            this.attr = attr;
-        }
+			this.ct = ct;
+			this.attr = attr;
+		}
 
-        /**
-         * Query the index for first feature including a certain point.
-         *
-         * @return null when no features was found that contains the point
-         */
-        @Nullable
-        @SuppressWarnings("unchecked")
-        public String query(Coord coord) {
-            // Because we can not easily transform the feature geometry with MATSim we have to do it the other way around...
-            Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
+		/**
+		 * Query the index for first feature including a certain point.
+		 *
+		 * @return null when no features was found that contains the point
+		 */
+		@Nullable
+		@SuppressWarnings("unchecked")
+		public String query(Coord coord) {
+			// Because we can not easily transform the feature geometry with MATSim we have to do it the other way around...
+			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
 
-            List<SimpleFeature> result = index.query(new Envelope(p));
-            for (SimpleFeature ft : result) {
-                MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
-                if (polygon.contains(MGC.coordinate2Point(p)))
-                    return (String) ft.getAttribute(attr);
-            }
+			List<SimpleFeature> result = index.query(new Envelope(p));
+			for (SimpleFeature ft : result) {
+				MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
+				if (polygon.contains(MGC.coordinate2Point(p)))
+					return (String) ft.getAttribute(attr);
+			}
 
-            return null;
-            // throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
-        }
-    }
+			return null;
+			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
+		}
+	}
 
 }
