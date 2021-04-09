@@ -17,6 +17,17 @@ public final class CrsOptions {
     @CommandLine.Option(names = "--target-crs", description = "Target coordinate system of the output")
     private String targetCRS;
 
+    /**
+     * Construct crs options with default input crs.
+     */
+    public CrsOptions(String inputCRS) {
+        this.inputCRS = inputCRS;
+    }
+
+    /**
+     * Default with new predefined options.
+     */
+    public CrsOptions() { }
 
     /**
      * Get the provided input crs.
