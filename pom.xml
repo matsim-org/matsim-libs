@@ -64,22 +64,18 @@
             <id>ch.sbb</id>
             <url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
         </repository>
-        <repository>
-            <!-- For MATSim snapshots: -->
-            <id>ojo-snapshots</id>
-            <url>https://oss.jfrog.org/libs-snapshot</url>
-        </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
+            <id>github</id>
+            <name>GitHub Maven Packages</name>
+            <url>https://maven.pkg.github.com/matsim-org/matsim-libs</url>
         </repository>
         <snapshotRepository>
-            <id>oss-jfrog-artifactory</id>
-            <name>artifactory-snapshots</name>
-            <url>https://oss.jfrog.org/oss-snapshot-local</url>
+            <id>github</id>
+            <name>GitHub Maven Packages</name>
+            <url>https://maven.pkg.github.com/matsim-org/matsim-libs</url>
         </snapshotRepository>
     </distributionManagement>
 
