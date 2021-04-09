@@ -1,0 +1,42 @@
+name: deploy-on-release-created
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  deploy-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Set MATSim version
+        run: mvn versions:set --batch-mode -DnewVersion=${{ github.event.release.tag_name }} -DgenerateBackupPoms=false
+
+      # Build and publish are separated so we start deploying only after all jars are built successfully
+      - name: Build jars
+        run: mvn -pl -distribution package --batch-mode -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests
+
+      - name: Publish jars to GitHub Packages
+        run: mvn -pl -distribution deploy --batch-mode -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+    env:
+      MAVEN_OPTS: -Xmx2g
