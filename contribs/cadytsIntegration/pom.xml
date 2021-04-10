@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>cadytsIntegration</artifactId>
+  <artifactId>cadyts-integration</artifactId>
   <name>cadytsIntegration</name>
     <build>
         <plugins>

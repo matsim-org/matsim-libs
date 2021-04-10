@@ -136,7 +136,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>cadytsIntegration</artifactId>
+			<artifactId>cadyts-integration</artifactId>
 			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>

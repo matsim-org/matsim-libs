@@ -37,7 +37,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>cadytsIntegration</artifactId>
+			<artifactId>cadyts-integration</artifactId>
 			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -82,7 +82,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>eventsBasedPTRouter</artifactId>
+			<artifactId>events-based-pt-router</artifactId>
 			<version>14.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>

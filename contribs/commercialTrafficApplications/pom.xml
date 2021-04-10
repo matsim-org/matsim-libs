@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>commercialTrafficApplications</artifactId>
+  <artifactId>commercial-traffic-applications</artifactId>
   <name>commercialTrafficApplications</name>
 
     <dependencies>
