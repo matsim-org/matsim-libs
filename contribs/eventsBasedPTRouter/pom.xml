@@ -6,7 +6,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>eventsBasedPTRouter</artifactId>
+  <artifactId>events-based-pt-router</artifactId>
   <name>eventsBasedPTRouter</name>
   <build>
     <plugins>
