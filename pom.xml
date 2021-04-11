@@ -58,25 +58,21 @@
         </repository>
         <repository>
             <id>matsim</id>
-            <url>https://dl.bintray.com/matsim/matsim</url>
-        </repository>
-        <repository>
-            <id>ch.sbb</id>
-            <url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
+            <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Maven Packages</name>
-            <url>https://maven.pkg.github.com/matsim-org/matsim-libs</url>
-        </repository>
-        <snapshotRepository>
-            <id>github</id>
-            <name>GitHub Maven Packages</name>
-            <url>https://maven.pkg.github.com/matsim-org/matsim-libs</url>
-        </snapshotRepository>
+             <id>matsim-releases</id>
+             <name>MATSim Releases Maven Repository</name>
+             <url>https://repo.matsim.org/repository/matsim-releases/</url>
+         </repository>
+         <snapshotRepository>
+             <id>matsim-snapshots</id>
+             <name>MATSim Snapshots Maven Repository</name>
+             <url>https://repo.matsim.org/repository/matsim-snapshots/</url>
+         </snapshotRepository>
     </distributionManagement>
 
     <!-- Some commonly used dependencies with fixed versions, please try to avoid replicating the versions in other poms -->
