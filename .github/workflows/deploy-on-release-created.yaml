@@ -39,5 +39,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Upload matsim (core) assembly as release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ github.token }}
+          file: matsim/target/matsim-${{ github.event.release.tag_name }}-release.zip
+          tag: ${{ github.event.release.tag_name }}
     env:
       MAVEN_OPTS: -Xmx2g
