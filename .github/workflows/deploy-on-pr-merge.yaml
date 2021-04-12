@@ -22,9 +22,13 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Setup Java
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
           java-version: 11
+          distribution: 'adopt'
+          server-id: matsim-snapshots
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
       # Build and publish are separated so we start deploying only after all jars are built successfully
       - name: Build jars
@@ -34,7 +38,8 @@ jobs:
         # fail at end to deploy as many jars as possible
         run: mvn -pl -distribution deploy --batch-mode --fail-at-end -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
 
     env:
       MAVEN_OPTS: -Xmx2g
