@@ -1,0 +1,45 @@
+name: deploy-on-pr-merge
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-snapshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+          server-id: matsim-snapshots
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      # Build and publish are separated so we start deploying only after all jars are built successfully
+      - name: Build jars
+        run: mvn -pl -distribution package --batch-mode -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests
+
+      - name: Publish jars to GitHub Packages
+        # fail at end to deploy as many jars as possible
+        run: mvn -pl -distribution deploy --batch-mode --fail-at-end -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+
+    env:
+      MAVEN_OPTS: -Xmx2g

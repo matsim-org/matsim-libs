@@ -1,6 +1,12 @@
 name: verify-push
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches-ignore:
+      - 'master' #no need to run after merging to master
+    tags-ignore:
+      - '*' #do not run on pushing tags
+  pull_request:
 
 jobs:
   build:
