@@ -105,7 +105,12 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 			 */
 
 			PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScorinParams = this.config.getScoringParameters(subpopulation);
-			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScorinParams, scConfig);
+//			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScorinParams, scConfig);
+
+
+
+			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScorinParams.getActivityParams(), subpopulationScorinParams.getModes(), scConfig);
+
 			if (transitConfigGroup.isUseTransit()) {
 
 				PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
