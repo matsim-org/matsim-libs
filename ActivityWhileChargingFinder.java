@@ -35,13 +35,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class ActivityWhileChargingFinder {
+public class ActivityWhileChargingFinder {
 
 	private final Set<String> activityTypes;
 	private static final double MINIMUM_TIME = 10 * 60;
 	private Logger log = Logger.getLogger(ActivityWhileChargingFinder.class);
 
-	ActivityWhileChargingFinder(Set<String> possibleWhileChargingStartActTypes){
+	public ActivityWhileChargingFinder(Set<String> possibleWhileChargingStartActTypes){
 		this.activityTypes = possibleWhileChargingStartActTypes;
 	}
 

@@ -23,6 +23,7 @@ package org.matsim.urbanEV;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
+import org.locationtech.jts.awt.PointShapeFactory;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingPower;
@@ -33,9 +34,12 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleets;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
+import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.urbanEV.analysis.ChargerToXY;
+
 
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +52,7 @@ public class UrbanEVModule extends AbstractModule {
 		this.activityWhileChargingFinder = null;
 	}
 
-	UrbanEVModule(ActivityWhileChargingFinder activityWhileChargingFinder) {
+	public UrbanEVModule(ActivityWhileChargingFinder activityWhileChargingFinder) {
 		this.activityWhileChargingFinder = activityWhileChargingFinder;
 	}
 
@@ -59,6 +63,10 @@ public class UrbanEVModule extends AbstractModule {
 		install(new ChargingModule());
 		install(new DischargingModule());
 		install(new EvStatsModule());
+		//install(new XYModule());
+		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
+		addControlerListenerBinding().to(ChargerToXY.class);
+		addMobsimListenerBinding().to(ChargerToXY.class);
 
 
 		installQSimModule(new AbstractQSimModule() {

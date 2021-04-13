@@ -7,7 +7,9 @@ import com.opencsv.exceptions.CsvException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargerWriter;
 import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
+import org.matsim.core.network.NetworkUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -105,7 +107,10 @@ public class CSVToXML {
     public static void main(String[] args) throws IOException, CsvException {
         String fileName = "C:\\Users\\admin\\IdeaProjects\\matsim-berlin\\src\\main\\java\\org\\matsim\\urbanEV\\ind_1004.csv";
         CSVToXML csvreader = new CSVToXML(fileName);
-        new CreateNewXML(csvreader.chargers);
+        new ChargerWriter(csvreader.chargers.stream()).write( "C:\\Users\\admin\\Desktop\\chargers1.xml");
+
+
+        //new CreateNewXML(csvreader.chargers);
 
 
     }

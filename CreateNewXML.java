@@ -47,15 +47,15 @@ public  class CreateNewXML {
                 linkId.setValue(String.valueOf(charger.getLinkId()));
                 chargername.setAttributeNode(linkId);
 
-                Attr chargerType = document.createAttribute("chargerType");
+                Attr chargerType = document.createAttribute("charger_type");
                 chargerType.setValue(charger.getChargerType());
                 chargername.setAttributeNode(chargerType);
 
-                Attr plugPower = document.createAttribute("plug_Power");
+                Attr plugPower = document.createAttribute("plug_power");
                 plugPower.setValue(String.valueOf(charger.getPlugPower()));
                 chargername.setAttributeNode(plugPower);
 
-                Attr plugCount = document.createAttribute("plug_Count");
+                Attr plugCount = document.createAttribute("plug_count");
                 plugCount.setValue(String.valueOf(charger.getPlugCount()));
                 chargername.setAttributeNode(plugCount);
                 rootElement.appendChild(document.createTextNode("\n"));
