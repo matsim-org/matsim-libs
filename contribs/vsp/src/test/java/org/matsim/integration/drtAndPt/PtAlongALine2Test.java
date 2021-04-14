@@ -52,6 +52,7 @@ import org.matsim.core.mobsim.qsim.PreplanningEngine;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
@@ -142,6 +143,7 @@ public class PtAlongALine2Test{
 
 		// === RAPTOR: ===
 		{
+			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased); // we'll set up SwissRailRaptor ourself, so disable it here to prevent conflicts
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
 
 			if ( drtMode!= DrtMode.none){

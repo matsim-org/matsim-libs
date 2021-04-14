@@ -42,8 +42,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.common.collect.ImmutableList;
 
-import ch.sbb.matsim.routing.graph.Graph;
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.LeastCostPathTree;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -64,7 +64,7 @@ public class OneToManyPathCalculatorTest {
 
 	private final IdMap<Node, Node> nodeMap = new IdMap<>(Node.class);
 
-	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new Graph(network), new FreeSpeedTravelTime(),
+	private final LeastCostPathTree dijkstraTree = new LeastCostPathTree(new SpeedyGraph(network), new FreeSpeedTravelTime(),
 			new TimeAsTravelDisutility(new FreeSpeedTravelTime()));
 
 	@Before
