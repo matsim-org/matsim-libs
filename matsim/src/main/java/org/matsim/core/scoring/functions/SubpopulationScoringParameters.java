@@ -79,7 +79,7 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 				transitActivityParams.setClosingTime(0.) ;
 				ActivityUtilityParameters.Builder modeParamsBuilder = new ActivityUtilityParameters.Builder(transitActivityParams);
 				modeParamsBuilder.setScoreAtAll(false);
-				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder);
+				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
 			}
 
 			this.params.put(
