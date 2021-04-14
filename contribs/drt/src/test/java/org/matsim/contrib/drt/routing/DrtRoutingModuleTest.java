@@ -85,7 +85,7 @@ public class DrtRoutingModuleTest {
 				.getFacilities()
 				.values()
 				.stream()
-				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.map(DrtStopFacilityImpl::createFromFacility)
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),

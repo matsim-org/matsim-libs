@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.edrt.scheduler;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -30,12 +27,15 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author michalm
@@ -89,7 +89,7 @@ public class EmptyVehicleChargingScheduler {
 		double endTime = beginTime + chargingDuration;
 
 		schedule.addTask(taskFactory.createChargingTask(vehicle, beginTime, endTime, charger, totalEnergy));
-		((ChargingWithQueueingAndAssignmentLogic)charger.getLogic()).assignVehicle(ev);
+		((ChargingWithAssignmentLogic)charger.getLogic()).assignVehicle(ev);
 
 		// append STAY
 		schedule.addTask(taskFactory.createStayTask(vehicle, endTime, vehicle.getServiceEndTime(), charger.getLink()));

@@ -24,6 +24,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.util.EnumSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -116,17 +119,35 @@ public class ReRoutingIT {
 		controler.run();
 		this.evaluate();
 	}
-	
+
+	@Test
+	public void testReRoutingSpeedyALT() throws MalformedURLException {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.SpeedyALT);
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate("plans_speedyALT.xml.gz");
+	}
+
 	private void evaluate() throws MalformedURLException {
+		this.evaluate("plans.xml.gz");
+	}
+
+	private final static Logger LOG = LogManager.getLogger(ReRoutingIT.class);
+	private void evaluate(String plansFilename) throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
-		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), plansFilename).toString());
 		Scenario referenceScenario = ScenarioUtils.loadScenario(config);
 
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").toURI().toURL().toString());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		Gbl.startMeasurement();
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
+		Gbl.printElapsedTime();
 		if ( !isEqual ) {
 			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/reference_population.xml.gz");
 			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(utils.getOutputDirectory() + "/output_population.xml.gz");

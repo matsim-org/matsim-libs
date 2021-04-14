@@ -67,7 +67,7 @@ class CarrierAgent
 		private int activityCounter = 0;
 
 		private CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
-			log.warn("creating CarrierDriverAgent with driverId=" + driverId );
+			log.debug("creating CarrierDriverAgent with driverId=" + driverId );
 			this.driverId = driverId;
 			this.scheduledTour = tour;
 		}
@@ -146,7 +146,7 @@ class CarrierAgent
 
 			notifyEventHappened( event, currentActivity, scheduledTour, driverId, activityCounter );
 
-			log.warn("handling activity end event=" + event );
+			log.debug("handling activity end event=" + event );
 			if(FreightConstants.START.equals( event.getActType() ) ) {
 				activityCounter += 1;
 				return;

@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import static ch.sbb.matsim.routing.graph.LeastCostPathTree.StopCriterion;
 import static org.matsim.contrib.dvrp.path.VrpPaths.FIRST_LINK_TT;
 import static org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -39,11 +38,11 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.router.speedy.LeastCostPathTree;
+import org.matsim.core.router.speedy.LeastCostPathTree.StopCriterion;
 import org.matsim.core.utils.misc.OptionalTime;
 
 import com.google.common.base.Preconditions;
-
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
 
 /**
  * @author Michal Maciejewski (michalm)

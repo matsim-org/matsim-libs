@@ -114,9 +114,6 @@ public class DrtRequestInsertionRetryQueueTest {
 	}
 
 	private DrtRequestInsertionRetryParams params(int interval, double maxAge) {
-		var params = new DrtRequestInsertionRetryParams();
-		params.setRetryInterval(interval);
-		params.setMaxRequestAge(maxAge);
-		return params;
+		return new DrtRequestInsertionRetryParams().setRetryInterval(interval).setMaxRequestAge(maxAge);
 	}
 }

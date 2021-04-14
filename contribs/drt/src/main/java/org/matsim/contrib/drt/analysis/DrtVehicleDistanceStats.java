@@ -58,7 +58,7 @@ public class DrtVehicleDistanceStats
 		final Map<Id<Person>, MutableDouble> distanceByPersonId = new HashMap<>();
 		double totalDistance = 0;
 		double totalOccupiedDistance = 0;
-		double totalRevenueDistance = 0; //in (passenger x meters)
+		double totalPassengerTraveledDistance = 0; //in (passenger x meters)
 		final double[] totalDistanceByOccupancy;
 
 		private VehicleState(int maxCapacity) {
@@ -72,7 +72,7 @@ public class DrtVehicleDistanceStats
 			int occupancy = distanceByPersonId.size();
 			if (occupancy > 0) {
 				totalOccupiedDistance += linkLength;
-				totalRevenueDistance += linkLength * occupancy;
+				totalPassengerTraveledDistance += linkLength * occupancy;
 			}
 			totalDistanceByOccupancy[occupancy] += linkLength;
 		}

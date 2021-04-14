@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.*;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

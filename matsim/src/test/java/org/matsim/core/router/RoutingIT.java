@@ -40,6 +40,8 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.speedy.SpeedyALTFactory;
+import org.matsim.core.router.speedy.SpeedyDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -82,7 +84,20 @@ public class RoutingIT {
 			}
 		});
 	}
-	@Test	
+	@Test
+	public void testSpeedyDijkstra() {
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "SpeedyDijkstra";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new SpeedyDijkstraFactory();
+			}
+		});
+	}
+	@Test
 	public void testDijkstraPruneDeadEnds() {
 		doTest(new RouterProvider() {
 			@Override
@@ -157,6 +172,19 @@ public class RoutingIT {
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
 				return new FastAStarLandmarksFactory(2);
+			}
+		});
+	}
+	@Test
+	public void testSpeedyALT() {
+		doTest(new RouterProvider() {
+			@Override
+			public String getName() {
+				return "SpeedyALT";
+			}
+			@Override
+			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
+				return new SpeedyALTFactory();
 			}
 		});
 	}

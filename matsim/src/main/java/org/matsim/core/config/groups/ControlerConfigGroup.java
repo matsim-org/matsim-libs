@@ -33,7 +33,7 @@ import java.util.*;
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
 
-	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
+	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks, SpeedyALT}
 
 	public enum EventsFileFormat {xml, pb, json}
 
@@ -102,8 +102,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
-				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
+		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + Arrays.toString(RoutingAlgorithmType.values()));
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
 		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: " + Arrays.toString(EventsFileFormat.values()) + IOUtils.NATIVE_NEWLINE+ "\t\t" +
 				"Multiple values can be specified separated by commas (',').");

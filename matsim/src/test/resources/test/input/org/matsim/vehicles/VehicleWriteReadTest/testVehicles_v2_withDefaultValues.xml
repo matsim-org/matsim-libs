@@ -79,8 +79,16 @@
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
 
-	<vehicle id=" 42  23" type="defaultValue&gt;Car"/>
-	<vehicle id="23" type="normal&amp;Car"/>
+	<vehicle id=" 42  23" type="defaultValue&gt;Car">
+		<attributes>
+			<attribute name="testAttributeDouble" class="java.lang.Double">1.234</attribute>
+		</attributes>
+	</vehicle>		
+	<vehicle id="23" type="normal&amp;Car">
+		<attributes>
+			<attribute name="testAttributeString" class="java.lang.String">firstVehicle</attribute>
+		</attributes>
+	</vehicle>
 	<vehicle id="42" type="defaultValue&gt;Car"/>
 
 

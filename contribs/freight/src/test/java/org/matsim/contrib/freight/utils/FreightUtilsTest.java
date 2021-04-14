@@ -55,7 +55,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
-import javax.management.InvalidAttributeValueException;
 
 public class FreightUtilsTest {
 
@@ -437,7 +436,7 @@ public class FreightUtilsTest {
 		Controler controler = new Controler(scenario);
 
 		try {
-			FreightUtils.runJsprit(scenario, freightConfig);
+			FreightUtils.runJsprit(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -455,8 +454,6 @@ public class FreightUtilsTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 		//remove all attributes --> remove the NumberOfJspritIterations attribute to trigger exception
@@ -465,7 +462,7 @@ public class FreightUtilsTest {
 			carrier.getAttributes().clear();
 		}
 
-		FreightUtils.runJsprit(scenario, freightConfig);
+		FreightUtils.runJsprit(scenario);
 	}
 
 	/**
@@ -478,9 +475,8 @@ public class FreightUtilsTest {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
-		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
 		try {
-			FreightUtils.runJsprit(scenario, freightConfig);
+			FreightUtils.runJsprit(scenario);
 		} catch (Exception e) {
 			Assert.fail();
 		}
