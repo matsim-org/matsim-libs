@@ -102,6 +102,8 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 	public void doSimStep(double time) {
 		beforeFirstSimStep = false;
 		while (activityEndsList.peek() != null) {
+//			Logger.getRootLogger().info("Activity time : " + time);
+//			Logger.getRootLogger().info("Activity engine end time : " + activityEndsList.peek().activityEndTime);
 			if (activityEndsList.peek().activityEndTime <= time) {
 				MobsimAgent agent = activityEndsList.poll().agent;
 				unregisterAgentAtActivityLocation(agent);
@@ -148,6 +150,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
 			internalInterface.getMobsim().getAgentCounter().decLiving();
+//			Logger.getRootLogger().info("Last activity, decreasing living for : " + agent.getId());
 		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay() && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.

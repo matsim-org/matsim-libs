@@ -37,6 +37,14 @@ public interface DriverAgent extends Identifiable<Person>, NetworkAgent, Vehicle
 	 */
 	public Id<Link> chooseNextLinkId();
 
+	public default int getLinkIndex() {
+		throw new UnsupportedOperationException();
+	}
+
+	public default int getPlanIndex() {
+		throw new UnsupportedOperationException();
+	}
+
 	/**
 	 * notifies the agent that it was moved over the node.  
 	 * <p></p>
@@ -50,6 +58,10 @@ public interface DriverAgent extends Identifiable<Person>, NetworkAgent, Vehicle
 	 * </ul>
 	 */
 	public void notifyMoveOverNode(Id<Link> newLinkId);
+
+	default void myNotifyMoveOverNode(Id<Link> newLinkId, int personLinkIndex, int planIndex) {
+		throw new UnsupportedOperationException();
+	}
 	
 	public boolean isWantingToArriveOnCurrentLink( ) ;
 	

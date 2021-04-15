@@ -167,6 +167,21 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
+	public final void myNotifyMoveOverNode(Id<Link> newLinkId, int personLinkIndex, int planIndex) {
+		driverAgentDelegate.myNotifyMoveOverNode(newLinkId, personLinkIndex, planIndex);
+	}
+
+	@Override
+	public int getLinkIndex() {
+		return basicAgentDelegate.getCurrentLinkIndex();
+	}
+
+	@Override
+	public int getPlanIndex() {
+		return basicAgentDelegate.getCurrentPlanElementIndex();
+	}
+
+	@Override
 	public final Id<Link> chooseNextLinkId() {
 		return driverAgentDelegate.chooseNextLinkId();
 	}

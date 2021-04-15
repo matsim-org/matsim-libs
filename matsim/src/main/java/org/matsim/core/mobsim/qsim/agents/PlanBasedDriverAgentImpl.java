@@ -63,6 +63,14 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		this.cachedNextLinkId = null; //reset cached nextLink
 	}
 
+	@Override
+	public final void myNotifyMoveOverNode(Id<Link> newLinkId, int personLinkIndex, int planIndex) {
+		this.basicPlanAgentDelegate.setCurrentLinkId( newLinkId ) ;
+		this.basicPlanAgentDelegate.setCurrentLinkIndex(personLinkIndex + 1);
+		this.basicPlanAgentDelegate.setCurrentPlanElementIndex(planIndex);
+		this.cachedNextLinkId = null;
+	}
+
 	/**
 	 * Returns the next link the vehicle will drive along.
 	 *
@@ -122,6 +130,11 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		this.cachedNextLinkId = routeLinkIds.get(this.basicPlanAgentDelegate.getCurrentLinkIndex());
 		return this.cachedNextLinkId;
 
+	}
+
+	@Override
+	public int getLinkIndex() {
+		return basicPlanAgentDelegate.getCurrentLinkIndex();
 	}
 
 	@Override

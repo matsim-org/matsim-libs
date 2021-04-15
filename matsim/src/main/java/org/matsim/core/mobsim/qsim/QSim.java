@@ -31,9 +31,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -41,6 +43,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -61,6 +64,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.AcceptedVehiclesDto;
+import org.matsim.core.mobsim.qsim.qnetsimengine.MoveVehicleDto;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -136,6 +141,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimAgent> allAgents = new LinkedHashMap<>();
 	private final IdMap<Vehicle, MobsimVehicle> vehicles = new IdMap<>(Vehicle.class);
 	private final List<AgentSource> agentSources = new ArrayList<>();
 
@@ -145,11 +151,17 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private long qSimInternalTime = 0;
 	private final Map<MobsimEngine, AtomicLong> mobsimEngineRunTimes;
 	private ActivityEngine activityEngine;
+	private QNetsimEngineI qNetsimEngine;
 
 	{
 		if (analyzeRunTimes) this.mobsimEngineRunTimes = new HashMap<>();
 		else this.mobsimEngineRunTimes = null;
 	}
+
+	private int workerId;
+	private ImmutableSetMultimap<Integer, Id<Node>> workerNodesIds;
+	private Map<Id<Node>, Integer> nodesWorkerIds;
+	private WorkerDelegate workerDelegate;
 
 	/*package (for tests)*/ final InternalInterface internalInterface = new InternalInterface() {
 
@@ -235,6 +247,25 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 //		this.qVehicleFactory = qVehicleFactory;
 	}
 
+	public int getWorkerId() {
+		return workerId;
+	}
+
+	public void setWorkerId(int workerId) {
+		this.workerId = workerId;
+	}
+
+	public void setWorkerNodesIds(Map<Integer, Set<Id<Node>>> workerNodesIds) {
+		ImmutableSetMultimap.Builder<Integer, Id<Node>> multiMapBuilder = ImmutableSetMultimap.builder();
+		workerNodesIds.forEach(multiMapBuilder::putAll);
+		this.workerNodesIds = multiMapBuilder.build();
+		this.nodesWorkerIds = this.workerNodesIds.inverse()
+				.asMap()
+				.entrySet()
+				.stream()
+				.collect(Collectors.toMap(Entry::getKey, e -> e.getValue().iterator().next()));
+	}
+
 	// ============================================================================================================================
 	// "run" method:
 
@@ -261,11 +292,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				arrangeNextAgentAction(agent);
 			}
 
+//			Logger.getRootLogger().info("Total agents " + allAgents.size());
+//			Logger.getRootLogger().info("Agents in sim" + agents.size() + " " + agentCounter.getLiving());
+
 			// do iterations
 			boolean doContinue = true;
 			while (doContinue) {
 				doContinue = doSimStep();
 			}
+		} catch (Throwable t) {
+			t.printStackTrace();
 		} finally {
 			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
 			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
@@ -414,7 +450,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		
 		// console printout:
 		this.printSimLog(now);
-		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > now));
+		boolean shouldFinish = !workerDelegate.shouldFinish();
+
+//		boolean doContinue =  (this.agentCounter.isLiving() && (this.stopTime > now));
+		boolean doContinue =  shouldFinish;
 		this.events.afterSimStep(now);
 		this.listenerManager.fireQueueSimulationAfterSimStepEvent(now);
 
@@ -432,12 +471,46 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return doContinue;
 	}
 
+	public List<AcceptedVehiclesDto> acceptVehicles(int workerId, List<MoveVehicleDto> moveVehicleDtos) {
+		return qNetsimEngine.acceptVehicles(workerId, moveVehicleDtos);
+	}
+
 	public void insertAgentIntoMobsim(final MobsimAgent agent) {
 		if (this.agents.containsKey(agent.getId())) {
 			throw new RuntimeException("Agent with same Id (" + agent.getId().toString() + ") already in mobsim; aborting ... ") ;
 		}
+
+		//		todo tmp koment dla qsima
+		Map<Id<Link>, ? extends Link> links = this.scenario.getNetwork().getLinks();
+		Id<Link> currentLinkId = agent.getCurrentLinkId();
+		Id<Node> destinationNodeId = links.get(currentLinkId).getToNode().getId();
+
+		allAgents.putIfAbsent(agent.getId(), agent);
+
+		if (!workerNodesIds.get(workerId).contains(destinationNodeId)) {
+			return;
+		}
+
 		this.agents.put(agent.getId(), agent);
 		this.agentCounter.incLiving();
+//		Logger.getRootLogger().info("increasing living because of inserting into mobsim : " + agent.getId());
+		if ( agent instanceof HasPerson ){
+			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
+			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
+				allpersons.addPerson( ((HasPerson) agent).getPerson() );
+			}
+		}
+	}
+
+	public void insertAgentIntoMobsimFromUpdate(final MobsimAgent agent) {
+		if (this.agents.containsKey(agent.getId())) {
+			throw new RuntimeException("Agent with same Id (" + agent.getId().toString() + ") already in mobsim; aborting ... ") ;
+		}
+
+		allAgents.putIfAbsent(agent.getId(), agent);
+		this.agents.put(agent.getId(), agent);
+		this.agentCounter.incLiving();
+//		Logger.getRootLogger().info("increasing living because of inserting from update : " + agent.getId());
 		if ( agent instanceof HasPerson ){
 			final Population allpersons = PopulationUtils.getOrCreateAllpersons( scenario );
 			if ( !allpersons.getPersons().containsKey( ((HasPerson) agent).getPerson().getId() ) ){
@@ -459,7 +532,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
 			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
-			
+
+//			Logger.getRootLogger().info("Decrising living because of aborting " + agent.getId());
 			this.agents.remove(agent.getId()) ;
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
@@ -616,6 +690,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if (mobsimEngine instanceof WithinDayEngine) {
 			this.withindayEngine = (WithinDayEngine) mobsimEngine;
 		}
+		if (mobsimEngine instanceof QNetsimEngineI) {
+			this.qNetsimEngine = (QNetsimEngineI) mobsimEngine;
+		}
 		mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 		
@@ -625,6 +702,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	@Override
 	public AgentCounter getAgentCounter() {
 		return this.agentCounter;
+	}
+
+	@Override
+	public double getStopTime() {
+		return stopTime;
 	}
 
 	public void addDepartureHandler(DepartureHandler departureHandler) {
@@ -674,6 +756,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableMap(this.agents);
 	}
 
+	public Map<Id<Person>, MobsimAgent> getAllAgents() {
+		return allAgents;
+	}
+
+	public void removeAgent(Id<Person> agent) {
+		agents.remove(agent);
+		agentCounter.decLiving();
+//		Logger.getRootLogger().info("Decrising living because of moving to other node " + agent);
+	}
+
 	public void addAgentSource(AgentSource agentSource) {
 		this.agentSources.add(agentSource);
 	}
@@ -718,5 +810,20 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 											   "the network change events engine was not set up for the qsim?  Aborting ...") ;
 		}
 	}
-	
+
+	public void setWorkerDelegate(WorkerDelegate workerDelegate) {
+		this.workerDelegate = workerDelegate;
+	}
+
+	public WorkerDelegate getWorkerDelegate() {
+		return workerDelegate;
+	}
+
+	public Map<Id<Node>, Integer> getNodesWorkerIds() {
+		return nodesWorkerIds;
+	}
+
+	public ImmutableSetMultimap<Integer, Id<Node>> getWorkerNodesIds() {
+		return workerNodesIds;
+	}
 }

@@ -142,9 +142,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 		// Establish and end connection between driver and vehicle
 		if (o instanceof VehicleEntersTrafficEvent) {
+			Logger.getRootLogger().info("Entering traffic " + ((VehicleEntersTrafficEvent) o).getPersonId());
 			this.vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
 		}
 		if (o instanceof VehicleLeavesTrafficEvent) {
+			Logger.getRootLogger().info("Leaving traffic " + ((VehicleLeavesTrafficEvent) o).getPersonId());
 			this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
 		}
 		// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
@@ -158,6 +160,11 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if ( o instanceof LinkEnterEvent ) {
 			Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId();
 			Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId);
+
+			//tutaj chyba kolejność eventów ma znaczenie....
+			//poprzedni event powinien ustawić tu kierowcę
+			//todo.....
+
 			ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
 			// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
 			if (scoringFunction != null) {

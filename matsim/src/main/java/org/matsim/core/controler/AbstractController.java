@@ -26,7 +26,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.MemoryObserver;
 
-/*package*/ abstract class AbstractController {
+/*package*/ abstract public class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not
 	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
@@ -49,7 +49,7 @@ import org.matsim.utils.MemoryObserver;
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
 
-    AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
+    protected AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManagerImpl = controlerListenerManager;
         this.controlerListenerManagerImpl.setControler(matsimServices);
@@ -63,7 +63,7 @@ import org.matsim.utils.MemoryObserver;
         // Fixme [kn] this should really be ten thousand draws instead of just one
     }
 
-    final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
+    final protected void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
         this.controlerIO = controlerIO;
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }

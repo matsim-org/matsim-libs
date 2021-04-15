@@ -19,9 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -106,7 +104,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		// complicated from the perspective here, but makes the QNetsimEngine simpler (no exception for the "multiple lanes" any more).
 		// Please ask if you need this and have problems. kai, feb'16
 	}
-	
+
 	@Override
 	public QLaneI getAcceptingQLane() {
 		return this.fakeLane ;
@@ -133,7 +131,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 //			throw new RuntimeException("not implemented") ;
 //		}
 
-		@Override
+        @Override
+        public Queue<QVehicle> getBuffer() {
+			throw new RuntimeException("not implemented") ;
+        }
+
+        @Override
 		public void addFromWait(QVehicle arg0) {
 			throw new RuntimeException("not implemented") ;
 		}

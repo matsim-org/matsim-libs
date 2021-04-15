@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration monitorInterval="60">
 
+	<Properties>
+		<property name="filePattern">${date:yyyy-MM-dd-HH_mm_ss}</property>
+	</Properties>
+
 	<Appenders>
 		<Console name="stdout" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{ISO8601} %5p %C{1}:%L %m%n" />
@@ -14,12 +18,17 @@
 				<ThresholdFilter level="WARN" onMatch="ACCEPT" />
 			</Filters>
 		</Console>
+		<File name="file" fileName="output_${filePattern}.log" append="false">
+			<PatternLayout
+					pattern="%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level %logger{36} - %msg%n" />
+		</File>
 	</Appenders>
 
 	<Loggers>
 		<Root level="info">
 			<AppenderRef ref="stdout" />
 			<AppenderRef ref="stderr" />
+			<AppenderRef ref="file" />
 		</Root>
 	</Loggers>
 

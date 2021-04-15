@@ -70,6 +70,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		// See MATSIM-233 for details. td apr'14
 		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		QLinkI qlink = (QLinkI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
+		//todo co z parkowaniem itd.?
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
 			if (vehicleBehavior == VehicleBehavior.teleport) {

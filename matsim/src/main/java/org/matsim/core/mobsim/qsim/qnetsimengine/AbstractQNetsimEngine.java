@@ -20,16 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -62,6 +60,11 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> implements QNetsimEngineI {
 
 	private NetsimInternalInterface ii = new NetsimInternalInterface(){
+		@Override
+		public QSim getQSim() {
+			return qsim;
+		}
+
 		@Override public QNetwork getNetsimNetwork() {
 			return network ;
 		}
@@ -215,7 +218,7 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	 * @return the list of {@link AbstractQNetsimEngineRunner}
 	 */
 	protected abstract List<A> initQSimEngineRunners() ;
-	
+
 	/**
 	 * Implements one simulation step, called from simulation framework
 	 * @param time The current time in the simulation.
@@ -227,7 +230,6 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 		this.printSimLog(time);
 	}
 
-	
 	@Override
 	public final void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
@@ -439,5 +441,9 @@ abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> impl
 	 */
 	protected List<A> getQnetsimEngineRunner(){
 		return this.engines;
+	}
+
+	public QSim getQSim() {
+		return qsim;
 	}
 }

@@ -47,7 +47,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import javax.inject.Inject;
 import java.util.Map;
 
-class MatsimServicesImpl implements MatsimServices {
+public class MatsimServicesImpl implements MatsimServices {
 
 	@Override
 	public IterationStopWatch getStopwatch() {

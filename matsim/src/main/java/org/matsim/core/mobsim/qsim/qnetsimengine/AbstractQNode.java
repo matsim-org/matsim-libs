@@ -21,10 +21,11 @@
 
  package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 /**
@@ -110,5 +111,20 @@ abstract class AbstractQNode implements QNodeI {
 	@Override
 	public final Map<String, Object> getCustomAttributes() {
 		return customAttributes;
+	}
+
+	@Override
+	public List<AcceptedVehiclesDto> acceptVehicles(List<MoveVehicleDto> moveVehicleDtos, boolean local) {
+		return null;
+	}
+
+	@Override
+	public Map<Id<Link>, List<AcceptedVehiclesDto>> acceptVehiclesLocal(List<MoveVehicleDto> moveVehicleDtos) {
+		return null;
+	}
+
+	@Override
+	public void handleAccepted(List<AcceptedVehiclesDto> accepted) {
+
 	}
 }

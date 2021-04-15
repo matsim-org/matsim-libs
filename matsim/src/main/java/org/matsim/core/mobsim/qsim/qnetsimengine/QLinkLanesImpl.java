@@ -158,6 +158,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private List<QLaneI> toNodeLaneQueues = null;
 
+	private Map<Id<Lane>, QLaneI> toNodeLaneQueuesMap = null;
+
 	private VisData visdata = null;
 
 	private final List<ModelLane> lanes;
@@ -215,6 +217,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (lane.getToLanes() == null || lane.getToLanes().isEmpty()) { // lane is at the end of
 																			// link
 				this.toNodeLaneQueues.add(queue);
+				this.toNodeLaneQueuesMap.put(queue.getId(), queue);
 				toLinkIds.addAll(lane.getLaneData().getToLinkIds());
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			} else { // lane is within the link and has no connection to a node
@@ -321,6 +324,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		
 			/* part B */
 			// move vehicles to the lane buffer if they have reached their earliest lane exit time
+
+			//przeniesienie tych co przyjechaly wg czasu do buffera (stąd pewnie będą przenieione przy moveNodes()?)
+			//vehQueue -> buffer
 			lane.doSimStep();
 			/* end of part B */
 			
@@ -346,6 +352,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	private void moveBufferToNextLane(QLaneI qlane) {
+//		to jest przeniesienie tych które już dojechały (wg czasu) do gotowych do opuszczenia
+//		buffer -> vehQueue
+//		tylko dla wewnetrznych polaczen miedzy laneami w linku???
+//		tu się oblicza earliest time
 		QVehicle veh;
 		while (!qlane.isNotOfferingVehicle()) {
 			veh = qlane.getFirstVehicle();
@@ -353,6 +363,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			QLaneI nextQueue = this.chooseNextLane(qlane, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
+					//TODO możliwe między węzłami ???
+					//może nie ???
+					//"link-interal"???
 					qlane.popFirstVehicle();
 					nextQueue.addFromUpstream(veh);
 				} else {
@@ -419,6 +432,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				continue;
 			}
 
+			//przeniesienie tych co dopiero zaczynają jazdę
+			//wait -> buffer
 			this.firstLaneQueue.addFromWait(veh);
 		}
 		return movedWaitToRoad;

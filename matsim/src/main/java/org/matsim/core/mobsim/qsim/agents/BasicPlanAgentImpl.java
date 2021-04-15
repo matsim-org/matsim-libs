@@ -100,6 +100,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
+//		Logger.getRootLogger().info("Ending leg " + getId());
 		this.getEvents().processEvent(new PersonArrivalEvent( now, this.getId(), this.getDestinationLinkId(), getCurrentLeg().getMode()));
 		if( (!(this.getCurrentLinkId() == null && this.getDestinationLinkId() == null)) 
 				&& !this.getCurrentLinkId().equals(this.getDestinationLinkId())) {
@@ -187,12 +188,14 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			}
 			departure = Double.POSITIVE_INFINITY ;
 		}
-	
+
+//		Logger.getRootLogger().info("Setting activity end time to: " + departure + " for " + getId());
 		this.activityEndTime = departure ;
 	}
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
+//		Logger.getRootLogger().info("Ending activity " + getId());
 		if ( ! ( this.getCurrentPlanElement() instanceof Activity ) ){
 			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
 		}
@@ -372,7 +375,12 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	}
 	
 	final Leg getCurrentLeg() {
-		return (Leg) this.getCurrentPlanElement() ;
+		try {
+			return (Leg) this.getCurrentPlanElement() ;
+		} catch (ClassCastException e) {
+//			Logger.getRootLogger().info("class cast leg");
+			throw new RuntimeException();
+		}
 	}
 	@Override
 	public final int getCurrentLinkIndex() {
@@ -383,6 +391,14 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	
 	final void incCurrentLinkIndex() {
 		currentLinkIndex++ ;
+	}
+
+	final void setCurrentLinkIndex(int currentLinkIndex) {
+		this.currentLinkIndex = currentLinkIndex;
+	}
+
+	public void setCurrentPlanElementIndex(int currentPlanElementIndex) {
+		this.currentPlanElementIndex = currentPlanElementIndex;
 	}
 
 	@Override

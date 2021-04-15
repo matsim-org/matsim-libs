@@ -39,6 +39,7 @@ class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner implem
 	private final Phaser endBarrier;
 
 	/*package*/ QNetsimEngineRunnerWithBarriers(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
+		super(null);
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;

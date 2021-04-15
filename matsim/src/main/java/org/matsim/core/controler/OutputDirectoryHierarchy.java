@@ -48,7 +48,7 @@ public final class OutputDirectoryHierarchy {
 
 	private final ControlerConfigGroup.CompressionType defaultCompressionType;
 	
-	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
+	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.overwriteExistingFiles;
 
 	@Inject
 	OutputDirectoryHierarchy(ControlerConfigGroup config) {
@@ -73,7 +73,7 @@ public final class OutputDirectoryHierarchy {
 	 * @param createDirectories create the directories or abort if they exist
 	 */
 	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories, ControlerConfigGroup.CompressionType compressionType){
-		this.overwriteFiles = overwriteFiles;
+		this.overwriteFiles = OverwriteFileSetting.overwriteExistingFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}

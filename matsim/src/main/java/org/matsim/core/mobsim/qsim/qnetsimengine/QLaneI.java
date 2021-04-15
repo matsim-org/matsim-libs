@@ -20,6 +20,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -36,6 +38,8 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  *
  */
 public interface QLaneI extends Identifiable<Lane> {
+
+	Queue<QVehicle> getBuffer();
 	
 	void addFromWait( final QVehicle veh);
 

@@ -19,11 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -228,6 +224,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					+ " the warning if it works. kai, sep'14") ;
 		}
 
+	}
+
+	@Override
+	public Queue<QVehicle> getBuffer() {
+		return new LinkedList<>(buffer);
 	}
 
 	@Override
@@ -680,6 +681,11 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	public final QVehicle popFirstVehicle() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
+		if (veh == null) {
+//			Logger.getRootLogger().info("popping null !!!!");
+		} else {
+//			Logger.getRootLogger().info("popping " + veh.getId() + ", linkId " + veh.getCurrentLink().getId());
+		}
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  hasMoreThanOneLane() ) {
 				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getId(), this.getId() ));
@@ -801,6 +807,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 //		veh.setCurrentLink(qLink.getLink());
 		this.qLink.setCurrentLinkToVehicle( veh ) ;
+
+		if (veh.getDriver() == null) {
+			throw new RuntimeException("driver null");
+		}
 		vehQueue.add(veh);
 
 		switch (context.qsimConfig.getTrafficDynamics()) {
@@ -848,6 +858,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	 */
 	@Override
 	public final void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
+		if (veh.getDriver() == null) {
+			throw new RuntimeException("driver null");
+		}
 		this.vehQueue.addFirst(veh) ;
 	}
 	

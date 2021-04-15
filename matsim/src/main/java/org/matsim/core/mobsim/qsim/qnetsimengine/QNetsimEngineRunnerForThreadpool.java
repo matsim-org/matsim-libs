@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.concurrent.Callable;
 
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.qsim.QSim;
 
 /**
  * Split up the old {@code QNetsimEngineRunner} which was implementing
@@ -35,7 +36,8 @@ final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner
 	private volatile boolean simulationRunning = true;
 	private boolean movingNodes;
 
-	QNetsimEngineRunnerForThreadpool() {
+	QNetsimEngineRunnerForThreadpool(QSim qSim) {
+		super(qSim);
 	}
 
 	@Override

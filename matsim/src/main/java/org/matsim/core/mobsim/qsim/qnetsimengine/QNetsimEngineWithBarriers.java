@@ -102,6 +102,11 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine<QNetsimEngin
 	}
 
 	@Override
+	public List<AcceptedVehiclesDto> acceptVehicles(int workerId, List<MoveVehicleDto> moveVehicleDtos) {
+		return null;
+	}
+
+	@Override
 	protected List<QNetsimEngineRunnerWithBarriers> initQSimEngineRunners() {
 		this.startBarrier = new Phaser(this.numOfThreads + 1);
 		Phaser separationBarrier = new Phaser(this.numOfThreads);

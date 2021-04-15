@@ -20,14 +20,20 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.WorkerDelegate;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 /**
  * These are the "threads" of the {@link QNetsimEngineWithThreadpool}. The "run()" method is implicitly called by starting the thread.
@@ -49,6 +55,7 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	 * cdobler, sep'14
 	 */
 	private final Queue<QNodeI> nodesQueue = new ConcurrentLinkedQueue<>();
+	private final Map<Id<Node>, QNodeI> nodes = new HashMap<>();
 
 	/*
 	 * Needs not to be thread-safe since links are only activated from nodes which
@@ -57,6 +64,8 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	 * cdobler, sep'14
 	 */
 	private final List<QLinkI> linksList = new LinkedList<>();
+
+	private QSim qSim;
 
 	/*
 	 * Ensure that nodes and links are only activate during times where we expect it.
@@ -77,6 +86,10 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		else runTimes = null;
 	}
 
+	public AbstractQNetsimEngineRunner(QSim qSim) {
+		this.qSim = qSim;
+	}
+
 	/*package*/ final void setTime(final double t) {
 		time = t;
 	}
@@ -87,6 +100,10 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		boolean remainsActive;
 		this.lockNodes = true;
 		QNodeI node;
+		//todo co z aktywowaniem
+		//todo mmulithreaded qsim
+		//todo te wszystkie active itd.
+
 		Iterator<QNodeI> simNodes = this.nodesQueue.iterator();
 		while (simNodes.hasNext()) {
 			node = simNodes.next();
@@ -95,20 +112,31 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 		}
 		this.lockNodes = false;
 	}
+
+	public List<AcceptedVehiclesDto> acceptVehicles(List<MoveVehicleDto> moveVehicleDtos) {
+		if (moveVehicleDtos.isEmpty())
+			return Collections.emptyList();
+		MoveVehicleDto firstVeh = moveVehicleDtos.get(0);
+		QLinkI qlink = (QLinkI) qSim.getNetsimNetwork().getNetsimLink(firstVeh.getToLinkId());
+		return qlink.getToNode().acceptVehicles(moveVehicleDtos, false);
+	}
 	
 	protected final void moveLinks() {
 		boolean remainsActive;
-		lockLinks = true;
-		QLinkI link;
-		ListIterator<QLinkI> simLinks = this.linksList.listIterator();
-		while (simLinks.hasNext()) {
-			link = simLinks.next();
+		//todo wygląda to na concurrent modification ale to raczej nie moja wina
+		synchronized (this) {
+			lockLinks = true;
+			QLinkI link;
+			ListIterator<QLinkI> simLinks = this.linksList.listIterator();
+			while (simLinks.hasNext()) {
+				link = simLinks.next();
 
-			remainsActive = link.doSimStep();
+				remainsActive = link.doSimStep();
 
-			if (!remainsActive) simLinks.remove();
+				if (!remainsActive) simLinks.remove();
+			}
+			lockLinks = false;
 		}
-		lockLinks = false;
 	}
 
 	/*
@@ -118,8 +146,10 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	 */
 	@Override
 	protected final void registerLinkAsActive(QLinkI link) {
-		if (!lockLinks) linksList.add(link);
-		else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
+		synchronized (this) {
+			if (!lockLinks) linksList.add(link);
+			else throw new RuntimeException("Tried to activate a QLink at a time where this was not allowed. Aborting!");
+		}
 	}
 
 	@Override
@@ -134,7 +164,10 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 	 */
 	@Override
 	protected final void registerNodeAsActive(QNodeI node) {
-		if (!this.lockNodes) this.nodesQueue.add(node);
+		if (!this.lockNodes) {
+			this.nodesQueue.add(node);
+			this.nodes.put(node.getNode().getId(), node);
+		}
 		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}
 
@@ -160,4 +193,5 @@ abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry 
 			if (bin < this.runTimes.length) this.runTimes[bin] = end - this.startTime;
 		}
 	}
+
 }

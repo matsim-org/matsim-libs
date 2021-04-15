@@ -25,7 +25,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 
 import javax.inject.Inject;
 
-class TerminateAtFixedIterationNumber implements TerminationCriterion {
+public class TerminateAtFixedIterationNumber implements TerminationCriterion {
 
 	private final int lastIteration;
 

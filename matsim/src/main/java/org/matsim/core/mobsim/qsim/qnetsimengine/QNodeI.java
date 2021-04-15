@@ -24,7 +24,11 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
+
+import java.util.*;
 
 /**
  * @author kainagel
@@ -34,6 +38,11 @@ interface QNodeI extends NetsimNode {
 
 	boolean doSimStep(double now) ;
 
+	List<AcceptedVehiclesDto> acceptVehicles(List<MoveVehicleDto> moveVehicleDtos, boolean local);
+
 	void init() ;
 
+	Map<Id<Link>, List<AcceptedVehiclesDto>> acceptVehiclesLocal(List<MoveVehicleDto> moveVehicleDtos);
+
+	void handleAccepted(List<AcceptedVehiclesDto> accepted);
 }

@@ -20,17 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
+import java.util.*;
+import java.util.concurrent.*;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.WorkerDelegate;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -47,6 +44,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 
 	private final int numOfRunners;
 	private ExecutorService pool;
+	private CountDownLatch initialized = new CountDownLatch(1);
 	
 	public QNetsimEngineWithThreadpool(final QSim sim) {
 		this(sim, null);
@@ -100,19 +98,44 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
+
+
+			WorkerDelegate workerDelegate = getQSim().getWorkerDelegate();
+			workerDelegate.sendFinished();
+			workerDelegate.waitForUpdates();
+
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
 			}
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
+
+			workerDelegate.initializeForNextStep();
+			workerDelegate.sendReadyForNextStep();
+			workerDelegate.waitUntilReadyForNextStep();
+
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e) ;
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e.getCause());
 		}
 	}
-	
+
+	@Override
+	public List<AcceptedVehiclesDto> acceptVehicles(int workerId, List<MoveVehicleDto> moveVehicleDtos) {
+		//todo tutaj oddzielna pula do tego itd...
+		//todo to jest wszystko do przerobienia, na razie tmp
+		//bo przychodzą wiadomości zanim engines się zainicjalizuje
+		//normalnie tutaj nie będę zwracał tego od razu, tylko po wykonaniu przez jakiś wątek będzie wysyłana wiadomość
+		try {
+			initialized.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return getQnetsimEngineRunner().get(0).acceptVehicles(moveVehicleDtos);
+	}
+
 	private static class NamedThreadFactory implements ThreadFactory {
 		private int count = 0;
 
@@ -126,9 +149,11 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEng
 	protected List<QNetsimEngineRunnerForThreadpool> initQSimEngineRunners() {
 		List<QNetsimEngineRunnerForThreadpool> engines = new ArrayList<>();
 		for (int i = 0; i < numOfRunners; i++) {
-			QNetsimEngineRunnerForThreadpool engine = new QNetsimEngineRunnerForThreadpool();
+			QNetsimEngineRunnerForThreadpool engine = new QNetsimEngineRunnerForThreadpool(getNetsimInternalInterface().getQSim());
 			engines.add(engine);
 		}
+		initialized.countDown();
+//		Logger.getRootLogger().info("skończyłem inicjalizować engines");
 		return engines;
 	}
 

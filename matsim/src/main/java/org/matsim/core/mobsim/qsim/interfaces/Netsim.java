@@ -35,4 +35,6 @@ public interface Netsim extends ObservableMobsim {
 	Scenario getScenario();
 
 	MobsimTimer getSimTimer();
+
+    double getStopTime();
 }
