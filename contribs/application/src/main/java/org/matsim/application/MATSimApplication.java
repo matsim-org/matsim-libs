@@ -22,9 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -68,9 +66,9 @@ import java.util.stream.Collectors;
 )
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
-    public static final String DEFAULT_NAME = "MATSimApplication";
     public static final String COLOR = "@|bold,fg(81) ";
-    public static final String HEADER = COLOR +
+    static final String DEFAULT_NAME = "MATSimApplication";
+    static final String HEADER = COLOR +
             "  __  __   _ _____ ___ _       \n" +
             " |  \\/  | /_\\_   _/ __(_)_ __  \n" +
             " | |\\/| |/ _ \\| | \\__ \\ | '  \\ \n" +
@@ -89,7 +87,7 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     protected Path output;
 
     /**
-     * This Map will never contain anything, because these argument is not parsed correctly, but instead will go into remainingArgs field.
+     * This Map will never contain anything, because this argument is not parsed correctly, but instead will go into remainingArgs field.
      *
      * @see #remainingArgs
      */
@@ -283,6 +281,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
             return;
         }
 
+        prepareArgs(args);
+
         CommandLine cli = prepare(app);
 
         CommandLine.ParseResult parsed = cli.parseArgs(args);
@@ -320,6 +320,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException("Could not instantiate the application class", e);
         }
+
+        prepareArgs(args);
 
         CommandLine cli = prepare(app);
         AtomicReference<Exception> exc = new AtomicReference<>();
@@ -392,6 +394,18 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         app.prepareControler(controler);
 
         return controler;
+    }
+
+    /**
+     * Command argument needs to be at the correct position.
+     */
+    private static void prepareArgs(String[] args) {
+
+        // run needs to be at the last position
+        if (args.length > 0 && args[0].equals("run")) {
+            System.arraycopy(args, 1, args, 0, args.length -1);
+            args[args.length - 1] = "run";
+        }
     }
 
     /**
