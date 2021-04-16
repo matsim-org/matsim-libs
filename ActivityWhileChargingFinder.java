@@ -30,6 +30,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.Tuple;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -37,12 +38,14 @@ import java.util.stream.Collectors;
 
 class ActivityWhileChargingFinder {
 
-	private final Set<String> activityTypes;
-	private static final double MINIMUM_TIME = 10 * 60;
+	private final Collection<String> activityTypes;
+	private final double minimumActDuration;
+
 	private Logger log = Logger.getLogger(ActivityWhileChargingFinder.class);
 
-	ActivityWhileChargingFinder(Set<String> possibleWhileChargingStartActTypes){
+	ActivityWhileChargingFinder(Collection<String> possibleWhileChargingStartActTypes, double minimumActDuration){
 		this.activityTypes = possibleWhileChargingStartActTypes;
+		this.minimumActDuration = minimumActDuration;
 	}
 
 	/**
@@ -77,7 +80,7 @@ class ActivityWhileChargingFinder {
 			Leg nextEVLeg = getNextLegOfRoutingModeAfterActivity(plan.getPlanElements(), tuple.getSecond(), evRoutingMode);
 			Preconditions.checkNotNull(nextEVLeg, "should not happen");
 			double end = nextEVLeg.getDepartureTime().seconds();
-			if(end - begin >= MINIMUM_TIME) return tuple.getSecond();
+			if(end - begin >= minimumActDuration) return tuple.getSecond();
 		}
 		return null;
 	}

@@ -22,6 +22,8 @@ package org.matsim.urbanEV;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -31,14 +33,8 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
 	//TODO should we rename the entire package from UrbanEV to EVChargingPreplanning or something similar?
 	static final String GROUP_NAME = "urbanEV" ;
 
-	/**
-	 *
-	 * @param name
-	 * @param whileChargingActivityTypes - the activity types during which agents can charge their vehicle
-	 */
-	public UrbanEVConfigGroup(String name, Set<String> whileChargingActivityTypes) {
-		super(name);
-		this.whileChargingActivityTypes = whileChargingActivityTypes;
+	public UrbanEVConfigGroup() {
+		super(GROUP_NAME);
 	}
 
 	private static final String MAXIMUM_CHARGING_PROCEDURES = "maximumChargingProceduresPerAgent";
@@ -58,13 +54,13 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
 	/**
 	 * determines the minimum duration for activities to be determined suitable for charging the vehicle during the performance of the activity. In seconds.
 	 */
-	private double minWhileChargingActivityDuration_s = 20 * 3600;
+	private double minWhileChargingActivityDuration_s = 10 * 60;
 
 	private static final String WHILE_CHARGING_ACT_TYPES = "whileChargingActivityTypes";
 	/**
 	 * the activity types during which agents can charge their vehicle
 	 */
-	private Set<String> whileChargingActivityTypes;
+	private Set<String> whileChargingActivityTypes = new HashSet<>();
 
 	//-------------------------------------------------------------------------------------------
 
@@ -98,6 +94,7 @@ public class UrbanEVConfigGroup extends ReflectiveConfigGroup {
 		this.minWhileChargingActivityDuration_s = minWhileChargingActivityDuration_s;
 	}
 
+	//TODO Set return type are not suitable for XML configuration....
 //	@StringGetter(WHILE_CHARGING_ACT_TYPES)
 	public Set<String> getWhileChargingActivityTypes() {
 		return whileChargingActivityTypes;

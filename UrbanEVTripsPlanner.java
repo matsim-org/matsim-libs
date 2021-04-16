@@ -113,7 +113,6 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(UrbanEVTripsPlanner.class);
 
-
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
  		if(! (e.getQueueSimulation() instanceof QSim)){
@@ -146,6 +145,9 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	}
 
 	private void processPlans(Map<Plan, Set<Id<Vehicle>>> selectedEVPlans) {
+
+		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
+
 		for (Plan plan : selectedEVPlans.keySet()) {
 
 			//from here we deal with the modifiable plan (only!?)
@@ -153,7 +155,8 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 			Plan modifiablePlan = WithinDayAgentUtils.getModifiablePlan(mobsimagent);
 
 			for(Id<Vehicle> ev : selectedEVPlans.get(plan)){
-				int cnt = 3; //only replan cnt times per vehicle and person. otherwise, there might be a leg which is just too long and we end up in an infinity loop...
+				//only replan cnt times per vehicle and person. otherwise, there might be a leg which is just too long and we end up in an infinity loop...
+				int cnt = configGroup.getMaximumChargingProceduresPerAgent();
 
 				/*
 				 * i had all of this implemented without so many if-statements and without do-while-loop. However, i felt like when replanning takes place, we need to start
@@ -185,8 +188,10 @@ class UrbanEVTripsPlanner implements MobsimInitializedListener {
 	 * @return
 	 */
 	private Leg getLegWithCriticalSOC(Plan modifiablePlan, Id<Vehicle> ev, ElectricVehicleSpecification electricVehicleSpecification) {
+		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
+
 		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(electricVehicleSpecification, driveConsumptionFactory, auxConsumptionFactory, chargingPowerFactory);
-		double capacityThreshold = electricVehicleSpecification.getBatteryCapacity() * (0.2); //TODO randomize?
+		double capacityThreshold = electricVehicleSpecification.getBatteryCapacity() * (configGroup.getCriticalRelativeSOC()); //TODO randomize? Might also depend on the battery size!
 
 		Double chargingBegin = null;
 

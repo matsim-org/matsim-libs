@@ -23,7 +23,6 @@ package org.matsim.urbanEV;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
-import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargingModule;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
@@ -34,26 +33,28 @@ import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.fleet.ElectricFleets;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.EvStatsModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class UrbanEVModule extends AbstractModule {
 
-	private final ActivityWhileChargingFinder activityWhileChargingFinder;
+	@Inject
+	Config config;
 
 	public UrbanEVModule(){
-		this.activityWhileChargingFinder = null;
-	}
-
-	UrbanEVModule(ActivityWhileChargingFinder activityWhileChargingFinder) {
-		this.activityWhileChargingFinder = activityWhileChargingFinder;
 	}
 
 	@Override
 	public void install() {
+
+		UrbanEVConfigGroup configGroup = (UrbanEVConfigGroup) config.getModules().get(UrbanEVConfigGroup.GROUP_NAME);
+		if(configGroup == null) throw new IllegalArgumentException("no config group of type " + UrbanEVConfigGroup.GROUP_NAME + " was specified in the config");
+
 		//standard EV stuff except for ElectricFleetModule
 		install(new ChargingInfrastructureModule());
 		install(new ChargingModule());
@@ -97,9 +98,9 @@ public class UrbanEVModule extends AbstractModule {
 				addMobsimScopeEventHandlerBinding().to(UrbanVehicleChargingHandler.class);
 			}
 		});
-		//TODO find a better solution for this
-		bind(ActivityWhileChargingFinder.class).toInstance(
-				this.activityWhileChargingFinder == null ? new ActivityWhileChargingFinder(new HashSet<>(getConfig().planCalcScore().getActivityTypes())) : this.activityWhileChargingFinder);
+
+		Collection<String> whileChargingActTypes = configGroup.getWhileChargingActivityTypes().isEmpty() ? config.planCalcScore().getActivityTypes() : configGroup.getWhileChargingActivityTypes();
+		bind(ActivityWhileChargingFinder.class).toInstance(new ActivityWhileChargingFinder(whileChargingActTypes, configGroup.getMinWhileChargingActivityDuration_s()));
 	}
 
 
