@@ -6,13 +6,7 @@
 	<packaging>jar</packaging>
 	<version>0.10.1</version>
 	<name>MATSim Benchmark</name>
-	
-	<distributionManagement>
-        <repository>
-			<id>bintray</id>
-			<url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
-		</repository>
-		</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -68,6 +62,12 @@
 
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>matsim</id>
+			<url>https://repo.matsim.org/repository/matsim</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
