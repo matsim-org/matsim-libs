@@ -39,7 +39,7 @@ jobs:
 
       - name: Publish jars to matsim maven repo
         # fail at end to deploy as many jars as possible
-        run: mvn -pl -distribution deploy --batch-mode --fail-at-end -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests -Dmaven.resources.skip=true
+        run: mvn -pl -distribution deploy --batch-mode --fail-at-end -Dmaven.javadoc.skip -Dassembly.skipAssembly=true -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
         env:
           MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
