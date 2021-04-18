@@ -118,7 +118,7 @@ public final class EventsFileComparator {
 
 		Result retCode = comparator.retCode;
 		if (retCode == Result.FILES_ARE_EQUAL) {
-			log.info("Event files are semantic equivalent.");
+			log.info("Event files are semantically equivalent.");
 		} else {
 			log.warn("Event files differ.");
 		}
