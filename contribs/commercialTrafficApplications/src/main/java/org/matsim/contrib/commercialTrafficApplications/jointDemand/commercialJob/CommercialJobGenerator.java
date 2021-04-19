@@ -153,12 +153,12 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	}
 
 	/**
-	 * Jsprit creates tours that begins with the opening time of the carrier. In
-	 * this consequence the first leg of a tour reaches the customer to early.
-	 * Moreover it needs to be enforced, that a service does not departure too early,
-	 * which would cause services that starts to early. This methods adjust the
-	 * activity (service) endTimes and leg departure times to avoid to early start
-	 * of services. The firsttourTraveltimeBuffer tries to ensure that the carrier
+	 * Jsprit creates tours that begin with the opening time of the carrier. As a
+	 * consequence, the tour vehicle arrives may arrive too early at the first customer.
+	 * Moreover, we need to enforce that a service does not end too early (before the of it's TimeWindow),
+	 * otherwise following services would start too early.
+	 * This method adjusts the (service) activity endTimes and leg departure times to avoid too early starts
+	 * of the services. The firsttourTraveltimeBuffer tries to ensure that the carrier
 	 * departures early enough (leg travel time x firsttourTraveltimeBuffer) to
 	 * reach his first destination (service).
 	 * 
@@ -178,7 +178,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 				if(!currentActivity.getType().equals(FreightConstants.START))
 				{
 
-					// ExpactedArrivalTime from jsprit needs to be recalculated
+					// ExpectedArrivalTime from jsprit needs to be recalculated
 					// Recalculation is based on next leg departure time and current act service time
 					Leg prevLeg = (Leg) planElements.get(i-1);
 					Leg nextLeg = PopulationUtils.getNextLeg(plan, currentActivity);
@@ -189,8 +189,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
 						//End of plan is reached
 						if (nextLeg == null) {
-							// If next activity is the end activity, departure is allowed to start
-							// immediately
+							// If next activity is the end activity, departure is allowed to start immediately
 							prevAct.setEndTime(prevLeg.getDepartureTime().seconds());
 						} else {
 							// Update recent prevAct and prevLeg
@@ -228,7 +227,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 	}
 
 	/**
-	 * Creates just a simple copy of Jsprit tour and forms a MATSim plan
+	 * Creates just a simple copy of the ScheduledTour (from JSprit) and forms a MATSim plan
 	 * @param carrier
 	 * @param scheduledTour
 	 * @return
@@ -256,7 +255,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 				Route route = tourLeg.getRoute();
 				Assert.isTrue(tourLeg.getRoute() != null, "Missing route for carrier: " + carrier.getId().toString());
 
-				// Assign information to defaultLeg taken from tourLeg
+				// Assign information from tourLeg to defaultLeg
 				defaultLeg.setDepartureTime(tourLeg.getExpectedDepartureTime());
 				defaultLeg.setTravelTime(tourLeg.getExpectedTransportTime());
 				
