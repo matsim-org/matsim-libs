@@ -2,6 +2,7 @@ package org.matsim.application;
 
 import com.google.common.collect.Lists;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.application.commands.RunScenario;
 import org.matsim.application.commands.ShowGUI;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -62,7 +63,7 @@ import java.util.stream.Collectors;
         showDefaultValues = true,
         mixinStandardHelpOptions = true,
         abbreviateSynopsis = true,
-        subcommands = {ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
+        subcommands = {RunScenario.class, ShowGUI.class, CommandLine.HelpCommand.class, AutoComplete.GenerateCompletion.class}
 )
 public abstract class MATSimApplication implements Callable<Integer>, CommandLine.IDefaultValueProvider {
 
@@ -92,16 +93,16 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
      * @see #remainingArgs
      */
     @CommandLine.Option(names = {"-c:", "--config:"}, arity = "0..*", description = "Overwrite config values (e.g. --config:controler.runId=123)")
-    protected Map<String, String> configValues;
+    private Map<String, String> configValues;
 
     @CommandLine.Unmatched
-    protected List<String> remainingArgs;
+    private List<String> remainingArgs;
 
     /**
      * Path to the default scenario config, if applicable.
      */
     @Nullable
-    protected final String defaultScenario;
+    private final String defaultScenario;
 
     /**
      * Contains loaded config file.
@@ -201,10 +202,9 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
     /**
      * Preparation step for the config.
      *
-     * @param config initialized config
-     * @return prepared {@link Config}, or null if same as input
+     * @param config base config loaded from user specified location
+     * @return prepared {@link Config}
      */
-    @Nullable
     protected Config prepareConfig(Config config) {
         return config;
     }
@@ -429,11 +429,6 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         List<ConfigGroup> modules = Lists.newArrayList();
         modules.addAll(app.getConfigurableModules());
         modules.addAll(app.getCustomModules());
-
-        // App itself is set as run subcommand
-        cli.addSubcommand("run", app);
-        CommandLine.Model.CommandSpec spec = cli.getSubcommands().get("run").getCommandSpec();
-        spec.usageMessage(new CommandLine.Model.UsageMessageSpec().description("Run the scenario"));
 
         // setupConfig(cli, modules);
         return cli;
