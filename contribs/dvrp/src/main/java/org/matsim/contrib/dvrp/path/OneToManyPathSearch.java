@@ -35,11 +35,11 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-import ch.sbb.matsim.routing.graph.Graph;
-import ch.sbb.matsim.routing.graph.LeastCostPathTree;
+import org.matsim.core.router.speedy.SpeedyGraph;
+import org.matsim.core.router.speedy.LeastCostPathTree;
 
 public class OneToManyPathSearch {
-	public static OneToManyPathSearch createSearch(Graph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
+	public static OneToManyPathSearch createSearch(SpeedyGraph graph, IdMap<Node, Node> nodeMap, TravelTime travelTime,
 			TravelDisutility travelDisutility, boolean lazyPathCreation) {
 		return new OneToManyPathSearch(nodeMap, new LeastCostPathTree(graph, travelTime, travelDisutility),
 				lazyPathCreation);

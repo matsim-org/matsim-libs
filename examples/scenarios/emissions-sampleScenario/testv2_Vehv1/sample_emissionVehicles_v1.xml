@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
+	<vehicleType id="car_average">
+		<description>
+			BEGIN_EMISSIONSPASSENGER_CAR;average;average;averageEND_EMISSIONS
+		</description>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+	</vehicleType>
+	<vehicleType id="car_petrol">
+		<description>
+			BEGIN_EMISSIONSPASSENGER_CAR;petrol (4S);&gt;=2L;PC-P-Euro-1END_EMISSIONS
+		</description>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+	</vehicleType>
+	<vehicleType id="car_diesel">
+		<description>
+			BEGIN_EMISSIONSPASSENGER_CAR;diesel;&lt;1,4L;PC-D-Euro-3END_EMISSIONS
+		</description>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+	</vehicleType>
+	<vehicleType id="truck">
+		<description>
+			BEGIN_EMISSIONSHEAVY_GOODS_VEHICLE;average;average;averageEND_EMISSIONS
+		</description>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		
+		<accessTime secondsPerPerson="1.0"/>
+		<egressTime secondsPerPerson="1.0"/>
+		<doorOperation mode="serial"/>
+	</vehicleType>
+	<vehicle id="555928.1#7278" type="car_diesel"/>
+	<vehicle id="570902.2#10897" type="car_petrol"/>
+	<vehicle id="570902.2#14854" type="car_petrol"/>
+	<vehicle id="570902.2#2983" type="car_petrol"/>
+	<vehicle id="pv_car_10041_9162_1" type="car_average"/>
+	<vehicle id="pv_car_5315_9162_1" type="car_average"/>
+	<vehicle id="gv_4499" type="truck"/>
+	<vehicle id="gv_4500" type="truck"/>
+</vehicleDefinitions>
