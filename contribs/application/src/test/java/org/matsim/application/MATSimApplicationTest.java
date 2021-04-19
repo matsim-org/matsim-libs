@@ -54,7 +54,7 @@ public class MATSimApplicationTest {
 
         assertThat(input.resolve("persons.xml")).exists();
 
-        MATSimApplication.execute(TestScenario.class, "prepare", "trajectoryToPlans",
+        MATSimApplication.execute(TestScenario.class, "prepare", "trajectory-to-plans",
                 "--samples", "0.5", "0.1",
                 "--sample-size", "1.0",
                 "--name", "test",
