@@ -13,36 +13,37 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public interface MATSimAppCommand extends Callable<Integer> {
 
-    /**
-     * Run the command logic.
-     *
-     * @return return code, 0 - success. 1 - general failure, 2 - user/input error
-     */
-    @Override
-    Integer call() throws Exception;
+	/**
+	 * Run the command logic.
+	 *
+	 * @return return code, 0 - success. 1 - general failure, 2 - user/input error
+	 */
+	@Override
+	Integer call() throws Exception;
 
-    /**
-     * Execute the command with given arguments.
-     * @param args arguments passed to the command
-     * @implNote This method is for convenience and does not need to be overwritten
-     */
-    default void execute(String... args) {
-        CommandLine cli = new CommandLine(this);
-        AtomicReference<Exception> exc = new AtomicReference<>();
-        cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
-            exc.set(ex);
-            return 2;
-        });
+	/**
+	 * Execute the command with given arguments.
+	 *
+	 * @param args arguments passed to the command
+	 * @implNote This method is for convenience and does not need to be overwritten
+	 */
+	default void execute(String... args) {
+		CommandLine cli = new CommandLine(this);
+		AtomicReference<Exception> exc = new AtomicReference<>();
+		cli.setExecutionExceptionHandler((ex, commandLine, parseResult) -> {
+			exc.set(ex);
+			return 2;
+		});
 
-        int code = cli.execute(args);
+		int code = cli.execute(args);
 
-        if (code > 0) {
-            Exception e = exc.get();
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            else
-                throw new RuntimeException("Command exited with error", e);
+		if (code > 0) {
+			Exception e = exc.get();
+			if (e instanceof RuntimeException)
+				throw (RuntimeException) e;
+			else
+				throw new RuntimeException("Command exited with error", e);
 
-        }
-    }
+		}
+	}
 }

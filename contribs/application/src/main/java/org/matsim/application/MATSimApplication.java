@@ -504,7 +504,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         }
     }
 
-    @CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See help prepare)")
+    @CommandLine.Command(name = "prepare", description = "Contains all commands for preparing the scenario. (See help prepare)",
+            subcommands = CommandLine.HelpCommand.class)
     public static class PrepareCommand implements Callable<Integer> {
 
         @CommandLine.Spec
@@ -517,7 +518,8 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
         }
     }
 
-    @CommandLine.Command(name = "analysis", description = "Contains all commands for analysing the scenario. (See help analysis)")
+    @CommandLine.Command(name = "analysis", description = "Contains all commands for analysing the scenario. (See help analysis)",
+            subcommands = CommandLine.HelpCommand.class)
     public static class AnalysisCommand implements Callable<Integer> {
 
         @CommandLine.Spec
