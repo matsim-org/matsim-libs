@@ -154,6 +154,10 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
 
         double probability = computeAddingProbability(numOfMissingTrips, addingCondition);
         log.info("probability of adding trips is: {}", probability);
+
+        if (probability > 1)
+            log.warn("Probability is too high, there are not enough activities in the input too enhance them");
+
         log.info("adding missing trips..........{}", addedTrips);
         for (Person person : population.getPersons().values()) {
             if (addingCondition.test(person.getId())) {
@@ -236,7 +240,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                 }
             }
         }
-        log.info("adding missing trips..........{}..finished", addedTrips);
+        log.info("adding missing trips finished, added {} trips", addedTrips);
     }
 
     private Coord getShortDistanceCoordinate(Coord coord, double range) {
