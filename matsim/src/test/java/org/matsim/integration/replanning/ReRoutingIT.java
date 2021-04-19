@@ -48,7 +48,7 @@ public class ReRoutingIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private Scenario loadScenario() {
-		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		Config config = utils.loadConfig(utils.getClassInputDirectory() +"config.xml");
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
 		config.plans().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "plans_hwh_1pct.xml.gz").toString());
 		config.qsim().setTimeStepSize(10.0);
@@ -137,9 +137,9 @@ public class ReRoutingIT {
 
 	private final static Logger LOG = LogManager.getLogger(ReRoutingIT.class);
 	private void evaluate(String plansFilename) throws MalformedURLException {
-		Config config = utils.loadConfig(IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		Config config = utils.loadConfig(utils.getClassInputDirectory() + "config.xml");
 		config.network().setInputFile(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
-		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), plansFilename).toString());
+		config.plans().setInputFile(plansFilename);
 		Scenario referenceScenario = ScenarioUtils.loadScenario(config);
 
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").toURI().toURL().toString());
