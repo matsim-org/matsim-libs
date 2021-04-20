@@ -178,7 +178,7 @@ public class FirstReloadLSPMobsimTest {
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
+	        	builder.setDeliveryServiceTime(capacityDemand * 60 );
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }

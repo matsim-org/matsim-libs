@@ -23,7 +23,8 @@ public class ShipmentUtils{
 		private TimeWindow startTimeWindow;
 		private TimeWindow endTimeWindow;
 		private int capacityDemand;
-		private double serviceTime;
+		private double deliveryServiceTime;
+		private double pickupServiceTime;
 		private ArrayList<Requirement> requirements;
 		private ArrayList<UtilityFunction> utilityFunctions;
 		private ArrayList<LSPInfo> infos;
@@ -33,9 +34,9 @@ public class ShipmentUtils{
 		}
 
 		private LSPShipmentBuilder( Id<LSPShipment> id ){
-			this.requirements = new ArrayList<Requirement>();
-			this.utilityFunctions = new ArrayList<UtilityFunction>();
-			this.infos = new ArrayList<LSPInfo>();
+			this.requirements = new ArrayList<>();
+			this.utilityFunctions = new ArrayList<>();
+			this.infos = new ArrayList<>();
 			this.id = id;
 		}
 
@@ -64,8 +65,12 @@ public class ShipmentUtils{
 			return this;
 		}
 
-		public LSPShipmentBuilder setServiceTime( double serviceTime ){
-			this.serviceTime = serviceTime;
+		public LSPShipmentBuilder setDeliveryServiceTime( double serviceTime ){
+			this.deliveryServiceTime = serviceTime;
+			return this;
+		}
+		public LSPShipmentBuilder setPickupServiceTime( double serviceTime ){
+			this.pickupServiceTime = serviceTime;
 			return this;
 		}
 
@@ -114,8 +119,11 @@ public class ShipmentUtils{
 			return capacityDemand;
 		}
 
-		public double getServiceTime() {
-			return serviceTime;
+		public double getDeliveryServiceTime() {
+			return deliveryServiceTime;
+		}
+		public double getPickupServiceTime(){
+			return pickupServiceTime;
 		}
 
 		public ArrayList<Requirement> getRequirements() {

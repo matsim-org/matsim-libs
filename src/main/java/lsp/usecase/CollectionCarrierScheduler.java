@@ -101,10 +101,10 @@ import lsp.resources.LSPResourceScheduler;
 			
 	private CarrierService convertToCarrierService( ShipmentWithTime tuple ){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getFromLinkId());
-		builder.setServiceStartTimeWindow(tuple.getShipment().getStartTimeWindow());
-		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
-		builder.setServiceDuration(tuple.getShipment().getServiceDuration() );
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getFrom() );
+		builder.setServiceStartTimeWindow(tuple.getShipment().getPickupTimeWindow() );
+		builder.setCapacityDemand(tuple.getShipment().getSize() );
+		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime() );
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
@@ -172,7 +172,7 @@ import lsp.resources.LSPResourceScheduler;
 		Leg legBeforeService = (Leg) tour.getTourElements().get(serviceIndex-1);
 		double startTimeOfLoading = legBeforeService.getExpectedDepartureTime() + legBeforeService.getExpectedTransportTime();
 		builder.setStartTime(startTimeOfLoading);
-		builder.setEndTime(startTimeOfLoading + tuple.getShipment().getServiceDuration() );
+		builder.setEndTime(startTimeOfLoading + tuple.getShipment().getDeliveryServiceTime() );
 		builder.setCarrierId(carrier.getId());
 		builder.setLinkId(serviceActivity.getLocation());
 		builder.setCarrierService(serviceActivity.getService());

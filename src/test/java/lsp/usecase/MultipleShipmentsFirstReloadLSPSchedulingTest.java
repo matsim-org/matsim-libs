@@ -172,7 +172,7 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
+	        	builder.setDeliveryServiceTime(capacityDemand * 60 );
 	        	LSPShipment shipment = builder.build();
 	        	lsp.assignShipmentToLSP(shipment);
 	        }
@@ -254,9 +254,9 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			CarrierService service = entry.getKey();
 			LSPShipment shipment = entry.getValue().shipment;
 			LogisticsSolutionElement element = entry.getValue().element;
-			assertTrue(service.getLocationLinkId() == shipment.getFromLinkId());
-			assertTrue(service.getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(service.getServiceDuration() == shipment.getServiceDuration() );
+			assertTrue(service.getLocationLinkId() == shipment.getFrom() );
+			assertTrue(service.getCapacityDemand() == shipment.getSize() );
+			assertTrue(service.getServiceDuration() == shipment.getDeliveryServiceTime() );
 			boolean handledByReloadingPoint = false;
 			for(LogisticsSolutionElement clientElement : reloadEventHandler.getReloadingPoint().getClientElements()) {
 				if(clientElement == element) {
@@ -278,10 +278,10 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);
-			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
-			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
-			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
+			assertTrue(endHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
+			assertTrue(endHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
+			assertTrue(endHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertTrue(endHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
 			assertTrue(endHandler.getElement() == planElements.get(2).getSolutionElement());
 			assertTrue(endHandler.getElement() == lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
 			assertTrue(endHandler.getLspShipment() == shipment);
@@ -290,10 +290,10 @@ public class MultipleShipmentsFirstReloadLSPSchedulingTest {
 			
 			assertTrue(eventHandlers.get(1) instanceof CollectionServiceEndEventHandler);
 			CollectionServiceEndEventHandler serviceHandler = (CollectionServiceEndEventHandler) eventHandlers.get(1);
-			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFromLinkId());
-			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getCapacityDemand());
-			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getServiceDuration() );
-			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getStartTimeWindow());
+			assertTrue(serviceHandler.getCarrierService().getLocationLinkId() == shipment.getFrom() );
+			assertTrue(serviceHandler.getCarrierService().getCapacityDemand() == shipment.getSize() );
+			assertTrue(serviceHandler.getCarrierService().getServiceDuration() == shipment.getDeliveryServiceTime() );
+			assertTrue(serviceHandler.getCarrierService().getServiceStartTimeWindow() == shipment.getPickupTimeWindow() );
 			assertTrue(serviceHandler.getElement() == planElements.get(0).getSolutionElement());
 			assertTrue(serviceHandler.getElement() == lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements().iterator().next());
 			assertTrue(serviceHandler.getLspShipment() == shipment);

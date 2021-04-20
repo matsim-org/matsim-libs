@@ -112,7 +112,7 @@ import lsp.shipment.LSPShipment;
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
 			LogisticsSolutionElement firstElement = getFirstElement(solution);
 			for(LSPShipment shipment : solution.getShipments() ) {
-				firstElement.getIncomingShipments().addShipment(shipment.getStartTimeWindow().getStart(), shipment);
+				firstElement.getIncomingShipments().addShipment(shipment.getPickupTimeWindow().getStart(), shipment );
 			}	
 		}
 	}

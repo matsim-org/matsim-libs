@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.events.handler.EventHandler;
 
-import demand.UtilityFunction;
 import lsp.LogisticsSolution;
 import lsp.functions.LSPInfo;
 
@@ -20,7 +19,8 @@ import lsp.functions.LSPInfo;
 	private final TimeWindow startTimeWindow;
 	private final TimeWindow endTimeWindow;
 	private final int capacityDemand;
-	private final double serviceTime;
+	private final double deliveryServiceTime;
+	private final double pickupServiceTime;
 	private final ShipmentPlan schedule;
 	private final ShipmentPlan log;
 	private final ArrayList<EventHandler> eventHandlers;
@@ -36,7 +36,8 @@ import lsp.functions.LSPInfo;
 		this.startTimeWindow = builder.getStartTimeWindow();
 		this.endTimeWindow = builder.getEndTimeWindow();
 		this.capacityDemand = builder.getCapacityDemand();
-		this.serviceTime = builder.getServiceTime();
+		this.deliveryServiceTime = builder.getDeliveryServiceTime();
+		this.pickupServiceTime = builder.getPickupServiceTime();
 		this.schedule = new Schedule(this);
 		this.log = new Log(this);
 		this.eventHandlers = new ArrayList<>();
@@ -57,22 +58,22 @@ import lsp.functions.LSPInfo;
 	}
 
 	@Override
-	public Id<Link> getFromLinkId() {
+	public Id<Link> getFrom() {
 		return fromLinkId;
 	}
 
 	@Override
-	public Id<Link> getToLinkId() {
+	public Id<Link> getTo() {
 		return toLinkId;
 	}
 
 	@Override
-	public TimeWindow getStartTimeWindow() {
+	public TimeWindow getPickupTimeWindow() {
 		return startTimeWindow;
 	}
 
 	@Override
-	public TimeWindow getEndTimeWindow() {
+	public TimeWindow getDeliveryTimeWindow() {
 		return endTimeWindow;
 	}
 
@@ -87,13 +88,13 @@ import lsp.functions.LSPInfo;
 	}
 
 	@Override
-	public int getCapacityDemand() {
+	public int getSize() {
 		return capacityDemand;
 	}
 
 	@Override
-	public double getServiceDuration() {
-		return serviceTime;
+	public double getDeliveryServiceTime() {
+		return deliveryServiceTime;
 	}
 
 	@Override
@@ -122,6 +123,9 @@ import lsp.functions.LSPInfo;
 
 	@Override public Id<LogisticsSolution> getSolutionId() {
 		return solutionId;
+	}
+	@Override public double getPickupServiceTime(){
+		return pickupServiceTime;
 	}
 
 

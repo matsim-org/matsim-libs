@@ -69,9 +69,9 @@ import org.matsim.vehicles.VehicleType;
 
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
-			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCapacity().getOther().intValue() ){
+			if((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
+				load = load + tuple.getShipment().getSize();
 			}
 			else{
 				load=0;
@@ -79,7 +79,7 @@ import org.matsim.vehicles.VehicleType;
 				scheduledTours.addAll(plan.getScheduledTours());
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
+				load = load + tuple.getShipment().getSize();
 			}
 			
 		}
@@ -107,7 +107,7 @@ import org.matsim.vehicles.VehicleType;
 		double latestTupleTime = 0;
 
 		for ( ShipmentWithTime tuple : tuples){
-			totalLoadingTime = totalLoadingTime + tuple.getShipment().getServiceDuration();
+			totalLoadingTime = totalLoadingTime + tuple.getShipment().getDeliveryServiceTime();
 			if(tuple.getTime() > latestTupleTime){
 				latestTupleTime = tuple.getTime();
 			}
@@ -133,8 +133,8 @@ import org.matsim.vehicles.VehicleType;
 	private CarrierService convertToCarrierService( ShipmentWithTime tuple ){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
 		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, adapter.getEndLinkId());
-		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
-		builder.setServiceDuration(tuple.getShipment().getServiceDuration() );
+		builder.setCapacityDemand(tuple.getShipment().getSize() );
+		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime() );
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;

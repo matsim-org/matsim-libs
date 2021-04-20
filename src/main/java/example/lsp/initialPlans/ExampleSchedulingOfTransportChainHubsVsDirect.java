@@ -18,9 +18,12 @@ import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.*;
 
 /**	The LSP have to possibilities to send the goods from the first depot to the recipients:
@@ -320,7 +323,7 @@ import java.util.*;
 			builder.setEndTimeWindow(endTimeWindow);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 			builder.setStartTimeWindow(startTimeWindow);
-			builder.setServiceTime(capacityDemand * 60);
+			builder.setDeliveryServiceTime(capacityDemand * 60 );
 			LSPShipment shipment = builder.build();
 			shipmentList.add(shipment);
 		}
@@ -370,14 +373,23 @@ import java.util.*;
 
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
-		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
-			elementList.sort(new ShipmentPlanElementComparator());
-			System.out.println("Shipment: " + shipment.getId());
-			for(ShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());
+		try ( BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/schedules.txt" ) ){
+			for( LSPShipment shipment : lsp.getShipments() ){
+				ArrayList<ShipmentPlanElement> elementList = new ArrayList<>( shipment.getShipmentPlan().getPlanElements().values() );
+				elementList.sort( new ShipmentPlanElementComparator() );
+				final String str1 = "Shipment: " + shipment.getId();
+				System.out.println( str1 );
+				writer.write( str1 + "\n");
+				for( ShipmentPlanElement element : elementList ){
+					final String str2 = element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime();
+					System.out.println( str2 );
+					writer.write(str2);
+				}
+				System.out.println();
+				writer.write("\n");
 			}
-			System.out.println();
+		} catch( IOException e ){
+			e.printStackTrace();
 		}
 
 		log.info("Done.");

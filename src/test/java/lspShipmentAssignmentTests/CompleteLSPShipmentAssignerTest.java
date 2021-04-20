@@ -269,7 +269,7 @@ public class CompleteLSPShipmentAssignerTest {
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
+	        	builder.setDeliveryServiceTime(capacityDemand * 60 );
 	        	completeLSP.assignShipmentToLSP(builder.build());
 	        }	
 	}

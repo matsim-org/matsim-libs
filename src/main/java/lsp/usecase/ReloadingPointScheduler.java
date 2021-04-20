@@ -55,7 +55,7 @@ import lsp.shipment.ShipmentPlanElement;
 	private void updateSchedule( ShipmentWithTime tuple ){
 		ShipmentUtils.ScheduledShipmentHandleBuilder builder = ShipmentUtils.ScheduledShipmentHandleBuilder.newInstance();
 		builder.setStartTime(tuple.getTime());
-		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getCapacityDemand());
+		builder.setEndTime(tuple.getTime() + capacityNeedFixed + capacityNeedLinear * tuple.getShipment().getSize() );
 		builder.setResourceId(reloadingPoint.getId());
 		for(LogisticsSolutionElement element : reloadingPoint.getClientElements()){
 			if(element.getIncomingShipments().getShipments().contains(tuple)){

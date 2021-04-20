@@ -26,7 +26,7 @@ class LSPShipmentMaker {
 
 		for(int i = 0; i < 8; i++){
 			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
-			builder.setServiceTime(180);
+			builder.setDeliveryServiceTime(180 );
 			builder.setCapacityDemand(1);
 			TimeWindow startTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);
 			builder.setStartTimeWindow(startTimeWindow);
@@ -53,7 +53,7 @@ class LSPShipmentMaker {
 		}
 
 		for(LSPShipment shipment : shipments){
-			System.out.println(shipment.getFromLinkId() + " "+ shipment.getToLinkId());
+			System.out.println(shipment.getFrom() + " "+ shipment.getTo() );
 		}
 	}
 }

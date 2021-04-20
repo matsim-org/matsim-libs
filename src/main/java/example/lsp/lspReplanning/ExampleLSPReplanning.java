@@ -148,7 +148,7 @@ import lsp.shipment.LSPShipment;
 	        	builder.setEndTimeWindow(endTimeWindow);
 	        	TimeWindow startTimeWindow = TimeWindow.newInstance(0,(24*3600));
 	        	builder.setStartTimeWindow(startTimeWindow);
-	        	builder.setServiceTime(capacityDemand * 60);
+	        	builder.setDeliveryServiceTime(capacityDemand * 60 );
 	        	shipmentList.add(builder.build());
 		 } 	
 	    return shipmentList;

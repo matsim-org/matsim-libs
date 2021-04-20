@@ -74,10 +74,10 @@ import org.matsim.vehicles.VehicleType;
 		
 		for( ShipmentWithTime tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
-			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCapacity().getOther().intValue() ){
+			if((load + tuple.getShipment().getSize()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
-				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getServiceDuration();
+				load = load + tuple.getShipment().getSize();
+				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
 				availiabilityTimeOfLastShipment = tuple.getTime();
 			}
 			else{
@@ -88,8 +88,8 @@ import org.matsim.vehicles.VehicleType;
 				cumulatedLoadingTime = 0;
 				shipmentsInCurrentTour.clear();
 				shipmentsInCurrentTour.add(tuple);
-				load = load + tuple.getShipment().getCapacityDemand();
-				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getServiceDuration();
+				load = load + tuple.getShipment().getSize();
+				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getDeliveryServiceTime();
 				availiabilityTimeOfLastShipment = tuple.getTime();
 			}
 		}
@@ -108,10 +108,10 @@ import org.matsim.vehicles.VehicleType;
 		
 	private CarrierService convertToCarrierService( ShipmentWithTime tuple ){
 		Id<CarrierService> serviceId = Id.create(tuple.getShipment().getId().toString(), CarrierService.class);
-		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getToLinkId());
+		CarrierService.Builder builder = CarrierService.Builder.newInstance(serviceId, tuple.getShipment().getTo() );
 		//builder.setServiceStartTimeWindow(tuple.getShipment().getEndTimeWindow());
-		builder.setCapacityDemand(tuple.getShipment().getCapacityDemand());
-		builder.setServiceDuration(tuple.getShipment().getServiceDuration() );
+		builder.setCapacityDemand(tuple.getShipment().getSize() );
+		builder.setServiceDuration(tuple.getShipment().getDeliveryServiceTime() );
 		CarrierService service = builder.build();
 		pairs.add(new LSPCarrierPair(tuple, service));
 		return service;
