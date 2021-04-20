@@ -109,7 +109,7 @@ import lsp.resources.LSPResource;
 		String idString = loggedShipmentHandle.getResourceId() + "" + loggedShipmentHandle.getSolutionElement().getId() + "" + loggedShipmentHandle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().getPlanElements().put(loadId, loggedShipmentHandle);
+			lspShipment.getLog().addPlanElement(loadId, loggedShipmentHandle);
 		}	
 	}
 	
@@ -140,7 +140,7 @@ import lsp.resources.LSPResource;
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> loadId = Id.create(idString, ShipmentPlanElement.class);
 		if(!lspShipment.getLog().getPlanElements().containsKey(loadId)) {
-			lspShipment.getLog().getPlanElements().put(loadId, handle);
+			lspShipment.getLog().addPlanElement(loadId, handle);
 		}	
 	}
 

@@ -1,12 +1,10 @@
 package lsp.shipment;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
+
 import org.matsim.api.core.v01.Id;
 
-/*package-private*/ class Log implements ShipmentPlan {
+/*package-private*/ class ShipmentPlanImpl implements ShipmentPlan {
 
 	static class LogElementComparator implements Comparator<ShipmentPlanElement>{
 
@@ -35,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 	private final HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> logElements;
 	
 	
-	public Log(LSPShipment shipment){
+	ShipmentPlanImpl( LSPShipment shipment ){
 		this.shipment = shipment;
 		this.logElements = new HashMap<>();
 	}
@@ -50,13 +48,18 @@ import org.matsim.api.core.v01.Id;
 	}
 
 	@Override
-	public  HashMap<Id<ShipmentPlanElement> , ShipmentPlanElement> getPlanElements() {
-		return logElements;
+	public Map<Id<ShipmentPlanElement>, ShipmentPlanElement> getPlanElements() {
+		return Collections.unmodifiableMap( logElements );
 	}
 
 	@Override
 	public ShipmentPlanElement getMostRecentEntry() {
-		ArrayList<ShipmentPlanElement> logList = new ArrayList<ShipmentPlanElement>(logElements.values());
+
+		// there is no method to remove entries.  in consequence, the only way to change the result of this method is to "add" additional material into the plan.  Possibly,
+		// the method here is indeed there to find the plan element that was added most recently, to figure out how the next one can be added.  However, this then
+		// should be sorted by sequence of addition, not by timing.  ???   kai/kai, apr'21
+
+		ArrayList<ShipmentPlanElement> logList = new ArrayList<>( logElements.values() );
 		Collections.sort(logList, new LogElementComparator() );
 		Collections.reverse(logList);
 		return logList.get(0);
