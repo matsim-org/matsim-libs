@@ -1,4 +1,4 @@
-package org.matsim.application.prepare;
+package org.matsim.application.prepare.population;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
-import org.matsim.core.router.RoutingModeMainModeIdentifier;
 
 import com.google.common.collect.Lists;
 
@@ -36,6 +35,9 @@ public class RemoveRoutesFromPlans implements Callable<Integer> {
 
     @CommandLine.Option(names = "--keep-selected", description = "Keep only the selected plan.", defaultValue = "false")
     private boolean keepOnlySelected;
+
+	@CommandLine.Option(names = "--clean-activities", description = "Remove link and facility from activities", defaultValue = "false")
+    private boolean cleanActivities;
 
     @CommandLine.Option(names = "--output", description = "Output file name")
     private Path output;
@@ -75,9 +77,12 @@ public class RemoveRoutesFromPlans implements Callable<Integer> {
 					if (el instanceof Leg) {
 						((Leg) el).setRoute(null);
 					}
-					if (el instanceof Activity) {
-						((Activity) el).setLinkId(null);
-						((Activity) el).setFacilityId(null);
+
+					if (cleanActivities) {
+						if (el instanceof Activity) {
+							((Activity) el).setLinkId(null);
+							((Activity) el).setFacilityId(null);
+						}
 					}
 				}
 			}

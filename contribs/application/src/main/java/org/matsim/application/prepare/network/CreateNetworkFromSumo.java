@@ -1,4 +1,4 @@
-package org.matsim.application.prepare;
+package org.matsim.application.prepare.network;
 
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
-import java.util.concurrent.Callable;
 
 @CommandLine.Command(
 		name = "network-from-sumo",

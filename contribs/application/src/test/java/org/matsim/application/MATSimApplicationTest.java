@@ -3,9 +3,9 @@ package org.matsim.application;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.application.prepare.GenerateShortDistanceTrips;
-import org.matsim.application.prepare.MergePopulations;
-import org.matsim.application.prepare.TrajectoryToPlans;
+import org.matsim.application.prepare.population.GenerateShortDistanceTrips;
+import org.matsim.application.prepare.population.MergePopulations;
+import org.matsim.application.prepare.population.TrajectoryToPlans;
 import org.matsim.application.prepare.freight.ExtractRelevantFreightTrips;
 import org.matsim.application.prepare.freight.GenerateGermanWideFreightTrips;
 import org.matsim.core.config.Config;
@@ -13,7 +13,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
