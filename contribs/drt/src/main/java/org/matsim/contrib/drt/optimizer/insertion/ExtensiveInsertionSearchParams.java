@@ -21,7 +21,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -30,12 +30,12 @@ public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
 	public static final String SET_NAME = "ExtensiveInsertionSearch";
 
 	public static final String NEAREST_INSERTIONS_AT_END_LIMIT = "nearestInsertionsAtEndLimit";
-	@Positive
-	private int nearestInsertionsAtEndLimit = 40;
+	@PositiveOrZero
+	private int nearestInsertionsAtEndLimit = 10;
 
 	public static final String ADMISSIBLE_BEELINE_SPEED_FACTOR = "admissibleBeelineSpeedFactor";
 	@DecimalMin("1.0")
-	private double admissibleBeelineSpeedFactor = 1.5;
+	private double admissibleBeelineSpeedFactor = 1.0;
 
 	public ExtensiveInsertionSearchParams() {
 		super(SET_NAME);
@@ -47,8 +47,9 @@ public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
 	}
 
 	@StringSetter(NEAREST_INSERTIONS_AT_END_LIMIT)
-	public void setNearestInsertionsAtEndLimit(int nearestInsertionsAtEndLimit) {
+	public ExtensiveInsertionSearchParams setNearestInsertionsAtEndLimit(int nearestInsertionsAtEndLimit) {
 		this.nearestInsertionsAtEndLimit = nearestInsertionsAtEndLimit;
+		return this;
 	}
 
 	@StringGetter(ADMISSIBLE_BEELINE_SPEED_FACTOR)
@@ -57,7 +58,8 @@ public class ExtensiveInsertionSearchParams extends DrtInsertionSearchParams {
 	}
 
 	@StringSetter(ADMISSIBLE_BEELINE_SPEED_FACTOR)
-	public void setAdmissibleBeelineSpeedFactor(double admissibleBeelineSpeedFactor) {
+	public ExtensiveInsertionSearchParams setAdmissibleBeelineSpeedFactor(double admissibleBeelineSpeedFactor) {
 		this.admissibleBeelineSpeedFactor = admissibleBeelineSpeedFactor;
+		return this;
 	}
 }

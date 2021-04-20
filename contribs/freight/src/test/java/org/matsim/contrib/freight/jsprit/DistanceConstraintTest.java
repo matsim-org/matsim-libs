@@ -120,7 +120,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV1, 25);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -199,7 +199,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 		
 		
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
@@ -283,7 +283,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV3, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -378,7 +378,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV4, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
@@ -461,7 +461,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV5, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		//We need two tours, due to reloading both shipments must be transported one after the other
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
@@ -540,7 +540,7 @@ public class DistanceConstraintTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV5, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 
 		//We need two tours, due to reloading both shipments must be transported one after the other

@@ -21,21 +21,16 @@ package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
- *
  */
-class HbefaColdEmissionFactor {
+class HbefaColdEmissionFactor extends HbefaEmissionFactor {
 	// yy not sure if it really makes sense to have an object for this.  But at least it should be immutable
 	// (set from constructor). Going one step in that direction by introducing a corresponding constructor.
 	// kai, jul'18
 
-	private double coldEmissionFactor;
+	// Creating this object hierarchy here, to keep refactoring to a minimum. The above comment is still true
+	// janek. dec'20
 
-	/*package-private*/ HbefaColdEmissionFactor(double coldEmissionFactor){
-		this.coldEmissionFactor = coldEmissionFactor ;
+	/*package-private*/ HbefaColdEmissionFactor(double coldEmissionFactor) {
+		super(coldEmissionFactor);
 	}
-	
-	public double getColdEmissionFactor() {
-		return coldEmissionFactor;
-	}
-	
 }

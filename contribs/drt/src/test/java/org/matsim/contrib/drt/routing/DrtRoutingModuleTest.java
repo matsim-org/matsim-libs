@@ -79,12 +79,13 @@ public class DrtRoutingModuleTest {
 		drtCfg.setMode(drtMode);
 		drtCfg.setMaxTravelTimeAlpha(1.5);
 		drtCfg.setMaxTravelTimeBeta(5 * 60);
+		drtCfg.setMaxWaitTime(5 * 60);
 
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
 				.getFacilities()
 				.values()
 				.stream()
-				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.map(DrtStopFacilityImpl::createFromFacility)
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),

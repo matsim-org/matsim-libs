@@ -62,7 +62,7 @@ public final class RunChessboard {
             prepareScenario() ;
         }
 
-        Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+        Carriers carriers = FreightUtils.addOrGetCarriers(scenario );
         CarrierVehicleTypes types = FreightUtils.getCarrierVehicleTypes(scenario);
 
         Controler controler = new Controler(scenario);

@@ -111,7 +111,7 @@ final class Grid {
 		}
 		
 		setActivityCoord2NearestReceiverPointId();
-		
+
 		// delete unnecessary information
 		this.consideredActivityCoordsForReceiverPointGrid.clear();
 		this.consideredActivityCoordsForSpatialFunctionality.clear();
@@ -157,6 +157,22 @@ final class Grid {
 			readReceiverPoints(gridCSVFile, ct);
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		for (NoiseReceiverPoint nrp : receiverPoints.values()) {
+			final Coord coord = nrp.getCoord();
+			if (coord.getX() < xCoordMin) {
+				xCoordMin = coord.getX();
+			}
+			if (coord.getX() > xCoordMax) {
+				xCoordMax = coord.getX();
+			}
+			if (coord.getY() < yCoordMin) {
+				yCoordMin = coord.getY();
+			}
+			if (coord.getY() > yCoordMax) {
+				yCoordMax = coord.getY();
+			}
 		}
 		
 		log.info("Total number of receiver points: " + receiverPoints.size());

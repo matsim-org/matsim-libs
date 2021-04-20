@@ -1,11 +1,49 @@
 pull_request_rules:
   - name: automatic merge on CI success and review
     conditions:
-      - status-success=continuous-integration/travis-ci/push
-#      - status-success=Jenkins@VSP
+# all GitHub Actions builds must be successful
+      - status-success=build (matsim)
+      - status-success=build (contribs/vsp)
+      - status-success=build (contribs/common)
+      - status-success=build (contribs/taxi)
+      - status-success=build (contribs/minibus)
+      - status-success=build (contribs/signals)
+      - status-success=build (contribs/bicycle)
+      - status-success=build (contribs/cadytsIntegration)
+      - status-success=build (contribs/drt)
+      - status-success=build (contribs/discrete_mode_choice)
+      - status-success=build (contribs/carsharing)
+      - status-success=build (contribs/commercialTrafficApplications)
+      - status-success=build (contribs/av)
+      - status-success=build (contribs/locationchoice)
+      - status-success=build (contribs/ev)
+      - status-success=build (contribs/dvrp)
+      - status-success=build (contribs/emissions)
+      - status-success=build (contribs/decongestion)
+      - status-success=build (contribs/noise)
+      - status-success=build (contribs/accidents)
+      - status-success=build (contribs/freight)
+      - status-success=build (contribs/parking)
+      - status-success=build (contribs/matrixbasedptrouter)
+      - status-success=build (contribs/accessibility)
+      - status-success=build (contribs/integration)
+      - status-success=build (contribs/multimodal)
+      - status-success=build (contribs/protobuf)
+      - status-success=build (contribs/socnetsim)
+      - status-success=build (contribs/sumo)
+      - status-success=build (contribs/pseudosimulation)
+      - status-success=build (contribs/roadpricing)
+      - status-success=build (contribs/analysis)
+      - status-success=build (contribs/eventsBasedPTRouter)
+      - status-success=build (contribs/hybridsim)
+      - status-success=build (contribs/otfvis)
+      - status-success=build (contribs/osm)
+      - status-success=build (contribs/sbb-extensions)
       - "#approved-reviews-by>=0"
       - label=automerge
-#      - status-success=continuous-integration/travis-ci/pr
+    #      - status-success=Jenkins@VSP
+    #      - status-success=continuous-integration/travis-ci/push
+    #      - status-success=continuous-integration/travis-ci/pr
     actions:
       merge:
         method: merge

@@ -34,11 +34,11 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
  * @author michalm
  */
 public class BestInsertionFinder<D> {
-	private static class InsertionWithCost<D> {
-		private final InsertionWithDetourData<D> insertionWithDetourData;
-		private final double cost;
+	static class InsertionWithCost<D> {
+		final InsertionWithDetourData<D> insertionWithDetourData;
+		final double cost;
 
-		private InsertionWithCost(InsertionWithDetourData<D> insertionWithDetourData, double cost) {
+		InsertionWithCost(InsertionWithDetourData<D> insertionWithDetourData, double cost) {
 			this.insertionWithDetourData = insertionWithDetourData;
 			this.cost = cost;
 		}
@@ -48,10 +48,13 @@ public class BestInsertionFinder<D> {
 			insertion -> insertion.vehicleEntry.vehicle.getId()).thenComparingInt(insertion -> insertion.pickup.index)
 			.thenComparingInt(insertion -> insertion.dropoff.index);
 
-	private final Comparator<InsertionWithCost<D>> comparator = Comparator.<InsertionWithCost<D>>comparingDouble(
-			insertionWithCost -> insertionWithCost.cost).thenComparing(
-			insertion -> insertion.insertionWithDetourData.getInsertion(), INSERTION_COMPARATOR);
+	static <D> Comparator<InsertionWithCost<D>> createInsertionWithCostComparator() {
+		return Comparator.<InsertionWithCost<D>>comparingDouble(
+				insertionWithCost -> insertionWithCost.cost).thenComparing(
+				insertion -> insertion.insertionWithDetourData.getInsertion(), INSERTION_COMPARATOR);
+	}
 
+	private final Comparator<InsertionWithCost<D>> comparator = createInsertionWithCostComparator();
 	private final InsertionCostCalculator<D> costCalculator;
 
 	BestInsertionFinder(InsertionCostCalculator<D> costCalculator) {

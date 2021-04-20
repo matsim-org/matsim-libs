@@ -62,7 +62,8 @@ public class Depots {
 				null /* already at a depot*/ :
 				links.stream()
 						.min(Comparator.comparing(
-								l -> DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord())))
+								l -> DistanceUtils.calculateSquaredDistance(currentLink.getToNode().getCoord(),
+										l.getFromNode().getCoord())))
 						.get();
 	}
 }

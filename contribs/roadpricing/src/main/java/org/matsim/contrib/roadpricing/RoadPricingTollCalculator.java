@@ -21,6 +21,7 @@
 package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
+import java.util.stream.Collector;
 
 import javax.inject.Inject;
 
@@ -54,19 +55,29 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 	Logger log = Logger.getLogger( RoadPricingTollCalculator.class ) ;
 
-	static class AgentTollInfo {
+
+	/**
+	 * Much of this is no longer needed since we now throw money events immediately when links are left.  It is, however, still
+	 * needed for area toll, and for the specific implementation of cordon toll here. kai, jan'21
+	 */
+	private static class AgentTollInfo {
 		public double toll = 0.0;
 		boolean insideCordonArea = true;
 	}
 
-	final RoadPricingScheme scheme;
-	final TreeMap<Id<Person>, AgentTollInfo> agents = new TreeMap<>();
+	private final RoadPricingScheme scheme;
+
+	/**
+	 * Much of this is no longer needed since we now throw money events immediately when links are left.  It is, however, still
+	 * needed for area toll, and for the specific implementation of cordon toll here. kai, jan'21
+	 */
+	private final TreeMap<Id<Person>, AgentTollInfo> agents = new TreeMap<>();
+
 	private final Network network;
 
 	private final TollBehaviourI handler;
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
+	private final Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-    @Inject
 	RoadPricingTollCalculator(final Network network, final RoadPricingScheme scheme, EventsManager events ) {
 		super();
 		events.addHandler(this);
@@ -81,10 +92,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			log.warn("area toll does not work if you have different toll amounts on different " +
 					"links.  Make sure you get what you want.  kai, mar'12");
 		} else if (RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType())) {
-			this.handler = new CordonTollBehaviour(events);
-			log.info("just instantiated CordonTollBehavior") ;
-			log.warn("cordon toll only charges at transition from untolled to tolled. " +
-					"Make sure this is what you want. kai, mar'12") ;
+			throw new RuntimeException( "use LINK toll behavior to implement cording pricing (just pay on links that traverse the cordon)" );
 		} else if (RoadPricingScheme.TOLL_TYPE_LINK.equals(scheme.getType())) {
 			this.handler = new LinkTollBehaviour(events);
 			log.info("just instantiated LinkTollBehavior") ;
@@ -116,18 +124,18 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 		}
 	}
 
-	/**
-	 * Sends {@link PersonMoneyEvent}s for all agents that must pay a toll.
-	 * This method should usually be called at the end before of an iteration.
-	 *
-	 * <strong>Important note: </strong>Do not call this method twice without
-	 * calling {@link #reset(int)} in between. Otherwise modules listening to
-	 * AgentMoneyEvents will hear them twice, i.e. the toll-disutility
-	 * may be added twice to the agents' score!
-	 *
-	 * @param time the current time the generated events are associated with
-	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
-	 */
+//	/**
+//	 * Sends {@link PersonMoneyEvent}s for all agents that must pay a toll.
+//	 * This method should usually be called at the end before of an iteration.
+//	 *
+//	 * <strong>Important note: </strong>Do not call this method twice without
+//	 * calling {@link #reset(int)} in between. Otherwise modules listening to
+//	 * AgentMoneyEvents will hear them twice, i.e. the toll-disutility
+//	 * may be added twice to the agents' score!
+//	 *
+//	 * @param time the current time the generated events are associated with
+//	 * @param events the {@link EventsManager} collection, the generated events are sent to for processing
+//	 */
 //	public void sendMoneyEvents(final double time, final EventsManager events) {
 //		// public is currently needed. kai, sep'13
 //
@@ -143,27 +151,25 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	}
 
 
-	/**
-	 * Returns the toll the specified agent has paid in the course of the
-	 * simulation so far.
-	 *
-	 * @param agentId
-	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
-	 */
-	double getAgentToll(final Id<Person> agentId) {
-		AgentTollInfo info = this.agents.get(agentId);
-		if (info == null) {
-			return 0.0;
-		}
-		return info.toll;
-	}
+//	/**
+//	 * Returns the toll the specified agent has paid in the course of the
+//	 * simulation so far.
+//	 *
+//	 * @param agentId
+//	 * @return The toll paid by the specified agent, 0.0 if no toll was paid.
+//	 */
+//	double getAgentToll(final Id<Person> agentId) {
+//		AgentTollInfo info = this.agents.get(agentId);
+//		if (info == null) {
+//			return 0.0;
+//		}
+//		return info.toll;
+//	}
 
 	/**
 	 * @return The toll paid by all the agents.
 	 */
-	public double getAllAgentsToll() {
-		// public is currently needed. kai, sep'13
-
+	double getAllAgentsToll() {
 		double tolls = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			tolls += (ai == null) ? 0.0 : ai.toll;
@@ -174,9 +180,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	/**
 	 * @return The Number of all the Drawees.
 	 */
-	public int getDraweesNr() {
-		// public is currently needed. kai, sep'13
-
+	int getDraweesNr() {
 		int dwCnt = 0;
 		for (AgentTollInfo ai : this.agents.values()) {
 			if ((ai != null) && (ai.toll > 0.0)) {
@@ -190,7 +194,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * A simple interface to implement different toll schemes.
 	 */
 	private interface TollBehaviourI {
-		public void handleEvent(LinkEnterEvent event, Link link );
+		void handleEvent( LinkEnterEvent event, Link link );
 	}
 
 	/**
@@ -199,70 +203,47 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * agent does not have to pay the toll for a link if it starts on the link,
 	 * as it may have paid already when arriving on the link.
 	 */
-	class DistanceTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class DistanceTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
 		public DistanceTollBehaviour(EventsManager events) {
 			this.events = events;
 		}
-
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(),
-					event.getTime(), driverId, event.getVehicleId());
+			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId());
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					/* The agent is not yet "registered". */
-					
-					/* Generate a "registration object. */
-					info = new AgentTollInfo();
-					
-					/* Register it. */
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
-				info.toll += newToll;
 				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
 
+				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
+				info.toll += newToll;
 			}
 		}
 	}
 
 	
-	class LinkTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class LinkTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
-		public LinkTollBehaviour(EventsManager events) {
+		private LinkTollBehaviour(EventsManager events) {
 			this.events = events;
 
 		}
-
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
-
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			
 			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
-
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					/* The agent is not yet "registered" */
-
-					/* Generate a "registration object" */
-					info = new AgentTollInfo();
-
-					/* Register it. */
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
-				info.toll += cost.amount;
 				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+
+				AgentTollInfo info = RoadPricingTollCalculator.this.agents.computeIfAbsent( driverId, (key) -> new AgentTollInfo() );
+				info.toll += cost.amount;
 			}
 		}
 	}
@@ -277,12 +258,12 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 	 * 			 fee.  kai, mar'12
 	 * </ul> 
 	 */
-	class AreaTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
+	private class AreaTollBehaviour implements TollBehaviourI {
+		private final EventsManager events;
 		/**
 		 * @param events The EventsManager to send money events
 		 */
-		public AreaTollBehaviour(EventsManager events) {
+		private AreaTollBehaviour(EventsManager events) {
 			this.events = events;
 		}
 
@@ -303,72 +284,10 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 					/* The toll amount comes from the current link, but should 
 					 * be the same for all links. */
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
+
 					info.toll = cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 				}
-			}
-		}
-	}
-
-	/**
-	 * Handles the calculation of the cordon toll. An agent has only to pay if he
-	 * crosses the cordon from the outside to the inside.
-	 */
-	class CordonTollBehaviour implements TollBehaviourI {
-		private EventsManager events;
-		/**
-		 * @param events The EventsManager to send money events
-		 */
-		public CordonTollBehaviour(EventsManager events) {
-			this.events = events;
-		}
-
-		@Override
-		public void handleEvent(final LinkEnterEvent event, final Link link) {
-			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			Cost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
-			if (cost != null) {
-				// this is a link inside the toll area.
-				// [[I guess this assumes that all links inside the cordon are listed in the toll scheme, similar to an area
-				// toll.  Conventionally, one would not do it in this way, but one would just name those links where
-				// the cordon toll is charged.  kai, mar'12]]
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					// (the agent is not yet "registered")
-					// [[yyyy this would refer to any toll, so if we have two cordons, it does not work.  kai, mar'12]]
-
-					// generate a "registration object":
-					info = new AgentTollInfo();
-
-					// register it:
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-
-					// we start in the area, do not toll:
-					info.toll = 0.0;
-
-					// info.insideCordonArea is implicitly initialized with `true'. kai, mar'12
-				} else if (!info.insideCordonArea) {
-					// (info is != null, and insideCordonArea is false)
-					// agent was outside before, now inside the toll area --> agent has to pay
-					info.insideCordonArea = true;
-					info.toll += cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
-				}
-				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
-			} else {
-				// this is a link outside the toll area; just need to memorize that the agent is outside the toll area.
-				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
-				if (info == null) {
-					// (the agent is not yet "registered")
-
-					// generate a "registration object":
-					info = new AgentTollInfo();
-
-					// register it:
-					RoadPricingTollCalculator.this.agents.put(driverId, info);
-				}
-				// memorize that agent is outside toll area:
-				info.insideCordonArea = false;
 			}
 		}
 	}

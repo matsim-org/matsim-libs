@@ -4,13 +4,8 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor.Builder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -51,6 +46,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  * Most of these tests were copied from org.matsim.pt.router.TransitRouterImplTest
  * and only minimally adapted to make them run with SwissRailRaptor.
@@ -60,9 +63,8 @@ import org.matsim.testcases.MatsimTestUtils;
 public class SwissRailRaptorTest {
 
     private SwissRailRaptor createTransitRouter(TransitSchedule schedule, Config config, Network network) {
-        SwissRailRaptorData data = SwissRailRaptorData.create(schedule, RaptorUtils.createStaticConfig(config), network);
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(config), new LeastCostRaptorRouteSelector(), stopFinder);
+        SwissRailRaptorData data = SwissRailRaptorData.create(schedule, null, RaptorUtils.createStaticConfig(config), network, null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, config).build();
         return raptor;
     }
 
@@ -89,7 +91,7 @@ public class SwissRailRaptorTest {
         double distance = 0.0;
         for (Leg leg : legs) {
             System.out.println(leg+" "+leg.getRoute().getDistance());
-			actualTravelTime += leg.getTravelTime().seconds();
+            actualTravelTime += leg.getTravelTime().seconds();
             distance += leg.getRoute().getDistance();
         }
         double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
@@ -818,6 +820,39 @@ public class SwissRailRaptorTest {
 
             Assert.assertEquals(expectedCost, route1.getTotalCosts(), 1e-7);
         }
+    }
+
+    @Test
+    public void testCustomTransferCostCalculator() {
+        TransferFixture f = new TransferFixture(60.0);
+
+        int[] transferCount = new int[] { 0 };
+
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.schedule, null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptor router = new Builder(data, f.config).with(new RaptorTransferCostCalculator() {
+            @Override
+            public double calcTransferCost(Supplier<Transfer> transfer, RaptorParameters raptorParams, int totalTravelTime, int totalTransferCount, double existingTransferCosts, double now) {
+                transferCount[0]++;
+                Transfer t = transfer.get();
+
+                assertEquals(f.stop1, t.getFromStop());
+                assertEquals(f.stop2, t.getToStop());
+                assertEquals(Id.create("0to1", TransitLine.class), t.getFromTransitLine().getId());
+                assertEquals(Id.create("2to3", TransitLine.class), t.getToTransitLine().getId());
+                assertEquals(Id.create("0to1", TransitRoute.class), t.getFromTransitRoute().getId());
+                assertEquals(Id.create("2to3", TransitRoute.class), t.getToTransitRoute().getId());
+
+                return 0.5;
+            }
+        }).build();
+
+        Coord fromCoord = f.fromFacility.getCoord();
+        Coord toCoord = f.toFacility.getCoord();
+        List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
+        for (Leg leg : legs) {
+            System.out.println(leg);
+        }
+        Assert.assertTrue("TransferCost function must have been called at least once.", transferCount[0] > 0);
     }
 
     private Config prepareConfig(double transferFixedCost, double transferRelativeCostFactor) {

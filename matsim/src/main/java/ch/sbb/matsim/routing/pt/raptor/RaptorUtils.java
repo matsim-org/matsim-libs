@@ -52,6 +52,7 @@ public final class RaptorUtils {
                 staticConfig.addModeMappingForPassengers(mapping.getRouteMode(), mapping.getPassengerMode());
             }
         }
+        staticConfig.setUseCapacityConstraints(srrConfig.isUseCapacityConstraints());
 
         return staticConfig;
     }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+
+<!--config so that there is a context (i.e. a base path name).  kai, apr'21-->
+
+<config>
+
+
+
+</config>

@@ -42,7 +42,9 @@ public final class NoiseComputationModule extends AbstractModule {
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
 		this.bind(NoiseContext.class).to(NoiseContextImpl.class).in( Singleton.class );
+		this.bind(BarrierContext.class).in(Singleton.class);
 		this.bind(ShieldingContext.class).in(Singleton.class);
+		this.bind(ReflectionContext.class).in(Singleton.class);
 
 		switch (noiseParameters.getNoiseComputationMethod()) {
 			case RLS90:
@@ -62,6 +64,9 @@ public final class NoiseComputationModule extends AbstractModule {
 				for(RLS19VehicleType type: RLS19VehicleType.values()) {
 					noiseVehicleTypeMultibinder.addBinding().toInstance(type);
 				}
+				this.bind(RoadSurfaceContext.class).in(Singleton.class);
+				this.bind(IntersectionContext.class).in(Singleton.class);
+
 				break;
 			default:
 				throw new IllegalStateException("Unrecognized noise computation method: " + noiseParameters.getNoiseComputationMethod());

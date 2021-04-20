@@ -38,9 +38,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.MemoryObserver;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -87,14 +90,16 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	}
 
 	private void setRelevantLinkInfo() {
+		MemoryObserver.start(60);
 		Counter cnt = new Counter("set relevant link-info # ");
 		final NoiseConfigGroup noiseParams = noiseContext.getNoiseParams();
 		for(NoiseReceiverPoint nrp: noiseContext.getGrid().getReceiverPoints().values()) {
 			if(!nrp.isInitialized()) {
 				// get the zone grid cell around the receiver point
 				Set<Id<Link>> potentialLinks = noiseContext.getPotentialLinks(nrp);
+				immissionModule.setCurrentRp(nrp);
 
-				// go through these potential relevant link Ids
+					// go through these potential relevant link Ids
 				Set<Id<Link>> relevantLinkIds = ConcurrentHashMap.newKeySet();
 				potentialLinks.parallelStream().forEach(linkId -> {
 					if (!(relevantLinkIds.contains(linkId))) {
@@ -114,6 +119,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 			cnt.incCounter();
 		}
 		cnt.printCounter();
+		MemoryObserver.stop();
 	}
 
 
@@ -156,6 +162,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		if (printLog) {
 			log.info("##############################################");
 		}
+		MemoryObserver.printMemory();
 
 		// Remove activities that were completed in the previous time interval.
 		updateActivityInformation();
@@ -291,17 +298,14 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				this.noiseContext.getLinkId2vehicleId2lastEnterTime().put(event.getLinkId(), vehicleId2enterTime);
 			}
 
-			if (this.noiseContext.getNoiseLinks().get(event.getLinkId()) != null) {
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
-
-			} else {
-
-				NoiseLink noiseLink = new NoiseLink(event.getLinkId());
-				List<Id<Vehicle>> enteringVehicleIds = new ArrayList<>();
-				enteringVehicleIds.add(event.getVehicleId());
-				noiseLink.setEnteringVehicleIds(enteringVehicleIds);
-
+			NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(event.getLinkId());
+			if (noiseLink == null) {
+				noiseLink = new NoiseLink(event.getLinkId());
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
+			}
+
+			if(noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+				noiseLink.addEnteringVehicleId(event.getVehicleId());
 			}
 
             NoiseVehicleType noiseVehicleType = vehicleIdentifier.identifyVehicle(event.getVehicleId());

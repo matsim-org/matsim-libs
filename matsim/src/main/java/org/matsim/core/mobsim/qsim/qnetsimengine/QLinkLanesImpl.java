@@ -36,6 +36,8 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
@@ -116,12 +118,13 @@ import org.matsim.vis.snapshotwriters.VisData;
  */
 public final class QLinkLanesImpl extends AbstractQLink {
 	private static final Logger log = Logger.getLogger(QLinkLanesImpl.class);
-	
+
 	/* public? */ static final class Builder {
 		private final NetsimEngineContext context;
 		private final NetsimInternalInterface netsimEngine;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
+		private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
 
 		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
 			this.context = context;
@@ -132,8 +135,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			this.linkSpeedCalculator = linkSpeedCalculator ;
 		}
 
+		public void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+			this.flowEfficiencyCalculator = flowEfficiencyCalculator;
+		}
+
 		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
-			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, vehicleHandler ) ;
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, flowEfficiencyCalculator, vehicleHandler ) ;
 		}
 
 	}
@@ -162,6 +169,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private final List<ModelLane> lanes;
 
+	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
+
 	private final Map<Id<Lane>, Map<Id<Link>, List<QLaneI>>> nextQueueToLinkCache;
 
 	private NetsimEngineContext context;
@@ -171,15 +180,17 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param context TODO
 	 * @param netsimEngine TODO
 	 * @param linkSpeedCalculator
+	 * @param flowEfficiencyCalculator
 	 */
 	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
-				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
+						   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, FlowEfficiencyCalculator flowEfficiencyCalculator, VehicleHandler vehicleHandler) {
 		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
 		this.context = context ;
 		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();
 		this.lanes = lanes;
+		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 		this.nextQueueToLinkCache = new LinkedHashMap<>(); // maps a lane id to a map containing the
 															// downstream queues indexed by a
 															// downstream link
@@ -205,6 +216,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setLength(lane.getLength());
 			builder.setEffectiveNumberOfLanes(lane.getLaneData().getNumberOfRepresentedLanes());
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
+			builder.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
 			QLaneI queue = builder.createLane(this);
 			// --
 			queueByIdMap.put(laneId, queue);

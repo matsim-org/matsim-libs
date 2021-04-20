@@ -38,10 +38,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystemParams;
 import org.matsim.contrib.drt.fare.DrtFareParams;
 import org.matsim.contrib.drt.optimizer.insertion.DrtInsertionSearchParams;
+import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.optimizer.insertion.ExtensiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.insertion.SelectiveInsertionSearchParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingParams;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategyParams;
+import org.matsim.contrib.drt.speedup.DrtSpeedUpParams;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.util.ReflectiveConfigGroupWithConfigurableParameterSets;
@@ -50,6 +52,8 @@ import org.matsim.core.config.ConfigGroup;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableParameterSets implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
@@ -84,13 +88,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
 	static final String MAX_TRAVEL_TIME_ALPHA_EXP =
 			"Defines the slope of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Alpha should not be smaller than 1.";
 
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
 	static final String MAX_TRAVEL_TIME_BETA_EXP =
 			"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
-					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
+					+ "maxTravelTimeAlpha * unsharedRideTime + maxTravelTimeBeta. "
 					+ "Beta should not be smaller than 0.";
 
 	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
@@ -117,14 +121,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return null (in most cases caught by fallback routing module).";
 
-	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	static final String ESTIMATED_DRT_SPEED_EXP =
-			"Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
-					+ "and in plans file, [m/s]. The default value is 25 km/h";
-
-	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
-	static final String ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP = "Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.";
-
 	public static final String VEHICLES_FILE = "vehiclesFile";
 	static final String VEHICLES_FILE_EXP = "An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd";
 
@@ -145,9 +141,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
-
-	public static final String DRT_SPEED_UP_MODE = "drtSpeedUpMode";
-	static final String DRT_SPEED_UP_MODE_EXP = "For PreviousIterationZonalDemandAggregator in rebalancing to work properly with the drt-speed-up module, also departures of the speed-up mode must be considered as drt mode departures. Set to the empty String \"\" if not using drt-speed-up (the default). Drt-speed-up module should set this automatically if used.";
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
@@ -180,12 +173,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 
 	@PositiveOrZero // used only for stopbased DRT scheme
 	private double maxWalkDistance = Double.MAX_VALUE;// [m];
-
-	@PositiveOrZero
-	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
-
-	@DecimalMin("1.0")
-	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@Nullable//it is possible to generate a FleetSpecification (instead of reading it from a file)
 	private String vehiclesFile = null;
@@ -220,8 +207,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	@Nullable
 	private DrtFareParams drtFareParams;
 
-	@NotNull
-	private String drtSpeedUpMode = "";
+	@Nullable
+	private DrtSpeedUpParams drtSpeedUpParams;
+
+	@Nullable
+	private DrtRequestInsertionRetryParams drtRequestInsertionRetryParams;
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -245,9 +235,18 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 				() -> drtInsertionSearchParams,
 				params -> drtInsertionSearchParams = (SelectiveInsertionSearchParams)params);
 
-		//drt fare
+		//drt fare (optional)
 		addDefinition(DrtFareParams.SET_NAME, DrtFareParams::new, () -> drtFareParams,
 				params -> drtFareParams = (DrtFareParams)params);
+
+		//drt speedup (optional)
+		addDefinition(DrtSpeedUpParams.SET_NAME, DrtSpeedUpParams::new, () -> drtSpeedUpParams,
+				params -> drtSpeedUpParams = (DrtSpeedUpParams)params);
+
+		//request retry handling (optional)
+		addDefinition(DrtRequestInsertionRetryParams.SET_NAME, DrtRequestInsertionRetryParams::new,
+				() -> drtRequestInsertionRetryParams,
+				params -> drtRequestInsertionRetryParams = (DrtRequestInsertionRetryParams)params);
 	}
 
 	@Override
@@ -318,13 +317,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		map.put(OPERATIONAL_SCHEME, OPERATIONAL_SCHEME_EXP);
 		map.put(MAX_WALK_DISTANCE, MAX_WALK_DISTANCE_EXP);
 		map.put(TRANSIT_STOP_FILE, TRANSIT_STOP_FILE_EXP);
-		map.put(ESTIMATED_DRT_SPEED, ESTIMATED_DRT_SPEED_EXP);
-		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
-		map.put(DRT_SPEED_UP_MODE, DRT_SPEED_UP_MODE_EXP);
 		return map;
 	}
 
@@ -389,7 +385,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
-	 * @param -- {@value #MAX_WAIT_TIME_EXP}
+	 * @param maxWaitTime -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
 	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
@@ -587,40 +583,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	}
 
 	/**
-	 * @return -- {@value #ESTIMATED_DRT_SPEED_EXP}
-	 */
-	@StringGetter(ESTIMATED_DRT_SPEED)
-	public double getEstimatedDrtSpeed() {
-		return estimatedDrtSpeed;
-	}
-
-	/**
-	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
-	 */
-	@StringSetter(ESTIMATED_DRT_SPEED)
-	public DrtConfigGroup setEstimatedDrtSpeed(double estimatedSpeed) {
-		this.estimatedDrtSpeed = estimatedSpeed;
-		return this;
-	}
-
-	/**
-	 * @return -- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
-	 */
-	@StringGetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
-	public double getEstimatedBeelineDistanceFactor() {
-		return estimatedBeelineDistanceFactor;
-	}
-
-	/**
-	 * @param-- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
-	 */
-	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
-	public DrtConfigGroup setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
-		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
-		return this;
-	}
-
-	/**
 	 * @return -- {@value #WRITE_DETAILED_CUSTOMER_STATS_EXP}
 	 */
 	@StringGetter(WRITE_DETAILED_CUSTOMER_STATS)
@@ -654,14 +616,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 		return this;
 	}
 
-	public String getDrtSpeedUpMode() {
-		return drtSpeedUpMode;
-	}
-
-	public void setDrtSpeedUpMode(String drtSpeedUpMode) {
-		this.drtSpeedUpMode = drtSpeedUpMode;
-	}
-
 	public double getAdvanceRequestPlanningHorizon() {
 		return advanceRequestPlanningHorizon;
 	}
@@ -686,4 +640,20 @@ public final class DrtConfigGroup extends ReflectiveConfigGroupWithConfigurableP
 	public Optional<DrtFareParams> getDrtFareParams() {
 		return Optional.ofNullable(drtFareParams);
 	}
+
+	public Optional<DrtSpeedUpParams> getDrtSpeedUpParams() {
+		return Optional.ofNullable(drtSpeedUpParams);
+	}
+
+	public Optional<DrtRequestInsertionRetryParams> getDrtRequestInsertionRetryParams() {
+		return Optional.ofNullable(drtRequestInsertionRetryParams);
+	}
+
+	/**
+	 * Convenience method that brings syntax closer to syntax in, e.g., {@link PlansCalcRouteConfigGroup} or {@link PlanCalcScoreConfigGroup}
+	 */
+	public final void addDrtInsertionSearchParams(final DrtInsertionSearchParams pars) {
+		addParameterSet( pars );
+	}
+
 }

@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
@@ -52,6 +53,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonScoreEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
@@ -100,6 +102,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	private final boolean isTransitDriverStartsHandler;
 	private final boolean isPersonStuckHandler;
 	private final boolean isPersonMoneyHandler;
+	private final boolean isPersonScoreHandler;
 	private final boolean isAgentWaitingForPtHandler;
 	private final boolean isPersonEntersVehicleHandler;
 	private final boolean isPersonLeavesVehicleHandler;
@@ -128,6 +131,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		this.isTransitDriverStartsHandler = this.eventHandler instanceof TransitDriverStartsEventHandler;
 		this.isPersonStuckHandler = this.eventHandler instanceof PersonStuckEventHandler;
 		this.isPersonMoneyHandler = this.eventHandler instanceof PersonMoneyEventHandler;
+		this.isPersonScoreHandler = this.eventHandler instanceof PersonScoreEventHandler;
 		this.isAgentWaitingForPtHandler = this.eventHandler instanceof AgentWaitingForPtEventHandler;
 		this.isPersonEntersVehicleHandler = this.eventHandler instanceof PersonEntersVehicleEventHandler;
 		this.isPersonLeavesVehicleHandler = this.eventHandler instanceof PersonLeavesVehicleEventHandler;
@@ -336,6 +340,10 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		}
 		if (this.isPersonMoneyHandler && klass == PersonMoneyEvent.class) {
 			((PersonMoneyEventHandler) this.eventHandler).handleEvent((PersonMoneyEvent)ev);
+			return true;
+		}
+		if (this.isPersonScoreHandler && klass == PersonScoreEvent.class) {
+			((PersonScoreEventHandler) this.eventHandler).handleEvent((PersonScoreEvent)ev);
 			return true;
 		}
 		if (this.isAgentWaitingForPtHandler && klass == AgentWaitingForPtEvent.class) {

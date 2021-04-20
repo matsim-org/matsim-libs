@@ -84,6 +84,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup.BoardingAcceptance;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -153,11 +154,10 @@ public class EditTripsTest {
 	public void testAgentLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
-		Config config = ConfigUtils
-				.loadConfig(configURL);
+		Config config = ConfigUtils.loadConfig(configURL);
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
-				.setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 15. * 60;
@@ -273,11 +273,10 @@ public class EditTripsTest {
 	public void testAgentIsAtTeleportLegAndLeavesStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
-		Config config = ConfigUtils
-				.loadConfig(configURL);
+		Config config = ConfigUtils.loadConfig(configURL);
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
-				.setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;
@@ -353,11 +352,10 @@ public class EditTripsTest {
 	public void testAgentIsAtTeleportLegAndWaitsAtStop() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
-		Config config = ConfigUtils
-				.loadConfig(configURL);
+		Config config = ConfigUtils.loadConfig(configURL);
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		String outputDirectory = utils.getOutputDirectory();
-		config.controler()
-				.setOutputDirectory(outputDirectory);
+		config.controler().setOutputDirectory(outputDirectory);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getPopulation().getPersons().clear();
 		double activityEndTime = 7. * 3600 + 22. * 60;

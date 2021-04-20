@@ -143,6 +143,11 @@ class RLS90NoiseImmission implements NoiseImmission {
         return correction;
     }
 
+    @Override
+    public void setCurrentRp(NoiseReceiverPoint nrp) {
+
+    }
+
     static double calculateDistanceCorrection(double distance) {
         double correctionTermDs = 15.8 - (10 * Math.log10(distance)) - (0.0142 * (Math.pow(distance, 0.9)));
         return correctionTermDs;

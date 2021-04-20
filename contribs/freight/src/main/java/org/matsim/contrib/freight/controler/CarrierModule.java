@@ -44,36 +44,31 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 
 import java.util.List;
 
-public class CarrierModule extends AbstractModule {
+public final class CarrierModule extends AbstractModule {
 
-	private FreightConfigGroup freightConfig;
-
-	private Carriers carriers;
 	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
 	private CarrierScoringFunctionFactory scoringFunctionFactory;
 
-
 	public CarrierModule() {
-
 	}
 
+//	/**
+//	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must be bound separately
+//	 * when this constructor is used.
+//	 *
+//	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
+//	 */
+//	@Deprecated
+//	public CarrierModule(Carriers carriers) {
+//		this.carriers = carriers;
+//	}
+
 	/**
-	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must be bound separately
-	 * when this constructor is used.
-	 *
 	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
 	 */
 	@Deprecated
-	public CarrierModule(Carriers carriers) {
-		this.carriers = carriers;
-	}
-
-	/**
-	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
-	 */
-	@Deprecated
-	public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-		this.carriers = carriers;
+	public CarrierModule(CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
+//		this.carriers = carriers;
 		this.strategyManagerFactory = strategyManagerFactory;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
@@ -81,7 +76,7 @@ public class CarrierModule extends AbstractModule {
 	@Override public void install() {
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
-		bind(Carriers.class).toProvider(new CarrierProvider()).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
+		bind(Carriers.class).toProvider( new CarrierProvider() ).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
 
 		if (strategyManagerFactory != null) {
@@ -156,17 +151,17 @@ public class CarrierModule extends AbstractModule {
 	}
 
 
-	private class CarrierProvider implements Provider<Carriers> {
+	private static class CarrierProvider implements Provider<Carriers> {
 		@Inject Scenario scenario;
 		@Override public Carriers get() {
-			if ( carriers!=null ){
-				if ( scenario.getScenarioElement( FreightUtils.CARRIERS ) != null ) {
-					throw new RuntimeException("carriers are provided as scenario element AND per the CarrierModule constructor.  I could check if " +
-										     "they are the same, but in general the second way to do this is deprecated so please put " +
-										     "null into your constructor (and expect more cleanup here).") ;
-				}
-				scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
-			}
+//			if ( carriers!=null ){
+//				if ( scenario.getScenarioElement( FreightUtils.CARRIERS ) != null ) {
+//					throw new RuntimeException("carriers are provided as scenario element AND per the CarrierModule constructor.  I could check if " +
+//										     "they are the same, but in general the second way to do this is deprecated so please put " +
+//										     "null into your constructor (and expect more cleanup here).") ;
+//				}
+//				scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
+//			}
 			return FreightUtils.getCarriers(scenario);
 		}
 	}

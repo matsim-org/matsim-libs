@@ -24,6 +24,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisVehicle;
 
@@ -55,12 +56,10 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		}
 
 
-		double vehLen = Math.min( 
+		return Math.min(
 				curvedLength / overallStorageCapacity , // number of ``cells''
-				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles 
+				curvedLength / sum  // the link may be more than ``full'' because of forward squeezing of stuck vehicles
 				);
-		
-		return vehLen;
 	}
 	
 
@@ -103,7 +102,22 @@ class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 		return distanceFromFNode;
 	}
 
-	
+	public AgentSnapshotInfo.DrivingState calculateDrivingState(double length, double spacing, double lastDistanceToFromNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 
-	
+		var distanceFromFNode = calculateFreespeedDistanceToFromNode(freespeedTraveltime, remainingTravelTime, length);
+
+		return AgentSnapshotInfo.DrivingState.CONGESTED;
+	}
+
+	private double calculateFreespeedDistanceToFromNode(double freespeedTraveltime, double remainingTravelTime, double curvedLength) {
+
+		if (freespeedTraveltime == 0) {
+			return 0;
+		}
+
+		var result = (1.0 - (remainingTravelTime / freespeedTraveltime)) * curvedLength;
+		return Math.min(result, 0.0);
+	}
+
+	private double calculateCongestedDinstanceToFromNode(double value) {return 0;}
 }

@@ -20,10 +20,8 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -39,7 +37,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.routes.DefaultTransitPassengerRouteFactory;
 import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -48,8 +46,9 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Save waiting times of agents while mobsim is running
@@ -154,7 +153,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = (((Leg)planElement).getRoute());
-						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());
@@ -179,7 +178,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						Route route = ((Leg)planElement).getRoute();
-						TransitPassengerRoute eRoute = (TransitPassengerRoute) new ExperimentalTransitRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
+						TransitPassengerRoute eRoute = (TransitPassengerRoute) new DefaultTransitPassengerRouteFactory().createRoute(route.getStartLinkId(), route.getEndLinkId());
 						eRoute.setStartLinkId(route.getStartLinkId());
 						eRoute.setEndLinkId(route.getEndLinkId());
 						eRoute.setRouteDescription(route.getRouteDescription());

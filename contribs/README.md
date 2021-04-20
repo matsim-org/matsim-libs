@@ -41,5 +41,6 @@ The MATSim core development team cannot make any guarantee that these extensions
 | [roadpricing](roadpricing/README.md) | Functionality to simulate different road-pricing scenarios in MATSim
 | [signals](signals/README.md) | Simulate traffic lights microscopically
 | [socnetsim](socnetsim/README.md) | Social network simulation
+| [sumo](sumo/README.md) | Converter and integrations for [SUMO](https://sumo.dlr.de/])
 | [taxi](taxi/README.md) | Taxi service functionality
 | vsp |

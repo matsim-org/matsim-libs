@@ -64,17 +64,13 @@ class SwissRailRaptorAccessibilityContributionCalculator implements Accessibilit
 
 		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
 		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-		this.raptorData = SwissRailRaptorData.create(schedule, raptorConfig, ptNetwork);
+			this.raptorData = SwissRailRaptorData.create(schedule, null, raptorConfig, ptNetwork, null);
 
-		DefaultRaptorParametersForPerson parametersForPerson = new DefaultRaptorParametersForPerson(scenario.getConfig());
-		DefaultRaptorStopFinder defaultRaptorStopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-		LeastCostRaptorRouteSelector routeSelector = new LeastCostRaptorRouteSelector();
-
-		this.raptor = new SwissRailRaptor(raptorData, parametersForPerson, routeSelector, defaultRaptorStopFinder);
+		this.raptor = new SwissRailRaptor.Builder(raptorData, scenario.getConfig()).build();
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.scenario = scenario;
 
-		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		this.betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 
 		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}

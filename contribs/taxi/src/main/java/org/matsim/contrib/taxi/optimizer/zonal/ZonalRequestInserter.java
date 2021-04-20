@@ -35,9 +35,8 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
-import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
-import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
+import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.ZonalSystemParams;
@@ -67,14 +66,13 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params,
-			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
-			URL context) {
+			ZonalRegisters zonalRegisters, URL context) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.dispatchFinder = new BestDispatchFinder(scheduler.getScheduleInquiry(), network, timer, travelTime,
 				travelDisutility);
 		this.requestInserter = new RuleBasedRequestInserter(scheduler, timer, dispatchFinder,
-				params.getRuleBasedTaxiOptimizerParams(), idleTaxiRegistry, unplannedRequestRegistry);
+				params.getRuleBasedTaxiOptimizerParams(), zonalRegisters);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
 		zones = Zones.readZones(zonalSystemParams.getZonesXmlUrl(context), zonalSystemParams.getZonesShpUrl(context));

@@ -130,6 +130,10 @@ public class DrtVehicleOccupancyProfileWriter implements IterationEndsListener {
 
 	private void generateImage(DefaultTableXYDataset xyDataset, TimeProfileCharts.ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(xyDataset, chartType);
+		String runID = matsimServices.getConfig().controler().getRunId();
+		if( runID != null){
+			chart.setTitle( runID + " " + chart.getTitle().getText());
+		}
 		makeStayTaskSeriesGrey(chart.getXYPlot());
 		String imageFile = filename(OUTPUT_FILE + "_" + chartType.name());
 		ChartSaveUtils.saveAsPNG(chart, imageFile, 1500, 1000);

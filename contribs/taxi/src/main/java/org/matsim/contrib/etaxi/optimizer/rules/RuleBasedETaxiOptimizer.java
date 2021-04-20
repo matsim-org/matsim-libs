@@ -21,7 +21,6 @@ package org.matsim.contrib.etaxi.optimizer.rules;
 
 import java.util.stream.Stream;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.ScheduleTimingUpdater;
@@ -35,44 +34,13 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
+import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.zone.SquareGridSystem;
-import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
-	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
-			TravelTime travelTime, TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure) {
-		double cellSize = ((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
-				.getCellSize();
-		return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, network,
-				timer, travelTime, travelDisutility, chargingInfrastructure, new SquareGridSystem(network, cellSize));
-	}
-
-	public static RuleBasedETaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater, Network network, MobsimTimer timer,
-			TravelTime travelTime, TravelDisutility travelDisutility, ChargingInfrastructure chargingInfrastructure,
-			ZonalSystem zonalSystem) {
-		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem,
-				eScheduler.getScheduleInquiry());
-		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
-		BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler.getScheduleInquiry(), network, timer,
-				travelTime, travelDisutility);
-		RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(eScheduler, timer, dispatchFinder,
-				((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
-				idleTaxiRegistry, unplannedRequestRegistry);
-
-		return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
-				chargingInfrastructure, idleTaxiRegistry, unplannedRequestRegistry, dispatchFinder, requestInserter);
-	}
 
 	// TODO MIN_RELATIVE_SOC should depend on the weather and time of day
 	private final RuleBasedETaxiOptimizerParams params;
@@ -83,15 +51,13 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 
 	public RuleBasedETaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			ETaxiScheduler eScheduler, ScheduleTimingUpdater scheduleTimingUpdater,
-			ChargingInfrastructure chargingInfrastructure, IdleTaxiZonalRegistry idleTaxiRegistry,
-			UnplannedRequestZonalRegistry unplannedRequestRegistry, BestDispatchFinder dispatchFinder,
-			UnplannedRequestInserter requestInserter) {
-		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, idleTaxiRegistry,
-				unplannedRequestRegistry, requestInserter);
+			ChargingInfrastructure chargingInfrastructure, ZonalRegisters zonalRegisters,
+			BestDispatchFinder dispatchFinder, UnplannedRequestInserter requestInserter) {
+		super(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, zonalRegisters, requestInserter);
 		this.params = (RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.eScheduler = eScheduler;
-		this.idleTaxiRegistry = idleTaxiRegistry;
+		this.idleTaxiRegistry = zonalRegisters.idleTaxiRegistry;
 		eDispatchFinder = new BestChargerFinder(dispatchFinder);
 	}
 

@@ -18,6 +18,7 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -32,6 +33,8 @@ class TimeAndSpaceTourRouter {
 	static class MatsimVehicleAdapter implements Vehicle {
 
 		private CarrierVehicle carrierVehicle;
+
+		private Attributes attributes = new Attributes();
 
 		public MatsimVehicleAdapter(CarrierVehicle vehicle) {
 			this.carrierVehicle = vehicle;
@@ -51,6 +54,10 @@ class TimeAndSpaceTourRouter {
 			return carrierVehicle;
 		}
 
+		@Override
+		public Attributes getAttributes() {
+			return this.attributes;
+		}
 	}
 	
 	

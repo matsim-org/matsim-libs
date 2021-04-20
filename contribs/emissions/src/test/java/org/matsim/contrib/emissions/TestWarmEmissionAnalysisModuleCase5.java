@@ -81,26 +81,24 @@ public class TestWarmEmissionAnalysisModuleCase5{
 	// single class before was so large that I could not fully comprehend it, there may now be errors in the ripped-apart classes.  Hopefully, over time,
 	// this will help to sort things out.  kai, feb'20
 
-	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
+	private final HandlerToTestEmissionAnalysisModules emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private final EmissionsConfigGroup.EmissionsComputationMethod emissionsComputationMethod;
 	private static final String PASSENGER_CAR = "PASSENGER_CAR";
-
-	private WarmEmissionAnalysisModule emissionsModule;
-	private Map<Pollutant, Double> warmEmissions;
 
 	private static final Double DETAILED_ZERO_FACTOR_FF =  .0011;
 
 	// vehicle information for regular test cases
 
 	// case 5 - data in detailed table, stop go speed zero
-	private final String zeroRoadCatgory = "URB_case6";
+	private final String zeroRoadCategory = "URB_case6";
 	private final String zeroTechnology = "zero technology";
 	private final String zeroConcept = "zero concept";
 	private final String zeroSizeClass = "zero size class";
 	private final Double zeroFreeVelocity = 20.; //km/h
 	private final Double zeroSgVelocity = 0.; //km/h
+
 
 
 	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
@@ -115,11 +113,15 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-
+	/*
+	 * this test method creates a vehicle and a mock link  (both zero properties)
+	 * the free flow factor is used to calculate and test the PM warm Emissions and HandlerToTestEmissionAnalysisModules Sum
+	 * detailed values are used
+	 */
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent5(){
 		//-- set up tables, event handler, parameters, module
-		setUp();
+		WarmEmissionAnalysisModule emissionsModule = setUp();
 
 		// case 6 - data in detailed table, stop go speed zero
 		// use free flow factor to calculate emissions
@@ -127,26 +129,25 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		double zeroLinklength = 3000.;
 		Link zerolink = TestWarmEmissionAnalysisModule.createMockLink("link zero", zeroLinklength, zeroFreeVelocity / 3.6 );
 		Id<Link> lpgLinkId = zerolink.getId();
-		EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCatgory);
+		EmissionUtils.setHbefaRoadType(zerolink, zeroRoadCategory);
 
 		Id<VehicleType> zeroVehicleTypeId = Id.create(
 				PASSENGER_CAR + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept, VehicleType.class );
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 
-		warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6 );
+		Map<Pollutant, Double> warmEmissions = emissionsModule.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2 * zeroLinklength / (zeroFreeVelocity + zeroSgVelocity) * 3.6);
 		Assert.assertEquals( DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., warmEmissions.get(PM ), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset();
 
-		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions );
-		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
+		emissionsModule.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
+		Assert.assertEquals( pollutants.size() * DETAILED_ZERO_FACTOR_FF *zeroLinklength/1000., emissionEventManager.getSum(), MatsimTestUtils.EPSILON );
+		warmEmissions.clear();
 
 	}
 
 
 
-	private void setUp() {
+	private WarmEmissionAnalysisModule setUp() {
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
@@ -157,13 +158,13 @@ public class TestWarmEmissionAnalysisModuleCase5{
 				avgHbefaWarmTable );
 		TestWarmEmissionAnalysisModule.addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		EventsManager emissionEventManager = this.emissionEventManager;
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 		ecg.setDetailedVsAverageLookupBehavior( DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
-		emissionsModule = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+		return new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 	}
 
@@ -172,44 +173,36 @@ public class TestWarmEmissionAnalysisModuleCase5{
 		//entries for zero case
 		{
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
-			vehAtt.setHbefaEmConcept( zeroConcept );
-			vehAtt.setHbefaSizeClass( zeroSizeClass );
-			vehAtt.setHbefaTechnology( zeroTechnology );
+			vehAtt.setHbefaEmConcept(zeroConcept);
+			vehAtt.setHbefaSizeClass(zeroSizeClass);
+			vehAtt.setHbefaTechnology(zeroTechnology);
 
-			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-			detWarmFactor.setWarmEmissionFactor( DETAILED_ZERO_FACTOR_FF );
-			detWarmFactor.setSpeed( zeroFreeVelocity );
+			HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor(DETAILED_ZERO_FACTOR_FF, zeroFreeVelocity);
 
-			for( Pollutant wp : pollutants ){
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.FREEFLOW );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(zeroRoadCategory);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.FREEFLOW);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 
-			detWarmFactor = new HbefaWarmEmissionFactor();
-			double detailedZeroFactorSg = .00011;
-			detWarmFactor.setWarmEmissionFactor( detailedZeroFactorSg );
-			detWarmFactor.setSpeed( zeroSgVelocity );
+			detWarmFactor = new HbefaWarmEmissionFactor(.00011, zeroSgVelocity);
 
-			for( Pollutant wp : pollutants ){
+
+			for (Pollutant wp : pollutants) {
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
-				detWarmKey.setHbefaComponent( wp );
-				detWarmKey.setHbefaRoadCategory( zeroRoadCatgory );
-				detWarmKey.setHbefaTrafficSituation( HbefaTrafficSituation.STOPANDGO );
-				detWarmKey.setHbefaVehicleAttributes( vehAtt );
-				detWarmKey.setHbefaVehicleCategory( HbefaVehicleCategory.PASSENGER_CAR );
-				detailedHbefaWarmTable.put( detWarmKey, detWarmFactor );
+				detWarmKey.setComponent(wp);
+				detWarmKey.setRoadCategory(zeroRoadCategory);
+				detWarmKey.setTrafficSituation(HbefaTrafficSituation.STOPANDGO);
+				detWarmKey.setVehicleAttributes(vehAtt);
+				detWarmKey.setVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+				detailedHbefaWarmTable.put(detWarmKey, detWarmFactor);
 			}
 		}
-
 	}
-
-
-
 }
 	
 

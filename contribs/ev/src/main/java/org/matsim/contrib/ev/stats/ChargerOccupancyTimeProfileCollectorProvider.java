@@ -19,8 +19,12 @@
 
 package org.matsim.contrib.ev.stats;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
@@ -29,11 +33,6 @@ import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculato
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ChargingInfrastructure chargingInfrastructure;
@@ -74,8 +73,8 @@ public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<Mo
 				ChargingLogic logic = c.getLogic();
 				plugged += logic.getPluggedVehicles().size();
 				queued += logic.getQueuedVehicles().size();
-				if (logic instanceof ChargingWithQueueingAndAssignmentLogic) {
-					assigned += ((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size();
+				if (logic instanceof ChargingWithAssignmentLogic) {
+					assigned += ((ChargingWithAssignmentLogic)logic).getAssignedVehicles().size();
 				}
 			}
 			return ImmutableMap.of(PLUGGED_ID, (double)plugged, QUEUED_ID, (double)queued, ASSIGNED_ID,

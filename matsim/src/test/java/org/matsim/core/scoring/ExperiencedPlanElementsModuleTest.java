@@ -50,7 +50,7 @@ public class ExperiencedPlanElementsModuleTest {
 		Subscriber subscriber = new Subscriber();
 		injector.getInstance(EventsToActivities.class).addActivityHandler(subscriber);
 		ReplayEvents replayEvents = injector.getInstance(ReplayEvents.class);
-		replayEvents.playEventsFile(matsimTestUtils.getClassInputDirectory() + "events.xml", 0);
+		replayEvents.playEventsFile(matsimTestUtils.getClassInputDirectory() + "events.xml", 0, false);
 		Assert.assertEquals("There are two activities.", 2, subscriber.activityCount);
 	}
 

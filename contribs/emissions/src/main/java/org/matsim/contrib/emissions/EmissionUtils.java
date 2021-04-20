@@ -60,13 +60,13 @@ public final class EmissionUtils {
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
-	/*package-private*/ static void setHbefaRoadType(Link link, String type) {
+	public static void setHbefaRoadType(Link link, String type) {
 		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	/*package-private*/ static String getHbefaRoadType(Link link) {
+	public static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -227,10 +227,10 @@ public final class EmissionUtils {
 
 		avgHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
-			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
-			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>( HbefaTrafficSituation.class ));
+			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>(HbefaTrafficSituation.class));
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
@@ -268,6 +268,7 @@ public final class EmissionUtils {
 
 				break;
 			case fromVehicleTypeDescription:
+				// (v1 but hbefa vehicle description is in vehicle type description (Amit's version))
 
 				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
 					// information has already been moved to correct location
@@ -316,16 +317,16 @@ public final class EmissionUtils {
 
 	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
-		EngineInformation engineInfo = vehicleType.getEngineInformation();;
+		EngineInformation engineInfo = vehicleType.getEngineInformation();
 		StringBuilder strb = new StringBuilder();
-		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaSizeClass( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
-		return strb.toString() ;
+		strb.append(VehicleUtils.getHbefaVehicleCategory(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaTechnology(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaSizeClass(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaEmissionsConcept(engineInfo));
+		return strb.toString();
 	}
 
 	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {

@@ -23,10 +23,11 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.zone.skims.DvrpTravelTimeMatrix;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -49,11 +50,16 @@ public class SelectiveInsertionSearchQSimModule extends AbstractDvrpModeQSimModu
 
 	@Override
 	protected void configureQSim() {
-		bindModal(new TypeLiteral<DrtInsertionSearch<OneToManyPathSearch.PathData>>() {
-		}).toProvider(modalProvider(
-				getter -> new SelectiveInsertionSearch(getter.getModal(DetourPathCalculator.class), drtCfg,
-						getter.get(MobsimTimer.class), getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool(),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
+		bindModal(new TypeLiteral<DrtInsertionSearch<PathData>>() {
+		}).toProvider(modalProvider(getter -> {
+			var costCalculator = getter.getModal(CostCalculationStrategy.class);
+			var timer = getter.get(MobsimTimer.class);
+			var provider = SelectiveInsertionProvider.create(drtCfg, timer, costCalculator,
+					getter.getModal(DvrpTravelTimeMatrix.class),
+					getter.getModal(QSimScopeForkJoinPoolHolder.class).getPool());
+			return new DefaultDrtInsertionSearch(provider, getter.getModal(DetourPathCalculator.class), costCalculator,
+					drtCfg, timer);
+		})).asEagerSingleton();
 
 		addModalComponent(SingleInsertionDetourPathCalculator.class, new ModalProviders.AbstractProvider<>(getMode()) {
 			@Inject

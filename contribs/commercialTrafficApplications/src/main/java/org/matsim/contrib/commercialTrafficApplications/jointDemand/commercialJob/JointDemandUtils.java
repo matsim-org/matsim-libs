@@ -26,29 +26,26 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Carriers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 import java.util.stream.Collectors;
 
+//TODO add javadoc
 public class JointDemandUtils {
 
-    //TODO use StringCollection object attribute type instead of custom convention (using semicolon)
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     public static final String CARRIER_MARKET_ATTRIBUTE_NAME = "market";
-    static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
     static final String FREIGHT_DRIVER_PREFIX = "freight";
 
-    //the pattern for the activity attribute is the following:
-    //<attribute name="commercialJob[NUMBER]" class="java.lang.String">[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute>
-    static final int COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX = 0;
-    static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 1;
-    static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 2;
-    static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 3;
-    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 4;
+//    the pattern is the following
+//    attribute name="commercialJob[NUMBER]" class="java.util.Collection">["OPERATOR","CAPACITYDEMAND","EARLIESTSTART","LATESTSTART","DURATION"]</attribute>
+    public static final int COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX = 0;
+    public static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 1;
+    public static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 2;
+    public static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 3;
+    public static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 4;
 
-    static Set<Activity> getCustomerActivitiesExpectingJobs(Plan plan) {
+    public static Set<Activity> getCustomerActivitiesExpectingJobs(Plan plan) {
         Set<Activity> activitiesWithJob = new HashSet<>();
         plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
@@ -57,18 +54,20 @@ public class JointDemandUtils {
         return activitiesWithJob;
     }
 
-    static Id<Carrier> getCurrentlySelectedCarrierForJob(Activity activity, int commercialJobIndex) {
-        String[] commercialJobProperties = ((String) getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-        return Id.create(commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX], Carrier.class);
+    public static Id<Carrier> getCurrentlySelectedCarrierForJob(Activity activity, int commercialJobIndex) {
+        Collection<String> commercialJobProperties = getCommercialJob(activity, commercialJobIndex);
+        return Id.create((String) commercialJobProperties.toArray()[COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX], Carrier.class);
     }
 
-    static void setJobCarrier(Activity activity, int commercialJobIndex, Id<Carrier> carrier) {
-        String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-        commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX] = carrier.toString();
-        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
+    public static void setJobCarrier(Activity activity, int commercialJobIndex, Id<Carrier> carrier) {
+        Collection<String> commercialJobProperties = getCommercialJob(activity, commercialJobIndex);
+        List<String> copy = new ArrayList<>();
+        copy.addAll(commercialJobProperties);
+        copy.set(COMMERCIALJOB_ATTRIBUTE_CARRIER_IDX, carrier.toString());
+        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, copy);
     }
 
-    static Set<Id<Carrier>> getExistingOperatorsForMarket(Carriers carriers, String market) {
+    public static Set<Id<Carrier>> getExistingOperatorsForMarket(Carriers carriers, String market) {
         return carriers.getCarriers().values().
                 stream()
                 .filter(carrier -> carrier.getAttributes().getAttribute(CARRIER_MARKET_ATTRIBUTE_NAME).equals(market))
@@ -76,7 +75,7 @@ public class JointDemandUtils {
                 collect(Collectors.toSet());
     }
 
-    static Id<Person> generateDriverId(Carrier carrier, CarrierVehicle carrierVehicle, int nextId) {
+    public static Id<Person> generateDriverId(Carrier carrier, CarrierVehicle carrierVehicle, int nextId) {
         return Id.createPersonId(FREIGHT_DRIVER_PREFIX + "_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId);
     }
 
@@ -86,7 +85,7 @@ public class JointDemandUtils {
         return Id.create(subStr, Carrier.class);
     }
 
-    static boolean planExpectsCommercialJobs(Plan plan) {
+    public static boolean planExpectsCommercialJobs(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
                 .anyMatch(planElement -> activityExpectsCommercialJobs((Activity) planElement));
@@ -101,11 +100,11 @@ public class JointDemandUtils {
         return false;
     }
 
-    static Map<String,Object> getCommercialJobAttributes(Activity activity){
+    public static Map<String,Object> getCommercialJobAttributes(Activity activity){
         Map<String,Object> commercialJobs = new HashMap<>();
         activity.getAttributes().getAsMap().forEach((key, value) -> {
             if (key.startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) {
-                if (((String) value).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER).length != 5)
+                if (((Collection)value).size() != 5)
                     throw new IllegalArgumentException("wrong length of commercialJob attribute for activity=" + activity);
                 commercialJobs.put(key, value);
             }
@@ -113,7 +112,7 @@ public class JointDemandUtils {
         return commercialJobs;
     }
 
-    static int getNumberOfJobsForActivity(Activity activity){
+    public static int getNumberOfJobsForActivity(Activity activity){
         return getCommercialJobAttributes(activity).size();
     }
 
@@ -132,8 +131,9 @@ public class JointDemandUtils {
         return carriersSplitByMarket;
     }
 
-    private static Object getCommercialJob(Activity activity, int jobIndex){
-        return activity.getAttributes().getAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + jobIndex);
+    @Nullable
+    public static Collection<String> getCommercialJob(Activity activity, int jobIndex){
+        return (Collection<String>) activity.getAttributes().getAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + jobIndex);
     }
 
     private static String convertPropertiesArrayToAttributeValue(String[] jobProperties){
@@ -148,8 +148,8 @@ public class JointDemandUtils {
     public static void addCustomerCommercialJobAttribute(Activity activity, Id<Carrier> carrier,
                                                          int amount, double earliestStart, double latestStart, double duration) {
         int commercialJobIndex = getNumberOfJobsForActivity(activity) + 1;
-        String jobProperties = carrier + ";" + amount + ";" + earliestStart + ";" + latestStart + ";" + duration;
-        if (activity.getAttributes().getAsMap().containsKey(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex)) throw new RuntimeException("");
+        List<String> jobProperties = List.of(carrier.toString(), String.valueOf(amount), String.valueOf(earliestStart), String.valueOf(latestStart), String.valueOf(duration));
+        if (activity.getAttributes().getAsMap().containsKey(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex)) throw new RuntimeException("job attribute nr " + commercialJobIndex + " already exists");
         activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, jobProperties);
     }
 

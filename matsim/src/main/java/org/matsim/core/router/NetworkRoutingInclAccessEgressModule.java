@@ -55,6 +55,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.annotation.Nullable;
+
 /**
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that routes from a {@link Facility} to another {@link Facility}, as we need
  * in MATSim.
@@ -79,14 +81,21 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private static boolean hasWarnedAccessEgress = false;
 	private PlansCalcRouteConfigGroup.AccessEgressType accessEgressType;
 
+	/**
+	 * If not null given, the main routing will be performed on an inverted network.
+	 */
+	@Nullable
+	private final Network invertedNetwork;
+
 	NetworkRoutingInclAccessEgressModule(
 			final String mode,
-			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork,
+			final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork, @Nullable Network invertedNetwork,
 			final RoutingModule accessToNetworkRouter,
 			final RoutingModule egressFromNetworkRouter) {
 		Gbl.assertNotNull(scenario.getNetwork());
 		Gbl.assertIf(scenario.getNetwork().getLinks().size() > 0); // otherwise network for mode probably not defined
 		this.filteredNetwork = filteredNetwork;
+		this.invertedNetwork = invertedNetwork;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;
 		this.scenario = scenario;
@@ -102,6 +111,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			hasWarnedAccessEgress = true;
 			log.warn("you are using AccessEgressType=" + AccessEgressType.walkConstantTimeToLink +
 					". That means, access and egress won't get network-routed - even if you specified corresponding RoutingModules for access and egress ");
+		}
+		if (invertedNetwork != null && !(routeAlgo instanceof InvertedLeastPathCalculator)) {
+			throw new IllegalArgumentException("Inverted network must be used with inverted least path calculator.");
 		}
 	}
 
@@ -352,6 +364,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
 		if (toLink != fromLink) { // (a "true" route)
+
+			if (invertedNetwork != null) {
+				startNode = invertedNetwork.getNodes().get(Id.create(fromLink.getId(), Node.class));
+				endNode = invertedNetwork.getNodes().get(Id.create(toLink.getId(), Node.class));
+			}
 
 			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);

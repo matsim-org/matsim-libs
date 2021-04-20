@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
@@ -132,7 +133,9 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 					scoringFunction.addMoney(((PersonMoneyEvent) o).getAmount());
 					// yy looking at this, I am a bit skeptic if it truly makes sense to not pass this additionally into the general events handling function below.
 					// A use case might be different utilities of money by money transaction type (e.g. toll, fare, reimbursement, ...).  kai, mar'17
-				} 
+				} else if (o instanceof PersonScoreEvent) {
+					scoringFunction.addScore(((PersonScoreEvent) o).getAmount());
+				}
 //				else {
 					scoringFunction.handleEvent(o);
 					// passing this on in any case, see comment above.  kai, mar'17

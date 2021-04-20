@@ -107,7 +107,7 @@ public class TaxiStatsCalculator {
 	}
 
 	private void updatePassengerWaitTimeStats(DvrpVehicle vehicle) {
-		vehicle.getSchedule().tasks().filter(task -> getBaseType(task) == PICKUP).forEach(task -> {
+		vehicle.getSchedule().tasks().filter(task -> PICKUP.isBaseTypeOf(task)).forEach(task -> {
 			TaxiRequest req = ((TaxiPickupTask)task).getRequest();
 			double waitTime = Math.max(task.getBeginTime() - req.getEarliestStartTime(), 0);
 			int hour = (int)(req.getEarliestStartTime() / 3600);
