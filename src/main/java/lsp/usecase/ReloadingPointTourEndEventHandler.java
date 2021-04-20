@@ -48,7 +48,7 @@ import lsp.resources.LSPResource;
 	public void addShipment(LSPShipment shipment, LogisticsSolutionElement solutionElement){
 		ReloadingPointEventHandlerPair pair = new ReloadingPointEventHandlerPair(shipment, solutionElement);
 		
-		for(ShipmentPlanElement planElement: shipment.getSchedule().getPlanElements().values()){
+		for(ShipmentPlanElement planElement: shipment.getShipmentPlan().getPlanElements().values()){
 			if(planElement instanceof ScheduledShipmentTransport){
 				ScheduledShipmentTransport transport = (ScheduledShipmentTransport) planElement;
 				if(transport.getSolutionElement().getNextElement() == solutionElement){

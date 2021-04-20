@@ -66,7 +66,7 @@ import lsp.shipment.ShipmentPlanElement;
 		ShipmentPlanElement  handle = builder.build();
 		String idString = handle.getResourceId() + "" + handle.getSolutionElement().getId() + "" + handle.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, handle);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, handle);
 	}
 	
 	private void addShipmentToEventHandler( ShipmentWithTime tuple ){

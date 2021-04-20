@@ -139,19 +139,19 @@ public class CollectionLSPSchedulingTest {
 	public void testCollectionLSPScheduling() {
 		
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			
 			System.out.println();
-			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
+			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() +"  "+ scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();	
 		}
 				
 		for(LSPShipment shipment : collectionLSP.getShipments()) {
-			assertTrue(shipment.getSchedule().getPlanElements().size() == 3);
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 3);
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			assertTrue(planElements.get(2).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(2).getEndTime() >= (0));
 			assertTrue(planElements.get(2).getEndTime() <= (24*3600));

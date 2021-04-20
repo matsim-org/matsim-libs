@@ -1,8 +1,6 @@
 package example.lsp.initialPlans;
 
-import example.lsp.simulationTrackers.SimulationTrackersUtils;
 import lsp.*;
-import lsp.functions.LSPInfo;
 import lsp.resources.LSPResource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentPlanElement;
@@ -363,7 +361,7 @@ import java.util.*;
 		//print the schedules for the assigned LSPShipments
 		log.info("print the schedules for the assigned LSPShipments");
 		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			elementList.sort(new ShipmentPlanElementComparator());
 			System.out.println("Shipment: " + shipment.getId());
 			for(ShipmentPlanElement element : elementList) {

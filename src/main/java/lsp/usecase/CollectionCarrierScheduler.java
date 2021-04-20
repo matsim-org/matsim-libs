@@ -179,7 +179,7 @@ import lsp.resources.LSPResourceScheduler;
 		ShipmentPlanElement  load = builder.build();
 		String idString = load.getResourceId() + "" + load.getSolutionElement().getId() + "" + load.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, load);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, load);
 	}
 	
 	private void addCollectionServiceEventHandler( CarrierService carrierService, ShipmentWithTime tuple, LSPCarrierResource resource ){
@@ -226,7 +226,7 @@ import lsp.resources.LSPResourceScheduler;
 		ShipmentPlanElement transport = builder.build();
 		String idString = transport.getResourceId() + "" + transport.getSolutionElement().getId() + "" + transport.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, transport);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, transport);
 	}
 	
 	private void addShipmentUnloadElement( ShipmentWithTime tuple, Tour tour, Tour.ServiceActivity serviceActivity ){
@@ -247,7 +247,7 @@ import lsp.resources.LSPResourceScheduler;
 		ShipmentPlanElement unload = builder.build();
 		String idString = unload.getResourceId() + "" + unload.getSolutionElement().getId() + "" + unload.getElementType();
 		Id<ShipmentPlanElement> id = Id.create(idString, ShipmentPlanElement.class);
-		tuple.getShipment().getSchedule().addPlanElement(id, unload);
+		tuple.getShipment().getShipmentPlan().addPlanElement(id, unload);
 	}
 	
 	

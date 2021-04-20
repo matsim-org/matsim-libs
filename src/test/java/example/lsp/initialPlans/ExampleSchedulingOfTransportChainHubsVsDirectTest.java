@@ -47,7 +47,7 @@ public class ExampleSchedulingOfTransportChainHubsVsDirectTest{
 		}
 	}
 	@Test
-	public void testMain2(){
+	public void testMain2_direct(){
 
 		try{
 			ExampleSchedulingOfTransportChainHubsVsDirect.main( new String []{

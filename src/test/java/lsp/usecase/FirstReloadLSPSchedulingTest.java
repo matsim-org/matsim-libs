@@ -184,11 +184,11 @@ public class FirstReloadLSPSchedulingTest {
 	public void testFirstReloadLSPScheduling() {
 		
 		for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 			
 			System.out.println();
-			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
+			for(int i = 0; i < shipment.getShipmentPlan().getPlanElements().size(); i++) {
 				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() +"  "+ scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();	
@@ -196,8 +196,8 @@ public class FirstReloadLSPSchedulingTest {
 	
 	
 		for(LSPShipment shipment : lsp.getShipments()){
-			assertTrue(shipment.getSchedule().getPlanElements().size() == 4);
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
+			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 4);
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
 			assertTrue(planElements.get(3).getElementType() == "HANDLE");
 			assertTrue(planElements.get(3).getEndTime() >= (0));
@@ -274,7 +274,7 @@ public class FirstReloadLSPSchedulingTest {
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertTrue(shipment.getEventHandlers().size() == 2);
 			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			
 			assertTrue(eventHandlers.get(0) instanceof CollectionTourEndEventHandler);
 			CollectionTourEndEventHandler endHandler = (CollectionTourEndEventHandler) eventHandlers.get(0);

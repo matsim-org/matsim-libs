@@ -23,7 +23,7 @@ public interface LSPShipment {
 	
 	public TimeWindow getEndTimeWindow();
 	
-	public ShipmentPlan getSchedule();
+	public ShipmentPlan getShipmentPlan();
 	
 	public ShipmentPlan getLog();
 	

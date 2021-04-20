@@ -1,10 +1,7 @@
 package lsp.controler;
 
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.handler.EventHandler;
 
 import lsp.LSP;
 import lsp.LSPs;
@@ -35,7 +32,7 @@ class LSPRescheduler implements BeforeMobsimListener{
 				}
 				
 				for(LSPShipment shipment : lsp.getShipments()) {
-					shipment.getSchedule().clear();
+					shipment.getShipmentPlan().clear();
 					shipment.getLog().clear();
 					lsp.getSelectedPlan().getAssigner().assignShipment(shipment);
 				}

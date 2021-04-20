@@ -321,7 +321,7 @@ import lsp.resources.LSPResource;
         
       //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : lsp.getShipments()) {
-			ArrayList<ShipmentPlanElement> elementList = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> elementList = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(elementList, new ShipmentPlanElementComparator());
 			System.out.println("Shipment: " + shipment.getId());
 			for(ShipmentPlanElement element : elementList) {
@@ -329,8 +329,14 @@ import lsp.resources.LSPResource;
 			}			
 			System.out.println();
 		}
-		
-	
+
+
+		for (LSPResource lspResource : lsp.getResources()) {
+			if (lspResource instanceof Carrier ) {
+				((Carrier) lspResource).getShipments().toString();
+			}
+		}
+
 	
 	}
 	

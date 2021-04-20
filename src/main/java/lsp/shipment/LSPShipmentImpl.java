@@ -77,7 +77,7 @@ import lsp.functions.LSPInfo;
 	}
 
 	@Override
-	public ShipmentPlan getSchedule() {
+	public ShipmentPlan getShipmentPlan() {
 		return schedule;
 	}
 

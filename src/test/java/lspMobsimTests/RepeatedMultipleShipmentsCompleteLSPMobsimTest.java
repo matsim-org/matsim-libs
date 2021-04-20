@@ -305,7 +305,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 			initialize();
 			for(LSPShipment shipment : completeLSP.getShipments()) {
 				assertFalse(shipment.getLog().getPlanElements().isEmpty());
-				ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+				ArrayList<ShipmentPlanElement> scheduleElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 				Collections.sort(scheduleElements, new ShipmentPlanElementComparator());
 				ArrayList<ShipmentPlanElement> logElements = new ArrayList<ShipmentPlanElement>(shipment.getLog().getPlanElements().values());
 				Collections.sort(logElements, new ShipmentPlanElementComparator());
@@ -315,7 +315,7 @@ public class RepeatedMultipleShipmentsCompleteLSPMobsimTest {
 					if(scheduleElement.getElementType() != logElement.getElementType()) {
 						System.out.println(scheduleElement.getElementType());
 						System.out.println(logElement.getElementType());
-						for(int j = 0; j < shipment.getSchedule().getPlanElements().size(); j++) {
+						for(int j = 0; j < shipment.getShipmentPlan().getPlanElements().size(); j++) {
 							System.out.println("Scheduled: " + scheduleElements.get(j).getSolutionElement().getId() + "  " + scheduleElements.get(j).getResourceId()+ "  " + scheduleElements.get(j).getElementType() + " Start: " + scheduleElements.get(j).getStartTime() + " End: " + scheduleElements.get(j).getEndTime());
 						}
 						System.out.println();

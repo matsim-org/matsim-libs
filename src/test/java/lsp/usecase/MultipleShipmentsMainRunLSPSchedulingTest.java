@@ -240,8 +240,8 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 
 		
 		for(LSPShipment shipment : lsp.getShipments()){
-			assertTrue(shipment.getSchedule().getPlanElements().size() == 7);
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getSchedule().getPlanElements().values());
+			assertTrue(shipment.getShipmentPlan().getPlanElements().size() == 7);
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
 			assertTrue(planElements.get(6).getElementType() == "UNLOAD");
 			assertTrue(planElements.get(6).getEndTime() >= (0));
@@ -348,7 +348,7 @@ public class MultipleShipmentsMainRunLSPSchedulingTest {
 		for(LSPShipment shipment : lsp.getShipments()) {
 			assertTrue(shipment.getEventHandlers().size() == 4);
 			eventHandlers = new ArrayList<EventHandler>(shipment.getEventHandlers());
-			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			ArrayList<ShipmentPlanElement> planElements = new ArrayList<ShipmentPlanElement>(shipment.getShipmentPlan().getPlanElements().values());
 			Collections.sort(planElements, new ShipmentPlanElementComparator());
 			ArrayList<LogisticsSolutionElement> solutionElements = new ArrayList<>(lsp.getSelectedPlan().getSolutions().iterator().next().getSolutionElements());
 			ArrayList<LSPResource> resources = new ArrayList<>(lsp.getResources());
