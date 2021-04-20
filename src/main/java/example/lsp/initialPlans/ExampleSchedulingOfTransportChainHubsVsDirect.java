@@ -16,6 +16,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.CommandLine;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -337,9 +338,10 @@ import java.util.*;
 			log.warn(arg);
 		}
 
-		CommandLine cmd = new CommandLine.Builder( args )
-				.allowAnyOption( true )
-				.build();
+		//Set up required MATSim classes
+		Config config;
+		config = ConfigUtils.loadConfig( args );
+		CommandLine cmd = ConfigUtils.getCommandLine(args);
 
 		ExampleSchedulingOfTransportChainHubsVsDirect.solutionType = SolutionType.valueOf( cmd.getOption( "solutionType" ).get() ) ;
 		log.warn( "solutionType=" + ExampleSchedulingOfTransportChainHubsVsDirect.solutionType );
@@ -347,9 +349,6 @@ import java.util.*;
 		log.info("Starting ...");
 		log.info("Set up required MATSim classes");
 
-		//Set up required MATSim classes
-		Config config = new Config();
-		config.addCoreModules();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("scenarios/2regions/2regions-network.xml");
 		Network network = scenario.getNetwork();
