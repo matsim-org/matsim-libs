@@ -224,6 +224,11 @@ import java.util.*;
 				log.info("");
 				log.info("set up logistic Solution - original solution is created");
 
+				//Das ist wichtig, damit er die die Kette zur Verfügung hat.
+				depotElement.setNextElement(mainRunElement);
+				mainRunElement.setNextElement(secondReloadElement);
+				secondReloadElement.setNextElement(distributionElement);
+
 				LogisticsSolution completeSolutionWithReloading = LSPUtils.LogisticsSolutionBuilder.newInstance(
 						Id.create("SolutionWithReloadingId", LogisticsSolution.class)).addSolutionElement(depotElement).addSolutionElement(mainRunElement).addSolutionElement(secondReloadElement).addSolutionElement(distributionElement).build();
 
