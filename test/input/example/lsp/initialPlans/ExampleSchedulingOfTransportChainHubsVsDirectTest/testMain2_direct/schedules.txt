@@ -1,0 +1,10 @@
+Shipment: 1
+DepotElement		Depot		HANDLE		0.0		15.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		15.0		435.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		435.0		3088.333333333334DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		3088.333333333334		3388.333333333334
+Shipment: 2
+DepotElement		Depot		HANDLE		0.0		15.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		15.0		315.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		315.0		2581.666666666667DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		2581.666666666667		2881.666666666667
+Shipment: 3
+DepotElement		Depot		HANDLE		0.0		19.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		19.0		559.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		559.0		2692.333333333334DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		2692.333333333334		3232.333333333334
+Shipment: 4
+DepotElement		Depot		HANDLE		0.0		12.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		15.0		435.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		435.0		2568.3333333333335DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		2568.3333333333335		2688.3333333333335
+Shipment: 5
+DepotElement		Depot		HANDLE		0.0		17.0DirectDistributionElement		DirectDistributionCarrierAdapter		LOAD		17.0		437.0DirectDistributionElement		DirectDistributionCarrierAdapter		TRANSPORT		437.0		2570.3333333333335DirectDistributionElement		DirectDistributionCarrierAdapter		UNLOAD		2570.3333333333335		2990.3333333333335
