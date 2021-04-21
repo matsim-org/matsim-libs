@@ -42,7 +42,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 	@CommandLine.Option(names = "--landuse", description = "Optional path to shape-file to distribute coordinates according to landuse", required = false)
 	private Path landuse;
 
-	@CommandLine.Option(names = "--landuse-iters", description = "Maximum number of points to generate trying to fit into landuse", defaultValue = "150")
+	@CommandLine.Option(names = "--landuse-iters", description = "Maximum number of points to generate trying to fit into landuse", defaultValue = "250")
 	private int iters;
 
 	@CommandLine.Option(names = "--network", description = "Match to closest link using given network", required = false)
