@@ -3,10 +3,7 @@ package org.matsim.application.prepare.population;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -42,7 +39,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 	@CommandLine.Option(names = "--landuse", description = "Optional path to shape-file to distribute coordinates according to landuse", required = false)
 	private Path landuse;
 
-	@CommandLine.Option(names = "--landuse-iters", description = "Maximum number of points to generate trying to fit into landuse", defaultValue = "250")
+	@CommandLine.Option(names = "--landuse-iters", description = "Maximum number of points to generate trying to fit into landuse", defaultValue = "500")
 	private int iters;
 
 	@CommandLine.Option(names = "--network", description = "Match to closest link using given network", required = false)
@@ -115,11 +112,12 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 							if (index != null) {
 								Coordinate newCoord = new Coordinate(coord.getX() + x, coord.getY() + y);
+								Point newPoint = f.createPoint(newCoord);
 								List<Geometry> result = index.query(new Envelope(newCoord));
 
 								// if the point is in any of the landuse shapes we keep it
 								for (Geometry r : result) {
-									if (r.contains(f.createPoint(newCoord)))
+									if (r.contains(newPoint))
 										break outer;
 								}
 							}
