@@ -72,7 +72,7 @@ public class StartingLegMessage extends EventMessage {
 
 		// schedule ActEndEvent
 		event = new ActivityEndEvent(this.getMessageArrivalTime(), vehicle.getOwnerPerson().getId(), vehicle.getCurrentLinkId(), vehicle
-				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType());
+				.getPreviousActivity().getFacilityId(), vehicle.getPreviousActivity().getType(), vehicle.getPreviousActivity().getCoord());
 		eventsManager.processEvent(event);
 
 		// schedule AgentDepartureEvent
