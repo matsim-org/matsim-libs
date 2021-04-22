@@ -38,6 +38,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
@@ -106,6 +107,7 @@ public class TransitScheduleReprojectionIOTest {
 		Scenario scenario ;
 		{
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( "transitschedule.xml" );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );
@@ -171,6 +173,7 @@ public class TransitScheduleReprojectionIOTest {
 			new TransitScheduleWriter( originalScenario.getTransitSchedule() ).writeFile( withAttributes );
 			
 			final Config config = ConfigUtils.createConfig( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ) );
+			config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 			config.transit().setTransitScheduleFile( withAttributes );
 			config.transit().setUseTransit( true );
 			config.transit().setInputScheduleCRS( INITIAL_CRS );

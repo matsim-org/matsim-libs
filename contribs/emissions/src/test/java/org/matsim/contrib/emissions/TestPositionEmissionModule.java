@@ -23,13 +23,15 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
+import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
@@ -46,7 +48,8 @@ import static org.junit.Assert.assertEquals;
 
 public class TestPositionEmissionModule {
 
-    private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
+    private static final String configFile = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario/testv2_Vehv2" ), "config_detailed.xml" ).toString();
+    // (I changed the above from veh v1 to veh v2 since veh v1 is deprecated, especially for emissions.  kai, apr'21)
 
     @Rule
     public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -132,7 +135,7 @@ public class TestPositionEmissionModule {
                 addEventHandlerBinding().toInstance(handler);
                 addEventHandlerBinding().toInstance(mainLinkWarmHandler);
                 addEventHandlerBinding().toInstance(coldHandler);
-                bind(EventsManager.class).to(SimStepParallelEventsManagerImpl.class).in(Singleton.class);
+                bind(EventsManager.class).to(EventsManagerImpl.class).in(Singleton.class);
             }
         });
 

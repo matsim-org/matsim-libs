@@ -869,7 +869,7 @@ public final class NetworkUtils {
 
 		return actual.getAllowedModes().containsAll(expected.getAllowedModes())
 				&& expected.getCapacity() == actual.getCapacity()
-				&& expected.getFlowCapacityPerSec() == actual.getFlowCapacityPerSec()
+				&& expected.getCapacityPeriod() == actual.getCapacityPeriod()
 				&& expected.getFreespeed() == actual.getFreespeed()
 				&& expected.getLength() == actual.getLength()
 				&& expected.getNumberOfLanes() == actual.getNumberOfLanes();

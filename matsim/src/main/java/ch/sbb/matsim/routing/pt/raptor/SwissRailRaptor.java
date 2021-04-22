@@ -6,22 +6,24 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.facilities.Facility;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Provides public transport route search capabilities using an implementation of the
@@ -45,9 +47,10 @@ public class SwissRailRaptor implements TransitRouter {
                            RaptorParametersForPerson parametersForPerson,
                            RaptorRouteSelector routeSelector,
                            RaptorStopFinder stopFinder,
-													 RaptorInVehicleCostCalculator inVehicleCostCalculator) {
+													 RaptorInVehicleCostCalculator inVehicleCostCalculator,
+													 RaptorTransferCostCalculator transferCostCalculator) {
         this.data = data;
-        this.raptor = new SwissRailRaptorCore(data, inVehicleCostCalculator);
+        this.raptor = new SwissRailRaptorCore(data, inVehicleCostCalculator, transferCostCalculator);
         this.parametersForPerson = parametersForPerson;
         this.defaultRouteSelector = routeSelector;
         this.stopFinder = stopFinder;
@@ -256,5 +259,48 @@ public class SwissRailRaptor implements TransitRouter {
         route.addNonPt(null, null, departureTime, walkTime, beelineDistance * beelineDistanceFactor, TransportMode.walk);
         return route;
     }
+
+    public static class Builder {
+			private final SwissRailRaptorData data;
+			private RaptorParametersForPerson parametersForPerson;
+			private RaptorRouteSelector routeSelector = new LeastCostRaptorRouteSelector();
+			private RaptorStopFinder stopFinder = new DefaultRaptorStopFinder(new DefaultRaptorIntermodalAccessEgress(), null);
+			private RaptorInVehicleCostCalculator inVehicleCostCalculator = new DefaultRaptorInVehicleCostCalculator();
+			private RaptorTransferCostCalculator transferCostCalculator = new DefaultRaptorTransferCostCalculator();
+
+			public Builder(SwissRailRaptorData data, Config config) {
+				this.data = data;
+				this.parametersForPerson = new DefaultRaptorParametersForPerson(config);
+			}
+
+			public Builder with(RaptorParametersForPerson parametersForPerson) {
+				this.parametersForPerson = parametersForPerson;
+				return this;
+			}
+
+			public Builder with(RaptorRouteSelector routeSelector) {
+				this.routeSelector = routeSelector;
+				return this;
+			}
+
+			public Builder with(RaptorStopFinder stopFinder) {
+				this.stopFinder = stopFinder;
+				return this;
+			}
+
+			public Builder with(RaptorInVehicleCostCalculator inVehicleCostCalculator) {
+				this.inVehicleCostCalculator = inVehicleCostCalculator;
+				return this;
+			}
+
+			public Builder with(RaptorTransferCostCalculator transferCostCalculator) {
+				this.transferCostCalculator = transferCostCalculator;
+				return this;
+			}
+
+			public SwissRailRaptor build() {
+				return new SwissRailRaptor(this.data, this.parametersForPerson, this.routeSelector, this.stopFinder, this.inVehicleCostCalculator, this.transferCostCalculator);
+			}
+		}
 
 }

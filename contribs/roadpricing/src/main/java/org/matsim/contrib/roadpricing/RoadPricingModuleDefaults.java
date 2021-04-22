@@ -102,7 +102,7 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 							+ "construct a zero toll file and insert that. ");
 				}
 				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
-				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
+				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.addOrGetMutableRoadPricingScheme(scenario );
 				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
 				return rpsImpl;
 			}
@@ -125,9 +125,7 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 		public TravelDisutilityFactory get() {
 			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-					originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
-			);
+			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory( originalTravelDisutilityFactory, scheme, config );
 			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
 			return travelDisutilityFactory;
 		}

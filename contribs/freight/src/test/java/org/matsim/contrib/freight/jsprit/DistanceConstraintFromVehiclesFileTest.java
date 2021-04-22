@@ -21,7 +21,6 @@
 
 package org.matsim.contrib.freight.jsprit;
 
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -48,7 +47,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.management.InvalidAttributeValueException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +110,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV1, 25);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -185,7 +183,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV2, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 		
 		
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
@@ -260,7 +258,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV3, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -342,7 +340,7 @@ public class DistanceConstraintFromVehiclesFileTest {
 		scenario.addScenarioElement("carriers", carriers);
 		CarrierUtils.setJspritIterations(carrierV4, 10);
 
-		FreightUtils.runJsprit(scenario, ConfigUtils.addOrGetModule(config, FreightConfigGroup.class));
+		FreightUtils.runJsprit(scenario);
 
 		Assert.assertEquals("Not the correct amount of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());

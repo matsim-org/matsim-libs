@@ -32,6 +32,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,6 +54,7 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -431,18 +434,20 @@ final public class IOUtils {
 	 * @throws UncheckedIOException
 	 */
 	public static boolean isEqual(InputStream first, InputStream second) throws UncheckedIOException {
-		try {
-			while (true) {
-				int fr = first.read();
-				int tr = second.read();
-
-				if (fr != tr) {
+		byte[] buf1 = new byte[64 * 1024];
+		byte[] buf2 = new byte[64 * 1024];
+		try (first; second) {
+			DataInputStream d2 = new DataInputStream(second);
+			int len;
+			while ((len = first.read(buf1)) > 0) {
+				d2.readFully(buf2,0, len);
+				if (!Arrays.equals(buf1, 0, len, buf2, 0, len)) {
 					return false;
 				}
-				if (fr == -1) {
-					return true; // EOF on both sides
-				}
 			}
+			return d2.read() < 0; // is the end of the second file also.
+		} catch(EOFException ioe) {
+			return false;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

@@ -5,7 +5,7 @@
     <groupId>org.matsim</groupId>
     <artifactId>matsim-all</artifactId>
     <packaging>pom</packaging>
-    <version>13.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
     <name>MATSim-All</name>
     <modules>
         <module>matsim</module>
@@ -32,7 +32,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <argLine></argLine>
 
-        <geotools.version>21.5</geotools.version>
+        <geotools.version>24.2</geotools.version>
         <guice.version>4.2.2</guice.version>
         <guava.version>30.0-jre</guava.version>
         <jackson.version>2.10.3</jackson.version>
@@ -58,29 +58,21 @@
         </repository>
         <repository>
             <id>matsim</id>
-            <url>https://dl.bintray.com/matsim/matsim</url>
-        </repository>
-        <repository>
-            <id>ch.sbb</id>
-            <url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
-        </repository>
-        <repository>
-            <!-- For MATSim snapshots: -->
-            <id>ojo-snapshots</id>
-            <url>https://oss.jfrog.org/libs-snapshot</url>
+            <url>https://repo.matsim.org/repository/matsim</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/matsim/matsim/matsim</url>
-        </repository>
-        <snapshotRepository>
-            <id>oss-jfrog-artifactory</id>
-            <name>artifactory-snapshots</name>
-            <url>https://oss.jfrog.org/oss-snapshot-local</url>
-        </snapshotRepository>
+             <id>matsim-releases</id>
+             <name>MATSim Releases Maven Repository</name>
+             <url>https://repo.matsim.org/repository/matsim-releases/</url>
+         </repository>
+         <snapshotRepository>
+             <id>matsim-snapshots</id>
+             <name>MATSim Snapshots Maven Repository</name>
+             <url>https://repo.matsim.org/repository/matsim-snapshots/</url>
+         </snapshotRepository>
     </distributionManagement>
 
     <!-- Some commonly used dependencies with fixed versions, please try to avoid replicating the versions in other poms -->
@@ -219,7 +211,18 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.3.0</version>
                     <configuration>
                         <descriptors>
                             <descriptor>src/main/assembly/assembly-release.xml</descriptor>

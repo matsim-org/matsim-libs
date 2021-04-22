@@ -12,6 +12,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 import static org.matsim.contrib.noise.RLS19VehicleType.*;
 
@@ -27,14 +28,16 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
     private final ShieldingContext shielding;
     private final IntersectionContext intersection;
+    private final ReflectionContext reflection;
 
     @Inject
     RLS19NoiseImmission(NoiseContext noiseContext, ShieldingContext shielding,
-                        IntersectionContext intersection) {
+                        IntersectionContext intersection, ReflectionContext reflection) {
         this.noiseParams = noiseContext.getNoiseParams();
         this.noiseContext = noiseContext;
         this.shielding = shielding;
         this.intersection = intersection;
+        this.reflection = reflection;
     }
 
     @Override
@@ -95,6 +98,11 @@ public class RLS19NoiseImmission implements NoiseImmission {
         return getSectionsCorrection(nrp, candidateLink);
     }
 
+    @Override
+    public void setCurrentRp(NoiseReceiverPoint nrp) {
+        reflection.setCurrentReceiver(nrp);
+    }
+
     private double getSectionsCorrection(NoiseReceiverPoint nrp, Link link) {
 
         Coordinate nrpCoordinate = CoordUtils.createGeotoolsCoordinate(nrp.getCoord());
@@ -115,8 +123,14 @@ public class RLS19NoiseImmission implements NoiseImmission {
         // des Teilstücks zum Immissionsort betragen (li ≤ si / 2)"
         double maxL = Math.max(1, segment.midPoint().distance(nrpCoordinate) / 2);
         if (length <= maxL) {
-            final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment);
+            final double sectionCorrection = 10 * Math.log10(length) - calculateCorrection(nrpCoordinate, segment, null);
             correctionTemp += Math.pow(10, 0.1*sectionCorrection);
+
+            final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(segment);
+            for(ReflectionContext.ReflectionTuple reflection: reflectionLinks) {
+                double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink.getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink, reflection.facade);
+                correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+            }
         } else {
             double lMid = length / 2;
 
@@ -130,15 +144,23 @@ public class RLS19NoiseImmission implements NoiseImmission {
 
             LineSegment central = new LineSegment(leftCoord, rightCoord);
 
-            final double sectionCorrection = 10 * Math.log10(central.getLength()) - calculateCorrection(nrpCoordinate, central);
+
+            final double sectionCorrection = 10 * Math.log10(central.getLength()) - calculateCorrection(nrpCoordinate, central, null);
             correctionTemp += Math.pow(10, 0.1 * sectionCorrection);
+
+            final Set<ReflectionContext.ReflectionTuple> reflectionLinks = reflection.getReflections(central);
+            for(ReflectionContext.ReflectionTuple reflection: reflectionLinks) {
+                double sectionCorrectionReflection = 10 * Math.log10(reflection.reflectionLink.getLength()) - calculateCorrection(nrpCoordinate, reflection.reflectionLink, reflection.facade);
+                correctionTemp += Math.pow(10, 0.1 * sectionCorrectionReflection);
+            }
+
             correctionTemp += getSubSectionsCorrection(nrpCoordinate, leftRemaining);
             correctionTemp += getSubSectionsCorrection(nrpCoordinate, rightRemaining);
         }
         return correctionTemp;
     }
 
-    private double calculateCorrection(Coordinate nrp, LineSegment segment) {
+    private double calculateCorrection(Coordinate nrp, LineSegment segment, LineSegment reflectionFacade) {
 
         final Coordinate coordinate = segment.midPoint();
         double distance = Math.max(1, coordinate.distance(nrp));
@@ -151,13 +173,20 @@ public class RLS19NoiseImmission implements NoiseImmission {
         //to maintain the correct signs. nk, Sep'20
         double intersectionCorrection = intersection.calculateIntersectionCorrection(coordinate);
 
+        double multipleReflectionCorrection = reflection.getMultipleReflectionCorrection(segment);
+
         double geometricDivergence = 20 * Math.log10(distance) + 10 * Math.log10(2 * Math.PI);
         double airDampeningFactor = distance / 200.;
         double groundDampening = Math.max(4.8 - (AVERAGE_GROUND_HEIGHT / distance) * (34 + 600 / distance), 0);
 
         if (noiseParams.isConsiderNoiseBarriers()) {
-            return geometricDivergence + airDampeningFactor - intersectionCorrection
-                    + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
+            if(reflectionFacade != null) {
+                return geometricDivergence + airDampeningFactor - intersectionCorrection - multipleReflectionCorrection
+                        + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, reflectionFacade)) + 0.5;
+            } else {
+                return geometricDivergence + airDampeningFactor - intersectionCorrection - multipleReflectionCorrection
+                        + Math.max(groundDampening, this.shielding.determineShieldingValue(nrp, segment));
+            }
         } else {
             return geometricDivergence + airDampeningFactor - intersectionCorrection + groundDampening ;
         }

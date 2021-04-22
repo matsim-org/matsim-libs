@@ -20,7 +20,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToLegs;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.DefaultTransitPassengerRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -256,7 +257,7 @@ public class Plans {
 		//pt route
 		TransitStopFacility egressFacility = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), act12.getCoord(), false);
 		TransitStopFacility accessFacility = sBuilder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), act12.getCoord(), false);
-		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessFacility, egressFacility, Id.create("transitline1", TransitLine.class), Id.create("transitroute1", TransitRoute.class));
+		TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(accessFacility.getLinkId(), egressFacility.getLinkId(), accessFacility.getId(), egressFacility.getId(), Id.create("transitline1", TransitLine.class), Id.create("transitroute1", TransitRoute.class));
 		ptRoute.setDistance(1000);
 		ptRoute.setTravelTime(250.0);
 		ptRoute.setStartLinkId(link4);
@@ -689,7 +690,7 @@ public class Plans {
 		//pt route
 		TransitStopFacility egressFacility = sBuilder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), actp4_2.getCoord(), false);
 		TransitStopFacility accessFacility = sBuilder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), actp4_2.getCoord(), false);
-		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessFacility, egressFacility, Id.create("transitline2", TransitLine.class), Id.create("transitroute2", TransitRoute.class));
+		TransitPassengerRoute ptRoute = new DefaultTransitPassengerRoute(accessFacility.getLinkId(), egressFacility.getLinkId(), accessFacility.getId(), egressFacility.getId(), Id.create("transitline2", TransitLine.class), Id.create("transitroute2", TransitRoute.class));
 		//Route route4_2 = RouteUtils.createGenericRouteImpl(link1, link3);
 		ptRoute.setDistance(6500);
 		ptRoute.setTravelTime(1625.0);

@@ -91,11 +91,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author dgrether
  * @author knagel
  */
-public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEndRescheduler {
+public final class QSim implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
-	/** time since last "info" */
+	/**
+	 * time since last "info"
+	 */
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;

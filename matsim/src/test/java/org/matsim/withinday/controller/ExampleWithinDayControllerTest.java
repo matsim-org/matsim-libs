@@ -64,11 +64,14 @@ public class ExampleWithinDayControllerTest {
 				.filter(Leg.class::isInstance)
 				.forEach(planElement -> ((Leg)planElement).setRoute(null));
 
-		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(
-				scenario.getConfig().planCalcScore());
 		PlanAlgorithm router = new PlanRouter(new TripRouterFactoryBuilderWithDefaults().build(scenario).get());
 		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, scenario);
 		scenario.getPopulation().getPersons().values().forEach(pp4s::run);
+		// yyyyyy According to specs, these 3 lines should not be necessary: Having no route should just trigger the re-routing. Commenting
+		// out these 3 lines indeed triggers the standard re-routing, but it fails with issues in the time computation. Presumably, this
+		// points to some problem there, and should thus be fixed.  kai, mar'21
+
+		// Once that is fixed, this whole "preparePlans" method might not be necessary any more.  kai, mar'21
 
 	}
 
