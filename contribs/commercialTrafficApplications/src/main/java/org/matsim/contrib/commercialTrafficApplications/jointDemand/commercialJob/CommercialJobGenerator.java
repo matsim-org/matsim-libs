@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -70,6 +72,8 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
     static final String CUSTOMER_ATTRIBUTE_NAME = "customer";
     static final String SERVICEID_ATTRIBUTE_NAME = "serviceId";
+	static final String EXPECTED_ARRIVALTIME_NAME = "eta";
+	static final String SERVICE_DURATION_NAME = "duration";
 
     private final double firsttourTraveltimeBuffer;
     private final int timeSliceWidth;
@@ -100,6 +104,204 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         getDrtModes(scenario.getConfig());
     }
 
+    /**
+	 * Converts Jsprit tours to MATSim freight agents and adjusts departure times of
+	 * leg and end times of activities
+	 */
+	private void buildFreightAgents() {
+
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			int nextId = 0;
+
+			for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+				CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
+				Id<Person> driverId = JointDemandUtils.generateDriverId(carrier, carrierVehicle, nextId);
+				nextId++;
+				Person driverPerson = createDriverPerson(driverId);
+
+				// Transform Jsprit output to MATSim freight agents
+				Plan plainPlan = createPlainPlanFromTour(carrier, scheduledTour);
+				
+				// adjust Jsprit departure times and activity end times to avoid too early services
+				manageJspritDepartureTimes(plainPlan);
+				
+				driverPerson.addPlan(plainPlan);
+				plainPlan.setPerson(driverPerson);
+				scenario.getPopulation().addPerson(driverPerson);
+				builldVehicleAndDriver(carrier, driverPerson, carrierVehicle);
+			}
+
+		}
+
+	}
+	
+	/**
+	 * Creates fright vehicles and drivers
+	 * @param carrier
+	 * @param driverPerson
+	 * @param carrierVehicle
+	 */
+	private void builldVehicleAndDriver(Carrier carrier, Person driverPerson, CarrierVehicle carrierVehicle) {
+		if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
+			scenario.getVehicles().addVehicleType(carrierVehicle.getType());
+		Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
+		VehicleUtils.insertVehicleIdsIntoAttributes(driverPerson, Map.of(CarrierUtils.getCarrierMode(carrier), vid));
+		scenario.getVehicles()
+				.addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
+		freightVehicles.add(vid);
+		freightDrivers.add(driverPerson.getId());
+	}
+
+	/**
+	 * Jsprit creates tours that begin with the opening time of the carrier. As a
+	 * consequence, the tour vehicle arrives may arrive too early at the first customer.
+	 * Moreover, we need to enforce that a service does not end too early (before the of it's TimeWindow),
+	 * otherwise following services would start too early.
+	 * This method adjusts the (service) activity endTimes and leg departure times to avoid too early starts
+	 * of the services. The firsttourTraveltimeBuffer tries to ensure that the carrier
+	 * departures early enough (leg travel time x firsttourTraveltimeBuffer) to
+	 * reach his first destination (service).
+	 * 
+	 * @param plan
+	 */
+	void manageJspritDepartureTimes(Plan plan) {
+		List<PlanElement> planElements = plan.getPlanElements();
+
+		for (int i = 0; i < planElements.size(); i++) {
+			PlanElement planElement = planElements.get(i);
+
+			if (planElement instanceof Activity) {
+				
+				Activity currentActivity = (Activity) planElement;
+				
+				// Handle all regular services
+				if(!currentActivity.getType().equals(FreightConstants.START))
+				{
+
+					// ExpectedArrivalTime from jsprit needs to be recalculated
+					// Recalculation is based on next leg departure time and current act service time
+					Leg prevLeg = (Leg) planElements.get(i-1);
+					Leg nextLeg = PopulationUtils.getNextLeg(plan, currentActivity);
+					
+					Activity prevAct = (Activity) planElements.get(i - 2);
+
+					if (!prevAct.getType().equals(FreightConstants.START)) {
+
+						//End of plan is reached
+						if (nextLeg == null) {
+							// If next activity is the end activity, departure is allowed to start immediately
+							prevAct.setEndTime(prevLeg.getDepartureTime().seconds());
+						} else {
+							// Update recent prevAct and prevLeg
+							// Expected arrival time at current activity
+							Double expactedArrivalTime = nextLeg.getDepartureTime().seconds()
+									- (double) currentActivity.getAttributes().getAttribute(SERVICE_DURATION_NAME);
+
+							// Set endTimes to avoid an too early departure after service
+							// The earliestPrevActEndTime will include a waiting time,
+							// for which the vehicle remains at previous activity
+							Double earliestPrevActEndTime = expactedArrivalTime - prevLeg.getTravelTime().seconds();
+							prevAct.setEndTime(earliestPrevActEndTime);
+							prevLeg.setDepartureTime(earliestPrevActEndTime);
+						}
+
+					}
+
+				} else if (currentActivity.getType().equals(FreightConstants.START))
+				{
+					
+					Double travelTimeToFirstJob = ((Leg) planElements.get(i+1)).getTravelTime().seconds();
+					Double departureTimeAtFirstJob = ((Leg) planElements.get(i+3)).getDepartureTime().seconds();
+					Double jobServiceDuration = (double) ((Activity) planElements.get(i+2)).getAttributes().getAttribute(SERVICE_DURATION_NAME);
+					Double initalLegDepartureTime = departureTimeAtFirstJob - jobServiceDuration - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;
+					Double expactedArrivalTimeAtFirstJob = departureTimeAtFirstJob - travelTimeToFirstJob*this.firsttourTraveltimeBuffer;					
+					
+					//Set optimal endTimes to avoid an too early arrival at first job
+					 ((Activity) planElements.get(i+2)).getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expactedArrivalTimeAtFirstJob );
+					currentActivity.setEndTime(initalLegDepartureTime);
+					((Leg) planElements.get(i+1)).setDepartureTime(initalLegDepartureTime);
+					
+				}
+			}
+		}
+	}
+
+	/**
+	 * Creates just a simple copy of the ScheduledTour (from JSprit) and forms a MATSim plan
+	 * @param carrier
+	 * @param scheduledTour
+	 * @return
+	 */
+	Plan createPlainPlanFromTour(Carrier carrier, ScheduledTour scheduledTour) {
+
+		String carrierMode = CarrierUtils.getCarrierMode(carrier);
+
+		// Create empty plan
+		Plan plan = PopulationUtils.createPlan();
+
+		// Create start activity
+
+		Activity startActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.START,
+				scheduledTour.getVehicle().getLocation());
+		plan.addActivity(startActivity);
+
+		for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
+			if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
+
+				// Take information from scheduled leg and create a defaultLeg
+				Tour.Leg tourLeg = (Tour.Leg) tourElement;
+				Leg defaultLeg = PopulationUtils.createLeg(carrierMode);
+
+				Route route = tourLeg.getRoute();
+				Assert.isTrue(tourLeg.getRoute() != null, "Missing route for carrier: " + carrier.getId().toString());
+
+				// Assign information from tourLeg to defaultLeg
+				defaultLeg.setDepartureTime(tourLeg.getExpectedDepartureTime());
+				defaultLeg.setTravelTime(tourLeg.getExpectedTransportTime());
+				
+				if (drtModes.contains(carrierMode)) {
+					defaultLeg.setRoute(null); // DrtRoute gets calculated later on
+				} else {
+					double routeDistance = RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork());
+					route.setDistance(routeDistance);
+					route.setTravelTime(tourLeg.getExpectedTransportTime());
+					defaultLeg.setRoute(route);
+				}
+
+				plan.addLeg(defaultLeg);
+
+			} else if (tourElement instanceof Tour.TourActivity) {
+
+				// Take information and create a defaultActivity
+				Tour.ServiceActivity tourActivity = (Tour.ServiceActivity) tourElement;
+
+				Double expactedArrival = tourActivity.getExpectedArrival();
+				Double serviceDuration = tourActivity.getDuration();
+				CarrierService service = carrier.getServices().get(tourActivity.getService().getId());
+				String actType = COMMERCIALJOB_ACTIVITYTYPE_PREFIX + "_" + carrier.getId();
+				String customer = (String) service.getAttributes().getAsMap().get(CUSTOMER_ATTRIBUTE_NAME);
+
+				// Assign information to defaultActivity taken from tourActivity
+				Activity defaultActivity = PopulationUtils.createActivityFromLinkId(actType,
+						tourActivity.getLocation());
+				defaultActivity.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer);
+				defaultActivity.getAttributes().putAttribute(SERVICEID_ATTRIBUTE_NAME, service.getId().toString());
+
+				// Is used later to adjust endTimes of activities
+				defaultActivity.getAttributes().putAttribute(EXPECTED_ARRIVALTIME_NAME, expactedArrival);
+				defaultActivity.getAttributes().putAttribute(SERVICE_DURATION_NAME, serviceDuration);
+
+				plan.addActivity(defaultActivity);
+			}
+		}
+
+		// Create end activity
+		Activity endActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.END,
+				scheduledTour.getVehicle().getLocation());
+		plan.addActivity(endActivity);
+
+		return plan;
+	}
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -113,7 +315,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        createFreightAgents();
+        buildFreightAgents();
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
@@ -201,6 +403,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         });
     }
 
+    @Deprecated
     private void createFreightAgents() {
         for (Carrier carrier : carriers.getCarriers().values()) {
             int nextId = 0;

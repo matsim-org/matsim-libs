@@ -78,10 +78,10 @@ public class HermesRoundaboutTest {
 		controler.getEvents().addHandler((PersonArrivalEventHandler) event -> eventsCount[0]++);
 		controler.getEvents().addHandler((LinkLeaveEventHandler) event -> eventsCount[1]++);
 		controler.run();
-		//400 agents with 3 legs each (incl. access/egress)
-		Assert.equals(1200, eventsCount[0]);
-		//400 agents each traveling on 7 links
-		Assert.equals(7*400,eventsCount[1]);
+		//400 agents with 3 legs each (incl. access/egress) in 3 iterations
+		Assert.equals(3 * 400 * 3, eventsCount[0]);
+		//400 agents each traveling on 7 links in 3 iterations
+		Assert.equals(7 * 400 * 3, eventsCount[1]);
 	}
 
 	private Config createConfig() {
@@ -91,7 +91,7 @@ public class HermesRoundaboutTest {
 
 		config.qsim().setUsePersonIdForMissingVehicleId(true);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(2);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		config.plansCalcRoute().setAccessEgressType(PlansCalcRouteConfigGroup.AccessEgressType.accessEgressModeToLink); //standard accessEgressMode is walk
 

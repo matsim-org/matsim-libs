@@ -5,12 +5,6 @@
 package ch.sbb.matsim.config;
 
 import com.google.common.base.Verify;
-import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +12,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser / SBB
@@ -604,24 +604,27 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	protected void checkConsistency(Config config) {
 
 		if (useIntermodality) {
-			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress " 
-					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
-					+ "SwissRailRaptorConfigGroup is loaded correctly.");
-			
-			for (IntermodalAccessEgressParameterSet paramset: intermodalAccessEgressSettings) {
-				Verify.verifyNotNull(paramset.mode, "mode of an IntermodalAccessEgressParameterSet "
-						+ "is undefined. Please set a value in the config.");
-				Verify.verify(paramset.maxRadius > 0.0, "maxRadius of IntermodalAccessEgressParameterSet "
-						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
-				Verify.verify(paramset.initialSearchRadius > 0.0, "initialSearchRadius of IntermodalAccessEgressParameterSet "
-						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
-				Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
-						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
-				
-				Verify.verify(paramset.maxRadius >= paramset.initialSearchRadius, "maxRadius of IntermodalAccessEgressParameterSet "
-						+ "for mode " + paramset.mode + " is smaller than initialSearchRadius. This is inconsistent.");
-				
-			}
-		}
+
+            Verify.verify(config.plans().getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.reject), "Using intermodal access and egress in "
+                    + "combination with plans without a routing mode is not supported.");
+            Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress "
+                    + "modes defined. Add at least one parameterset with an access/egress mode and ensure "
+                    + "SwissRailRaptorConfigGroup is loaded correctly.");
+
+            for (IntermodalAccessEgressParameterSet paramset : intermodalAccessEgressSettings) {
+                Verify.verifyNotNull(paramset.mode, "mode of an IntermodalAccessEgressParameterSet "
+                        + "is undefined. Please set a value in the config.");
+                Verify.verify(paramset.maxRadius > 0.0, "maxRadius of IntermodalAccessEgressParameterSet "
+                        + "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+                Verify.verify(paramset.initialSearchRadius > 0.0, "initialSearchRadius of IntermodalAccessEgressParameterSet "
+                        + "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+                Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
+                        + "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+
+                Verify.verify(paramset.maxRadius >= paramset.initialSearchRadius, "maxRadius of IntermodalAccessEgressParameterSet "
+                        + "for mode " + paramset.mode + " is smaller than initialSearchRadius. This is inconsistent.");
+
+            }
+        }
 	}
 }
