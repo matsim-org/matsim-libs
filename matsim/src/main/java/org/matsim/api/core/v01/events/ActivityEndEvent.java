@@ -41,15 +41,24 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
-	
+
+	/**
+	 * @deprecated -- add Coord as argument
+	 */
+	@Deprecated // add Coord as argument
+	public ActivityEndEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+							 final Id<ActivityFacility> facilityId, final String acttype ){
+		this( time, agentId, linkId, facilityId, acttype, null);
+	}
+	// this is the new constructor:
 	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+			final Id<ActivityFacility> facilityId, final String acttype, final Coord coord) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 		this.personId = agentId;
-		coord = CoordUtils.createCoord(123456.78901234567890d, 123456.78901234567890d); // TODO: get real Coord
+		this.coord = coord;
 	}
 
 	@Override
