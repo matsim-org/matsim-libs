@@ -84,7 +84,7 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
 
         if (shp.getShapeFile() != null) {
             log.info("Using shape file {}", shp.getShapeFile());
-            HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, population);
+            HomeLocationFilter homeLocationFilter = new HomeLocationFilter(shp, crs.getInputCRS(), population);
             for (Person person : population.getPersons().values()) {
                 if (homeLocationFilter.considerAgent(person)) {
                     personsInCityBoundary.add(person.getId());
