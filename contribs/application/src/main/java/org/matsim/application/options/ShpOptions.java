@@ -127,11 +127,13 @@ public final class ShpOptions {
 			throw new IllegalStateException("Shape file path not specified");
 		if (!Files.exists(shp))
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
+		if (queryCRS == null)
+			throw new IllegalArgumentException("Input crs must not be null!");
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
 
 		try {
-			return new Index(ct, attr, null);
+			return new Index(ct, attr, filter);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
