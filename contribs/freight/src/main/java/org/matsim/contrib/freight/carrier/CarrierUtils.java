@@ -48,7 +48,7 @@ public class CarrierUtils{
 		if(service != null){
 			return service;
 		}
-		log.error("Service with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Service with Id does not exists", new IllegalStateException("Service with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 
@@ -66,7 +66,7 @@ public class CarrierUtils{
 		if(shipment != null){
 			return shipment;
 		}
-		log.error("Shipment with Id does not exists", new IllegalStateException("Serice with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
+		log.error("Shipment with Id does not exists", new IllegalStateException("Shipment with id " + serviceId + " is missing in Carrier: " + carrier.getId()));
 		return null;
 	}
 	

@@ -513,7 +513,7 @@ public class MatsimJspritFactory {
 		for (CarrierService service : carrier.getServices().values()) {
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord coordinate = null;
 			if (network != null) {
@@ -530,7 +530,7 @@ public class MatsimJspritFactory {
 		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord fromCoordinate = null;
 			Coord toCoordinate = null;
@@ -610,7 +610,7 @@ public class MatsimJspritFactory {
 			log.debug("Handle CarrierService: " + service.toString());
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 			Coord coordinate = null;
 			if (network != null) {
@@ -629,7 +629,7 @@ public class MatsimJspritFactory {
 			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException(
-						"VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
+						"VRP with mixed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
 
 			Coord fromCoordinate = null;

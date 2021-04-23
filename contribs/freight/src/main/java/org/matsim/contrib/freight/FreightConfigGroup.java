@@ -40,7 +40,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private String vehicleRoutingAlgortihmFile;
     public static final String VEHICLEROUTINGALGORITHM = "vehicleRoutingAlgortihmFile";
     private static final String VEHICLEROUTINGALGORITHMDESC = "(Optional) Vehicle Routing Algorithm File, according to jsprit library. "
-           + "Empty value \"\" means an default algorithm is used.";
+           + "Empty value \"\" means a default algorithm is used.";
 
     @Positive
     private int travelTimeSliceWidth = 1800;
