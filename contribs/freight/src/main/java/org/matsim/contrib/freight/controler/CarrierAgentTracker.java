@@ -51,7 +51,6 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	CarrierAgentTracker( Carriers carriers, CarrierScoringFunctionFactory carrierScoringFunctionFactory, EventsManager events ) {
 		this.events = events;
-		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
 	}
@@ -68,11 +67,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
-			log.warn( "" );
-			log.warn( "about to create scoring function for carrierId=" + carrier.getId() );
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
-			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
-			log.warn( "" );
 			CarrierAgent carrierAgent = new CarrierAgent( carrier, carrierScoringFunction );
 			carrierAgents.add(carrierAgent);
 		}
