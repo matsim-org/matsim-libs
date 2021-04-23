@@ -75,10 +75,10 @@ public class TimeWindow {
 	@Override
 	public int hashCode(){
 		int result = 59;
-		Long startLong  = Double.doubleToLongBits(start);
+		long startLong  = Double.doubleToLongBits(start);
 		int startHash = (int) (startLong^(startLong>>>32));
 		result = 31 * result + startHash;
-		Long endLong  = Double.doubleToLongBits(end);
+		long endLong  = Double.doubleToLongBits(end);
 		int endHash = (int) (endLong^(endLong>>>32));
 		result = 31 * result + endHash;
 		return result;

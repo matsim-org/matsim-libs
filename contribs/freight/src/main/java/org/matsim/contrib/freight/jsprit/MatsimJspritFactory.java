@@ -243,7 +243,7 @@ public class MatsimJspritFactory {
 			throw new AssertionError("carrierVeh must have the same earliestDep as vrpVeh");
 		if (carrierVehicle.getLatestEndTime() != vehicle.getLatestArrival())
 			throw new AssertionError("carrierVeh must have the same latestArr as vrpVeh");
-		if (carrierVehicle.getLocation().toString() != vehicle.getStartLocation().getId())
+		if (!carrierVehicle.getLocation().toString().equals(vehicle.getStartLocation().getId()))
 			throw new AssertionError("locations must be equal");
 		return vehicle;
 	}
@@ -274,7 +274,7 @@ public class MatsimJspritFactory {
 			throw new AssertionError("vehicles must have the same earliestStartTime");
 		if (vehicle.getLatestArrival() != carrierVehicle.getLatestEndTime())
 			throw new AssertionError("vehicles must have the same latestEndTime");
-		if (vehicle.getStartLocation().getId() != carrierVehicle.getLocation().toString())
+		if (!vehicle.getStartLocation().getId().equals(carrierVehicle.getLocation().toString()))
 			throw new AssertionError("locs must be the same");
 		return carrierVehicle;
 	}
