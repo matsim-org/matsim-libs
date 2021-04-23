@@ -37,6 +37,8 @@ import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler.DefaultFiles;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -123,13 +125,7 @@ public final class CarrierModule extends AbstractModule {
 		} );
 
 
-		this.addControlerListenerBinding().toInstance( new ShutdownListener(){
-			@Inject Config config ;
-			@Inject Scenario scenario ;
-			@Override public void notifyShutdown( ShutdownEvent event ){
-				writeAdditionalRunOutput( config, FreightUtils.getCarriers( scenario ) );
-			}
-		} );
+		this.addControlerListenerBinding().toInstance((ShutdownListener) event -> writeAdditionalRunOutput( event.getServices().getControlerIO(), event.getServices().getConfig(), FreightUtils.getCarriers( event.getServices().getScenario() ) ));
 
 	}
 
@@ -142,12 +138,11 @@ public final class CarrierModule extends AbstractModule {
 		return carrierControlerListener.getCarrierAgentTracker();
 	}
 
-	private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
+	private static void writeAdditionalRunOutput( OutputDirectoryHierarchy controllerIO, Config config, Carriers carriers ) {
 		// ### some final output: ###
-		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml" ) ;
-		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml.gz") ;
-		new CarrierVehicleTypeWriter( CarrierVehicleTypes.getVehicleTypes(carriers )).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml" );
-		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml.gz");
+		String compression = config.controler().getCompressionType().fileEnding;
+		new CarrierPlanXmlWriterV2(carriers).write( controllerIO.getOutputFilename("output_carriers.xml" + compression));
+		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(controllerIO.getOutputFilename("output_carriersVehicleTypes.xml" + compression));
 	}
 
 
