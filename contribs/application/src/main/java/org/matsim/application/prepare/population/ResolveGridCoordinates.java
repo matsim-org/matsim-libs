@@ -2,14 +2,13 @@ package org.matsim.application.prepare.population;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
+import org.matsim.application.options.CrsOptions;
 import org.matsim.application.options.LanduseOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.network.NetworkUtils;
@@ -36,6 +35,9 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 	@CommandLine.Option(names = "--network", description = "Match to closest link using given network", required = false)
 	private Path networkPath;
+
+	@CommandLine.Mixin
+	private CrsOptions crs = new CrsOptions();
 
 	@CommandLine.Mixin
 	private ShpOptions shp = new ShpOptions();
@@ -78,7 +80,7 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 						if (geom != null && !geom.contains(MGC.coord2Point(coord)))
 							continue;
 
-						Coord newCoord = landuse.select(
+						Coord newCoord = landuse.select(crs.getInputCRS(),
 								() -> {
 									double x = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
 									double y = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);

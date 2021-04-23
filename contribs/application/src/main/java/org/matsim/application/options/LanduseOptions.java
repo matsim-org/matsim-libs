@@ -2,19 +2,12 @@ package org.matsim.application.options;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 import picocli.CommandLine;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -40,32 +33,23 @@ public class LanduseOptions {
 	/**
 	 * Holds the index of geometries
 	 */
-	private STRtree index;
+	private ShpOptions.Index index;
 
 	/**
 	 * Create an index of landuse shapes.
 	 */
 	@Nullable
-	public synchronized STRtree getIndex() {
+	public synchronized ShpOptions.Index getIndex(String queryCRS) {
 
 		if (index != null || landuse == null)
 			return index;
 
-		log.info("Using landuse from {}", landuse);
+		log.info("Using landuse from {}, with filter {}", landuse, filter);
+
 
 		ShpOptions landShp = new ShpOptions(landuse, null, StandardCharsets.UTF_8);
-		index = new STRtree();
 
-		for (SimpleFeature ft : landShp.readFeatures()) {
-			Geometry theGeom = (Geometry) ft.getDefaultGeometry();
-
-			if (filter != null && !filter.contains(ft.getAttribute(attr)))
-				continue;
-
-			index.insert(theGeom.getEnvelopeInternal(), theGeom);
-		}
-
-		index.build();
+		index = landShp.createIndex(queryCRS, attr, filter);
 
 		log.info("Read {} features for landuse", index.size());
 
@@ -77,28 +61,23 @@ public class LanduseOptions {
 	 * Will try at least {@link #iters} times, after which the last point is returned even if not within a geometry.
 	 * When no landuse is configured the first point is returned.
 	 *
+	 * @param queryCRS crs of the generated coordinates
 	 * @param genCoord function to generate a new point
 	 */
-	public Coord select(Supplier<Coord> genCoord) {
+	public Coord select(String queryCRS, Supplier<Coord> genCoord) {
 
-		STRtree index = getIndex();
+		ShpOptions.Index index = getIndex(queryCRS);
 
 		Coord coord;
 		int i = 0;
-		outer:
 		do {
 			coord = genCoord.get();
 			i++;
 
 			if (index != null) {
-				Point newPoint = MGC.coord2Point(coord);
-				List<Geometry> result = index.query(new Envelope(newPoint.getCoordinate()));
-
 				// if the point is in any of the landuse shapes we keep it
-				for (Geometry r : result) {
-					if (r.contains(newPoint))
-						break outer;
-				}
+				if (index.contains(coord))
+					break;
 			}
 
 			// regenerate points if there is an index

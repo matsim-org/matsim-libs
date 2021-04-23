@@ -9,7 +9,6 @@ import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -30,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Reusable class for shape file options.
@@ -119,8 +119,9 @@ public final class ShpOptions {
 	 *
 	 * @param queryCRS coordinate system of the queries
 	 * @param attr     the attribute to query from the shape file
+	 * @param filter   filter features by attribute values
 	 */
-	public Index createIndex(String queryCRS, String attr) {
+	public Index createIndex(String queryCRS, String attr, Set<String> filter) {
 
 		if (shp == null)
 			throw new IllegalStateException("Shape file path not specified");
@@ -130,10 +131,19 @@ public final class ShpOptions {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(queryCRS, detectCRS());
 
 		try {
-			return new Index(ct, attr);
+			return new Index(ct, attr, null);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * Create an index without a filter.
+	 *
+	 * @see #createIndex(String, String)
+	 */
+	public Index createIndex(String queryCRS, String attr) {
+		return createIndex(queryCRS, attr, null);
 	}
 
 	/**
@@ -177,7 +187,7 @@ public final class ShpOptions {
 		 * @param ct   coordinate transform from query to target crs
 		 * @param attr attribute for the result of {@link #query(Coord)}
 		 */
-		private Index(CoordinateTransformation ct, String attr)
+		Index(CoordinateTransformation ct, String attr, @Nullable Set<String> filter)
 				throws IOException {
 			ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
 			ds.setCharset(shpCharset);
@@ -185,11 +195,16 @@ public final class ShpOptions {
 			FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
 			while (it.hasNext()) {
 				SimpleFeature ft = it.next();
-				MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
 
-				Envelope env = polygon.getEnvelopeInternal();
+				if (filter != null && !filter.contains(ft.getAttribute(attr)))
+					continue;
+
+				Geometry geom = (Geometry) ft.getDefaultGeometry();
+				Envelope env = geom.getEnvelopeInternal();
 				index.insert(env, ft);
 			}
+
+			index.build();
 
 			it.close();
 			ds.dispose();
@@ -213,13 +228,37 @@ public final class ShpOptions {
 
 			List<SimpleFeature> result = index.query(new Envelope(p));
 			for (SimpleFeature ft : result) {
-				MultiPolygon polygon = (MultiPolygon) ft.getDefaultGeometry();
-				if (polygon.contains(MGC.coordinate2Point(p)))
+				Geometry geom = (Geometry) ft.getDefaultGeometry();
+				if (geom.contains(MGC.coordinate2Point(p)))
 					return (String) ft.getAttribute(attr);
 			}
 
 			return null;
 			// throw new NoSuchElementException(String.format("No matching entry found for x:%f y:%f %s", x, y, p));
+		}
+
+		/**
+		 * Checks whether a coordinate is contained in any of the features.
+		 */
+		public boolean contains(Coord coord) {
+
+			Coordinate p = MGC.coord2Coordinate(ct.transform(coord));
+
+			List<SimpleFeature> result = index.query(new Envelope(p));
+			for (SimpleFeature ft : result) {
+				Geometry geom = (Geometry) ft.getDefaultGeometry();
+				if (geom.contains(MGC.coordinate2Point(p)))
+					return true;
+			}
+
+			return false;
+		}
+
+		/**
+		 * Size of the tree.
+		 */
+		public int size() {
+			return index.size();
 		}
 	}
 

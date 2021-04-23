@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
+import org.matsim.application.options.LanduseOptions;
 import org.matsim.application.options.ShpOptions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -59,6 +60,9 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--output",  description = "Path to output population", required = true)
     private Path output;
+
+    @CommandLine.Mixin
+    private LanduseOptions landuse = new LanduseOptions();
 
     @CommandLine.Mixin
     private CrsOptions crs = new CrsOptions();
@@ -113,6 +117,14 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
             String nutsId = index.query(link.getToNode().getCoord());
 
             if (nutsId != null) {
+
+                // filter additional links by landuse
+                ShpOptions.Index landIndex = landuse.getIndex(crs.getInputCRS());
+                if (landIndex != null) {
+                    if (!landIndex.contains(link.getToNode().getCoord()))
+                        continue;
+                }
+
                 regionLinksMap.computeIfAbsent(nutsId, (k) -> new ArrayList<>()).add(link.getId());
             }
         }

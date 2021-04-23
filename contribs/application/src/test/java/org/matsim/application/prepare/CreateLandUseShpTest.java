@@ -8,6 +8,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CreateLandUseShpTest {
 
 	@Rule
@@ -16,7 +18,6 @@ public class CreateLandUseShpTest {
 	@Test
 	public void convert() {
 
-		// use the pbf of the osm reader
 		Path input = Path.of(utils.getClassInputDirectory(), "andorra-latest-free.shp.zip");
 
 		Assume.assumeTrue(Files.exists(input));
@@ -27,6 +28,10 @@ public class CreateLandUseShpTest {
 				input.toString(),
 				"--output", output.toString()
 		);
+
+		assertThat(output)
+				.exists()
+				.isRegularFile();
 
 	}
 }
