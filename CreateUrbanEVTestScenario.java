@@ -42,6 +42,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 class CreateUrbanEVTestScenario {
 
@@ -80,16 +81,24 @@ class CreateUrbanEVTestScenario {
 		EVUtils.setInitialEnergy(carVehicleType.getEngineInformation(), 5);
 		EVUtils.setChargerTypes(carVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
+		VehicleType carVehicleType2 = vehiclesFactory.createVehicleType(Id.create("EV", VehicleType.class));
+		VehicleUtils.setHbefaTechnology(carVehicleType2.getEngineInformation(), "electricity");
+		VehicleUtils.setEnergyCapacity(carVehicleType2.getEngineInformation(), 10);
+		EVUtils.setInitialEnergy(carVehicleType2.getEngineInformation(), 4);
+		EVUtils.setChargerTypes(carVehicleType2.getEngineInformation(), Arrays.asList("a", "b", "default"));
+
 		VehicleType bikeVehicleType = vehiclesFactory.createVehicleType(Id.create(TransportMode.bike, VehicleType.class));
 		VehicleUtils.setHbefaTechnology(bikeVehicleType.getEngineInformation(), "electricity");
 		VehicleUtils.setEnergyCapacity(bikeVehicleType.getEngineInformation(), 10);
 		EVUtils.setInitialEnergy(bikeVehicleType.getEngineInformation(), 4);
 		EVUtils.setChargerTypes(bikeVehicleType.getEngineInformation(), Arrays.asList("a", "b", "default"));
 
+		scenario.getVehicles().addVehicleType(carVehicleType2);
 		scenario.getVehicles().addVehicleType(carVehicleType);
 		scenario.getVehicles().addVehicleType(bikeVehicleType);
 
 		Map<String, VehicleType> mode2VehicleType = new HashMap<>();
+		mode2VehicleType.put("EV", carVehicleType2);
 		mode2VehicleType.put(TransportMode.car, carVehicleType);
 		mode2VehicleType.put(TransportMode.bike, bikeVehicleType);
 		createAndRegisterVehicles(scenario, mode2VehicleType);
@@ -465,12 +474,17 @@ class CreateUrbanEVTestScenario {
 	}
 
 	private static void createAndRegisterVehicles(Scenario scenario, Map<String, VehicleType> mode2VehicleType){
+
+
+
 		VehiclesFactory vFactory = scenario.getVehicles().getFactory();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			Map<String,Id<Vehicle>> mode2VehicleId = new HashMap<>();
 			for (String mode : mode2VehicleType.keySet()) {
+
 				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode);
 				Vehicle vehicle = vFactory.createVehicle(vehicleId, mode2VehicleType.get(mode));
+
 				scenario.getVehicles().addVehicle(vehicle);
 				mode2VehicleId.put(mode, vehicleId);
 			}
