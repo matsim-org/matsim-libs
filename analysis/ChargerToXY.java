@@ -61,6 +61,13 @@ public class ChargerToXY implements ChargingEndEventHandler, ChargingStartEventH
 public ChargerToXY (ChargingInfrastructureSpecification chargingInfrastructureSpecification, Network network){
     this.chargingInfrastructureSpecification = chargingInfrastructureSpecification;
     this.network = network;
+    for (Id<Charger> chargerId : chargingInfrastructureSpecification.getChargerSpecifications().keySet()) {
+        XYDataContainer dataContainer = new XYDataContainer(0,
+                                                                                     chargerId,
+                chargingInfrastructureSpecification.getChargerSpecifications().get(chargerId).getLinkId(),
+                                                                                                 0);
+        dataContainers.add(dataContainer);
+    }
 
 }
 public static List<XYDataContainer> getDataContainers(){ return dataContainers; }
@@ -70,6 +77,7 @@ public static List<XYDataContainer> getDataContainers(){ return dataContainers; 
 
     @Override
     public void handleEvent(ChargingEndEvent event) {
+
     crtChargers.get(event.getChargerId()).remove(event.getVehicleId());
         XYDataContainer dataContainer = new XYDataContainer(event.getTime(),
                 event.getChargerId(),
@@ -119,6 +127,21 @@ public static List<XYDataContainer> getDataContainers(){ return dataContainers; 
         } catch (IOException exception) {
             exception.printStackTrace();
         }*/
+
+        CSVPrinter csvPrinter = null;
+        try {
+            csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getIterationFilename(iterationCounter.getIterationNumber(), "chargerXYData.csv"))), CSVFormat.DEFAULT.withDelimiter(';').
+                    withHeader("X", "Y", "Time", "ChargerId", "chargingVehicles"));
+            List<ChargerToXY.XYDataContainer> dataContainers = ChargerToXY.getDataContainers();
+
+            for (ChargerToXY.XYDataContainer dataContainer : dataContainers) {
+
+                csvPrinter.printRecord(dataContainer.x, dataContainer.y, Time.writeTime(dataContainer.time), dataContainer.chargerId, dataContainer.chargingVehicles);
+            }
+            csvPrinter.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
     }
 
     @Override

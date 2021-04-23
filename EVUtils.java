@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-class EVUtils {
+public class EVUtils {
 
 	private static final String INITIALENERGY_KWH = "initialEnergyInKWh";
 	private static final String CHARGERTYPES = "chargerTypes";
@@ -49,7 +49,7 @@ class EVUtils {
 	 * @param engineInformation
 	 * @param initialEnergyInKWh initial energy [kWh]
 	 */
-	static void setInitialEnergy(EngineInformation engineInformation, double initialEnergyInKWh ){
+	public static void setInitialEnergy(EngineInformation engineInformation, double initialEnergyInKWh){
 		engineInformation.getAttributes().putAttribute(INITIALENERGY_KWH,  initialEnergyInKWh);
 	}
 
@@ -57,7 +57,7 @@ class EVUtils {
 		return ImmutableList.copyOf((Collection<String>) engineInformation.getAttributes().getAttribute( CHARGERTYPES));
 	}
 
-	static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes ){
+	public static void setChargerTypes(EngineInformation engineInformation, Collection<String> chargerTypes){
 		engineInformation.getAttributes().putAttribute(CHARGERTYPES,  chargerTypes);
 	}
 

@@ -37,7 +37,10 @@ import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureModule;
 import org.matsim.contrib.ev.stats.ChargerPowerCollector;
 import org.matsim.contrib.ev.stats.EvStatsModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.urbanEV.analysis.ActivityWhileChargingCollector;
 import org.matsim.urbanEV.analysis.ChargerToXY;
 
 
@@ -67,6 +70,8 @@ public class UrbanEVModule extends AbstractModule {
 		addEventHandlerBinding().to(ChargerToXY.class).in(Singleton.class);
 		addControlerListenerBinding().to(ChargerToXY.class);
 		addMobsimListenerBinding().to(ChargerToXY.class);
+		addEventHandlerBinding().to((Class<? extends EventHandler>) ActivityWhileChargingCollector.class).in(Singleton.class);
+		addMobsimListenerBinding().to(ActivityWhileChargingCollector.class);
 
 
 		installQSimModule(new AbstractQSimModule() {
