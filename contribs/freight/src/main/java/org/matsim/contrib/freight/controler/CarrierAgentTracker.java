@@ -214,8 +214,9 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 		carrierAgent.handleEvent(event, driverId );
 	}
 	private CarrierAgent getCarrierAgent(Id<Person> driverId) {
-		if(driverAgentMap.containsKey(driverId)){
-			return driverAgentMap.get(driverId);
+		CarrierAgent carrier = driverAgentMap.get(driverId);
+		if(carrier != null){
+			return carrier;
 		}
 		for(CarrierAgent ca : carrierAgents){
 			if(ca.getDriverIds().contains(driverId)){
