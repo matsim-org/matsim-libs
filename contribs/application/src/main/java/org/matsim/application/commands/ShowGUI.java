@@ -23,8 +23,7 @@ public class ShowGUI implements Callable<Integer> {
             name = name.substring(MATSimApplication.COLOR.length(), name.length() - 4);
         }
 
-        Gui show = Gui.show(name, MATSimApplication.class);
-        show.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        Gui.show(name, MATSimApplication.class);
 
         return 0;
     }

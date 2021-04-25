@@ -3,8 +3,10 @@ package org.matsim.application.options;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.data.FeatureReader;
+import org.geotools.data.FileDataStoreFactorySpi;
 import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -25,10 +27,13 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -55,7 +60,7 @@ public final class ShpOptions {
 	/**
 	 * Constructor to use shape options manually.
 	 */
-	public ShpOptions(Path shp, String shpCrs, Charset shpCharset) {
+	public ShpOptions(Path shp, @Nullable String shpCrs, @Nullable Charset shpCharset) {
 		this.shp = shp;
 		this.shpCrs = shpCrs;
 		this.shpCharset = shpCharset;
@@ -87,12 +92,43 @@ public final class ShpOptions {
 			throw new IllegalStateException(String.format("Shape file %s does not exists", shp));
 
 		try {
-			ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
-			ds.setCharset(shpCharset);
+			ShapefileDataStore ds = openDataStore(shp);
+			if (shpCharset != null)
+				ds.setCharset(shpCharset);
+
 			return ShapeFileReader.getSimpleFeatures(ds);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * Opens datastore to a shape-file.
+	 */
+	public static ShapefileDataStore openDataStore(Path shp) throws IOException {
+
+		FileDataStoreFactorySpi factory = new ShapefileDataStoreFactory();
+
+		ShapefileDataStore ds;
+		if (shp.toString().endsWith(".shp"))
+			ds = (ShapefileDataStore) factory.createDataStore(shp.toUri().toURL());
+		else if (shp.toString().endsWith(".zip")) {
+
+			FileSystem fs = FileSystems.newFileSystem(shp, ClassLoader.getSystemClassLoader());
+			Optional<Path> match = Files.walk(fs.getPath("/"))
+					.filter(p -> p.toString().endsWith(".shp"))
+					.findFirst();
+
+			if (match.isEmpty())
+				throw new IllegalArgumentException("No .shp file found in the zip.");
+
+			log.info("Using {} from .zip file", match.get());
+			ds = (ShapefileDataStore) factory.createDataStore(match.get().toUri().toURL());
+		} else {
+			throw new IllegalArgumentException("Shape file must either be .zip or .shp, but was: " + shp);
+		}
+
+		return ds;
 	}
 
 	/**
@@ -191,8 +227,10 @@ public final class ShpOptions {
 		 */
 		Index(CoordinateTransformation ct, String attr, @Nullable Set<String> filter)
 				throws IOException {
-			ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
-			ds.setCharset(shpCharset);
+			ShapefileDataStore ds = openDataStore(shp);
+
+			if (shpCharset != null)
+				ds.setCharset(shpCharset);
 
 			FeatureReader<SimpleFeatureType, SimpleFeature> it = ds.getFeatureReader();
 			while (it.hasNext()) {
