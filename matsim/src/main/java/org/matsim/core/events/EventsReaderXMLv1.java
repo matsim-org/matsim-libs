@@ -158,13 +158,20 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 		}
 		// === material related to wait2link above here
 		else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
+			Coord coord = null ;
+			if ( atts.getValue( Event.ATTRIBUTE_X )!=null ) {
+				double xx = Double.parseDouble( atts.getValue( Event.ATTRIBUTE_X ) ) ;
+				double yy = Double.parseDouble( atts.getValue( Event.ATTRIBUTE_Y ) ) ;
+				coord = new Coord( xx, yy ) ;
+			}
 			this.events.processEvent(new ActivityEndEvent(
 					time, 
 					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(HasLinkId.ATTRIBUTE_LINK), Link.class),
 					atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY),
 							ActivityFacility.class),
-					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
+					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE),
+					coord));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null ;
 			if ( atts.getValue( Event.ATTRIBUTE_X )!=null ) {
