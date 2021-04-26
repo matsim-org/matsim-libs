@@ -3,11 +3,15 @@ package org.matsim.integration.drtAndPt;
 import static java.util.stream.Collectors.toList;
 import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -55,14 +59,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 //@RunWith(Parameterized.class)
 public class PtAlongALine2Test{
@@ -142,14 +138,15 @@ public class PtAlongALine2Test{
 
 		// === RAPTOR: ===
 		{
-			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
+			//config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased); // we'll set up SwissRailRaptor ourself, so disable it here to prevent conflicts
+			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 
-			if ( drtMode!= DrtMode.none){
+			if (drtMode != DrtMode.none) {
 				configRaptor.setUseIntermodalAccessEgress(true);
 
 				//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
 				configRaptor.addIntermodalAccessEgress(
-						new IntermodalAccessEgressParameterSet().setMode( "walk2" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
+						new IntermodalAccessEgressParameterSet().setMode("walk2").setMaxRadius(1000000).setInitialSearchRadius(1000000).setSearchExtensionRadius(10000));
 				// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 				// the reduced drt network we should be able to see differentiation.)
 
@@ -167,7 +164,7 @@ public class PtAlongALine2Test{
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress(
-							new IntermodalAccessEgressParameterSet().setMode( "drt3" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
+							new IntermodalAccessEgressParameterSet().setMode("drt3").setMaxRadius(1000000).setInitialSearchRadius(1000000).setSearchExtensionRadius(10000));
 				}
 			}
 
@@ -175,18 +172,18 @@ public class PtAlongALine2Test{
 
 		// === SCORING: ===
 
-		double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();;
-		if ( drtMode!= DrtMode.none ) {
+		double margUtlTravPt = config.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+		if (drtMode != DrtMode.none) {
 			// (scoring parameters for drt modes)
-			config.planCalcScore().addModeParams( new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling( margUtlTravPt ) );
-			if ( drt2 ) {
-				config.planCalcScore().addModeParams( new ModeParams("drt2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
+			config.planCalcScore().addModeParams(new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling(margUtlTravPt));
+			if (drt2) {
+				config.planCalcScore().addModeParams(new ModeParams("drt2").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
-			if ( drt3 ) {
-				config.planCalcScore().addModeParams( new ModeParams("drt3").setMarginalUtilityOfTraveling( margUtlTravPt ) );
+			if (drt3) {
+				config.planCalcScore().addModeParams(new ModeParams("drt3").setMarginalUtilityOfTraveling(margUtlTravPt));
 			}
 		}
-		config.planCalcScore().addModeParams( new ModeParams("walk2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
+		config.planCalcScore().addModeParams(new ModeParams("walk2").setMarginalUtilityOfTraveling(margUtlTravPt));
 
 		// === QSIM: ===
 
@@ -322,8 +319,6 @@ public class PtAlongALine2Test{
 		// ### CONTROLER: ###
 
 		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new SwissRailRaptorModule() ) ;
 
 		if ( drtMode== DrtMode.full || drtMode== DrtMode.withPrebooking ){
 			controler.addOverridingModule( new DvrpModule() );
@@ -584,8 +579,6 @@ public class PtAlongALine2Test{
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new SwissRailRaptorModule() ) ;
-
 		// This will start otfvis.  Comment in if desired.
 //		controler.addOverridingModule( new OTFVisLiveModule() );
 
@@ -684,7 +677,6 @@ public class PtAlongALine2Test{
 
 		Controler controler = new Controler(scenario);
 
-		controler.addOverridingModule(new SwissRailRaptorModule() ) ;
 
 		// This will start otfvis.  Comment out if not needed.
 //		controler.addOverridingModule( new OTFVisLiveModule() );

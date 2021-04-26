@@ -43,15 +43,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public final class RunDetailedEmissionToolOnlineExample {
 
-	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
+//	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 
 	public static Config prepareConfig( String[] args ) {
 		Config config;
-		if ( args == null || args.length == 0 ) {
-			config = ConfigUtils.loadConfig( configFile, new EmissionsConfigGroup() );
-		} else {
-			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup() );
-		}
+//		if ( args == null || args.length == 0 ) {
+//			config = ConfigUtils.loadConfig( configFile, new EmissionsConfigGroup() );
+//		} else {
+			config = ConfigUtils.loadConfig( args, new EmissionsConfigGroup() );
+//		}
 		return config;
 	}
 
