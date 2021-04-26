@@ -57,6 +57,7 @@ jobs:
           - contribs/hybridsim
           - contribs/otfvis
           - contribs/osm
+          - contribs/application
           - contribs/sbb-extensions
 
     steps:

@@ -71,18 +71,7 @@ public class ShapeFileReader implements MatsimSomeReader {
 			File dataFile = new File(filename);
 			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
 			Gbl.assertIf( dataFile.exists() );
-			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
-			SimpleFeatureSource featureSource = store.getFeatureSource();
-
-			SimpleFeatureIterator it = featureSource.getFeatures().features();
-			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
-			while (it.hasNext()) {
-				SimpleFeature ft = it.next();
-				featureSet.add(ft);
-			}
-			it.close();
-			store.dispose();
-			return featureSet;
+			return getSimpleFeatures(FileDataStoreFinder.getDataStore(dataFile));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -91,21 +80,28 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public static Collection<SimpleFeature> getAllFeatures(final URL url) {
 		try {
 			log.info( "will try to read from " + url.getPath() ) ;
-			FileDataStore store = FileDataStoreFinder.getDataStore(url);
-			SimpleFeatureSource featureSource = store.getFeatureSource();
-
-			SimpleFeatureIterator it = featureSource.getFeatures().features();
-			List<SimpleFeature> featureSet = new ArrayList<SimpleFeature>();
-			while (it.hasNext()) {
-				SimpleFeature ft = it.next();
-				featureSet.add(ft);
-			}
-			it.close();
-			store.dispose();
-			return featureSet;
+			return getSimpleFeatures(FileDataStoreFinder.getDataStore(url));
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * Read all simple features from a data store. This method makes sure the store is closed afterwards.
+	 * @return list of contained features.
+	 */
+	public static List<SimpleFeature> getSimpleFeatures(FileDataStore dataStore) throws IOException {
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource();
+
+		SimpleFeatureIterator it = featureSource.getFeatures().features();
+		List<SimpleFeature> featureSet = new ArrayList<>();
+		while (it.hasNext()) {
+			SimpleFeature ft = it.next();
+			featureSet.add(ft);
+		}
+		it.close();
+		dataStore.dispose();
+		return featureSet;
 	}
 
 	/**
