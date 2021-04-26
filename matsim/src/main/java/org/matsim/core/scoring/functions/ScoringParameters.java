@@ -96,6 +96,7 @@ public class ScoringParameters implements MatsimParameters {
 		private boolean usingOldScoringBelowZeroUtilityDuration;
 		private double simulationPeriodInDays = 1.0;
 
+		@Deprecated
 		public Builder(
 				final Scenario scenario,
 				final Person person ) {
@@ -105,6 +106,15 @@ public class ScoringParameters implements MatsimParameters {
 					scenario.getConfig().scenario() );
 		}
 
+		/**
+		 * This constructor makes defensive copies of both the activity and the mode params.
+		 * Rather use the other constructor.
+		 *
+		 * @param configGroup
+		 * @param scoringParameterSet
+		 * @param scenarioConfig
+		 */
+		@Deprecated
 		public Builder(
 				final PlanCalcScoreConfigGroup configGroup,
 				final PlanCalcScoreConfigGroup.ScoringParameterSet scoringParameterSet,
@@ -151,7 +161,7 @@ public class ScoringParameters implements MatsimParameters {
 
 
 		/**
-		 * this constructor does not use defensive copies for the activity params but for the mode params
+		 * This constructor does not make defensive copies of the activity params but it makes copies of the mode params
 		 *
 		 * @param configGroup
 		 * @param scoringParameterSet
@@ -267,16 +277,6 @@ public class ScoringParameters implements MatsimParameters {
 		}
 
 		public ScoringParameters build() {
-//			final Map<String, ModeUtilityParameters> modes = modeParams.size() <= 20 ? new ArrayMap() : new TreeMap<>();
-//			for ( Map.Entry<String, ModeUtilityParameters.Builder> e : modeParams.entrySet() ) {
-//				modes.put( e.getKey() , e.getValue().build() );
-//			}
-//
-//			final Map<String, ActivityUtilityParameters> acts = utilParams.size() <= 20 ? new ArrayMap() : new TreeMap<>();
-//			for ( Map.Entry<String, ActivityUtilityParameters.Builder> e : utilParams.entrySet() ) {
-//				acts.put( e.getKey() , e.getValue().build() );
-//			}
-
 			return new ScoringParameters(
 					utilParams,
 					modeParams,

@@ -19,7 +19,6 @@
 package playground.vsp.scoring;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Person;
@@ -110,7 +109,6 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 			 */
 
 			PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
-//			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScoringParams, scConfig);
 
 			// save the activityParams of the subpopulation so we need to build them only once.
 			this.activityParamsPerSubpopulation.computeIfAbsent(subpopulation, k -> {

@@ -39,7 +39,6 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 	private final PlanCalcScoreConfigGroup config;
 	private final ScenarioConfigGroup scConfig;
 	private final TransitConfigGroup transitConfigGroup;
-//	private final String subpopulationAttributeName;
 	private final Map<String, ScoringParameters> params = new HashMap<>();
 	private final Population population;
 
@@ -48,7 +47,6 @@ public class SubpopulationScoringParameters implements ScoringParametersForPerso
 		this.config = planCalcScoreConfigGroup;
 		this.scConfig = scenarioConfigGroup;
 		this.transitConfigGroup = transitConfigGroup;
-//		this.subpopulationAttributeName = plansConfigGroup.getSubpopulationAttributeName();
 		this.population = population ;
 	}
 
