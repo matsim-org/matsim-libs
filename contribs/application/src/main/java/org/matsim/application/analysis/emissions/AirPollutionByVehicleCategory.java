@@ -144,8 +144,8 @@ public class AirPollutionByVehicleCategory implements MATSimAppCommand {
 				scenario.getVehicles().getVehicleTypes().values(),
 				scenario.getTransitVehicles().getVehicleTypes().values())) {
 
-			HbefaVehicleCategory cat = vehicleCategories.computeIfAbsent(type.toString(), (k) -> {
-				log.warn("Vehicle type {} not mapped to a category, using {}", type, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
+			HbefaVehicleCategory cat = vehicleCategories.computeIfAbsent(type.getId().toString(), (k) -> {
+				log.warn("Vehicle type {} not mapped to a category, using {}", k, HbefaVehicleCategory.NON_HBEFA_VEHICLE);
 				return HbefaVehicleCategory.NON_HBEFA_VEHICLE;
 			});
 
