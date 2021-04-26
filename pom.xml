@@ -33,6 +33,7 @@
         <argLine></argLine>
 
         <geotools.version>24.2</geotools.version>
+        <jts.version>1.17.1</jts.version>
         <guice.version>4.2.2</guice.version>
         <guava.version>30.0-jre</guava.version>
         <jackson.version>2.10.3</jackson.version>
@@ -139,9 +140,19 @@
                 <version>${geotools.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-epsg-extension</artifactId>
+                <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.geotools.jdbc</groupId>
                 <artifactId>gt-jdbc-postgis</artifactId>
                 <version>${geotools.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.locationtech.jts</groupId>
+                <artifactId>jts-core</artifactId>
+                <version>${jts.version}</version>
             </dependency>
 
             <dependency>
@@ -211,7 +222,18 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>2.5.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.3.0</version>
                     <configuration>
                         <descriptors>
                             <descriptor>src/main/assembly/assembly-release.xml</descriptor>
