@@ -122,7 +122,7 @@ public final class ShpOptions {
 			if (match.isEmpty())
 				throw new IllegalArgumentException("No .shp file found in the zip.");
 
-			log.info("Using {} from .zip file", match.get());
+			log.info("Using {} from {}", match.get(), shp);
 			ds = (ShapefileDataStore) factory.createDataStore(match.get().toUri().toURL());
 		} else {
 			throw new IllegalArgumentException("Shape file must either be .zip or .shp, but was: " + shp);
