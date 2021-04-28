@@ -3,10 +3,11 @@ package org.matsim.application.analysis;
 
 import it.unimi.dsi.fastutil.doubles.Double2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.doubles.Double2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
@@ -74,7 +75,7 @@ public class CheckPopulation implements MATSimAppCommand {
 
 		sep();
 
-		Object2IntMap<String> attributes = new Object2IntOpenHashMap<>();
+		Object2IntMap<String> attributes = new Object2IntAVLTreeMap<>();
 
 		// Count attributes
 		for (Person agent : population.getPersons().values()) {
@@ -117,7 +118,51 @@ public class CheckPopulation implements MATSimAppCommand {
 
 		counts.forEach((k, v) -> log.info("\t{}-m: {} ({}%)", k.intValue(), v, Math.round((v * 1000d) / trips.size()) / 10d));
 
+		sep();
+
+		Object2IntMap<String> acts = new Object2IntAVLTreeMap<>();
+		Object2IntMap<String> firstAct = new Object2IntAVLTreeMap<>();
+		Object2IntMap<String> lastAct = new Object2IntAVLTreeMap<>();
+
+		for (Person agent : agents) {
+
+			List<Activity> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
+
+			if (activities.size() == 0)
+				continue;
+
+			firstAct.mergeInt(actName(activities.get(0)), 1, Integer::sum);
+			lastAct.mergeInt(actName(activities.get(activities.size() - 1)), 1, Integer::sum);
+			activities.forEach(act -> acts.mergeInt(actName(act), 1, Integer::sum));
+		}
+
+		log.info("Activity distribution (total):");
+
+		printDist(acts);
+
+		log.info("Activity distribution (first):");
+
+		printDist(firstAct);
+
+		log.info("Activity distribution (last):");
+
+		printDist(lastAct);
+
 		return 0;
+	}
+
+	private static String actName(Activity act) {
+
+		int idx = act.getType().lastIndexOf("_");
+		if (idx == -1)
+			return act.getType();
+
+		return act.getType().substring(0, idx);
+	}
+
+	private static <T> void printDist(Object2IntMap<T> map) {
+		int total = map.values().intStream().sum();
+		map.forEach((k, v) -> log.info("\t{}: {} ({}%)", k, v, Math.round((v * 1000d) / total) / 10d));
 	}
 
 }
