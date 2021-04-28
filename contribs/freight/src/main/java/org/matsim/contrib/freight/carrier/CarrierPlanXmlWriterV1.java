@@ -26,9 +26,9 @@ import org.matsim.core.utils.misc.Time;
  * @deprecated Use {@link CarrierPlanXmlWriterV2} instead which writes the newer format
  */
 @Deprecated
-public class CarrierPlanWriter extends MatsimXmlWriter {
+public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierPlanWriter.class);
+	private static Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
 
 	private Collection<Carrier> carriers;
 
@@ -41,7 +41,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	 * 
 	 * @param carriers to be written
 	 */
-	public CarrierPlanWriter(Collection<Carrier> carriers) {
+	public CarrierPlanXmlWriterV1(Collection<Carrier> carriers) {
 		super();
 		this.carriers = carriers;
 	}

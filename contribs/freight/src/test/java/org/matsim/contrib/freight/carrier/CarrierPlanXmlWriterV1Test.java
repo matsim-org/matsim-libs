@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  */
-public class CarrierPlanWriterTest {
+public class CarrierPlanXmlWriterV1Test {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -44,7 +44,7 @@ public class CarrierPlanWriterTest {
 		Carriers carriers = new Carriers();
 		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers);
 		carrierPlanReaderV1.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
-		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
+		CarrierPlanXmlWriterV1 planWriter = new CarrierPlanXmlWriterV1(carriers.getCarriers().values());
 		planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
 	}
 	
