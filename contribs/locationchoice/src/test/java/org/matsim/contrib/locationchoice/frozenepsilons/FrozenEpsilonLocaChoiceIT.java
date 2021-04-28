@@ -229,6 +229,12 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	enum RunType { shortRun, medRun, longRun }
 
+	/*
+	 * Checks if the typical duration performance is used for the calculation of the maxRadius
+	 * with epsilon = 0, the search radius only depends on the typical duration performance, if the activity is not shifted, the typical duration performance will not be processed correctly
+	 * true = means it is used and the test person relocated his position to the facility
+	 * false = means it is not used and the test person didn't relocated his position
+	 */
 	@Test public void testDurationTypicalPerformanceUsage() {
 		//Config
 		Config config = ConfigUtils.createConfig();
@@ -285,7 +291,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		//facilities
 		{
 			ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
-			ActivityFacility af = ff.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(1, 0));
+			ActivityFacility af = ff.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(-1, 0));
 			ActivityOption option = ff.createActivityOption("shop");
 			af.addActivityOption(option);
 			scenario.getActivityFacilities().addActivityFacility(af);
@@ -297,6 +303,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		controler.run();
 
+		// takes the output plan and checks if the selected plan uses the shopping facility
 		Assert.assertTrue(((Activity) controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("1")).getSelectedPlan().getPlanElements().get(2)).getFacilityId() != null);
 
 	}
