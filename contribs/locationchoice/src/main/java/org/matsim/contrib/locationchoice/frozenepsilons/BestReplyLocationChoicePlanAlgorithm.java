@@ -169,26 +169,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
 			int facilityIndex = facility.getArrayIndex();
 			if (this.sampler.sample(facilityIndex, personIndex)) { 
-				
-				// only add destination if it can be reached with the chosen mode
-				String mode = PopulationUtils.getPreviousLeg( plan, actToMove ).getMode();
-				
-				Id<Link> linkId = null;
-				// try to get linkId from facility, else get it from act. other options not allowed!
-				if (facility.getLinkId() != null) {
-					linkId = facility.getLinkId();
-				}
-				else {
-					linkId = actToMove.getLinkId();
-				}
-				// TODO: solve this generic. for that we need info from the config, which modes are actually teleported.
-				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode) || 
-						mode.equals(TransportMode.bike) || 
-						mode.equals(TransportMode.walk) ||
-						mode.equals(TransportMode.transit_walk) ||
-						mode.equals(TransportMode.other)) {
-					cs.addDestination(facility.getId());
-				}	
+				cs.addDestination(facility.getId());
 			}
 		}
 		
