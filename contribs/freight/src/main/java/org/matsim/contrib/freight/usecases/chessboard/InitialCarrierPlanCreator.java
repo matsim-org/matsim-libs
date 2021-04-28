@@ -156,7 +156,7 @@ final class InitialCarrierPlanCreator {
             carrier.setSelectedPlan(plan);
         }
 
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

@@ -23,7 +23,7 @@ import org.matsim.core.utils.misc.Time;
  * 
  * @author sschroeder
  *
- * @deprecated Use {@link CarrierPlanXmlWriterV2} instead which writes the newer format
+ * @deprecated Use {@link CarrierPlanWriter} instead which writes the newest format
  */
 @Deprecated
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
