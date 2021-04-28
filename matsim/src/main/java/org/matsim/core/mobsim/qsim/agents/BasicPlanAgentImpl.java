@@ -197,7 +197,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
 		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
-		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType(), act.getCoord()));
 	
 		// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
 		advancePlan(now);
