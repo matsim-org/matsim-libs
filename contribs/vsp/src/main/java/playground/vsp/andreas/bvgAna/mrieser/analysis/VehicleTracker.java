@@ -28,6 +28,8 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Tracks at which facility a vehicle is currently located. If a vehicle departs at a facility,
@@ -38,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
  */
 public class VehicleTracker implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	private final Map<Id, Id> vehicleFacilityMap = new HashMap<Id, Id>();
+	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
 	
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		this.vehicleFacilityMap.put(event.getVehicleId(), event.getFacilityId());
@@ -58,7 +60,7 @@ public class VehicleTracker implements VehicleArrivesAtFacilityEventHandler, Veh
 	 * @return the id of the facility where the specified vehicle is currently located, 
 	 * <code>null</code> if the vehicle is currently at no known location.
 	 */
-	public Id getFacilityIdForVehicle(final Id vehicleId) {
+	public Id<TransitStopFacility> getFacilityIdForVehicle(final Id<Vehicle> vehicleId) {
 		return this.vehicleFacilityMap.get(vehicleId);
 	}
 	
