@@ -44,6 +44,7 @@ import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.OptionalTime;
 
 /**
@@ -830,6 +831,22 @@ public final class NetworkUtils {
 	public static Network readNetwork(String string) {
 		Network network = createNetwork();
 		new MatsimNetworkReader(network).readFile(string);
+		return network;
+	}
+
+	/**
+	 * reads network form file and applies a coordinate transformation.
+	 * @param filename network file name
+	 * @param transformation coordinate transformation as from @{{@link org.matsim.core.utils.geometry.transformations.TransformationFactory#getCoordinateTransformation(String, String)}}
+	 * @return network from file transformed onto target CRS
+	 */
+	public static Network readNetwork(String filename, CoordinateTransformation transformation) {
+		var network = readNetwork(filename);
+		network.getNodes().values().parallelStream()
+				.forEach(node -> {
+					var transformedCoord = transformation.transform(node.getCoord());
+					node.setCoord(transformedCoord);
+				});
 		return network;
 	}
 
