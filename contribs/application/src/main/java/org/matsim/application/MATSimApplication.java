@@ -226,7 +226,11 @@ public abstract class MATSimApplication implements Callable<Integer>, CommandLin
      */
     protected void addRunOption(Config config, String option, Object value) {
 
-        String postfix = "-" + option + "_" + value;
+        String postfix;
+        if ("".equals(value))
+            postfix = "-" + option;
+        else
+            postfix = "-" + option + "_" + value;
 
         String outputDir = config.controler().getOutputDirectory();
         if (outputDir.endsWith("/")) {

@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class HomeLocationFilter implements AgentFilter {
-	private static final Logger log = Logger.getLogger(HomeLocationFilter.class);
 
 	private final Set<Id<Person>> consider = new HashSet<>();
 	private static final String HOME_ACTIVITY_TYPE_PREFIX = "home";
@@ -36,10 +35,13 @@ public class HomeLocationFilter implements AgentFilter {
 				}
 			}
 		}
+	}
 
-		log.info("The total population size is " + population.getPersons().values().size());
-		log.info("The population size inside the city for this simulation setup is " + consider.size());
-
+	/**
+	 * Number of agents in the zone.
+	 */
+	public int size() {
+		return consider.size();
 	}
 
 	@Override
