@@ -241,7 +241,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				.getFacilities()
 				.values()
 				.stream()
-				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.map(DrtStopFacilityImpl::createFromFacility)
 				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
 		return () -> drtStops;
 	}

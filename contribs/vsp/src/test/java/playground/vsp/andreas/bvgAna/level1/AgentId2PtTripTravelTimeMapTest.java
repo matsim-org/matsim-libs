@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
+import org.matsim.api.core.v01.Coord;
 import playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
 import playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMapData;
 
@@ -53,14 +54,14 @@ public class AgentId2PtTripTravelTimeMapTest {
 	        
 	        AgentId2PtTripTravelTimeMap test = new AgentId2PtTripTravelTimeMap(idSet);
 	        
-	        ActivityStartEvent event1 = new ActivityStartEvent(1.0, agentId1, linkId1, facilId1, "w");
-	        ActivityEndEvent event2 = new ActivityEndEvent(1.2, agentId1, linkId1, facilId1, "w");
+	        ActivityStartEvent event1 = new ActivityStartEvent(1.0, agentId1, linkId1, facilId1, "w", new Coord( 234., 5.67 ));
+	        ActivityEndEvent event2 = new ActivityEndEvent(1.2, agentId1, linkId1, facilId1, "w", new Coord( 234., 5.67 ));
 	        
-	        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2, agentId1, linkId2, "pt");        
+	        PersonDepartureEvent event3 = new PersonDepartureEvent(1.2, agentId1, linkId2, "pt");
 	        PersonArrivalEvent event4 = new PersonArrivalEvent(1.9, agentId1, linkId3, "pt");
 	        
-	        ActivityStartEvent event5 = new ActivityStartEvent(1.9, agentId1, linkId3, facilId2, "h");	//home mit anderen werten
-	        ActivityEndEvent event6 = new ActivityEndEvent(2.7, agentId1, linkId3, facilId2, "h");
+	        ActivityStartEvent event5 = new ActivityStartEvent(1.9, agentId1, linkId3, facilId2, "h", new Coord( 123., 45.67 ));	//home mit anderen werten
+	        ActivityEndEvent event6 = new ActivityEndEvent(2.7, agentId1, linkId3, facilId2, "h", new Coord( 123., 45.67 ));
 	                
 	        test.handleEvent(event1);
 	        test.handleEvent(event2);

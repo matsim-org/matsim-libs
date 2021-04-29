@@ -54,13 +54,13 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
 
-	public VehicleWriterV2( Vehicles vehicles ) {
+	public VehicleWriterV2(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException, IOException {
-		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
+		log.info(Gbl.aboutToWrite("vehicles", filename));
 		this.openFile(filename);
 		this.writeXmlHead();
 		this.writeRootElement();
@@ -79,13 +79,22 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV2Names.VEHICLEDEFINITIONS);
 	}
 
-	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException {
+	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException, IOException {
 		List<Vehicle> sortedVehicles = veh.values().stream().sorted(comparing(Vehicle::getId)).collect(toList());
 		for (Vehicle v : sortedVehicles) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, v.getId().toString()));
 			atts.add(this.createTuple(VehicleSchemaV2Names.TYPE, v.getType().getId().toString()));
-			this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, true);
+
+			/* The format of the vehicle depends on whether the particular vehicle has attributes specified. */
+			if (v.getAttributes().isEmpty()) {
+				this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, true);
+			} else {
+				this.writeStartTag(VehicleSchemaV2Names.VEHICLE, atts, false);
+				this.writer.newLine();
+				attributesWriter.writeAttributes("\t\t", this.writer, v.getAttributes(), false);
+				this.writeEndTag(VehicleSchemaV2Names.VEHICLE);
+			}
 		}
 	}
 
@@ -102,7 +111,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 
 			//Write general vehicleType attributes
 			this.writer.write("\n");
-			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() , false);
+			attributesWriter.writeAttributes("\t\t", this.writer, vt.getAttributes(), false);
 
 			//Write vehicleType description, if present
 			if (vt.getDescription() != null) {
@@ -131,26 +140,26 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
 				//attributes for capacity
 				this.writer.write("\n");
-				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes(), false );
+				attributesWriter.writeAttributes("\t\t\t", this.writer, vehicleCapacity.getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 			}
 
 			//Write length, if present
-			if (!Double.isNaN(vt.getLength())){
+			if (!Double.isNaN(vt.getLength())) {
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getLength())));
 				this.writeStartTag(VehicleSchemaV2Names.LENGTH, atts, true);
 			}
 
 			//Write width, if present
-			if (!Double.isNaN(vt.getWidth())){
+			if (!Double.isNaN(vt.getWidth())) {
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getWidth())));
 				this.writeStartTag(VehicleSchemaV2Names.WIDTH, atts, true);
 			}
 
 			//Write maximumVelocity, if present
-			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
+			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())) {
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV2Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
 				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
@@ -161,7 +170,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				atts.clear();
 				this.writeStartTag(VehicleSchemaV2Names.ENGINEINFORMATION, atts);
 				this.writer.write("\n");
-				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vt.getEngineInformation().getAttributes(), false);
+				attributesWriter.writeAttributes("\t\t\t", this.writer, vt.getEngineInformation().getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 			}
 
@@ -181,7 +190,7 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV2Names.COSTINFORMATION, atts);
 				//attributes for costInformation
 				this.writer.write("\n");
-				attributesWriter.writeAttributes( "\t\t\t" , this.writer , costInformation.getAttributes(), false );
+				attributesWriter.writeAttributes("\t\t\t", this.writer, costInformation.getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.COSTINFORMATION);
 			}
 
@@ -201,10 +210,10 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 
 			//Write flowEfficiencyFactor, if present
 			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
-                atts.clear();
-                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
-                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
-            }
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
+				this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
+			}
 
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
 			this.writer.write("\n");

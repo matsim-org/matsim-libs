@@ -22,7 +22,6 @@
  */
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,7 +76,8 @@ public class NoiseRLS19IT {
         Geometry geom = new GeometryFactory().createPolygon(shell);
         FeatureNoiseBarrierImpl barrier = new FeatureNoiseBarrierImpl(Id.create("1", NoiseBarrier.class), geom, 10);
         barriers.add(barrier);
-        ShieldingContext context = new ShieldingContext(barriers, config, shieldingCorrection);
+        BarrierContext barrierContext = new BarrierContext(barriers);
+        ShieldingContext context = new ShieldingContext(config, shieldingCorrection, barrierContext);
 
 
         ReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
@@ -147,7 +147,11 @@ public class NoiseRLS19IT {
         Geometry geom = new GeometryFactory().createPolygon(shell);
         FeatureNoiseBarrierImpl barrier = new FeatureNoiseBarrierImpl(Id.create("1", NoiseBarrier.class), geom, 10);
         barriers.add(barrier);
-        ShieldingContext shieldingContext = new ShieldingContext(barriers, config, shieldingCorrection);
+
+        BarrierContext barrierContext = new BarrierContext(barriers);
+        ShieldingContext shieldingContext = new ShieldingContext(shieldingCorrection, barrierContext);
+        ReflectionContext reflectionContext = new ReflectionContext(barrierContext);
+
 
         Scenario scenario = ScenarioUtils.createScenario(config);
         final NoiseContextStub noiseContext = new NoiseContextStub(scenario);
@@ -178,7 +182,7 @@ public class NoiseRLS19IT {
         NoiseReceiverPoint rp = new NoiseReceiverPoint(Id.create("a", ReceiverPoint.class), new Coord(0,0));
 
 
-        RLS19NoiseImmission immission = new RLS19NoiseImmission(noiseContext, shieldingContext, new IntersectionContext(network));
+        RLS19NoiseImmission immission = new RLS19NoiseImmission(noiseContext, shieldingContext, new IntersectionContext(network), reflectionContext);
 
         noiseLink.setEmission(65);
         noiseLink2.setEmission(55);

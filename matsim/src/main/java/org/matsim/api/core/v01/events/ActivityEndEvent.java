@@ -22,29 +22,43 @@ package org.matsim.api.core.v01.events;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacility;
 
-public final class ActivityEndEvent extends Event implements HasPersonId, HasLinkId, HasFacilityId {
+public final class ActivityEndEvent extends Event implements HasPersonId, HasLinkId, HasFacilityId, BasicLocation {
 
 	public static final String EVENT_TYPE = "actend";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
 	private final Id<Person> personId;
+	private Coord coord;
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
-	
+
+	/**
+	 * @deprecated -- add Coord as argument
+	 */
+	@Deprecated // add Coord as argument
+	public ActivityEndEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+							 final Id<ActivityFacility> facilityId, final String acttype ){
+		this( time, agentId, linkId, facilityId, acttype, null);
+	}
+	// this is the new constructor:
 	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+			final Id<ActivityFacility> facilityId, final String acttype, final Coord coord) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 		this.personId = agentId;
+		this.coord = coord;
 	}
 
 	@Override
@@ -76,5 +90,11 @@ public final class ActivityEndEvent extends Event implements HasPersonId, HasLin
 		return attr;
 	}
 
-	
+	@Override public Coord getCoord(){
+		return coord;
+	}
+	public void setCoord( Coord coord ) {
+		// yy  this is to retrofit the coordinate into existing events that don't have it.
+		this.coord = coord;
+	}
 }

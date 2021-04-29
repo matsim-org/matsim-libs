@@ -66,7 +66,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private String inputScheduleCRS = null;
 
 	private Set<String> transitModes;
-	private TransitRoutingAlgorithmType routingAlgorithmType = TransitRoutingAlgorithmType.DijkstraBased;
+	private TransitRoutingAlgorithmType routingAlgorithmType = TransitRoutingAlgorithmType.SwissRailRaptor;
 	
 	// ---
 	private static final String USE_TRANSIT = "useTransit";

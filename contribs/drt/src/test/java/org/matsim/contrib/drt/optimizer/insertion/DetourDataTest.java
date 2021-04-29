@@ -27,7 +27,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.passenger.DrtRequest;
@@ -36,6 +36,7 @@ import org.matsim.testcases.fakes.FakeLink;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableTable;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -63,7 +64,7 @@ public class DetourDataTest {
 	private final String dropoff_stop1 = "dropoff_stop1";
 
 	private final DrtRequest request = DrtRequest.newBuilder().fromLink(pickupLink).toLink(dropoffLink).build();
-	private final Entry entry = entry(startLink, stop0Link, stop1Link);
+	private final VehicleEntry entry = entry(startLink, stop0Link, stop1Link);
 
 	private final ImmutableMap<Link, String> pathToPickupMap = ImmutableMap.of(startLink, start_pickup, stop0Link,
 			stop0_pickup, stop1Link, stop1_pickup);
@@ -78,8 +79,8 @@ public class DetourDataTest {
 			dropoff_stop1);
 
 	private static final String ZERO_DETOUR = "zero_detour";
-	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap::get, pathFromPickupMap::get,
-			pathToDropoffMap::get, pathFromDropoffMap::get, ZERO_DETOUR);
+	private final DetourData<String> detourData = new DetourData<>(pathToPickupMap, pathFromPickupMap, pathToDropoffMap,
+			pathFromDropoffMap, ZERO_DETOUR);
 
 	@Test
 	public void insertion_0_0() {
@@ -124,12 +125,27 @@ public class DetourDataTest {
 		return new FakeLink(Id.createLinkId(id));
 	}
 
-	private Entry entry(Link startLink, Link... stopLinks) {
-		return new Entry(null, new Waypoint.Start(null, startLink, 0, 0),
+	private VehicleEntry entry(Link startLink, Link... stopLinks) {
+		return new VehicleEntry(null, new Waypoint.Start(null, startLink, 0, 0),
 				Arrays.stream(stopLinks).map(this::stop).collect(ImmutableList.toImmutableList()));
 	}
 
 	private Waypoint.Stop stop(Link link) {
 		return new Waypoint.Stop(new DrtStopTask(0, 60, link), 0);
+	}
+
+	@Test
+	public void testCreate() {
+		Insertion insertion = new Insertion(request, entry, 0, 1);
+		var timeEstimates = ImmutableTable.<Link, Link, Double>builder()//
+				.put(startLink, pickupLink, 12.)
+				.put(pickupLink, stop0Link, 34.)
+				.put(stop0Link, dropoffLink, 56.)
+				.put(dropoffLink, stop1Link, 78.)
+				.build();
+		var detourData = DetourData.create(timeEstimates::get, request).createInsertionWithDetourData(insertion);
+
+		var expectedDetourData = new InsertionWithDetourData<>(insertion, 12., 34., 56., 78.);
+		assertThat(detourData).isEqualToComparingFieldByField(expectedDetourData);
 	}
 }

@@ -31,6 +31,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
@@ -232,15 +234,16 @@ public class TestWarmEmissionsFallbackBehaviour {
 	 * @return EmissionsModule
 	 */
 	private EmissionModule setUpScenario(EmissionsConfigGroup.DetailedVsAverageLookupBehavior lookupBehavior) {
-		Config config = ConfigUtils.createConfig();
+//		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "emissions-sampleScenario" ), "config_empty.xml" ).toString() ) ;
 //		Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setDetailedVsAverageLookupBehavior(lookupBehavior);
 		emissionsConfig.setHbefaRoadTypeSource(EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes);							//Somehow needed even if deprecated, since a null pointer exception ids thrown when not set :( . kmt mar'20
-		emissionsConfig.setAverageColdEmissionFactorsFile("./scenarios/sampleScenario/sample_41_EFA_ColdStart_vehcat_2020average.txt");
-		emissionsConfig.setDetailedColdEmissionFactorsFile("./scenarios/sampleScenario/sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
-		emissionsConfig.setAverageWarmEmissionFactorsFile( "./scenarios/sampleScenario/sample_41_EFA_HOT_vehcat_2020average.txt" );
-		emissionsConfig.setDetailedWarmEmissionFactorsFile("./scenarios/sampleScenario/sample_41_EFA_HOT_SubSegm_2020detailed.txt");
+		emissionsConfig.setAverageColdEmissionFactorsFile("sample_41_EFA_ColdStart_vehcat_2020average.txt");
+		emissionsConfig.setDetailedColdEmissionFactorsFile("sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
+		emissionsConfig.setAverageWarmEmissionFactorsFile( "sample_41_EFA_HOT_vehcat_2020average.txt" );
+		emissionsConfig.setDetailedWarmEmissionFactorsFile("sample_41_EFA_HOT_SubSegm_2020detailed.txt");
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 

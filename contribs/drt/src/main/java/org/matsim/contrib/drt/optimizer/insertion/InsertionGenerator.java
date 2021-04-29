@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleEntry;
 import org.matsim.contrib.drt.optimizer.Waypoint;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 
@@ -31,7 +31,7 @@ import com.google.common.base.Objects;
 
 /**
  * Generates all possible pickup and dropoff insertion point pairs that do not violate the vehicle capacity. In order to
- * generate insertion points for a given vehicle, a {@code VehicleData.Entry} must be prepared. It contains the
+ * generate insertion points for a given vehicle, a {@code VehicleEntry} must be prepared. It contains the
  * information about the vehicle current state (location, time and occupancy; additionally, the vehicle can be queried
  * about the current task etc. ) and the sequence of planned stops (of length {@code N}.
  * <p>
@@ -85,11 +85,17 @@ public class InsertionGenerator {
 	}
 
 	public static class Insertion {
-		public final VehicleData.Entry vehicleEntry;
+		public final VehicleEntry vehicleEntry;
 		public final InsertionPoint pickup;
 		public final InsertionPoint dropoff;
 
-		public Insertion(DrtRequest request, VehicleData.Entry vehicleEntry, int pickupIdx, int dropoffIdx) {
+		public Insertion(VehicleEntry vehicleEntry, InsertionPoint pickup, InsertionPoint dropoff) {
+			this.vehicleEntry = vehicleEntry;
+			this.pickup = pickup;
+			this.dropoff = dropoff;
+		}
+
+		public Insertion(DrtRequest request, VehicleEntry vehicleEntry, int pickupIdx, int dropoffIdx) {
 			this.vehicleEntry = vehicleEntry;
 
 			Waypoint.Pickup pickupWaypoint = new Waypoint.Pickup(request);
@@ -135,7 +141,7 @@ public class InsertionGenerator {
 		}
 	}
 
-	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
+	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleEntry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.start.occupancy;
@@ -156,8 +162,8 @@ public class InsertionGenerator {
 		return insertions;
 	}
 
-	//TODO replace argument: int i -> InsertionPoint pickup
-	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i,
+	//TODO replace argument: int i -> InsertionPoint pickup//?
+	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleEntry vEntry, int i,
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();
 		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
@@ -184,11 +190,11 @@ public class InsertionGenerator {
 		insertions.add(new Insertion(drtRequest, vEntry, i, stopCount));// insertion after last stop
 	}
 
-	private Waypoint.Stop currentStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop currentStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx - 1);
 	}
 
-	private Waypoint.Stop nextStop(VehicleData.Entry entry, int insertionIdx) {
+	private Waypoint.Stop nextStop(VehicleEntry entry, int insertionIdx) {
 		return entry.stops.get(insertionIdx);
 	}
 }

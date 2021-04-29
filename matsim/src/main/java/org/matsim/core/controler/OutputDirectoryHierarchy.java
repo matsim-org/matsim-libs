@@ -22,6 +22,8 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -52,10 +54,20 @@ public final class OutputDirectoryHierarchy {
 
 	@Inject
 	OutputDirectoryHierarchy(ControlerConfigGroup config) {
+
 		this(config.getOutputDirectory(),
 				config.getRunId(),
 				config.getOverwriteFileSetting(),
 				config.getCompressionType());
+	}
+
+	/**
+	 * A constructor with a fairly powerful argument so that it can be adapted to functionality changes without having to change the API.
+	 *
+	 * @param config
+	 */
+	public OutputDirectoryHierarchy( Config config ) {
+		this( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting(), config.controler().getCompressionType() );
 	}
 
 	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles, ControlerConfigGroup.CompressionType defaultCompressionType) {

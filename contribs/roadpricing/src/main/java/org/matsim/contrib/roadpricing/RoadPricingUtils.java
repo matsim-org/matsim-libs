@@ -41,16 +41,48 @@ public class RoadPricingUtils {
 //		return new RoadPricingModule(scheme);
 //	}
 
+
+	/**
+	 * @deprecated -- please inline.  Reason: move syntax closer ot how it is in {@link ConfigUtils}.
+	 */
 	public static RoadPricingSchemeImpl createAndRegisterMutableScheme( Scenario scenario ) {
-		return (RoadPricingSchemeImpl) getScheme( scenario );
+		return addOrGetMutableRoadPricingScheme( scenario );
+	}
+	public static RoadPricingSchemeImpl addOrGetMutableRoadPricingScheme( Scenario scenario ) {
+		return (RoadPricingSchemeImpl) addOrGetRoadPricingScheme( scenario );
 	}
 
-	public static RoadPricingScheme getScheme(Scenario sc) {
+	/**
+	 * @deprecated -- please inline.  Reason: make syntax more consistent.
+	 */
+	public static RoadPricingScheme getScheme(Scenario sc){
+		return getRoadPricingScheme( sc );
+	}
+
+	/**
+	 * This method will fail if it is not there.
+	 */
+	public static RoadPricingScheme getRoadPricingScheme( Scenario sc ) {
+		if ( sc.getScenarioElement( RoadPricingScheme.ELEMENT_NAME ) == null ) {
+			throw new RuntimeException( "\n\ncannot retreive RoadPricingScheme from scenario; typical ways to resolve" +
+								    "that are to call RoadPricingUtils.loadRoadPricingScheme... " +
+								    " or RoadPricingUtils.addOrGetRoadPricingScheme... " +
+								    "or RoadPricingUtils.addRoadPricingScheme... early enough.");
+
+		}
+		return (RoadPricingScheme) sc.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
+	}
+
+	public static RoadPricingScheme addOrGetRoadPricingScheme( Scenario sc ) {
 		Object o = sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 		if (o == null) {
 			sc.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, new RoadPricingSchemeImpl());
 		}
 		return (RoadPricingScheme) sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+	}
+	
+	public static void addRoadPricingScheme( Scenario scenario, RoadPricingScheme roadPricingScheme ) {
+		scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
 	}
 
 	public static void setType(RoadPricingSchemeImpl scheme, String type) {
@@ -77,8 +109,14 @@ public class RoadPricingUtils {
 		scheme.addLinkCost(linkId, startTime, endTime, amount);
 	}
 
+	/**
+	 * @deprecated -- please inline.  Reason: Make syntax more consistent across contribs.
+	 */
 	public static RoadPricingSchemeImpl loadRoadPricingScheme( Scenario sc ){
-		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) getScheme( sc );
+		return loadRoadPricingSchemeAccordingToRoadPricingConfig( sc );
+	}
+	public static RoadPricingSchemeImpl loadRoadPricingSchemeAccordingToRoadPricingConfig( Scenario sc ){
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) addOrGetRoadPricingScheme( sc );
 		RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( sc.getConfig(), RoadPricingConfigGroup.class );
 		;
 		new RoadPricingReaderXMLv1( scheme ).readFile( rpConfig.getTollLinksFile() );
