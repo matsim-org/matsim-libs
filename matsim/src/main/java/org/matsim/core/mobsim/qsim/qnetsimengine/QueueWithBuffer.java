@@ -191,6 +191,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double accumulatedInflowCap = 1. ;
 	
 	private final FlowEfficiencyCalculator flowEfficiencyCalculator;
+	private double maxFlowFromFdiag;
 
 	private QueueWithBuffer(AbstractQLink.QLinkInternalInterface qlink, final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId,
 							double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context,
@@ -399,7 +400,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 				
-				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
+				this.maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
 						
 				if ( maxFlowFromFdiag < flowCapacityPerTimeStep ) {
@@ -560,7 +561,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.processArrivalOfHoles( ) ;
 				break;
 			case kinematicWaves:
-				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowUsedInQsim, maxFlowUsedInQsim);
+				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowFromFdiag, maxFlowFromFdiag);
+//				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxFlowUsedInQsim, maxFlowUsedInQsim);
 				this.processArrivalOfHoles( ) ;
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
