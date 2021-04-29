@@ -128,7 +128,7 @@ public class CapacityDependentScoringTest {
 		events.processEvent(new PersonDepartureEvent(7*3600 - 100, driver1, Id.create(1, Link.class), "car"));
 		events.processEvent(new PersonEntersVehicleEvent(7*3600 - 100, driver1, veh.getId()));
 
-		events.processEvent(new ActivityEndEvent(7*3600, person.getId(), Id.create(1, Link.class), null, "home"));
+		events.processEvent(new ActivityEndEvent(7*3600, person.getId(), Id.create(1, Link.class), null, "home", new Coord( 234., 5.67 )));
 		events.processEvent(new PersonDepartureEvent(7*3600, person.getId(), Id.create(1, Link.class), "pt"));
 		events.processEvent(new AgentWaitingForPtEvent(7*3600, person.getId(), f.stopAId, f.stopDId));
 

@@ -390,7 +390,7 @@ class ScenarioImporter {
 			// TODO - better way to handle this?
 			flatplan.add(Agent.prepareSleepForEntry(eventid, 0));
 		}
-		events.add(new ActivityEndEvent(0, id, linkid, facid, type));
+		events.add(new ActivityEndEvent(0, id, linkid, facid, type, act.getCoord()));
 	}
 
 	private void processPlanNetworkRoute(

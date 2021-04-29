@@ -440,7 +440,7 @@ public final class NetworkUtils {
         }
 
         if ( nearestNode.getInLinks().isEmpty() && nearestNode.getOutLinks().isEmpty() ) {
-            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" ) ;
+            log.warn(network + "[found nearest node that has no incident links.  Will probably crash eventually ...  Maybe run NetworkCleaner?][node = " + nearestNode.getId() + "]" ) ;
         }
 
         // now find nearest link from the nearest node

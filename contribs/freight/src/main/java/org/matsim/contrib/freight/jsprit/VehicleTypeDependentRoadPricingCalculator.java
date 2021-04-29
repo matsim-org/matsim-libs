@@ -117,10 +117,8 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 */
 	@SuppressWarnings("WeakerAccess")
 	public void addPricingScheme(Id<org.matsim.vehicles.VehicleType> vehicleTypeId, RoadPricingScheme pricingScheme){
-		if(!schemes.containsKey(vehicleTypeId)){
-			schemes.put(vehicleTypeId, new ArrayList<>());
-		}
-		schemes.get(vehicleTypeId).add(pricingScheme);
+		Collection<RoadPricingScheme> list = schemes.computeIfAbsent(vehicleTypeId, k -> new ArrayList<>());
+		list.add(pricingScheme);
 		if(pricingScheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON)){
 			throw new RuntimeException("the matsim cordon toll implementation no longer exists; link pricing is probably what you want");
 		}

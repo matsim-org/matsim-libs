@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
@@ -320,7 +320,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
-        CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
+        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers);
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 
