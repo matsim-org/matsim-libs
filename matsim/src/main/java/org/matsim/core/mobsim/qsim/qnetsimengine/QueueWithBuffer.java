@@ -400,9 +400,28 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// also have to be re-computed with each freespeed change. kai, feb'18
 				
 				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
-				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ); 
-						
-				if ( maxFlowFromFdiag < flowCapacityPerTimeStep ) {
+				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() );
+
+				TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
+
+				if(trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.MAX_CAP_FOR_ONE_LANE){
+
+					if (wrnCnt<5) {
+						wrnCnt++ ;
+						log.warn("you are using the maximum capacity for one lane as the inflow capacity. This is the old standard behavior of the qsim and probably leads to wrong results " +
+								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
+								"TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES or TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY instead.");
+
+					}
+					if ( wrnCnt==5 ) { //this verbose warning is only given 5 times
+						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+					}
+
+					this.maxFlowUsedInQsim = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
+					// write out the modified qsim behavior as link attribute
+					qLink.getLink().getAttributes().putAttribute("maxFlowUsedInQsim", 3600*maxFlowUsedInQsim/context.qsimConfig.getTimeStepSize());
+
+				} else if ( maxFlowFromFdiag < flowCapacityPerTimeStep ) {
 					
 					if (wrnCnt<10) {
 						wrnCnt++ ;
@@ -421,8 +440,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					
 					// now either correct the flow capacity or the number of lanes!
 					
-					TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = context.qsimConfig.getTrafficDynamicsCorrectionApproach();
-					
+
 					if (trafficDynamicsCorrectionApproach == TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY) {
 						this.maxFlowUsedInQsim = maxFlowFromFdiag;
 						
