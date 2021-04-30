@@ -113,7 +113,7 @@ final class InitialCarrierPlanCreator {
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
         
-        Boolean addDefaultCostCalculators = true;
+        boolean addDefaultCostCalculators = true;
         
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
@@ -156,7 +156,7 @@ final class InitialCarrierPlanCreator {
             carrier.setSelectedPlan(plan);
         }
 
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

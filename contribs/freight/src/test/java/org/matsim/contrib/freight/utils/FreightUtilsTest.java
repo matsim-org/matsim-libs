@@ -428,7 +428,7 @@ public class FreightUtilsTest {
 		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
-		freightConfig.setVehicleRoutingAlgortihmFileFile(vraFile);
+		freightConfig.setVehicleRoutingAlgorithmFileFile(vraFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -442,7 +442,7 @@ public class FreightUtilsTest {
 			Assert.fail();
 		}
 
-		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgorithmFile());
 	}
 
 	/**
@@ -480,7 +480,7 @@ public class FreightUtilsTest {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgortihmFile());
+		Assert.assertNull(ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getVehicleRoutingAlgorithmFile());
 	}
 
 	private Config prepareConfig(){

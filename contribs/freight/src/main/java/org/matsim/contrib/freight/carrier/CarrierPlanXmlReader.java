@@ -65,15 +65,11 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	public void readStream( InputStream inputStream ){
 		log.info(MSG) ;
 		try {
-			reader.parse( inputStream ) ;
-		} catch (Exception e)
-		{log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
-			if (e.getCause().getMessage().contains("cvc-elt.1")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
-				log.warn("read with validation = true failed. Try it again without validation... ");
 			reader.setValidating(false);
 			reader.parse(inputStream);
-			} else { //other problem: e.g. validation does not work, because of missing validation file.
-				throw  e;}
+		} catch (Exception e) {
+			log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+			throw  e;
 		}
 	}
 
