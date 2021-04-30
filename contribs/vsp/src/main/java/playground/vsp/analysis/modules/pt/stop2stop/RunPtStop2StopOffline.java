@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -40,6 +39,7 @@ public class RunPtStop2StopOffline {
         String transitVehiclesFile = "/home/gregor/tmp/i364/i364.output_transitVehicles.xml.gz";
         String outputFile = "/home/gregor/tmp/i364/i364.pt_stop2stop_departures.csv.gz";
         String sep = ",";
+        String sep2 = "-";
 
         Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MatsimVehicleReader transitVehicleReader = new MatsimVehicleReader(dummyScenario.getTransitVehicles());
@@ -53,7 +53,7 @@ public class RunPtStop2StopOffline {
         eventsReader.readFile(eventsFile);
         eventsManager.finishProcessing();
 
-        ptStop2StopAnalysis.writeStop2StopEntriesByDepartureCsv(outputFile, sep);
+        ptStop2StopAnalysis.writeStop2StopEntriesByDepartureCsv(outputFile, sep, sep2);
         log.info("Done");
     }
 }
