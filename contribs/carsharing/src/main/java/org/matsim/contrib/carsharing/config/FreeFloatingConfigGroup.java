@@ -26,64 +26,16 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	
-	public static final String GROUP_NAME = "FreeFloating";
-		
-	private String travelingFreeFloating = null;
-	
-	private String constantFreeFloating = null;
-	
-	private String vehiclelocationsInputFile = null;
+	public static final String GROUP_NAME = "FreeFloating";	
 
 	private String areasInputFile = null;
 	
-	private String timeFeeFreeFloating = null;
-	
-	private String timeParkingFeeFreeFloating = null;
-	
-	private String distanceFeeFreeFloating = null;
-	
-	private boolean useFeeFreeFloating = false;	
-	
-	private String specialTimeStart = null; //in seconds
-	
-	private String specialTimeEnd = null;  //in seconds
-	
-	private String specialTimeFee = null;
-
+	private boolean useFreeFloating = false;	
 	
 	public FreeFloatingConfigGroup() {
 		super(GROUP_NAME);
 	}
-	
-	@StringGetter( "travelingFreeFloating" )
-	public String getUtilityOfTravelling() {
-		return this.travelingFreeFloating;
-	}
-
-	@StringSetter( "travelingFreeFloating" )
-	public void setUtilityOfTravelling(final String travelingFreeFloating) {
-		this.travelingFreeFloating = travelingFreeFloating;
-	}
-
-	@StringGetter( "constantFreeFloating" )
-	public String constantFreeFloating() {
-		return this.constantFreeFloating;
-	}
-
-	@StringSetter( "constantFreeFloating" )
-	public void setConstantFreeFloating(final String constantFreeFloating) {
-		this.constantFreeFloating = constantFreeFloating;
-	}
-	
-	@StringGetter( "vehiclelocationsFreefloating" )
-	public String getvehiclelocations() {
-		return this.vehiclelocationsInputFile;
-	}
-
-	@StringSetter( "vehiclelocationsFreefloating" )
-	public void setvehiclelocations(final String vehiclelocationsInputFile) {
-		this.vehiclelocationsInputFile = vehiclelocationsInputFile;
-	}
+		
 
 	@StringGetter( "areasFreefloating" )
 	public String getAreas() {
@@ -94,75 +46,15 @@ public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	public void setAreas(final String areasInputFile) {
 		this.areasInputFile = areasInputFile;
 	}
-
-	@StringGetter( "timeFeeFreeFloating" )
-	public String timeFeeFreeFloating() {
-		return this.timeFeeFreeFloating;
-	}
-
-	@StringSetter( "timeFeeFreeFloating" )
-	public void setTimeFeeFreeFloating(final String timeFeeFreeFloating) {
-		this.timeFeeFreeFloating = timeFeeFreeFloating;
-	}
-	
-	@StringGetter( "timeParkingFeeFreeFloating" )
-	public String timeParkingFeeFreeFloating() {
-		return this.timeParkingFeeFreeFloating;
-	}
-
-	@StringSetter( "timeParkingFeeFreeFloating" )
-	public void setTimeParkingFeeFreeFloating(final String timeParkingFeeFreeFloating) {
-		this.timeParkingFeeFreeFloating = timeParkingFeeFreeFloating;
-	}
-	
-	@StringGetter( "distanceFeeFreeFloating" )
-	public String distanceFeeFreeFloating() {
-		return this.distanceFeeFreeFloating;
-	}
-
-	@StringSetter( "distanceFeeFreeFloating" )
-	public void setDistanceFeeFreeFloating(final String distanceFeeFreeFloating) {
-		this.distanceFeeFreeFloating = distanceFeeFreeFloating;
-	}
 	
 	@StringGetter( "useFreeFloating" )
 	public boolean useFeeFreeFloating() {
-		return this.useFeeFreeFloating;
+		return this.useFreeFloating;
 	}
 
 	@StringSetter( "useFreeFloating" )
-	public void setUseFeeFreeFloating(final boolean useFeeFreeFloating) {
-		this.useFeeFreeFloating = useFeeFreeFloating;
-	}
-	
-	@StringGetter( "specialTimeStart" )
-	public String specialTimeStart() {
-		return this.specialTimeStart;
-	}
-
-	@StringSetter( "specialTimeStart" )
-	public void setSpecialTimeStart(final String specialTimeStart) {
-		this.specialTimeStart = specialTimeStart;
-	}
-	
-	@StringGetter( "specialTimeEnd" )
-	public String specialTimeEnd() {
-		return this.specialTimeEnd;
-	}
-
-	@StringSetter( "specialTimeEnd" )
-	public void setSpecialTimeEnd(final String specialTimeEnd) {
-		this.specialTimeEnd = specialTimeEnd;
-	}
-	
-	@StringGetter( "specialTimeFee" )
-	public String specialTimeFee() {
-		return this.specialTimeFee;
-	}
-
-	@StringSetter( "specialTimeFee" )
-	public void setSpecialTimeFee(final String specialTimeFee) {
-		this.specialTimeFee = specialTimeFee;
+	public void setUseFeeFreeFloating(final boolean useFreeFloating) {
+		this.useFreeFloating = useFreeFloating;
 	}
 	
 }
