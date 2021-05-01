@@ -49,15 +49,9 @@
 		<param name="useFreeFloating" value="true" />	
 	</module>
 
-	<module name="OneWayCarsharing" >
-	    <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
-
-		<param name="vehiclelocationsOneWayCarsharing" value="Stations.txt" />
-		<param name="travelingOneWayCarsharing" value="-10.0" />
-		<param name="constantOneWayCarsharing" value="-0.4" />
-        <param name="timeFeeOneWayCarsharing" value="-0.0" />
-		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
+	<module name="OneWayCarsharing" >	    
         <param name="useOneWayCarsharing" value="true" />
+        <!--  currently not used -->
         <param name="searchDistanceOneWayCarsharing" value="1000.0" />
 	</module>
 
