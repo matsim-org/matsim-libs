@@ -20,6 +20,7 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +35,8 @@ public class ActEndEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final ActivityEndEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new ActivityEndEvent(7893.14, Id.create("143", Person.class), Id.create("293", Link.class), Id.create("f811", ActivityFacility.class), "home"));
+				new ActivityEndEvent(7893.14, Id.create("143", Person.class), Id.create("293", Link.class), Id.create("f811", ActivityFacility.class),
+						"home", new Coord( 234., 5.67 )));
 		assertEquals(7893.14, event.getTime(), EPSILON);
 		assertEquals("143", event.getPersonId().toString());
 		assertEquals("293", event.getLinkId().toString());

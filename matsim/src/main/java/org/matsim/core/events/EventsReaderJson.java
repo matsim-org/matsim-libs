@@ -198,12 +198,19 @@ public final class EventsReaderJson {
 		}
 		// === material related to wait2link above here
 		else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
+			Coord coord = null;
+			if (o.has(Event.ATTRIBUTE_X)) {
+				double xx = o.get(Event.ATTRIBUTE_X).asDouble();
+				double yy = o.get(Event.ATTRIBUTE_Y).asDouble();
+				coord = new Coord(xx, yy);
+			}
 			this.events.processEvent(new ActivityEndEvent(
 					time, 
 					Id.create(o.get(HasPersonId.ATTRIBUTE_PERSON).asText(), Person.class),
 					Id.create(o.get(HasLinkId.ATTRIBUTE_LINK).asText(), Link.class),
 					o.has(HasFacilityId.ATTRIBUTE_FACILITY) ? Id.create(o.get(HasFacilityId.ATTRIBUTE_FACILITY).asText(), ActivityFacility.class) : null,
-					o.get(ActivityEndEvent.ATTRIBUTE_ACTTYPE).asText()));
+					o.get(ActivityEndEvent.ATTRIBUTE_ACTTYPE).asText(),
+					coord));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null;
 			if (o.has(Event.ATTRIBUTE_X)) {
