@@ -207,11 +207,13 @@ public final class ModeStatsControlerListener implements StartupListener, Iterat
 				for (Entry<String, Map<Integer, Double>> entry : this.modeHistories.entrySet()) {
 					String mode = entry.getKey();
 					Map<Integer, Double> history = entry.getValue();
-					double[] historyArray = new double[history.size()];
-					for ( Entry<Integer,Double> entryHistory : history.entrySet() ) {
-						historyArray[entryHistory.getKey()] = entryHistory.getValue() ;
-					}
-					chart2.addSeries(mode, historyArray);
+//					double[] historyArray = new double[history.size()];
+//					for ( Entry<Integer,Double> entryHistory : history.entrySet() ) {
+//						historyArray[entryHistory.getKey()] = entryHistory.getValue() ;
+//					}
+					double[] a = new double[1];
+					a[0] = 1.0;
+					chart2.addSeries(mode, a);
 				}
 				chart2.addMatsimLogo();
 				chart2.saveAsPng(this.modeFileName + "_stackedbar.png", 800, 600);
