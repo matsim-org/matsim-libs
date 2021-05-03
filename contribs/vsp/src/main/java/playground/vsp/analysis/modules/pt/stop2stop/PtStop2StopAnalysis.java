@@ -277,8 +277,16 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
             return departureId;
         }
 
+        public Id<TransitStopFacility> getStopId() {
+            return stopId;
+        }
+
         public int getStopSequence() {
             return stopSequence;
+        }
+
+        public Id<TransitStopFacility> getStopPreviousId() {
+            return stopPreviousId;
         }
     }
 
