@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.analysis.zonal;
 
+import java.awt.*;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -28,6 +30,15 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtils;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.xy.DefaultTableXYDataset;
+import org.jfree.data.xy.XYDataItem;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.vrpagent.AbstractTaskEvent;
@@ -112,11 +123,93 @@ public class ZonalIdleVehicleXYVisualiser
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+
+		//////////// EDIT: /////////////////////////////////////////////////////////////
+		int lastIteration = services.getConfig().controler().getLastIteration();
+		int numberOfIteration = services.getIterationNumber();
+
+		if( numberOfIteration == lastIteration ) {
+			DefaultTableXYDataset testDataSet = new DefaultTableXYDataset();
+			for (Map.Entry<DrtZone, LinkedList<Tuple<Double, Integer>>> e : this.zoneEntries.entrySet()) {
+				String zoneId = e.getKey().getId();
+				XYSeries series = new XYSeries(zoneId, true, false);
+				for (Tuple<Double, Integer> entry : e.getValue()) {
+					double time = entry.getFirst();
+					int numberOfIdleVehicles = entry.getSecond();
+					// because item = 0, numberOfVehics = 0 gets always written out,
+					// even if item = 0, numberOfVehics = 1
+					if (!(time == 0.0 & numberOfIdleVehicles == 0)) {
+						series.addOrUpdate(time, numberOfIdleVehicles);
+					}
+				}
+				testDataSet.addSeries(series);
+			}
+
+			// fill out the missing time points for plot
+			DefaultTableXYDataset dataSetPlot = new DefaultTableXYDataset();
+			for( int i = 0; i < testDataSet.getSeriesCount(); i++) {
+				String zoneId = testDataSet.getSeriesKey(i).toString();
+				XYSeries xySeries = testDataSet.getSeries(i);
+				XYSeries seriesForPlot = new XYSeries( zoneId, true, false );
+				double lastNumberOfIdleVehicles = 0.;
+				double lastTime = 0.;
+				for(Object o : xySeries.getItems())   {
+					XYDataItem item = (XYDataItem) o;
+					double time = item.getXValue();
+					double numberOfIdleVehicles = item.getYValue();
+					if (Double.isNaN(numberOfIdleVehicles)) {
+						for(double timeIter = lastTime; timeIter <= time; timeIter++) {
+							seriesForPlot.addOrUpdate(timeIter, lastNumberOfIdleVehicles);
+						}
+					} else {
+						for(double timeIter = lastTime; timeIter < time; timeIter++) {
+							seriesForPlot.addOrUpdate(timeIter, lastNumberOfIdleVehicles);
+						}
+						seriesForPlot.add(time, numberOfIdleVehicles);
+						lastNumberOfIdleVehicles = numberOfIdleVehicles;
+					}
+					lastTime = time;
+				}
+				dataSetPlot.addSeries( seriesForPlot );
+			}
+
+			// to do
+			// * for the length of simulation in [time]
+			// ** create (time, vehics = same as last, or 0 if none before)
+			// ** for every zone XYset
+
+			JFreeChart testChart = ChartFactory.createStackedXYAreaChart("Idle vehicles per zone", "Time [sec]", "count", dataSetPlot,
+					PlotOrientation.VERTICAL, true, false, false);
+
+			makeStayTaskSeriesGrey(testChart.getXYPlot());
+			String imageFile = "testChart2";
+
+			saveAsPNG(testChart, imageFile, 800, 600);
+		}
+		//////////// EDIT: /////////////////////////////////////////////////////////////
+
 	}
 
 	@Override
 	public void reset(int iteration) {
 		initEntryMap();
 	}
+
+	////////////copied methods - to not depend on dvrp ///////////////////////////////////////////////////////
+	private void makeStayTaskSeriesGrey(XYPlot plot) {
+		XYDataset dataset = plot.getDataset(0);
+		for (int i = 0; i < dataset.getSeriesCount(); i++) {
+			plot.getRenderer().setSeriesPaint(i, Color.LIGHT_GRAY);
+			return;
+		}
+	}
+	private static void saveAsPNG(JFreeChart chart, String filename, int width, int height) {
+		try {
+			ChartUtils.writeChartAsPNG(new FileOutputStream(filename + ".png"), chart, width, height);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
