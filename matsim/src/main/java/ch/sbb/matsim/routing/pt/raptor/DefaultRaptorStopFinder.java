@@ -64,12 +64,12 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 	}
 
 	@Override
-	public List<InitialStop> findStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type) {
+	public List<InitialStop> findStops(Facility fromFacility, Facility toFacility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, RaptorStopFinder.Direction type) {
 		if (type == Direction.ACCESS) {
-			return findAccessStops(facility, person, departureTime, parameters, data);
+			return findAccessStops(fromFacility, person, departureTime, parameters, data);
 		}
 		if (type == Direction.EGRESS) {
-			return findEgressStops(facility, person, departureTime, parameters, data);
+			return findEgressStops(toFacility, person, departureTime, parameters, data);
 		}
 		return Collections.emptyList();
 	}
