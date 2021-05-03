@@ -180,11 +180,8 @@ public class ZonalIdleVehicleXYVisualiser
 
 			JFreeChart testChart = ChartFactory.createStackedXYAreaChart("Idle vehicles per zone", "Time [sec]", "count", dataSetPlot,
 					PlotOrientation.VERTICAL, true, false, false);
-
 			makeStayTaskSeriesGrey(testChart.getXYPlot());
-			String imageFile = "testChart2";
-
-			saveAsPNG(testChart, imageFile, 800, 600);
+			saveAsPNG(testChart, "testChart2", 800, 600);
 		}
 		//////////// EDIT: /////////////////////////////////////////////////////////////
 
