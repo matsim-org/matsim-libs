@@ -64,9 +64,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public enum TrafficDynamics { queue, withHoles,
 		kinematicWaves //  MATSim-630; previously, the switch was InflowConstraint.maxflowFromFdiag. Amit Jan 2017.
 	}
-	
+
+	/**
+	 * Defines how the qsim sets the inflow and/or how it reacts to link attributes which are inconsistent with regard to the fundamental diagram.
+	 * Note that {@code MAX_CAP_FOR_ONE_LANE} is backwards-compatible but always sets the inflow capacity to the maximum according to the fundamental diagram for one lane,
+	 * so it essentially sets the inflow capacity too high for one-lane-links and probably too low for multiple-lane-links.
+	 */
 	public enum TrafficDynamicsCorrectionApproach { REDUCE_FLOW_CAPACITY, INCREASE_NUMBER_OF_LANES, MAX_CAP_FOR_ONE_LANE }
-	private TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES;
+	private TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY;
 
 	public enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime }
 	public enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime }
