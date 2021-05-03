@@ -164,7 +164,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
             }
             
             double distance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
-            double tripBasedSearchRadius = distance * paramset.getPercentTripSearchRadius();
+            double tripBasedSearchRadius = distance * paramset.getShareTripSearchRadius();
             double searchRadius = Math.min(paramset.getInitialSearchRadius(), paramset.getMaxRadius());
             searchRadius  = Math.min(searchRadius, tripBasedSearchRadius);
             Collection<TransitStopFacility> stopFacilities = filteredStopsQT.getDisk(x, y, searchRadius);

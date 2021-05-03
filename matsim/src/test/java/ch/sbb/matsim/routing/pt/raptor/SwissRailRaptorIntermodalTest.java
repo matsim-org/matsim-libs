@@ -897,7 +897,7 @@ public class SwissRailRaptorIntermodalTest {
         bikeAccess.setLinkIdAttribute("accessLinkId_bike");
         bikeAccess.setStopFilterValue("true");
         bikeAccess.setSearchExtensionRadius(0.0);
-        bikeAccess.setPercentTripSearchRadius(0.0001);
+        bikeAccess.setShareTripSearchRadius(0.0001);
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);

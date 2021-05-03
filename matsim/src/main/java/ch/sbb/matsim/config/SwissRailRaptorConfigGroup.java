@@ -420,7 +420,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         private static final String PARAM_PERSON_FILTER_VALUE = "personFilterValue";
         private static final String PARAM_STOP_FILTER_ATTRIBUTE = "stopFilterAttribute";
         private static final String PARAM_STOP_FILTER_VALUE = "stopFilterValue";
-        private static final String PARAM_PERCENT_TRIP_SEARCH_RADIUS = "percentTripSearchRadius";
+        private static final String PARAM_SHARE_TRIP_SEARCH_RADIUS = "percentTripSearchRadius";
 
         private String mode;
         private double maxRadius;
@@ -431,7 +431,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         private String personFilterValue;
         private String stopFilterAttribute;
         private String stopFilterValue;
-        private double percentTripSearchRadius = Double.POSITIVE_INFINITY;
+        private double shareTripSearchRadius = Double.POSITIVE_INFINITY;
 
         public IntermodalAccessEgressParameterSet() {
             super(TYPE);
@@ -536,14 +536,14 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             return this ;
         }
         
-        @StringGetter(PARAM_PERCENT_TRIP_SEARCH_RADIUS)
-        public double getPercentTripSearchRadius() {
-            return percentTripSearchRadius;
+        @StringGetter(PARAM_SHARE_TRIP_SEARCH_RADIUS)
+        public double getShareTripSearchRadius() {
+            return shareTripSearchRadius;
         }
 
-        @StringSetter(PARAM_PERCENT_TRIP_SEARCH_RADIUS)
-        public IntermodalAccessEgressParameterSet setPercentTripSearchRadius(double percentTripSearchRadius) {
-            this.percentTripSearchRadius = percentTripSearchRadius;
+        @StringSetter(PARAM_SHARE_TRIP_SEARCH_RADIUS)
+        public IntermodalAccessEgressParameterSet setShareTripSearchRadius(double shareTripSearchRadius) {
+            this.shareTripSearchRadius = shareTripSearchRadius;
             return this ;
         }
 
@@ -558,7 +558,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             map.put(PARAM_MAX_RADIUS, "Radius from the origin / destination coord in which transit stops are accessible by this mode.");
             map.put(PARAM_INITIAL_SEARCH_RADIUS, "Radius from the origin / destination coord in which transit stops are searched. Only if less than 2 transit stops are found the search radius is increased step-wise until the maximum search radius set in param radius is reached.");
             map.put(PARAM_SEARCH_EXTENSION_RADIUS, "If less than 2 stops were found in initialSearchRadius take the distance of the closest transit stop and add this extension radius to search again.The search radius will not exceed the maximum search radius set in param radius.");
-            map.put(PARAM_PERCENT_TRIP_SEARCH_RADIUS, "The share of the trip crowfly distance within which the stops for access and egress will be searched for. This is a harder constraint than initial search radius. Default is positive infinity.");
+            map.put(PARAM_SHARE_TRIP_SEARCH_RADIUS, "The share of the trip crowfly distance within which the stops for access and egress will be searched for. This is a harder constraint than initial search radius. Default is positive infinity.");
             
             return map;
         }
