@@ -420,7 +420,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         private static final String PARAM_PERSON_FILTER_VALUE = "personFilterValue";
         private static final String PARAM_STOP_FILTER_ATTRIBUTE = "stopFilterAttribute";
         private static final String PARAM_STOP_FILTER_VALUE = "stopFilterValue";
-        private static final String PARAM_SHARE_TRIP_SEARCH_RADIUS = "percentTripSearchRadius";
+        private static final String PARAM_SHARE_TRIP_SEARCH_RADIUS = "shareTripSearchRadius";
 
         private String mode;
         private double maxRadius;
