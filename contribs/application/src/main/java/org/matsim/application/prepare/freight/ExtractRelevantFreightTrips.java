@@ -183,13 +183,15 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act0.setCoord(ct.transform(link.getCoord()));
                             double newEndTime = departureTime + timeSpent;
+                            if (newEndTime >= 24 * 3600)
+                                newEndTime = 24 * 3600;
                             act0.setEndTime(newEndTime);
                             isCoordSet = true;
                             break;
                         }
                         timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
                     }
-                    if (!isCoordSet){
+                    if (!isCoordSet) {
                         Coord originalCoord = route.links.get(0).getCoord();
                         act0.setCoord(ct.transform(originalCoord));
                         act0.setEndTime(departureTime);
@@ -214,6 +216,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                             if (!vehicleIsInside) {
                                 act0.setCoord(ct.transform(link.getCoord()));
                                 double newEndTime = departureTime + timeSpent;
+                                if (newEndTime >= 24 * 3600)
+                                    newEndTime = 24 * 3600;
                                 act0.setEndTime(newEndTime);
                                 vehicleIsInside = true;
                             } else {
