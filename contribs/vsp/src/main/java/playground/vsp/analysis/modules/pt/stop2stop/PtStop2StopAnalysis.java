@@ -114,8 +114,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
                     ptVehicleData.stopSequenceCounter, ptVehicleData.lastStopId,
                     ptVehicleData.lastVehicleArrivesAtFacilityEvent.getTime() - ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(),
                     ptVehicleData.lastVehicleArrivesAtFacilityEvent.getDelay(), event.getTime() - event.getDelay(),
-                    event.getDelay(), ptVehicleData.currentPax,
-                    ptVehicleData.currentPax / ptVehicleData.totalVehicleCapacity,
+                    event.getDelay(), ptVehicleData.currentPax, ptVehicleData.totalVehicleCapacity,
                     ptVehicleData.alightings, ptVehicleData.boardings, ptVehicleData.linksTravelledOnSincePreviousStop));
             // calculate number of passengers at departure
             // (the Stop2StopEntry before needed the number of passengers at arrival so do not move this up!)
@@ -205,7 +204,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         private final Id<TransitRoute> transitRouteId;
         private final Id<Departure> departureId;
         private final Id<Person> driverId;
-        private final double totalVehicleCapacity; // use double such that int / double results in a proper double value
+        private final double totalVehicleCapacity; // use double for possible future capacity scaling issues
         private int stopSequenceCounter = 0;
         private Id<TransitStopFacility> lastStopId;
         private VehicleArrivesAtFacilityEvent lastVehicleArrivesAtFacilityEvent;
@@ -236,7 +235,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         final double departureTimeScheduled;
         final double departureDelay;
         final double passengersAtArrival;
-        final double passengersPerTotalCapacity;
+        final double totalVehicleCapacity;
         final double passengersAlighting;
         final double passengersBoarding;
         final List<Id<Link>> linkIdsSincePreviousStop;
@@ -245,7 +244,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
                        Id<Departure> departureId, Id<TransitStopFacility> stopId, int stopSequence,
                        Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
                        double departureTimeScheduled, double departureDelay, double passengersAtArrival,
-                       double passengersPerTotalCapacity, double passengersAlighting, double passengersBoarding,
+                       double totalVehicleCapacity, double passengersAlighting, double passengersBoarding,
                        List<Id<Link>> linkIdsSincePreviousStop) {
             this.transitLineId = transitLineId;
             this.transitRouteId = transitRouteId;
@@ -258,7 +257,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
             this.departureTimeScheduled = departureTimeScheduled;
             this.departureDelay = departureDelay;
             this.passengersAtArrival = passengersAtArrival;
-            this.passengersPerTotalCapacity = passengersPerTotalCapacity;
+            this.totalVehicleCapacity = totalVehicleCapacity;
             this.passengersAlighting = passengersAlighting;
             this.passengersBoarding = passengersBoarding;
             this.linkIdsSincePreviousStop = List.copyOf(linkIdsSincePreviousStop);
@@ -292,7 +291,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 
     static final String[] HEADER = {"transitLine", "transitRoute", "departure", "stop", "stopSequence",
             "stopPrevious", "arrivalTimeScheduled", "arrivalDelay", "departureTimeScheduled", "departureDelay",
-            "passengersAtArrival", "passengersPerTotalCapacity", "passengersAlighting", "passengersBoarding",
+            "passengersAtArrival", "totalVehicleCapacity", "passengersAlighting", "passengersBoarding",
             "linkIdsSincePreviousStop"};
 
     public static Comparator<Stop2StopEntry> stop2StopEntryByTransitLineComparator =
@@ -324,7 +323,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
                 printer.print(entry.departureTimeScheduled);
                 printer.print(entry.departureDelay);
                 printer.print(entry.passengersAtArrival);
-                printer.print(entry.passengersPerTotalCapacity);
+                printer.print(entry.totalVehicleCapacity);
                 printer.print(entry.passengersAlighting);
                 printer.print(entry.passengersBoarding);
                 printer.print(entry.linkIdsSincePreviousStop.stream().map(id -> id.toString()).collect(Collectors.joining(listSeparatorInsideColumn)));
