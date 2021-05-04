@@ -223,7 +223,10 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         }
     }
 
-    static final class Stop2StopEntry/* implements Comparable<Stop2StopEntry>*/ {
+    /**
+     * output data structure
+     */
+    static final class Stop2StopEntry {
         final Id<TransitLine> transitLineId;// for aggregation -> set null or leave out and use Map lineId -> Stop2StopEntry?
         final Id<TransitRoute> transitRouteId;
         final Id<Departure> departureId;
@@ -234,17 +237,17 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         final double arrivalDelay;
         final double departureTimeScheduled;
         final double departureDelay;
-        final double passengersAtArrival;
+        final int passengersAtArrival;
         final double totalVehicleCapacity;
-        final double passengersAlighting;
-        final double passengersBoarding;
+        final int passengersAlighting;
+        final int passengersBoarding;
         final List<Id<Link>> linkIdsSincePreviousStop;
 
         Stop2StopEntry(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId,
                        Id<Departure> departureId, Id<TransitStopFacility> stopId, int stopSequence,
                        Id<TransitStopFacility> stopPreviousId, double arrivalTimeScheduled, double arrivalDelay,
-                       double departureTimeScheduled, double departureDelay, double passengersAtArrival,
-                       double totalVehicleCapacity, double passengersAlighting, double passengersBoarding,
+                       double departureTimeScheduled, double departureDelay, int passengersAtArrival,
+                       double totalVehicleCapacity, int passengersAlighting, int passengersBoarding,
                        List<Id<Link>> linkIdsSincePreviousStop) {
             this.transitLineId = transitLineId;
             this.transitRouteId = transitRouteId;
