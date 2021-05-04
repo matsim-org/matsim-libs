@@ -211,7 +211,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
         private int currentPax = 0;
         private int alightings = 0;
         private int boardings = 0;
-        private List<Id<Link>> linksTravelledOnSincePreviousStop = new ArrayList<>(8);
+        private final List<Id<Link>> linksTravelledOnSincePreviousStop = new ArrayList<>(8);
 
         private PtVehicleData(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId,
                               Id<Departure> departureId, Id<Person> driverId, VehicleType vehicleType) {
