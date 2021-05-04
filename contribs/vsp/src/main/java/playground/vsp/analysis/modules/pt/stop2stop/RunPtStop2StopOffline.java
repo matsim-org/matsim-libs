@@ -35,17 +35,18 @@ public class RunPtStop2StopOffline {
     private static final Logger log = Logger.getLogger(RunPtStop2StopOffline.class);
 
     public static void main(String[] args) {
-//        String eventsFile = "/home/gregor/tmp/i364/i364.output_events.xml.gz";
-//        String transitVehiclesFile = "/home/gregor/tmp/i364/i364.output_transitVehicles.xml.gz";
-//        String outputFile = "/home/gregor/tmp/i364/i364.pt_stop2stop_departures.csv.gz";
+        String eventsFile = "/home/gregor/tmp/i364/i364.output_events.xml.gz";
+        String transitVehiclesFile = "/home/gregor/tmp/i364/i364.output_transitVehicles.xml.gz";
+        String outputCsvByDeparture = "/home/gregor/tmp/i364/i364.pt_stop2stop_departures.csv.gz";
+        String outputCsvByLine = "/home/gregor/tmp/i364/i364.pt_stop2stop_lines.csv.gz";
 //        String eventsFile = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.output_events.xml.gz";
 //        String transitVehiclesFile = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.output_transitVehicles.xml.gz";
 //        String outputCsvByDeparture = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.pt_stop2stop_departures.csv.gz";
 //        String outputCsvByLine = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.pt_stop2stop_lines.csv.gz";
-        String eventsFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_events.xml.gz";
-        String transitVehiclesFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_transitVehicles.xml.gz";
-        String outputCsvByDeparture = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_departures.csv.gz";
-        String outputCsvByLine = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_lines.csv.gz";
+//        String eventsFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_events.xml.gz";
+//        String transitVehiclesFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_transitVehicles.xml.gz";
+//        String outputCsvByDeparture = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_departures.csv.gz";
+//        String outputCsvByLine = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_lines.csv.gz";
         String sep = ",";
         String sep2 = ";";
 
