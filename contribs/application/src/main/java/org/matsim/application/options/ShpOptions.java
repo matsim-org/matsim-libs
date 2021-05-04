@@ -4,14 +4,17 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FileDataStoreFactorySpi;
-import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.index.strtree.AbstractNode;
+import org.locationtech.jts.index.strtree.Boundable;
+import org.locationtech.jts.index.strtree.ItemBoundable;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.locationtech.jts.util.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -31,10 +34,7 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Reusable class for shape file options.
@@ -195,7 +195,7 @@ public final class ShpOptions {
 
 		if (shpCrs == null) {
 			try {
-				ShapefileDataStore ds = (ShapefileDataStore) FileDataStoreFinder.getDataStore(shp.toFile());
+				ShapefileDataStore ds = openDataStore(shp);
 				CoordinateReferenceSystem crs = ds.getSchema().getCoordinateReferenceSystem();
 				ds.dispose();
 				shpCrs = "EPSG:" + CRS.lookupEpsgCode(crs, true);
@@ -292,6 +292,30 @@ public final class ShpOptions {
 			}
 
 			return false;
+		}
+
+
+		/**
+		 * Return all features in the index.
+		 */
+		public List<SimpleFeature> getAll() {
+			List<SimpleFeature> result = new ArrayList<>();
+			itemsTree(result, index.getRoot());
+
+			return result;
+		}
+
+		private void itemsTree(List<SimpleFeature> list, AbstractNode node) {
+			for (Object o : node.getChildBoundables()) {
+				Boundable childBoundable = (Boundable) o;
+				if (childBoundable instanceof AbstractNode) {
+					itemsTree(list, (AbstractNode) childBoundable);
+				} else if (childBoundable instanceof ItemBoundable) {
+					list.add((SimpleFeature) ((ItemBoundable) childBoundable).getItem());
+				} else {
+					Assert.shouldNeverReachHere();
+				}
+			}
 		}
 
 		/**
