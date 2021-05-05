@@ -105,12 +105,15 @@ public class SupersonicOsmNetworkReader {
         List<WaySegment> segments = new ArrayList<>();
         double segmentLength = 0;
 
+
         // set up first node for segment
         long fromNodeId = way.getNodeIds().get(0);
-        ProcessedOsmNode fromNodeForSegment = nodes.get(fromNodeId);
+        //ProcessedOsmNode fromNodeForSegment = nodes.get(fromNodeId);
+        int fromNodeForSegmentIndex = 0;
 
         for (int i = 1; i < way.getNodeIds().size(); i++) {
 
+            ProcessedOsmNode fromNodeForSegment = nodes.get(way.getNodeIds().get(fromNodeForSegmentIndex));
             // get the from and to nodes for a sub segment of the current way
             ProcessedOsmNode fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
             ProcessedOsmNode toOsmNode = nodes.get(way.getNodeIds().get(i));
@@ -123,10 +126,14 @@ public class SupersonicOsmNetworkReader {
                 segments.addAll(loopSegments);
 
                 segmentLength = 0;
-                fromNodeForSegment = toOsmNode;
+                //fromNodeForSegment = toOsmNode;
+                fromNodeForSegmentIndex = i;
             }
             // if we have an intersection or the end of the way
             else if (isCreateSegment(fromNodeForSegment, toOsmNode, way)) {
+
+               // var nodesForSegment = way.getNodeIds().subList(fromNodeForSegmentIndex, i);
+
                 segments.add(
                         new WaySegment(fromNodeForSegment, toOsmNode, segmentLength, way.getLinkProperties(), way.getTags(), way.getId(),
                                 //if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
@@ -135,7 +142,8 @@ public class SupersonicOsmNetworkReader {
                 );
 
                 segmentLength = 0;
-                fromNodeForSegment = toOsmNode;
+               // fromNodeForSegment = toOsmNode;
+                fromNodeForSegmentIndex = i;
             }
         }
         return segments;
