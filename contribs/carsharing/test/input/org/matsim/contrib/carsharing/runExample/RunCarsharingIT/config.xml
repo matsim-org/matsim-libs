@@ -29,52 +29,33 @@
 
 <!-- ====================================================================== -->
 
-		<module name="qsim">
-			<param name="endTime" value="00:00:00"   />
-			<param name="flowCapacityFactor" value="1"   />
-			<param name="storageCapacityFactor" value="10.0"   />
-			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
-			<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
-		</module>
+	<module name="qsim">
+		<param name="endTime" value="00:00:00"   />
+		<param name="flowCapacityFactor" value="1"   />
+		<param name="storageCapacityFactor" value="10.0"   />
+		<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+	</module>
 
     <module name="Carsharing" >
-		<param name="statsWriterFrequency" value="1" />
-			<param name="vehiclelocations" value="CarsharingStations.xml" />
-			<param name="membership" value="CSMembership.xml" />
+	    <param name="statsWriterFrequency" value="1" />
+		<param name="vehiclelocations" value="CarsharingStations.xml" />
+		<param name="membership" value="CSMembership.xml" />
 	</module>
 
 
 	<module name="FreeFloating" >
-		<param name="areasFreefloating" value="freefloating_areas.xml" />
-		<param name="travelingFreeFloating" value="-0.1" />
-		<param name="constantFreeFloating" value="-0.0" />
-		<param name="timeFeeFreeFloating" value="-0.01" />
-		<param name="timeParkingFeeFreeFloating" value="-0.005" />
-		<param name="distanceFeeFreeFloating" value="-0.00" />
-		<param name="specialTimeStart" value="0" />
-		<param name="specialTimeEnd" value="0" />
-		<param name="specialTimeFee" value="0" />
-		<param name="useFreeFloating" value="true" />
+		<param name="areasFreefloating" value="freefloating_areas.xml" />	
+		<param name="useFreeFloating" value="true" />	
 	</module>
 
-	<module name="OneWayCarsharing" >
-	    <param name="timeParkingFeeOneWayCarsharing" value="-0.005" />
-
-		<param name="vehiclelocationsOneWayCarsharing" value="Stations.txt" />
-		<param name="travelingOneWayCarsharing" value="-10.0" />
-		<param name="constantOneWayCarsharing" value="-0.4" />
-        <param name="timeFeeOneWayCarsharing" value="-0.0" />
-		<param name="distanceFeeOneWayCarsharing" value="-0.0" />
+	<module name="OneWayCarsharing" >	    
         <param name="useOneWayCarsharing" value="true" />
+        <!--  currently not used -->
         <param name="searchDistanceOneWayCarsharing" value="1000.0" />
 	</module>
 
 	<module name="TwoWayCarsharing" >
-		<param name="vehiclelocationsTwoWayCarsharing" value="CarsharingStations.xml" />
-		<param name="travelingTwoWayCarsharing" value="-6.0" />
-		<param name="constantTwoWayCarsharing" value="-0.4" />
-        <param name="timeFeeTwoWayCarsharing" value="-0.0" />
-		<param name="distanceFeeTwoWayCarsharing" value="-0.0" />
         <param name="useTwoWayCarsharing" value="true" />
         <param name="searchDistanceTwoWayCarsharing" value="10000.0" />
 
@@ -156,27 +137,124 @@
 		<param name="BrainExpBeta" value="2.0" />
 
 		<param name="lateArrival" value="-18.0" />
-		<param name="traveling" value="-6.0" />
-		<param name="travelingPt" value="-6.0" />
-		<param name="travelingBike" value="-26.0" />
-		<param name="traveling_access_walk_tw" value="-6"/>
-		<param name="traveling_egress_walk_tw" value="-6"/>
-		<param name="traveling_twoway_vehicle" value="-6"/>
-		
-		<param name="traveling_access_walk_ff" value="0"/>
-		<param name="traveling_egress_walk_ff" value="0"/>
-		<param name="traveling_freefloating_vehicle" value="0"/>
-		
-		<param name="traveling_access_walk_ow" value="0"/>
-		<param name="traveling_egress_walk_ow" value="0"/>
-		<param name="traveling_oneway_vehicle" value="0"/>
-		
-		<param name="constantCar" value="-0.4" />
-
-		<param name="constantBike" value="-0.4" />
-		<param name="constantPt" value="-4.0" />
-		<param name="constantWalk" value="-0.0" />
-
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="freefloating_vehicle" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="oneway_vehicle" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+				<param name="mode" value="twoway_vehicle" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="access_walk_ff" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+				<param name="mode" value="access_walk_tw" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="access_walk_ow" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="egress_walk_ff" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+				<param name="mode" value="egress_walk_tw" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="egress_walk_ow" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="-0.4" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="car" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="-4.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="pt" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="-0.4" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-26.0" />
+				<param name="mode" value="bike" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+		<parameterset type="modeParams" >
+				<param name="constant" value="0.0" />
+				<param name="dailyMonetaryConstant" value="0.0" />
+				<param name="dailyUtilityConstant" value="0.0" />
+				<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+				<param name="marginalUtilityOfTraveling_util_hr" value="-0.0" />
+				<param name="mode" value="walk" />
+				<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+        
 		<param name="performing" value="6.0" />
 		<param name="earlyDeparture" value="0" />
 		<param name="waiting" value="0" />
