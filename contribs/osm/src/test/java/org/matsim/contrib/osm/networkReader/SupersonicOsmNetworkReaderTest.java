@@ -655,4 +655,35 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(1, node8.getInLinks().size());
 		assertEquals(1, node8.getOutLinks().size());
 	}
+
+	@Test
+	public void simplifiedLinksWithPreservedOriginalGeometry() {
+
+		var file = Paths.get(matsimTestUtils.getOutputDirectory() + "file.osm.bbf");
+		var osmData = Utils.createSingleLink();
+		Utils.writeOsmData(osmData, file);
+
+		var network = new SupersonicOsmNetworkReader.Builder()
+				.setCoordinateTransformation(transformation)
+				.setStoreOriginalGeometry(true)
+				.build()
+				.read(file);
+
+		assertEquals(1, network.getLinks().size());
+		var link = network.getLinks().values().iterator().next();
+
+		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM));
+		var originalGeometry = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(osmData.getNodes().size(), originalGeometry.size());
+
+		for (var i = 0; i < osmData.getNodes().size(); i++) {
+			var osmNode = osmData.getNodes().get(i);
+			var actualNode = originalGeometry.get(i);
+
+			assertEquals(osmNode.getId(), Long.parseLong(actualNode.getId().toString()));
+			assertEquals(osmNode.getLongitude(), actualNode.getCoord().getX(), 0.0000000001);
+			assertEquals(osmNode.getLatitude(), actualNode.getCoord().getY(), 0.000000001);
+		}
+	}
 }

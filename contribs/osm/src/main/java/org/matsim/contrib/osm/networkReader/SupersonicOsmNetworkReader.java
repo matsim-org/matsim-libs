@@ -144,7 +144,8 @@ public class SupersonicOsmNetworkReader {
             // if we have an intersection or the end of the way
             else if (isCreateSegment(fromNodeForSegment, toOsmNode, way)) {
 
-                var nodesForSegment = way.getNodeIds().subList(fromNodeForSegmentIndex, i);
+                // get all the node ids for the way segment. TLongList.subList(fromIndex, toIndex) has toIndex exclusive, therefore i + 1
+                var nodesForSegment = way.getNodeIds().subList(fromNodeForSegmentIndex, i + 1);
                 var waySegment = new WaySegment(
                         fromNodeForSegment, toOsmNode, nodesForSegment,
                         segmentLength,
