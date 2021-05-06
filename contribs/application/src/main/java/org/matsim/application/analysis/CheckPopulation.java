@@ -20,9 +20,7 @@ import picocli.CommandLine;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
@@ -124,7 +122,14 @@ public class CheckPopulation implements MATSimAppCommand {
 		Object2IntMap<String> firstAct = new Object2IntAVLTreeMap<>();
 		Object2IntMap<String> lastAct = new Object2IntAVLTreeMap<>();
 
+		List<TripStructureUtils.Subtour> subtours = new ArrayList<>();
+
 		for (Person agent : agents) {
+			try {
+				subtours.addAll(TripStructureUtils.getSubtours(agent.getSelectedPlan()));
+			} catch (NullPointerException e) {
+				// no coordinate or facility present
+			}
 
 			List<Activity> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 
@@ -147,6 +152,13 @@ public class CheckPopulation implements MATSimAppCommand {
 		log.info("Activity distribution (last):");
 
 		printDist(lastAct);
+
+		long closed = subtours.stream().filter(TripStructureUtils.Subtour::isClosed).count();
+
+		if (subtours.size() > 0)
+			log.info("Closed subtours: \t{}%", (closed * 100d) / subtours.size() );
+		else
+			log.info("No info about subtours (link or facilities ids missing)");
 
 		return 0;
 	}
