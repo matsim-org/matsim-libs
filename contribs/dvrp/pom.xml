@@ -11,13 +11,6 @@
 	<artifactId>dvrp</artifactId>
 	<name>dvrp</name>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>

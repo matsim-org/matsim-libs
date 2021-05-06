@@ -26,9 +26,6 @@
                   <argLine>-Xmx2000m -Djava.awt.headless=true</argLine>
               </configuration>
           </plugin>
-          <plugin>
-              <artifactId>maven-assembly-plugin</artifactId>
-          </plugin>
       </plugins>
   </build>
   <dependencies>

@@ -9,13 +9,6 @@
   <artifactId>pseudosimulation</artifactId>
   <!-- <version>deterministic-psim</version> -->
   <name>pseudosimulation</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
