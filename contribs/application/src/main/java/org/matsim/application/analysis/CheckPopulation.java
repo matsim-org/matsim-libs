@@ -7,8 +7,10 @@ import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.application.MATSimAppCommand;
 import org.matsim.application.options.CrsOptions;
@@ -125,11 +127,18 @@ public class CheckPopulation implements MATSimAppCommand {
 		List<TripStructureUtils.Subtour> subtours = new ArrayList<>();
 
 		for (Person agent : agents) {
-			try {
-				subtours.addAll(TripStructureUtils.getSubtours(agent.getSelectedPlan()));
-			} catch (NullPointerException e) {
-				// no coordinate or facility present
+
+			// if there are no facility or link ids. the coordinate is used as proxy id.
+			for (PlanElement el : agent.getSelectedPlan().getPlanElements()) {
+				if (el instanceof Activity) {
+					Activity act = (Activity) el;
+					if (act.getFacilityId() == null && act.getLinkId() == null) {
+						act.setLinkId(Id.createLinkId(act.getCoord().toString()));
+					}
+				}
 			}
+
+			subtours.addAll(TripStructureUtils.getSubtours(agent.getSelectedPlan()));
 
 			List<Activity> activities = TripStructureUtils.getActivities(agent.getSelectedPlan(), TripStructureUtils.StageActivityHandling.ExcludeStageActivities);
 
@@ -156,7 +165,7 @@ public class CheckPopulation implements MATSimAppCommand {
 		long closed = subtours.stream().filter(TripStructureUtils.Subtour::isClosed).count();
 
 		if (subtours.size() > 0)
-			log.info("Closed subtours: \t{}%", (closed * 100d) / subtours.size() );
+			log.info("Closed subtours estimate: \t{}%", Math.round((closed * 1000d) / subtours.size()) / 10d);
 		else
 			log.info("No info about subtours (link or facilities ids missing)");
 
