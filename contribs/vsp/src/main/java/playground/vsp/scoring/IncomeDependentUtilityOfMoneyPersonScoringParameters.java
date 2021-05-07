@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalDouble;
+import java.util.TreeMap;
 
 /**
  * @author tschlenther
@@ -63,6 +64,7 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 	private final TransitConfigGroup transitConfigGroup;
 	private final Map<Id<Person>, ScoringParameters> params = new IdMap<>(Person.class);
 	private final double globalAvgIncome;
+	private Map<String, Map<String, ActivityUtilityParameters>> activityParamsPerSubpopulation = new HashMap<>();
 
 	@Inject
 	IncomeDependentUtilityOfMoneyPersonScoringParameters(Population population, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, ScenarioConfigGroup scenarioConfigGroup, TransitConfigGroup transitConfigGroup) {
@@ -95,17 +97,32 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 	@Override
 	public ScoringParameters getScoringParameters(Person person) {
 
-		ScoringParameters scoringParametersThisPerson = params.get(person.getId());
-		if (scoringParametersThisPerson == null) {
+		ScoringParameters scoringParametersForThisPerson = params.get(person.getId());
+		if (scoringParametersForThisPerson == null) {
 			final String subpopulation = PopulationUtils.getSubpopulation( person );
+
+			//the following is a comment that was orinally put into SubpopulationScoringParams, which is the template for this class...
 			/* lazy initialization of params. not strictly thread safe, as different threads could
 			 * end up with different params-object, although all objects will have the same
 			 * values in them due to using the same config. Still much better from a memory performance
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
 
-			PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScorinParams = this.config.getScoringParameters(subpopulation);
-			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScorinParams, scConfig);
+			PlanCalcScoreConfigGroup.ScoringParameterSet subpopulationScoringParams = this.config.getScoringParameters(subpopulation);
+
+			// save the activityParams of the subpopulation so we need to build them only once.
+			this.activityParamsPerSubpopulation.computeIfAbsent(subpopulation, k -> {
+				Map<String, ActivityUtilityParameters> activityParams = new TreeMap<>();
+				for (PlanCalcScoreConfigGroup.ActivityParams params : subpopulationScoringParams.getActivityParams()) {
+					ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
+					activityParams.put(params.getActivityType(), factory.build() ) ;
+				}
+				return activityParams;
+			});
+
+			//use the builder that does not make defensive copies of the activity params
+			ScoringParameters.Builder builder = new ScoringParameters.Builder(this.config, subpopulationScoringParams, this.activityParamsPerSubpopulation.get(subpopulation), scConfig);
+
 			if (transitConfigGroup.isUseTransit()) {
 
 				PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
@@ -114,26 +131,26 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParameters implements Sco
 				transitActivityParams.setClosingTime(0.) ;
 				ActivityUtilityParameters.Builder modeParamsBuilder = new ActivityUtilityParameters.Builder(transitActivityParams);
 				modeParamsBuilder.setScoreAtAll(false);
-				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder);
+				builder.setActivityParameters(PtConstants.TRANSIT_ACTIVITY_TYPE, modeParamsBuilder.build());
 			}
 
 			if (person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME) != null){
 				//here is where we put person-specific stuff
 				double personalIncome = (double) person.getAttributes().getAttribute(PERSONAL_INCOME_ATTRIBUTE_NAME);
 				if(personalIncome > 0){
-					builder.setMarginalUtilityOfMoney(subpopulationScorinParams.getMarginalUtilityOfMoney()  * globalAvgIncome / personalIncome);
+					builder.setMarginalUtilityOfMoney(subpopulationScoringParams.getMarginalUtilityOfMoney()  * globalAvgIncome / personalIncome);
 				} else {
 					log.warn("you have set income to " + personalIncome + " for person " + person + ". This is invalid and gets ignored." +
 							"Instead, the marginalUtilityOfMoney is derived from the subpopulation's scoring parameters.");
 				}
 			}
 
-			scoringParametersThisPerson = builder.build();
+			scoringParametersForThisPerson = builder.build();
 			this.params.put(
 					person.getId(),
-					scoringParametersThisPerson);
+					scoringParametersForThisPerson);
 		}
 
-		return scoringParametersThisPerson;
+		return scoringParametersForThisPerson;
 	}
 }
