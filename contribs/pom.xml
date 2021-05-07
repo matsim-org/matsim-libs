@@ -36,7 +36,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.22.2</version>
 				<executions>
 					<execution>
 						<goals>
@@ -145,11 +144,8 @@
 			<!--it is not in weekly releases and then causes problems.  -->
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<!--<version>0.10.0</version>-->
-			<!--<version>0.11.0-apr17</version>-->
 			<scope>test</scope>
 			<version>${project.version}</version>
-			<!--(This has possibly no effect here, don't know.)-->
 		</dependency>
 		<dependency>
 			<!-- needed to compile in IntelliJ with Eclipse compiler -->
@@ -157,6 +153,4 @@
 			<artifactId>commons-logging</artifactId>
 		</dependency>
 	</dependencies>
-
-
 </project>
