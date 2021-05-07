@@ -28,6 +28,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 
 @CommandLine.Command(
         name = "extract-freight-trips",
@@ -56,6 +57,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
     private boolean cutOnBoundary;
+
+    private final SplittableRandom rnd = new SplittableRandom(4711);
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
@@ -183,8 +186,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act0.setCoord(ct.transform(link.getCoord()));
                             double newEndTime = departureTime + timeSpent;
-                            if (newEndTime >= 24 * 3600)
-                                newEndTime = 24 * 3600;
+                            if (newEndTime >= 86400)
+                                newEndTime = rnd.nextInt(86400);
                             act0.setEndTime(newEndTime);
                             isCoordSet = true;
                             break;
@@ -217,7 +220,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                                 act0.setCoord(ct.transform(link.getCoord()));
                                 double newEndTime = departureTime + timeSpent;
                                 if (newEndTime >= 24 * 3600)
-                                    newEndTime = 24 * 3600;
+                                    newEndTime = rnd.nextInt(86400);
                                 act0.setEndTime(newEndTime);
                                 vehicleIsInside = true;
                             } else {
