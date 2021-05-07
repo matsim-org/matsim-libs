@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -660,7 +661,7 @@ public class SupersonicOsmNetworkReaderTest {
 	public void simplifiedLinksWithPreservedOriginalGeometry() {
 
 		var file = Paths.get(matsimTestUtils.getOutputDirectory() + "file.osm.bbf");
-		var osmData = Utils.createSingleLink();
+		var osmData = Utils.createSingleLink(List.of(new Tag(OsmTags.HIGHWAY, OsmTags.LIVING_STREET)));
 		Utils.writeOsmData(osmData, file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -669,17 +670,28 @@ public class SupersonicOsmNetworkReaderTest {
 				.build()
 				.read(file);
 
-		assertEquals(1, network.getLinks().size());
-		var link = network.getLinks().values().iterator().next();
+		assertEquals(2, network.getLinks().size());
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002f")));
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002r")));
 
+		var forwardLink = network.getLinks().get(Id.createLinkId("10002f"));
+		assertOriginalGeometryOnLink(forwardLink, osmData.getNodes(), true);
+
+		var reverseLink = network.getLinks().get(Id.createLinkId("10002r"));
+		assertOriginalGeometryOnLink(reverseLink, osmData.getNodes(), false);
+
+	}
+
+	private void assertOriginalGeometryOnLink(Link link, List<OsmNode> osmNodes, boolean isForward) {
 		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM));
 		var originalGeometry = NetworkUtils.getOriginalGeometry(link);
 
-		assertEquals(osmData.getNodes().size(), originalGeometry.size());
+		assertEquals(osmNodes.size(), originalGeometry.size());
 
-		for (var i = 0; i < osmData.getNodes().size(); i++) {
-			var osmNode = osmData.getNodes().get(i);
-			var actualNode = originalGeometry.get(i);
+		for (var i = 0; i != osmNodes.size() ; i++) {
+			var osmNode = osmNodes.get(i);
+			// if forward link traverse forward, otherwise the nodes should be reversed compared to original geometry
+			var actualNode = isForward ? originalGeometry.get(i) : originalGeometry.get(originalGeometry.size() - 1 - i);
 
 			assertEquals(osmNode.getId(), Long.parseLong(actualNode.getId().toString()));
 			assertEquals(osmNode.getLongitude(), actualNode.getCoord().getX(), 0.0000000001);

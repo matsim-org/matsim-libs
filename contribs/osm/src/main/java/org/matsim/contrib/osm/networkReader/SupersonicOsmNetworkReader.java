@@ -247,7 +247,7 @@ public class SupersonicOsmNetworkReader {
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
         link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
         if (storeOriginalGeometry)
-            link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, getOriginalGeometry(segment.getNodesForSegment()));
+            link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, getOriginalGeometry(segment.getNodesForSegment(), direction));
         afterLinkCreated.accept(link, segment.getTags(), direction);
         return link;
     }
@@ -322,12 +322,17 @@ public class SupersonicOsmNetworkReader {
         return properties.lanesPerDirection;
     }
 
-    private String getOriginalGeometry(TLongList nodeIds) {
+    private String getOriginalGeometry(TLongList nodeIds, Direction direction) {
 
         var stringBuilder = new StringBuilder();
 
         // the first and last nodes are the from- and to node of a link. We don't have to include them here
-        for (var i = 1 ; i < nodeIds.size() - 1; i++) {
+        // if forward link, put nodes in the same order as original osm way, otherwise the other way around
+        var startIndex = direction == Direction.Forward ? 1 : nodeIds.size() - 2;
+        var endIndex = direction == Direction.Forward ? nodeIds.size() - 1 : 0;
+        var incrementBy = direction == Direction.Forward ? 1 : -1;
+
+        for (var i = startIndex; i != endIndex; i += incrementBy) {
             var id = nodeIds.get(i);
             var node = nodes.get(id);
             var coord = node.getCoord();
@@ -338,6 +343,7 @@ public class SupersonicOsmNetworkReader {
             stringBuilder.append(coord.getY());
             stringBuilder.append(' ');
         }
+
         return stringBuilder.toString();
     }
 
