@@ -236,6 +236,13 @@
                     <rules>
                         <requireUpperBoundDeps/>
                         <banDuplicatePomDependencyVersions/>
+						<requireReleaseDeps>
+							<failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+							<excludes>
+								<exclude>org.matsim:*</exclude>
+								<exclude>org.matsim.contrib:*</exclude>
+							</excludes>
+						</requireReleaseDeps>
                     </rules>
                 </configuration>
             </plugin>
