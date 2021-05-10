@@ -28,6 +28,7 @@ import picocli.CommandLine;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SplittableRandom;
 
 @CommandLine.Command(
         name = "extract-freight-trips",
@@ -56,6 +57,8 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--cut-on-boundary", description = "Cut trips on shape-file boundary", defaultValue = "false")
     private boolean cutOnBoundary;
+
+    private final SplittableRandom rnd = new SplittableRandom(4711);
 
     public static void main(String[] args) {
         System.exit(new CommandLine(new ExtractRelevantFreightTrips()).execute(args));
@@ -155,6 +158,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                     boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    if (route.links.size() == 0) {
+                        continue;
+                    }
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act1.setCoord(ct.transform(link.getCoord()));
@@ -178,18 +184,23 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                     boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    if (route.links.size() == 0) {
+                        continue;
+                    }
                     double timeSpent = 0;
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act0.setCoord(ct.transform(link.getCoord()));
                             double newEndTime = departureTime + timeSpent;
+                            if (newEndTime >= 86400)
+                                newEndTime = rnd.nextInt(86400);
                             act0.setEndTime(newEndTime);
                             isCoordSet = true;
                             break;
                         }
                         timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
                     }
-                    if (!isCoordSet){
+                    if (!isCoordSet) {
                         Coord originalCoord = route.links.get(0).getCoord();
                         act0.setCoord(ct.transform(originalCoord));
                         act0.setEndTime(departureTime);
@@ -208,12 +219,17 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 boolean vehicleIsInside = false;
                 LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                         network.getLinks().get(endLink).getToNode(), 0, null, null);
+                if (route.links.size() == 0) {
+                    continue;
+                }
                 if (cutOnBoundary) {
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             if (!vehicleIsInside) {
                                 act0.setCoord(ct.transform(link.getCoord()));
                                 double newEndTime = departureTime + timeSpent;
+                                if (newEndTime >= 24 * 3600)
+                                    newEndTime = rnd.nextInt(86400);
                                 act0.setEndTime(newEndTime);
                                 vehicleIsInside = true;
                             } else {
