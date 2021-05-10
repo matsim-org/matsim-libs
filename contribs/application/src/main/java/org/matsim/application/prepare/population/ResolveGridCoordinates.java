@@ -17,6 +17,8 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import picocli.CommandLine;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SplittableRandom;
 
 @CommandLine.Command(
@@ -69,6 +71,10 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 
 		for (Person p : population.getPersons().values()) {
 
+			// store the mapped coordinates for each person
+			// ensures that the location of one activity does not change for one person
+			Map<Coord, Coord> mapping = new HashMap<>();
+
 			for (Plan plan : p.getPlans()) {
 
 				for (PlanElement el : plan.getPlanElements()) {
@@ -80,17 +86,21 @@ public class ResolveGridCoordinates implements MATSimAppCommand {
 						if (geom != null && !geom.contains(MGC.coord2Point(coord)))
 							continue;
 
-						Coord newCoord = landuse.select(crs.getInputCRS(),
-								() -> {
-									double x = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
-									double y = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
+						Coord newCoord = mapping.getOrDefault(coord, null);
+						if (newCoord == null) {
+							newCoord = landuse.select(crs.getInputCRS(),
+									() -> {
+										double x = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
+										double y = rnd.nextDouble(-gridResolution / 2, gridResolution / 2);
 
-									if (coord.hasZ())
-										return new Coord(coord.getX() + x, coord.getY() + y, coord.getZ());
-									else
-										return new Coord(coord.getX() + x, coord.getY() + y);
-								}
-						);
+										if (coord.hasZ())
+											return new Coord(coord.getX() + x, coord.getY() + y, coord.getZ());
+										else
+											return new Coord(coord.getX() + x, coord.getY() + y);
+									}
+							);
+							mapping.put(coord, newCoord);
+						}
 
 						act.setCoord(newCoord);
 
