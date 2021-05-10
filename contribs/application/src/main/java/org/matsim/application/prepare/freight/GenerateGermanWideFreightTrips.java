@@ -58,7 +58,7 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
     @CommandLine.Option(names = "--working-days", defaultValue = "260", description = "Number of working days in a year", required = true)
     private int workingDays;
 
-    @CommandLine.Option(names = "--output",  description = "Path to output population", required = true)
+    @CommandLine.Option(names = "--output", description = "Path to output population", required = true)
     private Path output;
 
     @CommandLine.Mixin
@@ -112,20 +112,29 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
         Map<String, List<Id<Link>>> regionLinksMap = new HashMap<>();
 
         ShpOptions.Index index = shp.createIndex(crs.getInputCRS(), "NUTS_ID");
+        ShpOptions.Index landIndex = landuse.getIndex(crs.getInputCRS());
+
         for (Link link : links) {
-
             String nutsId = index.query(link.getToNode().getCoord());
-
             if (nutsId != null) {
-
                 // filter additional links by landuse
-                ShpOptions.Index landIndex = landuse.getIndex(crs.getInputCRS());
                 if (landIndex != null) {
                     if (!landIndex.contains(link.getToNode().getCoord()))
                         continue;
                 }
-
                 regionLinksMap.computeIfAbsent(nutsId, (k) -> new ArrayList<>()).add(link.getId());
+            }
+        }
+
+        // For regions without any industrial area, then any links inside the region may be chosen
+        Set<String> completedRegions = new HashSet<>();
+        completedRegions.addAll(regionLinksMap.keySet());
+        if (landIndex != null) {
+            for (Link link : links) {
+                String nutsId = index.query(link.getToNode().getCoord());
+                if (nutsId != null && !completedRegions.contains(nutsId)) {
+                    regionLinksMap.computeIfAbsent(nutsId, (k) -> new ArrayList<>()).add(link.getId());
+                }
             }
         }
 

@@ -20,15 +20,8 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -904,6 +897,28 @@ public final class NetworkUtils {
 	 */
 	public static Coord findNearestPointOnLink(Coord coord, Link link) {
 		return CoordUtils.orthogonalProjectionOnLineSegment(link.getFromNode().getCoord(),link.getToNode().getCoord(),coord);
+	}
 
+	public static final String ORIG_GEOM = "origgeom";
+	public static List<Node> getOriginalGeometry(Link link) {
+
+		// use a list since order is important
+		List<Node> result = new ArrayList<>();
+		result.add(link.getFromNode());
+		var attr = link.getAttributes().getAttribute(ORIG_GEOM);
+
+		if (attr != null) {
+			var data = ((String)attr).split(" ");
+			for (String date : data) {
+				var values = date.split(",");
+				if (values.length != 3) throw new RuntimeException("expected three values per node but found: " + date);
+				var coord = new Coord(Double.parseDouble(values[1]), Double.parseDouble(values[2]));
+				var node = new NodeImpl(Id.createNodeId(values[0]), coord);
+				result.add(node);
+			}
+		}
+
+		result.add(link.getToNode());
+		return result;
 	}
 }
