@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.network;
 
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -36,6 +37,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author nagel
@@ -161,43 +164,98 @@ public class NetworkUtilsTest {
 
 		//fromNode
 		Coord tp1 = new Coord(1,1);
-		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp1,link));
+		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp1,link));
 
 		//toNode
 		Coord tp2 = new Coord(100,100);
-		Assert.assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp2,link));
+		assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp2,link));
 
 		//on the link
 		Coord tp3 = new Coord(50,50);
-		Assert.assertEquals(tp3,NetworkUtils.findNearestPointOnLink(tp3,link));
+		assertEquals(tp3,NetworkUtils.findNearestPointOnLink(tp3,link));
 
 		//along the link vector, but before link
 		Coord tp4 = new Coord(-50,-50);
-		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp4,link));
+		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp4,link));
 
 		//along the link vector, but after link ends
 		Coord tp5 = new Coord(150,150);
-		Assert.assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp5,link));
+		assertEquals(n2,NetworkUtils.findNearestPointOnLink(tp5,link));
 
 		//off the link, but before link start
 		Coord tp6 = new Coord(1,0);
-		Assert.assertEquals(new Coord(1,1),NetworkUtils.findNearestPointOnLink(tp6,link));
+		assertEquals(new Coord(1,1),NetworkUtils.findNearestPointOnLink(tp6,link));
 
 		//off the link, parallel to it
 		Coord tp7 = new Coord(2,1);
-		Assert.assertEquals(new Coord(1.5,1.5),NetworkUtils.findNearestPointOnLink(tp7,link));
+		assertEquals(new Coord(1.5,1.5),NetworkUtils.findNearestPointOnLink(tp7,link));
 
 		//off the link, parallel to it
 		Coord tp8 = new Coord(30,45);
-		Assert.assertEquals(new Coord(37.5,37.5),NetworkUtils.findNearestPointOnLink(tp8,link));
+		assertEquals(new Coord(37.5,37.5),NetworkUtils.findNearestPointOnLink(tp8,link));
 
 		//loop link
-		Assert.assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp8,loop));
+		assertEquals(n1,NetworkUtils.findNearestPointOnLink(tp8,loop));
 
 		//link is plain in x & y
-		Assert.assertEquals(new Coord(1,45),NetworkUtils.findNearestPointOnLink(tp8,plainXLink));
-		Assert.assertEquals(new Coord(30,1),NetworkUtils.findNearestPointOnLink(tp8,plainYLink));
+		assertEquals(new Coord(1,45),NetworkUtils.findNearestPointOnLink(tp8,plainXLink));
+		assertEquals(new Coord(30,1),NetworkUtils.findNearestPointOnLink(tp8,plainYLink));
 
+	}
+
+	@Test
+	public void getOriginalGeometry() {
+
+		var network = NetworkUtils.createNetwork();
+		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+		network.addLink(link);
+
+		var intermediateNode1 = network.getFactory().createNode(Id.createNodeId("intermediate_1"), new Coord(20, 20));
+		var intermediateNode2 = network.getFactory().createNode(Id.createNodeId("intermediate_2"), new Coord(70, 70));
+
+		var intermediateString1 = intermediateNode1.getId().toString() + "," + intermediateNode1.getCoord().getX() + "," + intermediateNode1.getCoord().getY();
+		var intermediateString2 = intermediateNode2.getId().toString() + "," + intermediateNode2.getCoord().getX() + "," + intermediateNode2.getCoord().getY();
+		var geometryString = intermediateString1 + " " + intermediateString2;
+		link.getAttributes().putAttribute(NetworkUtils.ORIG_GEOM, geometryString);
+
+		var expectedNodeList = List.of(fromNode, intermediateNode1, intermediateNode2, toNode);
+		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+		for (var i = 0; i < expectedNodeList.size(); i++) {
+			var expectedNode = expectedNodeList.get(i);
+			var actualNode = actualNodeList.get(i);
+
+			assertEquals(expectedNode.getId(), actualNode.getId());
+			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+		}
+	}
+
+	@Test
+	public void getOriginalGeometry_noGeometryStored() {
+
+		var network = NetworkUtils.createNetwork();
+		var fromNode  = NetworkUtils.createAndAddNode(network, Id.createNodeId("from"), new Coord(0,0));
+		var toNode = NetworkUtils.createAndAddNode(network, Id.createNodeId("to"), new Coord(100, 100));
+		var link = network.getFactory().createLink(Id.createLinkId("link"), fromNode, toNode);
+		network.addLink(link);
+
+		var expectedNodeList = List.of(fromNode, toNode);
+
+		var actualNodeList = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(expectedNodeList.size(), actualNodeList.size());
+
+		for (var i = 0; i < expectedNodeList.size(); i++) {
+			var expectedNode = expectedNodeList.get(i);
+			var actualNode = actualNodeList.get(i);
+
+			assertEquals(expectedNode.getId(), actualNode.getId());
+			assertEquals(expectedNode.getCoord(), actualNode.getCoord());
+		}
 	}
 }
 
