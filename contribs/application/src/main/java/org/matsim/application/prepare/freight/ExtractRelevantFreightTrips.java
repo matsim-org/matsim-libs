@@ -155,6 +155,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                     boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    if (route.links.size() == 0) {
+                        continue;
+                    }
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
                             act1.setCoord(ct.transform(link.getCoord()));
@@ -178,6 +181,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                     boolean isCoordSet = false;
                     LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                             network.getLinks().get(endLink).getToNode(), 0, null, null);
+                    if (route.links.size() == 0) {
+                        continue;
+                    }
                     double timeSpent = 0;
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
@@ -189,7 +195,7 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                         }
                         timeSpent += Math.floor(link.getLength() / link.getFreespeed()) + 1;
                     }
-                    if (!isCoordSet){
+                    if (!isCoordSet) {
                         Coord originalCoord = route.links.get(0).getCoord();
                         act0.setCoord(ct.transform(originalCoord));
                         act0.setEndTime(departureTime);
@@ -208,6 +214,9 @@ public class ExtractRelevantFreightTrips implements MATSimAppCommand {
                 boolean vehicleIsInside = false;
                 LeastCostPathCalculator.Path route = router.calcLeastCostPath(network.getLinks().get(startLink).getToNode(),
                         network.getLinks().get(endLink).getToNode(), 0, null, null);
+                if (route.links.size() == 0) {
+                    continue;
+                }
                 if (cutOnBoundary) {
                     for (Link link : route.links) {
                         if (linksOnTheBoundary.contains(link.getId())) {
