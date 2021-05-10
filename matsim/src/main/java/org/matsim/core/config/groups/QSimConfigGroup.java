@@ -66,12 +66,15 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * Defines how the qsim sets the inflow and/or how it reacts to link attributes which are inconsistent with regard to the fundamental diagram.
-	 * Note that {@code MAX_CAP_FOR_ONE_LANE} is backwards-compatible but always sets the inflow capacity to the maximum according to the fundamental diagram for one lane,
-	 * so it essentially sets the inflow capacity too high for one-lane-links and probably too low for multiple-lane-links.
+	 * Defines how the qsim sets the inflow and/or how it reacts to link attributes which are inconsistent with regard to the fundamental diagram. <br>
+	 *
+	 * <li>Note that {@code MAX_CAP_FOR_ONE_LANE} is backwards-compatible but always sets the inflow capacity to the maximum according to the fundamental diagram for one lane,
+	 * so it essentially sets the inflow capacity too low for multiple-lane-links. </li>
+	 * <li>{@code INFLOW_FROM_FDIAG} sets the inflow capacity to maximum flow capacity according to the fundamental diagram, assuming the nr of lanes in the link attributes to be correct.</li>
+	 * <li>{@code NR_OF_LANES_FROM_FDIAG} sets the number of lanes to minimum required according to the fundamental diagram, assuming the flow capacity in the link attributes to be correct.</li>
 	 */
-	public enum TrafficDynamicsCorrectionApproach { REDUCE_FLOW_CAPACITY, INCREASE_NUMBER_OF_LANES, MAX_CAP_FOR_ONE_LANE }
-	private TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach = TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY;
+	public enum InFlowCapacitySetting {INFLOW_FROM_FDIAG, NR_OF_LANES_FROM_FDIAG, MAX_CAP_FOR_ONE_LANE }
+	private InFlowCapacitySetting inFlowCapacitySetting = InFlowCapacitySetting.INFLOW_FROM_FDIAG;
 
 	public enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime }
 	public enum EndtimeInterpretation { minOfEndtimeAndMobsimFinished, onlyUseEndtime }
@@ -626,12 +629,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		this.nodeTransitionLogic = nodeTransitionLogic;
 	}
 
-	public TrafficDynamicsCorrectionApproach getTrafficDynamicsCorrectionApproach() {
-		return this.trafficDynamicsCorrectionApproach;
+	public InFlowCapacitySetting getInFlowCapacitySetting() {
+		return this.inFlowCapacitySetting;
 	}
 
-	public void setTrafficDynamicsCorrectionApproach(TrafficDynamicsCorrectionApproach trafficDynamicsCorrectionApproach) {
-		this.trafficDynamicsCorrectionApproach = trafficDynamicsCorrectionApproach;
+	public void setInFlowCapacitySetting(InFlowCapacitySetting inFlowCapacitySetting) {
+		this.inFlowCapacitySetting = inFlowCapacitySetting;
 	}
 
 ////	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)

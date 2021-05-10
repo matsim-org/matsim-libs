@@ -67,7 +67,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamicsCorrectionApproach;
+import org.matsim.core.config.groups.QSimConfigGroup.InFlowCapacitySetting;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.ParallelEventsManager;
@@ -1538,7 +1538,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setTrafficDynamicsCorrectionApproach(TrafficDynamicsCorrectionApproach.REDUCE_FLOW_CAPACITY);
+		f.config.qsim().setInFlowCapacitySetting(InFlowCapacitySetting.INFLOW_FROM_FDIAG);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -1598,7 +1598,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setTrafficDynamicsCorrectionApproach(TrafficDynamicsCorrectionApproach.INCREASE_NUMBER_OF_LANES);
+		f.config.qsim().setInFlowCapacitySetting(InFlowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -1658,7 +1658,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setTrafficDynamicsCorrectionApproach(TrafficDynamicsCorrectionApproach.MAX_CAP_FOR_ONE_LANE);
+		f.config.qsim().setInFlowCapacitySetting(InFlowCapacitySetting.MAX_CAP_FOR_ONE_LANE);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
