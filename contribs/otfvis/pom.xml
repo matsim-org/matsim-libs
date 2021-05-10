@@ -21,9 +21,6 @@
 						work otherwise... -->
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 	<modelVersion>4.0.0</modelVersion>

@@ -13,13 +13,6 @@
 		<jsprit.version>1.8</jsprit.version>
 	</properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 
 
 	<dependencyManagement>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<parent>
 		<groupId>org.matsim</groupId>
@@ -112,62 +113,7 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<!--source>8</source--><!--can be skipped from maven-javadoc-plugin 3.1.0-->
-					<quiet>true</quiet>
-					<header>MATSim API</header>
-					<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
-					<groups>
-						<group>
-							<title>api</title>
-							<packages>org.matsim.api:org.matsim.api.*</packages>
-						</group>
-						<group>
-							<title>run</title>
-							<packages>org.matsim.run:org.matsim.run.*</packages>
-						</group>
-						<group>
-							<title>core</title>
-							<packages>org.matsim.core:org.matsim.core.*</packages>
-						</group>
-						<group>
-							<title>pt</title>
-							<packages>org.matsim.pt:org.matsim.pt.*</packages>
-						</group>
-						<group>
-							<title>utils</title>
-							<packages>org.matsim.utils:org.matsim.utils.*</packages>
-						</group>
-						<group>
-							<title>withinday</title>
-							<packages>org.matsim.withinday:org.matsim.withinday.*</packages>
-						</group>
-						<group>
-							<title>vis</title>
-							<packages>org.matsim.vis:org.matsim.vis.*</packages>
-						</group>
-					</groups>
-					<detectLinks>true</detectLinks>
-					<doclint>none</doclint>
-					<linksource>true</linksource>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.22.2</version>
 				<executions>
 					<execution>
 						<goals>
@@ -375,4 +321,85 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<quiet>true</quiet>
+							<header>MATSim API</header>
+							<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
+							<groups>
+								<group>
+									<title>api</title>
+									<packages>org.matsim.api:org.matsim.api.*</packages>
+								</group>
+								<group>
+									<title>run</title>
+									<packages>org.matsim.run:org.matsim.run.*</packages>
+								</group>
+								<group>
+									<title>core</title>
+									<packages>org.matsim.core:org.matsim.core.*</packages>
+								</group>
+								<group>
+									<title>pt</title>
+									<packages>org.matsim.pt:org.matsim.pt.*</packages>
+								</group>
+								<group>
+									<title>utils</title>
+									<packages>org.matsim.utils:org.matsim.utils.*</packages>
+								</group>
+								<group>
+									<title>withinday</title>
+									<packages>org.matsim.withinday:org.matsim.withinday.*</packages>
+								</group>
+								<group>
+									<title>vis</title>
+									<packages>org.matsim.vis:org.matsim.vis.*</packages>
+								</group>
+							</groups>
+							<detectLinks>true</detectLinks>
+							<doclint>none</doclint>
+							<linksource>true</linksource>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>3.3.0</version>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/assembly-release.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+						</configuration>
+						<executions>
+							<execution>
+								<id>make-assembly</id>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 </project>
