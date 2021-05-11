@@ -8,11 +8,4 @@
     <groupId>org.matsim.contrib</groupId>
     <artifactId>decongestion</artifactId>
     <name>decongestion</name>
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>

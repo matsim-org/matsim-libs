@@ -9,13 +9,6 @@
   <artifactId>pseudosimulation</artifactId>
   <!-- <version>deterministic-psim</version> -->
   <name>pseudosimulation</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
@@ -36,12 +29,6 @@
       <groupId>colt</groupId>
       <artifactId>colt</artifactId>
       <version>1.2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.matsim</groupId>
-      <artifactId>matsim-examples</artifactId>
-      <version>14.0-SNAPSHOT</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
