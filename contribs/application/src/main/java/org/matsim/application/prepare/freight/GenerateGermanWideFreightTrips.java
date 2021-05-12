@@ -168,17 +168,17 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
         MutableInt totalGeneratedPerson = new MutableInt();
 
-        //analysis cross broader trips
+        // Analyze cross broader trips
         boolean includeInternationalTrips = false;
         List<Id<Link>> boundaryLinkIds = new ArrayList<>();
         if (pathToBoundaryLinks != null) {
             includeInternationalTrips = true;
-            BufferedReader csvReader = new BufferedReader(new FileReader(pathToBoundaryLinks.toString()));
-            String[] linksIdStrings = csvReader.readLine().split(",");
-            for (String linkIdString : linksIdStrings) {
-                boundaryLinkIds.add(Id.createLinkId(linkIdString));
+            try (BufferedReader csvReader = Files.newBufferedReader(pathToBoundaryLinks)){
+                String[] linksIdStrings = csvReader.readLine().split(",");
+                for (String linkIdString : linksIdStrings) {
+                    boundaryLinkIds.add(Id.createLinkId(linkIdString));
+                }
             }
-
         }
 
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(freightDataPath, StandardCharsets.ISO_8859_1),
