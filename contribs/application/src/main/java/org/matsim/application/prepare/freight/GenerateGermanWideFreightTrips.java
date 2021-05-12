@@ -176,7 +176,6 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
             BufferedReader csvReader = new BufferedReader(new FileReader(pathToBoundaryLinks.toString()));
             String[] linksIdStrings = csvReader.readLine().split(",");
             for (String linkIdString : linksIdStrings) {
-                System.out.println("Boundary link " + linkIdString + " is added to the list");
                 boundaryLinkIds.add(Id.createLinkId(linkIdString));
             }
 
