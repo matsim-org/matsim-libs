@@ -21,6 +21,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import picocli.CommandLine;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -60,6 +62,9 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
     @CommandLine.Option(names = "--output", description = "Path to output population", required = true)
     private Path output;
+
+    @CommandLine.Option(names = "--boundary-links", description = "Path to boundary links for cross-broader traffic", required = false)
+    private Path pathToBoundaryLinks;
 
     @CommandLine.Mixin
     private LanduseOptions landuse = new LanduseOptions();
@@ -163,6 +168,19 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
         MutableInt totalGeneratedPerson = new MutableInt();
 
+        // Analyze cross broader trips
+        boolean includeInternationalTrips = false;
+        List<Id<Link>> boundaryLinkIds = new ArrayList<>();
+        if (pathToBoundaryLinks != null) {
+            includeInternationalTrips = true;
+            try (BufferedReader csvReader = Files.newBufferedReader(pathToBoundaryLinks)){
+                String[] linksIdStrings = csvReader.readLine().split(",");
+                for (String linkIdString : linksIdStrings) {
+                    boundaryLinkIds.add(Id.createLinkId(linkIdString));
+                }
+            }
+        }
+
         try (CSVParser parser = new CSVParser(Files.newBufferedReader(freightDataPath, StandardCharsets.ISO_8859_1),
                 CSVFormat.DEFAULT.withDelimiter(';').withFirstRecordAsHeader())) {
 
@@ -189,69 +207,76 @@ public class GenerateGermanWideFreightTrips implements MATSimAppCommand {
 
                 String tonNL = record.get(17);
 
-                if (relevantRegionIds.contains(originVL) && relevantRegionIds.contains(destinationVL)
-                        && modeVL.equals("2") && !tonVL.equals("0")) {
-                    double trucks = Double.parseDouble(tonVL) / adjustedTrucksLoad;
-                    int numOfTrucks = 0;
-                    if (trucks < 1) {
-                        if (rnd.nextDouble() < trucks) {
-                            numOfTrucks = 1;
+                if ((relevantRegionIds.contains(originVL) && relevantRegionIds.contains(destinationVL)) || includeInternationalTrips) {
+                    if (modeVL.equals("2") && !tonVL.equals("0")) {
+                        double trucks = Double.parseDouble(tonVL) / adjustedTrucksLoad;
+                        int numOfTrucks = 0;
+                        if (trucks < 1) {
+                            if (rnd.nextDouble() < trucks) {
+                                numOfTrucks = 1;
+                            }
+                        } else {
+                            numOfTrucks = (int) (Math.floor(trucks) + 1);
                         }
-                    } else {
-                        numOfTrucks = (int) (Math.floor(trucks) + 1);
+                        List<Id<Link>> linksInOrigin = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(originVL), boundaryLinkIds);
+                        Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
+
+                        List<Id<Link>> linksInDestination = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(destinationVL), boundaryLinkIds);
+                        Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
+
+                        generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
+                                populationFactory, totalGeneratedPerson);
                     }
-                    List<Id<Link>> linksInOrigin = regionLinksMap.get(lookUpTableCore.get(originVL));
-                    Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
-
-                    List<Id<Link>> linksInDestination = regionLinksMap.get(lookUpTableCore.get(destinationVL));
-                    Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
-
-                    generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
-                            populationFactory, totalGeneratedPerson);
                 }
 
-                if (relevantRegionIds.contains(originHL) && relevantRegionIds.contains(destinationHL)
-                        && modeHL.equals("2") && !tonHL.equals("0")) {
-                    double trucks = Double.parseDouble(tonHL) / adjustedTrucksLoad;
-                    int numOfTrucks = 0;
-                    if (trucks < 1) {
-                        if (rnd.nextDouble() < trucks) {
-                            numOfTrucks = 1;
+                if ((relevantRegionIds.contains(originHL) && relevantRegionIds.contains(destinationHL)) || includeInternationalTrips) {
+                    if (modeHL.equals("2") && !tonHL.equals("0")) {
+                        double trucks = Double.parseDouble(tonHL) / adjustedTrucksLoad;
+                        int numOfTrucks = 0;
+                        if (trucks < 1) {
+                            if (rnd.nextDouble() < trucks) {
+                                numOfTrucks = 1;
+                            }
+                        } else {
+                            numOfTrucks = (int) (Math.floor(trucks) + 1);
                         }
-                    } else {
-                        numOfTrucks = (int) (Math.floor(trucks) + 1);
+                        List<Id<Link>> linksInOrigin = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(originHL), boundaryLinkIds);
+                        Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
+
+                        List<Id<Link>> linksInDestination = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(destinationHL), boundaryLinkIds);
+                        Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
+
+                        generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
+                                populationFactory, totalGeneratedPerson);
                     }
-
-                    List<Id<Link>> linksInOrigin = regionLinksMap.get(lookUpTableCore.get(originHL));
-                    Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
-
-                    List<Id<Link>> linksInDestination = regionLinksMap.get(lookUpTableCore.get(destinationHL));
-                    Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
-
-                    generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
-                            populationFactory, totalGeneratedPerson);
                 }
 
-                if (relevantRegionIds.contains(originNL) && relevantRegionIds.contains(destinationNL)
-                        && modeNL.equals("2") && !tonNL.equals("0")) {
-                    double trucks = Double.parseDouble(tonNL) / adjustedTrucksLoad;
-                    int numOfTrucks = 0;
-                    if (trucks < 1) {
-                        if (rnd.nextDouble() < trucks) {
-                            numOfTrucks = 1;
+                if ((relevantRegionIds.contains(originNL) && relevantRegionIds.contains(destinationNL)) || includeInternationalTrips) {
+                    if (modeNL.equals("2") && !tonNL.equals("0")) {
+                        double trucks = Double.parseDouble(tonNL) / adjustedTrucksLoad;
+                        int numOfTrucks = 0;
+                        if (trucks < 1) {
+                            if (rnd.nextDouble() < trucks) {
+                                numOfTrucks = 1;
+                            }
+                        } else {
+                            numOfTrucks = (int) (Math.floor(trucks) + 1);
                         }
-                    } else {
-                        numOfTrucks = (int) (Math.floor(trucks) + 1);
+                        List<Id<Link>> linksInOrigin = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(originNL), boundaryLinkIds);
+                        Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
+
+                        List<Id<Link>> linksInDestination = regionLinksMap.
+                                getOrDefault(lookUpTableCore.get(destinationNL), boundaryLinkIds);
+                        Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
+
+                        generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
+                                populationFactory, totalGeneratedPerson);
                     }
-
-                    List<Id<Link>> linksInOrigin = regionLinksMap.get(lookUpTableCore.get(originNL));
-                    Id<Link> fromLinkId = linksInOrigin.get(rnd.nextInt(linksInOrigin.size()));
-
-                    List<Id<Link>> linksInDestination = regionLinksMap.get(lookUpTableCore.get(destinationNL));
-                    Id<Link> toLinkId = linksInDestination.get(rnd.nextInt(linksInDestination.size()));
-
-                    generateFreightPlan(network, fromLinkId, toLinkId, numOfTrucks, goodType, population,
-                            populationFactory, totalGeneratedPerson);
                 }
             }
         }
