@@ -28,17 +28,14 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 
 	@Rule
 	public MatsimTestUtils utils;
-	private static TransitConfigGroup transitConfigGroup;
-	private static ScenarioConfigGroup scenarioConfigGroup;
-	private static PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
-	private static IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
-	private static Population population;
+	private IncomeDependentUtilityOfMoneyPersonScoringParameters personScoringParams;
+	private Population population;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		transitConfigGroup = new TransitConfigGroup();
-		scenarioConfigGroup = new ScenarioConfigGroup();
-		planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
+	@Before
+	public void setUp() {
+		TransitConfigGroup transitConfigGroup = new TransitConfigGroup();
+		ScenarioConfigGroup scenarioConfigGroup = new ScenarioConfigGroup();
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
 
 		PlanCalcScoreConfigGroup.ScoringParameterSet personParams = planCalcScoreConfigGroup.getOrCreateScoringParameters("person");
 		personParams.setMarginalUtilityOfMoney(1);
@@ -91,7 +88,10 @@ public class IncomeDependentUtilityOfMoneyPersonScoringParametersTest {
 			PopulationUtils.putPersonAttribute(freightWithIncome2, PERSONAL_INCOME_ATTRIBUTE_NAME, 0.5d);
 			population.addPerson(freightWithIncome2);
 		}
-		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population, planCalcScoreConfigGroup, scenarioConfigGroup, transitConfigGroup);
+		personScoringParams = new IncomeDependentUtilityOfMoneyPersonScoringParameters(population,
+				planCalcScoreConfigGroup,
+				scenarioConfigGroup,
+				transitConfigGroup);
 	}
 
 	@Test
