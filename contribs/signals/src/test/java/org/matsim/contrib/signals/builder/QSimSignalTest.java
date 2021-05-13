@@ -58,6 +58,8 @@ public class QSimSignalTest implements
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
+	private final Fixture fixture = new Fixture();
+	
 	
 	/**
 	 * Tests the setup with a traffic light that shows all the time green
@@ -65,7 +67,7 @@ public class QSimSignalTest implements
 	@Test
 	public void testTrafficLightIntersection2arms1AgentV20() {
 		// configure and load standard scenario
-		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(false );
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false );
 		
 		this.link2EnterTime = 38.0;
 		runQSimWithSignals(scenario, true);
@@ -78,16 +80,16 @@ public class QSimSignalTest implements
 	@Test
 	public void testSignalSystems1AgentGreenAtSec100() {		
 		// configure and load standard scenario
-		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(false );
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(false );
 		// modify scenario
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
-				Fixture.signalSystemId2 );
-		SignalPlanData planData = controllerData.getSignalPlanData().get( Fixture.signalPlanId2 );
+				fixture.signalSystemId2 );
+		SignalPlanData planData = controllerData.getSignalPlanData().get( fixture.signalPlanId2 );
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(5 * 3600);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( Fixture.signalGroupId100 );
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( fixture.signalGroupId100 );
 		groupData.setDropping(0);
 		groupData.setOnset(100);
 
@@ -101,16 +103,16 @@ public class QSimSignalTest implements
 	@Test
 	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
-		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(true );
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true );
 		// modify scenario
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
-				Fixture.signalSystemId2 );
-		SignalPlanData planData = controllerData.getSignalPlanData().get( Fixture.signalPlanId2 );
+				fixture.signalSystemId2 );
+		SignalPlanData planData = controllerData.getSignalPlanData().get( fixture.signalPlanId2 );
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(60);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( Fixture.signalGroupId100 );
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( fixture.signalGroupId100 );
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
 		
@@ -123,16 +125,16 @@ public class QSimSignalTest implements
 	@Test
 	public void testIntergreensNoAbortOneAgentDriving() {
 		//configure and load standard scenario
-		Scenario scenario = new Fixture().createAndLoadTestScenarioOneSignal(true );
+		Scenario scenario = fixture.createAndLoadTestScenarioOneSignal(true );
 		// modify scenario
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
-				Fixture.signalSystemId2 );
-		SignalPlanData planData = controllerData.getSignalPlanData().get( Fixture.signalPlanId2 );
+				fixture.signalSystemId2 );
+		SignalPlanData planData = controllerData.getSignalPlanData().get( fixture.signalPlanId2 );
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(60);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( Fixture.signalGroupId100 );
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get( fixture.signalGroupId100 );
 		groupData.setOnset(30);
 		groupData.setDropping(25);	
 		
@@ -146,7 +148,7 @@ public class QSimSignalTest implements
 	@Test
 	public void testConflictingDirectionsAbortOneAgentDriving() {
 		//configure and load test scenario with data about conflicting directions
-		Scenario scenario = new Fixture().createAndLoadTestScenarioTwoSignals(true );
+		Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true );
 
 		runQSimWithSignals(scenario, false);
 		Assert.assertFalse("The simulation should abort because of intergreens violation.", runQSimWithSignals(scenario, false));
@@ -158,12 +160,12 @@ public class QSimSignalTest implements
 	@Test
 	public void testConflictingDirectionsNoAbortOneAgentDriving() {
 		//configure and load test scenario with data about conflicting directions
-		Scenario scenario = new Fixture().createAndLoadTestScenarioTwoSignals(true );
+		Scenario scenario = fixture.createAndLoadTestScenarioTwoSignals(true );
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalGroupSettingsData group100setting = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(
-				Fixture.signalSystemId2 ).getSignalPlanData().get(
-				Fixture.signalPlanId2 ).getSignalGroupSettingsDataByGroupId().get(
-				Fixture.signalGroupId100 );
+				fixture.signalSystemId2 ).getSignalPlanData().get(
+				fixture.signalPlanId2 ).getSignalGroupSettingsDataByGroupId().get(
+				fixture.signalGroupId100 );
 		group100setting.setOnset(15);
 
 		runQSimWithSignals(scenario, false);
@@ -222,10 +224,10 @@ public class QSimSignalTest implements
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
-		if (e.getLinkId().equals( Fixture.linkId1 )){
+		if (e.getLinkId().equals( fixture.linkId1 )){
 			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
-		else if (e.getLinkId().equals( Fixture.linkId2 )){
+		else if (e.getLinkId().equals( fixture.linkId2 )){
 			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}
