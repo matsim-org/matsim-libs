@@ -20,7 +20,8 @@ package org.matsim.contrib.freight.utils;
 
 import java.util.Collection;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -53,29 +54,23 @@ import org.junit.Assert;
  */
 public class FreightUtilsIT {
 	
-	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
-	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+	private final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
+	private final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
+
+	private Carrier carrierWServices;
+	private Carrier carrierWShipments;
+
+	private Carrier carrierWShipmentsOnlyFromCarrierWServices;
+	private Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
-	private static Carriers carriersWithServicesAndShpiments;
-	private static Carrier carrierWServices;
-	private static Carrier carrierWShipments;
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private static Carriers carriersWithShipmentsOnly;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
-	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
-	
-	/** Commented out because it is not working even as @Rule nor as @ClassRule due to different reasons, 
-	* e.g. @BeforeClass needs @ClassRule, but MatsimTestUtils does not work together with @ClassRule ;
-	*  MatsimTestUtils needs be static vs static not allowed in @Rule, KMT sep/18
-	**/
-//	@Rule		
-//	public static MatsimTestUtils testUtils = new MatsimTestUtils();
-	
-	@BeforeClass
-	public static void setUp() {
+	@Before
+	public void setUp() {
 		
 		//Create carrier with services and shipments
-		carriersWithServicesAndShpiments = new Carriers() ;
+		Carriers carriersWithServicesAndShpiments = new Carriers();
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarrierUtils.addService(carrierWServices, service1);
@@ -124,7 +119,7 @@ public class FreightUtilsIT {
 
 		//load Network and build netbasedCosts for jsprit
 		Network network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 
+		new MatsimNetworkReader(network).readFile(testUtils.getPackageInputDirectory() + "grid-network.xml");
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
@@ -151,7 +146,8 @@ public class FreightUtilsIT {
 		 */
 
 		//Convert to jsprit VRP
-		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(
+				carriersWithServicesAndShpiments);
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader(carriersWithShipmentsOnly).loadVehicleTypes(vehicleTypes) ;	
@@ -311,17 +307,4 @@ public class FreightUtilsIT {
 				.setServiceStartTimeWindow(TimeWindow.newInstance(0.0, 36001.0))
 				.build();
 	}
-	
-	
-	/**
-	 * Note: Manually added here, because MatsimTestUtils does not work with @BeforeClass; KMT sep/18
-	 * @return String location of the packageInputDirectory
-	 */
-	private static String getPackageInputDirectory() {
-		String classInputDirectory = "test/input/" + FreightUtilsTest.class.getCanonicalName().replace('.', '/') + "/";
-		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
-		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
-		return packageInputDirectory;
-	}
-
 }

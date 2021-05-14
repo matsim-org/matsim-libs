@@ -37,13 +37,13 @@ import java.util.TreeMap;
 public class DiversityGeneratingPlansRemoverTest {
 	private static final Logger log = Logger.getLogger( DiversityGeneratingPlansRemoverTest.class ) ;
 	
-	private static final Id<Node> node0 = Id.createNodeId( "node0" ) ;
-	private static final Id<Node> node1 = Id.createNodeId( "node1" ) ;
-	private static final Id<Node> node2 = Id.createNodeId( "node2" ) ;
-	private static final Id<Node> node3 = Id.createNodeId( "node3" ) ;
-	private static final Id<Link> link0_1 = Id.createLinkId( "dummy0-1" );
-	private static final Id<Link> link1_2 = Id.createLinkId( "dummy1-2" );
-	private static final Id<Link> link2_3 = Id.createLinkId( "dummyN" );
+	private final Id<Node> node0 = Id.createNodeId( "node0" ) ;
+	private final Id<Node> node1 = Id.createNodeId( "node1" ) ;
+	private final Id<Node> node2 = Id.createNodeId( "node2" ) ;
+	private final Id<Node> node3 = Id.createNodeId( "node3" ) ;
+	private final Id<Link> link0_1 = Id.createLinkId( "dummy0-1" );
+	private final Id<Link> link1_2 = Id.createLinkId( "dummy1-2" );
+	private final Id<Link> link2_3 = Id.createLinkId( "dummyN" );
 	
 	@Test
 	public void calcWeights() {
@@ -179,7 +179,7 @@ public class DiversityGeneratingPlansRemoverTest {
 		
 	}
 	
-	private static Plan createHwhPlan( final PopulationFactory pf ) {
+	private Plan createHwhPlan( final PopulationFactory pf ) {
 		Plan plan = pf.createPlan() ;
 		{
 			Activity act = pf.createActivityFromCoord( "home", new Coord(0.,0.) ) ;

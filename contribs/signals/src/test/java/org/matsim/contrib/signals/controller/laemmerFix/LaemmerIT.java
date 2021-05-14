@@ -68,10 +68,10 @@ public class LaemmerIT {
 	
 	private static final int maxCycleTime = 90;
 	private static final int cycleIntergreenTime = 10;
-	private static final Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
-	private static final Id<SignalGroup> signalGroupId1l = Id.create("SignalGroup1l", SignalGroup.class);
-	private static final Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
-	private static final Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
+	private final Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
+	private final Id<SignalGroup> signalGroupId1l = Id.create("SignalGroup1l", SignalGroup.class);
+	private final Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
+	private final Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
 	
 	/**
 	 * single intersection with demand (equals flow capacity) only in NS-direction. signals should show green only for the NS-direction.
