@@ -12,9 +12,10 @@ public class MatsimToPostgresControlerListener implements ShutdownListener {
 
     @Override
     public void notifyShutdown(ShutdownEvent event) {
-
-        new PostgresExporter(exporterConfigGroup).export();
+        PostgresExporter postgresExporter = new PostgresExporter(exporterConfigGroup);
 
     }
+
+
 
 }
