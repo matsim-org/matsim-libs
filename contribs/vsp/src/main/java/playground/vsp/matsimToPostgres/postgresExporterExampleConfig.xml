@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="postgresExporter" >
+		<!-- xml-File containing database host, database, user, password, port -->
+		<param name="dbParamFile" value="./dbParam.xml" />
+		
+		<!-- Possible values: failIfRunIdExists, overwriteExistingRunId-->
+		<param name="overwriteRun" value="failIfRunIdExists" />
+			
+		<parameterset type="initialData" >
+			<!-- Possible values: importOverwrite, importIfNotExist, NoImport-->
+			<param name="importMode" value="importIfNotExist" />
+			
+			<!-- csv-File containing geo data of aggregation areas such as counties, communities, hexagons etc... -->
+			<param name="aggregationAreasFile" value="./aggregationAreas.csv" />
+
+		</parameterset>
+	</module>
+	
+</config>
