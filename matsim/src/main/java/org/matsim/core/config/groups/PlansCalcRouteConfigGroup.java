@@ -85,7 +85,14 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 																		"settings for helper modes such as for " + TransportMode.non_network_walk;
 	private boolean clearingDefaultModeRoutingParams = false ;
 	// ---
-
+	public static class TeleportedModeParams extends ModeRoutingParams {
+		public TeleportedModeParams( String mode ){
+			super( mode );
+		}
+	}
+	/**
+	 * @deprecated -- try to use {@link TeleportedModeParams} to be consistent with xml config (not always possible).
+	 */
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_TYPE = "teleportedModeParameters";
 		public static final String MODE = "mode";
@@ -321,6 +328,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			throw new RuntimeException( "you cannot set the clearing of the default mode routing params to false after you have already cleared once." ) ;
 		}
 	}
+	public void clearTeleportedModeParams() {
+		this.clearModeRoutingParams();
+	}
+	/**
+	 * @deprecated -- use {@link #clearTeleportedModeParams()} to be consistent with naming in xml config.
+	 */
 	public void clearModeRoutingParams( ) {
 		// This is essentially a config switch, except that it cannot be set back to false once it was set to true.
 
@@ -361,6 +374,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		super.addParameterSet( set );
 	}
 
+	public void addTeleportedModeParams( final TeleportedModeParams pars ) {
+		this.addModeRoutingParams( pars );
+	}
 	public void addModeRoutingParams(final ModeRoutingParams pars) {
 		testForLocked() ;
 		addParameterSet( pars );
