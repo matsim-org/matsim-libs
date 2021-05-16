@@ -29,7 +29,7 @@ import org.matsim.vehicles.VehicleType;
  */
 public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
+	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV2.class);
 
 	private Collection<Carrier> carriers;
 

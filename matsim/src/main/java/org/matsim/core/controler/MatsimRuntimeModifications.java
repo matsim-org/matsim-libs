@@ -33,7 +33,7 @@ class MatsimRuntimeModifications {
 
 	private AtomicBoolean unexpectedShutdown = new AtomicBoolean(false);
 
-	private static Logger log = Logger.getLogger(MatsimRuntimeModifications.class);
+	private static final  Logger log = Logger.getLogger(MatsimRuntimeModifications.class);
 
 	interface MyRunnable {
 		void run() throws UnexpectedShutdownException;

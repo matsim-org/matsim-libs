@@ -10,7 +10,7 @@ import java.util.List;
 
 public class CarrierUtils{
 
-	private static Logger log = Logger.getLogger(CarrierUtils.class);
+	private static final  Logger log = Logger.getLogger(CarrierUtils.class);
 
 	public static Carrier createCarrier( Id<Carrier> id ){
 		return new CarrierImpl(id);

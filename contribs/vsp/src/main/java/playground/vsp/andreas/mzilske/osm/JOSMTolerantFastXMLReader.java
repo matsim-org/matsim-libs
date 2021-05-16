@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class JOSMTolerantFastXMLReader implements RunnableSource {
 		
-		private static Logger log = Logger.getLogger(JOSMTolerantFastXMLReader.class.getName());
+		private static final Logger log = Logger.getLogger(JOSMTolerantFastXMLReader.class.getName());
 		
 		private Sink sink;
 		private final File file;
