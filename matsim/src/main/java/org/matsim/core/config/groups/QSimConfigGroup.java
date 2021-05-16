@@ -95,7 +95,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
-	private boolean usePersonIdForMissingVehicleId = true;
+	private boolean usePersonIdForMissingVehicleId = false;
 	@Positive
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
@@ -536,11 +536,13 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( VEHICLES_SOURCE)
 	public final void setVehiclesSource( VehiclesSource source ) {
+		// yyyy This setting triggers behavior in PrepareForSim, the result of which is also used by the router.  A better place for this switch might be in the vehicles config group. kai, may'21
 		testForLocked();
 		this.vehiclesSource = source ;
 	}
 	@StringGetter( VEHICLES_SOURCE )
 	public final VehiclesSource getVehiclesSource() {
+		// yyyy This setting triggers behavior in PrepareForSim, the result of which is also used by the router.  A better place for this switch might be in the vehicles config group. kai, may'21
 		return this.vehiclesSource ;
 	}
 

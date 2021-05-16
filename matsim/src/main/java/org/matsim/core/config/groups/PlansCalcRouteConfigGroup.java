@@ -113,7 +113,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
 		"teleportedModeFreespeedFactor wins over teleportedModeSpeed.";
 		
-		static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
+		private static final String TELEPORTED_MODE_FREESPEED_LIMIT_CMT = "When using freespeed factor, a speed limit on the free speed. "
 				+ "Link travel time will be $= factor * [ min( link_freespeed, freespeed_limit) ]" ;
 
 		public ModeRoutingParams(final String mode) {
