@@ -1,46 +1,68 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>12.0-SNAPSHOT</version>
-  </parent>
-  
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>emissions</artifactId>
-  <name>emissions</name>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>emissions.example.RunEmissionToolOfflineExample</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.matsim.contrib</groupId>
-      <artifactId>analysis</artifactId>
-      <version>12.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.9.6</version>
-    </dependency>
-  </dependencies>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.matsim</groupId>
+        <artifactId>contrib</artifactId>
+        <version>14.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.matsim.contrib</groupId>
+    <artifactId>emissions</artifactId>
+    <name>emissions</name>
+
+    <repositories>
+        <repository>
+            <id>unidata-all</id>
+            <name>Unidata All</name>
+            <url>https://artifacts.unidata.ucar.edu/repository/unidata-all/</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>libs/</classpathPrefix>
+                            <mainClass>emissions.example.RunEmissionToolOfflineExample</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*$*</exclude> <!-- exclude all inner classes -->
+                        <exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
+                    </excludes>
+                    <forkCount>1</forkCount>
+                    <reuseForks>false</reuseForks>
+                    <!-- avoid out of memory errors: -->
+                    <argLine>-Xmx1500m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+                    <!-- skips surefire tests without skipping failsafe tests.
+                     Property value seems to magically default to false -->
+                    <!--<skipTests>${skip.surefire.tests}</skipTests>-->
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.matsim.contrib</groupId>
+            <artifactId>analysis</artifactId>
+            <version>14.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
 </project>

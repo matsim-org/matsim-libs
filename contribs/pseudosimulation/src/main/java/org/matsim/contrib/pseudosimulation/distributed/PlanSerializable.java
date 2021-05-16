@@ -1,9 +1,5 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -22,8 +18,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.pt.routes.DefaultTransitPassengerRouteFactory;
 import org.matsim.vehicles.Vehicle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 class PlanSerializable implements Serializable {
     public static boolean isUseTransit = false;
@@ -138,10 +138,10 @@ class PlanSerializable implements Serializable {
         private RouteSerializable route;
 
         public LegSerializable(Leg leg) {
-            departureTime = leg.getDepartureTime();
+			departureTime = leg.getDepartureTime().seconds();
             mode = leg.getMode();
             routingMode = TripStructureUtils.getRoutingMode(leg);
-            travelTime = leg.getTravelTime();
+			travelTime = leg.getTravelTime().seconds();
 
             if (leg.getRoute() != null) {
                 if (leg.getMode().equals(TransportMode.car))
@@ -194,7 +194,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             startLinkIdString = route.getStartLinkId().toString();
             travelCost = route.getTravelCost();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
             vehicleIdString = route.getVehicleId() == null ? null : route.getVehicleId().toString();
             List<Id<Link>> linkIds = route.getLinkIds();
             linkIdStrings = new ArrayList<>();
@@ -233,7 +233,7 @@ class PlanSerializable implements Serializable {
             endLinkIdString = route.getEndLinkId().toString();
             routeDescription = route.getRouteDescription();
             startLinkIdString = route.getStartLinkId().toString();
-            travelTime = route.getTravelTime();
+			travelTime = route.getTravelTime().seconds();
         }
 
         @Override
@@ -242,7 +242,7 @@ class PlanSerializable implements Serializable {
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
             if (mode.equals(TransportMode.pt) && isUseTransit) {
-                route = new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
+                route = new DefaultTransitPassengerRouteFactory().createRoute(startLinkId, endLinkId);
             } else {
                 route = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
             }

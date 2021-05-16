@@ -19,19 +19,27 @@
 
 package org.matsim.contrib.taxi.schedule.reconstruct;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
 import org.matsim.vehicles.Vehicle;
 
 public class DriveRecorder
 		implements PersonEntersVehicleEventHandler, LinkLeaveEventHandler, VehicleLeavesTrafficEventHandler {
-	private class Drive {
+	private static class Drive {
 		private final Id<Person> personId;
 		private final double departureTime;
 		private final List<Link> links = new ArrayList<>();
@@ -77,7 +85,7 @@ public class DriveRecorder
 		if (drive != null) {
 			updateDrive(drive, event.getLinkId(), event.getTime());
 			double duration = event.getTime() - drive.departureTime;
-			Link[] links = drive.links.toArray(new Link[drive.links.size()]);
+			Link[] links = drive.links.toArray(new Link[0]);
 			double[] linkTTs = createLinkTTs(drive);
 			VrpPathWithTravelData vrpPath = new VrpPathWithTravelDataImpl(drive.departureTime, duration, links,
 					linkTTs);

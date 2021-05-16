@@ -244,7 +244,7 @@ public class CommuterDemandWriter {
 		Activity homeAct = (Activity) p.getPlans().get(0).getPlanElements().get(0);
 		Activity workAct = (Activity) p.getPlans().get(0).getPlanElements().get(2);
 		Leg leg = (Leg) p.getPlans().get(0).getPlanElements().get(1);
-		homeAct.setEndTime(workAct.getStartTime().seconds() - leg.getTravelTime());
+		homeAct.setEndTime(workAct.getStartTime().seconds() - leg.getTravelTime().seconds());
 		// leg.setRoute(null);
 		// leg = (Leg) p.getPlans().get(0).getPlanElements().get(3);
 		// leg.setRoute(null);

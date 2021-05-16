@@ -58,8 +58,8 @@ class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
-                double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
+                double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
+                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
             }
 
 			@Override
@@ -105,7 +105,7 @@ class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
         
-        Boolean addDefaultCostCalculators = true;
+        boolean addDefaultCostCalculators = true;
          
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 

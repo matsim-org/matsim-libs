@@ -19,44 +19,44 @@
 
 package org.matsim.vehicles;
 
+import java.io.File;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.io.File;
-import java.util.Map;
 
 /**
  * @author dgrether
  */
 public class VehicleWriterV2Test extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger( VehicleWriterV2Test.class ) ;
+	private static final Logger log = Logger.getLogger(VehicleWriterV2Test.class);
 
-	private static final String TESTXML  = "testVehicles_v2.xml";
+	private static final String TESTXML = "testVehicles_v2.xml";
 
-	private final Id<Vehicle> id23 = Id.create("23", Vehicle.class);
-	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
-	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
+	private Id<Vehicle> id23;
+	private Id<Vehicle> id42;
+	private Id<Vehicle> id42_23;
 
-	private Map<Id<VehicleType>, VehicleType> vehicleTypes ;
+	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
-	@BeforeClass
+	@Before
 	public void setUp() throws Exception {
 		super.setUp();
 		String outfileName = this.getOutputDirectory() + "../testOutputVehicles.xml";
 
-		//read it
+		// read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles1);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
-		//write it
+		// write it
 		VehicleWriterV2 writer = new VehicleWriterV2(vehicles1);
 		writer.writeFile(outfileName);
-		assertTrue(new File(outfileName).exists()); 
+		assertTrue(new File(outfileName).exists());
 //		//read it again
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles2);
@@ -64,6 +64,13 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 
 		vehicleTypes = vehicles2.getVehicleTypes();
 		vehicles = vehicles2.getVehicles();
+
+		id23 = Id.create("23", Vehicle.class);
+		id42 = Id.create("42", Vehicle.class);
+
+		// indeed this should be double blank in the middle but due to collapse this is
+		// only one blank
+		id42_23 = Id.create(" 42  23", Vehicle.class);
 	}
 
 	@Test
@@ -87,14 +94,15 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), EPSILON);
 		assertEquals(200.0, vehTypeNormalCar.getCapacity().getOther(), EPSILON);
 
-		assertNotNull(vehTypeNormalCar.getCostInformation() );
-		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON );
-		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON );
-		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON );
-		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation() ), EPSILON );
+		assertNotNull(vehTypeNormalCar.getCostInformation());
+		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON);
+		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
+		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
+		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation()), EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
-		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();;
+		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();
+		;
 		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(engineInformation));
 		assertEquals("petrol", VehicleUtils.getHbefaTechnology(engineInformation));
 		assertEquals("< 1,4L", VehicleUtils.getHbefaSizeClass(engineInformation));
@@ -109,7 +117,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
-		assertEquals( VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar ) );
+		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
 	}
 
 	@Test
@@ -120,11 +128,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
 		assertNotNull(vehTypeDefaultCar.getCapacity());
-		assertNotNull(vehTypeDefaultCar.getCostInformation() );
-		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts() );
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter() );
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond() );
-		assertEquals( VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
+		assertNotNull(vehTypeDefaultCar.getCostInformation());
+		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts());
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
+		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar));
 		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
 		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
@@ -140,11 +148,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehTypeSmallTruck.getWidth(), EPSILON);
 		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeSmallTruck.getEngineInformation()));
 		assertEquals("EURO-6", VehicleUtils.getHbefaEmissionsConcept(vehTypeSmallTruck.getEngineInformation()));
-		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), EPSILON );
-		assertEquals(0.2,vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), EPSILON );
-		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(),EPSILON );
-		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation() ), EPSILON );
-		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation() ), EPSILON );
+		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), EPSILON);
+		assertEquals(0.2, vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), EPSILON);
+		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(), EPSILON);
+		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation()), EPSILON);
+		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation()), EPSILON);
 	}
 
 	@Test
@@ -154,7 +162,30 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 	}
 
 	@Test
-	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly(){
+	public void test_VehicleAttributesReadCorrectly(){
+		assertNotNull(vehicleTypes);
+		/* First vehicle has an attribute. */
+		Vehicle v1 = vehicles.get(Id.createVehicleId("23"));
+		assertNotNull(v1.getAttributes());
+		assertNotNull(v1.getAttributes().getAttribute("testAttributeString"));
+		assertEquals("firstVehicle", v1.getAttributes().getAttribute("testAttributeString").toString());
+
+		/* Second vehicle has no attributes. */
+		Vehicle v2 = vehicles.get(Id.createVehicleId("42"));
+		assertNotNull(v2.getAttributes());
+		assertTrue(v2.getAttributes().isEmpty());
+		assertNull(v2.getAttributes().getAttribute("testAttribute"));
+
+		/* Third vehicle again has one attribute. */
+		Vehicle v3 = vehicles.get(Id.createVehicleId(" 42  23"));
+		assertNotNull(v3.getAttributes());
+		assertNotNull(v3.getAttributes().getAttribute("testAttributeDouble"));
+		assertEquals(1.234, v3.getAttributes().getAttribute("testAttributeDouble"));
+	}
+
+
+	@Test
+	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly() {
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
 		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());

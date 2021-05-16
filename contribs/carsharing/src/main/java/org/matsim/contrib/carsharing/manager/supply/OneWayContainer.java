@@ -47,7 +47,6 @@ public class OneWayContainer implements VehiclesContainer {
 
 				if (((OneWayCarsharingStation) cs).getVehicles(vehicle.getType()).contains(vehicle)) {
 					((OneWayCarsharingStation) cs).removeCar(vehicle);
-					this.vehicleToStationMap.remove(vehicle);
 				}
 
 			}

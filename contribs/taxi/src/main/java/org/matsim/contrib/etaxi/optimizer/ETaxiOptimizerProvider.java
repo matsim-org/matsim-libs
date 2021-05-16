@@ -29,10 +29,20 @@ import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerPar
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
+import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
+import org.matsim.contrib.taxi.optimizer.rules.ZonalRegisters;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.zone.SquareGridSystem;
+import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -71,14 +81,32 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	public TaxiOptimizer get() {
 		String type = taxiCfg.getTaxiOptimizerParams().getName();
 		if (type.equals(RuleBasedETaxiOptimizerParams.SET_NAME)) {
-			return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater, network, timer, travelTime,
-					travelDisutility, chargingInfrastructure);
+			ZonalRegisters zonalRegisters = createZonalRegisters(
+					((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams());
+			BestDispatchFinder dispatchFinder = new BestDispatchFinder(eScheduler.getScheduleInquiry(), network, timer,
+					travelTime, travelDisutility);
+			RuleBasedRequestInserter requestInserter = new RuleBasedRequestInserter(eScheduler, timer, dispatchFinder,
+					((RuleBasedETaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams(),
+					zonalRegisters);
+
+			return new RuleBasedETaxiOptimizer(eventsManager, taxiCfg, fleet, eScheduler, scheduleTimingUpdater,
+					chargingInfrastructure, zonalRegisters, dispatchFinder, requestInserter);
 		} else if (type.equals(AssignmentETaxiOptimizerParams.SET_NAME)) {
-			return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-					travelDisutility, eScheduler, scheduleTimingUpdater, chargingInfrastructure);
+			LeastCostPathCalculator router = new FastAStarEuclideanFactory().createPathCalculator(network,
+					travelDisutility, travelTime);
+			return new AssignmentETaxiOptimizer(eventsManager, taxiCfg, fleet, timer, network, travelTime,
+					travelDisutility, eScheduler, scheduleTimingUpdater, chargingInfrastructure, router);
 		} else {
 			throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().
 					getName());
 		}
+	}
+
+	private ZonalRegisters createZonalRegisters(RuleBasedTaxiOptimizerParams params) {
+		ZonalSystem zonalSystem = new SquareGridSystem(network.getNodes().values(), params.getCellSize());
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem,
+				eScheduler.getScheduleInquiry());
+		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
+		return new ZonalRegisters(idleTaxiRegistry, unplannedRequestRegistry);
 	}
 }

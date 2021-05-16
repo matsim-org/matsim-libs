@@ -266,7 +266,7 @@ import junit.framework.TestCase;
 		Mobsim sim = new QSimBuilder(scenario.getConfig()) //
 				.useDefaults() //
 				.build(scenario, events);
-		scoring.beginIteration(0);
+		scoring.beginIteration(0, false);
 		sim.run();
 		scoring.finish();
 

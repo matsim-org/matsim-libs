@@ -10,8 +10,8 @@ class HbefaRoadVehicleCategoryKey {
     }
 
     public HbefaRoadVehicleCategoryKey(HbefaWarmEmissionFactorKey key) {
-        this.hbefaVehicleCategory = key.getHbefaVehicleCategory();
-        this.hbefaRoadCategory = key.getHbefaRoadCategory();
+        this.hbefaVehicleCategory = key.getVehicleCategory();
+        this.hbefaRoadCategory = key.getRoadCategory();
     }
 
     public HbefaVehicleCategory getHbefaVehicleCategory() {
@@ -35,5 +35,10 @@ class HbefaRoadVehicleCategoryKey {
     public int hashCode() {
 
         return Objects.hash(hbefaVehicleCategory, hbefaRoadCategory);
+    }
+
+    @Override
+    public String toString() {
+        return this.hbefaVehicleCategory + "---" + this.hbefaRoadCategory;
     }
 }

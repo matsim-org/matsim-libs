@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.*;
 
@@ -58,6 +59,7 @@ public class SupersonicOsmNetworkReaderTest {
 		}
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Test
 	public void singleLink() {
 
@@ -80,12 +82,14 @@ public class SupersonicOsmNetworkReaderTest {
 		OsmNode node1 = singleLink.getNodes().get(0);
 		OsmNode node2 = singleLink.getNodes().get(1);
 		OsmNode node3 = singleLink.getNodes().get(2);
+		OsmNode node4 = singleLink.getNodes().get(3);
 		OsmWay way = singleLink.getWays().get(0);
 
 		Link link = network.getLinks().values().iterator().next(); // get the only link
 		double expectedLengthPart1 = CoordUtils.calcEuclideanDistance(new Coord(node1.getLongitude(), node1.getLatitude()), new Coord(node2.getLongitude(), node2.getLatitude()));
 		double expectedLengthPart2 = CoordUtils.calcEuclideanDistance(new Coord(node2.getLongitude(), node2.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));
-		assertEquals(expectedLengthPart1 + expectedLengthPart2, link.getLength(), 0);
+		double expectedLengthPart3 = CoordUtils.calcEuclideanDistance(new Coord(node3.getLongitude(), node3.getLatitude()), new Coord(node4.getLongitude(), node4.getLatitude()));
+		assertEquals(expectedLengthPart1 + expectedLengthPart2 + expectedLengthPart3, link.getLength(), 0);
 
 		LinkProperties linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
@@ -101,8 +105,9 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(MOTORWAY, link.getAttributes().getAttribute(NetworkUtils.TYPE));
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Test
-	public void singleLinkPreserveMiddleNode() {
+	public void singleLinkPreserveMiddleNodes() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 
@@ -112,15 +117,15 @@ public class SupersonicOsmNetworkReaderTest {
 
 		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(transformation)
-				.setPreserveNodeWithId(id -> id == 2)
+				.setPreserveNodeWithId(id -> true)
 				.build()
 				.read(file);
 
-		assertEquals(2, network.getLinks().size());
-		assertEquals(3, network.getNodes().size());
+		assertEquals(3, network.getLinks().size());
+		assertEquals(4, network.getNodes().size());
 
 		// now, test that the link has all the required properties
-		Link link = network.getLinks().values().iterator().next(); // get the only link
+		Link link = network.getLinks().get(Id.createLinkId("10001f"));
 
 		LinkProperties linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
@@ -206,7 +211,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		Link link = network.getLinks().get(Id.createLinkId("10000f"));
-		assertEquals(50 / 3.6 * 0.5, link.getFreespeed(), 0);
+		assertEquals(50 / 3.6 * LinkProperties.DEFAULT_FREESPEED_FACTOR, link.getFreespeed(), 0);
 	}
 
 	@Test
@@ -468,42 +473,48 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void twoIntersectingLinks() {
 
-		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
-		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
-				new Node(4, 0, 2), new Node(5, 2, 0));
-		final List<OsmWay> ways = Arrays.asList(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
-				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
-		writeOsmData(nodes, ways, file);
+		var twoLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
+		var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
+		Utils.writeOsmData(twoLinks, file);
 
-		Network network = new SupersonicOsmNetworkReader.Builder()
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(transformation)
 				.build()
 				.read(file);
 
 		assertEquals(5, network.getNodes().size());
-		assertEquals(4, network.getLinks().size());
+		assertEquals(6, network.getLinks().size());
 
 		// check whether the links were correctly split
-		Link link1 = network.getLinks().get(Id.createLinkId("10000f"));
+		Link link1 = network.getLinks().get(Id.createLinkId("10003f"));
 		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
-		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
+		assertEquals(Id.createNodeId(5), link1.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
 
-		Link link2 = network.getLinks().get(Id.createLinkId("10001f"));
-		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
-		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
+		Link link2 = network.getLinks().get(Id.createLinkId("10007f"));
+		assertEquals(Id.createNodeId(5), link2.getFromNode().getId());
+		assertEquals(Id.createNodeId(9), link2.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
 
-		Link link3 = network.getLinks().get(Id.createLinkId("20000f"));
-		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
-		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
+		Link link3 = network.getLinks().get(Id.createLinkId("20003f"));
+		assertEquals(Id.createNodeId(10), link3.getFromNode().getId());
+		assertEquals(Id.createNodeId(5), link3.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
-		Link link4 = network.getLinks().get(Id.createLinkId("20001f"));
-		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
-		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
+		Link link4 = network.getLinks().get(Id.createLinkId("20007f"));
+		assertEquals(Id.createNodeId(5), link4.getFromNode().getId());
+		assertEquals(Id.createNodeId(17), link4.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
+
+		Link link5 = network.getLinks().get(Id.createLinkId("20007r"));
+		assertEquals(Id.createNodeId(17), link5.getFromNode().getId());
+		assertEquals(Id.createNodeId(5), link5.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link5.getFromNode().getCoord(), link5.getToNode().getCoord()), link5.getLength(), 0);
+
+		Link link6 = network.getLinks().get(Id.createLinkId("20003r"));
+		assertEquals(Id.createNodeId(5), link6.getFromNode().getId());
+		assertEquals(Id.createNodeId(10), link6.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link6.getFromNode().getCoord(), link6.getToNode().getCoord()), link6.getLength(), 0);
 	}
 
 	@Test
@@ -644,5 +655,47 @@ public class SupersonicOsmNetworkReaderTest {
 		org.matsim.api.core.v01.network.Node node8 = network.getNodes().get(Id.createNodeId(7));
 		assertEquals(1, node8.getInLinks().size());
 		assertEquals(1, node8.getOutLinks().size());
+	}
+
+	@Test
+	public void simplifiedLinksWithPreservedOriginalGeometry() {
+
+		var file = Paths.get(matsimTestUtils.getOutputDirectory() + "file.osm.bbf");
+		var osmData = Utils.createSingleLink(List.of(new Tag(OsmTags.HIGHWAY, OsmTags.LIVING_STREET)));
+		Utils.writeOsmData(osmData, file);
+
+		var network = new SupersonicOsmNetworkReader.Builder()
+				.setCoordinateTransformation(transformation)
+				.setStoreOriginalGeometry(true)
+				.build()
+				.read(file);
+
+		assertEquals(2, network.getLinks().size());
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002f")));
+		assertTrue(network.getLinks().containsKey(Id.createLinkId("10002r")));
+
+		var forwardLink = network.getLinks().get(Id.createLinkId("10002f"));
+		assertOriginalGeometryOnLink(forwardLink, osmData.getNodes(), true);
+
+		var reverseLink = network.getLinks().get(Id.createLinkId("10002r"));
+		assertOriginalGeometryOnLink(reverseLink, osmData.getNodes(), false);
+
+	}
+
+	private void assertOriginalGeometryOnLink(Link link, List<OsmNode> osmNodes, boolean isForward) {
+		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIG_GEOM));
+		var originalGeometry = NetworkUtils.getOriginalGeometry(link);
+
+		assertEquals(osmNodes.size(), originalGeometry.size());
+
+		for (var i = 0; i != osmNodes.size() ; i++) {
+			var osmNode = osmNodes.get(i);
+			// if forward link traverse forward, otherwise the nodes should be reversed compared to original geometry
+			var actualNode = isForward ? originalGeometry.get(i) : originalGeometry.get(originalGeometry.size() - 1 - i);
+
+			assertEquals(osmNode.getId(), Long.parseLong(actualNode.getId().toString()));
+			assertEquals(osmNode.getLongitude(), actualNode.getCoord().getX(), 0.0000000001);
+			assertEquals(osmNode.getLatitude(), actualNode.getCoord().getY(), 0.000000001);
+		}
 	}
 }

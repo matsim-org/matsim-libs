@@ -27,29 +27,24 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
-public class ChargerImpl implements Charger {
-	/**
-	 * @param specification charger specification
-	 * @param link          link at which the charger is located
-	 * @param logicFactory  ChargingLogic factory
-	 */
-	public static Charger create(ChargerSpecification specification, Link link, ChargingLogic.Factory logicFactory) {
-		if (!link.getId().equals(specification.getLinkId())) {
-			throw new IllegalArgumentException("link.id != specification.linkId");
-		}
+import com.google.common.base.Preconditions;
 
-		ChargerImpl charger = new ChargerImpl(specification, link);
-		charger.logic = Objects.requireNonNull(logicFactory.create(charger));
-		return charger;
-	}
+public class ChargerImpl implements Charger {
 
 	private final ChargerSpecification specification;
 	private final Link link;
-	private ChargingLogic logic;
+	private final ChargingLogic logic;
 
-	private ChargerImpl(ChargerSpecification specification, Link link) {
+	public ChargerImpl(ChargerSpecification specification, Link link, ChargingLogic logic) {
+		Preconditions.checkArgument(link.getId().equals(specification.getLinkId()), "link.id != specification.linkId");
 		this.specification = specification;
 		this.link = link;
+		this.logic = Objects.requireNonNull(logic);
+	}
+
+	@Override
+	public ChargerSpecification getSpecification() {
+		return specification;
 	}
 
 	@Override

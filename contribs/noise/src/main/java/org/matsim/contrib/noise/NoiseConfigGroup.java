@@ -86,8 +86,9 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
 	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
+	private static final String NOISE_COMPUTATION_METHOD = "noiseComputationMethod";
 
-    public NoiseConfigGroup() {
+	public NoiseConfigGroup() {
 		super(GROUP_NAME);
 	}
 	
@@ -126,19 +127,28 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
 	private boolean computePopulationUnits = true;
-	
+
+    public enum NoiseAllocationApproach {
+        AverageCost, MarginalCost
+    }
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	private String[] hgvIdPrefixes = { "lkw" };
-	private Set<String> busIdIdentifier = new HashSet<String>();
-	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
-	private Set<String> networkModesToIgnore = new HashSet<String>();
+	private Set<String> busIdIdentifier = new HashSet<>();
+	private Set<Id<Link>> tunnelLinkIDs = new HashSet<>();
+	private Set<String> networkModesToIgnore = new HashSet<>();
 	
 	private double noiseTollFactor = 1.0;
 
 	private boolean considerNoiseBarriers = false;
     private String noiseBarriersFilePath = null;
     private String noiseBarriersSourceCrs = null;
+
+    public enum NoiseComputationMethod {
+        RLS90,RLS19
+    }
+
+    private NoiseComputationMethod noiseComputationMethod = NoiseComputationMethod.RLS90;
     
     // ########################################################################################################
 	
@@ -194,6 +204,8 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
         comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
         comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
+
+        comments.put(NOISE_COMPUTATION_METHOD, "Specifies the computation method of different guidelines: " + Arrays.toString(NoiseComputationMethod.values()));
 
 		return comments;
 	}
@@ -280,53 +292,6 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 				log.warn("Inconsistent parameters will be adjusted:");
 				this.setComputeCausingAgents(true);
 			}
-		}
-		
-		if  (this.tunnelLinkIdFile != null && !"".equals(this.tunnelLinkIdFile)) {
-			
-			if (this.tunnelLinkIDs.size() > 0) {
-				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
-				this.tunnelLinkIDs.clear();
-			}
-			
-			// loading tunnel link IDs from file
-			URL url = this.getTunnelLinkIDsFileURL(config.getContext());
-			BufferedReader br = IOUtils.getBufferedReader(url.getFile());
-			
-			String line = null;
-			try {
-				line = br.readLine();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} // headers
-
-			log.info("Reading tunnel link Id file...");
-			try {
-				int countWarning = 0;
-				while ((line = br.readLine()) != null) {
-					
-					String[] columns = line.split(";");
-					Id<Link> linkId = null;
-					for (int column = 0; column < columns.length; column++) {
-						if (column == 0) {
-							linkId = Id.createLinkId(columns[column]);
-						} else {
-							if (countWarning < 1) {
-								log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
-							} else if (countWarning == 1) {
-								log.warn("This message is only given once.");
-							}
-							countWarning++;
-						}						
-					}
-					log.info("Adding tunnel link ID " + linkId);
-					this.tunnelLinkIDs.add(linkId);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-			log.info("Reading tunnel link Id file... Done.");
 		}
 		
 		if (this.useActualSpeedLevel && this.allowForSpeedsOutsideTheValidRange) {
@@ -581,7 +546,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter(TUNNEL_LINK_ID_FILE)
-	private String getTunnelLinkIdFile() {
+	public String getTunnelLinkIdFile() {
 		return tunnelLinkIdFile;
 	}
 
@@ -799,4 +764,13 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
         this.noiseBarriersSourceCrs = noiseBarriersSourceCrs;
     }
 
+    @StringGetter(NOISE_COMPUTATION_METHOD)
+	public NoiseComputationMethod getNoiseComputationMethod() {
+		return this.noiseComputationMethod;
+	}
+
+	@StringSetter(NOISE_COMPUTATION_METHOD)
+	public void setNoiseComputationMethod(NoiseComputationMethod noiseComputationMethod) {
+		this.noiseComputationMethod = noiseComputationMethod;
+	}
 }

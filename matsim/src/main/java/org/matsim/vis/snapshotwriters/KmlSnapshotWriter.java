@@ -76,7 +76,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<>();
 
-	private double time = Time.getUndefinedTime();
+	private double time;
 	
 	private final static Logger log = Logger.getLogger(KmlSnapshotWriter.class);
 	

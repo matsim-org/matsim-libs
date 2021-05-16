@@ -20,15 +20,15 @@
 package org.matsim.contrib.taxi.passenger;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
 //TODO remove this class once taxi stats are refactored
 public class SubmittedTaxiRequestsCollector {
-	private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
+	private final Map<Id<Request>, TaxiRequest> requests = new ConcurrentHashMap<>();
 
 	public Map<Id<Request>, ? extends TaxiRequest> getRequests() {
 		return Collections.unmodifiableMap(requests);

@@ -20,7 +20,6 @@
 
 package playground.vsp.airPollution.exposure;
 
-import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -33,6 +32,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+
+import com.google.inject.Inject;
 
 /**
  * @author benjamin
@@ -67,7 +68,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	public void notifyStartup(StartupEvent event) {
 		EventsManager eventsManager = emissionModule.getEmissionEventsManager();
 
-		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
+		double simulationEndtime = controler.getConfig().qsim().getEndTime().seconds();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
 		eventsManager.addHandler(intervalHandler);
 	}

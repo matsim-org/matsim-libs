@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonScoreEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -106,8 +107,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
             double timeDifference = calcDifference(job, event.getTime());
             double score = scoreCalculator.calcScore(timeDifference);
 
-            //TODO: we need direct scoring here!! this implies the marginal utility of money to be 1!
-            eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score, "jobStart_" + job.getId(), ""));
+            eventsManager.processEvent(new PersonScoreEvent(event.getTime(),customerAboutToBeServed,score,"jobStart_" + job.getId()));
             logEntries.add(new DeliveryLogEntry(customerAboutToBeServed, carrier.getId(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
         }
     }

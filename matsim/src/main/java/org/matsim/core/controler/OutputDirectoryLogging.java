@@ -20,18 +20,18 @@
 
 package org.matsim.core.controler;
 
-import org.apache.log4j.Appender;
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.FileAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
-
-import java.io.IOException;
 
 /**
  * 
@@ -168,17 +168,18 @@ public final class OutputDirectoryLogging {
 		//might also be sent to the warn logstream but then you end up with a warning even if everything is alright
 		String endLoggingInfo = "closing the logfile, i.e. messages sent to the logger after this message are not written to the logfile.";
 		log.info(endLoggingInfo);
-		Logger root = Logger.getRootLogger();
-		Appender app = root.getAppender(LOGFILE);
+		LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+		org.apache.logging.log4j.core.Logger root = LoggerContext.getContext(false).getRootLogger();
+		Appender app = root.getAppenders().get(LOGFILE);
 		if (app != null) {
 			root.removeAppender(app);
-			app.close();
+			app.stop();
 		}
-		app = root.getAppender(WARNLOGFILE);
+		app = root.getAppenders().get(WARNLOGFILE);
 		if (app != null) {
 			root.removeAppender(app);
-			app.close();
+			app.stop();
 		}
+		ctx.updateLoggers();
 	}
-
 }

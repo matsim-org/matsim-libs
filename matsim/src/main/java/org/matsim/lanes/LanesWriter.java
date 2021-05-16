@@ -143,7 +143,7 @@ public final class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSome
 						String converted = attributesConverter.convertToString(objAttribute.getValue());
 						if (converted != null) {
 							XMLAttributeType att = fac.createXMLAttributeType();
-							att.setKey(objAttribute.getKey());
+							att.setName(objAttribute.getKey());
 							att.setValue(converted);
 							att.setClazz(clazz.getCanonicalName());
 							xmllane.getAttributes().getAttributeList().add(att);

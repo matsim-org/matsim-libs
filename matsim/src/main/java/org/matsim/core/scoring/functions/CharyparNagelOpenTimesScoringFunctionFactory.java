@@ -58,7 +58,7 @@ public final class CharyparNagelOpenTimesScoringFunctionFactory implements Scori
 		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(parameters, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(parameters));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(parameters));
-
+		sumScoringFunction.addScoringFunction(new ScoreEventScoring());
 		return sumScoringFunction;
 	}
 

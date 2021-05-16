@@ -1,6 +1,7 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
@@ -13,7 +14,6 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.LinkProvider;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.InitialNode;
@@ -62,7 +62,7 @@ public class BestDispatchFinder {
 	// for immediate requests only
 	// minimize TW
 	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Stream<? extends DvrpVehicle> vehicles) {
-		return findBestVehicle(req, vehicles, r -> r.getFromLink());
+		return findBestVehicle(req, vehicles, TaxiRequest::getFromLink);
 	}
 
 	// We use many-to-one forward search. Therefore, we cannot assess all vehicles.
@@ -70,7 +70,7 @@ public class BestDispatchFinder {
 	// TODO intuitively, many-to-one is slower, some performance tests needed before switching to
 	// one-to-many
 	public <D> Dispatch<D> findBestVehicle(D destination, Stream<? extends DvrpVehicle> vehicles,
-			LinkProvider<D> destinationToLink) {
+			Function<D, Link> destinationToLink) {
 		double currTime = timer.getTimeOfDay();
 		Link toLink = destinationToLink.apply(destination);
 		Node toNode = toLink.getFromNode();
@@ -123,11 +123,11 @@ public class BestDispatchFinder {
 	// for immediate requests only
 	// minimize TP
 	public Dispatch<TaxiRequest> findBestRequestForVehicle(DvrpVehicle veh, Stream<TaxiRequest> unplannedRequests) {
-		return findBestDestination(veh, unplannedRequests, r -> r.getFromLink());
+		return findBestDestination(veh, unplannedRequests, TaxiRequest::getFromLink);
 	}
 
 	public <D> Dispatch<D> findBestDestination(DvrpVehicle veh, Stream<D> destinations,
-			LinkProvider<D> destinationToLink) {
+			Function<D, Link> destinationToLink) {
 		LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
 		Node fromNode = departure.link.getToNode();
 

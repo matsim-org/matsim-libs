@@ -82,7 +82,7 @@ public class PSim implements Mobsim {
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes) {
         Logger.getLogger(getClass()).warn("Constructing PSim");
         this.scenario = sc;
-        this.endTime = sc.getConfig().qsim().getEndTime();
+        this.endTime = sc.getConfig().qsim().getEndTime().seconds();
         this.eventManager = eventsManager;
         int numThreads = sc.getConfig().global().getNumberOfThreads() ;
         threads = new SimThread[numThreads];
@@ -199,17 +199,17 @@ public class PSim implements Mobsim {
                                 travelTime = trip.egressTime_s() - prevEndTime;
                             }
                         } else{
-                            try{
                                 Route route = prevLeg.getRoute();
-                                travelTime = route.getTravelTime();
+                                if (route == null) {
+                                    Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
+                                    continue;
+                                }
+
+                                travelTime = route.getTravelTime().orElse(0);
                                 eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
                                         route.getDistance()
-                                        ,prevLeg.getMode()
+                                        , prevLeg.getMode()
                                 ) );
-                            } catch( NullPointerException e ){
-                                Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
-                                continue;
-                            }
                         }
 
                         travelTime = Math.max( MIN_LEG_DURATION, travelTime );
@@ -220,17 +220,6 @@ public class PSim implements Mobsim {
                          * agent arrives.
                          */
                         actEndTime = Math.max( arrivalTime + MIN_ACT_DURATION, actEndTime );
-                        /*
-                         * If act end time is not specified...
-                         */
-                        if( Double.isInfinite( actEndTime ) ){
-                            // if(transitPerformance!=null){
-                            if( transitEmulator != null ){
-                                //this guy is stuck, will be caught in events handling outside the loop
-                                break;
-                            } else
-                                throw new RuntimeException( "I think this is discuraged." );
-                        }
                         /*
                          * Send arrival and activity start events.
                          */

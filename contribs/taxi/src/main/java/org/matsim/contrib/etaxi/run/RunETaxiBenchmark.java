@@ -20,13 +20,13 @@
 package org.matsim.contrib.etaxi.run;
 
 import java.net.URL;
+import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarks;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
@@ -37,10 +37,8 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
-import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
@@ -50,8 +48,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.common.collect.ImmutableSet;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -64,9 +61,14 @@ import com.google.common.collect.ImmutableSet;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunETaxiBenchmark {
+	private static final double CHARGING_SPEED_FACTOR = 1.5; // > 1 in this example
+	private static final double MAX_RELATIVE_SOC = 0.8; // charge up to 80% SOC
+	private static final double TEMPERATURE = 20; // oC
+
 	public static void run(URL configUrl, int runs) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new EvConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl,
+				new MultiModeTaxiConfigGroup(ETaxiConfigGroups::createWithCustomETaxiOptimizerParams),
+				new DvrpConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, runs).run();
 	}
@@ -77,21 +79,17 @@ public class RunETaxiBenchmark {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
+		DvrpBenchmarks.adjustConfig(config);
 
-		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		DvrpBenchmarks.initController(controler);
 
 		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
-		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
-
-		Controler controler = new Controler(scenario);
-		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new DvrpBenchmarkModule());
-		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(mode));
 
 		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.addOverridingModule(new EvModule());
-		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
 		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
@@ -101,18 +99,22 @@ public class RunETaxiBenchmark {
 			}
 		});
 
+		controler.configureQSimComponents(
+				DvrpQSimComponents.activateModes(List.of(EvModule.EV_COMPONENT), List.of(mode)));
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 2.0));
-				bind(TemperatureService.class).toInstance(linkId -> 20);
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, CHARGING_SPEED_FACTOR));
+				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class).mode(mode)
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
+				.mode(mode)
 				.objectClass(Fleet.class)
 				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
 				.build());

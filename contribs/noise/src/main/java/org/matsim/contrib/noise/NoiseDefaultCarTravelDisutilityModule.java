@@ -32,6 +32,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 
 import java.util.Map;
 
+import static org.matsim.core.config.ConfigUtils.addOrGetModule;
+
 /**
 * @author ikaddoura
 */
@@ -41,7 +43,7 @@ public final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule 
 	@Override
 	public void install() {
 		
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
+		NoiseConfigGroup noiseParameters = addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 				
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			
@@ -61,11 +63,12 @@ public final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule 
 			com.google.inject.Injector injector = Injector.createInjector( this.getConfig() , module );
 			Map<String,TravelDisutilityFactory> factories = injector.getInstance( Key.get( new TypeLiteral<Map<String, TravelDisutilityFactory>>(){} ) ) ;
 			TravelDisutilityFactory defaultFactoryForCar = factories.get( TransportMode.car ) ;
-			// yyyyyy should rather insert the above, but I think that for the time being the default variant is not even using the randomizing version
-			//  .  Kai, aug'19
+			// yy should rather insert the above, but I think that for the time being the default variant is not even using the randomizing version
+			// .  Kai, aug'19
+			// probably now fixed.  kai, mar'20
 
 			final NoiseTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new NoiseTollTimeDistanceTravelDisutilityFactory(
-					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, this.getConfig().planCalcScore())
+					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, this.getConfig())
 			);
 			bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 		}		

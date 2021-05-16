@@ -85,7 +85,7 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 		Trip trip = getCurrentTrip(event.getPersonId());
 		Leg leg = trip.legs.get(trip.legs.size() - 1);
-		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
+		leg.setTravelTime(event.getTime() - leg.getDepartureTime().seconds());
 	}
 
 	@Override

@@ -22,8 +22,17 @@ package org.matsim.core.trafficmonitoring;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -73,7 +82,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	TimeSlotComputation aggregator;
 
 
-	private Map<Id<Link>, TravelTimeData> linkData;
+	private IdMap<Link, TravelTimeData> linkData;
 
 	private Map<Tuple<Id<Link>, Id<Link>>, TravelTimeData> linkToLinkData;
 
@@ -228,7 +237,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		this.travelTimeGetter = new AveragingTravelTimeGetter( this.aggregator ) ;
 		this.ttDataFactory = new TravelTimeDataArrayFactory(network, this.numSlots);
 		if (this.calculateLinkTravelTimes){
-			this.linkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4));
+			this.linkData = new IdMap<>(Link.class);
 
 			/*
 			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
@@ -253,9 +262,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		// the vehicleEntersTraffic event.  So we need to memorize the ignored vehicles from there ...
 		this.vehiclesToIgnore = new HashSet<>();
 
-
 		this.reset(0);
-
 	}
 
 	@Override
@@ -264,7 +271,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		 * performs a trip with one of those modes. if not, we skip the event. */
 		if (filterAnalyzedModes && vehiclesToIgnore.contains(e.getVehicleId())) return;
 
-		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getVehicleId());
+		LinkEnterEvent oldEvent = this.linkEnterEvents.put(e.getVehicleId(), e);
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
 			Tuple<Id<Link>, Id<Link>> fromToLink = new Tuple<>(oldEvent.getLinkId(), e.getLinkId());
 			TravelTimeData data = getLinkToLinkTravelTimeData(fromToLink );
@@ -274,7 +281,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			data.addTravelTime(timeSlot, e.getTime() - enterTime );
 			data.setNeedsConsolidation( true );
 		}
-		this.linkEnterEvents.put(e.getVehicleId(), e);
 	}
 
 	@Override
@@ -332,7 +338,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 			// this functionality is no longer there.
 
 			if (this.calculateLinkToLinkTravelTimes
-					&& event.getTime() < qsimConfig.getEndTime()
+					&& event.getTime() < qsimConfig.getEndTime().seconds()
 				// (we think that this only makes problems when the abort is not just because of mobsim end time. kai & theresa, jan'17)
 			){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
@@ -470,12 +476,11 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 					// if the travel time that has been measured so far is less than that minimum travel time, then do something:
 					if (travelTime < minTravelTime) {
-
-						data.setTravelTime(i, minTravelTime );
 						// (set the travel time to the smallest possible travel time that makes sense according to the argument above)
-
+						travelTime = minTravelTime;
+						data.setTravelTime(i, travelTime);
 					}
-					prevTravelTime = data.getTravelTime(i, i * this.timeSlice ) ;
+					prevTravelTime = travelTime;
 				}
 				data.setNeedsConsolidation( false );
 			}

@@ -19,6 +19,7 @@
 package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.roadpricing.RoadPricing;
 import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.Config;
@@ -36,11 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author nagel, jwjoubert
  */
 public final class RunRoadPricingExample {
-	private static final String TEST_CONFIG = "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
-	private final String[] args;
-	private Config config;
-	// to not change class name: referenced from book.  kai, dec'14
-
+	// do not change class name: referenced from book.  kai, dec'14
+	
 	/**
 	 * Executing the road pricing example.
 	 * @param args optional arguments, the first which must be a <code>config.xml</code>
@@ -48,44 +46,21 @@ public final class RunRoadPricingExample {
 	 *             associated files from a test instance.
 	 */
 	public static void main(String[] args) {
-		new RunRoadPricingExample(args).run();
-	}
 
-	public RunRoadPricingExample( String[] args ) {
-		if (args.length > 0) {
-			this.args = args;
-		} else{
-			/* Use a test case's config file. */
-			this.args = new String[]{TEST_CONFIG};
-		}
-	}
-
-	public void run() {
-		if (config == null) {
-			config = prepareConfig();
-		}
+		// load the config:
+		Config config = ConfigUtils.loadConfig( args );
 
 		// load the scenario:
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		// instantiate the controler:
 		Controler controler = new Controler(scenario);
 
-		// use the road pricing module.
-		// (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
-		//        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-		controler.addOverridingModule( new RoadPricingModule() );
+		// use the road pricing module:
+		RoadPricing.configure( controler );
 
 		// run the controler:
 		controler.run();
-	}
-
-	public Config prepareConfig() {
-		// load the config, telling it to "materialize" the road pricing section:
-		config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
-		return config;
 	}
 
 }

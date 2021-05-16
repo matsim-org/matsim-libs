@@ -1,0 +1,115 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>14.0-SNAPSHOT</version>
+	</parent>
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>application</artifactId>
+	<name>application</name>
+	<description>MATSim Application</description>
+
+	<repositories>
+		<!-- Needs some vsp dependencies -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>otfvis</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>osm</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>sumo</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>analysis</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>emissions</artifactId>
+			<version>14.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.matsim-org</groupId>
+			<artifactId>gtfs2matsim</artifactId>
+			<version>12.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.geotools</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.matsim</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.matsim-vsp</groupId>
+			<artifactId>matsim-analysis</artifactId>
+			<!-- <version>v2.5</version> -->
+			<version>v3.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.geotools</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.matsim</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+
+		<!-- Command line parser -->
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.6.1</version>
+		</dependency>
+		<dependency>
+			<groupId>it.unimi.dsi</groupId>
+			<artifactId>fastutil</artifactId>
+			<version>8.5.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-yaml</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.18.1</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+</project>

@@ -267,7 +267,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				this.amountSum = this.amountSum + amount;
 				
 				if (activityEndTime == FINAL_CONGESTION_EVENT_TIME) {
-					activityEndTime = this.scenario.getConfig().qsim().getEndTime();
+					activityEndTime = this.scenario.getConfig().qsim().getEndTime().seconds();
 				}
 				
 				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount, "congestionPricing", null);				

@@ -20,14 +20,16 @@
 
 package org.matsim.core.controler;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.core.config.groups.ControlerConfigGroup.*;
+import static org.junit.Assert.*;
+import static org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
+import static org.matsim.core.config.groups.ControlerConfigGroup.SnapshotFormat;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -51,9 +53,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -114,8 +116,13 @@ public class ControlerIT {
 		Controler controler = new Controler(config);
 		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
-			public boolean continueIterations(int iteration) {
-				return false;
+			public boolean mayTerminateAfterIteration(int iteration) {
+				return true;
+			}
+
+			@Override
+			public boolean doTerminate(int iteration) {
+				return true;
 			}
 		});
 		controler.run();
@@ -229,7 +236,7 @@ public class ControlerIT {
 		// test that the plans have the correct travel times 
 		// (travel time of the plan does not contain first and last link)
 		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
-				((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), MatsimTestUtils.EPSILON);
+				((Leg)(person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime().seconds(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -460,7 +467,7 @@ public class ControlerIT {
 		assertEquals(f.link3.getId(), act2b.getLinkId());
 		
 		int expectedPlanLength = 3 ;
-		if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+		if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 			// now 7 instead of earlier 3: h-wlk-iact-car-iact-walk-h
 			expectedPlanLength = 7 ;
 		}
@@ -477,7 +484,7 @@ public class ControlerIT {
 			assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 1 )).getRoute());
-			if ( f.scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			if ( !f.scenario.getConfig().plansCalcRoute().getAccessEgressType().equals(PlansCalcRouteConfigGroup.AccessEgressType.none) ) {
 				assertNotNull(
 					"null route in plan "+plan.getPlanElements(),
 					((Leg) plan.getPlanElements().get( 3 )).getRoute());
@@ -932,11 +939,12 @@ public class ControlerIT {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 

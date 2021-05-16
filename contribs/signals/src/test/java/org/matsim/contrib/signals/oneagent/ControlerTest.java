@@ -23,9 +23,11 @@ import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.controler.Controler;
@@ -92,22 +94,18 @@ public class ControlerTest {
 			}
 		});
 		
-		controler.addControlerListener(new IterationStartsListener() {
-			
-			@Override
-			public void notifyIterationStarts(IterationStartsEvent event) {
-				event.getServices().getEvents().addHandler(new EventsLogger());
+		controler.addControlerListener((IterationStartsListener)event -> {
+			event.getServices().getEvents().addHandler(new EventsLogger());
 
-				TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
-				if (0 == event.getIteration()) {
-					enterHandler.link2EnterTime = 38.0;
-				}
+			TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
+			if (0 == event.getIteration()) {
+				enterHandler.link2EnterTime = 38.0;
+			}
 
-				if (1 == event.getIteration()) {
-					enterHandler.link2EnterTime = 100.0;
-					SignalGroupStateChangedEventHandler signalsHandler0 = new TestSignalGroupStateChangedHandler();
-					event.getServices().getEvents().addHandler(signalsHandler0);
-				}
+			if (1 == event.getIteration()) {
+				enterHandler.link2EnterTime = 100.0;
+				SignalGroupStateChangedEventHandler signalsHandler0 = new TestSignalGroupStateChangedHandler();
+				event.getServices().getEvents().addHandler(signalsHandler0);
 			}
 		});
 		
@@ -134,12 +132,13 @@ public class ControlerTest {
 
 
 	private static final class TestLink2EnterEventHandler implements LinkEnterEventHandler {
+		final Id<Link> linkId2 = Id.create(2, Link.class);
 		double link2EnterTime = 0;
 		@Override
 		public void reset(int i) {}
 		@Override
 		public void handleEvent(LinkEnterEvent e){
-			if (e.getLinkId().equals(Fixture.linkId2)) {
+			if (e.getLinkId().equals(linkId2)) {
 				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
 			}
 		}

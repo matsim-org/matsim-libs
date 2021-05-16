@@ -70,9 +70,10 @@ public class RunCarsharing {
 
 		CarsharingUtils.addConfigModules(config);
 
-		final Scenario sc = ScenarioUtils.loadScenario(config);
+		final Scenario sc = ScenarioUtils.createScenario(config);
 		sc.getPopulation().getFactory().getRouteFactories().setRouteFactory(CarsharingRoute.class,
 				new CarsharingRouteFactory());
+		ScenarioUtils.loadScenario(sc);
 
 		final Controler controler = new Controler(sc);
 

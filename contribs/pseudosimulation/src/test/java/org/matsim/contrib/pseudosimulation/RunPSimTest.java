@@ -29,6 +29,7 @@ import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.pt.config.TransitConfigGroup.TransitRoutingAlgorithmType;
 import org.matsim.testcases.MatsimTestUtils;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -45,6 +46,7 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testA() {
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controler().setCreateGraphs(false);
 
 		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
@@ -121,6 +123,7 @@ public class RunPSimTest {
 	 */
 	@Test
 	public void testB() {
+		config.transit().setRoutingAlgorithmType(TransitRoutingAlgorithmType.DijkstraBased);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(2);
 		config.controler().setCreateGraphs(false);

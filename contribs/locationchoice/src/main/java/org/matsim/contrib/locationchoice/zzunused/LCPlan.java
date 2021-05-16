@@ -65,9 +65,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	
 	// Leg related arrays
 	/*package*/ Route[] routes;
-	/*package*/ double[] depTimes;
-	/*package*/ double[] arrTimes;
-	/*package*/ double[] travTimes;
+	/*package*/ OptionalTime[] depTimes;
+	/*package*/ OptionalTime[] arrTimes;
+	/*package*/ OptionalTime[] travTimes;
 	/*package*/ String[] modes;
 	
 	private final Attributes attributes = new Attributes();
@@ -176,9 +176,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				
 //		destPlan.legs = new LCLeg[legCount];
 		destPlan.routes = new Route[legCount];
-		destPlan.depTimes = new double[legCount];
-		destPlan.arrTimes = new double[legCount];
-		destPlan.travTimes = new double[legCount];
+		destPlan.depTimes = new OptionalTime[legCount];
+		destPlan.arrTimes = new OptionalTime[legCount];
+		destPlan.travTimes = new OptionalTime[legCount];
 		destPlan.modes = new String[legCount];
 		
 		activityCount = 0;
@@ -203,7 +203,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				destPlan.routes[legCount] = leg.getRoute();
 				destPlan.depTimes[legCount] = leg.getDepartureTime();
 				Leg r = ((Leg) leg);
-				destPlan.arrTimes[legCount] = r.getDepartureTime() + r.getTravelTime();
+				destPlan.arrTimes[legCount] = OptionalTime.defined(r.getDepartureTime().seconds() + r.getTravelTime()
+						.seconds());
 				destPlan.travTimes[legCount] = leg.getTravelTime();
 				destPlan.modes[legCount] = leg.getMode();
 				legCount++;
@@ -248,9 +249,9 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		// leg data
 		int legs = srcPlan.routes.length;
 		destPlan.routes = new Route[legs];
-		destPlan.depTimes = new double[legs];
-		destPlan.arrTimes = new double[legs];
-		destPlan.travTimes = new double[legs];
+		destPlan.depTimes = new OptionalTime[legs];
+		destPlan.arrTimes = new OptionalTime[legs];
+		destPlan.travTimes = new OptionalTime[legs];
 		destPlan.modes = new String[legs];
 		
 		System.arraycopy(srcPlan.routes, 0, destPlan.routes, 0, legs);

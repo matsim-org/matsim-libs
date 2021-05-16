@@ -1,5 +1,7 @@
 package org.matsim.contrib.taxi.util.chart;
 
+import static org.matsim.contrib.taxi.schedule.TaxiTaskBaseType.*;
+
 import java.awt.Color;
 import java.util.Collection;
 
@@ -10,7 +12,7 @@ import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskBaseType;
 
 public class TaxiScheduleCharts {
 	public static JFreeChart chartSchedule(Collection<? extends DvrpVehicle> vehicles) {
@@ -20,10 +22,11 @@ public class TaxiScheduleCharts {
 	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> task.getTaskType() + "";
 
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
-		if (task.getTaskType() == TaxiTaskType.PICKUP) {
+		TaxiTaskBaseType baseType = getBaseTypeOrElseThrow(task);
+		if (baseType == PICKUP) {
 			return task.getTaskType() + "_" + ((TaxiPickupTask)task).getRequest().getPassengerId();
 		}
-		if (task.getTaskType() == TaxiTaskType.DROPOFF) {
+		if (baseType == DROPOFF) {
 			return task.getTaskType() + "_" + ((TaxiDropoffTask)task).getRequest().getPassengerId();
 		}
 		return task.getTaskType() + "";
@@ -36,7 +39,7 @@ public class TaxiScheduleCharts {
 	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = task -> {
-		switch (((TaxiTaskType)task.getTaskType())) {
+		switch (getBaseTypeOrElseThrow(task)) {
 			case PICKUP:
 			case DROPOFF:
 				return PICKUP_DROPOFF_COLOR;

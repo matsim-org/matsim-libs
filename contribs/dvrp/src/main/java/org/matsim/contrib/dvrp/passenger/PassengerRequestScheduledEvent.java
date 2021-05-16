@@ -21,8 +21,10 @@
 package org.matsim.contrib.dvrp.passenger;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -31,7 +33,7 @@ import org.matsim.contrib.dvrp.optimizer.Request;
  * @author michalm
  */
 public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEvent {
-	public static final String EVENT_TYPE = "PassengersRequest scheduled";
+	public static final String EVENT_TYPE = "PassengerRequest scheduled";
 
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
@@ -85,5 +87,17 @@ public class PassengerRequestScheduledEvent extends AbstractPassengerRequestEven
 		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
 		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");
 		return attr;
+	}
+
+	public static PassengerRequestScheduledEvent convert(GenericEvent event) {
+		Map<String, String> attributes = event.getAttributes();
+		double time = Double.parseDouble(attributes.get(ATTRIBUTE_TIME));
+		String mode = Objects.requireNonNull(attributes.get(ATTRIBUTE_MODE));
+		Id<Request> requestId = Id.create(attributes.get(ATTRIBUTE_REQUEST), Request.class);
+		Id<Person> personId = Id.createPersonId(attributes.get(ATTRIBUTE_PERSON));
+		Id<DvrpVehicle> vehicleId = Id.create(attributes.get(ATTRIBUTE_VEHICLE), DvrpVehicle.class);
+		double pickupTime = Double.parseDouble(attributes.get(ATTRIBUTE_PICKUP_TIME));
+		double dropoffTime = Double.parseDouble(attributes.get(ATTRIBUTE_DROPOFF_TIME));
+		return new PassengerRequestScheduledEvent(time, mode, requestId, personId, vehicleId, pickupTime, dropoffTime);
 	}
 }

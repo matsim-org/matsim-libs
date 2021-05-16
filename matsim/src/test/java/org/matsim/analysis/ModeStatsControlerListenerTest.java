@@ -108,13 +108,13 @@ public class ModeStatsControlerListenerTest {
 		Leg leg2 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg2);
 		plan.addLeg(leg2);
-		Activity act3 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity act3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(act3);
 		plan.addActivity(act3);
 		Leg leg3 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(leg3);
 		plan.addLeg(leg3);
-		Activity act4 = PopulationUtils.createActivityFromLinkId("car interaction", link2);
+		Activity act4 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		planElem.add(act4);
 		plan.addActivity(act4);
 		Leg leg4 = PopulationUtils.createLeg(TransportMode.walk);
@@ -127,13 +127,13 @@ public class ModeStatsControlerListenerTest {
 		Leg leg5 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg5);
 		plan.addLeg(leg5);
-		Activity act6 = PopulationUtils.createActivityFromLinkId("car interaction", link2);
+		Activity act6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link2, TransportMode.car);
 		planElem.add(act6);
 		plan.addActivity(act6);
 		Leg leg6 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(leg6);
 		plan.addLeg(leg6);
-		Activity act7 = PopulationUtils.createActivityFromLinkId("car interaction", link3);
+		Activity act7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		planElem.add(act7);
 		plan.addActivity(act7);
 		Leg leg7 = PopulationUtils.createLeg(TransportMode.walk);
@@ -146,13 +146,13 @@ public class ModeStatsControlerListenerTest {
 		Leg leg8 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg8);
 		plan.addLeg(leg8);
-		Activity act9 = PopulationUtils.createActivityFromLinkId("car interaction", link3);
+		Activity act9 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link3, TransportMode.car);
 		planElem.add(act9);
 		plan.addActivity(act9);
 		Leg leg9 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(leg9);
 		plan.addLeg(leg9);
-		Activity act10 = PopulationUtils.createActivityFromLinkId("car interaction", link4);
+		Activity act10 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.car);
 		planElem.add(act10);
 		plan.addActivity(act10);
 		Leg leg10 = PopulationUtils.createLeg(TransportMode.walk);
@@ -165,13 +165,13 @@ public class ModeStatsControlerListenerTest {
 		Leg leg11 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg11);
 		plan.addLeg(leg11);
-		Activity act12 = PopulationUtils.createActivityFromLinkId("pt interaction", link4);
+		Activity act12 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		planElem.add(act12);
 		plan.addActivity(act12);
 		Leg leg12 = PopulationUtils.createLeg(TransportMode.pt);
 		planElem.add(leg12);
 		plan.addLeg(leg12);
-		Activity act13 = PopulationUtils.createActivityFromLinkId("pt interaction", link5);
+		Activity act13 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		planElem.add(act13);
 		plan.addActivity(act13);
 		Leg leg13 = PopulationUtils.createLeg(TransportMode.walk);
@@ -184,25 +184,25 @@ public class ModeStatsControlerListenerTest {
 		Leg leg14 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg14);
 		plan.addLeg(leg14);
-		Activity act15 = PopulationUtils.createActivityFromLinkId("pt interaction", link5);
+		Activity act15 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.pt);
 		planElem.add(act15);
 		plan.addActivity(act15);
 		Leg leg15 = PopulationUtils.createLeg(TransportMode.pt);
 		planElem.add(leg15);
 		plan.addLeg(leg15);
-		Activity act16 = PopulationUtils.createActivityFromLinkId("pt interaction", link4);
+		Activity act16 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.pt);
 		planElem.add(act16);
 		plan.addActivity(act16);
 		Leg leg16 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(leg16);
 		plan.addLeg(leg16);
-		Activity act17 = PopulationUtils.createActivityFromLinkId("car interaction", link4);
+		Activity act17 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.car);
 		planElem.add(act17);
 		plan.addActivity(act17);
 		Leg leg17 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(leg17);
 		plan.addLeg(leg17);
-		Activity act18 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity act18 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(act18);
 		plan.addActivity(act18);
 		Leg leg18 = PopulationUtils.createLeg(TransportMode.walk);
@@ -234,13 +234,13 @@ public class ModeStatsControlerListenerTest {
 		Leg legp2_1 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(legp2_1);
 		plan2.addLeg(legp2_1);
-		Activity actp2_2 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity actp2_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(actp2_2);
 		plan2.addActivity(actp2_2);
 		Leg legp2_2 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(legp2_2);
 		plan2.addLeg(legp2_2);
-		Activity actp2_3 = PopulationUtils.createActivityFromLinkId("car interaction", link4);
+		Activity actp2_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.car);
 		planElem.add(actp2_3);
 		plan2.addActivity(actp2_3);
 		Leg legp2_3 = PopulationUtils.createLeg(TransportMode.walk);
@@ -267,13 +267,13 @@ public class ModeStatsControlerListenerTest {
 		Leg legp2_6 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(legp2_6);
 		plan2.addLeg(legp2_6);
-		Activity actp2_7 = PopulationUtils.createActivityFromLinkId("car interaction", link4);
+		Activity actp2_7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link4, TransportMode.car);
 		planElem.add(actp2_7);
 		plan2.addActivity(actp2_7);
 		Leg legp2_7 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(legp2_7);
 		plan2.addLeg(legp2_7);
-		Activity actp2_8 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity actp2_8 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(actp2_8);
 		plan2.addActivity(actp2_8);
 		Leg legp2_8 = PopulationUtils.createLeg(TransportMode.walk);
@@ -305,13 +305,13 @@ public class ModeStatsControlerListenerTest {
 		Leg legp3_1 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(legp3_1);
 		plan3.addLeg(legp3_1);
-		Activity actp3_2 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity actp3_2 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(actp3_2);
 		plan3.addActivity(actp3_2);
 		Leg legp3_2 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(legp3_2);
 		plan3.addLeg(legp3_2);
-		Activity actp3_3 = PopulationUtils.createActivityFromLinkId("car interaction", link5);
+		Activity actp3_3 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.car);
 		planElem.add(actp3_3);
 		plan3.addActivity(actp3_3);
 		Leg legp3_3 = PopulationUtils.createLeg(TransportMode.walk);
@@ -324,13 +324,13 @@ public class ModeStatsControlerListenerTest {
 		Leg legp3_5 = PopulationUtils.createLeg(TransportMode.walk);
 		planElem.add(legp3_5);
 		plan3.addLeg(legp3_5);
-		Activity actp3_6 = PopulationUtils.createActivityFromLinkId("car interaction", link5);
+		Activity actp3_6 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link5, TransportMode.car);
 		planElem.add(actp3_6);
 		plan3.addActivity(actp3_6);
 		Leg legp3_6 = PopulationUtils.createLeg(TransportMode.car);
 		planElem.add(legp3_6);
 		plan3.addLeg(legp3_6);
-		Activity actp3_7 = PopulationUtils.createActivityFromLinkId("car interaction", link1);
+		Activity actp3_7 = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(null, link1, TransportMode.car);
 		planElem.add(actp3_7);
 		plan3.addActivity(actp3_7);
 		Leg legp3_7 = PopulationUtils.createLeg(TransportMode.walk);
@@ -362,41 +362,50 @@ public class ModeStatsControlerListenerTest {
 		StartupEvent eventStart = new StartupEvent(null);
 		modStatListner.notifyStartup(eventStart);
 
-		HashMap<String, Integer> modes = new HashMap<String, Integer>();
+		HashMap<String, Integer> modesIter0 = new HashMap<String, Integer>();
 
-		IterationEndsEvent event0 = new IterationEndsEvent(null, 0);
+		IterationEndsEvent event0 = new IterationEndsEvent(null, 0, false);
 		modStatListner.notifyIterationEnds(event0);
 
 		//Merging 3 maps (modes of 3 persons) to a new single map and adding together the count of each mode of all 3 persons
-		person1modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person2modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person3modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
+		person1modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
+		person2modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
+		person3modes.forEach((k, v) -> modesIter0.merge(k, v, Integer::sum));
 
-		readAndcompareValues(modes, 0);
+		readAndcompareValues(modesIter0, 0);
 		
 		//Remove one person
 		population.getPersons().remove(Id.create("2", Person.class));
 
-		IterationEndsEvent event1 = new IterationEndsEvent(null, 1);
+		// Change mode of one trip of person 3
+		PlanElement pe = population.getPersons().get(Id.create("3", Person.class)).getSelectedPlan().getPlanElements().get(3);
+		Leg leg = (Leg) pe;
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) - 1);
+		// add a new mode which did not occur before
+		leg.setMode(TransportMode.ride);
+		person3modes.put(leg.getMode(), person3modes.get(leg.getMode()) + 1);
+
+		IterationEndsEvent event1 = new IterationEndsEvent(null, 1, false);
 		modStatListner.notifyIterationEnds(event1);
 
-		modes.clear();
-		//Merging 2 maps (modes of 2 persons) to a new single map and adding together the count of each mode of 2 persons
-		person1modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
-		person3modes.forEach((k, v) -> modes.merge(k, v, Integer::sum));
+		HashMap<String, Integer> modesIter1 = new HashMap<String, Integer>();
 
-		readAndcompareValues(modes, 1);
+		//Merging 2 maps (modes of 2 persons) to a new single map and adding together the count of each mode of 2 persons
+		person1modes.forEach((k, v) -> modesIter1.merge(k, v, Integer::sum));
+		person3modes.forEach((k, v) -> modesIter1.merge(k, v, Integer::sum));
+
+		readAndcompareValues(modesIter1, 1);
 
 		//Remove one more person
 		population.getPersons().remove(Id.create("3", Person.class));
 
-		IterationEndsEvent event2 = new IterationEndsEvent(null, 2);
+		IterationEndsEvent event2 = new IterationEndsEvent(null, 2, false);
 		modStatListner.notifyIterationEnds(event2);
 
+		// in the last iteration check whether all iterations can still be found
+		readAndcompareValues(modesIter0, 0);
+		readAndcompareValues(modesIter1, 1);
 		readAndcompareValues(person1modes, 2);
-
-		ShutdownEvent eventShutdown = new ShutdownEvent(null, false);
-		modStatListner.notifyShutdown(eventShutdown);
 	}
 
 	//(no: of trips in a mode) / (total no: of trips) ---> should match with the text file

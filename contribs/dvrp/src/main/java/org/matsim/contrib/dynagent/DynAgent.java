@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -41,13 +41,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 public final class DynAgent implements MobsimDriverPassengerAgent {
-	private DynAgentLogic agentLogic;
+	private final DynAgentLogic agentLogic;
 
-	private Id<Person> id;
+	private final Id<Person> id;
 
 	private MobsimVehicle veh;
 
-	private EventsManager events;
+	private final EventsManager events;
 
 	private MobsimAgent.State state;
 
@@ -70,7 +70,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 		// initial activity
 		dynActivity = this.agentLogic.computeInitialActivity(this);
-		state = Time.isUndefinedTime(dynActivity.getEndTime()) ? MobsimAgent.State.ABORT : MobsimAgent.State.ACTIVITY;
+		state = MobsimAgent.State.ACTIVITY;
 	}
 
 	private void computeNextAction(DynAction oldDynAction, double now) {
@@ -98,6 +98,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		computeNextAction(dynActivity, now);
 	}
 
+	//this method can be called for several agents at the same time
 	@Override
 	public void endLegAndComputeNextState(double now) {
 		events.processEvent(new PersonArrivalEvent(now, id, currentLinkId, dynLeg.getMode()));
@@ -206,7 +207,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// MobsimAgent
 	@Override
-	public Double getExpectedTravelTime() {
+	public OptionalTime getExpectedTravelTime() {
 		return dynLeg.getExpectedTravelTime();
 	}
 

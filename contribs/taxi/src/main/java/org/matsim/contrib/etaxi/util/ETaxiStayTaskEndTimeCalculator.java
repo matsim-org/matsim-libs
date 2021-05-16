@@ -31,7 +31,7 @@ public class ETaxiStayTaskEndTimeCalculator extends TaxiStayTaskEndTimeCalculato
 
 	@Override
 	public double calcNewEndTime(DvrpVehicle vehicle, StayTask task, double newBeginTime) {
-		if (task instanceof ETaxiChargingTask) {
+		if (task.getTaskType().equals(ETaxiChargingTask.TYPE)) {
 			// FIXME underestimated due to the ongoing AUX/drive consumption
 			double duration = task.getEndTime() - task.getBeginTime();
 			return newBeginTime + duration;

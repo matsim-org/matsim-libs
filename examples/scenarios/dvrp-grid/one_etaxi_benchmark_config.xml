@@ -1,6 +1,10 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
+	<module name="dvrp">
+		<param name="initialTravelTimesFile" value="one_taxi_benchmark_link_travel_times.csv.gz"/>
+	</module>
+
 	<module name="multiModeTaxi">
 		<parameterset type="taxi">
 			<param name="destinationKnown" value="false"/>
@@ -14,7 +18,7 @@
 			<param name="timeProfiles" value="false"/>
 			<param name="detailedStats" value="false"/>
 
-			<parameterset type="org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams">
+			<parameterset type="RuleBasedETaxiOptimizer">
 				<parameterset type="RuleBasedTaxiOptimizer"/>
 
 				<param name="minRelativeSoc" value="0.7"/>
@@ -36,8 +40,6 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="grid_network.xml"/>
-		<param name="timeVariantNetwork" value="true"/>
-		<param name="inputChangeEventsFile" value="one_taxi_benchmark_change_events.xml"/>
 	</module>
 
 	<module name="plans">

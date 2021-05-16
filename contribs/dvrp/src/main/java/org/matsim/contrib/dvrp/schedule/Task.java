@@ -37,10 +37,11 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
  */
 public interface Task {
 	interface TaskType {
+		String name();
 	}
 
 	enum TaskStatus {
-		PLANNED, STARTED, PERFORMED;
+		PLANNED, STARTED, PERFORMED
 	}
 
 	TaskType getTaskType();

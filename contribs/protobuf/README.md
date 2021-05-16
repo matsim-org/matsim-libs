@@ -1,4 +1,4 @@
-## Overview
+## Protobuf
 
 The protobuf contrib provides a protocol buffer implementation and converter for the MATSim event infrastructure.
  

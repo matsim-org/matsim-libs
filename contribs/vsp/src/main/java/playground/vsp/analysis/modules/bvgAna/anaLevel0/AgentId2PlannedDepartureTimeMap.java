@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.routes.TransitPassengerRoute;
 
 /**
  *
@@ -88,8 +88,8 @@ public class AgentId2PlannedDepartureTimeMap {
 
 					if(leg.getMode() == TransportMode.pt){
 						// it's the start of a new pt leg, report it
-						if (leg.getRoute() instanceof ExperimentalTransitRoute){
-							ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+						if (leg.getRoute() instanceof TransitPassengerRoute){
+							TransitPassengerRoute route = (TransitPassengerRoute) leg.getRoute();
 							plannedDepartureList.add(new Tuple<Id, AgentId2PlannedDepartureTimeMapData>(route.getAccessStopId(), new AgentId2PlannedDepartureTimeMapData(route.getAccessStopId(), runningTime, route.getLineId(), route.getRouteId())));
 						} else if (leg.getRoute() != null) {
 							log.warn("unknown route description found - only know to handle ExperimentalTransitRoute, got " + leg.getRoute().getClass().getCanonicalName());
@@ -97,10 +97,10 @@ public class AgentId2PlannedDepartureTimeMap {
 					}
 
 					// add the legs travel time
-					if(Double.isInfinite(leg.getTravelTime())){
+					if(leg.getTravelTime().isUndefined()) {
 						log.debug("Infinite travel time founde");
 					} else {
-						runningTime += leg.getTravelTime();
+						runningTime += leg.getTravelTime().seconds();
 					}
 
 				}

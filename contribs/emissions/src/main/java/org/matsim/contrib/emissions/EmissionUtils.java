@@ -60,13 +60,13 @@ public final class EmissionUtils {
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
-	/*package-private*/ static void setHbefaRoadType(Link link, String type) {
+	public static void setHbefaRoadType(Link link, String type) {
 		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	/*package-private*/ static String getHbefaRoadType(Link link) {
+	public static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -227,10 +227,10 @@ public final class EmissionUtils {
 
 		avgHbefaWarmTable.forEach((warmEmissionFactorKey, emissionFactor) -> {
 			HbefaRoadVehicleCategoryKey roadVehicleCategoryKey = new HbefaRoadVehicleCategoryKey(warmEmissionFactorKey);
-			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
+			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
-			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>( HbefaTrafficSituation.class ));
+			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>(HbefaTrafficSituation.class));
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
@@ -268,6 +268,7 @@ public final class EmissionUtils {
 
 				break;
 			case fromVehicleTypeDescription:
+				// (v1 but hbefa vehicle description is in vehicle type description (Amit's version))
 
 				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
 					// information has already been moved to correct location
@@ -316,16 +317,16 @@ public final class EmissionUtils {
 
 	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
-		EngineInformation engineInfo = vehicleType.getEngineInformation();;
+		EngineInformation engineInfo = vehicleType.getEngineInformation();
 		StringBuilder strb = new StringBuilder();
-		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaSizeClass( engineInfo ) ) ;
-		strb.append( ";" ) ;
-		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
-		return strb.toString() ;
+		strb.append(VehicleUtils.getHbefaVehicleCategory(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaTechnology(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaSizeClass(engineInfo));
+		strb.append(";");
+		strb.append(VehicleUtils.getHbefaEmissionsConcept(engineInfo));
+		return strb.toString();
 	}
 
 	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
@@ -383,6 +384,62 @@ public final class EmissionUtils {
 				// kai, jan'20
 		}
 		return pollutant;
+	}
+
+	/**
+	 *  try to re-write the key from hbefa3.x to hbefa4.x:
+	 */
+	/*package-private*/
+	static HbefaVehicleAttributes tryRewriteHbefa3toHbefa4(Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
+		// try to re-write the key from hbefa3.x to hbefa4.x:
+		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
+
+		// technology is copied:
+		attribs2.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+
+		// size class is "not specified":
+		attribs2.setHbefaSizeClass("not specified");
+
+		// em concept is re-written with different dashes:
+		switch (vehicleInformationTuple.getSecond().getHbefaEmConcept()) {
+			case "PC-P-Euro-1":
+				attribs2.setHbefaEmConcept("PC P Euro-1");
+				break;
+			case "PC-P-Euro-2":
+				attribs2.setHbefaEmConcept("PC P Euro-2");
+				break;
+			case "PC-P-Euro-3":
+				attribs2.setHbefaEmConcept("PC P Euro-3");
+				break;
+			case "PC-P-Euro-4":
+				attribs2.setHbefaEmConcept("PC P Euro-4");
+				break;
+			case "PC-P-Euro-5":
+				attribs2.setHbefaEmConcept("PC P Euro-5");
+				break;
+			case "PC-P-Euro-6":
+				attribs2.setHbefaEmConcept("PC P Euro-6");
+				break;
+			case "PC-D-Euro-1":
+				attribs2.setHbefaEmConcept("PC D Euro-1");
+				break;
+			case "PC-D-Euro-2":
+				attribs2.setHbefaEmConcept("PC D Euro-2");
+				break;
+			case "PC-D-Euro-3":
+				attribs2.setHbefaEmConcept("PC D Euro-3");
+				break;
+			case "PC-D-Euro-4":
+				attribs2.setHbefaEmConcept("PC D Euro-4");
+				break;
+			case "PC-D-Euro-5":
+				attribs2.setHbefaEmConcept("PC D Euro-5");
+				break;
+			case "PC-D-Euro-6":
+				attribs2.setHbefaEmConcept("PC D Euro-6");
+				break;
+		}
+		return attribs2;
 	}
 
 }

@@ -35,7 +35,7 @@ import javax.inject.Inject;
 public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
 	private final double marginalUtilityOfMoney ;
-	private TravelDisutilityFactory previousTravelDisutilityFactory;
+	private final TravelDisutilityFactory previousTravelDisutilityFactory;
 	private double sigma = 3. ;
 
 	@Inject
@@ -57,8 +57,7 @@ public final class RoadPricingTravelDisutilityFactory implements TravelDisutilit
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		if ( this.sigma != 0. ) {
 			if ( previousTravelDisutilityFactory instanceof RandomizingTimeDistanceTravelDisutilityFactory) {
-				((RandomizingTimeDistanceTravelDisutilityFactory) previousTravelDisutilityFactory).setSigma( this.sigma );
-			} else {
+                        } else {
 				throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
 			}
 		}

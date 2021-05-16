@@ -1,7 +1,25 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
-import com.google.inject.Inject;
-import org.apache.commons.cli.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,8 +44,16 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,12 +61,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.util.*;
+import com.google.inject.Inject;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
@@ -249,11 +270,11 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
             stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                    .qsim().getEndTime() - config.qsim().getStartTime())).getStopStopTimes();
+                    .qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds())).getStopStopTimes();
 
             waitTimes = new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                    .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
+                    .qsim().getEndTime().seconds() - config.qsim().getStartTime().seconds())).getWaitTimes();
 
             // tell PlanSerializable to record transit routes
             PlanSerializable.isUseTransit = true;
@@ -273,14 +294,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
         else {
             final RandomizingTimeDistanceTravelDisutilityFactory disutilityFactory =
-                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config.planCalcScore());
+                    new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, config);
             matsimControler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
                     bindCarTravelDisutilityFactory().toInstance(disutilityFactory);
                 }
             });
-            disutilityFactory.setSigma(0.1);
 
         }
         matsimControler.addOverridingModule(new AbstractModule() {

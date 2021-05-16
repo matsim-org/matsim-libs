@@ -19,47 +19,60 @@
 
 package org.matsim.vehicles;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.testcases.MatsimTestCase;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.junit.Before;
+import org.matsim.api.core.v01.Id;
+import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author dgrether
  * @author kturner
  */
 public class VehicleWriterV1Test extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger( VehicleWriterV1Test.class ) ;
+	private static final Logger log = Logger.getLogger(VehicleWriterV1Test.class);
 
-	private static final String TESTXML  = "testVehicles_v1.xml";
+	private static final String TESTXML = "testVehicles_v1.xml";
 
-	private final Id<Vehicle> id23 = Id.create("23", Vehicle.class);
-	private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
-	private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
+	private Id<Vehicle> id23;
+	private Id<Vehicle> id42;
+	private Id<Vehicle> id42_23;
 
-	public void testWriter() throws FileNotFoundException, IOException {
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+
+		id23 = Id.create("23", Vehicle.class);
+		id42 = Id.create("42", Vehicle.class);
+
+		// indeed this should be double blank in the middle but due to collapse this is
+		// only one blank
+		id42_23 = Id.create(" 42  23", Vehicle.class);
+	}
+
+	public void testWriter() {
 
 		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
 
-		//read it
+		// read it
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getPackageInputDirectory() + TESTXML);
 
-		//write it
+		// write it
 		VehicleWriterV1 writer = new VehicleWriterV1(vehicles);
 		writer.writeFile(outfileName);
-		assertTrue(new File(outfileName).exists()); 
-		//read it again
+		assertTrue(new File(outfileName).exists());
+		// read it again
 		vehicles = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles);
 		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
 
-		//check it, check it, check it now!
+		// check it, check it, check it now!
 		this.checkContent(vehicles);
 	}
 
@@ -79,15 +92,14 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		assertEquals(Integer.valueOf(20), vehType.getCapacity().getStandingRoom());
 //		assertNotNull(vehType.getCapacity().getFreightCapacity());
 //		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
-		assertEquals( 23.23, vehType.getCapacity().getVolumeInCubicMeters(), EPSILON );
+		assertEquals(23.23, vehType.getCapacity().getVolumeInCubicMeters(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
-		assertEquals( EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType() );
+		assertEquals(EngineInformation.FuelType.diesel, vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
-		assertEquals( VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType ) );
+		assertEquals(VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(2.0, vehType.getPcuEquivalents());
-
 
 		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
@@ -95,7 +107,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
 		assertNotNull(vehType.getCapacity());
-		assertEquals( VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehType ) );
+		assertEquals(VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehType));
 		assertEquals(1.0, vehType.getPcuEquivalents());
 
 		assertNotNull(vehicles);
@@ -111,7 +123,6 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 
 		assertNotNull(vehicles.get(id42_23));
 		assertEquals(id42_23, vehicles.get(id42_23).getId());
-
 
 	}
 

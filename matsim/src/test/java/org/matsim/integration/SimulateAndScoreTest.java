@@ -185,7 +185,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 				install(new TripRouterModule());
 				install(new TravelTimeCalculatorModule());
 				install(new EventsManagerModule());
-				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ));
+				addTravelDisutilityFactoryBinding("car").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config ));
 			}
 		});
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
@@ -216,7 +216,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 
@@ -283,7 +283,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		EventsCollector handler = new EventsCollector();
 		events.addHandler(handler);
 
-		scorer.beginIteration(0);
+		scorer.beginIteration(0, false);
 		sim.run();
 		scorer.finish();
 

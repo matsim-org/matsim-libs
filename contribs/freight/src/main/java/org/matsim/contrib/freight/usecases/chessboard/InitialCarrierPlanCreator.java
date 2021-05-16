@@ -83,8 +83,8 @@ final class InitialCarrierPlanCreator {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 //						double waiting = 0.;
-                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit*waiting + service;
+                double service = act.getOperationTime()*vehicle.getType().getVehicleCostParams().perServiceTimeUnit;
+                return penalty4missedTws*tooLate + vehicle.getType().getVehicleCostParams().perWaitingTimeUnit*waiting + service;
                 //						//				return penalty4missedTws*tooLate;
                 //						return 0.0;
             }
@@ -113,7 +113,7 @@ final class InitialCarrierPlanCreator {
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
         
-        Boolean addDefaultCostCalculators = true;
+        boolean addDefaultCostCalculators = true;
         
         VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
@@ -156,7 +156,7 @@ final class InitialCarrierPlanCreator {
             carrier.setSelectedPlan(plan);
         }
 
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
+        new CarrierPlanWriter(carriers).write("input/usecases/chessboard/freight/carrierPlans_10minTW.xml");
     }
 
 }

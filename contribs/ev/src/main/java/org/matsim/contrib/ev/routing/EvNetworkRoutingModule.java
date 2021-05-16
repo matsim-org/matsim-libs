@@ -74,7 +74,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final TravelTime travelTime;
 	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
-	private final String stageActivityType;
+	private final String stageActivityModePrefix;
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
 
@@ -92,7 +92,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		this.chargingInfrastructureSpecification = chargingInfrastructureSpecification;
 		this.driveConsumptionFactory = driveConsumptionFactory;
 		this.auxConsumptionFactory = auxConsumptionFactory;
-		stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+		stageActivityModePrefix = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
 		this.evConfigGroup = evConfigGroup;
 		this.vehicleSuffix = mode.equals(TransportMode.car) ? "" : "_" + mode;
 	}
@@ -134,7 +134,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 				for (Link stopLocation : stopLocations) {
 
 					StraightLineKnnFinder<Link, ChargerSpecification> straightLineKnnFinder = new StraightLineKnnFinder<>(
-							2, l -> l, s -> network.getLinks().get(s.getLinkId()));
+							2, Link::getCoord, s -> network.getLinks().get(s.getLinkId()).getCoord());
 					List<ChargerSpecification> nearestChargers = straightLineKnnFinder.findNearest(stopLocation,
 							chargingInfrastructureSpecification.getChargerSpecifications()
 									.values()
@@ -149,10 +149,10 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					List<? extends PlanElement> routeSegment = delegate.calcRoute(lastFrom, nexttoFacility,
 							lastArrivaltime, person);
 					Leg lastLeg = (Leg)routeSegment.get(0);
-					lastArrivaltime = lastLeg.getDepartureTime() + lastLeg.getTravelTime();
+					lastArrivaltime = lastLeg.getDepartureTime().seconds() + lastLeg.getTravelTime().seconds();
 					stagedRoute.add(lastLeg);
-					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
-							selectedChargerLink.getCoord(), selectedChargerLink.getId());
+					Activity chargeAct = PopulationUtils.createStageActivityFromCoordLinkIdAndModePrefix(selectedChargerLink.getCoord(),
+							selectedChargerLink.getId(), stageActivityModePrefix);
 					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
@@ -180,12 +180,12 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		double lastSoc = pseudoVehicle.getBattery().getSoc();
-		double linkEnterTime = basicLeg.getDepartureTime();
+		double linkEnterTime = basicLeg.getDepartureTime().seconds();
 		for (Link l : links) {
-			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
+			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime().seconds(), null, null);
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
-					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
+					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime().seconds(), travelT, l.getId());
 			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model

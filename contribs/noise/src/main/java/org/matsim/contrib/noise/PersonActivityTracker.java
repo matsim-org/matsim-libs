@@ -131,7 +131,7 @@ final class PersonActivityTracker implements ActivityEndEventHandler , ActivityS
 	
 	public void handleEvent(ActivityStartEvent event) {
 						
-		if (!(this.noiseContext.getScenario().getPopulation().getPersons().get(event.getPersonId()) != null)) {
+		if (this.noiseContext.getScenario().getPopulation().getPersons().get(event.getPersonId()) == null) {
 		} else {
 		
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {

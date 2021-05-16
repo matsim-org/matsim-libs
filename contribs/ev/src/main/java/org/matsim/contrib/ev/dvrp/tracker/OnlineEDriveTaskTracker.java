@@ -33,12 +33,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  */
 public class OnlineEDriveTaskTracker implements OnlineDriveTaskTracker, ETaskTracker {
 	private final EvDvrpVehicle vehicle;
-	private final MobsimTimer timer;
 	private final OnlineDriveTaskTracker driveTracker;
 
 	public OnlineEDriveTaskTracker(EvDvrpVehicle vehicle, MobsimTimer timer, OnlineDriveTaskTracker driveTracker) {
 		this.vehicle = vehicle;
-		this.timer = timer;
 		this.driveTracker = driveTracker;
 	}
 

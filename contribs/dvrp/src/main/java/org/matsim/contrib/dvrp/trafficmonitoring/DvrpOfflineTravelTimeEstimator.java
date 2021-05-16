@@ -19,22 +19,24 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -47,67 +49,73 @@ import com.google.inject.name.Named;
  *
  * @author michalm
  */
-public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
+public class DvrpOfflineTravelTimeEstimator
+		implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener, AfterMobsimListener {
 	private final TravelTime observedTT;
 	private final Network network;
+	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
-	private final int interval;
-	private final int intervalCount;
-	private final Map<Id<Link>, double[]> linkTTs;
+	private final TimeDiscretizer timeDiscretizer;
+	private final double[][] linkTravelTimes;
 	private final double alpha;
 
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
 			@Named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
-		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
+			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig,
+			OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		this(initialTT, observedTT, network, new TimeDiscretizer(ttCalcConfig),
+				dvrpConfig.getTravelTimeEstimationAlpha(), outputDirectoryHierarchy);
 	}
 
 	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
-			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
+			TimeDiscretizer timeDiscretizer, double travelTimeEstimationAlpha,
+			OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		this.observedTT = observedTT;
 		this.network = network;
+		this.timeDiscretizer = timeDiscretizer;
+		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 
 		alpha = travelTimeEstimationAlpha;
-		if (alpha > 1 || alpha <= 0) {
-			throw new IllegalArgumentException("travelTimeEstimationAlpha must be in (0,1]");
-		}
+		checkArgument(alpha > 0 && alpha <= 1, "travelTimeEstimationAlpha must be in (0,1]");
 
-		interval = ttCalcConfig.getTraveltimeBinSize();
-		intervalCount = TimeBinUtils.getTimeBinCount(ttCalcConfig.getMaxTime(), interval);
-
-		linkTTs = Maps.newHashMapWithExpectedSize(network.getLinks().size());
-		init(initialTT);
-	}
-
-	private void init(TravelTime initialTT) {
-		for (Link link : network.getLinks().values()) {
-			double[] tt = new double[intervalCount];
-			updateTTs(link, tt, initialTT, 1.);
-			linkTTs.put(link.getId(), tt);
-		}
+		linkTravelTimes = DvrpOfflineTravelTimes.convertToLinkTravelTimeMatrix(initialTT, network.getLinks().values(),
+				timeDiscretizer);
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO TTC is more flexible (simple averaging vs linear interpolation, etc.)
-		int idx = TimeBinUtils.getTimeBinIndex(time, interval, intervalCount);
-		return linkTTs.get(link.getId())[idx];
+
+		// check if the link belongs to the network
+		var linkTT = checkNotNull(linkTravelTimes[link.getId().index()],
+				"Link (%s) does not belong to network. No travel time data.", link.getId());
+
+		//handle negative times (e.g. in backward shortest path search)
+		int timeBin = time < 0 ? 0 : timeDiscretizer.getIdx(time);
+		return linkTT[timeBin];
 	}
 
 	@Override
 	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
-		for (Link link : network.getLinks().values()) {
-			updateTTs(link, linkTTs.get(link.getId()), observedTT, alpha);
-		}
+		updateTTs(observedTT, alpha);
 	}
 
-	private void updateTTs(Link link, double[] tt, TravelTime travelTime, double alpha) {
-		for (int i = 0; i < intervalCount; i++) {
-			double oldEstimatedTT = tt[i];
-			double experiencedTT = travelTime.getLinkTravelTime(link, i * interval, null, null);
-			tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		DvrpOfflineTravelTimes.saveLinkTravelTimes(timeDiscretizer, linkTravelTimes,
+				outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "dvrp_travel_times.csv.gz"));
+	}
+
+	private void updateTTs(TravelTime travelTime, double alpha) {
+		for (Link link : network.getLinks().values()) {
+			double[] tt = linkTravelTimes[link.getId().index()];
+			timeDiscretizer.forEach((bin, time) -> {
+				double oldEstimatedTT = tt[bin];
+				double experiencedTT = travelTime.getLinkTravelTime(link, time, null, null);
+				tt[bin] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+			});
 		}
 	}
 }

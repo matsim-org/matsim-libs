@@ -76,6 +76,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
@@ -321,11 +322,11 @@ public class CreateAutomatedFDTest {
 	
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
-		private static final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
-		private static final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
-		private static final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
-		private static final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
-		private static final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
+		private final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
+		private final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
+		private final Id<Link> MIDDEL_LINK_ID_OF_TRACK = Id.createLinkId(1);
+		private final Id<Link> LAST_LINK_ID_OF_TRACK = Id.createLinkId(2);
+		private final Id<Link> DESTINATION_LINK_ID = Id.createLinkId("work");
 
 		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
 			personId = agentId;
@@ -439,7 +440,7 @@ public class CreateAutomatedFDTest {
 		}
 
 		@Override
-		public Double getExpectedTravelTime() {
+		public OptionalTime getExpectedTravelTime() {
 			throw new RuntimeException("not implemented");
 		}
 

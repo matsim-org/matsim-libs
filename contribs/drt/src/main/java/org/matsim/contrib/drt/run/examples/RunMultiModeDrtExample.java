@@ -22,19 +22,11 @@ package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -44,22 +36,6 @@ public class RunMultiModeDrtExample {
 	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(), config.plansCalcRoute());
-
-		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		ScenarioUtils.loadScenario(scenario);
-
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new MultiModeDrtModule());
-		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
-
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-
-		controler.run();
+		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 }

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +34,8 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
@@ -89,7 +89,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 		for (Trip oldTrip : trips) {
 			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
-			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
+			if (log.isDebugEnabled()) log.debug("about to call TripRouter with routingMode=" + routingMode);
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
 							routingMode,

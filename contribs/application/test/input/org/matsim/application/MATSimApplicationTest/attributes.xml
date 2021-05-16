@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE objectAttributes SYSTEM "http://matsim.org/files/dtd/objectattributes_v1.dtd">
+
+<objectAttributes>
+
+    <object id="1">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">never</attribute>
+    </object>
+    <object id="2">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="3">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="4">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="5">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="6">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">never</attribute>
+    </object>
+    <object id="7">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="8">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="9">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+    <object id="10">
+        <attribute name="PermissibleModesCalculator_carAvailability" class="java.lang.String">always</attribute>
+    </object>
+
+</objectAttributes>

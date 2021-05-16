@@ -62,15 +62,19 @@
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="pt"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-3.0" />
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="walk"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-1.0" />
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="bike"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-2.0" />
 			</parameterset>
 			<parameterset type="modeParams">
 				<param name="mode" value="ride"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-5.0" />
 			</parameterset>
 
 			<parameterset type="activityParams">

@@ -37,24 +37,10 @@ public class DrtRequestTimeConstraintViolations {
 	}
 
 	/**
-	 * @return expected/actual wait time constraint violation of a planned/performed pickup
-	 */
-	public static double getCurrentWaitTimeViolation(DrtRequest request) {
-		return getTimeConstraintViolation(request.getPickupTask().getEndTime(), request.getLatestStartTime());
-	}
-
-	/**
 	 * @return travel time constraint violation at the moment of request insertion
 	 */
 	public static double getInitialTravelTimeViolation(DrtRequest request, PassengerRequestScheduledEvent event) {
 		return getTimeConstraintViolation(event.getDropoffTime(), request.getLatestArrivalTime());
-	}
-
-	/**
-	 * @return expected/actual travel time constraint violation of a planned/performed pickup
-	 */
-	public static double getCurrentTravelTimeViolation(DrtRequest request) {
-		return getTimeConstraintViolation(request.getDropoffTask().getEndTime(), request.getLatestArrivalTime());
 	}
 
 	private static double getTimeConstraintViolation(double time, double maxTime) {

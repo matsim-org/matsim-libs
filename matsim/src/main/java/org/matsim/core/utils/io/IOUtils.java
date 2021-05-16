@@ -22,8 +22,8 @@ package org.matsim.core.utils.io;
 
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+import net.jpountz.lz4.LZ4FrameInputStream;
+import net.jpountz.lz4.LZ4FrameOutputStream;
 import org.apache.commons.compress.compressors.CompressorException;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
@@ -32,6 +32,8 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,6 +53,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,7 +106,7 @@ import java.util.zip.GZIPOutputStream;
  * 
  * <h2>Compression</h2>
  * 
- * Compessed files are automatically assumed if ceraint file types are
+ * Compressed files are automatically assumed if certain file types are
  * encountered. Currently, the following patterns match certain compression
  * algorithms:
  * 
@@ -112,6 +116,11 @@ import java.util.zip.GZIPOutputStream;
  * <li><code>*.bz2</code>: Bzip2 compression</li>
  * <li><code>*.zst</code>: ZStandard compression</li>
  * </ul>
+ *
+ * <h2>Encryption</h2>
+ *
+ * Files ending with {@code .enc} are assumed to be encrypted and will be handled with {@link CipherUtils}.
+ *
  */
 final public class IOUtils {
 
@@ -246,7 +255,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * not compression is assumed.
 	 */
 	private static CompressionType getCompression(URL url) {
-		String[] segments = url.getPath().split("\\.");
+
+		// .enc extension is ignored
+		String[] segments = url.getPath().replace(".enc", "").split("\\.");
 		String lastExtension = segments[segments.length - 1];
 		return COMPRESSION_EXTENSIONS.get(lastExtension.toLowerCase(Locale.ROOT));
 	}
@@ -262,6 +273,9 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 		try {
 			InputStream inputStream = url.openStream();
 
+			if (url.getPath().endsWith(".enc"))
+				inputStream = CipherUtils.getDecryptedInput(inputStream);
+
 			CompressionType compression = getCompression(url);
 			if (compression != null) {
 				switch (compression) {
@@ -269,7 +283,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 						inputStream = new GZIPInputStream(inputStream);
 						break;
 					case LZ4:
-						inputStream = new LZ4BlockInputStream(inputStream);
+						inputStream = new LZ4FrameInputStream(inputStream);
 						break;
 					case BZIP2:
 						inputStream = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, inputStream);
@@ -281,7 +295,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
-		} catch (IOException | CompressorException e) {
+		} catch (IOException | CompressorException | GeneralSecurityException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -338,7 +352,7 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 						outputStream = new GZIPOutputStream(outputStream);
 						break;
 					case LZ4:
-						outputStream = new LZ4BlockOutputStream(outputStream);
+						outputStream = new LZ4FrameOutputStream(outputStream);
 						break;
 					case BZIP2:
 						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
@@ -448,18 +462,20 @@ PR ist hier: https://github.com/matsim-org/matsim/pull/646
 	 * @throws UncheckedIOException
 	 */
 	public static boolean isEqual(InputStream first, InputStream second) throws UncheckedIOException {
-		try {
-			while (true) {
-				int fr = first.read();
-				int tr = second.read();
-
-				if (fr != tr) {
+		byte[] buf1 = new byte[64 * 1024];
+		byte[] buf2 = new byte[64 * 1024];
+		try (first; second) {
+			DataInputStream d2 = new DataInputStream(second);
+			int len;
+			while ((len = first.read(buf1)) > 0) {
+				d2.readFully(buf2,0, len);
+				if (!Arrays.equals(buf1, 0, len, buf2, 0, len)) {
 					return false;
 				}
-				if (fr == -1) {
-					return true; // EOF on both sides
-				}
 			}
+			return d2.read() < 0; // is the end of the second file also.
+		} catch(EOFException ioe) {
+			return false;
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

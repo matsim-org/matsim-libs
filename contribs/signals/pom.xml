@@ -2,35 +2,28 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>12.0-SNAPSHOT</version>
+    <version>14.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
   <artifactId>signals</artifactId>
   <name>signals</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.matsim</groupId>
       <artifactId>matsim-examples</artifactId>
-      <version>12.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>otfvis</artifactId>
-      <version>12.0-SNAPSHOT</version>
+      <version>14.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
  		<groupId>org.assertj</groupId>
  		<artifactId>assertj-core</artifactId>
- 		<version>3.9.1</version>
+ 		<version>3.15.0</version>
  		<scope>test</scope>
  	</dependency>
   </dependencies>

@@ -1,0 +1,55 @@
+name: deploy-on-pr-merge
+
+on:
+  push:
+    branches:
+      - master # snapshot deployment
+  pull_request:
+    types:
+      - closed # pr-labelled deployment (only if PR is merged to master)
+
+jobs:
+  deploy-snapshot:
+    name: deploy snapshot/PR-labelled version
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'master')
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v2
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'adopt'
+          server-id: ${{ github.event_name == 'push' && 'matsim-snapshots' || 'matsim-releases' }} #choose mvn repo
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+
+      - name: Set MATSim version (if PR-labelled version)
+        if: github.event_name == 'pull_request'
+        run: mvn versions:set --batch-mode -DnewVersion=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout | sed 's/SNAPSHOT//')PR${{ github.event.pull_request.number }} -DgenerateBackupPoms=false
+
+      # Build and publish are separated so we start deploying only after all jars are built successfully
+      - name: Build jars
+        run: mvn package --batch-mode -DskipTests
+
+      - name: Publish jars to matsim maven repo
+        # fail at end to deploy as many jars as possible
+        run: mvn deploy --batch-mode --fail-at-end -DskipTests -Dmaven.resources.skip=true -Dmaven.install.skip=true
+        env:
+          MAVEN_USERNAME: ${{ secrets.REPOMATSIM_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.REPOMATSIM_TOKEN }}
+
+    env:
+      MAVEN_OPTS: -Xmx2g

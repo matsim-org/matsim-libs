@@ -1,26 +1,24 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
-/**
- *
- */
 package org.matsim.contrib.drt.analysis;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -41,77 +39,58 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.awt.*;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.*;
-import java.util.Map.Entry;
-
-/**
- * @author jbischoff
- */
-
 public class DrtTripsAnalyser {
 
-	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime,
-																int endTime, int binSize_s) {
-		LinkedList<DrtTrip> alltrips = new LinkedList<>();
-		alltrips.addAll(trips);
-		Collections.sort(alltrips);
+	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime, int endTime,
+			int binSize_s) {
+		LinkedList<DrtTrip> alltrips = new LinkedList<>(trips);
 		DrtTrip currentTrip = alltrips.pollFirst();
-		if (currentTrip.getDepartureTime() > endTime) {
+		if (currentTrip.departureTime > endTime) {
 			Logger.getLogger(DrtTripsAnalyser.class).error("wrong end / start Times for analysis");
 		}
 		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
 			List<DrtTrip> currentList = new ArrayList<>();
-			splitTrips.put(Double.valueOf(time), currentList);
-			while (currentTrip.getDepartureTime() < time + binSize_s) {
+			splitTrips.put((double)time, currentList);
+			while (currentTrip.departureTime < time + binSize_s) {
 				currentList.add(currentTrip);
 				currentTrip = alltrips.pollFirst();
 				if (currentTrip == null) {
 					return splitTrips;
 				}
 			}
-
 		}
 
 		return splitTrips;
-
 	}
 
 	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
-													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
 		Map<Id<Link>, int[]> boardings = new HashMap<>();
 		Map<Id<Link>, int[]> deboardings = new HashMap<>();
-		double actualstartTime = Math.max(startTime, 0.0);
-		int bins = (int)((endTime - actualstartTime) / timeBinSize);
+		int bins = (int)((endTime - startTime) / timeBinSize);
 
 		for (DrtTrip trip : trips) {
-			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
-			int startTimeBin = (int)((trip.getDepartureTime() - startTime) / timeBinSize);
+			int[] board = boardings.getOrDefault(trip.fromLinkId, new int[bins]);
+			int startTimeBin = (int)((trip.departureTime + trip.waitTime - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
 				board[startTimeBin]++;
-				boardings.put(trip.getFromLinkId(), board);
+				boardings.put(trip.fromLinkId, board);
 			}
-			int[] deboard = deboardings.getOrDefault(trip.getToLinkId(), new int[bins]);
-			int arrivalTimeBin = (int)((trip.getArrivalTime() - startTime) / timeBinSize);
+			int[] deboard = deboardings.getOrDefault(trip.toLink, new int[bins]);
+			int arrivalTimeBin = (int)((trip.arrivalTime - startTime) / timeBinSize);
 			if (arrivalTimeBin < bins) {
 				deboard[arrivalTimeBin]++;
-				deboardings.put(trip.getFromLinkId(), deboard);
+				deboardings.put(trip.fromLinkId, deboard);
 			}
 		}
 		writeBoardings(boardingsFile, network, boardings, startTime, timeBinSize, bins, delimiter);
@@ -128,7 +107,7 @@ public class DrtTripsAnalyser {
 			}
 			for (Entry<Id<Link>, int[]> e : boardings.entrySet()) {
 				bw.newLine();
-				Coord coord = network.getLinks().get(e.getKey()).getCoord();
+				Coord coord = network.getLinks().get(e.getKey()).getToNode().getCoord();
 				bw.write(e.getKey().toString() + delimiter + coord.getX() + delimiter + coord.getY());
 				for (int i = 0; i < e.getValue().length; i++) {
 					bw.write(delimiter + e.getValue()[i]);
@@ -141,7 +120,8 @@ public class DrtTripsAnalyser {
 		}
 	}
 
-	public static String summarizeTrips(List<DrtTrip> trips, String delimiter) {
+	public static String summarizeTrips(List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
+			String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
@@ -156,35 +136,28 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue;
 			}
-			waitStats.addValue(trip.getWaitTime());
-			rideStats.addValue(trip.getInVehicleTravelTime());
-			distanceStats.addValue(trip.getTravelDistance());
-			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
-			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
+			waitStats.addValue(trip.waitTime);
+			rideStats.addValue(trip.arrivalTime - trip.departureTime - trip.waitTime);
+			distanceStats.addValue(travelDistances.get(trip.request));
+			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
+			traveltimes.addValue(trip.arrivalTime - trip.departureTime);
 		}
-		String value = format.format(waitStats.getValues().length)
-				+ delimiter
-				+ format.format(waitStats.getMean())
-				+ delimiter
-				+ format.format(waitStats.getMax())
-				+ delimiter
-				+ format.format(waitStats.getPercentile(95))
-				+ delimiter
-				+ format.format(waitStats.getPercentile(75))
-				+ delimiter
-				+ format.format(waitStats.getPercentile(50))
-				+ delimiter
-				+ format.format(rideStats.getMean())
-				+ delimiter
-				+ format.format(distanceStats.getMean())
-				+ delimiter
-				+ format.format(directDistanceStats.getMean())
-				+ delimiter
-				+ format.format(traveltimes.getMean());
-		return value;
+
+		return String.join(delimiter, format.format(waitStats.getValues().length) + "",//
+				format.format(waitStats.getMean()) + "",//
+				format.format(waitStats.getMax()) + "",//
+				format.format(waitStats.getPercentile(95)) + "",//
+				format.format(waitStats.getPercentile(75)) + "",//
+				format.format(waitStats.getPercentile(50)) + "",//
+				format.format(getPercentageWaitTimeBelow(600, waitStats)) + "",//
+				format.format(getPercentageWaitTimeBelow(900, waitStats)) + "",//
+				format.format(rideStats.getMean()) + "",//
+				format.format(distanceStats.getMean()) + "",//
+				format.format(directDistanceStats.getMean()) + "",//
+				format.format(traveltimes.getMean()));
 	}
 
 	public static double getDirectDistanceMean(List<DrtTrip> trips) {
@@ -192,54 +165,49 @@ public class DrtTripsAnalyser {
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue;
 			}
 
-			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
+			directDistanceStats.addValue(trip.unsharedDistanceEstimate_m);
 		}
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg,
-									  String fileName, boolean createGraphs) {
+	public static void analyseDetours(Network network, List<DrtTrip> trips, Map<Id<Request>, Double> travelDistances,
+			DrtConfigGroup drtCfg, String fileName, boolean createGraphs) {
 		if (trips == null)
 			return;
 
-		List<String> detours = new ArrayList<String>();
+		List<String> detours = new ArrayList<>();
 		XYSeries distances = new XYSeries("distances");
 		XYSeries travelTimes = new XYSeries("travel times");
 		XYSeries rideTimes = new XYSeries("ride times");
 
 		for (DrtTrip trip : trips) {
-			if (trip.getToLinkId() == null) {
+			if (trip.toLink == null) {
 				continue; // unfinished trip (simulation stopped before arrival)
 			}
 
-			double travelTime = trip.getInVehicleTravelTime() + trip.getWaitTime();
-			distances.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
-			travelTimes.add(travelTime, trip.getUnsharedTimeEstimate_m());
-			rideTimes.add(trip.getInVehicleTravelTime(), trip.getUnsharedTimeEstimate_m());
+			double travelDistance = travelDistances.get(trip.request);
+			double travelTime = trip.arrivalTime - trip.departureTime;
+			distances.add(travelDistance, trip.unsharedDistanceEstimate_m);
+			travelTimes.add(travelTime, trip.unsharedTimeEstimate_m);
+			rideTimes.add(trip.arrivalTime - trip.departureTime - trip.waitTime, trip.unsharedTimeEstimate_m);
 
-			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
-			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
-			detours.add(trip.getPerson()
-					+ ";"
-					+ trip.getTravelDistance()
-					+ ";"
-					+ trip.getUnsharedDistanceEstimate_m()
-					+ ";"
-					+ distanceDetour
-					+ ";"
-					+ travelTime
-					+ ";"
-					+ trip.getUnsharedTimeEstimate_m()
-					+ ";"
-					+ timeDetour);
+			double distanceDetour = travelDistance / trip.unsharedDistanceEstimate_m;
+			double timeDetour = travelTime / trip.unsharedTimeEstimate_m;
+			detours.add(String.join(";", trip.person + "",//
+					travelDistance + "",//
+					trip.unsharedDistanceEstimate_m + "",//
+					distanceDetour + "",//
+					travelTime + "",//
+					trip.unsharedTimeEstimate_m + "",//
+					timeDetour + ""));
 		}
 
 		collection2Text(detours, fileName + ".csv",
-				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
+				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour", String::toString);
 
 		if (createGraphs) {
 			final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
@@ -259,11 +227,10 @@ public class DrtTripsAnalyser {
 	}
 
 	public static void analyseWaitTimes(String fileName, List<DrtTrip> trips, int binsize_s, boolean createGraphs) {
-		Collections.sort(trips);
 		if (trips.size() == 0)
 			return;
-		int startTime = ((int)(trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
-		int endTime = ((int)(trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
+		int startTime = ((int)(trips.get(0).departureTime / binsize_s)) * binsize_s;
+		int endTime = ((int)(trips.get(trips.size() - 1).departureTime / binsize_s) + binsize_s) * binsize_s;
 		Map<Double, List<DrtTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
@@ -298,7 +265,7 @@ public class DrtTripsAnalyser {
 				if (!e.getValue().isEmpty()) {
 					DescriptiveStatistics stats = new DescriptiveStatistics();
 					for (DrtTrip t : e.getValue()) {
-						stats.addValue(t.getWaitTime());
+						stats.addValue(t.waitTime);
 					}
 					rides = stats.getN();
 					averageWait = stats.getMean();
@@ -319,25 +286,16 @@ public class DrtTripsAnalyser {
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
 				requests.addOrUpdate(h, rides * 3600. / binsize_s);// normalised [req/h]
 				bw.newLine();
-				bw.write(Time.writeTime(e.getKey())
-						+ ";"
-						+ rides
-						+ ";"
-						+ format.format(averageWait)
-						+ ";"
-						+ format.format(min)
-						+ ";"
-						+ format.format(p_5)
-						+ ";"
-						+ format.format(p_25)
-						+ ";"
-						+ format.format(median)
-						+ ";"
-						+ format.format(p_75)
-						+ ";"
-						+ format.format(p_95)
-						+ ";"
-						+ format.format(max));
+				bw.write(String.join(";", Time.writeTime(e.getKey()) + "",//
+						rides + "",//
+						format.format(averageWait) + "",//
+						format.format(min) + "",//
+						format.format(p_5) + "",//
+						format.format(p_25) + "",//
+						format.format(median) + "",//
+						format.format(p_75) + "",//
+						format.format(p_95) + "",//
+						format.format(max) + ""));
 
 			}
 			bw.flush();
@@ -385,16 +343,16 @@ public class DrtTripsAnalyser {
 		return chart;
 	}
 
-	public static <T> void collection2Text(Collection<T> c, String filename, String header) {
+	public static <T> void collection2Text(Collection<T> c, String filename, String header,
+			Function<T, String> toStringFunction) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
 			if (header != null) {
 				bw.write(header);
 				bw.newLine();
 			}
-			for (Iterator<T> iterator = c.iterator(); iterator.hasNext(); ) {
-
-				bw.write(iterator.next().toString());
+			for (T t : c) {
+				bw.write(toStringFunction.apply(t));
 				bw.newLine();
 			}
 			bw.flush();
@@ -408,8 +366,9 @@ public class DrtTripsAnalyser {
 	 * @param vehicleDistances
 	 * @param iterationFilename
 	 */
-	public static void writeVehicleDistances(Map<Id<Vehicle>, double[]> vehicleDistances, String iterationFilename) {
-		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;revenueDistance_pm";
+	public static void writeVehicleDistances(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
+			String iterationFilename) {
+		String header = "vehicleId;drivenDistance_m;occupiedDistance_m;emptyDistance_m;passengerDistanceTraveled_pm";
 		BufferedWriter bw = IOUtils.getBufferedWriter(iterationFilename);
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -418,21 +377,16 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 		try {
 			bw.write(header);
-			for (Entry<Id<Vehicle>, double[]> e : vehicleDistances.entrySet()) {
-				double drivenDistance = e.getValue()[0];
-				double revenueDistance = e.getValue()[1];
-				double occDistance = e.getValue()[2];
-				double emptyDistance = drivenDistance - occDistance;
+			bw.newLine();
+			for (Entry<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> e : vehicleDistances.entrySet()) {
+				var vehicleId = e.getKey();
+				var vehicleState = e.getValue();
+				bw.write(vehicleId + ";"//
+						+ format.format(vehicleState.totalDistance) + ";"//
+						+ format.format(vehicleState.totalOccupiedDistance) + ";"//
+						+ format.format(vehicleState.totalDistanceByOccupancy[0]) + ";"//
+						+ format.format(vehicleState.totalPassengerTraveledDistance));
 				bw.newLine();
-				bw.write(e.getKey().toString()
-						+ ";"
-						+ format.format(drivenDistance)
-						+ ";"
-						+ format.format(occDistance)
-						+ ";"
-						+ format.format(emptyDistance)
-						+ ";"
-						+ format.format(revenueDistance));
 			}
 			bw.flush();
 			bw.close();
@@ -447,7 +401,8 @@ public class DrtTripsAnalyser {
 	 * @param del              Delimiter tag
 	 * @return
 	 */
-	public static String summarizeVehicles(Map<Id<Vehicle>, double[]> vehicleDistances, String del) {
+	public static String summarizeVehicles(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances,
+			String del) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -455,43 +410,32 @@ public class DrtTripsAnalyser {
 		format.setGroupingUsed(false);
 
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		DescriptiveStatistics revenue = new DescriptiveStatistics();
+		DescriptiveStatistics passengerTraveledDistance = new DescriptiveStatistics();
 		DescriptiveStatistics occupied = new DescriptiveStatistics();
 		DescriptiveStatistics empty = new DescriptiveStatistics();
 
-		for (double[] dist : vehicleDistances.values()) {
-			driven.addValue(dist[0]);
-			revenue.addValue(dist[1]);
-			occupied.addValue(dist[2]);
-			double emptyD = dist[0] - dist[2];
-			empty.addValue(emptyD);
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
+			driven.addValue(state.totalDistance);
+			passengerTraveledDistance.addValue(state.totalPassengerTraveledDistance);
+			occupied.addValue(state.totalOccupiedDistance);
+			empty.addValue(state.totalDistanceByOccupancy[0]);
 		}
-		double d_r_d_t = revenue.getSum() / driven.getSum();
-		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
-		String result = vehicleDistances.size()
-				+ del
-				+ format.format(driven.getSum())
-				+ del
-				+ format.format(empty.getSum())
-				+ del
-				+ format.format(empty.getSum() / driven.getSum())
-				+ del
-				+ format.format(revenue.getSum())
-				+ del
-				+ format.format(driven.getMean())
-				+ del
-				+ format.format(empty.getMean())
-				+ del
-				+ format.format(revenue.getMean())
-				+ del
-				+ format.format(d_r_d_t);
-		return result;
+		double d_p_d_t = passengerTraveledDistance.getSum() / driven.getSum();
+		return String.join(del, vehicleDistances.size() + "",//
+				format.format(driven.getSum()) + "",//
+				format.format(empty.getSum()) + "",//
+				format.format(empty.getSum() / driven.getSum()) + "",//
+				format.format(passengerTraveledDistance.getSum()) + "",//
+				format.format(driven.getMean()) + "",//
+				format.format(empty.getMean()) + "",//
+				format.format(passengerTraveledDistance.getMean()) + "",//
+				format.format(d_p_d_t) + "");
 	}
 
-	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {
+	public static double getTotalDistance(Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances) {
 		DescriptiveStatistics driven = new DescriptiveStatistics();
-		for (double[] dist : vehicleDistances.values()) {
-			driven.addValue(dist[0]);
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
+			driven.addValue(state.totalDistance);
 		}
 		return driven.getSum();
 	}
@@ -509,8 +453,8 @@ public class DrtTripsAnalyser {
 				.getAsInt();
 	}
 
-	public static String summarizeDetailedOccupancyStats(Map<Id<Vehicle>, double[]> vehicleDistances, String del,
-			int maxcap) {
+	public static String summarizeDetailedOccupancyStats(
+			Map<Id<Vehicle>, DrtVehicleDistanceStats.VehicleState> vehicleDistances, String del, int maxcap) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
 		format.setMinimumIntegerDigits(1);
@@ -519,18 +463,27 @@ public class DrtTripsAnalyser {
 
 		double[] sum = new double[maxcap + 1];
 
-		for (double[] dist : vehicleDistances.values()) {
-			double emptyD = dist[0] - dist[2];
-			sum[0] += emptyD;
-			for (int i = 3; i < maxcap + 3; i++) {
-				sum[i - 2] += dist[i];
+		for (DrtVehicleDistanceStats.VehicleState state : vehicleDistances.values()) {
+			for (int i = 0; i <= maxcap; i++) {
+				sum[i] += state.totalDistanceByOccupancy[i];
 			}
 		}
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (int i = 0; i <= maxcap; i++) {
-			result = result + ";" + format.format(sum[i]);
+			result.append(";").append(format.format(sum[i]));
 		}
 
-		return result;
+		return result.toString();
+	}
+
+	public static double getPercentageWaitTimeBelow(int timeCriteria, DescriptiveStatistics stats) {
+		double[] waitingTimes = stats.getValues();
+
+		if (waitingTimes.length == 0) {
+			return Double.NaN; // to be consistent with DescriptiveStatistics
+		}
+
+		double count = (double)Arrays.stream(waitingTimes).filter(t -> t < timeCriteria).count();
+		return count * 100 / waitingTimes.length;
 	}
 }

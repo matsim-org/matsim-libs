@@ -30,42 +30,40 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-                new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data,f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", f.schedule.getFacilities().size(), map.size());
 
-        assertTravelInfo(map, 0 , "23", 1, "07:41:00", "08:14:06"); // transfer at C, 7:50/8:02 blue, walk at A
+        assertTravelInfo(map, 0 , "23", 1, "07:41:00", "08:14:07"); // transfer at C, 7:50/8:02 blue, walk at A
         assertTravelInfo(map, 1 , "23", 1, "07:41:00", "08:14:00"); // transfer at C, 7:50/8:02 blue
-        assertTravelInfo(map, 2 , "23", 1, "07:41:00", "08:09:06"); // transfer at C, 7:50/8:02 blue, walk at B
+        assertTravelInfo(map, 2 , "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:02 blue, walk at B
         assertTravelInfo(map, 3 , "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:02 blue
-        assertTravelInfo(map, 4 , "23", 0, "07:41:00", "07:50:03"); // transfer at C, 7:50, walk 3 seconds (2 meters)
-        assertTravelInfo(map, 5 , "23", 0, "07:41:00", "07:50:03"); // transfer at C, 7:50, walk 3 seconds (2 meters)
+        assertTravelInfo(map, 4 , "23", 0, "07:41:00", "07:50:04"); // transfer at C, 7:50, walk 3.12 (-> 4) seconds (2.6 meters)
+        assertTravelInfo(map, 5 , "23", 0, "07:41:00", "07:50:04"); // transfer at C, 7:50, walk 3.12 (-> 4) seconds (2.6 meters)
         assertTravelInfo(map, 6 , "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:02 blue
-        assertTravelInfo(map, 7 , "23", 1, "07:41:00", "08:09:06"); // transfer at C, 7:50/8:02 blue, walk at D
+        assertTravelInfo(map, 7 , "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:02 blue, walk at D
         assertTravelInfo(map, 8 , "23", 1, "07:41:00", "08:16:00"); // transfer at C, 7:50/8:02 blue
-        assertTravelInfo(map, 9 , "23", 1, "07:41:00", "08:16:06"); // transfer at C, 7:50/8:02 blue, walk at E
+        assertTravelInfo(map, 9 , "23", 1, "07:41:00", "08:16:07"); // transfer at C, 7:50/8:02 blue, walk at E
         assertTravelInfo(map, 10, "23", 1, "07:41:00", "08:23:00"); // transfer at C, 7:50/8:02 blue (travelling to 11 and transferring would be faster, but not cheaper!
         assertTravelInfo(map, 11, "23", 2, "07:41:00", "08:19:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
         assertTravelInfo(map, 12, "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:00 red
-        assertTravelInfo(map, 13, "23", 1, "07:41:00", "08:09:06"); // transfer at C, 7:50/8:00 red, walk 4 meters / 6 seconds
+        assertTravelInfo(map, 13, "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:00 red, walk 4 meters / 7 seconds
         assertTravelInfo(map, 14, "23", 2, "07:41:00", "08:19:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
-        assertTravelInfo(map, 15, "23", 2, "07:41:00", "08:19:06"); // same as [14], then walk
+        assertTravelInfo(map, 15, "23", 2, "07:41:00", "08:19:07"); // same as [14], then walk
         assertTravelInfo(map, 16, "23", 2, "07:41:00", "08:24:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
-        assertTravelInfo(map, 17, "23", 2, "07:41:00", "08:24:06"); // same as [16], then walk
+        assertTravelInfo(map, 17, "23", 2, "07:41:00", "08:24:07"); // same as [16], then walk
         assertTravelInfo(map, 18, "23", 0, "07:41:00", "07:50:00"); // directly reachable
         assertTravelInfo(map, 19, "23", 1, "07:41:00", "08:01:00"); // transfer at C, 7:50/7:51 green
         assertTravelInfo(map, 20, "23", 1, "07:41:00", "08:11:00"); // transfer at C, 7:50/7:51 green
-        assertTravelInfo(map, 21, "23", 1, "07:41:00", "08:09:03"); // transfer at C, 7:50/8:00 red, walk 2 meters / 3 seconds
+        assertTravelInfo(map, 21, "23", 1, "07:41:00", "08:09:04"); // transfer at C, 7:50/8:00 red, walk 2.6 meters / 4 seconds
         assertTravelInfo(map, 22, "23", 2, "07:41:00", "08:21:00"); // transfer at C, 7:50/8:00 red, transfer at G 8:09/8:11
         assertTravelInfo(map, 23, "23", 0, "07:40:00", "07:40:00"); // our start location
     }
@@ -75,17 +73,15 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", 20, map.size());
 
@@ -93,8 +89,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 1 , "23", 1, "07:41:00", "08:14:00"); // transfer at C, 7:50/8:02 blue
         Assert.assertNull(map.get(Id.create(2, TransitStopFacility.class))); // unreachable
         assertTravelInfo(map, 3 , "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:02 blue
-        assertTravelInfo(map, 4 , "23", 0, "07:41:00", "07:50:03"); // transfer at C, 7:50, walk 3 seconds (2 meters)
-        assertTravelInfo(map, 5 , "23", 0, "07:41:00", "07:50:03"); // transfer at C, 7:50, walk 3 seconds (2 meters)
+        assertTravelInfo(map, 4 , "23", 0, "07:41:00", "07:50:04"); // transfer at C, 7:50, walk 3.12 (-> 4) seconds (2.6 meters)
+        assertTravelInfo(map, 5 , "23", 0, "07:41:00", "07:50:04"); // transfer at C, 7:50, walk 3.12 (-> 4) seconds (2.6 meters)
         assertTravelInfo(map, 6 , "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:02 blue
         assertTravelInfo(map, 7 , "23", 2, "07:41:00", "08:33:00"); // transfer at C, 7:50/8:00 red, transfer at G 8:09/8.12
         assertTravelInfo(map, 8 , "23", 1, "07:41:00", "08:16:00"); // transfer at C, 7:50/8:02 blue
@@ -102,7 +98,7 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 10, "23", 1, "07:41:00", "08:23:00"); // transfer at C, 7:50/8:02 blue (travelling to 11 and transferring would be faster, but not cheaper!
         assertTravelInfo(map, 11, "23", 2, "07:41:00", "08:19:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
         assertTravelInfo(map, 12, "23", 1, "07:41:00", "08:09:00"); // transfer at C, 7:50/8:00 red
-        assertTravelInfo(map, 13, "23", 1, "07:41:00", "08:09:06"); // transfer at C, 7:50/8:00 red, walk 4 meters / 6 seconds
+        assertTravelInfo(map, 13, "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:00 red, walk 4 meters / 7 seconds
         assertTravelInfo(map, 14, "23", 2, "07:41:00", "08:19:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
         Assert.assertNull(map.get(Id.create(15, TransitStopFacility.class))); // unreachable
         assertTravelInfo(map, 16, "23", 2, "07:41:00", "08:24:00"); // transfer at C, 7:50/8:00 red, transfer at G, 8:09/8:12
@@ -110,7 +106,7 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 18, "23", 0, "07:41:00", "07:50:00"); // directly reachable
         assertTravelInfo(map, 19, "23", 1, "07:41:00", "08:01:00"); // transfer at C, 7:50/7:51 green
         assertTravelInfo(map, 20, "23", 1, "07:41:00", "08:11:00"); // transfer at C, 7:50/7:51 green
-        assertTravelInfo(map, 21, "23", 1, "07:41:00", "08:09:03"); // transfer at C, 7:50/8:00 red, walk 2 meters / 3 seconds
+        assertTravelInfo(map, 21, "23", 1, "07:41:00", "08:09:04"); // transfer at C, 7:50/8:00 red, walk 2.6 meters / 3.12 (-> 4) seconds
         assertTravelInfo(map, 22, "23", 2, "07:41:00", "08:21:00"); // transfer at C, 7:50/8:00 red, transfer at G 8:09/8:11
         assertTravelInfo(map, 23, "23", 0, "07:40:00", "07:40:00"); // our start location
     }
@@ -122,43 +118,41 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 50*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         // latest departure on green line is at 07:51, so we'll miss some stops!
         Assert.assertEquals("wrong number of reached stops.", 21, map.size());
 
-        assertTravelInfo(map, 0 , "23", 1, "07:51:00", "08:14:06"); // same as [1], then walk
+        assertTravelInfo(map, 0 , "23", 1, "07:51:00", "08:14:07"); // same as [1], then walk
         assertTravelInfo(map, 1 , "23", 1, "07:51:00", "08:14:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 2 , "23", 1, "07:51:00", "08:09:06"); // same as [3], then walk
+        assertTravelInfo(map, 2 , "23", 1, "07:51:00", "08:09:07"); // same as [3], then walk
         assertTravelInfo(map, 3 , "23", 1, "07:51:00", "08:09:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 4 , "23", 0, "07:51:00", "08:00:03"); // transfer at C, 8:00, walk 3 seconds (2 meters)
-        assertTravelInfo(map, 5 , "23", 0, "07:51:00", "08:00:03"); // transfer at C, 8:00, walk 3 seconds (2 meters)
+        assertTravelInfo(map, 4 , "23", 0, "07:51:00", "08:00:04"); // transfer at C, 8:00, walk 3.12 (-> 4) seconds (2 meters)
+        assertTravelInfo(map, 5 , "23", 0, "07:51:00", "08:00:04"); // transfer at C, 8:00, walk 3.12 (-> 4) seconds (2 meters)
         assertTravelInfo(map, 6 , "23", 1, "07:51:00", "08:09:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 7 , "23", 1, "07:51:00", "08:09:06"); // same as [6], then walk
+        assertTravelInfo(map, 7 , "23", 1, "07:51:00", "08:09:07"); // same as [6], then walk
         assertTravelInfo(map, 8 , "23", 1, "07:51:00", "08:16:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 9 , "23", 1, "07:51:00", "08:16:06"); // same as [8], then walk
+        assertTravelInfo(map, 9 , "23", 1, "07:51:00", "08:16:07"); // same as [8], then walk
         assertTravelInfo(map, 10, "23", 1, "07:51:00", "08:23:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 11, "23", 1, "07:51:00", "08:23:06"); // same as [10], then walk
+        assertTravelInfo(map, 11, "23", 1, "07:51:00", "08:23:07"); // same as [10], then walk
         assertTravelInfo(map, 12, "23", 1, "07:51:00", "08:28:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 13, "23", 1, "07:51:00", "08:28:06"); // transfer at C, 8:00/8:02 blue, walk (4 meters) (transfer to red line is allowed)
+        assertTravelInfo(map, 13, "23", 1, "07:51:00", "08:28:07"); // transfer at C, 8:00/8:02 blue, walk (4 meters) (transfer to red line is allowed)
         assertTravelInfo(map, 14, "23", 1, "07:51:00", "08:39:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 15, "23", 1, "07:51:00", "08:39:06"); // same as [14], then walk
+        assertTravelInfo(map, 15, "23", 1, "07:51:00", "08:39:07"); // same as [14], then walk
         assertTravelInfo(map, 16, "23", 1, "07:51:00", "08:44:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 17, "23", 1, "07:51:00", "08:44:06"); // same as [16], then walk
+        assertTravelInfo(map, 17, "23", 1, "07:51:00", "08:44:07"); // same as [16], then walk
         assertTravelInfo(map, 18, "23", 0, "07:51:00", "08:00:00"); // directly reachable
         Assert.assertNull(map.get(Id.create(19, TransitStopFacility.class))); // unreachable
         Assert.assertNull(map.get(Id.create(20, TransitStopFacility.class)));
-        assertTravelInfo(map, 21, "23", 1, "07:51:00", "08:28:03"); // transfer at C, 8:00/8:01 green, walk 2 meters / 3 seconds
+        assertTravelInfo(map, 21, "23", 1, "07:51:00", "08:28:04"); // transfer at C, 8:00/8:01 green, walk 2 meters / 3.12 (-> 4) seconds
         Assert.assertNull(map.get(Id.create(22, TransitStopFacility.class)));
         assertTravelInfo(map, 23, "23", 0, "07:50:00", "07:50:00"); // our start location
     }
@@ -168,17 +162,15 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 50*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         // latest departure on green line is at 07:51, so we'll miss some stops!
         Assert.assertEquals("wrong number of reached stops.", 14, map.size());
@@ -187,8 +179,8 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 1 , "23", 1, "07:51:00", "08:14:00"); // transfer at C, 8:00/8:02 blue
         Assert.assertNull(map.get(Id.create(2, TransitStopFacility.class))); // unreachable
         assertTravelInfo(map, 3 , "23", 1, "07:51:00", "08:09:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 4 , "23", 0, "07:51:00", "08:00:03"); // transfer at C, 8:00, walk 3 seconds (2 meters)
-        assertTravelInfo(map, 5 , "23", 0, "07:51:00", "08:00:03"); // transfer at C, 8:00, walk 3 seconds (2 meters)
+        assertTravelInfo(map, 4 , "23", 0, "07:51:00", "08:00:04"); // transfer at C, 8:00, walk 3.12 (-> 4) seconds (2.6 meters)
+        assertTravelInfo(map, 5 , "23", 0, "07:51:00", "08:00:04"); // transfer at C, 8:00, walk 3.12 (-> 4) seconds (2.6 meters)
         assertTravelInfo(map, 6 , "23", 1, "07:51:00", "08:09:00"); // transfer at C, 8:00/8:02 blue
         Assert.assertNull(map.get(Id.create(7, TransitStopFacility.class))); // unreachable, no more departures at C(red) or G(blue)
         assertTravelInfo(map, 8 , "23", 1, "07:51:00", "08:16:00"); // transfer at C, 8:00/8:02 blue
@@ -196,7 +188,7 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 10, "23", 1, "07:51:00", "08:23:00"); // transfer at C, 8:00/8:02 blue
         Assert.assertNull(map.get(Id.create(11, TransitStopFacility.class))); // unreachable, no more departures at C(red) or G(blue)
         assertTravelInfo(map, 12, "23", 1, "07:51:00", "08:28:00"); // transfer at C, 8:00/8:02 blue
-        assertTravelInfo(map, 13, "23", 1, "07:51:00", "08:28:06"); // transfer at C, 8:00/8:02 blue, walk (4 meters) (transfer to red line is allowed)
+        assertTravelInfo(map, 13, "23", 1, "07:51:00", "08:28:07"); // transfer at C, 8:00/8:02 blue, walk (4 meters) (transfer to red line is allowed)
         assertTravelInfo(map, 14, "23", 1, "07:51:00", "08:39:00"); // transfer at C, 8:00/8:02 blue
         Assert.assertNull(map.get(Id.create(15, TransitStopFacility.class))); // unreachable
         assertTravelInfo(map, 16, "23", 1, "07:51:00", "08:44:00"); // transfer at C, 8:00/8:02 blue
@@ -204,7 +196,7 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 18, "23", 0, "07:51:00", "08:00:00"); // directly reachable
         Assert.assertNull(map.get(Id.create(19, TransitStopFacility.class))); // unreachable
         Assert.assertNull(map.get(Id.create(20, TransitStopFacility.class)));
-        assertTravelInfo(map, 21, "23", 1, "07:51:00", "08:28:03"); // transfer at C, 8:00/8:01 green, walk 2 meters / 3 seconds
+        assertTravelInfo(map, 21, "23", 1, "07:51:00", "08:28:04"); // transfer at C, 8:00/8:01 green, walk 2.6 meters / 4 seconds
         Assert.assertNull(map.get(Id.create(22, TransitStopFacility.class)));
         assertTravelInfo(map, 23, "23", 0, "07:50:00", "07:50:00"); // our start location
     }
@@ -216,10 +208,8 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -230,32 +220,32 @@ public class SwissRailRaptorTreeTest {
         List<TransitStopFacility> fromStops = new ArrayList<>();
         fromStops.add(fromStopB);
         fromStops.add(fromStopH);
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", f.schedule.getFacilities().size(), map.size());
 
-        assertTravelInfo(map, 0 ,  "2", 0, "07:49:00", "07:54:06"); // initial transfer at B (not counted), walk at A
+        assertTravelInfo(map, 0 ,  "2", 0, "07:49:00", "07:54:07"); // initial transfer at B (not counted), walk at A
         assertTravelInfo(map, 1 ,  "2", 0, "07:49:00", "07:54:00"); // initial transfer at B (not counted)
         assertTravelInfo(map, 2 ,  "2", 0, "07:30:00", "07:30:00"); // from B, we started here
-        assertTravelInfo(map, 3 ,  "2", 0, "07:30:06", "07:30:06"); // from B, walk
+        assertTravelInfo(map, 3 ,  "2", 0, "07:30:07", "07:30:07"); // from B, walk
         assertTravelInfo(map, 4 ,  "2", 0, "07:33:00", "07:38:00"); // from B, directly reachable
-        assertTravelInfo(map, 5 ,  "2", 0, "07:33:00", "07:38:06"); // same as [4], then walk
+        assertTravelInfo(map, 5 ,  "2", 0, "07:33:00", "07:38:07"); // same as [4], then walk
         assertTravelInfo(map, 6 ,  "2", 0, "07:33:00", "07:49:00"); // from B, directly reachable
-        assertTravelInfo(map, 7 ,  "2", 0, "07:33:00", "07:49:06"); // same as [6], then walk
+        assertTravelInfo(map, 7 ,  "2", 0, "07:33:00", "07:49:07"); // same as [6], then walk
         assertTravelInfo(map, 8 ,  "2", 0, "07:33:00", "07:56:00"); // from B, directly reachable
-        assertTravelInfo(map, 9 ,  "2", 0, "07:33:00", "07:56:06"); // same as [8], then walk
+        assertTravelInfo(map, 9 ,  "2", 0, "07:33:00", "07:56:07"); // same as [8], then walk
         assertTravelInfo(map, 10,  "2", 0, "07:33:00", "08:03:00"); // from B, directly reachable (would be faster from H, but not cheaper due to the transfer penalty at the end)
         assertTravelInfo(map, 11, "15", 0, "07:43:00", "07:59:00"); // from H, directly reachable
-        assertTravelInfo(map, 12, "15", 0, "07:43:00", "07:48:06"); // same as [13], then walk
+        assertTravelInfo(map, 12, "15", 0, "07:43:00", "07:48:07"); // same as [13], then walk
         assertTravelInfo(map, 13, "15", 0, "07:43:00", "07:48:00"); // from H, directly reachable
-        assertTravelInfo(map, 14, "15", 0, "07:30:06", "07:30:06"); // same as [15], then walk
+        assertTravelInfo(map, 14, "15", 0, "07:30:07", "07:30:07"); // same as [15], then walk
         assertTravelInfo(map, 15, "15", 0, "07:30:00", "07:30:00"); // from H, we started here
         assertTravelInfo(map, 16, "15", 0, "07:39:00", "07:44:00"); // from H[14]
-        assertTravelInfo(map, 17, "15", 0, "07:39:00", "07:44:06"); // same as [16], then walk
-        assertTravelInfo(map, 18,  "2", 0, "07:33:00", "07:38:03"); // same as [2], then walk
+        assertTravelInfo(map, 17, "15", 0, "07:39:00", "07:44:07"); // same as [16], then walk
+        assertTravelInfo(map, 18,  "2", 0, "07:33:00", "07:38:04"); // same as [2], then walk
         assertTravelInfo(map, 19,  "2", 1, "07:33:00", "07:51:00"); // from B, transfer at C, 7:38/7:41 green
         assertTravelInfo(map, 20,  "2", 1, "07:33:00", "08:01:00"); // from B, transfer at C, 7:38/7:41 green
-        assertTravelInfo(map, 21, "15", 0, "07:43:00", "07:48:03"); // from H, transfer at G (walk)
+        assertTravelInfo(map, 21, "15", 0, "07:43:00", "07:48:04"); // from H, transfer at G (walk)
         assertTravelInfo(map, 22, "15", 1, "07:43:00", "08:01:00"); // from H, transfer at G, 7:48/7:51 green
         assertTravelInfo(map, 23, "15", 1, "07:43:00", "08:11:00"); // from H, transfer at G, 7:48/7:51 green
     }
@@ -265,10 +255,8 @@ public class SwissRailRaptorTreeTest {
         Fixture f = new Fixture();
         f.init();
 
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -279,7 +267,7 @@ public class SwissRailRaptorTreeTest {
         List<TransitStopFacility> fromStops = new ArrayList<>();
         fromStops.add(fromStopB);
         fromStops.add(fromStopH);
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStops, depTime, raptorParams, null);
 
         Assert.assertEquals("wrong number of reached stops.", 22, map.size());
 
@@ -301,10 +289,10 @@ public class SwissRailRaptorTreeTest {
         assertTravelInfo(map, 15, "15", 0, "07:30:00", "07:30:00"); // from H, we started here
         assertTravelInfo(map, 16,  "2", 0, "07:33:00", "08:24:00"); // from B, directly reachable
         Assert.assertNull(map.get(Id.create(17, TransitStopFacility.class))); // unreachable
-        assertTravelInfo(map, 18,  "2", 0, "07:33:00", "07:38:03"); // from B, transfer at C, 7:38 (walk 2m)
+        assertTravelInfo(map, 18,  "2", 0, "07:33:00", "07:38:04"); // from B, transfer at C, 7:38 (walk 2.6m)
         assertTravelInfo(map, 19,  "2", 1, "07:33:00", "07:51:00"); // from B, transfer at C, 7:38/7:41 green
         assertTravelInfo(map, 20,  "2", 1, "07:33:00", "08:01:00"); // from B, transfer at C, 7:38/7:41 green
-        assertTravelInfo(map, 21, "15", 0, "07:43:00", "07:48:03"); // from H, transfer at G (walk)
+        assertTravelInfo(map, 21, "15", 0, "07:43:00", "07:48:04"); // from H, transfer at G (walk)
         assertTravelInfo(map, 22, "15", 1, "07:43:00", "08:01:00"); // from H, transfer at G, 7:48/7:51 green
         assertTravelInfo(map, 23, "15", 1, "07:43:00", "08:11:00"); // from H, transfer at G, 7:48/7:51 green
     }
@@ -316,22 +304,20 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Id<TransitStopFacility> stop19id = Id.create(19, TransitStopFacility.class);
         assertTravelInfo(map, 19, "23", 1, "07:41:00", "08:01:00"); // transfer at C, 7:50/7:51 green
         TravelInfo info0740 = map.get(stop19id);
-        TravelInfo info0739 = raptor.calcTree(fromStop, 7*3600 + 39*60, raptorParams).get(stop19id);
+        TravelInfo info0739 = raptor.calcTree(fromStop, 7*3600 + 39*60, raptorParams, null).get(stop19id);
 
         Assert.assertEquals("departure time should be the same.", info0740.ptDepartureTime, info0739.ptDepartureTime, 0.0);
         Assert.assertEquals("arrival time should be the same.", info0740.ptArrivalTime, info0739.ptArrivalTime, 0.0);
@@ -351,20 +337,18 @@ public class SwissRailRaptorTreeTest {
 
         RaptorStaticConfig config = RaptorUtils.createStaticConfig(f.config);
         config.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
-        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
-        DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
-        SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder );
+        SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), null, config, f.scenario.getNetwork(), null);
+        SwissRailRaptor raptor = new SwissRailRaptor.Builder(data, f.scenario.getConfig()).build();
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
         // start with a stop on the green line
         TransitStopFacility fromStop = f.schedule.getFacilities().get(Id.create(23, TransitStopFacility.class));
         double depTime = 7*3600 + 40*60;
-        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams);
+        Map<Id<TransitStopFacility>, TravelInfo> map = raptor.calcTree(fromStop, depTime, raptorParams, null);
 
         Id<TransitStopFacility> stop2id = Id.create(2, TransitStopFacility.class);
-        assertTravelInfo(map, 2 , "23", 1, "07:41:00", "08:09:06"); // transfer at C, 7:50/8:02 blue, walk at B
+        assertTravelInfo(map, 2 , "23", 1, "07:41:00", "08:09:07"); // transfer at C, 7:50/8:02 blue, walk at B
         TravelInfo info = map.get(stop2id);
 
         RaptorRoute route = info.getRaptorRoute();

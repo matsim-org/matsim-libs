@@ -20,26 +20,25 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.NodeTransition;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
+
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
 
 /**
  * Represents a node in the QSimulation.
@@ -49,34 +48,65 @@ final class QNodeImpl extends AbstractQNode {
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
 		private final NetsimEngineContext context;
-		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context ) {
+		private final QSimConfigGroup qsimConfig;
+		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context, QSimConfigGroup qsimConfig ) {
 			this.netsimEngine = netsimEngine2;
 			this.context = context;
+			this.qsimConfig = qsimConfig;
 		}
 		private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
 		public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {
 			this.turnAcceptanceLogic = turnAcceptanceLogic ;
 		}
 		public QNodeImpl build( Node n ) {
-			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic ) ;
+			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic, qsimConfig ) ;
 		}
 	}
 	
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
-	
+	private Double[] inLinkPriorities;
 	
 	private final Random random;
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
 	
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
-	
-	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, TurnAcceptanceLogic turnAcceptanceLogic) {
+	private NodeTransition nodeTransitionLogic;
+	private boolean stopMoveNodeWhenSingleOutlinkFull;
+	private boolean atLeastOneOutgoingLaneIsJammed;
+
+	/**
+	 * Checks if capacity is significant positive.
+	 * This allows for a small eps unequal to zero to mitigate rounding errors that can happen
+	 * with non integer capacities.
+	 */
+	private static boolean capacityLeft(double x) {
+		return x > 1E-10;
+	}
+
+	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, 
+			TurnAcceptanceLogic turnAcceptanceLogic, QSimConfigGroup qsimConfig) {
 		super(n) ;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
+		this.nodeTransitionLogic = qsimConfig.getNodeTransitionLogic();
+		
+		switch (nodeTransitionLogic) {
+		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+		case moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull:
+			this.stopMoveNodeWhenSingleOutlinkFull = true;
+			break;
+		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
+		case moveVehByVehRandomDistribution_dontBlockNode:
+			this.stopMoveNodeWhenSingleOutlinkFull = false;
+			break;
+		default:
+			throw new UnsupportedOperationException("Node transition logic " + nodeTransitionLogic + " is not implemented.");
+		}
+		
 		int nofInLinks = n.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
@@ -135,41 +165,196 @@ final class QNodeImpl extends AbstractQNode {
 	@Override
 	public boolean doSimStep(final double now) {
 		
-		int inLinksCounter = 0;
+		if (inLinkPriorities == null) {
+			/* initialize inLink priorities.
+			 * unfortunately, this can't be done in init() because when capacities are changed 
+			 * before controler.run() init() uses the old capacities. theresa, may'20 */ 
+			inLinkPriorities = new Double[inLinksArrayCache.length];
+			for (int inLinkCounter=0; inLinkCounter<this.inLinksArrayCache.length; inLinkCounter++) {
+				double linkCap = this.inLinksArrayCache[inLinkCounter].getLink().getCapacity(now);
+				inLinkPriorities[inLinkCounter] = 1. / linkCap;
+			}
+		}
+		
+		// reset congestion flag
+		this.atLeastOneOutgoingLaneIsJammed = false;
+		
 		double inLinksCapSum = 0.0;
 		// Check all incoming links for buffered agents
-		for (QLinkI link : this.inLinksArrayCache) {
+		for (int inLinkIndex = 0; inLinkIndex < this.inLinksArrayCache.length; inLinkIndex++) {
+			QLinkI link = this.inLinksArrayCache[inLinkIndex];
 			if (!link.isNotOfferingVehicle()) {
-				this.tempLinks[inLinksCounter] = link;
-				inLinksCounter++;
+				this.tempLinks[inLinkIndex] = link;
 				inLinksCapSum += link.getLink().getCapacity(now);
 			}
 		}
 		
-		if (inLinksCounter == 0) {
+		if (!capacityLeft(inLinksCapSum)) {
 			this.setActive(false);
 			return false; // Nothing to do
 		} 
 		
-		// randomize based on capacity
-		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
-			double rndNum = random.nextDouble() * inLinksCapSum;
-			double selCap = 0.0;
-			for (int i = 0; i < inLinksCounter; i++) {
-				QLinkI link = this.tempLinks[i];
-				if (link != null) {
-					selCap += link.getLink().getCapacity(now);
-					if (selCap >= rndNum) {
-						inLinksCapSum -= link.getLink().getCapacity(now);
-						this.tempLinks[i] = null;
-						this.moveLink(link, now);
-						break;
+		// select vehicles to be moved over the node. The order of vehicles selected depends on the chosen node transition logic.
+		switch (nodeTransitionLogic) {
+		case emptyBufferAfterBufferRandomDistribution_dontBlockNode:
+		case emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+			// randomize based on link capacity: select a link; if next links have enough space all vehicles from the buffer are allowed to pass the node
+			while (capacityLeft(inLinksCapSum)) {
+				double rndNum = random.nextDouble() * inLinksCapSum;
+				double selCap = 0.0;
+				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
+					QLinkI link = this.tempLinks[i];
+					if (link != null) {
+						// link is offering vehicles
+						selCap += link.getLink().getCapacity(now);
+						if (selCap >= rndNum) {
+							// try to move vehicles from this link over the node
+							inLinksCapSum -= link.getLink().getCapacity(now);
+							this.tempLinks[i] = null;
+							this.moveLink(link, now);
+							if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
+								// consider intersection as blocked; stop this node sim step
+								return true;
+							}
+							break;
+						}
+					}
+				}
+			}
+			break;
+		case moveVehByVehRandomDistribution_dontBlockNode:
+		case moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull:
+			// randomize based on link capacity: select the vehicles (one by one) that are allowed to pass the node
+			while (capacityLeft(inLinksCapSum)) {
+				double rndNum = random.nextDouble() * inLinksCapSum;
+				double selCap = 0.0;
+				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
+					QLinkI link = this.tempLinks[i];
+					if (link != null) {
+						// link is offering vehicles
+						selCap += link.getLink().getCapacity(now);
+						if (selCap >= rndNum) {
+							// try to move a vehicle from this link over the node
+							if ( ! moveFirstVehicleOnLink(now, link)) {
+								// the link is not able to move (more) vehicles in this time step
+								inLinksCapSum -= link.getLink().getCapacity(now);
+								this.tempLinks[i] = null;
+							} else {
+								// a vehicle has been moved
+							}
+							if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
+								// consider intersection as blocked; stop this node sim step
+								return true;
+							}
+							// select the next link (could be the same again) that is allowed to move a vehicle. I.e. start again with the beginning of the while-loop
+							break;
+						}
+					}
+				}
+			}
+			break;
+		case moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull:
+			// deterministically choose the inLinks vehicle by vehicle based on their capacity and also account for decisions made in previous time steps (i.e. update priorities) to approximate the correct distribution over time.
+			double prioWithWhichTheLastVehWasSent = 0.;
+			while (capacityLeft(inLinksCapSum)) {
+				// look for the inLink with minimal priority that has vehicles in the buffer (use first one when equal, because links are sorted by ID)
+				double minPrio = Float.MAX_VALUE;
+				int prioInLinkIndex = -1;
+				for (int i = 0; i < this.inLinksArrayCache.length; i++) {
+					if (tempLinks[i] != null && 
+							/* compare link priorities with some tolerance (done by comparing the float part of the double).
+							 * otherwise, priorities that should be equal are different when compared as double because its fixed precision
+							 * (e.g. 1/7200 + 1/7200 as double is greater than 1/3600).
+							 * for equal priorities the tie breaking rule is applied (lower link id, see above)
+							 */
+							(float) this.inLinkPriorities[i].doubleValue() < (float) minPrio) {
+						// link is offering vehicles and has lowest priority so far
+						minPrio = this.inLinkPriorities[i];
+						prioInLinkIndex = i;
+					}
+				}
+				QLinkI selectedLink = this.inLinksArrayCache[prioInLinkIndex];
+				
+				// try to move a vehicle from this selected link over the node
+				if ( ! moveFirstVehicleOnLink(now, selectedLink)) {
+					// the link is not able to move (more) vehicles in this time step
+					inLinksCapSum -= selectedLink.getLink().getCapacity(now);
+					this.tempLinks[prioInLinkIndex] = null;
+				} else {
+					// a vehicle has been moved; update priority of the selected link
+					prioWithWhichTheLastVehWasSent = minPrio;
+					this.inLinkPriorities[prioInLinkIndex] += 1. / selectedLink.getLink().getCapacity(now);
+				}
+				if (this.atLeastOneOutgoingLaneIsJammed) {
+					// stopMoveNodeWhenSingleOutlinkFull is always true for this node transition
+					// consider intersection as blocked; stop this node sim step; (*)
+					updatePriorities(now, prioWithWhichTheLastVehWasSent, prioInLinkIndex);
+					return true;
+				}
+				
+				// select the next link (could be the same again) that is allowed to move a vehicle. I.e. start again with the beginning of the while-loop
+			}
+			// vehicle moving done for this time step. update priorities 
+			updatePriorities(now, prioWithWhichTheLastVehWasSent, -1);
+			break;
+		default:
+			throw new UnsupportedOperationException("Node transition logic " + nodeTransitionLogic + " is not implemented.");
+		}
+		
+		return true;
+	}
+
+	private void updatePriorities(final double now, double prioWithWhichTheLastVehWasSent, int linkIndexToBeExcluded) {
+		
+		for (int linkIndex=0; linkIndex < this.inLinkPriorities.length; linkIndex++) {
+			// when the node was blocked (see * above) no priority updating is necessary for the blocked links
+			if (linkIndex != linkIndexToBeExcluded && tempLinks[linkIndex] == null) {	
+				// shift priorities of links that where disabled earlier because of other reasons, e.g. because their buffer was empty or a traffic light showed red,
+				// to the level of the other priorities such that they are not overprioritized in next time steps
+				inLinkPriorities[linkIndex] = prioWithWhichTheLastVehWasSent 
+						+ 1. / inLinksArrayCache[linkIndex].getLink().getCapacity(now);
+			}
+			// shift all priorities around zero accordingly to avoid overflow of double at some time step
+			inLinkPriorities[linkIndex] -= prioWithWhichTheLastVehWasSent;	
+		}
+	}
+
+	/**
+	 * @return <code>true</code> if a vehicle was successfully moved over the node, <code>false</code>
+	 * otherwise (e.g. in case all next links are jammed)
+	 * 
+	 * This logic is only implemented for the case without lanes. When multiple lanes exist for a link, an exception is thrown.
+	 */
+	private boolean moveFirstVehicleOnLink(final double now, QLinkI link) {
+		if (link.getOfferingQLanes().size() > 1) {
+			throw new RuntimeException("The qsim node transition parameter " + NodeTransition.moveVehByVehRandomDistribution_dontBlockNode + ", " 
+					+ NodeTransition.moveVehByVehRandomDistribution_nodeBlockedWhenSingleOutlinkFull + " and " 
+						+ NodeTransition.moveVehByVehDeterministicPriorities_nodeBlockedWhenSingleOutlinkFull 
+							+ " are only implemented for the case without lanes. But link " + link.getLink().getId() 
+								+ " in your scenario has more than one lane. "
+									+ "Use the default node transiton " + NodeTransition.emptyBufferAfterBufferRandomDistribution_dontBlockNode
+										+ " or " + NodeTransition.emptyBufferAfterBufferRandomDistribution_nodeBlockedWhenSingleOutlinkFull 
+											+ " or adapt the implementation such that it also works for lanes.");
+		}
+		for (QLaneI lane : link.getOfferingQLanes()) {
+			if (! lane.isNotOfferingVehicle()) {
+				QVehicle veh = lane.getFirstVehicle();
+				if (moveVehicleOverNode(veh, link, lane, now)) {
+					// vehicle was moved. stop here
+					return true;
+				} else {
+					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red. 
+					if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
+						// next link/lane is jammed. stop vehicle moving for the whole node
+						return false;
+					} else {
+						// try next lane
+						continue;
 					}
 				}
 			}
 		}
-		
-		return true;
+		return false;
 	}
 	
 	private void moveLink(final QLinkI link, final double now){
@@ -177,7 +362,14 @@ final class QNodeImpl extends AbstractQNode {
 			while (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
 				if (! moveVehicleOverNode(veh, link, lane, now )) {
-					break;
+					// vehicle was not moved, e.g. because the next link is jammed or a traffic light on this link shows red. 
+					if (this.stopMoveNodeWhenSingleOutlinkFull && this.atLeastOneOutgoingLaneIsJammed) {
+						// next link/lane is jammed. stop vehicle moving for the whole node
+						return;
+					} else {
+						// try next lane
+						break;
+					}
 				}
 			}
 		}
@@ -209,8 +401,10 @@ final class QNodeImpl extends AbstractQNode {
 		if (nextQueueLane.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLane, nextLinkId, nextQueueLane);
 			return true;
-		}
-		
+		} 
+		// else, i.e. next link or lane is jammed
+		this.atLeastOneOutgoingLaneIsJammed = true;
+				
 		if (vehicleIsStuck(fromLane, now)) {
 			/* We just push the vehicle further after stucktime is over, regardless
 			 * of if there is space on the next link or not.. optionally we let them
@@ -268,7 +462,7 @@ final class QNodeImpl extends AbstractQNode {
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 		
 		// -->
-		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
+		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId));
 		// <--
 		nextQueueLane.addFromUpstream(veh);
 	}

@@ -19,14 +19,13 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.ChargingWithAssignmentLogic;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 
 class AssignmentChargerPlugData {
 	static class ChargerPlug {
@@ -44,7 +43,7 @@ class AssignmentChargerPlugData {
 
 		int idx = 0;
 		for (Charger c : chargers) {
-			ChargingWithQueueingAndAssignmentLogic logic = (ChargingWithQueueingAndAssignmentLogic)c.getLogic();
+			ChargingWithAssignmentLogic logic = (ChargingWithAssignmentLogic)c.getLogic();
 
 			int dispatched = logic.getAssignedVehicles().size();
 			int queued = logic.getQueuedVehicles().size();
@@ -60,7 +59,7 @@ class AssignmentChargerPlugData {
 			int unassignedPlugs = Math.max(c.getPlugCount() - assignedVehicles, 0);
 			for (int p = 0; p < unassignedPlugs; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
-				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), currentTime));
+				builder.add(new DestEntry<>(idx++, plug, c.getLink(), currentTime));
 			}
 
 			// we do not want to have long queues at chargers: 1 awaiting veh per plug is the limit
@@ -79,7 +78,7 @@ class AssignmentChargerPlugData {
 			double chargeStart = currentTime + assignedWorkload / (c.getPlugCount() - unassignedPlugs);
 			for (int p = unassignedPlugs; p < assignableVehicles; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
-				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), chargeStart));
+				builder.add(new DestEntry<>(idx++, plug, c.getLink(), chargeStart));
 			}
 		}
 
