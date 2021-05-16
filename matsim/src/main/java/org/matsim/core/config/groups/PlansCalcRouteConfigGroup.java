@@ -377,11 +377,19 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public void addTeleportedModeParams( final TeleportedModeParams pars ) {
 		this.addModeRoutingParams( pars );
 	}
+	/**
+	 * @deprecated -- try to use {@link #addTeleportedModeParams(TeleportedModeParams)} instead.
+	 */
 	public void addModeRoutingParams(final ModeRoutingParams pars) {
 		testForLocked() ;
 		addParameterSet( pars );
 	}
-	
+	public void removeTeleportedModeParams( String key ){
+		this.removeModeRoutingParams( key );
+	}
+	/**
+	 * @deprecated -- try to use {@link #removeTeleportedModeParams(String)} instead.
+	 */
 	public void removeModeRoutingParams( String key ) {
 		testForLocked() ;
 		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
