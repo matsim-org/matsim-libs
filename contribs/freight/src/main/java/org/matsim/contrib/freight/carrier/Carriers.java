@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class Carriers {
 
-	private static Logger log = Logger.getLogger(Carriers.class);
+	private static final  Logger log = Logger.getLogger(Carriers.class);
 	
 	private Map<Id<Carrier>, Carrier> carriers = new HashMap<>();
 

@@ -53,7 +53,7 @@ import com.google.inject.util.Modules;
 public final class Injector {
 	private Injector(){} // namespace only, do not instantiate
 
-	private static Logger logger = Logger.getLogger(Injector.class);
+	private static final  Logger logger = Logger.getLogger(Injector.class);
 
 	public static com.google.inject.Injector createInjector(final Config config, Module... modules) {
 		com.google.inject.Injector bootstrapInjector = Guice.createInjector(new Module() {

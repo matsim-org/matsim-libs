@@ -38,8 +38,8 @@ public class TravelDistanceStatsTest {
 	HashMap<String, Integer> person3modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person1modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
-	private static int avglegdis;
-	private static int avgtripdis;
+	private int avglegdis;
+	private int avgtripdis;
 	private Double person1legsum;
 	private Double person2legsum;
 	private Double person3legsum;
@@ -390,7 +390,7 @@ public class TravelDistanceStatsTest {
 
 	}
 
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

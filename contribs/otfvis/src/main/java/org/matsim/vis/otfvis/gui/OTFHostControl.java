@@ -37,7 +37,7 @@ import org.matsim.vis.otfvis.interfaces.OTFServer;
 
 public class OTFHostControl implements GLEventListener {
 
-	private static Logger log = Logger.getLogger(OTFHostControl.class);
+	private static final Logger log = Logger.getLogger(OTFHostControl.class);
 	private final Component canvas;
 
 	private final BoundedRangeModel simTime;

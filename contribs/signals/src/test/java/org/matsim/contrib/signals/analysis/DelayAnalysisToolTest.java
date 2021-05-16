@@ -57,10 +57,10 @@ public class DelayAnalysisToolTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	private static Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
-	private static Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
-	private static Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
-	private static Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
+	private final Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
+	private final Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
+	private final Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
+	private final Id<Link> LINK_ID4 = Id.create("Link4", Link.class);
 	
 	//optionally to be modified
 	private static final boolean WRITE_OUTPUT = false;
@@ -146,7 +146,7 @@ public class DelayAnalysisToolTest {
 		return scenario;
 	}
 	
-	static void createNetwork(Scenario scenario){
+	void createNetwork(Scenario scenario){
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 
@@ -187,7 +187,7 @@ public class DelayAnalysisToolTest {
 		network.addLink(link4);	
 	}
 	
-	private static void createPopulation(Scenario scenario, int numberOfPersons) {
+	private void createPopulation(Scenario scenario, int numberOfPersons) {
 		Population population = scenario.getPopulation();
         PopulationFactory popFactory = (PopulationFactory) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();

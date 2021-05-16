@@ -62,7 +62,7 @@ class TimeAndSpaceTourRouter {
 	
 	
 	@SuppressWarnings("unused")
-	private static Logger logger = Logger.getLogger(TimeAndSpaceTourRouter.class);
+	private static final Logger logger = Logger.getLogger(TimeAndSpaceTourRouter.class);
 	
 	private LeastCostPathCalculator router;
 	

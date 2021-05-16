@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 */
 class XMLReader implements RunnableSource {
 
- private static Logger log = Logger.getLogger( XMLReader.class.getName() );
+ private static final Logger log = Logger.getLogger( XMLReader.class.getName() );
 
  private Sink sink;
 

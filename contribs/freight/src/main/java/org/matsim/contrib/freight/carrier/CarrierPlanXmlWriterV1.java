@@ -28,7 +28,7 @@ import org.matsim.core.utils.misc.Time;
 @Deprecated
 public class CarrierPlanXmlWriterV1 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
+	private static final  Logger logger = Logger.getLogger(CarrierPlanXmlWriterV1.class);
 
 	private Collection<Carrier> carriers;
 

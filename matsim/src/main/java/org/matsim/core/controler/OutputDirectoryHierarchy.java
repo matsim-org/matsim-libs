@@ -42,7 +42,7 @@ public final class OutputDirectoryHierarchy {
 
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
-	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
+	private static final  Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
 	
 	private String runId = null;
 	

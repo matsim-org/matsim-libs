@@ -77,7 +77,7 @@ public final class SumScoringFunction implements ScoringFunction {
 		void handleEvent( final Event event ) ;
 	}
 
-	private static Logger log = Logger.getLogger(SumScoringFunction.class);
+	private static final  Logger log = Logger.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<>();
 	private ArrayList<ActivityScoring> activityScoringFunctions = new ArrayList<>();
