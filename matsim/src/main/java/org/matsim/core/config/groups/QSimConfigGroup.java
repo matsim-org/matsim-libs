@@ -95,7 +95,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
-	private boolean usePersonIdForMissingVehicleId = false;
+	private boolean usePersonIdForMissingVehicleId = true;
 	@Positive
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
