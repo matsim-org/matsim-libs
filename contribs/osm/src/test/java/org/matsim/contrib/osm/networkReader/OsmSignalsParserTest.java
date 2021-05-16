@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 public class OsmSignalsParserTest {
 
-	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 

@@ -45,10 +45,10 @@ public class ScoreStatsControlerListenerTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	private static int avgexecuted;
-	private static int avgworst;
-	private static int avgaverage;
-	private static int avgbest;
+	private int avgexecuted;
+	private int avgworst;
+	private int avgaverage;
+	private int avgbest;
 	
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Population population = scenario.getPopulation();
@@ -592,7 +592,7 @@ public class ScoreStatsControlerListenerTest {
 		return size;
 	}
 	
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

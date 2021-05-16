@@ -41,13 +41,13 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class ModeStatsControlerListenerTest {
 
-	static int bike;
-	static int car;
-	static int pt;
-	static int other;
-	static int non_network_walk;
-	static int ride;
-	static int walk;
+	int bike;
+	int car;
+	int pt;
+	int other;
+	int non_network_walk;
+	int ride;
+	int walk;
 	HashMap<String, Integer> person3modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person1modes = new HashMap<String, Integer>();
 	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
@@ -468,7 +468,7 @@ public class ModeStatsControlerListenerTest {
 	}
 
 	//Identifying column numbers of each mode in the text file, if any one of the modes is not in the text file it will be assigned with default 0 value
-	private static void decideColumns(String[] columnNames) {
+	private void decideColumns(String[] columnNames) {
 
 		Integer i = 0;
 		while (i < columnNames.length) {

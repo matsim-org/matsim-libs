@@ -151,7 +151,7 @@ public class CreateAutomatedFDTest {
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
-	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
+	GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 
 	private final static Logger LOG = Logger.getLogger(CreateAutomatedFDTest.class);
 
@@ -320,7 +320,7 @@ public class CreateAutomatedFDTest {
 		}
 	}
 	
-	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
+	class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
 
 		private final Id<Link> ORIGIN_LINK_ID = Id.createLinkId("home");
 		private final Id<Link> BASE_LINK_ID = Id.createLinkId(0);
