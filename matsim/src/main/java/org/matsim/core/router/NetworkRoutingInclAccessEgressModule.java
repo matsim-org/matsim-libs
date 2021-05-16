@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -202,6 +204,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (mode.equals(TransportMode.walk)) {
 			Leg egressLeg = populationFactory.createLeg(TransportMode.non_network_walk);
+			// (Here we need the non_network_walk!! ... since we need a way to bushwhack from the facility to the walk network!  kai, may'21)
+
 			egressLeg.setDepartureTime(departureTime);
 			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), departureTime, startLinkId, endLinkId, populationFactory, config);
 			egressTrip.add(egressLeg);
@@ -251,6 +255,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (mode.equals(TransportMode.walk)) {
 			Leg accessLeg = populationFactory.createLeg(TransportMode.non_network_walk);
+			// (Here we need the non_network_walk!! ... since we need a way to bushwhack from the facility to the walk network!  kai, may'21)
+
 			accessLeg.setDepartureTime(departureTime);
 
 			Id<Link> startLinkId = fromFacility.getLinkId();
@@ -313,10 +319,20 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		} else if ((tmp = paramsMap.get(TransportMode.walk)) != null) {
 			params = tmp;
 		} else {
-			params = new ModeRoutingParams();
-			// old defaults
-			params.setBeelineDistanceFactor(1.3);
-			params.setTeleportedModeSpeed(2.0);
+			log.fatal( "Teleportation (= mode routing) params neither defined for " + TransportMode.walk + " nor for " + TransportMode.non_network_walk + ".  There are two cases:" ); ;
+			log.fatal( "(1) " + TransportMode.walk + " is teleported.  Then you need to define the corresponding teleportation (= mode routing) params for " + TransportMode.walk + "." );
+			log.fatal( "(2) " + TransportMode.walk + " is routed on the network.  Then you need to define the corresponding teleportation (= mode routing) params for "
+						  + TransportMode.non_network_walk + ".");
+			log.fatal("The old default fallback bevhavior was disabled in may'21.");
+			throw new RuntimeException( "Need teleportation params for bushwhaking modes.  See log statements above." );
+
+//			params = new ModeRoutingParams();
+//			// old defaults
+//			params.setBeelineDistanceFactor(1.3);
+//			params.setTeleportedModeSpeed(2.0);
+
+			// yyyyyy The above may be a source for buggy behavior: If the teleportation params are cleared, then presumably also the
+			// non-network routing is cleared, and then here it will fall back on the auto-magic behavior.  kai, may'21.
 		}
 
 		routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
