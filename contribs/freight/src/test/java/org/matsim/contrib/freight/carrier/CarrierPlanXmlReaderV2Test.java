@@ -21,8 +21,7 @@ import org.matsim.vehicles.Vehicle;
 
 public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 
-	private static Logger log = Logger.getLogger(CarrierPlanXmlReaderV2Test.class);
-	Carrier testCarrier;
+	private Carrier testCarrier;
 	
 	@Override
 	public void setUp() throws Exception{

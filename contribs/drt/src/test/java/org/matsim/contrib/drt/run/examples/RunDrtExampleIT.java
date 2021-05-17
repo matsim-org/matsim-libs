@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import org.assertj.core.data.Percentage;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.insertion.DrtRequestInsertionRetryParams;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -54,6 +55,7 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunDrtExampleWithRequestRetry() {
+		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
@@ -80,6 +82,7 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunDrtStopbasedExample() {
+		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_stop_based_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
@@ -102,6 +105,7 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunServiceAreabasedExampleWithSpeedUp() {
+		Id.resetCaches();
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_serviceArea_based_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),

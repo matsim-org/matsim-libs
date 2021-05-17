@@ -15,6 +15,6 @@ public interface RaptorStopFinder {
 
 	public enum Direction { ACCESS, EGRESS }
 
-	List<InitialStop> findStops(Facility facility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, Direction type);
+	List<InitialStop> findStops(Facility fromFacility, Facility toFacility, Person person, double departureTime, RaptorParameters parameters, SwissRailRaptorData data, Direction type);
 
 }

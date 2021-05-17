@@ -53,8 +53,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		this.lcContext = lcContext;
 	}
 
-	private static int cnt = 0 ;
-	
 	public double getDestinationScore(Activity act, double fVar, int activityIndex, Id<Person> personId) {
 		Level lvl = Level.INFO ;
 		double score = 0.0;

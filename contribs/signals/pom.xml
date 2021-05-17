@@ -8,13 +8,6 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>signals</artifactId>
   <name>signals</name>
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.matsim</groupId>

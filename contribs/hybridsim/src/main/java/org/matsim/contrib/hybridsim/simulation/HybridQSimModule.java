@@ -11,7 +11,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
 public class HybridQSimModule extends AbstractQSimModule {
-	static public String HYBRID_EXTERNAL_ENGINE_NAME = "HybridExternalEngine";
+	public static final  String HYBRID_EXTERNAL_ENGINE_NAME = "HybridExternalEngine";
 
 	@Override
 	protected void configureQSim() {

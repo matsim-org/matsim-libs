@@ -12,7 +12,7 @@ import java.io.IOException;
 @Deprecated // only there if someone insists on writing V1
 public final class CarrierVehicleTypeWriterV1 extends MatsimXmlWriter {
 
-	private static Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class );
+	private static final  Logger logger = Logger.getLogger(CarrierVehicleTypeWriter.class );
 
 	private CarrierVehicleTypes vehicleTypes;
 

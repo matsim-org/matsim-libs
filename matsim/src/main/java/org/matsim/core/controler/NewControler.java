@@ -34,7 +34,7 @@ import java.util.Set;
 class NewControler extends AbstractController implements ControlerI {
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(NewControler.class);
+	private static final Logger log = Logger.getLogger(NewControler.class);
 
 	private final Config config;
 	private final PrepareForSim prepareForSim;

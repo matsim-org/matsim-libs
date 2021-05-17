@@ -11,10 +11,9 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 
-	private static Logger log = Logger.getLogger(CarrierVehicleTypeLoaderTest.class);
 
-	CarrierVehicleTypes types;
-	Carriers carriers;
+	private CarrierVehicleTypes types;
+	private Carriers carriers;
 	
 	@Override
 	public void setUp() throws Exception{

@@ -48,7 +48,7 @@ import java.util.Set;
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class) ;
+	private static final  Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class);
 	
 	public VspConfigConsistencyCheckerImpl() {
 		// empty.  only here to find out where it is called.

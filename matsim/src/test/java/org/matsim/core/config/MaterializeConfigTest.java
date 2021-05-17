@@ -65,7 +65,7 @@ public class MaterializeConfigTest {
 }
 
 class TestConfigGroup extends ReflectiveConfigGroup {
-	public static String GROUP_NAME = "my group";
+	public static final String GROUP_NAME = "my group";
 	private int myField = 42;
 
 	public TestConfigGroup() {

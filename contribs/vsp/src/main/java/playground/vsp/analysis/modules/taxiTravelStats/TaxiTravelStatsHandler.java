@@ -52,7 +52,7 @@ public class TaxiTravelStatsHandler implements ActivityEndEventHandler, LinkEnte
 	
 	private static final Logger log = Logger.getLogger(TaxiTravelStatsHandler.class);
 	
-	private static int STANDARD_TAXI_CAPACITY = 1;
+	private static final  int STANDARD_TAXI_CAPACITY = 1;
 	
 	private final MutableScenario scenario;
 	private final Double interval;
