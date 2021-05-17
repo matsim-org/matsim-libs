@@ -432,7 +432,41 @@ public class IdentifiableArrayMapTest {
 			log.info("catched expected exception.");
 		}
 	}
-	
+
+	@Test
+	public void testValuesToArray() {
+		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
+		Id<TO> id1 = Id.create(1, TO.class);
+		Id<TO> id2 = Id.create(2, TO.class);
+		Id<TO> id3 = Id.create(3, TO.class);
+
+		TO to1 = new TO(id1);
+		TO to2 = new TO(id2);
+		TO to3 = new TO(id3);
+
+		map.put(id1, to1);
+		map.put(id2, to2);
+		map.put(id3, to3);
+
+		Object[] array1 = map.values().toArray();
+		Assert.assertEquals(3, array1.length);
+		Assert.assertEquals(to1, array1[0]);
+		Assert.assertEquals(to2, array1[1]);
+		Assert.assertEquals(to3, array1[2]);
+
+		TO[] array2 = map.values().toArray(new TO[0]);
+		Assert.assertEquals(3, array2.length);
+		Assert.assertEquals(to1, array2[0]);
+		Assert.assertEquals(to2, array2[1]);
+		Assert.assertEquals(to3, array2[2]);
+
+		TO[] array3 = map.values().toArray(new TO[3]);
+		Assert.assertEquals(3, array3.length);
+		Assert.assertEquals(to1, array3[0]);
+		Assert.assertEquals(to2, array3[1]);
+		Assert.assertEquals(to3, array3[2]);
+	}
+
 	@Test
 	public void testValuesIterator_SingleDiretor() {
 		Map<Id<TO>, TO> map = new IdentifiableArrayMap<>();
