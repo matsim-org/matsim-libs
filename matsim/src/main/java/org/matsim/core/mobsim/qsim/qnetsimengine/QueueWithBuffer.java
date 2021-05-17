@@ -372,8 +372,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
-		double now = context.getSimTimer().getTimeOfDay() ;
-		
+//		double now = context.getSimTimer().getTimeOfDay() ;
+
 		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 //		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -1026,12 +1026,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private int noOfSeepModeBringFwd = 0;
 
 	private QVehicle peekFromVehQueue(){
-		double now = context.getSimTimer().getTimeOfDay() ;
 
 		QVehicle returnVeh = vehQueue.peek();
 
 		if( context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ ) {
-			
+			double now = context.getSimTimer().getTimeOfDay();
+
 			int maxSeepModeAllowed = 4;
 			if( context.qsimConfig.isRestrictingSeepage() && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;
