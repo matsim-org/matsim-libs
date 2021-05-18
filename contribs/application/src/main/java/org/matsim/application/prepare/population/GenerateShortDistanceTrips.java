@@ -90,6 +90,10 @@ public class GenerateShortDistanceTrips implements MATSimAppCommand {
                     personsInCityBoundary.add(person.getId());
                 }
             }
+
+            log.info("The total population size is " + population.getPersons().values().size());
+            log.info("The population size inside the city for this simulation setup is " + homeLocationFilter.size());
+
         } else
             personsInCityBoundary.addAll(population.getPersons().keySet());
 
