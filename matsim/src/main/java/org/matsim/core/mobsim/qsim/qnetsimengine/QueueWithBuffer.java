@@ -184,7 +184,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final NetsimEngineContext context;
 
-	private double maxInFlowUsedInQsim = Double.POSITIVE_INFINITY ;
+	private double maxInflowUsedInQsim = Double.POSITIVE_INFINITY ;
 	private double effectiveNumberOfLanesUsedInQsim = Double.POSITIVE_INFINITY ;
 
 	private double accumulatedInflowCap = 1. ;
@@ -382,7 +382,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		
 		// start with the base assumption, might be adjusted below depending on the traffic dynamics
 		this.effectiveNumberOfLanesUsedInQsim = this.effectiveNumberOfLanes;
-		this.maxInFlowUsedInQsim = this.flowCapacityPerTimeStep;
+		this.maxInflowUsedInQsim = this.flowCapacityPerTimeStep;
 		
 		switch (context.qsimConfig.getTrafficDynamics()) {
 			case queue:
@@ -401,22 +401,22 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				final double maxFlowFromFdiag = (this.effectiveNumberOfLanes/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
 				final double minimumNumberOfLanesFromFdiag = this.flowCapacityPerTimeStep * context.effectiveCellSize * ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() );
 
-				QSimConfigGroup.InFlowCapacitySetting inFlowCapacitySetting = context.qsimConfig.getInFlowCapacitySetting();
+				QSimConfigGroup.InflowCapacitySetting inflowCapacitySetting = context.qsimConfig.getInFlowCapacitySetting();
 
-				if(inFlowCapacitySetting == QSimConfigGroup.InFlowCapacitySetting.MAX_CAP_FOR_ONE_LANE){
+				if(inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE){
 					if (wrnCnt<10) {
 						wrnCnt++ ;
 						log.warn("you are using the maximum capacity for one lane as the inflow capacity. This is the old standard behavior of the qsim and probably leads to wrong results " +
 								" as it does not respect the actual number of lanes nor the user-defined flow capacity. Please consider using" +
-								"InFlowCapacitySetting.INCREASE_NUMBER_OF_LANES or InFlowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
+								"InflowCapacitySetting.INCREASE_NUMBER_OF_LANES or InflowCapacitySetting.REDUCE_INFLOW_CAPACITY instead.");
 					}
 					if ( wrnCnt==5 ) { //this verbose warning is only given 5 times
 						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 					}
 
-					this.maxInFlowUsedInQsim = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
+					this.maxInflowUsedInQsim = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
 					// write out the modified qsim behavior as link attribute
-					qLink.getLink().getAttributes().putAttribute("maxInFlowUsedInQsim", 3600* maxInFlowUsedInQsim /context.qsimConfig.getTimeStepSize());
+					qLink.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600* maxInflowUsedInQsim /context.qsimConfig.getTimeStepSize());
 
 				} else  {
 					if ( maxFlowFromFdiag < flowCapacityPerTimeStep ){ //warnings
@@ -434,27 +434,27 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 								log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 							}
 						}
-						if (inFlowCapacitySetting == QSimConfigGroup.InFlowCapacitySetting.INFLOW_FROM_FDIAG) {
+						if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
 							if (wrnCnt<10) {
-								log.warn("The flow capacity will be reduced. See link attribute 'maxInFlowUsedInQsim' written into the output network.");
+								log.warn("The flow capacity will be reduced. See link attribute 'maxInflowUsedInQsim' written into the output network.");
 							}
-						} else if (inFlowCapacitySetting == QSimConfigGroup.InFlowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
+						} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
 							if (wrnCnt<10) {
 								log.warn("The number of lanes will be increased. See link attribute 'effectiveNumberOfLanesUsedInQsim' written into the output network.");
 							}
 						}
 					}
 					// now either correct the flow capacity or the number of lanes!
-					if (inFlowCapacitySetting == QSimConfigGroup.InFlowCapacitySetting.INFLOW_FROM_FDIAG) {
-						this.maxInFlowUsedInQsim = maxFlowFromFdiag;
+					if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG) {
+						this.maxInflowUsedInQsim = maxFlowFromFdiag;
 						// write out the modified qsim behavior as link attribute
-						qLink.getLink().getAttributes().putAttribute("maxInFlowUsedInQsim", 3600* maxInFlowUsedInQsim /context.qsimConfig.getTimeStepSize());
-					} else if (inFlowCapacitySetting == QSimConfigGroup.InFlowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
+						qLink.getLink().getAttributes().putAttribute("maxInflowUsedInQsim", 3600* maxInflowUsedInQsim /context.qsimConfig.getTimeStepSize());
+					} else if (inflowCapacitySetting == QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG) {
 						this.effectiveNumberOfLanesUsedInQsim = minimumNumberOfLanesFromFdiag;
 						// write out the modified qsim behavior as link attribute
 						qLink.getLink().getAttributes().putAttribute("effectiveNumberOfLanesUsedInQsim", effectiveNumberOfLanesUsedInQsim);
 					} else {
-						throw new RuntimeException("The approach "+ inFlowCapacitySetting.toString()+" is not implemented yet.");
+						throw new RuntimeException("The approach "+ inflowCapacitySetting.toString()+" is not implemented yet.");
 					}
 				}
 				break;
@@ -569,7 +569,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				this.processArrivalOfHoles( ) ;
 				break;
 			case kinematicWaves:
-				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxInFlowUsedInQsim, maxInFlowUsedInQsim);
+				this.accumulatedInflowCap = Math.min(accumulatedInflowCap + maxInflowUsedInQsim, maxInflowUsedInQsim);
 				this.processArrivalOfHoles( ) ;
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
