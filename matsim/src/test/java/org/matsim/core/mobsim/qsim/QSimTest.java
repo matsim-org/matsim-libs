@@ -1537,7 +1537,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithFlowReductionCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setInFlowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG);
+		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.INFLOW_FROM_FDIAG);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -1597,7 +1597,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithLaneIncreaseCorrectionBehavior() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setInFlowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
+		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.NR_OF_LANES_FROM_FDIAG);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
@@ -1657,7 +1657,7 @@ public class QSimTest {
 	public void testFlowCapacityDrivingKinematicWavesWithInflowEqualToMaxCapForOneLane() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate, numberOfThreads);
 		f.config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
-		f.config.qsim().setInFlowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE);
+		f.config.qsim().setInflowCapacitySetting(QSimConfigGroup.InflowCapacitySetting.MAX_CAP_FOR_ONE_LANE);
 
 		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
