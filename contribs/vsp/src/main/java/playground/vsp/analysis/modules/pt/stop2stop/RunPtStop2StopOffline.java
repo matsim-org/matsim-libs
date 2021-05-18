@@ -25,32 +25,48 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.MatsimVehicleReader;
 
 /**
  * Example runner for offline (after simulation has finished) usage of {@link PtStop2StopAnalysis}.
+ *
+ * @author vsp-gleich
  */
 public class RunPtStop2StopOffline {
     private static final Logger log = Logger.getLogger(RunPtStop2StopOffline.class);
 
     public static void main(String[] args) {
-        String eventsFile = "/home/gregor/tmp/i364/i364.output_events.xml.gz";
-        String transitVehiclesFile = "/home/gregor/tmp/i364/i364.output_transitVehicles.xml.gz";
-        String outputCsvByDeparture = "/home/gregor/tmp/i364/i364.pt_stop2stop_departures.csv.gz";
-        String outputCsvByLine = "/home/gregor/tmp/i364/i364.pt_stop2stop_lines.csv.gz";
+//        String eventsFile = "/home/gregor/tmp/i364/i364.output_events.xml.gz";
+//        String transitVehiclesFile = "/home/gregor/tmp/i364/i364.output_transitVehicles.xml.gz";
+//        String outputCsvByDeparture = "/home/gregor/tmp/i364/i364.pt_stop2stop_departures.csv.gz";
+//        String outputCsvByLine = "/home/gregor/tmp/i364/i364.pt_stop2stop_lines.csv.gz";
 //        String eventsFile = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.output_events.xml.gz";
 //        String transitVehiclesFile = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.output_transitVehicles.xml.gz";
 //        String outputCsvByDeparture = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.pt_stop2stop_departures.csv.gz";
 //        String outputCsvByLine = "/home/gregor/git/runs-svn/avoev/snz-vulkaneifel/output-Vu-BC/Vu-BC.pt_stop2stop_lines.csv.gz";
-//        String eventsFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_events.xml.gz";
-//        String transitVehiclesFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_transitVehicles.xml.gz";
-//        String outputCsvByDeparture = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_departures.csv.gz";
-//        String outputCsvByLine = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_lines.csv.gz";
+        String eventsFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_events.xml.gz";
+        String networkFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_network.xml.gz";
+        String transitScheduleFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_transitSchedule.xml.gz";
+        String transitVehiclesFile = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/output_transitVehicles.xml.gz";
+        String outputCsvByDeparture = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_departures.csv.gz";
+        String outputCsvByLine = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_lines.csv.gz";
+        String outputShpByLine = "/home/gregor/git/runs-svn/capetown-minibuses/output-minibus-wo-transit/100pct/2019-02-05_100pct_rest0/pt_stop2stop_lines.shp";
         String sep = ",";
         String sep2 = ";";
+        String coordinateReferenceSystem = "EPSG:31468";
 
         Scenario dummyScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+        //read network and schedule for shapefile coord drawing
+        MatsimNetworkReader networkReader = new MatsimNetworkReader(dummyScenario.getNetwork());
+        networkReader.readFile(networkFile);
+
+        TransitScheduleReader scheduleReader = new TransitScheduleReader(dummyScenario);
+        scheduleReader.readFile(transitScheduleFile);
+
         MatsimVehicleReader transitVehicleReader = new MatsimVehicleReader(dummyScenario.getTransitVehicles());
         transitVehicleReader.readFile(transitVehiclesFile);
 
@@ -64,6 +80,7 @@ public class RunPtStop2StopOffline {
 
         ptStop2StopAnalysis.writeStop2StopEntriesByDepartureCsv(outputCsvByDeparture, sep, sep2);
         log.info("ptStop2StopAnalysis.writeStop2StopEntriesByDepartureCsv done");
-        //PtStop2StopAnalysis2Shp.writePtStop2StopAnalysisByTransitLine2ShpFile(ptStop2StopAnalysis.getStop2StopEntriesByDeparture(), "", outputCsvByLine, sep);
+        PtStop2StopAnalysis2Shp.writePtStop2StopAnalysisByTransitLine2ShpFile(dummyScenario, ptStop2StopAnalysis.getStop2StopEntriesByDeparture(), outputShpByLine, coordinateReferenceSystem);
+        PtStop2StopAnalysis2Shp.writePtStop2StopAnalysisByTransitLine2CsvFile(dummyScenario, ptStop2StopAnalysis.getStop2StopEntriesByDeparture(), outputCsvByLine, sep);
     }
 }

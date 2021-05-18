@@ -42,6 +42,7 @@ import org.matsim.vehicles.Vehicles;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -266,7 +267,7 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
             this.linkIdsSincePreviousStop = List.copyOf(linkIdsSincePreviousStop);
         }
 
-        // getter for usage of standard Comparator implementations below
+        // getter for usage of standard Comparator implementations below and more
         public Id<TransitLine> getTransitLineId() {
             return transitLineId;
         }
@@ -289,6 +290,42 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 
         public Id<TransitStopFacility> getStopPreviousId() {
             return stopPreviousId;
+        }
+
+        public double getArrivalTimeScheduled() {
+            return arrivalTimeScheduled;
+        }
+
+        public double getArrivalDelay() {
+            return arrivalDelay;
+        }
+
+        public double getDepartureTimeScheduled() {
+            return departureTimeScheduled;
+        }
+
+        public double getDepartureDelay() {
+            return departureDelay;
+        }
+
+        public int getPassengersAtArrival() {
+            return passengersAtArrival;
+        }
+
+        public double getTotalVehicleCapacity() {
+            return totalVehicleCapacity;
+        }
+
+        public int getPassengersAlighting() {
+            return passengersAlighting;
+        }
+
+        public int getPassengersBoarding() {
+            return passengersBoarding;
+        }
+
+        public List<Id<Link>> getLinkIdsSincePreviousStop() {
+            return linkIdsSincePreviousStop;
         }
     }
 
@@ -339,5 +376,35 @@ public class PtStop2StopAnalysis implements TransitDriverStartsEventHandler, Veh
 
     public List<Stop2StopEntry> getStop2StopEntriesByDeparture () {
         return List.copyOf(stop2StopEntriesForEachDeparture);
+    }
+
+    static final class Stop2StopAggregation {
+
+        private final int departures;
+        private final long passengers;
+        private final double totalVehicleCapacity;
+
+        Stop2StopAggregation (int departures, long passengers, double totalVehicleCapacity) {
+            this.departures = departures;
+            this.passengers = passengers;
+            this.totalVehicleCapacity = totalVehicleCapacity;
+        }
+
+        public int getDepartures() {
+            return departures;
+        }
+
+        public long getPassengers() {
+            return passengers;
+        }
+
+        public double getTotalVehicleCapacity() {
+            return totalVehicleCapacity;
+        }
+    }
+
+    public static final BinaryOperator<Stop2StopAggregation> aggregateStop2StopAggregations() {
+        return (entry1, entry2) -> new PtStop2StopAnalysis.Stop2StopAggregation(entry1.getDepartures() + entry2.getDepartures(), entry1.getPassengers() + entry2.getPassengers(),
+                entry1.getTotalVehicleCapacity() + entry2.getTotalVehicleCapacity());
     }
 }
